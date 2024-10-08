@@ -3273,8 +3273,8 @@ ReportDefinitions:
     WHERE payment.tenantid =$tenantid 
       AND payment.paymentstatus != 'CANCELLED' 
       AND pd.businessservice = 'WS.ONE_TIME_FEE'
-      AND pd.receiptdate >= 1725129000000 
-      AND pd.receiptdate <= 1727688900000
+      AND pd.receiptdate >= $fromDate 
+      AND pd.receiptdate <= $toDate
     GROUP BY pdid
     )
     SELECT 
@@ -3303,7 +3303,7 @@ ReportDefinitions:
     WHERE payment.paymentstatus != 'CANCELLED'
     AND pd.businessservice = 'WS.ONE_TIME_FEE
     AND payment.tenantid =$tenantid
-    ORDER BY pd.receiptdate DESC;
+  orderby:  ORDER BY pd.receiptdate DESC;
     
 - reportName: SewerageReportUlb
   summary:  Sewerage Report Ulb
@@ -3426,8 +3426,8 @@ ReportDefinitions:
     WHERE payment.tenantid =$tenantid 
       AND payment.paymentstatus != 'CANCELLED' 
       AND pd.businessservice = 'SW.ONE_TIME_FEE'
-      AND pd.receiptdate >= 1725129000000 
-      AND pd.receiptdate <= 1727688900000
+      AND pd.receiptdate >= $fromDate 
+      AND pd.receiptdate <= $toDate
     GROUP BY pdid
     )
     SELECT 
@@ -3440,7 +3440,7 @@ ReportDefinitions:
     payment.transactionnumber,
     receipt_breakup.*,
     TO_CHAR(TO_TIMESTAMP(pd.manualreceiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS g8issuedate, 
-    pd.manualreceiptnumber AS g8receiptno,s
+    pd.manualreceiptnumber AS g8receiptno,
     sw.additionaldetails->>'waterSubUsageType' as usageType,
     sw.additionaldetails->>'ledgerid' as ledgerid,
     pt.propertyid as propertyid,
@@ -3456,6 +3456,6 @@ ReportDefinitions:
     WHERE payment.paymentstatus != 'CANCELLED'
     AND pd.businessservice = 'SW.ONE_TIME_FEE'
     AND payment.tenantid =$tenantid
-    ORDER BY pd.receiptdate DESC;
+  orderby:  ORDER BY pd.receiptdate DESC
 
       
