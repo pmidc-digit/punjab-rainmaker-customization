@@ -3301,7 +3301,7 @@ ReportDefinitions:
     inner join eg_pt_property pt on (ws.property_id=pt.propertyid and pt.status!='INACTIVE')
     inner join eg_pt_address pta on (pta.propertyid=pt.id)
     WHERE payment.paymentstatus != 'CANCELLED'
-    AND pd.businessservice = 'WS.ONE_TIME_FEE
+    AND pd.businessservice = 'WS.ONE_TIME_FEE'
     AND payment.tenantid =$tenantid
   orderby:  ORDER BY pd.receiptdate DESC;
     
