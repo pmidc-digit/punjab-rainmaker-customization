@@ -3220,6 +3220,16 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+  - name: ownername
+    label: reports.ws.ownername
+    type: string
+    source: ws
+    total: false
+  - name: connectioncategory
+    label: reports.ws.connectioncategory
+    type: string
+    source: ws
+    total: false
   - name: propertyid
     label: reports.ws.propertyid
     type: string
@@ -3292,7 +3302,9 @@ ReportDefinitions:
     ws.additionaldetails->>'ledgerid' as ledgerid,
     pt.propertyid as propertyid,
     pt.landarea as plotsize,
-    concat(doorno,',',buildingname,',',street,',',city) as address
+    concat(doorno,',',buildingname,',',street,',',city) as address,
+    ws.additionaldetails->>'connectionCategory' as connectioncategory,
+    ws.additionaldetails->>'ownerName' as ownername,
     FROM egcl_paymentdetail pd
     INNER JOIN egcl_payment payment ON pd.paymentid = payment.id
     INNER JOIN egcl_bill bill ON bill.id = pd.billid
@@ -3373,6 +3385,16 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+  - name: ownername
+    label: reports.ws.ownername
+    type: string
+    source: ws
+    total: false
+  - name: connectioncategory
+    label: reports.ws.connectioncategory
+    type: string
+    source: ws
+    total: false
   - name: propertyid
     label: reports.ws.propertyid
     type: string
@@ -3445,7 +3467,9 @@ ReportDefinitions:
     sw.additionaldetails->>'ledgerid' as ledgerid,
     pt.propertyid as propertyid,
     pt.landarea as plotsize,
-    concat(doorno,',',buildingname,',',street,',',city) as address
+    concat(doorno,',',buildingname,',',street,',',city) as address,
+    sw.additionaldetails->>'connectionCategory' as connectioncategory,
+    sw.additionaldetails->>'ownerName' as ownername,
     FROM egcl_paymentdetail pd
     INNER JOIN egcl_payment payment ON pd.paymentid = payment.id
     INNER JOIN egcl_bill bill ON bill.id = pd.billid
