@@ -3304,7 +3304,7 @@ ReportDefinitions:
     pt.landarea as plotsize,
     concat(doorno,',',buildingname,',',street,',',city) as address,
     ws.additionaldetails->>'connectionCategory' as connectioncategory,
-    ws.additionaldetails->>'ownerName' as ownername,
+    ws.additionaldetails->>'ownerName' as ownername
     FROM egcl_paymentdetail pd
     INNER JOIN egcl_payment payment ON pd.paymentid = payment.id
     INNER JOIN egcl_bill bill ON bill.id = pd.billid
@@ -3469,7 +3469,7 @@ ReportDefinitions:
     pt.landarea as plotsize,
     concat(doorno,',',buildingname,',',street,',',city) as address,
     sw.additionaldetails->>'connectionCategory' as connectioncategory,
-    sw.additionaldetails->>'ownerName' as ownername,
+    sw.additionaldetails->>'ownerName' as ownername
     FROM egcl_paymentdetail pd
     INNER JOIN egcl_payment payment ON pd.paymentid = payment.id
     INNER JOIN egcl_bill bill ON bill.id = pd.billid
