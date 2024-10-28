@@ -128,7 +128,7 @@ ReportDefinitions:
     inner join egcl_bill as bill on bill.id=pd.billid    
     inner join egcl_payment as payment on payment.id=pd.paymentid    
     inner join eg_user as usr on usr.id=payment.createdby::integer and payment.paymentstatus!='CANCELLED'
-    where payment.tenantid=$tenantid and pd.businessservice in ('WS','SW') and bill.status='ACTIVE'
+    where payment.tenantid=$tenantid and pd.businessservice in ('WS','SW','WS.ONE_TIME_FEE','SW.ONE_TIME_FEE') and bill.status='ACTIVE'
   orderby: order by pd.receiptdate desc
 
 
