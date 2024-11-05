@@ -3153,6 +3153,7 @@ ReportDefinitions:
       AND (d.status IS NULL OR d.status != 'CANCELLED')
 
 - reportName: WaterReportUlb
+  decryptionPathId: JE_PendencyReport_WS
   summary:  Water Report Ulb
   version: 1.0.0
   moduleName: rainmaker-ws
@@ -3254,7 +3255,17 @@ ReportDefinitions:
     label: reports.ws.g8receiptno
     type: string
     source: ws
-    total: false     
+    total: false
+  - name: name
+    label: reports.ws.approvedby
+    type: string
+    source: ws
+    total: false
+  - name: approvaldate
+    label: reports.ws.approvaldate
+    type: string
+    source: ws
+    total: false
   searchParams:
   - name: fromDate
     label: reports.pt.fromDate
@@ -3304,7 +3315,9 @@ ReportDefinitions:
     pt.landarea as plotsize,
     concat(doorno,',',buildingname,',',street,',',city) as address,
     ws.additionaldetails->>'connectionCategory' as connectioncategory,
-    ws.additionaldetails->>'ownerName' as ownername
+    ws.additionaldetails->>'ownerName' as ownername,
+    eu.name as name,
+    TO_CHAR(TO_TIMESTAMP(pi.lastmodifiedtime / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') as approvaldate
     FROM egcl_paymentdetail pd
     INNER JOIN egcl_payment payment ON pd.paymentid = payment.id
     INNER JOIN egcl_bill bill ON bill.id = pd.billid
@@ -3312,12 +3325,15 @@ ReportDefinitions:
     INNER JOIN eg_ws_connection ws ON ws.applicationno = bill.consumercode
     inner join eg_pt_property pt on (ws.property_id=pt.propertyid and pt.status!='INACTIVE')
     inner join eg_pt_address pta on (pta.propertyid=pt.id)
+    inner join eg_wf_processinstance_v2 pi on (pi.businessid=sw.applicationno and pi.action='APPROVE_FOR_CONNECTION')
+    inner join eg_user eu on eu.uuid=pi.lastmodifiedby
     WHERE payment.paymentstatus != 'CANCELLED'
     AND pd.businessservice = 'WS.ONE_TIME_FEE'
     AND payment.tenantid =$tenantid
   orderby:  ORDER BY pd.receiptdate DESC;
     
 - reportName: SewerageReportUlb
+  decryptionPathId: JE_PendencyReport_WS
   summary:  Sewerage Report Ulb
   version: 1.0.0
   moduleName: rainmaker-ws
@@ -3419,7 +3435,17 @@ ReportDefinitions:
     label: reports.ws.g8receiptno
     type: string
     source: ws
-    total: false     
+    total: false 
+  - name: name
+    label: reports.ws.approvedby
+    type: string
+    source: ws
+    total: false
+  - name: approvaldate
+    label: reports.ws.approvaldate
+    type: string
+    source: ws
+    total: false
   searchParams:
   - name: fromDate
     label: reports.pt.fromDate
@@ -3469,7 +3495,9 @@ ReportDefinitions:
     pt.landarea as plotsize,
     concat(doorno,',',buildingname,',',street,',',city) as address,
     sw.additionaldetails->>'connectionCategory' as connectioncategory,
-    sw.additionaldetails->>'ownerName' as ownername
+    sw.additionaldetails->>'ownerName' as ownername,
+    eu.name as name,
+    TO_CHAR(TO_TIMESTAMP(pi.lastmodifiedtime / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') as approvaldate
     FROM egcl_paymentdetail pd
     INNER JOIN egcl_payment payment ON pd.paymentid = payment.id
     INNER JOIN egcl_bill bill ON bill.id = pd.billid
@@ -3477,6 +3505,8 @@ ReportDefinitions:
     INNER JOIN eg_sw_connection sw ON sw.applicationno = bill.consumercode
     inner join eg_pt_property pt on (sw.property_id=pt.propertyid and pt.status!='INACTIVE')
     inner join eg_pt_address pta on (pta.propertyid=pt.id)
+    inner join eg_wf_processinstance_v2 pi on (pi.businessid=sw.applicationno and pi.action='APPROVE_FOR_CONNECTION')
+    inner join eg_user eu on eu.uuid=pi.lastmodifiedby
     WHERE payment.paymentstatus != 'CANCELLED'
     AND pd.businessservice = 'SW.ONE_TIME_FEE'
     AND payment.tenantid =$tenantid
