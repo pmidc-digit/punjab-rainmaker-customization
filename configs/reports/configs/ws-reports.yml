@@ -3166,6 +3166,16 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+  - name: applicationno
+    label: reports.ws.applicationno
+    type: string
+    source: ws
+    total: false
+  - name: connectionno
+    label: reports.ws.connectionno
+    type: string
+    source: ws
+    total: false
   - name: receiptdate
     label: reports.ws.receiptdate
     type: string
@@ -3311,6 +3321,8 @@ ReportDefinitions:
     pd.manualreceiptnumber AS g8receiptno,
     ws.additionaldetails->>'waterSubUsageType' as usageType,
     ws.additionaldetails->>'ledgerid' as ledgerid,
+    ws.connectionno as connectionno,
+    ws.applicationno as applicationno,
     pt.propertyid as propertyid,
     pt.landarea as plotsize,
     concat(doorno,',',buildingname,',',street,',',city) as address,
@@ -3343,6 +3355,16 @@ ReportDefinitions:
   sourceColumns:
   - name: tenantid
     label: reports.ws.tenantid
+    type: string
+    source: ws
+    total: false
+  - name: applicationno
+    label: reports.ws.applicationno
+    type: string
+    source: ws
+    total: false
+  - name: connectionno
+    label: reports.ws.connectionno
     type: string
     source: ws
     total: false
@@ -3491,6 +3513,8 @@ ReportDefinitions:
     pd.manualreceiptnumber AS g8receiptno,
     sw.additionaldetails->>'waterSubUsageType' as usageType,
     sw.additionaldetails->>'ledgerid' as ledgerid,
+    sw.connectionno  as connectionno,
+    sw.applicationno as applicationno,
     pt.propertyid as propertyid,
     pt.landarea as plotsize,
     concat(doorno,',',buildingname,',',street,',',city) as address,
