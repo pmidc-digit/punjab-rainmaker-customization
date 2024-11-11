@@ -6026,12 +6026,12 @@ ReportDefinitions:
   query: |
     select distinct p.propertyid,p.nooffloors,p.landarea,p.usagecategory,p.surveyid,p.oldpropertyid,u.name as ownername,
      u.guardian as guardianname,u.mobilenumber as mobileno, a.locality,localnames.localityname as localityname
-     from eg_pt_property as p inner join eg_pt_owner as o on p.id=o.propertyid and o.tenantid=$tenantid inner join eg_user as u 
+     from eg_pt_property as p inner join eg_pt_owner as o on p.id=o.propertyid and o.tenantid!='pb.testing' inner join eg_user as u 
       on o.userid=u.uuid and o.status='ACTIVE' inner join eg_pt_address as a on p.id=a.propertyid 
       left outer join eg_bndry_mohalla as localnames on a.locality=localnames.localitycode
-      where p.tenantid=$tenantid and p.status='ACTIVE' 
+      where p.tenantid!='pb.testing' and p.status='ACTIVE' 
       and 
-      o.propertyid in (select id  from eg_pt_property where tenantid=$tenantid and status='ACTIVE')
+      o.propertyid in (select id  from eg_pt_property where tenantid!='pb.testing' and status='ACTIVE')
   orderby: ORDER BY p.propertyid
   
 
