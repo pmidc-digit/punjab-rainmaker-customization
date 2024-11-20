@@ -2245,20 +2245,20 @@ ReportDefinitions:
       WITH receipt_breakup AS (
                   SELECT
                     pd.id as pdid,                    
-                    SUM(CASE WHEN taxheadcode LIKE 'PT_ADHOC_PENALTY' THEN adjustedamount ELSE 0 END) as adhocpenalty, 
-                    SUM(CASE WHEN taxheadcode LIKE 'PT_ADHOC_REBATE' THEN adjustedamount ELSE 0 END) as adhocrebate, 
-                    SUM(CASE WHEN taxheadcode LIKE 'PT_FIRE_CESS' THEN adjustedamount ELSE 0 END) as firecess, 
-                    SUM(CASE WHEN taxheadcode LIKE 'PT_CANCER_CESS' THEN adjustedamount ELSE 0 END) as cancercess, 
-                    SUM(CASE WHEN taxheadcode LIKE 'PT_TIME_INTEREST' THEN adjustedamount ELSE 0 END) as interest, 
-                    SUM(CASE WHEN taxheadcode LIKE 'PT_TIME_PENALTY' THEN adjustedamount ELSE 0 END) as penalty, 
-                    SUM(CASE WHEN taxheadcode LIKE 'PT_TIME_REBATE' THEN adjustedamount ELSE 0 END) as rebate,
-                    SUM(CASE WHEN taxheadcode LIKE 'PT_TAX' THEN bad.amount ELSE 0 END) as propertytax,
-                    SUM(CASE WHEN taxheadcode LIKE 'PT_TAX' THEN adjustedamount ELSE 0 END) as paidpropertytax, 
-                    (SUM(CASE WHEN taxheadcode LIKE 'PT_UNIT_USAGE_EXEMPTION' THEN bad.amount ELSE 0 END)
-                    + SUM(CASE WHEN taxheadcode LIKE 'PT_OWNER_EXEMPTION' THEN bad.amount ELSE 0 END) ) as exemption,
-                    (SUM(CASE WHEN taxheadcode LIKE 'PT_ROUNDOFF' THEN adjustedamount ELSE 0 END)
-                    + SUM(CASE WHEN taxheadcode LIKE 'PT_DECIMAL_CEILING_DEBIT' THEN adjustedamount ELSE 0 END)
-                    + SUM(CASE WHEN taxheadcode LIKE 'PT_DECIMAL_CEILING_CREDIT' THEN adjustedamount ELSE 0 END)) as adjustment
+                    SUM(CASE WHEN taxheadcode = 'PT_ADHOC_PENALTY' THEN adjustedamount ELSE 0 END) as adhocpenalty, 
+                    SUM(CASE WHEN taxheadcode = 'PT_ADHOC_REBATE' THEN adjustedamount ELSE 0 END) as adhocrebate, 
+                    SUM(CASE WHEN taxheadcode = 'PT_FIRE_CESS' THEN adjustedamount ELSE 0 END) as firecess, 
+                    SUM(CASE WHEN taxheadcode = 'PT_CANCER_CESS' THEN adjustedamount ELSE 0 END) as cancercess, 
+                    SUM(CASE WHEN taxheadcode = 'PT_TIME_INTEREST' THEN adjustedamount ELSE 0 END) as interest, 
+                    SUM(CASE WHEN taxheadcode = 'PT_TIME_PENALTY' THEN adjustedamount ELSE 0 END) as penalty, 
+                    SUM(CASE WHEN taxheadcode = 'PT_TIME_REBATE' THEN adjustedamount ELSE 0 END) as rebate,
+                    SUM(CASE WHEN taxheadcode = 'PT_TAX' THEN bad.amount ELSE 0 END) as propertytax,
+                    SUM(CASE WHEN taxheadcode = 'PT_TAX' THEN adjustedamount ELSE 0 END) as paidpropertytax, 
+                    (SUM(CASE WHEN taxheadcode = 'PT_UNIT_USAGE_EXEMPTION' THEN bad.amount ELSE 0 END)
+                    + SUM(CASE WHEN taxheadcode = 'PT_OWNER_EXEMPTION' THEN bad.amount ELSE 0 END) ) as exemption,
+                    (SUM(CASE WHEN taxheadcode = 'PT_ROUNDOFF' THEN adjustedamount ELSE 0 END)
+                    + SUM(CASE WHEN taxheadcode = 'PT_DECIMAL_CEILING_DEBIT' THEN adjustedamount ELSE 0 END)
+                    + SUM(CASE WHEN taxheadcode = 'PT_DECIMAL_CEILING_CREDIT' THEN adjustedamount ELSE 0 END)) as adjustment
                   FROM egcl_billaccountdetail as bad
                   INNER JOIN egcl_billdetial as bd on bd.id = bad.billdetailid
                   INNER JOIN egcl_paymentdetail as pd on pd.billid = bd.billid
