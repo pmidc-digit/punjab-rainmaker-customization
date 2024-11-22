@@ -3614,4 +3614,42 @@ ReportDefinitions:
      groupby: group by pd.createdby
      ) 
      select c.*,eu.username,eu.name as collector from collection c
-     inner join eg_user eu on eu.id::text=c.collector_userid::text  
+     inner join eg_user eu on eu.id::text=c.collector_userid::text
+     
+- reportName: swsummaryregistercollection
+  summary:  SW Summary register collection
+  version: 1.0.0
+  moduleName: rainmaker-ws
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: sum
+    label: reports.ws.sum
+    type: string
+    source: ws
+    total: true
+  - name: count
+    label: reports.ws.count
+    type: string
+    source: ws
+    total: true
+  - name: collector
+    label: reports.ws.collector
+    type: string
+    source: ws
+    total: false
+  query: |
+     with collection as(
+     select sum(amountpaid) as sum,count(*) as count,pd.createdby as
+     collector_userid from egcl_paymentdetail pd
+     inner join egcl_bill as bill on bill.id=pd.billid
+     where pd.tenantid=$tenantid and bill.status='ACTIVE'
+     and  pd.businessservice like  'SW%' and paymentid not in
+     (select id from egcl_payment where tenantid='pb.bareta' and  (paymentstatus='CANCELLED' or paymentmode='ONLINE') )
+     groupby: group by pd.createdby
+     ) 
+     select c.*,eu.username,eu.name as collector from collection c
+     inner join eg_user eu on eu.id::text=c.collector_userid::text       
+     
+     
