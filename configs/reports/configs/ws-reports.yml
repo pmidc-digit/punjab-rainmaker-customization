@@ -3610,7 +3610,7 @@ ReportDefinitions:
      inner join egcl_bill as bill on bill.id=pd.billid
      where pd.tenantid=$tenantid and bill.status='ACTIVE'
      and  pd.businessservice like  'WS%' and paymentid not in
-     (select id from egcl_payment where tenantid='pb.bareta' and  (paymentstatus='CANCELLED' or paymentmode='ONLINE') )
+     (select id from egcl_payment where tenantid=$tenantid and  (paymentstatus='CANCELLED' or paymentmode='ONLINE') )
      groupby: group by pd.createdby
      ) 
      select c.*,eu.username,eu.name as collector from collection c
@@ -3646,7 +3646,7 @@ ReportDefinitions:
      inner join egcl_bill as bill on bill.id=pd.billid
      where pd.tenantid=$tenantid and bill.status='ACTIVE'
      and  pd.businessservice like  'SW%' and paymentid not in
-     (select id from egcl_payment where tenantid='pb.bareta' and  (paymentstatus='CANCELLED' or paymentmode='ONLINE') )
+     (select id from egcl_payment where tenantid=$tenantid and  (paymentstatus='CANCELLED' or paymentmode='ONLINE') )
      groupby: group by pd.createdby
      ) 
      select c.*,eu.username,eu.name as collector from collection c
