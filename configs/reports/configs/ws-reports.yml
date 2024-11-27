@@ -3599,8 +3599,8 @@ ReportDefinitions:
     type: string
     source: ws
     total: true
-  - name: collector
-    label: reports.ws.collector
+  - name: collectorname
+    label: reports.ws.collectorname
     type: string
     source: ws
     total: false
@@ -3614,7 +3614,7 @@ ReportDefinitions:
      (select id from egcl_payment where tenantid=$tenantid and  (paymentstatus='CANCELLED' or paymentmode='ONLINE') )
      group by pd.createdby
      ) 
-     select c.*,eu.username,eu.name as collector from collection c
+     select c.*,eu.username,eu.name as collectorname from collection c
      inner join eg_user eu on eu.id::text=c.collector_userid::text
      
 - reportName: swsummaryregistercollection
@@ -3636,8 +3636,8 @@ ReportDefinitions:
     type: string
     source: ws
     total: true
-  - name: collector
-    label: reports.ws.collector
+  - name: collectorname
+    label: reports.ws.collectorname
     type: string
     source: ws
     total: false
@@ -3651,7 +3651,7 @@ ReportDefinitions:
      (select id from egcl_payment where tenantid=$tenantid and  (paymentstatus='CANCELLED' or paymentmode='ONLINE') )
       group by pd.createdby
      ) 
-     select c.*,eu.username,eu.name as collector from collection c
+     select c.*,eu.username,eu.name as collectorname from collection c
      inner join eg_user eu on eu.id::text=c.collector_userid::text       
      
      
