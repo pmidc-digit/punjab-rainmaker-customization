@@ -3626,7 +3626,6 @@ ReportDefinitions:
      with collection as(
      select sum(amountpaid) as sum,count(*) as count,pd.createdby as
      collectoruserid
-     --,to_timestamp(max(pd.receiptdate)/1000) as receipt_date
      from egcl_paymentdetail pd
      inner join egcl_bill as bill on bill.id=pd.billid
      where pd.tenantid=$tenantid and bill.status='ACTIVE'
@@ -3684,8 +3683,7 @@ ReportDefinitions:
   query: |
      with collection as(
      select sum(amountpaid) as sum,count(*) as count,pd.createdby as
-     collectoruserid 
-     --,to_timestamp(max(pd.receiptdate)/1000) as receipt_date
+     collectoruserid
      from egcl_paymentdetail pd
      inner join egcl_bill as bill on bill.id=pd.billid
      where pd.tenantid=$tenantid and bill.status='ACTIVE'
@@ -3694,7 +3692,7 @@ ReportDefinitions:
      and  pd.businessservice in ('SW','SW.ONE_TIME_FEE') and paymentid not in
      (select id from egcl_payment where tenantid=$tenantid and  (paymentstatus='CANCELLED' or paymentmode='ONLINE') )
       group by pd.createdby
-     ) 
+     )
      select c.*,eu.username,eu.name as collectorname from collection c
      inner join eg_user eu on eu.id::text=c.collectoruserid::text       
      
