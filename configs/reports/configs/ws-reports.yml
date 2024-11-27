@@ -3610,7 +3610,7 @@ ReportDefinitions:
      collector_userid from egcl_paymentdetail pd
      inner join egcl_bill as bill on bill.id=pd.billid
      where pd.tenantid=$tenantid and bill.status='ACTIVE'
-     and  pd.businessservice like  'WS%' and paymentid not in
+     and  pd.businessservice in  ('WS','WS.ONE_TIME_FEE') and paymentid not in
      (select id from egcl_payment where tenantid=$tenantid and  (paymentstatus='CANCELLED' or paymentmode='ONLINE') )
      group by pd.createdby
      ) 
@@ -3647,7 +3647,7 @@ ReportDefinitions:
      collector_userid from egcl_paymentdetail pd
      inner join egcl_bill as bill on bill.id=pd.billid
      where pd.tenantid=$tenantid and bill.status='ACTIVE'
-     and  pd.businessservice like  'SW%' and paymentid not in
+     and  pd.businessservice in ('SW','SW.ONE_TIME_FEE') and paymentid not in
      (select id from egcl_payment where tenantid=$tenantid and  (paymentstatus='CANCELLED' or paymentmode='ONLINE') )
       group by pd.createdby
      ) 
