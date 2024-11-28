@@ -3589,8 +3589,8 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
-  - name: collectoruserid
-    label: reports.ws.collectoruserid
+  - name: usernameid
+    label: reports.ws.usernameid
     type: string
     source: ws
     total: false
@@ -3623,19 +3623,19 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND pd.receiptdate <= $toDate    
   query: |
-     select pd.createdby as collectoruserid,
-     count (*) as count,
-     sum(pd.amountpaid) as sum,
-     usr.name as collectorname,
-     to_timestamp(max(pd.receiptdate)/1000) as receipt_date
-     from egcl_paymentdetail pd
-     inner join egcl_bill as bill on bill.id=pd.billid
-     inner join egcl_payment as payment on payment.id=pd.paymentid
-     inner join eg_user as usr on usr.id=payment.createdby::integer
-     where pd.tenantid=$tenantid and bill.status='ACTIVE'
-     and  pd.businessservice in ('WS','WS.ONE_TIME_FEE') and paymentid not in
-     (select id from egcl_payment where tenantid=$tenantid  and  (paymentstatus='CANCELLED' or paymentmode='ONLINE'))
-  groupby: group by pd.createdby, usr.name;
+    SELECT 
+    SUM(pd.amountpaid) AS sum,
+    COUNT(*) AS count,
+    CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END as paymentmode,
+    eu.username as usernameid,
+    eu.name AS collectorname
+    FROM egcl_paymentdetail pd
+    INNER JOIN  egcl_bill AS bill ON bill.id = pd.billid
+    INNER JOIN  eg_user as eu ON eu.id::text = pd.createdby::text
+    INNER JOIN egcl_payment as payment ON payment.id = pd.paymentid
+    WHERE pd.tenantid = $tenantid AND bill.status = 'ACTIVE' AND pd.businessservice IN ('WS', 'WS.ONE_TIME_FEE') AND payment.paymentstatus != 'CANCELLED'
+  groupby: GROUP BY eu.username, eu.name, CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END
+  orderby: ORDER BY CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END DESC,eu.username;
      
 - reportName: swsummaryregistercollection
   decryptionPathId: MiscReceiptULB_v2
@@ -3646,8 +3646,8 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
-  - name: collectoruserid
-    label: reports.ws.collectoruserid
+  - name: usernameid
+    label: reports.ws.usernameid
     type: string
     source: ws
     total: false
@@ -3680,18 +3680,18 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND pd.receiptdate <= $toDate
   query: |
-     select pd.createdby as collectoruserid,
-     count (*) as count,
-     sum(pd.amountpaid) as sum,
-     usr.name as collectorname,
-     to_timestamp(max(pd.receiptdate)/1000) as receipt_date
-     from egcl_paymentdetail pd
-     inner join egcl_bill as bill on bill.id=pd.billid
-     inner join egcl_payment as payment on payment.id=pd.paymentid
-     inner join eg_user as usr on usr.id=payment.createdby::integer
-     where pd.tenantid=$tenantid and bill.status='ACTIVE'
-     and  pd.businessservice in ('SW','SW.ONE_TIME_FEE') and paymentid not in
-     (select id from egcl_payment where tenantid=$tenantid  and  (paymentstatus='CANCELLED' or paymentmode='ONLINE'))
-  groupby: group by pd.createdby, usr.name; 
+    SELECT 
+    SUM(pd.amountpaid) AS sum,
+    COUNT(*) AS count,
+    CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END as paymentmode,
+    eu.username as usernameid,
+    eu.name AS collectorname
+    FROM egcl_paymentdetail pd
+    INNER JOIN  egcl_bill AS bill ON bill.id = pd.billid
+    INNER JOIN  eg_user as eu ON eu.id::text = pd.createdby::text
+    INNER JOIN egcl_payment as payment ON payment.id = pd.paymentid 
+    WHERE pd.tenantid = $tenantid AND bill.status = 'ACTIVE' AND pd.businessservice IN ('SW', 'SW.ONE_TIME_FEE') AND payment.paymentstatus != 'CANCELLED'
+  groupby: GROUP BY eu.username, eu.name, CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END
+  orderby: ORDER BY CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END DESC,eu.username; 
      
      
