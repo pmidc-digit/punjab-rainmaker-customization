@@ -3695,7 +3695,7 @@ ReportDefinitions:
     COUNT(*) AS count,
     CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END as paymentmode,
     eu.name AS collectorname,
-   	eu.type as type
+    eu.type as type
     FROM egcl_paymentdetail pd
     INNER JOIN  egcl_bill AS bill ON bill.id = pd.billid
     INNER JOIN  eg_user as eu ON eu.id::text = pd.createdby::text
