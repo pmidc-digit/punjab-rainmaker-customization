@@ -3589,11 +3589,6 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
-  - name: usernameid
-    label: reports.ws.usernameid
-    type: string
-    source: ws
-    total: false
   - name: collectorname
     label: reports.ws.collectorname
     type: string
@@ -3632,7 +3627,6 @@ ReportDefinitions:
     SUM(pd.amountpaid) AS sum,
     COUNT(*) AS count,
     CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END as paymentmode,
-    eu.username as usernameid,
     eu.name AS collectorname
     FROM egcl_paymentdetail pd
     INNER JOIN  egcl_bill AS bill ON bill.id = pd.billid
@@ -3651,11 +3645,6 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
-  - name: usernameid
-    label: reports.ws.usernameid
-    type: string
-    source: ws
-    total: false
   - name: collectorname
     label: reports.ws.collectorname
     type: string
@@ -3694,7 +3683,6 @@ ReportDefinitions:
     SUM(pd.amountpaid) AS sum,
     COUNT(*) AS count,
     CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END as paymentmode,
-    eu.username as usernameid,
     eu.name AS collectorname
     FROM egcl_paymentdetail pd
     INNER JOIN  egcl_bill AS bill ON bill.id = pd.billid
