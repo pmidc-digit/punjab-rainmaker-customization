@@ -547,7 +547,7 @@
               {
                 "variable": "taxCharge",
                 "value": {
-                  "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_TAX' || @.taxHeadCode == 'TL_TAX' || @.taxHeadCode == 'FIRENOC_TAXES' || @.taxHeadCode == 'WS_CHARGE' || @.taxHeadCode == 'SW_CHARGE' || @.taxHeadCode == 'WS_DISCHARGE_CHARGES' || @.taxHeadCode == 'SW_DISCHARGE_CHARGES')].amount"
+                  "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_TAX' || @.taxHeadCode == 'TL_TAX' || @.taxHeadCode == 'FIRENOC_TAXES' || @.taxHeadCode == 'WS_CHARGE' || @.taxHeadCode == 'SW_CHARGE')].amount"
                 }
               },
               {
@@ -677,7 +677,7 @@
             "derived": [
               {
                 "variable": "charge",
-                "formula": "{{ws_charge}}"
+                "formula": "{{ws_charge}}+{{ws_discharge}}"
               },
               {
                 "variable": "penalty",
@@ -779,6 +779,10 @@
                   {
                     "variable": "ws_charge",
                     "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_CHARGE')].taxAmount"
+                  },
+                  {
+                    "variable": "ws_discharge",
+                    "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_DISCHARGE_CHARGES')].taxAmount"
                   },
                   {
                     "variable": "ws_water_cess",
