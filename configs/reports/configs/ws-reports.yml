@@ -3608,7 +3608,12 @@ ReportDefinitions:
     label: reports.ws.paymentmode
     type: string
     source: ws
-    total: false    
+    total: false
+  - name: type
+    label: reports.ws.type
+    type: string
+    source: ws
+    total: false
   searchParams:
   - name: fromDate
     label: reports.pt.fromDate
@@ -3627,13 +3632,14 @@ ReportDefinitions:
     SUM(pd.amountpaid) AS sum,
     COUNT(*) AS count,
     CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END as paymentmode,
-    eu.name AS collectorname
+    eu.name AS collectorname,
+    eu.type as type
     FROM egcl_paymentdetail pd
     INNER JOIN  egcl_bill AS bill ON bill.id = pd.billid
     INNER JOIN  eg_user as eu ON eu.id::text = pd.createdby::text
     INNER JOIN egcl_payment as payment ON payment.id = pd.paymentid
-    WHERE pd.tenantid = $tenantid AND bill.status = 'ACTIVE' AND pd.businessservice IN ('WS', 'WS.ONE_TIME_FEE') AND payment.paymentstatus != 'CANCELLED'
-  groupby: GROUP BY eu.username, eu.name, CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END
+    WHERE pd.tenantid = $tenantid AND bill.status = 'ACTIVE' AND eu.type in ('EMPLOYEE','CITIZEN','SYSTEM') AND pd.businessservice IN ('WS', 'WS.ONE_TIME_FEE') AND payment.paymentstatus != 'CANCELLED'
+  groupby: GROUP BY eu.username, eu.name, CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END,eu.type
   orderby: ORDER BY CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END DESC,eu.username;
      
 - reportName: swsummaryregistercollection
@@ -3665,6 +3671,11 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+  - name: type
+    label: reports.ws.type
+    type: string
+    source: ws
+    total: false
   searchParams:
   - name: fromDate
     label: reports.pt.fromDate
@@ -3683,13 +3694,14 @@ ReportDefinitions:
     SUM(pd.amountpaid) AS sum,
     COUNT(*) AS count,
     CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END as paymentmode,
-    eu.name AS collectorname
+    eu.name AS collectorname,
+   	eu.type as type
     FROM egcl_paymentdetail pd
     INNER JOIN  egcl_bill AS bill ON bill.id = pd.billid
     INNER JOIN  eg_user as eu ON eu.id::text = pd.createdby::text
     INNER JOIN egcl_payment as payment ON payment.id = pd.paymentid 
-    WHERE pd.tenantid = $tenantid AND bill.status = 'ACTIVE' AND pd.businessservice IN ('SW', 'SW.ONE_TIME_FEE') AND payment.paymentstatus != 'CANCELLED'
-  groupby: GROUP BY eu.username, eu.name, CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END
+    WHERE pd.tenantid = $tenantid AND bill.status = 'ACTIVE' AND eu.type in ('EMPLOYEE','CITIZEN','SYSTEM') and pd.businessservice IN ('SW', 'SW.ONE_TIME_FEE') AND payment.paymentstatus != 'CANCELLED'
+  groupby: GROUP BY eu.username, eu.name, CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END,eu.type
   orderby: ORDER BY CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END DESC,eu.username; 
      
      
