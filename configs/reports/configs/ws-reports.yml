@@ -2056,3 +2056,58 @@ ReportDefinitions:
         where payment.tenantid=$tenantid and pd.businessservice in ('WS','WS.ONE_TIME_FEE') and bill.status='ACTIVE'
       groupby: GROUP BY usr.name, CASE WHEN paidby = 'EZETAP' THEN 'EZETAP' ELSE CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END END
       orderby: ORDER BY  usr.name desc,CASE WHEN paidby = 'EZETAP' THEN 'EZETAP' ELSE CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END END;
+
+  
+  - reportName: swzonewisecollection
+    decryptionPathId: MiscReceiptULB_v2
+    summary:  SW Zone Wise collection
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+    print:
+      pdfPageSize: A1
+      sourceColumns:
+         - name: collectorname
+           label: reports.ws.collectorname
+           type: string
+           source: ws
+           total: false
+         - name: count
+           label: reports.ws.count
+           type: string
+           source: ws
+           total: true
+         - name: sum
+           label: reports.ws.sum
+           type: string
+           source: ws
+           total: true
+         - name: paymentmode
+           label: reports.ws.paymentmode
+           type: string
+           source: ws
+           total: false
+      searchParams:
+      - name: fromDate
+        label: reports.pt.fromDate
+        type: epoch
+        source: pt
+        isMandatory: false
+        searchClause: AND pd.receiptdate >= $fromDate
+      - name: toDate
+        label: reports.pt.toDate
+        type: epoch
+        source: pt
+        isMandatory: false
+        searchClause: AND pd.receiptdate <= $toDate
+      query: |
+        SELECT epd.tenantid, ep.paymentmode,sum(epd.amountpaid) as totalamount, ebm.zonename, usr.name AS collectorname
+        FROM egcl_paymentdetail epd JOIN egcl_payment ep ON epd.paymentid = ep.id JOIN egcl_bill eb ON epd.billid = eb.id JOIN eg_sw_connection sw ON eb.consumercode = sw.applicationno
+        JOIN eg_pt_property pt on (sw.property_id=pt.propertyid and pt.status!='INACTIVE')
+        JOIN eg_user as usr ON usr.id=ep.createdby::integer and ep.paymentstatus!='CANCELLED'
+        JOIN eg_pt_address pta on (pta.propertyid=pt.id)
+        JOIN eg_bndry_mohalla ebm ON pta.locality = ebm.localitycode
+        WHERE sw.tenantid = $tenantid and eb.status='ACTIVE'
+        AND epd.businessservice in ('SW.ONE_TIME_FEE','SW')
+        AND epd.receiptdate >= $fromDate AND epd.receiptdate <= $toDate
+      groupby: GROUP BY epd.tenantid,ep.paymentmode,ebm.zonename,usr.name;
