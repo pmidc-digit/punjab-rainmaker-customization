@@ -1065,7 +1065,7 @@ router.post('/protected/punjab-pt/pre-hook/pg-service/transaction/v1/_create', a
 
         request['Transaction']['callbackUrl'] = url.format(url_callback);
     }
-       else  if (request['Transaction']['tenantId'] == 'pb.amritsar' && (request['Transaction']['module'] == 'WS' || request['Transaction']['module'] == 'SW' )) {
+       else  if (request['Transaction']['tenantId'] == 'pb.amritsar' && (request['Transaction']['module'] == 'WS' || request['Transaction']['module'] == 'SW' || request['Transaction']['module'] == 'WS.ONE_TIME_FEE' || request['Transaction']['module'] == 'SW.ONE_TIME_FEE' )) {
         let original_callback = request['Transaction']['callbackUrl'];
         request['Transaction']['gateway'] = 'CCAVANUE'
         url_callback = url.parse(original_callback)
