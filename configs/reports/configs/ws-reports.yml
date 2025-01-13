@@ -2111,3 +2111,80 @@ ReportDefinitions:
         AND epd.businessservice in ('SW.ONE_TIME_FEE','SW')
         AND epd.receiptdate >= $fromDate AND epd.receiptdate <= $toDate
       groupby: GROUP BY epd.tenantid,ep.paymentmode,ebm.zonename,usr.name;
+
+  - reportName: userwisedetailedcollection
+    decryptionPathId: MiscReceiptULB_v2
+    summary:  User Wise Detailed collection
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+    print:
+      pdfPageSize: A1
+      sourceColumns:
+         - name: consumercode
+           label: reports.ws.consumercode
+           type: string
+           source: ws
+           total: false
+         - name: receiptnumber
+           label: reports.ws.receiptnumber
+           type: string
+           source: ws
+           total: true
+         - name: paymentmode
+           label: reports.ws.paymentmode
+           type: string
+           source: ws
+           total: true
+         - name: receiptdate1
+           label: reports.ws.receiptdate1
+           type: string
+           source: ws
+           total: false
+         - name: amountpaid
+           label: reports.ws.amountpaid
+           type: string
+           source: ws
+           total: false
+         - name: collectorname
+           label: reports.ws.collectorname
+           type: string
+           source: ws
+           total: false
+      searchParams:
+      - name: connectionType
+        label: connectionType
+        type: singlevaluelist
+        pattern: 'list://WS%:Water,SW%:Sewerage'
+        source: pt
+        isMandatory: true
+        searchClause: AND bill.businessservice like $connectionType
+      - name: paymentType
+        label: paymentType
+        type: singlevaluelist
+        pattern: 'list://Cash:CASH,Online:ONLINE,Cheque:CHEQUE,DD:DD,Card:CARD,UPI:UPI,NEFT:NEFT,RTGS:RTGS'
+        source: pt
+        isMandatory: true
+        searchClause: AND payment.paymentmode like $paymentType
+      - name: fromDate
+        label: reports.pt.fromDate
+        type: epoch
+        source: pt
+        isMandatory: false
+        searchClause: AND payment.transactiondate >= $fromDate
+      - name: toDate
+        label: reports.pt.toDate
+        type: epoch
+        source: pt
+        isMandatory: false
+        searchClause: AND payment.transactiondate <= $toDate
+      query: |
+        select consumercode, receiptnumber, payment.paymentmode,
+        to_char((To_timestamp(pd.receiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') as receiptdate1,
+        amountpaid,
+        (case when eg_user.name is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else eg_user.name end)  as collectorname
+        from egcl_paymentdetail pd Left outer join eg_user on eg_user.id = pd.createdby::INTEGER
+        inner join egcl_bill as bill on bill.id=pd.billid
+        inner join egcl_payment as payment on payment.id=pd.paymentid and payment.paymentstatus!='CANCELLED'
+        and pd.businessservice in ('WS','SW','WS.ONE_TIME_FEE','SW.ONE_TIME_FEE') where payment.tenantid=$tenantid
+      orderby: ORDER BY pd.receiptdate DESC;
