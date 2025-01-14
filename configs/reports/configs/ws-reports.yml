@@ -2088,18 +2088,18 @@ ReportDefinitions:
         source: ws
         total: false
     searchParams:
-    - name: fromDate
-      label: reports.pt.fromDate
-      type: epoch
-      source: pt
-      isMandatory: false
-      searchClause: AND pd.receiptdate >= $fromDate
-    - name: toDate
-      label: reports.pt.toDate
-      type: epoch
-      source: pt
-      isMandatory: false
-      searchClause: AND pd.receiptdate <= $toDate
+      - name: fromDate
+        label: reports.pt.fromDate
+        type: epoch
+        source: pt
+        isMandatory: false
+        searchClause: AND pd.receiptdate >= $fromDate
+      - name: toDate
+        label: reports.pt.toDate
+        type: epoch
+        source: pt
+        isMandatory: false
+        searchClause: AND pd.receiptdate <= $toDate
     query: |
       SELECT epd.tenantid, ep.paymentmode,sum(epd.amountpaid) as totalamount, ebm.zonename, usr.name AS collectorname
       FROM egcl_paymentdetail epd JOIN egcl_payment ep ON epd.paymentid = ep.id JOIN egcl_bill eb ON epd.billid = eb.id JOIN eg_sw_connection sw ON eb.consumercode = sw.applicationno
