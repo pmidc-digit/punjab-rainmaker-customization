@@ -2007,30 +2007,30 @@ ReportDefinitions:
     version: 1.0.0
     moduleName: rainmaker-ws
     additionalConfig:
-    print:
-      pdfPageSize: A1
-      sourceColumns:
-         - name: collectorname
-           label: reports.ws.collectorname
-           type: string
-           source: ws
-           total: false
-         - name: count
-           label: reports.ws.count
-           type: string
-           source: ws
-           total: true
-         - name: sum
-           label: reports.ws.sum
-           type: string
-           source: ws
-           total: true
-         - name: paymentmode
-           label: reports.ws.paymentmode
-           type: string
-           source: ws
-           total: false
-      searchParams:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: collectorname
+        label: reports.ws.collectorname
+        type: string
+        source: ws
+        total: false
+      - name: count
+        label: reports.ws.count
+        type: string
+        source: ws
+        total: true
+      - name: sum
+        label: reports.ws.sum
+        type: string
+        source: ws
+        total: true
+      - name: paymentmode
+        label: reports.ws.paymentmode
+        type: string
+        source: ws
+        total: false
+    searchParams:
       - name: fromDate
         label: reports.pt.fromDate
         type: epoch
@@ -2043,20 +2043,19 @@ ReportDefinitions:
         source: pt
         isMandatory: false
         searchClause: AND pd.receiptdate <= $toDate
-      query: |
+    query: |
         select
-        usr.name as collectorname,
-        CASE WHEN paidby = 'EZETAP' THEN 'EZETAP' ELSE CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END END as paymentmode,
-        SUM(pd.amountpaid) AS sum,
-        COUNT(*) AS count
+          usr.name as collectorname,
+          CASE WHEN paidby = 'EZETAP' THEN 'EZETAP' ELSE CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END END as paymentmode,
+          SUM(pd.amountpaid) AS sum,
+          COUNT(*) AS count
         from egcl_paymentdetail pd 
         inner join egcl_bill as bill on bill.id=pd.billid 
         inner join egcl_payment as payment on payment.id=pd.paymentid 
         inner join eg_user as usr on usr.id=payment.createdby::integer and payment.paymentstatus!='CANCELLED' 
         where payment.tenantid=$tenantid and pd.businessservice in ('WS','WS.ONE_TIME_FEE') and bill.status='ACTIVE'
-      groupby: GROUP BY usr.name, CASE WHEN paidby = 'EZETAP' THEN 'EZETAP' ELSE CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END END
-      orderby: ORDER BY  usr.name desc,CASE WHEN paidby = 'EZETAP' THEN 'EZETAP' ELSE CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END END;
-
+    groupby: GROUP BY usr.name, CASE WHEN paidby = 'EZETAP' THEN 'EZETAP' ELSE CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END END
+    orderby: ORDER BY  usr.name desc,CASE WHEN paidby = 'EZETAP' THEN 'EZETAP' ELSE CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END END
   
   - reportName: swzonewisecollection
     decryptionPathId: MiscReceiptULB_v2
@@ -2101,15 +2100,16 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND pd.receiptdate <= $toDate
     query: |
-      SELECT epd.tenantid, ep.paymentmode,sum(epd.amountpaid) as totalamount, ebm.zonename, usr.name AS collectorname
-      FROM egcl_paymentdetail epd JOIN egcl_payment ep ON epd.paymentid = ep.id JOIN egcl_bill eb ON epd.billid = eb.id JOIN eg_sw_connection sw ON eb.consumercode = sw.applicationno
-      JOIN eg_pt_property pt on (sw.property_id=pt.propertyid and pt.status!='INACTIVE')
-      JOIN eg_user as usr ON usr.id=ep.createdby::integer and ep.paymentstatus!='CANCELLED'
-      JOIN eg_pt_address pta on (pta.propertyid=pt.id)
-      JOIN eg_bndry_mohalla ebm ON pta.locality = ebm.localitycode
-      WHERE sw.tenantid = $tenantid and eb.status='ACTIVE'
-      AND epd.businessservice in ('SW.ONE_TIME_FEE','SW')
-    groupby: GROUP BY epd.tenantid,ep.paymentmode,ebm.zonename,usr.name;
+        -- Use CTE to force query plan, compute & use CTE later 
+        SELECT epd.tenantid, ep.paymentmode,sum(epd.amountpaid) as totalamount, ebm.zonename, usr.name AS collectorname
+          FROM egcl_paymentdetail epd JOIN egcl_payment ep ON epd.paymentid = ep.id JOIN egcl_bill eb ON epd.billid = eb.id JOIN eg_sw_connection sw ON eb.consumercode = sw.applicationno
+        JOIN eg_pt_property pt on (sw.property_id=pt.propertyid and pt.status!='INACTIVE')
+        JOIN eg_user as usr ON usr.id=ep.createdby::integer and ep.paymentstatus!='CANCELLED'
+        JOIN eg_pt_address pta on (pta.propertyid=pt.id)
+        JOIN eg_bndry_mohalla ebm ON pta.locality = ebm.localitycode
+        WHERE sw.tenantid = $tenantid and eb.status='ACTIVE'
+        AND epd.businessservice in ('SW.ONE_TIME_FEE','SW')
+    groupby: GROUP BY epd.tenantid,ep.paymentmode,ebm.zonename,usr.name
 
   - reportName: userwisedetailedcollection
     decryptionPathId: MiscReceiptULB_v2
@@ -2120,69 +2120,70 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-    - name: consumercode
-      label: reports.ws.consumercode
-      type: string
-      source: ws
-      total: false
-    - name: receiptnumber
-      label: reports.ws.receiptnumber
-      type: string
-      source: ws
-      total: true
-    - name: paymentMode
-      label: reports.ws.paymentMode
-      type: string
-      source: ws
-      total: true
-    - name: receiptdate1
-      label: reports.ws.receiptdate1
-      type: string
-      source: ws
-      total: false
-    - name: amountpaid
-      label: reports.ws.amountpaid
-      type: string
-      source: ws
-      total: false
-    - name: collectorname
-      label: reports.ws.collectorname
-      type: string
-      source: ws
-      total: false
+      - name: consumercode
+        label: reports.ws.consumercode
+        type: string
+        source: ws
+        total: false
+      - name: receiptnumber
+        label: reports.ws.receiptnumber
+        type: string
+        source: ws
+        total: true
+      - name: paymentMode
+        label: reports.ws.paymentMode
+        type: string
+        source: ws
+        total: true
+      - name: receiptdate1
+        label: reports.ws.receiptdate1
+        type: string
+        source: ws
+        total: false
+      - name: amountpaid
+        label: reports.ws.amountpaid
+        type: string
+        source: ws
+        total: false
+      - name: collectorname
+        label: reports.ws.collectorname
+        type: string
+        source: ws
+        total: false
     searchParams:
-    - name: connectionType
-      label: connectionType
-      type: singlevaluelist
-      pattern: 'list://WS%:Water,SW%:Sewerage'
-      source: pt
-      isMandatory: true
-      searchClause: AND bill.businessservice like $connectionType
-    - name: paymentMode
-      label: Payment Mode
-      type: singlevaluelist
-      pattern: 'list://CARD:Card,CASH:Cash,CHEQUE:Cheque,DD:DD,OFFLINE_NEFT:NEFT,OFFLINE_RTGS:RTGS,ONLINE:Online,POSTAL_ORDER:PostalOrder'
-      source: pt
-      isMandatory: false
-      searchClause: AND payment.paymentmode = replace($paymentMode,',','_')
-    - name: fromDate
-      label: reports.pt.fromDate
-      type: epoch
-      source: pt
-      isMandatory: false
-      searchClause: AND payment.transactiondate >= $fromDate
-    - name: toDate
-      label: reports.pt.toDate
-      type: epoch
-      source: pt
-      isMandatory: false
-      searchClause: AND payment.transactiondate <= $toDate
+      - name: connectionType
+        label: connectionType
+        type: singlevaluelist
+        pattern: 'list://WS%:Water,SW%:Sewerage'
+        source: pt
+        isMandatory: true
+        searchClause: AND bill.businessservice like $connectionType
+      - name: paymentMode
+        label: Payment Mode
+        type: singlevaluelist
+        pattern: 'list://CARD:Card,CASH:Cash,CHEQUE:Cheque,DD:DD,OFFLINE_NEFT:NEFT,OFFLINE_RTGS:RTGS,ONLINE:Online,POSTAL_ORDER:PostalOrder'
+        source: pt
+        isMandatory: false
+        searchClause: AND payment.paymentmode = replace($paymentMode,',','_')
+      - name: fromDate
+        label: reports.pt.fromDate
+        type: epoch
+        source: pt
+        isMandatory: false
+        searchClause: AND payment.transactiondate >= $fromDate
+      - name: toDate
+        label: reports.pt.toDate
+        type: epoch
+        source: pt
+        isMandatory: false
+        searchClause: AND payment.transactiondate <= $toDate
     query: |
-      select consumercode, receiptnumber, payment.paymentMode,
-      to_char((To_timestamp(pd.receiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') as receiptdate1, amountpaid,
-      (case when eg_user.name is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else eg_user.name end)  as collectorname
-      from egcl_paymentdetail pd Left outer join eg_user on eg_user.id = pd.createdby::INTEGER
-      inner join egcl_bill as bill on bill.id=pd.billid
-      inner join egcl_payment as payment on payment.id=pd.paymentid and payment.paymentstatus!='CANCELLED'
-      and pd.businessservice in ('WS','SW','WS.ONE_TIME_FEE','SW.ONE_TIME_FEE') where payment.tenantid=$tenantid
-    orderby: ORDER BY pd.receiptdate DESC;
+        -- Use CTE to force query plan, compute & use CTE later
+        select consumercode, receiptnumber, payment.paymentMode,
+          to_char((To_timestamp(pd.receiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') as receiptdate1, amountpaid,
+          (case when eg_user.name is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else eg_user.name end)  as collectorname
+        from egcl_paymentdetail pd Left outer join eg_user on eg_user.id = pd.createdby::INTEGER
+        inner join egcl_bill as bill on bill.id=pd.billid
+        inner join egcl_payment as payment on payment.id=pd.paymentid and payment.paymentstatus!='CANCELLED'
+        and pd.businessservice in ('WS','SW','WS.ONE_TIME_FEE','SW.ONE_TIME_FEE') where payment.tenantid=$tenantid
+    orderby: ORDER BY pd.receiptdate DESC
