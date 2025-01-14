@@ -2109,7 +2109,6 @@ ReportDefinitions:
       JOIN eg_bndry_mohalla ebm ON pta.locality = ebm.localitycode
       WHERE sw.tenantid = $tenantid and eb.status='ACTIVE'
       AND epd.businessservice in ('SW.ONE_TIME_FEE','SW')
-      AND epd.receiptdate >= $fromDate AND epd.receiptdate <= $toDate
     groupby: GROUP BY epd.tenantid,ep.paymentmode,ebm.zonename,usr.name;
 
   - reportName: userwisedetailedcollection
