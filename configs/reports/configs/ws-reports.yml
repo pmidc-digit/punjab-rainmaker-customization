@@ -2088,18 +2088,18 @@ ReportDefinitions:
         source: ws
         total: false
     searchParams:
-      - name: fromDate
-        label: reports.pt.fromDate
-        type: epoch
-        source: pt
-        isMandatory: false
-        searchClause: AND pd.receiptdate >= $fromDate
-      - name: toDate
-        label: reports.pt.toDate
-        type: epoch
-        source: pt
-        isMandatory: false
-        searchClause: AND pd.receiptdate <= $toDate
+    - name: fromDate
+      label: reports.pt.fromDate
+      type: epoch
+      source: pt
+      isMandatory: false
+      searchClause: AND pd.receiptdate >= $fromDate
+    - name: toDate
+      label: reports.pt.toDate
+      type: epoch
+      source: pt
+      isMandatory: false
+      searchClause: AND pd.receiptdate <= $toDate
     query: |
       SELECT epd.tenantid, ep.paymentmode,sum(epd.amountpaid) as totalamount, ebm.zonename, usr.name AS collectorname
       FROM egcl_paymentdetail epd JOIN egcl_payment ep ON epd.paymentid = ep.id JOIN egcl_bill eb ON epd.billid = eb.id JOIN eg_sw_connection sw ON eb.consumercode = sw.applicationno
@@ -2121,65 +2121,65 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: consumercode
-        label: reports.ws.consumercode
-        type: string
-        source: ws
-        total: false
-      - name: receiptnumber
-        label: reports.ws.receiptnumber
-        type: string
-        source: ws
-        total: true
-      - name: paymentmode
-        label: reports.ws.paymentmode
-        type: string
-        source: ws
-        total: true
-      - name: receiptdate1
-        label: reports.ws.receiptdate1
-        type: string
-        source: ws
-        total: false
-      - name: amountpaid
-        label: reports.ws.amountpaid
-        type: string
-        source: ws
-        total: false
-      - name: collectorname
-        label: reports.ws.collectorname
-        type: string
-        source: ws
-        total: false
+    - name: consumercode
+      label: reports.ws.consumercode
+      type: string
+      source: ws
+      total: false
+    - name: receiptnumber
+      label: reports.ws.receiptnumber
+      type: string
+      source: ws
+      total: true
+    - name: paymentMode
+      label: reports.ws.paymentMode
+      type: string
+      source: ws
+      total: true
+    - name: receiptdate1
+      label: reports.ws.receiptdate1
+      type: string
+      source: ws
+      total: false
+    - name: amountpaid
+      label: reports.ws.amountpaid
+      type: string
+      source: ws
+      total: false
+    - name: collectorname
+      label: reports.ws.collectorname
+      type: string
+      source: ws
+      total: false
     searchParams:
-      - name: connectionType
-        label: connectionType
-        type: singlevaluelist
-        pattern: 'list://WS%:Water,SW%:Sewerage'
-        source: pt
-        isMandatory: true
-        searchClause: AND bill.businessservice like $connectionType
-      - name: paymentType
-        label: paymentType
-        type: singlevaluelist
-        pattern: 'list://Cash:CASH,Online:ONLINE,Cheque:CHEQUE,DD:DD,Card:CARD,UPI:UPI,NEFT:NEFT,RTGS:RTGS'
-        source: pt
-        isMandatory: true
-        searchClause: AND payment.paymentmode like $paymentType
-      - name: fromDate
-        label: reports.pt.fromDate
-        type: epoch
-        source: pt
-        isMandatory: false
-        searchClause: AND payment.transactiondate >= $fromDate
-      - name: toDate
-        label: reports.pt.toDate
-        type: epoch
-        source: pt
-        isMandatory: false
-        searchClause: AND payment.transactiondate <= $toDate
+    - name: connectionType
+      label: connectionType
+      type: singlevaluelist
+      pattern: 'list://WS%:Water,SW%:Sewerage'
+      source: pt
+      isMandatory: true
+      searchClause: AND bill.businessservice like $connectionType
+    - name: paymentMode
+      label: Payment Mode
+      type: singlevaluelist
+      pattern: 'list://CARD:Card,CASH:Cash,CHEQUE:Cheque,DD:DD,OFFLINE_NEFT:NEFT,OFFLINE_RTGS:RTGS,ONLINE:Online,POSTAL_ORDER:PostalOrder'
+      source: pt
+      isMandatory: false
+      searchClause: AND payment.paymentmode = replace($paymentMode,',','_')
+    - name: fromDate
+      label: reports.pt.fromDate
+      type: epoch
+      source: pt
+      isMandatory: false
+      searchClause: AND payment.transactiondate >= $fromDate
+    - name: toDate
+      label: reports.pt.toDate
+      type: epoch
+      source: pt
+      isMandatory: false
+      searchClause: AND payment.transactiondate <= $toDate
     query: |
-      select consumercode, receiptnumber, payment.paymentmode,
+      select consumercode, receiptnumber, payment.paymentMode,
       to_char((To_timestamp(pd.receiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') as receiptdate1, amountpaid,
       (case when eg_user.name is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else eg_user.name end)  as collectorname
       from egcl_paymentdetail pd Left outer join eg_user on eg_user.id = pd.createdby::INTEGER
