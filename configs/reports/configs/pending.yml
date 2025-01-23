@@ -1,1 +1,79 @@
+ReportDefinitions:
+  - reportName: PendingReport
+    summary: Pending Report Miscellaneous
+    version: 1.0.0
+    moduleName: uc
+    sourceColumns:
+      - name: tenantid
+        label: reports.uc.tenantid
+        type: string
+        source: pd
+        total: false
+      - name: servicename
+        label: reports.uc.servicename
+        type: string
+        source: uc
+        total: false
+      - name: totalappl
+        label: reports.uc.totalappl
+        type: string
+        source: uc
+        total: false
+      - name: pendingappl
+        label: reports.uc.pendingappl
+        type: string
+        source: uc
+        total: false
+    searchParams:
+      - name: ulb
+        label: reports.uc.ulb
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: uc
+        wrapper: true
+        isMandatory: false
+        searchClause: AND ta.tenantid = $ulb
+    query: |
+        -- Use CTE to force query plan, compute & use CTE later
+        WITH total_appl AS
+          (SELECT pp.tenantid,
+          CASE WHEN pp.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal'
+          WHEN pp.businessservice IN ('NewWS1') THEN 'WS-Service'
+          WHEN pp.businessservice IN ('NewSW1') THEN 'SW-Service'
+          WHEN pp.businessservice IN ('FIRENOC') THEN 'FireNoc'
+          WHEN pp.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment'
+          --WHEN pp.businessservice IN ('PT.CREATE','PT.UPDATE','PT.MUTATION','PT.CREATEWITHWNS') THEN 'PT-Service'
+          END as servicename,
+          count(*) as total_appl
+          FROM public.eg_wf_processinstance_v2 pp
+          WHERE pp.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.MUTATION','PT.CREATEWITHWNS')
+          GROUP BY pp.tenantid,CASE WHEN pp.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal'
+          WHEN pp.businessservice IN ('NewWS1') THEN 'WS-Service'
+          WHEN pp.businessservice IN ('NewSW1') THEN 'SW-Service'
+          WHEN pp.businessservice IN ('FIRENOC') THEN 'FireNoc'
+          WHEN pp.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment'
+          --WHEN pp.businessservice IN ('PT.CREATE','PT.UPDATE','PT.MUTATION','PT.CREATEWITHWNS') THEN 'PT-Service' END),
+          pending_appl AS
+          (SELECT p.tenantid, CASE WHEN p.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal' 
+          WHEN p.businessservice IN ('NewWS1') THEN 'WS-Service'
+          WHEN p.businessservice IN ('NewSW1') THEN 'SW-Service'
+          WHEN p.businessservice IN ('FIRENOC') THEN 'FireNoc'
+          WHEN p.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment'
+          --WHEN b.businessservice IN ('PT.CREATE','PT.UPDATE','PT.MUTATION','PT.CREATEWITHWNS') THEN 'PT-Service' END as servicename,
+          count(*) as pending_appl
+          FROM public.eg_wf_processinstance_v2 
+          JOIN  public.eg_wf_businessservice_v2 b ON p.businessservice=b.businessservice
+          WHERE (to_timestamp(p.lastmodifiedtime / 1000.0) - to_timestamp(p.createdtime / 1000.0)) > (b.businessservicesla / (1000 * 60 * 60 * 24)) * interval '1 day'
+          AND b.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.MUTATION','PT.CREATEWITHWNS')
+          GROUP BY p.tenantid,CASE WHEN p.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal'
+          WHEN p.businessservice IN ('NewWS1') THEN 'WS-Service'
+          WHEN p.businessservice IN ('NewSW1') THEN 'SW-Service'
+          WHEN p.businessservice IN ('FIRENOC') THEN 'FireNoc'
+          WHEN p.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment'
+          --WHEN b.businessservice IN ('PT.CREATE','PT.UPDATE','PT.MUTATION','PT.CREATEWITHWNS') THEN 'PT-Service'
+          END)
+          SELECT ta.tenantid as tenantid,ta.servicename as servicename,ta.total_appl as total_appl,COALESCE(pa.pending_appl,0) as pending_appl
+          FROM total_appl ta 
+          LEFT JOIN pending_appl pa ON ta.tenantid=pa.tenantid AND ta.servicename=pa.servicename;
+
 
