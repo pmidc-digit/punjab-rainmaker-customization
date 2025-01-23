@@ -25,14 +25,21 @@ ReportDefinitions:
         source: uc
         total: false
     searchParams:
-      - name: ulb
-        label: reports.uc.ulb
+      - name: tenantid
+        label: reports.uc.tenantid
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: uc
         wrapper: true
         isMandatory: false
-        searchClause: AND ta.tenantid = $ulb
+        searchClause: AND ta.tenantid = $tenantid
+      - name: servicename
+        label: servicename
+        type: singlevaluelist
+        pattern: 'list://TL%:TL-Renewal,SW%:SW-Service,WS%:WS-Service,FN%:FireNoc,BS%:Bill Amendment'
+        source: uc
+        isMandatory: true
+        searchClause: AND ta.servicename like $servicename
     query: |
         -- Use CTE to force query plan, compute & use CTE later
         WITH total_appl AS
@@ -74,6 +81,6 @@ ReportDefinitions:
           END)
           SELECT ta.tenantid as tenantid,ta.servicename as servicename,ta.total_appl as total_appl,COALESCE(pa.pending_appl,0) as pending_appl
           FROM total_appl ta 
-          LEFT JOIN pending_appl pa ON ta.tenantid=pa.tenantid AND ta.servicename=pa.servicename;
+          LEFT JOIN pending_appl pa ON ta.tenantid=pa.tenantid AND ta.servicename=pa.servicename WHERE 1=1;
 
 
