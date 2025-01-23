@@ -2335,7 +2335,7 @@ ReportDefinitions:
         eg_bndry_mohalla.zonecode as zone,
         propertyid,
         financialyear,
-        (case when oldlicensenumber is null then 'New' else 'Renewal' end) AS licensetype,
+        (case when oldlicensenumber is null then 'NEW' else 'RENEWAL' end) AS licensetype,
         oldlicensenumber,
         licensenumber,
         to_char((To_timestamp(issueddate / 1000) at time Zone 'Asia/Kolkata'), 'DD/MM/YYYY') as formattedIssuedDate,
