@@ -2,34 +2,34 @@ ReportDefinitions:
   - reportName: PendencyReport
     summary: Pendency Report Miscellaneous
     version: 1.0.0
-    moduleName: rainmaker-uc
+    moduleName: rainmaker-misc
     sourceColumns:
       - name: tenantid
-        label: reports.rainmaker-uc.tenantid
+        label: reports.rainmaker-misc.tenantid
         type: string
-        source: uc
+        source: rainmaker-misc
         total: false
       - name: servicename
-        label: reports.uc.servicename
+        label: reports.rainmaker-misc.servicename
         type: string
-        source: uc
+        source: rainmaker-misc
         total: false
       - name: totalappl
-        label: reports.uc.totalappl
+        label: reports.rainmaker-misc.totalappl
         type: string
-        source: uc
+        source: rainmaker-misc
         total: false
       - name: pendingappl
-        label: reports.uc.pendingappl
+        label: reports.rainmaker-misc.pendingappl
         type: string
-        source: uc
+        source: rainmaker-misc
         total: false
     searchParams:
       - name: tenantid
         label: reports.uc.tenantid
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-        source: uc
+        source: rainmaker-misc
         wrapper: true
         isMandatory: false
         searchClause: AND ta.tenantid = $tenantid
@@ -37,7 +37,7 @@ ReportDefinitions:
         label: servicename
         type: singlevaluelist
         pattern: 'list://TL%:TL-Renewal,SW%:SW-Service,WS%:WS-Service,FN%:FireNoc,BS%:Bill Amendment'
-        source: uc
+        source: rainmaker-misc
         isMandatory: true
         searchClause: AND ta.servicename like $servicename
     query: |
