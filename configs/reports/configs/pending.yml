@@ -14,32 +14,37 @@ ReportDefinitions:
         type: string
         source: rainmaker-misc
         total: false
-      - name: totalappl
-        label: totalappl
+      - name: total_application
+        label: total_application
         type: string
         source: rainmaker-misc
         total: false
-      - name: pendingappl
-        label: pendingappl
+      - name: pending_application_out_of_sla
+        label: pending_application_out_of_sla
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: pendingapplpercentage
+        label: pendingapplpercentage
         type: string
         source: rainmaker-misc
         total: false
     searchParams:
-      - name: tenantid
-        label: tenantid
-        type: singlevaluelist
-        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-        source: rainmaker-misc
-        wrapper: true
-        isMandatory: false
-        searchClause: $tenantid
       - name: servicename
         label: servicename
         type: singlevaluelist
         pattern: 'list://TL%:TL-Renewal,SW%:SW-Service,WS%:WS-Service,FN%:FireNoc,BS%:Bill Amendment'
         source: rainmaker-misc
         isMandatory: false
-        searchClause: $servicename
+        searchClause: AND ta.servicename =$servicename
+      - name: tenantselected
+        label: tenantid
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: rainmaker-misc
+        wrapper: true
+        isMandatory: false
+        searchClause: AND ta.tenantid =$tenantselected
     query: |
         WITH total_appl AS
           (SELECT pp.tenantid,
@@ -57,14 +62,15 @@ ReportDefinitions:
           WHEN pp.businessservice IN ('NewSW1') THEN 'SW-Service'
           WHEN pp.businessservice IN ('FIRENOC') THEN 'FireNoc'
           WHEN pp.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment'
+          END),
           pending_appl AS
-          (SELECT p.tenantid, CASE WHEN p.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal' 
+         (SELECT p.tenantid, CASE WHEN p.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal' 
           WHEN p.businessservice IN ('NewWS1') THEN 'WS-Service'
           WHEN p.businessservice IN ('NewSW1') THEN 'SW-Service'
           WHEN p.businessservice IN ('FIRENOC') THEN 'FireNoc'
-          WHEN p.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment'
+          WHEN p.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment' END as servicename,
           count(*) as pending_appl
-          FROM public.eg_wf_processinstance_v2 
+          FROM public.eg_wf_processinstance_v2 p
           JOIN  public.eg_wf_businessservice_v2 b ON p.businessservice=b.businessservice
           WHERE (to_timestamp(p.lastmodifiedtime / 1000.0) - to_timestamp(p.createdtime / 1000.0)) > (b.businessservicesla / (1000 * 60 * 60 * 24)) * interval '1 day'
           AND b.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.MUTATION','PT.CREATEWITHWNS')
@@ -73,8 +79,7 @@ ReportDefinitions:
           WHEN p.businessservice IN ('NewSW1') THEN 'SW-Service'
           WHEN p.businessservice IN ('FIRENOC') THEN 'FireNoc'
           WHEN p.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment' END)
-          SELECT ta.tenantid as tenantid,ta.servicename as servicename,ta.total_appl as total_appl,COALESCE(pa.pending_appl,0) as pending_appl
+          SELECT ta.tenantid as tenantid,ta.servicename as servicename,ta.total_appl as total_application,COALESCE(pa.pending_appl,0) as pending_application_out_of_sla,
+          ROUND(CASE WHEN ta.total_appl > 0 THEN (COALESCE(pa.pending_appl, 0) * 100.0 / ta.total_appl) ELSE 0 END, 2) AS pendingapplpercentage
           FROM total_appl ta 
-          LEFT JOIN pending_appl pa ON ta.tenantid=pa.tenantid AND ta.servicename=pa.servicename WHERE 1=1;
-
-
+          LEFT JOIN pending_appl pa ON ta.tenantid=pa.tenantid AND ta.servicename=pa.servicename WHERE ta.tenantid NOT IN ('pb','pb.testing')
