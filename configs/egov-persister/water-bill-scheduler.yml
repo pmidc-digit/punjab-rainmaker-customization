@@ -7,7 +7,7 @@ serviceMaps:
    fromTopic: save-ws-bill-scheduler
    isTransaction: true
    queryMaps:
-    - query: INSERT INTO eg_ws_scheduler (id, tenantid, transactiontype,locality,billingcyclestartdate,billingcycleenddate,status, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?);
+    - query: INSERT INTO eg_ws_scheduler (id, tenantid, transactiontype,locality,billingcyclestartdate,billingcycleenddate,status, createdby, lastmodifiedby, createdtime, lastmodifiedtime, groups) VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?,?);
       basePath: $.billScheduler
       jsonMaps:
        - jsonPath: $.billScheduler.id
@@ -31,3 +31,5 @@ serviceMaps:
        - jsonPath: $.billScheduler.auditDetails.createdTime
 
        - jsonPath: $.billScheduler.auditDetails.lastModifiedTime
+
+       - jsonPath: $.billScheduler.grup
