@@ -14,13 +14,13 @@ ReportDefinitions:
         type: string
         source: rainmaker-misc
         total: false
-      - name: totalappl
-        label: totalappl
+      - name: total_application
+        label: total_application
         type: string
         source: rainmaker-misc
         total: false
-      - name: pendingappl
-        label: pendingappl
+      - name: pending_application_out_of_sla
+        label: pending_application_out_of_sla
         type: string
         source: rainmaker-misc
         total: false
@@ -30,14 +30,14 @@ ReportDefinitions:
         source: rainmaker-misc
         total: false
     searchParams:
-      - name: tenantid
+      - name: tenantselected
         label: tenantid
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: rainmaker-misc
         wrapper: true
         isMandatory: false
-        searchClause: AND ta.tenantid =$tenantid
+        searchClause: AND ta.tenantid =$tenantselected
       - name: servicename
         label: servicename
         type: singlevaluelist
@@ -79,7 +79,7 @@ ReportDefinitions:
           WHEN p.businessservice IN ('NewSW1') THEN 'SW-Service'
           WHEN p.businessservice IN ('FIRENOC') THEN 'FireNoc'
           WHEN p.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment' END)
-          SELECT ta.tenantid as tenantid,ta.servicename as servicename,ta.total_appl as totalappl,COALESCE(pa.pending_appl,0) as pendingappl,
+          SELECT ta.tenantid as tenantid,ta.servicename as servicename,ta.total_appl as total_application,COALESCE(pa.pending_appl,0) as pending_application_out_of_sla,
           ROUND(CASE WHEN ta.total_appl > 0 THEN (COALESCE(pa.pending_appl, 0) * 100.0 / ta.total_appl) ELSE 0 END, 2) AS pendingapplpercentage
           FROM total_appl ta 
           LEFT JOIN pending_appl pa ON ta.tenantid=pa.tenantid AND ta.servicename=pa.servicename WHERE ta.tenantid NOT IN ('pb','pb.testing')
