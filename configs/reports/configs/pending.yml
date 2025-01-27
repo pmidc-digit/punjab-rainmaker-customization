@@ -30,6 +30,13 @@ ReportDefinitions:
         source: rainmaker-misc
         total: false
     searchParams:
+      - name: servicename
+        label: servicename
+        type: singlevaluelist
+        pattern: 'list://TL%:TL-Renewal,SW%:SW-Service,WS%:WS-Service,FN%:FireNoc,BS%:Bill Amendment'
+        source: rainmaker-misc
+        isMandatory: false
+        searchClause: AND ta.servicename =$servicename
       - name: tenantselected
         label: tenantid
         type: singlevaluelist
@@ -38,13 +45,6 @@ ReportDefinitions:
         wrapper: true
         isMandatory: false
         searchClause: AND ta.tenantid =$tenantselected
-      - name: servicename
-        label: servicename
-        type: singlevaluelist
-        pattern: 'list://TL%:TL-Renewal,SW%:SW-Service,WS%:WS-Service,FN%:FireNoc,BS%:Bill Amendment'
-        source: rainmaker-misc
-        isMandatory: false
-        searchClause: AND ta.servicename =$servicename
     query: |
         WITH total_appl AS
           (SELECT pp.tenantid,
