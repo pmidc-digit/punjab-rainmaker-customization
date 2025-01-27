@@ -37,14 +37,14 @@ ReportDefinitions:
         source: rainmaker-misc
         wrapper: true
         isMandatory: false
-        searchClause: $tenantid
+        searchClause: AND ta.tenantid =$tenantid
       - name: servicename
         label: servicename
         type: singlevaluelist
         pattern: 'list://TL%:TL-Renewal,SW%:SW-Service,WS%:WS-Service,FN%:FireNoc,BS%:Bill Amendment'
         source: rainmaker-misc
         isMandatory: false
-        searchClause: $servicename
+        searchClause: AND ta.servicename =$servicename
     query: |
         WITH total_appl AS
           (SELECT pp.tenantid,
@@ -82,4 +82,4 @@ ReportDefinitions:
           SELECT ta.tenantid as tenantid,ta.servicename as servicename,ta.total_appl as totalappl,COALESCE(pa.pending_appl,0) as pendingappl,
           ROUND(CASE WHEN ta.total_appl > 0 THEN (COALESCE(pa.pending_appl, 0) * 100.0 / ta.total_appl) ELSE 0 END, 2) AS pendingapplpercentage
           FROM total_appl ta 
-          LEFT JOIN pending_appl pa ON ta.tenantid=pa.tenantid AND ta.servicename=pa.servicename WHERE 1=1;
+          LEFT JOIN pending_appl pa ON ta.tenantid=pa.tenantid AND ta.servicename=pa.servicename WHERE ta.tenantid NOT IN ('pb','pb.testing')
