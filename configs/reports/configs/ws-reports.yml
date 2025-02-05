@@ -2111,7 +2111,7 @@ ReportDefinitions:
         AND epd.businessservice in ('SW.ONE_TIME_FEE','SW')
     groupby: GROUP BY epd.tenantid,ep.paymentmode,ebm.zonename,usr.name
 
-  - reportName: userwisedetailedcollection
+  - reportName: CollectionCountWaterSewerage
     decryptionPathId: MiscReceiptULB_v2
     summary:  User Wise Detailed collection
     version: 1.0.0
@@ -2120,33 +2120,88 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: consumercode
-        label: reports.ws.consumercode
+      - name: totalwaterconnections
+        label: reports.ws.totalwaterconnections
         type: string
         source: ws
         total: false
-      - name: receiptnumber
-        label: reports.ws.receiptnumber
-        type: string
-        source: ws
-        total: true
-      - name: paymentMode
-        label: reports.ws.paymentMode
-        type: string
-        source: ws
-        total: true
-      - name: receiptdate1
-        label: reports.ws.receiptdate1
+      - name: totalsewerageconnections
+        label: reports.ws.totalsewerageconnections
         type: string
         source: ws
         total: false
-      - name: amountpaid
-        label: reports.ws.amountpaid
+      - name: totalwateractive
+        label: reports.ws.totalwateractive
         type: string
         source: ws
         total: false
-      - name: collectorname
-        label: reports.ws.collectorname
+      - name: totalsewerageactive
+        label: reports.ws.totalsewerageactive
+        type: string
+        source: ws
+        total: false
+      - name: totalactiveresidentialinwater
+        label: reports.ws.totalactiveresidentialinwater
+        type: string
+        source: ws
+        total: false
+      - name: totalactiveresidentialinsewerage
+        label: reports.ws.totalactiveresidentialinsewerage
+        type: string
+        source: ws
+        total: false
+      - name: totalactivenonresidentialinsewerage
+        label: reports.ws.totalactivenonresidentialinsewerage
+        type: string
+        source: ws
+        total: false
+      - name: totalactivenonresidentialinwater
+        label: reports.ws.totalactivenonresidentialinwater
+        type: string
+        source: ws
+        total: false
+      - name: totalmeteredconnections
+        label: reports.ws.totalmeteredconnections
+        type: string
+        source: ws
+        total: false
+      - name: totalexemptedinwater
+        label: reports.ws.totalexemptedinwater
+        type: string
+        source: ws
+        total: false
+      - name: totalexemptedinsewerage
+        label: reports.ws.totalexemptedinsewerage
+        type: string
+        source: ws
+        total: false
+      - name: betweenfivemarlawater
+        label: reports.ws.betweenfivemarlawater
+        type: string
+        source: ws
+        total: false
+      - name: betweenfivemarlasewerage
+        label: reports.ws.betweenfivemarlasewerage
+        type: string
+        source: ws
+        total: false
+      - name: betweensixmarlawater
+        label: reports.ws.betweensixmarlawater
+        type: string
+        source: ws
+        total: false
+      - name: betweensixandtenmarlasewerage
+        label: reports.ws.betweensixandtenmarlasewerage
+        type: string
+        source: ws
+        total: false
+      - name: morethantenmarlawater
+        label: reports.ws.morethantenmarlawater
+        type: string
+        source: ws
+        total: false
+      - name: morethantenmarlasewerage
+        label: reports.ws.morethantenmarlasewerage
         type: string
         source: ws
         total: false
@@ -2187,3 +2242,104 @@ ReportDefinitions:
         inner join egcl_payment as payment on payment.id=pd.paymentid and payment.paymentstatus!='CANCELLED'
         and pd.businessservice in ('WS','SW','WS.ONE_TIME_FEE','SW.ONE_TIME_FEE') where payment.tenantid=$tenantid
     orderby: ORDER BY pd.receiptdate DESC
+
+
+  - reportName: SearchOnlineReceiptsWS
+    decryptionPathId: ReceiptRegisterShort_V2
+    summary: Search Online Receipts WS
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: billnumber
+        label: reports.ws.billnumber
+        type: string
+        source: ws
+        total: false
+      - name: consumercode
+        label: reports.ws.consumercode
+        type: string
+        source: ws
+        total: false
+      - name: receiptnumber
+        label: reports.ws.receiptnumber
+        type: string
+        source: ws
+        total: false
+      - name: receiptdate1
+        label: reports.ws.receiptdate1
+        type: string
+        source: ws
+        total: false
+      - name: amountpaid
+        label: reports.ws.amountpaid
+        type: string
+        source: ws
+        total: true
+      - name: transactionnumber
+        label: reports.ws.transactionnumber
+        type: string
+        source: ws
+        total: false
+      - name: transactiondate1
+        label: reports.ws.transactiondate
+        type: string
+        source: ws
+        total: false
+      - name: businessservice
+        label: reports.ws.businessservice
+        type: string
+        source: ws
+        total: false
+      - name: paymentstatus
+        label: reports.ws.paymentstatus
+        type: string
+        source: ws
+        total: false
+      - name: paymentmode
+        label: reports.ws.paymentmode
+        type: string
+        source: ws
+        total: false
+      - name: collectorname
+        label: reports.ws.collectorname
+        type: string
+        source: ws
+        total: false
+    query: >
+      -- Use CTE to force query plan, compute & use CTE later
+      SELECT a.totalwaterconnections, b.totalsewerageconnections, d.totalwateractive, e.totalsewerageactive, g.totalactiveresidentialinwater,
+      h.totalactiveresidentialinsewerage, i.totalactivenonresidentialinsewerage, j.totalactivenonresidentialinwater, k.totalmeteredconnections,
+      l.totalexemptedinwater, m.totalexemptedinsewerage, n.betweenfivemarlawater, o.betweenfivemarlasewerage, p.betweensixmarlawater, q.betweensixandtenmarlasewerage,
+      r.morethantenmarlawater, s.morethantenmarlasewerage
+      FROM (SELECT COUNT(wc.connectionno) AS totalwaterconnections FROM eg_ws_connection wc WHERE wc.tenantid = $tenantid AND wc.connectionno IS NOT NULL) a,
+      (SELECT COUNT(sc.connectionno) AS totalsewerageconnections FROM eg_sw_connection sc WHERE sc.tenantid = $tenantid AND sc.connectionno IS NOT NULL) b,
+      (SELECT COUNT(wc.connectionno) AS totalwateractive FROM eg_ws_connection wc WHERE wc.status = 'Active' AND wc.tenantid = $tenantid AND wc.connectionno IS NOT NULL) d,
+      (SELECT COUNT(sc.connectionno) AS totalsewerageactive FROM eg_sw_connection sc WHERE sc.status = 'Active' AND sc.tenantid = $tenantid AND sc.connectionno IS NOT NULL) e,
+      (SELECT COUNT(wc.connectionno) AS totalactiveresidentialinwater FROM eg_ws_connection wc WHERE wc.property_id IN 
+      (SELECT propertyid FROM eg_pt_property WHERE status IN ('ACTIVE', 'PENDINGWS') AND usagecategory IN ('RESIDENTIAL' , 'MIXED')AND tenantid = $tenantid) AND wc.status = 'Active' AND wc.additionaldetails->>'unitUsageType'='RESIDENTIAL' AND wc.tenantid = $tenantid AND wc.connectionno IS NOT NULL) g,
+      (SELECT COUNT(sc.connectionno) AS totalactiveresidentialinsewerage FROM eg_sw_connection sc WHERE sc.property_id IN 
+      (SELECT propertyid FROM eg_pt_property WHERE status IN ('ACTIVE', 'PENDINGWS') AND usagecategory IN ('RESIDENTIAL','MIXED') AND tenantid = $tenantid) AND sc.status = 'Active' AND sc.tenantid = $tenantid AND sc.additionaldetails->>'unitUsageType'='RESIDENTIAL' OR sc.additionaldetails->>'unitUsageType'='null' AND sc.connectionno IS NOT NULL) h,
+      (SELECT COUNT(sc.connectionno) AS totalactivenonresidentialinsewerage FROM eg_sw_connection sc WHERE sc.property_id IN 
+      (SELECT propertyid FROM eg_pt_property WHERE status IN ('ACTIVE', 'PENDINGWS') AND usagecategory != 'RESIDENTIAL' AND tenantid = $tenantid) AND sc.status = 'Active' AND sc.tenantid = $tenantid AND sc.connectionno IS NOT NULL) i,
+      (SELECT COUNT(wc.connectionno) AS totalactivenonresidentialinwater FROM eg_ws_connection wc WHERE wc.property_id IN 
+      (SELECT propertyid FROM eg_pt_property WHERE status IN ('ACTIVE', 'PENDINGWS') AND usagecategory LIKE 'NONRESIDENTIAL%' AND tenantid = $tenantid) AND wc.status = 'Active' AND wc.tenantid = $tenantid AND wc.connectionno IS NOT NULL) j,
+      (SELECT COUNT(wc.connectionno) AS totalmeteredconnections FROM eg_ws_connection wc JOIN eg_ws_service ws ON wc.id = ws.connection_id WHERE ws.connectiontype = 'Metered' AND wc.status = 'Active' AND wc.tenantid = $tenantid AND wc.connectionno IS NOT NULL) k,
+      (SELECT COUNT(wc.connectionno) AS totalexemptedinwater FROM eg_ws_connection wc WHERE wc.property_id IN 
+      (SELECT propertyid FROM eg_pt_property WHERE landarea BETWEEN 0 AND 125 AND status IN ('ACTIVE', 'PENDINGWS') AND usagecategory = 'RESIDENTIAL' AND tenantid = $tenantid) AND wc.status = 'Active' AND wc.tenantid = $tenantid AND wc.connectionno IS NOT NULL) l,
+      (SELECT COUNT(sc.connectionno) AS totalexemptedinsewerage FROM eg_sw_connection sc WHERE sc.property_id IN 
+      (SELECT propertyid FROM eg_pt_property WHERE landarea BETWEEN 0 AND 125 AND status IN ('ACTIVE', 'PENDINGWS') AND usagecategory = 'RESIDENTIAL' AND tenantid = $tenantid) AND sc.status = 'Active' AND sc.tenantid = $tenantid AND sc.connectionno IS NOT NULL) m,
+      (SELECT COUNT(wc.connectionno) AS betweenfivemarlawater FROM eg_ws_connection wc WHERE wc.property_id IN 
+      (SELECT propertyid FROM eg_pt_property WHERE landarea BETWEEN 0 AND 125 AND status IN ('ACTIVE', 'PENDINGWS') AND tenantid = $tenantid) AND wc.status = 'Active' AND wc.tenantid = $tenantid AND wc.connectionno IS NOT NULL) n,
+      (SELECT COUNT(sc.connectionno) AS betweenfivemarlasewerage FROM eg_sw_connection sc WHERE sc.property_id IN 
+      (SELECT propertyid FROM eg_pt_property WHERE landarea BETWEEN 0 AND 125 AND status IN ('ACTIVE', 'PENDINGWS') AND tenantid = $tenantid) AND sc.status = 'Active' AND sc.tenantid = $tenantid AND sc.connectionno IS NOT NULL) o,
+      (SELECT COUNT(wc.connectionno) AS betweensixmarlawater FROM eg_ws_connection wc WHERE wc.property_id IN 
+      (SELECT propertyid FROM eg_pt_property WHERE landarea BETWEEN 126 AND 250 AND status IN ('ACTIVE', 'PENDINGWS') AND tenantid = $tenantid) AND wc.status = 'Active' AND wc.tenantid = $tenantid AND wc.connectionno IS NOT NULL) p,
+      (SELECT COUNT(sc.connectionno) AS betweensixandtenmarlasewerage FROM eg_sw_connection sc WHERE sc.property_id IN 
+      (SELECT propertyid FROM eg_pt_property WHERE landarea BETWEEN 126 AND 250 AND status = 'ACTIVE' AND tenantid = $tenantid) AND sc.status = 'Active' AND sc.tenantid = $tenantid AND sc.connectionno IS NOT NULL) q,
+      (SELECT COUNT(wc.connectionno) AS morethantenmarlawater FROM eg_ws_connection wc WHERE wc.property_id IN 
+      (SELECT propertyid FROM eg_pt_property WHERE landarea >= 251 AND status IN ('ACTIVE', 'PENDINGWS') AND tenantid = $tenantid) AND wc.status = 'Active' AND wc.tenantid = $tenantid AND wc.connectionno IS NOT NULL) r,
+      (SELECT COUNT(sc.connectionno) AS morethantenmarlasewerage FROM eg_sw_connection sc WHERE sc.property_id IN 
+      (SELECT propertyid FROM eg_pt_property WHERE landarea >= 251 AND status IN ('ACTIVE', 'PENDINGWS') AND tenantid = $tenantid) AND sc.status = 'Active' AND sc.tenantid = $tenantid AND sc.connectionno IS NOT NULL) s
