@@ -214,5 +214,46 @@ serviceMaps:
             - jsonPath: $.Categories.*.auditDetails.lastModifiedTime
             - jsonPath: $.Categories.*.id
 
+    - version: 1.0
+      description: Persists questions in eg_ss_question table
+      fromTopic: save-ss-question
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO eg_ss_question( uuid,tenantid,surveyid,questionstatement,options,status,type,required,createdby,lastmodifiedby,createdtime,lastmodifiedtime,qorder,categoryid) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+          basePath: Questions.*
+          jsonMaps:
+            - jsonPath: $.Questions.*.uuid
+            - jsonPath: $.Questions.*.tenantId
+            - jsonPath: $.Questions.*.surveyId
+            - jsonPath: $.Questions.*.questionStatement
+            - jsonPath: $.Questions.*.options
+              type: ARRAY
+              dbType: STRING
+            - jsonPath: $.Questions.*.status
+            - jsonPath: $.Questions.*.type
+            - jsonPath: $.Questions.*.required
+            - jsonPath: $.Questions.*.auditDetails.createdBy
+            - jsonPath: $.Questions.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Questions.*.auditDetails.createdTime
+            - jsonPath: $.Questions.*.auditDetails.lastModifiedTime
+            - jsonPath: $.Questions.*.qorder
+            - jsonPath: $.Questions.*.categoryId
+
+    - version: 1.0
+      description: Update questions in eg_ss_question table
+      fromTopic: update-ss-question
+      isTransaction: true
+      queryMaps:
+        - query: UPDATE eg_ss_question SET status = COALESCE(?, status), lastmodifiedby = ?,lastmodifiedtime = ? WHERE uuid = ?;
+          basePath: Questions.*
+          jsonMaps:
+            - jsonPath: $.Questions.*.status
+            - jsonPath: $.Questions.*.lastModifiedBy
+            - jsonPath: $.Questions.*.lastModifiedTime
+            - jsonPath: $.Questions.*.uuid
+
+
+
+
 
 
