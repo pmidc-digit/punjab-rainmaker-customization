@@ -257,7 +257,7 @@ serviceMaps:
       fromTopic: insert-scorecard-survey-entity
       isTransaction: true
       queryMaps:
-        - query: INSERT INTO eg_ss_survey_entity (uuid,tenantid, title, category, description, startdate, enddate, postedby, active, answerscount, hasresponded) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        - query: INSERT INTO eg_ss_survey_entity (uuid,tenantid, title, category, description, startdate, enddate, postedby, active, answerscount, hasresponded,createdby,lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?);
           basePath: SurveyEntity
           jsonMaps:
             - jsonPath: $.SurveyEntity.uuid
@@ -271,6 +271,10 @@ serviceMaps:
             - jsonPath: $.SurveyEntity.active
             - jsonPath: $.SurveyEntity.answersCount
             - jsonPath: $.SurveyEntity.hasResponded
+            - jsonPath: $.SurveyEntity.auditDetails.createdBy
+            - jsonPath: $.SurveyEntity.auditDetails.lastModifiedBy
+            - jsonPath: $.SurveyEntity.auditDetails.createdTime
+            - jsonPath: $.SurveyEntity.auditDetails.lastModifiedTime
 
         - query: INSERT INTO eg_ss_survey_section(uuid, surveyuuid, title, weightage) VALUES (?, ?, ?, ?);
           basePath: SurveyEntity.sections.*
