@@ -251,9 +251,35 @@ serviceMaps:
             - jsonPath: $.Questions.*.auditDetails.lastModifiedBy
             - jsonPath: $.Questions.*.auditDetails.lastModifiedTime
             - jsonPath: $.Questions.*.uuid
+            
+    - version: 1.0
+      description: Insert into scorecard survey related tables
+      fromTopic: insert-scorecard-survey-entity
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO eg_ss_survey_entity (uuid,tenantid, title, category, description, startdate, enddate, postedby, active, answerscount, hasresponded) VALUES (?, ?, ?, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL);
+          basePath: SurveyEntity
+          jsonMaps:
+            - jsonPath: $.SurveyEntity.uuid
+            - jsonPath: $.SurveyEntity.tenantId
+            - jsonPath: $.SurveyEntity.surveyTitle
+            - jsonPath: $.SurveyEntity.surveyCategory
+            - jsonPath: $.SurveyEntity.surveyDescription
 
+        - query: INSERT INTO eg_ss_survey_section(uuid, surveyuuid, title, weightage) VALUES (?, ?, ?, ?);
+          basePath: SurveyEntity.sections.*
+          jsonMaps:
+            - jsonPath: $.SurveyEntity.sections.*.uuid
+            - jsonPath: $.SurveyEntity.uuid
+            - jsonPath: $.SurveyEntity.sections.*.title
+            - jsonPath: $.SurveyEntity.sections.*.weightage
 
+        - query: INSERT INTO eg_ss_question_weightage(questionuuid,sectionuuid,weightage, qorder) VALUES (?, ?, ?, ?);
+          basePath: SurveyEntity.sections.*.questions.*
+          jsonMaps:
+            - jsonPath: $.SurveyEntity.sections.*.questions.*.questionUuid
+            - jsonPath: $.SurveyEntity.sections.*.questions.*.sectionUuid
+            - jsonPath: $.SurveyEntity.sections.*.questions.*.weightage
+            - jsonPath: $.SurveyEntity.sections.*.questions.*.qorder
 
-
-
-
+          
