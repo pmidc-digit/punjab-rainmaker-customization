@@ -49,6 +49,7 @@ ReportDefinitions:
         WITH total_appl AS
           (SELECT pp.tenantid,
           CASE WHEN pp.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal'
+          WHEN pp.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
           WHEN pp.businessservice IN ('NewWS1') THEN 'WS-Service'
           WHEN pp.businessservice IN ('NewSW1') THEN 'SW-Service'
           WHEN pp.businessservice IN ('FIRENOC') THEN 'FireNoc'
@@ -56,16 +57,18 @@ ReportDefinitions:
           END as servicename,
           count(*) as total_appl
           FROM public.eg_wf_processinstance_v2 pp
-          WHERE pp.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.MUTATION','PT.CREATEWITHWNS')
+          WHERE pp.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.CREATEWITHWNS')
           AND PP.ASSIGNEE IS NOT NULL
           GROUP BY pp.tenantid,CASE WHEN pp.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal'
+          WHEN pp.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
           WHEN pp.businessservice IN ('NewWS1') THEN 'WS-Service'
           WHEN pp.businessservice IN ('NewSW1') THEN 'SW-Service'
           WHEN pp.businessservice IN ('FIRENOC') THEN 'FireNoc'
           WHEN pp.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment'
           END),
           pending_appl AS
-         (SELECT p.tenantid, CASE WHEN p.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal' 
+         (SELECT p.tenantid, CASE WHEN p.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal'
+          WHEN p.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
           WHEN p.businessservice IN ('NewWS1') THEN 'WS-Service'
           WHEN p.businessservice IN ('NewSW1') THEN 'SW-Service'
           WHEN p.businessservice IN ('FIRENOC') THEN 'FireNoc'
@@ -74,9 +77,10 @@ ReportDefinitions:
           FROM public.eg_wf_processinstance_v2 p
           JOIN  public.eg_wf_businessservice_v2 b ON p.businessservice=b.businessservice
           WHERE (to_timestamp(p.lastmodifiedtime / 1000.0) - to_timestamp(p.createdtime / 1000.0)) > (b.businessservicesla / (1000 * 60 * 60 * 24)) * interval '1 day'
-          AND b.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.MUTATION','PT.CREATEWITHWNS')
+          AND b.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.CREATEWITHWNS')
           AND P.ASSIGNEE IS NOT NULL
           GROUP BY p.tenantid,CASE WHEN p.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal'
+          WHEN p.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
           WHEN p.businessservice IN ('NewWS1') THEN 'WS-Service'
           WHEN p.businessservice IN ('NewSW1') THEN 'SW-Service'
           WHEN p.businessservice IN ('FIRENOC') THEN 'FireNoc'
