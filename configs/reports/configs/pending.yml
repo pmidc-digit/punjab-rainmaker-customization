@@ -85,3 +85,64 @@ ReportDefinitions:
           ROUND(CASE WHEN ta.total_appl > 0 THEN (COALESCE(pa.pending_appl, 0) * 100.0 / ta.total_appl) ELSE 0 END, 2) AS pendingapplpercentage
           FROM total_appl ta 
           LEFT JOIN pending_appl pa ON ta.tenantid=pa.tenantid AND ta.servicename=pa.servicename WHERE ta.tenantid NOT IN ('pb','pb.testing')
+
+          
+ReportDefinitions:
+  - reportName: DepartmentReport
+    summary: Department Report
+    version: 1.0.0
+    moduleName: rainmaker-misc
+    sourceColumns:
+      - name: departmentid
+        label: departmentid
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: departmentname
+        label: departmentname
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: total_application
+        label: total_application
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: pending_application_out_of_sla
+        label: pending_application_out_of_sla
+        type: string
+        source: rainmaker-misc
+        total: false
+    searchParams:
+      - name: departmentid
+        label: departmentid
+        type: singlevaluelist
+        pattern: 'list://1'
+        source: rainmaker-misc
+        isMandatory: false
+        searchClause: "" 
+      - name: departmentname
+        label: departmentname
+        type: singlevaluelist
+        pattern: 'list://Punjab Local Government'
+        source: rainmaker-misc
+        wrapper: true
+        isMandatory: false
+        searchClause: ""
+    query: |
+        WITH total_appl AS
+        (SELECT count(*) as total_appl
+        FROM public.eg_wf_processinstance_v2 pp
+        WHERE pp.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.CREATEWITHWNS')
+        AND pp.ASSIGNEE IS NOT NULL
+        AND pp.tenantid NOT IN ('pb','pb.testing')),
+        pending_appl AS
+        (SELECT count(*) as pending_appl
+        FROM public.eg_wf_processinstance_v2 p
+        JOIN  public.eg_wf_businessservice_v2 b ON p.businessservice=b.businessservice
+        WHERE (to_timestamp(p.lastmodifiedtime / 1000.0) - to_timestamp(p.createdtime / 1000.0)) > (b.businessservicesla / (1000 * 60 * 60 * 24)) * interval '1 day'
+        AND b.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.CREATEWITHWNS')
+        AND P.ASSIGNEE IS NOT NULL
+        AND p.tenantid NOT IN ('pb','pb.testing'))
+        SELECT '1' as departmentid, 'Punjab Local Government' as departmentname,ta.total_appl as total_application,pa.pending_appl as pending_application_out_of_sla
+        FROM total_appl ta,pending_appl pa
