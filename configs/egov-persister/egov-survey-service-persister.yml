@@ -313,7 +313,7 @@ serviceMaps:
         - query: INSERT INTO eg_ss_answer( uuid,questionuuid,surveyuuid,sectionuuid,answer,citizenid,comments,createdby,lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT (uuid) DO UPDATE SET answer = EXCLUDED.answer, comments = EXCLUDED.comments, lastmodifiedby = EXCLUDED.lastmodifiedby, lastmodifiedtime = EXCLUDED.lastmodifiedtime;
           basePath: AnswerEntity.answers.*
           jsonMaps:
-            - jsonPath: $.AnswerEntity.answers.*.uuid
+            - jsonPath: $.AnswerEntity.answers.*.answerUuid
             - jsonPath: $.AnswerEntity.answers.*.questionUuid
             - jsonPath: $.AnswerEntity.answers.*.surveyUuid
             - jsonPath: $.AnswerEntity.answers.*.sectionUuid
