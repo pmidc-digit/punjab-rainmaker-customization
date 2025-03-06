@@ -291,6 +291,19 @@ serviceMaps:
             - jsonPath: $.SurveyEntity.sections.*.questions.*.sectionUuid
             - jsonPath: $.SurveyEntity.sections.*.questions.*.weightage
             - jsonPath: $.SurveyEntity.sections.*.questions.*.qorder
+        
+    - version: 1.0
+      description: Updates activeness of survey
+      fromTopic: update-scorecard-survey-active
+      isTransaction: true
+      queryMaps:
+        - query: UPDATE eg_ss_survey_entity SET active=?, lastmodifiedtime=?, lastmodifiedby=? WHERE uuid=?;
+          basePath: $
+          jsonMaps:
+            - jsonPath: $.active
+            - jsonPath: $.lastModifiedTime
+            - jsonPath: $.lastModifiedBy
+            - jsonPath: $.uuid
 
     - version: 1.0
       description: Persists scorecard survey answers in eg_ss_answer table
