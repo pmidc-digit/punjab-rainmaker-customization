@@ -1326,14 +1326,6 @@ ReportDefinitions:
     source: tl
     isMandatory: false
     searchClause: AND egcl_paymentdetail.receiptdate  <= $toDate 
-  - name: collectorname
-    label: reports.uc.collectorname
-    type: singlevaluelist
-    pattern: http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=TL_CEMP|$.Employees[*].user.id|$.Employees[*].user.name
-    source: pt
-    wrapper: true
-    isMandatory: false
-    searchClause: AND eg_user.id = $collectorname::INTEGER
   query: |
     SELECT 
       licensenumber,
