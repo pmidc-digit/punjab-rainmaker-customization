@@ -211,7 +211,7 @@ ReportDefinitions:
         pattern: 'list://TL%:TL-Renewal,SW%:SW-Service,WS%:WS-Service,FN%:FireNoc,BS%:Bill Amendment'
         source: rainmaker-misc
         isMandatory: false
-        searchClause: AND ta.servicename =$servicename
+        searchClause: AND TRIM(ta.servicename) =TRIM($servicename)
     query: |
         WITH total_appl AS
         (SELECT CASE WHEN pp.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal'
