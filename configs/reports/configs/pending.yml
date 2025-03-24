@@ -58,7 +58,6 @@ ReportDefinitions:
           count(*) as total_appl
           FROM public.eg_wf_processinstance_v2 pp
           WHERE pp.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.CREATEWITHWNS')
-          AND PP.ASSIGNEE IS NOT NULL
           GROUP BY pp.tenantid,CASE WHEN pp.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal'
           WHEN pp.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
           WHEN pp.businessservice IN ('NewWS1') THEN 'WS-Service'
@@ -121,7 +120,6 @@ ReportDefinitions:
         (SELECT count(*) as total_appl
         FROM public.eg_wf_processinstance_v2 pp
         WHERE pp.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.CREATEWITHWNS')
-        AND pp.ASSIGNEE IS NOT NULL
         AND pp.tenantid NOT IN ('pb','pb.testing')),
         pending_appl AS
         (SELECT count(*) as pending_appl
@@ -168,7 +166,6 @@ ReportDefinitions:
         (SELECT pp.tenantid,count(*) as total_appl
         FROM public.eg_wf_processinstance_v2 pp
         WHERE pp.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.CREATEWITHWNS')
-        AND pp.ASSIGNEE IS NOT NULL
         AND pp.tenantid NOT IN ('pb','pb.testing')
         GROUP BY pp.tenantid),
         pending_appl AS
@@ -224,7 +221,6 @@ ReportDefinitions:
         count(*) as total_appl
         FROM public.eg_wf_processinstance_v2 pp
         WHERE pp.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.CREATEWITHWNS')
-        AND PP.ASSIGNEE IS NOT NULL
         AND pp.tenantid NOT IN ('pb','pb.testing')
         GROUP BY CASE WHEN pp.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal'
         WHEN pp.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
@@ -254,4 +250,4 @@ ReportDefinitions:
         WHEN p.businessservice IN ('FIRENOC') THEN 'FireNoc'
         WHEN p.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment' END)
         SELECT ta.servicename as servicename,ta.total_appl as total_application,COALESCE(pa.pending_appl,0) as pending_application_out_of_sla
-        FROM total_appl ta LEFT JOIN pending_appl pa ON ta.servicename=pa.servicename WHERE 1=1
+        FROM total_appl ta LEFT JOIN pending_appl pa ON ta.servicename=pa.servicename WHERE ta.servicename IS NOT NULL
