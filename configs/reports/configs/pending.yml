@@ -96,23 +96,23 @@ ReportDefinitions:
     version: 1.0.0
     moduleName: rainmaker-misc
     sourceColumns:
-      - name: departmentid
-        label: departmentid
+      - name: departmentID
+        label: departmentID
         type: string
         source: rainmaker-misc
         total: false
-      - name: departmentname
-        label: departmentname
+      - name: departmentName
+        label: departmentName
         type: string
         source: rainmaker-misc
         total: false
-      - name: total_application
-        label: total_application
+      - name: TotalApplicationReceived
+        label: TotalApplicationReceived
         type: string
         source: rainmaker-misc
         total: false
-      - name: pending_application_out_of_sla
-        label: pending_application_out_of_sla
+      - name: PendingBeyondTimelineApplicationCount
+        label: PendingBeyondTimelineApplicationCount
         type: string
         source: rainmaker-misc
         total: false
@@ -131,7 +131,7 @@ ReportDefinitions:
         AND b.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.CREATEWITHWNS')
         AND P.ASSIGNEE IS NOT NULL
         AND p.tenantid NOT IN ('pb','pb.testing'))
-        SELECT '1' as departmentid, 'Punjab Local Government' as departmentname,ta.total_appl as total_application,pa.pending_appl as pending_application_out_of_sla
+        SELECT '1' as departmentID, 'Punjab Local Government' as departmentName,ta.total_appl as TotalApplicationReceived,pa.pending_appl as PendingBeyondTimelineApplicationCount
         FROM total_appl ta,pending_appl pa
         
   - reportName: TenantWisePendencyReport
