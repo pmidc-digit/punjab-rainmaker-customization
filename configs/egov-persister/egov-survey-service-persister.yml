@@ -284,14 +284,16 @@ serviceMaps:
             - jsonPath: $.SurveyEntity.sections.*.title
             - jsonPath: $.SurveyEntity.sections.*.weightage
 
-        - query: INSERT INTO eg_ss_question_weightage(questionuuid,sectionuuid,weightage, qorder) VALUES (?, ?, ?, ?);
+        - query: INSERT INTO eg_ss_question_weightage(questionuuid,sectionuuid,weightage, qorder, required) VALUES (?, ?, ?, ?, ?);
           basePath: SurveyEntity.sections.*.questions.*
           jsonMaps:
             - jsonPath: $.SurveyEntity.sections.*.questions.*.questionUuid
             - jsonPath: $.SurveyEntity.sections.*.questions.*.sectionUuid
             - jsonPath: $.SurveyEntity.sections.*.questions.*.weightage
             - jsonPath: $.SurveyEntity.sections.*.questions.*.qorder
-        
+            - jsonPath: $.SurveyEntity.sections.*.required
+
+
     - version: 1.0
       description: Updates activeness of survey
       fromTopic: update-scorecard-survey-active
