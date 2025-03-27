@@ -9429,41 +9429,45 @@ ReportDefinitions:
     searchClause: AND upper(localityname) LIKE CONCAT('%',upper($localityname),'%')
   query: |
     --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property	Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id	Address
-    with owners as
-    ( 
-    select
-      split_part(string_agg(ownername,','),',',1) as ownername,
-      split_part(string_agg(mobilenumber,','),',',1) as mobilenumber,
-      propertyid
-    from report_owners
-    where tenantid=$tenantid  and status='ACTIVE' and propertyid in (select propertyid from report_unpaid_demand where tenantid=$tenantid)
-    group by propertyid
-    ),
-    units as
-    (
-      select distinct propertyid as propertyid,string_agg(usagecategory,',') as unitusage from report_units where propertyid in (select propertyid from report_unpaid_demand where tenantid=$tenantid)  and active=true group by propertyid
-    )
-    select 
-      d.propertyid as propertyid, 
-      pt.oldpropertyid as oldpropertyid,
-      pt.surveyid as surveyid,
-      d.demand as tentativedemand, 
-      d.fy as assessmentyear, 
-      pt.address as address, 
-      pt.blockname as blockname,
-      pt.propertyusagetype as propertycategory,
-      pt.propertytype as propertytype,
-      pt.ownershipcategory as ownership,
-      pt.plotsize as plotsize,
-      pt.firmbusinessname as businessname,
-      pt.localityname as localityname,
-      owners.ownername as ownername,
-      owners.mobilenumber as mobileno
-    from report_unpaid_demand d  
-    left join report_properties pt on pt.propertyid=d.propertyid and pt.propertystatus!='INACTIVE'
-    inner join units u on u.propertyid=pt.propertyid 
-    inner join owners on owners.propertyid=pt.propertyid
-    where d.tenantid=$tenantid and d.demand>0
+    WITH owners AS (
+    SELECT propertyid,
+    SPLIT_PART(STRING_AGG(ownername, ','), ',', 1) AS ownername,
+    SPLIT_PART(STRING_AGG(mobilenumber, ','), ',', 1) AS mobilenumber
+    FROM report_owners
+    WHERE tenantid = $tenantid
+    AND status = 'ACTIVE'
+    GROUP BY propertyid ),
+    units AS (
+    SELECT
+    propertyid,
+    STRING_AGG(usagecategory, ',') AS unitusage
+    FROM report_units
+    WHERE tenantid = $tenantid
+    AND active = TRUE
+    GROUP BY propertyid )
+    SELECT 
+    d.propertyid AS propertyid, 
+    pt.oldpropertyid AS oldpropertyid,
+    pt.surveyid AS surveyid,
+    d.demand AS tentativedemand, 
+    d.fy AS assessmentyear,
+    pt.address AS address,
+    pt.blockname AS blockname,
+    pt.propertyusagetype AS propertycategory,
+    pt.propertytype AS propertytype,
+    pt.ownershipcategory AS ownership,
+    pt.plotsize AS plotsize,
+    pt.firmbusinessname AS businessname,
+    pt.localityname AS localityname,
+    COALESCE(o.ownername, 'N/A') AS ownername,
+    COALESCE(o.mobilenumber, 'N/A') AS mobileno
+    FROM report_unpaid_demand d
+    LEFT JOIN report_properties pt ON pt.propertyid = d.propertyid
+    AND pt.propertystatus != 'INACTIVE'
+    LEFT JOIN units u ON u.propertyid = d.propertyid
+    LEFT JOIN owners o ON o.propertyid = d.propertyid
+    WHERE d.tenantid = $tenantid
+    AND d.demand > 0
     
     
 - reportName: STATEDEFAULTER_REPORT_WITH_LOCALITY_UNPAID_DEMAND_NEW
