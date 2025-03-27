@@ -1,0 +1,26 @@
+ServiceMaps:
+  serviceName: Survey Service
+  version: 1.0.0
+  mappings:
+   - topic: save-ss-category
+     configKey: INDEX
+     indexes:
+       - name: survey-category-index
+         type: general
+         id: $.id, $.tenantId
+         isBulk: true
+         timeStampField: $.auditDetails.createdTime
+         jsonPath: $.Categories.*
+         customJsonMapping:
+           indexMapping: {"Data":{"id": "id","label": "label","isActive": "isActive","tenantId": "","auditDetails": {}}}
+           fieldMapping:
+           - inJsonPath: $.id
+             outJsonPath: $.Data.id
+           - inJsonPath: $.label
+             outJsonPath: $.Data.label
+           - inJsonPath: $.isActive
+             outJsonPath: $.Data.isActive
+           - inJsonPath: $.tenantId
+             outJsonPath: $.Data.tenantId
+           - inJsonPath: $.auditDetails
+             outJsonPath: $.Data.auditDetails
