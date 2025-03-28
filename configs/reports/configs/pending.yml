@@ -272,44 +272,43 @@ ReportDefinitions:
                 WHEN pp.businessservice IN ('FIRENOC') THEN 'FireNoc'
                 WHEN pp.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment'
             END
-            ),
-            pending_appl AS (
-                SELECT 
-                    CASE 
-                        WHEN p.businessservice IN ('NEWTL.HAZ', 'DIRECTRENEWAL', 'EDITRENEWAL', 'NewTL') THEN 'TL-Renewal'
-                        WHEN p.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
-                        WHEN p.businessservice IN ('NewWS1') THEN 'WS-Service'
-                        WHEN p.businessservice IN ('NewSW1') THEN 'SW-Service'
-                        WHEN p.businessservice IN ('FIRENOC') THEN 'FireNoc'
-                        WHEN p.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment' 
-                    END AS servicename,
-                    p.tenantid,  -- Added tenantid
-                    COUNT(*) AS pending_appl
-                FROM public.eg_wf_processinstance_v2 p
-                JOIN public.eg_wf_businessservice_v2 b ON p.businessservice = b.businessservice
-                WHERE (TO_TIMESTAMP(p.lastmodifiedtime / 1000.0) - TO_TIMESTAMP(p.createdtime / 1000.0)) > 
-                      (b.businessservicesla / (1000 * 60 * 60 * 24)) * INTERVAL '1 day'
-                    AND b.businessservice NOT IN ('ModifyWSConnection', 'ModifySWConnection', 'PT.CREATE', 'PT.UPDATE', 'PT.CREATEWITHWNS')
-                    AND p.assignee IS NOT NULL
-                    AND p.tenantid NOT IN ('pb', 'pb.testing')
-                GROUP BY p.tenantid, 
-                    CASE 
-                        WHEN p.businessservice IN ('NEWTL.HAZ', 'DIRECTRENEWAL', 'EDITRENEWAL', 'NewTL') THEN 'TL-Renewal'
-                        WHEN p.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
-                        WHEN p.businessservice IN ('NewWS1') THEN 'WS-Service'
-                        WHEN p.businessservice IN ('NewSW1') THEN 'SW-Service'
-                        WHEN p.businessservice IN ('FIRENOC') THEN 'FireNoc'
-                        WHEN p.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment' 
-                    END
-            )
-            SELECT 
-                '' as serviceID
-                ta.servicename AS serviceName,
-                ta.tenantid AS authorityID,  -- Including tenantid in the final result
-                '1' as departmentID,
-                ta.total_appl AS TotalApplicationReceived,
-                COALESCE(pa.pending_appl, 0) AS PendingBeyondTimelineApplicationCount
-            FROM total_appl ta 
-            LEFT JOIN pending_appl pa 
-                ON ta.servicename = pa.servicename 
-                AND ta.tenantid = pa.tenantid WHERE 1=1
+          ),
+          pending_appl AS (
+              SELECT 
+                  CASE 
+                      WHEN p.businessservice IN ('NEWTL.HAZ', 'DIRECTRENEWAL', 'EDITRENEWAL', 'NewTL') THEN 'TL-Renewal'
+                      WHEN p.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
+                      WHEN p.businessservice IN ('NewWS1') THEN 'WS-Service'
+                      WHEN p.businessservice IN ('NewSW1') THEN 'SW-Service'
+                      WHEN p.businessservice IN ('FIRENOC') THEN 'FireNoc'
+                      WHEN p.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment' 
+                  END AS servicename,
+                  p.tenantid,  -- Added tenantid
+                  COUNT(*) AS pending_appl
+              FROM public.eg_wf_processinstance_v2 p
+              JOIN public.eg_wf_businessservice_v2 b ON p.businessservice = b.businessservice
+              WHERE (TO_TIMESTAMP(p.lastmodifiedtime / 1000.0) - TO_TIMESTAMP(p.createdtime / 1000.0)) > 
+                    (b.businessservicesla / (1000 * 60 * 60 * 24)) * INTERVAL '1 day'
+                  AND b.businessservice NOT IN ('ModifyWSConnection', 'ModifySWConnection', 'PT.CREATE', 'PT.UPDATE', 'PT.CREATEWITHWNS')
+                  AND p.assignee IS NOT NULL
+                  AND p.tenantid NOT IN ('pb', 'pb.testing')
+              GROUP BY p.tenantid, 
+                  CASE 
+                      WHEN p.businessservice IN ('NEWTL.HAZ', 'DIRECTRENEWAL', 'EDITRENEWAL', 'NewTL') THEN 'TL-Renewal'
+                      WHEN p.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
+                      WHEN p.businessservice IN ('NewWS1') THEN 'WS-Service'
+                      WHEN p.businessservice IN ('NewSW1') THEN 'SW-Service'
+                      WHEN p.businessservice IN ('FIRENOC') THEN 'FireNoc'
+                      WHEN p.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment' 
+                  END
+          )
+          SELECT 
+              ta.servicename AS servicename,
+              ta.tenantid AS tenant_id,  -- Including tenantid in the final result
+              ta.total_appl AS total_application,
+              COALESCE(pa.pending_appl, 0) AS pending_application_out_of_sla
+          FROM total_appl ta 
+          LEFT JOIN pending_appl pa 
+              ON ta.servicename = pa.servicename 
+              AND ta.tenantid = pa.tenantid  -- Ensuring tenantid match
+          WHERE 1=1
