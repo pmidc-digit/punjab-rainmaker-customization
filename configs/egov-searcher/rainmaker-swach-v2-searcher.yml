@@ -16,28 +16,25 @@ SearchDefinitions:
                     (SELECT row_to_json(auditDetails) 
                      FROM (
                        SELECT createdtime, lastmodifiedtime, createdby, lastmodifiedby 
-                       FROM public.eg_swach_service_v2 
-                       WHERE svc.serviceRequestId = public.eg_swach_service_v2.serviceRequestId
+                       FROM eg_swach_service_v2 
+                       WHERE svc.serviceRequestId = eg_swach_service_v2.serviceRequestId
                      ) auditDetails
                     ) AS auditDetails,
                     (SELECT row_to_json(addressDetail) 
                      FROM (
                        SELECT * 
-                       FROM public.eg_swach_address_v2 
-                       WHERE public.eg_swach_address_v2.parentid = public.eg_swach_service_v2.id
+                       FROM eg_swach_address_v2 
+                       WHERE eg_swach_address_v2.parentid = eg_swach_service_v2.id
                      ) addressDetail
                     ) AS addressDetail
-                  FROM public.eg_swach_service_v2 svc 
-                  WHERE svc.serviceRequestId = public.eg_swach_service_v2.serviceRequestId 
+                  FROM eg_swach_service_v2 svc 
+                  WHERE svc.serviceRequestId = eg_swach_service_v2.serviceRequestId 
                   ORDER BY createdtime DESC
                 ) services
               ) AS services
-            )
-            FROM public.eg_swach_service_v2 $where
+            ) FROM eg_swach_service_v2 $where 
             ORDER BY createdtime DESC $pagination
           ) serviceRequests
-        groupBy:
-        orderBy:
       searchParams:
         condition: AND
         params:
@@ -82,9 +79,9 @@ SearchDefinitions:
           - name: active
             isMandatory: false
             jsonPath: $.searchCriteria.active
-      pagination:
-        noOfRecords: $.searchCriteria.noOfRecords
-        offset: $.searchCriteria.offset
+        pagination:
+          noOfRecords: $.searchCriteria.noOfRecords
+          offset: $.searchCriteria.offset
       output:
         jsonFormat: {"ResponseInfo": {}}
         outJsonPath: $.services
