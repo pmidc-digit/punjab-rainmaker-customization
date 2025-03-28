@@ -200,18 +200,33 @@ ReportDefinitions:
     version: 1.0.0
     moduleName: service
     sourceColumns:
-      - name: servicename
-        label: servicename
+      - name: serviceID
+        label: serviceID
         type: string
         source: rainmaker-misc
         total: false
-      - name: total_application
-        label: total_application
+      - name: serviceName
+        label: serviceName
         type: string
         source: rainmaker-misc
         total: false
-      - name: pending_application_out_of_sla
-        label: pending_application_out_of_sla
+      - name: authorityID
+        label: authorityID
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: departmentID
+        label: departmentID
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: TotalApplicationReceived
+        label: TotalApplicationReceived
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: PendingBeyondTimelineApplicationCount
+        label: PendingBeyondTimelineApplicationCount
         type: string
         source: rainmaker-misc
         total: false
@@ -288,10 +303,12 @@ ReportDefinitions:
                     END
             )
             SELECT 
-                ta.servicename AS servicename,
-                ta.tenantid AS tenant_id,  -- Including tenantid in the final result
-                ta.total_appl AS total_application,
-                COALESCE(pa.pending_appl, 0) AS pending_application_out_of_sla
+                '' as serviceID
+                ta.servicename AS serviceName,
+                ta.tenantid AS authorityID,  -- Including tenantid in the final result
+                '1' as departmentID,
+                ta.total_appl AS TotalApplicationReceived,
+                COALESCE(pa.pending_appl, 0) AS PendingBeyondTimelineApplicationCount
             FROM total_appl ta 
             LEFT JOIN pending_appl pa 
                 ON ta.servicename = pa.servicename 
