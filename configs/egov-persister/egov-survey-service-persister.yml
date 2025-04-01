@@ -322,7 +322,7 @@ serviceMaps:
       queryMaps:
         - query: INSERT INTO eg_ss_survey_response (uuid, surveyuuid, citizenid, tenantid, locality, status, createdby, lastmodifiedby, createdtime, lastmodifiedtime)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (surveyuuid, citizenid, tenantid)
+            ON CONFLICT (uuid)
             DO UPDATE SET status = EXCLUDED.status, lastmodifiedby = EXCLUDED.lastmodifiedby, lastmodifiedtime = EXCLUDED.lastmodifiedtime;
           basePath: SurveyResponse
           jsonMaps:
@@ -338,7 +338,7 @@ serviceMaps:
             - jsonPath: $.SurveyResponse.answers.*.auditDetails.lastModifiedTime
         - query: INSERT INTO eg_ss_answer (uuid, questionuuid, surveyresponseuuid, sectionuuid,comments, createdby, lastmodifiedby, createdtime, lastmodifiedtime)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)
-            ON CONFLICT (surveyresponseuuid, questionuuid)
+            ON CONFLICT (uuid)
             DO UPDATE SET lastmodifiedby = EXCLUDED.lastmodifiedby,comments=EXCLUDED.comments, lastmodifiedtime = EXCLUDED.lastmodifiedtime;
           basePath: SurveyResponse.answers.*
           jsonMaps:
@@ -355,7 +355,7 @@ serviceMaps:
         - query: INSERT INTO eg_ss_answer_detail (uuid, answeruuid, answertype, answercontent, weightage,createdby, lastmodifiedby, createdtime, lastmodifiedtime)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)
             ON CONFLICT (uuid)
-            DO UPDATE SET answercontent = EXCLUDED.answercontent, lastmodifiedtime = EXCLUDED.lastmodifiedtime;
+            DO UPDATE SET answercontent = EXCLUDED.answercontent,weightage = EXCLUDED.weightage, lastmodifiedtime = EXCLUDED.lastmodifiedtime;
           basePath: SurveyResponse.answers.*.answerDetails.*
           jsonMaps:
             - jsonPath: $.SurveyResponse.answers.*.answerDetails.*.uuid
