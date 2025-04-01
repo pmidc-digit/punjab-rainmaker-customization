@@ -305,11 +305,12 @@ ReportDefinitions:
           SELECT 
               '' as serviceID,
               ta.servicename AS serviceName,
-              ta.tenantid AS authorityID,  -- Including tenantid in the final result
+              ta.tenantid AS authorityID,
+              '1' as departmentID,
               ta.total_appl AS TotalApplicationReceived,
               COALESCE(pa.pending_appl, 0) AS PendingBeyondTimelineApplicationCount
           FROM total_appl ta 
           LEFT JOIN pending_appl pa 
               ON ta.servicename = pa.servicename 
-              AND ta.tenantid = pa.tenantid  -- Ensuring tenantid match
+              AND ta.tenantid = pa.tenantid
           WHERE 1=1
