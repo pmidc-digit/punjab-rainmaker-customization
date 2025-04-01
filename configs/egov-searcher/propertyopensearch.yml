@@ -1,60 +1,71 @@
 SearchDefinitions:
- moduleName: property-services
- summary: Property Services Open API
- version: 1.0.0
- definitions:
- - name: propertyopensearch
-   query: 
-    baseQuery: Select row_to_json(result) from
-        (
-          select property.tenantid, property.propertyid, surveyid, oldpropertyid, property.createdtime, locality, owner.userid as owneruuid from eg_pt_property as property
-          INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = property.id
-          INNER JOIN eg_pt_owner owner ON owner.propertyid=property.id $where
-        ) result
-    groupBy:    
-    orderBy: createdtime,desc
-   searchParams: 
-    condition: AND
-    params:
-    - name: property.tenantid
-      isMandatory: true
-      jsonPath: $.searchCriteria.tenantId
-    - name: property.propertyId
-      isMandatory: false
-      jsonPath: $.searchCriteria.propertyId
-    - name: property.surveyId
-      isMandatory: false
-      jsonPath: $.searchCriteria.surveyId
-    - name: property.oldPropertyId
-      isMandatory: false
-      jsonPath: $.searchCriteria.oldPropertyId
-    - name: ptadd.doorNo
-      isMandatory: false
-      jsonPath: $.searchCriteria.doorNo
-    - name: ptadd.locality
-      isMandatory: true
-      jsonPath: $.searchCriteria.locality
-
-
-   output:
-    jsonFormat: {"ResponseInfo": {},"Properties": []}
-    outJsonPath: $.Properties
-    responseInfoPath: $.ResponseInfo
-- name: inboxpropertysearchcount
+  moduleName: property-services
+  summary: Property Services Open API
+  version: 1.0.0
+  definitions:
+    - name: propertyopensearch
       query:
-        baseQuery: SELECT row_to_json(TotalCount) from (SELECT COUNT(result) from
-          (
-          select DISTINCT(property.acknowldgementnumber),pi.createdtime from eg_pt_property as property
-          INNER JOIN eg_pt_owner owner ON property.id = owner.propertyid
-          INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = property.id
-          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = property.acknowldgementnumber
-          LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
-          $where
-          AND pi.createdtime IN (select max(createdtime) from eg_wf_processinstance_v2 wf where wf.businessid = property.acknowldgementnumber GROUP BY wf.businessid)
-          order by pi.createdtime asc
-          ) result) TotalCount
-        groupBy:
-        orderBy:
+        baseQuery: |
+          SELECT row_to_json(result) FROM (
+            SELECT property.tenantid, property.propertyid, surveyid, oldpropertyid, 
+                   property.createdtime, locality, owner.userid AS owneruuid 
+            FROM eg_pt_property AS property
+            INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = property.id
+            INNER JOIN eg_pt_owner owner ON owner.propertyid = property.id 
+            $where
+          ) result
+        groupBy: null
+        orderBy: 'createdtime,desc'
+      searchParams:
+        condition: AND
+        params:
+          - name: property.tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+          - name: property.propertyId
+            isMandatory: false
+            jsonPath: $.searchCriteria.propertyId
+          - name: property.surveyId
+            isMandatory: false
+            jsonPath: $.searchCriteria.surveyId
+          - name: property.oldPropertyId
+            isMandatory: false
+            jsonPath: $.searchCriteria.oldPropertyId
+          - name: ptadd.doorNo
+            isMandatory: false
+            jsonPath: $.searchCriteria.doorNo
+          - name: ptadd.locality
+            isMandatory: true
+            jsonPath: $.searchCriteria.locality
+      output:
+        jsonFormat:
+          ResponseInfo: {}
+          Properties: []
+        outJsonPath: $.Properties
+        responseInfoPath: $.ResponseInfo
+    - name: inboxpropertysearchcount
+      query:
+        baseQuery: |
+          SELECT row_to_json(TotalCount) FROM (
+            SELECT COUNT(result) FROM (
+              SELECT DISTINCT(property.acknowldgementnumber), pi.createdtime 
+              FROM eg_pt_property AS property
+              INNER JOIN eg_pt_owner owner ON property.id = owner.propertyid
+              INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = property.id
+              INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = property.acknowldgementnumber
+              LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+              $where
+              AND pi.createdtime IN (
+                SELECT max(createdtime) 
+                FROM eg_wf_processinstance_v2 wf 
+                WHERE wf.businessid = property.acknowldgementnumber 
+                GROUP BY wf.businessid
+              )
+              ORDER BY pi.createdtime ASC
+            ) result
+          ) TotalCount
+        groupBy: null
+        orderBy: null
       searchParams:
         condition: AND
         params:
@@ -85,11 +96,12 @@ SearchDefinitions:
           - name: pi.businessservice
             isMandatory: false
             jsonPath: $.searchCriteria.businessservice
-        pagination:
-          noOfRecords: $.searchCriteria.noOfRecords
-          offset: $.searchCriteria.offset
-
+      pagination:
+        noOfRecords: $.searchCriteria.noOfRecords
+        offset: $.searchCriteria.offset
       output:
-        jsonFormat: {"ResponseInfo": {},"TotalCount": {}}
+        jsonFormat:
+          ResponseInfo: {}
+          TotalCount: {}
         outJsonPath: $.TotalCount
         responseInfoPath: $.ResponseInfo
