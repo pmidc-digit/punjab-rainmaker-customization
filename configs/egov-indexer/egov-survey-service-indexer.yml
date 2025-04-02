@@ -150,44 +150,8 @@ ServiceMaps:
                 outJsonPath: $.Data.hasResponded
               - inJsonPath: $.auditDetails
                 outJsonPath: $.Data.auditDetails
-
-              # Section Responses Mapping
               - inJsonPath: $.sections
                 outJsonPath: $.Data.sections
-#              - inJsonPath: $.sections.*.title
-#                outJsonPath: $.Data.sections
-#              - inJsonPath: $.sections.*.weightage
-#                outJsonPath: $.Data.sections
-#              - inJsonPath: $.sections.*.sectionOrder
-#                outJsonPath: $.Data.sections
-#
-#              # Question Responses Mapping
-#              - inJsonPath: $.sections.*.questions.*.questionUuid
-#                outJsonPath: $.Data.questions
-#              - inJsonPath: $.sections.*.questions.*.qorder
-#                outJsonPath: $.Data.questions
-#              - inJsonPath: $.sections.*.questions.*.question.questionStatement
-#                outJsonPath: $.Data.questions
-#              - inJsonPath: $.sections.*.questions.*.question.uuid
-#                outJsonPath: $.Data.questions
-#              - inJsonPath: $.sections.*.questions.*.question.status
-#                outJsonPath: $.Data.questions
-#              - inJsonPath: $.sections.*.questions.*.question.type
-#                outJsonPath: $.Data.questions
-#              - inJsonPath: $.sections.*.questions.*.question.categoryId
-#                outJsonPath: $.Data.questions
-#              - inJsonPath: $.sections.*.questions.*.question.auditDetails
-#                outJsonPath: $.Data.questions
-#
-#              # Mapping Question Options
-#              - inJsonPath: $.sections.*.questions.*.question.options.*.uuid
-#                outJsonPath: $.Data.questionResponses.*.options
-#              - inJsonPath: $.sections.*.questions.*.question.options.*.optionText
-#                outJsonPath: $.Data.questionResponses.*.options
-#              - inJsonPath: $.sections.*.questions.*.question.options.*.weightage
-#                outJsonPath: $.Data.questionResponses.*.options
-#              - inJsonPath: $.sections.*.questions.*.question.options.*.auditDetails
-#                outJsonPath: $.Data.questionResponses.*.options
 
     - topic: update-scorecard-survey-active
       configKey: INDEX
@@ -213,42 +177,40 @@ ServiceMaps:
                 outJsonPath: $.Data.lastModifiedTime
               - inJsonPath: $.auditDetails
                 outJsonPath: $.Data.auditDetails
-
-    - topic: save-ss-answer
+    - topic: insert-scorecard-survey-answer
       configKey: INDEX
       indexes:
         - name: survey-answer-index
           type: general
-          id: $.uuid, $.surveyResponseUuid
-          isBulk: true
-          timeStampField: $.auditDetails.createdTime
-          jsonPath: $.SurveyResponse.answers.*
+          id: $.uuid, $.citizenId, $.tenantId
+          isBulk: false
+          timeStampField: $.answers[0].auditDetails.createdTime
+          jsonPath: $.SurveyResponse
           customJsonMapping:
-            indexMapping: {"Data":{"uuid": "uuid","questionUuid": "questionUuid","surveyResponseUuid": "surveyResponseUuid","sectionUuid": "sectionUuid","comments": "comments","auditDetails": {},"answerDetails": []}}
+            indexMapping: {
+              "Data":{
+                "surveyResponseUuid": "uuid",
+                "surveyUuid": "surveyUuid",
+                "tenantId": "tenantId",
+                "citizenId": "citizenId",
+                "locality": "locality",
+                "coordinates": "coordinates",
+                "status": "status",
+                "answers": [ ]}}
             fieldMapping:
               - inJsonPath: $.uuid
-                outJsonPath: $.Data.uuid
-              - inJsonPath: $.questionUuid
-                outJsonPath: $.Data.questionUuid
-              - inJsonPath: $.surveyResponseUuid
                 outJsonPath: $.Data.surveyResponseUuid
-              - inJsonPath: $.sectionUuid
-                outJsonPath: $.Data.sectionUuid
-              - inJsonPath: $.comments
-                outJsonPath: $.Data.comments
-              - inJsonPath: $.auditDetails
-                outJsonPath: $.Data.auditDetails
-              - inJsonPath: $.answerDetails.*.uuid
-                outJsonPath: $.Data.answerDetails
-              - inJsonPath: $.answerDetails.*.answerUuid
-                outJsonPath: $.Data.answerDetails
-              - inJsonPath: $.answerDetails.*.answerType
-                outJsonPath: $.Data.answerDetails
-              - inJsonPath: $.answerDetails.*.answerContent
-                outJsonPath: $.Data.answerDetails
-              - inJsonPath: $.answerDetails.*.weightage
-                outJsonPath: $.Data.answerDetails
-              - inJsonPath: $.answerDetails.*.comments
-                outJsonPath: $.Data.answerDetails
-              - inJsonPath: $.answerDetails.*.auditDetails
-                outJsonPath: $.Data.answerDetails
+              - inJsonPath: $.surveyUuid
+                outJsonPath: $.Data.surveyUuid
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.citizenId
+                outJsonPath: $.Data.citizenId
+              - inJsonPath: $.locality
+                outJsonPath: $.Data.locality
+              - inJsonPath: $.coordinates
+                outJsonPath: $.Data.coordinates
+              - inJsonPath: $.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.answers[*]
+                outJsonPath: $.Data.answers
