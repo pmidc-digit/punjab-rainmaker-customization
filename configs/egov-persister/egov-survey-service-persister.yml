@@ -284,13 +284,14 @@ serviceMaps:
             - jsonPath: $.SurveyEntity.auditDetails.createdTime
             - jsonPath: $.SurveyEntity.auditDetails.lastModifiedTime
 
-        - query: INSERT INTO eg_ss_survey_section(uuid, surveyuuid, title, weightage) VALUES (?, ?, ?, ?);
+        - query: INSERT INTO eg_ss_survey_section(uuid, surveyuuid, title, weightage,sectionorder) VALUES (?, ?, ?, ?,?);
           basePath: SurveyEntity.sections.*
           jsonMaps:
             - jsonPath: $.SurveyEntity.sections.*.uuid
             - jsonPath: $.SurveyEntity.uuid
             - jsonPath: $.SurveyEntity.sections.*.title
             - jsonPath: $.SurveyEntity.sections.*.weightage
+            - jsonPath: $.SurveyEntity.sections.*.sectionOrder
 
         - query: INSERT INTO eg_ss_question_weightage(questionuuid,sectionuuid,weightage, qorder, required) VALUES (?, ?, ?, ?, ?);
           basePath: SurveyEntity.sections.*.questions.*

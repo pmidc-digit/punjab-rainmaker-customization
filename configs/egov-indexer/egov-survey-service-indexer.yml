@@ -32,7 +32,7 @@ ServiceMaps:
           type: general
           id: $.id, $.tenantId
           isBulk: true
-          timeStampField: $.Categories.*.auditDetails.lastModifiedTime
+          timeStampField: $.auditDetails.lastModifiedTime
           jsonPath: $.Categories.*
           customJsonMapping:
             indexMapping: {"Data":{"id": "id","label": "label","isActive": "isActive","tenantId": "tenantId","lastModifiedBy": "lastModifiedBy","lastModifiedTime": "lastModifiedTime","auditDetails": {}}}
@@ -79,15 +79,15 @@ ServiceMaps:
               - inJsonPath: $.auditDetails
                 outJsonPath: $.Data.auditDetails
               - inJsonPath: $.options.*.uuid
-                outJsonPath: $.Data.options[].uuid
+                outJsonPath: $.Data.options
               - inJsonPath: $.options.*.questionUuid
-                outJsonPath: $.Data.options[].questionUuid
+                outJsonPath: $.Data.options
               - inJsonPath: $.options.*.optionText
-                outJsonPath: $.Data.options[].optionText
+                outJsonPath: $.Data.options
               - inJsonPath: $.options.*.weightage
-                outJsonPath: $.Data.options[].weightage
+                outJsonPath: $.Data.options
               - inJsonPath: $.options.*.auditDetails
-                outJsonPath: $.Data.options[].auditDetails
+                outJsonPath: $.Data.options
 
     - topic: update-ss-question
       configKey: INDEX
@@ -120,11 +120,11 @@ ServiceMaps:
         - name: survey-entity-index
           type: general
           id: $.uuid, $.tenantId
-          isBulk: true
-          timeStampField: $.SurveyEntity.auditDetails.createdTime
+          isBulk: false
+          timeStampField: $.auditDetails.createdTime
           jsonPath: $.SurveyEntity
           customJsonMapping:
-            indexMapping: {"Data":{"uuid": "uuid","tenantId": "tenantId","surveyTitle": "surveyTitle","surveyCategory": "surveyCategory","surveyDescription": "surveyDescription","startDate": "startDate","endDate": "endDate","postedBy": "postedBy","active": "active","answersCount": "answersCount","hasResponded": "hasResponded","auditDetails": {},"sectionResponses": [],"questionResponses": []}}
+            indexMapping: { "Data": { "uuid": "uuid", "tenantId": "tenantId", "surveyTitle": "surveyTitle", "surveyCategory": "surveyCategory", "surveyDescription": "surveyDescription", "startDate": "startDate", "endDate": "endDate", "postedBy": "postedBy", "active": "active", "answersCount": "answersCount", "hasResponded": "hasResponded", "auditDetails": {}, "sections": [] } }
             fieldMapping:
               - inJsonPath: $.uuid
                 outJsonPath: $.Data.uuid
@@ -150,22 +150,44 @@ ServiceMaps:
                 outJsonPath: $.Data.hasResponded
               - inJsonPath: $.auditDetails
                 outJsonPath: $.Data.auditDetails
-              - inJsonPath: $.sectionResponses.*.sectionUuid
-                outJsonPath: $.Data.sectionResponses[].sectionUuid
-              - inJsonPath: $.sectionResponses.*.title
-                outJsonPath: $.Data.sectionResponses[].title
-              - inJsonPath: $.sectionResponses.*.weightage
-                outJsonPath: $.Data.sectionResponses[].weightage
-              - inJsonPath: $.sectionResponses.*.questionResponses.*.questionUuid
-                outJsonPath: $.Data.questionResponses[].questionUuid
-              - inJsonPath: $.sectionResponses.*.questionResponses.*.questionStatement
-                outJsonPath: $.Data.questionResponses[].questionStatement
-              - inJsonPath: $.sectionResponses.*.questionResponses.*.answerUuid
-                outJsonPath: $.Data.questionResponses[].answerUuid
-              - inJsonPath: $.sectionResponses.*.questionResponses.*.comments
-                outJsonPath: $.Data.questionResponses[].comments
-              - inJsonPath: $.sectionResponses.*.questionResponses.*.answer
-                outJsonPath: $.Data.questionResponses[].answer
+
+              # Section Responses Mapping
+              - inJsonPath: $.sections
+                outJsonPath: $.Data.sections
+#              - inJsonPath: $.sections.*.title
+#                outJsonPath: $.Data.sections
+#              - inJsonPath: $.sections.*.weightage
+#                outJsonPath: $.Data.sections
+#              - inJsonPath: $.sections.*.sectionOrder
+#                outJsonPath: $.Data.sections
+#
+#              # Question Responses Mapping
+#              - inJsonPath: $.sections.*.questions.*.questionUuid
+#                outJsonPath: $.Data.questions
+#              - inJsonPath: $.sections.*.questions.*.qorder
+#                outJsonPath: $.Data.questions
+#              - inJsonPath: $.sections.*.questions.*.question.questionStatement
+#                outJsonPath: $.Data.questions
+#              - inJsonPath: $.sections.*.questions.*.question.uuid
+#                outJsonPath: $.Data.questions
+#              - inJsonPath: $.sections.*.questions.*.question.status
+#                outJsonPath: $.Data.questions
+#              - inJsonPath: $.sections.*.questions.*.question.type
+#                outJsonPath: $.Data.questions
+#              - inJsonPath: $.sections.*.questions.*.question.categoryId
+#                outJsonPath: $.Data.questions
+#              - inJsonPath: $.sections.*.questions.*.question.auditDetails
+#                outJsonPath: $.Data.questions
+#
+#              # Mapping Question Options
+#              - inJsonPath: $.sections.*.questions.*.question.options.*.uuid
+#                outJsonPath: $.Data.questionResponses.*.options
+#              - inJsonPath: $.sections.*.questions.*.question.options.*.optionText
+#                outJsonPath: $.Data.questionResponses.*.options
+#              - inJsonPath: $.sections.*.questions.*.question.options.*.weightage
+#                outJsonPath: $.Data.questionResponses.*.options
+#              - inJsonPath: $.sections.*.questions.*.question.options.*.auditDetails
+#                outJsonPath: $.Data.questionResponses.*.options
 
     - topic: update-scorecard-survey-active
       configKey: INDEX
@@ -217,16 +239,16 @@ ServiceMaps:
               - inJsonPath: $.auditDetails
                 outJsonPath: $.Data.auditDetails
               - inJsonPath: $.answerDetails.*.uuid
-                outJsonPath: $.Data.answerDetails[].uuid
+                outJsonPath: $.Data.answerDetails
               - inJsonPath: $.answerDetails.*.answerUuid
-                outJsonPath: $.Data.answerDetails[].answerUuid
+                outJsonPath: $.Data.answerDetails
               - inJsonPath: $.answerDetails.*.answerType
-                outJsonPath: $.Data.answerDetails[].answerType
+                outJsonPath: $.Data.answerDetails
               - inJsonPath: $.answerDetails.*.answerContent
-                outJsonPath: $.Data.answerDetails[].answerContent
+                outJsonPath: $.Data.answerDetails
               - inJsonPath: $.answerDetails.*.weightage
-                outJsonPath: $.Data.answerDetails[].weightage
+                outJsonPath: $.Data.answerDetails
               - inJsonPath: $.answerDetails.*.comments
-                outJsonPath: $.Data.answerDetails[].comments
+                outJsonPath: $.Data.answerDetails
               - inJsonPath: $.answerDetails.*.auditDetails
-                outJsonPath: $.Data.answerDetails[].auditDetails
+                outJsonPath: $.Data.answerDetails
