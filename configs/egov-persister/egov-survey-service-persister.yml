@@ -321,8 +321,8 @@ serviceMaps:
       fromTopic: insert-scorecard-survey-answer
       isTransaction: true
       queryMaps:
-        - query: INSERT INTO eg_ss_survey_response (uuid, surveyuuid, citizenid, tenantid, locality, status, createdby, lastmodifiedby, createdtime, lastmodifiedtime)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        - query: INSERT INTO eg_ss_survey_response (uuid, surveyuuid, citizenid, tenantid, locality,coordinates, status, createdby, lastmodifiedby, createdtime, lastmodifiedtime)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (uuid)
             DO UPDATE SET status = EXCLUDED.status, lastmodifiedby = EXCLUDED.lastmodifiedby, lastmodifiedtime = EXCLUDED.lastmodifiedtime;
           basePath: SurveyResponse
@@ -332,6 +332,7 @@ serviceMaps:
             - jsonPath: $.SurveyResponse.citizenId
             - jsonPath: $.SurveyResponse.tenantId
             - jsonPath: $.SurveyResponse.locality
+            - jsonPath: $.SurveyResponse.coordinates
             - jsonPath: $.SurveyResponse.status
             - jsonPath: $.SurveyResponse.answers.*.auditDetails.createdBy
             - jsonPath: $.SurveyResponse.answers.*.auditDetails.lastModifiedBy
@@ -368,26 +369,3 @@ serviceMaps:
             - jsonPath: $.SurveyResponse.answers.*.auditDetails.lastModifiedBy
             - jsonPath: $.SurveyResponse.answers.*.auditDetails.createdTime
             - jsonPath: $.SurveyResponse.answers.*.auditDetails.lastModifiedTime
-
-#    - version: 1.0
-#      description: Persists scorecard survey answers in eg_ss_answer table
-#      fromTopic: insert-scorecard-survey-answer
-#      isTransaction: true
-#      queryMaps:
-#        - query: INSERT INTO eg_ss_answer( uuid,questionuuid,surveyuuid,sectionuuid,answer,citizenid,comments,createdby,lastmodifiedby,createdtime,lastmodifiedtime,city) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT (uuid) DO UPDATE SET answer = EXCLUDED.answer, comments = EXCLUDED.comments, lastmodifiedby = EXCLUDED.lastmodifiedby, lastmodifiedtime = EXCLUDED.lastmodifiedtime;
-#          basePath: AnswerEntity.answers.*
-#          jsonMaps:
-#            - jsonPath: $.AnswerEntity.answers.*.answerUuid
-#            - jsonPath: $.AnswerEntity.answers.*.questionUuid
-#            - jsonPath: $.AnswerEntity.answers.*.surveyUuid
-#            - jsonPath: $.AnswerEntity.answers.*.sectionUuid
-#            - jsonPath: $.AnswerEntity.answers.*.answer
-#              type: ARRAY
-#              dbType: STRING
-#            - jsonPath: $.AnswerEntity.answers.*.citizenId
-#            - jsonPath: $.AnswerEntity.answers.*.comments
-#            - jsonPath: $.AnswerEntity.answers.*.auditDetails.createdBy
-#            - jsonPath: $.AnswerEntity.answers.*.auditDetails.lastModifiedBy
-#            - jsonPath: $.AnswerEntity.answers.*.auditDetails.createdTime
-#            - jsonPath: $.AnswerEntity.answers.*.auditDetails.lastModifiedTime
-#            - jsonPath: $.AnswerEntity.city
