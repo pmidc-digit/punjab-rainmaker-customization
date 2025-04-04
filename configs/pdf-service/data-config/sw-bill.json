@@ -461,7 +461,8 @@
                 "value": {
                   "path": "$.connection.oldConnectionNo"
                 }
-              }, {
+              },
+              {
                 "variable": "rate",
                 "value": {
                   "path": "$.additionalDetails.penaltyRate"
@@ -474,11 +475,11 @@
                 }
               },
               {
-                 "variable": "groupId",
-                 "value": {
+                "variable": "groupId",
+                "value": {
                   "path": "$.connection.additionalDetails.value.groups"
-                 }
-               },
+                }
+              },
               {
                 "variable": "payerAddress",
                 "value": {
@@ -675,11 +676,6 @@
                 "variable": "scissorImage",
                 "url": "http://www.pngall.com/wp-content/uploads/2016/03/Scissor-PNG-Clipart.png",
                 "type": "image"
-              },
-              {
-                "variable": "footerLogoImage",
-                "url": "https://pb-egov-assets.s3.ap-south-1.amazonaws.com/mseva-logo-colored.png",
-                "type": "image"
               }
             ]
           },
@@ -728,6 +724,10 @@
               {
                 "variable": "calculatedTotal",
                 "formula": "{{billTotalAmount}}>0?{{billTotalAmount}}:0"
+              },
+              {
+                "variable": "msgTenantID",
+                "formula": "{{tenant}} === 'pb.patiala' ? '0% Late payment charges will be applied after due date' : '10% late payment charges For both water and sewerage' "
               }
             ]
           },
@@ -745,9 +745,10 @@
                   {
                     "variable": "phoneNumber",
                     "value": "$.MdmsRes.tenant.tenants[0].contactNumber"
-                  }, {
-                    "variable":"mcGrade",
-                    "value":"$.MdmsRes.tenant.tenants[0].city.pwssbGrade"
+                  },
+                  {
+                    "variable": "mcGrade",
+                    "value": "$.MdmsRes.tenant.tenants[0].city.pwssbGrade"
                   },
                   {
                     "variable": "website",
@@ -775,32 +776,32 @@
               },
               {
                 "path": "http://billing-service:8080/billing-service/demand/_search",
-                "queryParam": "tenantId=$.tenantId,consumerCode=$.consumerCode,businessService=SW",
+                "queryParam": "tenantId=$.tenantId,consumerCode=$.consumerCode,businessService=SW,filter=%5B?(@.status=='ACTIVE')%5D",
                 "apiRequest": null,
                 "responseMapping": [
                   {
                     "variable": "ws_advanceAmount",
-                    "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_ADVANCE_CARRYFORWARD')].taxAmount"
+                    "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'SW_ADVANCE_CARRYFORWARD')].taxAmount"
                   },
                   {
                     "variable": "ws_roundoff",
-                    "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_Round_Off')].taxAmount"
+                    "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'SW_Round_Off')].taxAmount"
                   },
                   {
                     "variable": "ws_charge",
-                    "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_CHARGE')].taxAmount"
+                    "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'SW_CHARGE')].taxAmount"
                   },
                   {
                     "variable": "ws_water_cess",
-                    "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_WATER_CESS')].taxAmount"
+                    "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'SW_WATER_CESS')].taxAmount"
                   },
                   {
                     "variable": "ws_time_interest",
-                    "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_TIME_INTEREST')].taxAmount"
+                    "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'SW_TIME_INTEREST')].taxAmount"
                   },
                   {
                     "variable": "ws_time_penalty",
-                    "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_TIME_PENALTY')].taxAmount"
+                    "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'SW_TIME_PENALTY')].taxAmount"
                   }
                 ]
               },
@@ -841,7 +842,6 @@
                     "variable": "guardianName",
                     "value": "$.Properties[0].owners[0].fatherOrHusbandName"
                   }
-
                 ]
               }
             ]
