@@ -4,7 +4,7 @@
     "serviceName": "rainmaker-common",
     "version": "1.0.0",
     "baseKeyPath": "$.Bill.*",
-    "entityIdPath": "$.billNumber" ,
+    "entityIdPath": "$.billNumber",
     "isCommonTableBorderRequired": true,
     "mappings": [
       {
@@ -467,7 +467,8 @@
                 "value": {
                   "path": "$.connection.oldConnectionNo"
                 }
-              }, {
+              },
+              {
                 "variable": "rate",
                 "value": {
                   "path": "$.additionalDetails.penaltyRate"
@@ -476,19 +477,25 @@
               {
                 "variable": "ledgerId",
                 "value": {
-                 "path": "$.connection.additionalDetails.value.ledgerId"
+                  "path": "$.connection.additionalDetails.value.ledgerId"
+                }
+              },
+              {
+                "variable": "latePaymentc",
+                "value": {
+                  "path": "$.additionalDetails.latePaymentc"
                 }
               },
               {
                 "variable": "ledgerId",
                 "value": {
-                 "path": "$.connection.additionalDetails.value.ledgerId"
+                  "path": "$.connection.additionalDetails.value.ledgerId"
                 }
               },
               {
                 "variable": "groupId",
                 "value": {
-                 "path": "$.connection.additionalDetails.value.groups"
+                  "path": "$.connection.additionalDetails.value.groups"
                 }
               },
               {
@@ -752,9 +759,10 @@
                   {
                     "variable": "phoneNumber",
                     "value": "$.MdmsRes.tenant.tenants[0].contactNumber"
-                  }, {
-                    "variable":"mcGrade",
-                    "value":"$.MdmsRes.tenant.tenants[0].city.pwssbGrade"
+                  },
+                  {
+                    "variable": "mcGrade",
+                    "value": "$.MdmsRes.tenant.tenants[0].city.pwssbGrade"
                   },
                   {
                     "variable": "website",
@@ -848,8 +856,6 @@
                     "variable": "guardianName",
                     "value": "$.Properties[0].owners[0].fatherOrHusbandName"
                   }
-
-
                 ]
               }
             ]
