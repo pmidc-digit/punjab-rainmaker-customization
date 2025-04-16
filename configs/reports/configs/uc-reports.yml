@@ -965,13 +965,13 @@ ReportDefinitions:
         type: epoch
         source: uc
         isMandatory: false
-        searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
+        searchClause: AND eg_echallan.createdtime >= $fromDate
       - name: toDate
         label: reports.uc.toDate
         type: epoch
         source: uc
         isMandatory: false
-        searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
+        searchClause: AND eg_echallan.createdtime <= $toDate
       - name: businessservice
         label: reports.uc.businessservice
         type: singlevaluelist
@@ -979,7 +979,7 @@ ReportDefinitions:
         source: uc
         wrapper: true
         isMandatory: false
-        searchClause: AND businessdetails = $businessdetails
+        searchClause: AND egcl_bill.businessservice = $businessservice
       - name: collectorname
         label: reports.uc.collectorname
         type: singlevaluelist
@@ -987,19 +987,44 @@ ReportDefinitions:
         source: uc
         wrapper: true
         isMandatory: false
-        searchClause: AND collectorname = $collectorname        
+        searchClause: AND eg_user.id = $collectorname::INTEGER        
     query: |
         -- Use CTE to force query plan, compute & use CTE later
-        select billstatus as billstatus, receiptstatus as receiptstatus, ulb as ulb,
-        totalamount as totalamount, challanno as challanno, businessdetails as businessdetails,
-        comments as comments, status as status, receiptnumber as receiptnumber, doorno as doorno,
-        buildingname as buildingname, street as street, mobilenumber as mobilenumber,g8receiptno as g8receiptno,
-        g8issuedate as g8issuedate, ifsc as ifsc, bankname as bankname, branchname as branchname, cheque_dd_no as cheque_dd_no,
-        cheque_dd_date as cheque_dd_date, transactionnumber as transactionnumber, paymentmode as paymentmode,
-        cgst as cgst, sgst as sgst, tax as tax, fieldcollection as fieldcollection, payername as payername,
-        collectorname as collectorname, collectiontype as collectiontype, receiptdate as receiptdate
-        from public.echalan_receipt_register1 where ulb=$tenantid
-    orderby: ORDER BY receiptdate DESC;
+        SELECT
+        string_agg(distinct egcl_bill.status,',') as billstatus,
+        string_agg(distinct payment.paymentstatus,',') receiptstatus,        
+        string_agg(distinct  payment.tenantid,',') as ulb,
+        string_agg(distinct egcl_bill.totalamount::text,',') as totalamount,
+        eg_echallan.challanno,
+        string_agg(distinct eg_echallan.businessservice,',') as businessdetails,
+        string_agg(distinct eg_echallan.description,',') as comments,
+        string_agg(distinct eg_echallan.applicationstatus,',') as status,
+        string_agg(distinct egcl_paymentdetail.receiptnumber,',') as receiptnumber,
+        string_agg(distinct doorno,',') as doorno,
+        string_agg(distinct buildingname,',') as  buildingname,
+        string_agg(distinct street,',') as street,
+        string_agg(distinct payment.mobilenumber,',') as mobilenumber,
+        string_agg(distinct egcl_paymentdetail.manualreceiptnumber,',') as g8receiptno,
+        To_char((To_timestamp(egcl_paymentdetail.manualreceiptdate/ 1000) at time Zone 'Asia/Kolkata'), 'DD/MM/YYYY') as g8issuedate,
+        string_agg(distinct payment.ifsccode,',') as ifsc,
+        string_agg(distinct bank_branches.bank_name,',') as bankname,
+        string_agg(distinct bank_branches.branch,',') as branchname,
+        string_agg(distinct payment.instrumentnumber,',')  as cheque_dd_no,
+        to_char((To_timestamp(payment.instrumentdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') AS cheque_dd_date,
+        string_agg(distinct payment.transactionnumber,',') as transactionnumber,
+        string_agg(distinct payment.paymentmode,',') as paymentmode,
+        SUM(CASE WHEN bad.taxheadcode LIKE '%_CGST' THEN adjustedamount ELSE 0 END) as cgst,
+        SUM(CASE WHEN bad.taxheadcode LIKE '%_SGST' THEN adjustedamount ELSE 0 END) as sgst,
+        SUM(CASE WHEN bad.taxheadcode LIKE '%_TAX' THEN adjustedamount ELSE 0 END) as tax,
+        SUM(CASE WHEN bad.taxheadcode LIKE '%_FEE' THEN adjustedamount ELSE 0 END) as fieldcollection,
+        string_agg(distinct payment.payername,',') as payername,
+        string_agg(distinct eg_user.name,',') as collectorname,
+        'System' as collectiontype,
+        To_char((To_timestamp(egcl_paymentdetail.receiptdate / 1000) at time Zone 'Asia/Kolkata'), 'DD/MM/YYYY') as receiptdate
+        from eg_echallan inner JOIN egcl_bill ON (eg_echallan.tenantid!='pb.testing' and eg_echallan.challanno=egcl_bill.consumercode ) inner join egcl_paymentdetail on (egcl_paymentdetail.tenantid!='pb.testing' and egcl_bill.id=egcl_paymentdetail.billid)
+        inner JOIN eg_challan_address egchallan ON egchallan.echallanid=eg_echallan.id inner JOIN  egcl_payment as payment on (payment.tenantid!='pb.testing'  and egcl_paymentdetail.paymentid=payment.id) INNER JOIN egcl_billdetial as billd on billd.billid = egcl_bill.id inner join egcl_billaccountdetail as bad on bad.billdetailid=billd.id left join bank_branches on bank_branches.ifsc=payment.ifsccode inner JOIN eg_user ON payment.createdby::INTEGER=eg_user.id
+        where eg_echallan.tenantid!='pb.testing' and egcl_bill.businessservice not in ('PT','TL','FIRENOC','WS','SW','WS.ONE_TIME_FEE')  and payment.paymentstatus != 'CANCELLED'
+    groupby: group by challanno , egcl_paymentdetail.receiptdate ,payment.instrumentdate,egcl_paymentdetail.manualreceiptdate
     
 
 
@@ -1124,7 +1149,7 @@ ReportDefinitions:
         type: epoch
         source: uc
         isMandatory: true
-        searchClause: AND paydetail.receiptdate <= $toDate
+        searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
       - name: businessservice
         label: reports.uc.businessservice
         type: singlevaluelist
@@ -1132,7 +1157,7 @@ ReportDefinitions:
         source: uc
         wrapper: true
         isMandatory: false
-        searchClause: AND businessservice = $businessservice
+        searchClause: AND businessdetails = $businessdetails
       - name: collectorname
         label: reports.uc.collectorname
         type: singlevaluelist
@@ -1140,48 +1165,17 @@ ReportDefinitions:
         source: uc
         wrapper: true
         isMandatory: false
-        searchClause: AND eg_user.id = $collectorname::INTEGER
+        searchClause: AND collectorname = $collectorname::INTEGER
     query: |
         -- Use CTE to force query plan, compute & use CTE later
-        WITH receipt_breakup AS (
-                    SELECT 
-                      bill.id as bill_id, 
-                      SUM(CASE WHEN taxheadcode LIKE '%_CGST' THEN adjustedamount ELSE 0 END) as cgst, 
-                      SUM(CASE WHEN taxheadcode LIKE '%_TAX' THEN adjustedamount ELSE 0 END) as tax, 
-                      SUM(CASE WHEN taxheadcode LIKE '%_SGST' THEN adjustedamount ELSE 0 END) as sgst, 
-                      SUM(CASE WHEN taxheadcode LIKE '%_FEE' THEN adjustedamount ELSE 0 END) as fieldcollection            
-                    FROM egcl_billaccountdetail 
-                    INNER JOIN egcl_billdetial as billd on billd.id = egcl_billaccountdetail.billdetailid
-                    INNER JOIN egcl_bill as bill on bill.id=billd.billid
-                    WHERE  billd.tenantid=$tenantid AND businessservice not in ('PT','TL','FIRENOC') 
-                    GROUP BY billdetailid,bill.id
-        )
-        SELECT 
-          payment.tenantid as ulb,
-          paydetail.receiptnumber as receiptnumber,
-          To_char((To_timestamp(paydetail.receiptdate / 1000) at time Zone 'Asia/Kolkata'), 'DD/MM/YYYY') as receiptdate,
-          To_char((To_timestamp(paydetail.manualreceiptdate / 1000) at time Zone 'Asia/Kolkata'), 'DD/MM/YYYY') as g8issuedate,
-          paydetail.manualreceiptnumber as g8receiptno,
-          bank_branches.bank_name as bankname,
-          bank_branches.branch as branchname,
-          payment.paymentstatus as status,
-          businessservice as servicecategory,
-          receipt_breakup.*,  
-          payment.totalamountpaid as totalamount, 
-          paymentmode as paymentmode,
-          (case when paymentmode like 'CASH' then '' else  transactionnumber end) as ddorchequenumber,
-          (case when paymentmode like 'DD' or paymentmode like 'CHEQUE' then To_char((To_timestamp(payment.instrumentdate / 1000) at time Zone 'Asia/Kolkata'), 'DD/MM/YYYY') else '' end) as ddchequedate,
-          'System' as collectiontype,
-          eg_user.name as collectorname,
-          billd.additionaldetails->>'comment' as remarks
-        FROM egcl_payment AS payment
-        JOIN egcl_paymentdetail as paydetail on paydetail.paymentid=payment.id
-        JOIN receipt_breakup ON paydetail.billid = receipt_breakup.bill_id
-        JOIN egcl_billdetial as billd on billd.billid=paydetail.billid
-        JOIN eg_user ON payment.createdby::INTEGER=eg_user.id
-        LEFT OUTER JOIN bank_branches on bank_branches.ifsc=payment.ifsccode 
-        WHERE  payment.tenantid=$tenantid AND businessservice not in ('PT','TL','FIRENOC')  and payment.paymentstatus != 'CANCELLED'
-    orderby: ORDER BY paydetail.receiptdate DESC
+       select ulb as ulb,receiptnumber as receiptnumber,receiptdate as receiptdate,
+       g8issuedate as g8issuedate,g8receiptno as g8receiptno,status as status,
+       businessdetails as servicecategory,cgst as cgst,tax as tax, fieldcollection as fieldcollection,
+       sgst as sgst,cheque_dd_no as ddorchequenumber,cheque_dd_date as ddchequedate,bankname as bankname,
+       branchname as branchname,collectiontype as collectiontype,collectorname as collectorname,
+       totalamount as totalamount,paymentmode as paymentmode,comments as remarks
+       from public.echalan_receipt_register1 where ulb=$tenantid
+    orderby: ORDER BY receiptdate DESC;
 
 
   - reportName: MiscReceiptStateWide_v2
