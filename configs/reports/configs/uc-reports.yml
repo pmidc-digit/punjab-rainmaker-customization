@@ -1168,13 +1168,13 @@ ReportDefinitions:
         searchClause: AND collectorname = $collectorname::INTEGER
     query: |
         -- Use CTE to force query plan, compute & use CTE later
-       select ulb as ulb,receiptnumber as receiptnumber,receiptdate as receiptdate,
-       g8issuedate as g8issuedate,g8receiptno as g8receiptno,status as status,
-       businessdetails as servicecategory,cgst as cgst,tax as tax, fieldcollection as fieldcollection,
-       sgst as sgst,cheque_dd_no as ddorchequenumber,cheque_dd_date as ddchequedate,bankname as bankname,
-       branchname as branchname,collectiontype as collectiontype,collectorname as collectorname,
-       totalamount as totalamount,paymentmode as paymentmode,comments as remarks
-       from public.echalan_receipt_register1 where ulb=$tenantid
+        select ulb as ulb,receiptnumber as receiptnumber,receiptdate as receiptdate,
+        g8issuedate as g8issuedate,g8receiptno as g8receiptno,status as status,
+        businessdetails as servicecategory,cgst as cgst,tax as tax, fieldcollection as fieldcollection,
+        sgst as sgst,cheque_dd_no as ddorchequenumber,cheque_dd_date as ddchequedate,bankname as bankname,
+        branchname as branchname,collectiontype as collectiontype,collectorname as collectorname,
+        totalamount as totalamount,paymentmode as paymentmode,comments as remarks
+        from public.echalan_receipt_register1 where ulb=$tenantid
     orderby: ORDER BY receiptdate DESC
 
 
