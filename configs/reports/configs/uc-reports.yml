@@ -1143,7 +1143,7 @@ ReportDefinitions:
         type: epoch
         source: uc
         isMandatory: true
-        searchClause: AND paydetail.receiptdate >= $fromDate
+        searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
       - name: toDate
         label: reports.uc.toDate
         type: epoch
