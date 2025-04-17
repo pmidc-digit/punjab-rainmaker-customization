@@ -2471,7 +2471,7 @@ ReportDefinitions:
       instrumenttype as instrumenttype,transactionnumber as transactionnumber,transactiondate as transactiondate, 
       bankname as bankname, collectorname as collectorname,financialyear as financialyear from public.mv_pt_receipt_regiester 
       where tenantid=$tenantid
-  orderby: ORDER BY receiptdate DESC;
+  orderby: ORDER BY receiptnumber DESC;
   
   
 - reportName: CancelledReceiptRegister_V2
@@ -3784,6 +3784,11 @@ ReportDefinitions:
     type: string
     source: pt
     total: false
+  - name: paymentmode
+    label: reports.pt.paymentmode
+    type: string
+    source: pt
+    total: false
   - name: adhocpenalty
     label: reports.pt.adhocpenalty
     type: string
@@ -3875,13 +3880,13 @@ ReportDefinitions:
     type: epoch
     source: pt
     isMandatory: true
-    searchClause: AND pd.receiptdate >= $fromDate
+    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
   - name: toDate
     label: reports.pt.toDate
     type: epoch
     source: pt
     isMandatory: true
-    searchClause: AND pd.receiptdate <= $toDate
+    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
   - name: collectorname
     label: reports.pt.collectorname
     type: singlevaluelist
@@ -3889,38 +3894,23 @@ ReportDefinitions:
     source: pt
     wrapper: true
     isMandatory: false
-    searchClause: AND eg_user.id = $collectorname::INTEGER
+    searchClause: AND collectorname = $collectorname::INTEGER
   query: |
       -- Use CTE to force query plan, compute & use CTE later
-      SELECT
-        split_part(bd.tenantid,'.',2) as ulb,
-        Count (distinct pd.paymentid) as noofassessments,
-        SUM(CASE WHEN taxheadcode = 'PT_ADHOC_PENALTY' THEN adjustedamount ELSE 0 END) as adhocpenalty,
-        SUM(CASE WHEN taxheadcode = 'PT_ADHOC_REBATE' THEN adjustedamount ELSE 0 END) as adhocrebate,
-        SUM(CASE WHEN taxheadcode = 'PT_FIRE_CESS' THEN adjustedamount ELSE 0 END) as firecess,
-        SUM(CASE WHEN taxheadcode = 'PT_CANCER_CESS' THEN adjustedamount ELSE 0 END) as cancercess,
-        SUM(CASE WHEN taxheadcode = 'PT_TIME_INTEREST' THEN adjustedamount ELSE 0 END) as interest,
-        SUM(CASE WHEN taxheadcode = 'PT_TIME_PENALTY' THEN adjustedamount ELSE 0 END) as penalty,
-        SUM(CASE WHEN taxheadcode = 'PT_TIME_REBATE' THEN adjustedamount ELSE 0 END) as rebate,
-        SUM(CASE WHEN taxheadcode = 'PT_TAX' THEN adjustedamount ELSE 0 END) as propertytax,
-        (SUM(CASE WHEN taxheadcode = 'PT_UNIT_USAGE_EXEMPTION' THEN adjustedamount ELSE 0 END)
-        + SUM(CASE WHEN taxheadcode = 'PT_OWNER_EXEMPTION' THEN adjustedamount ELSE 0 END) )as exemption,
-        ( SUM(CASE WHEN taxheadcode = 'PT_ROUNDOFF' THEN adjustedamount ELSE 0 END)
-        + SUM(CASE WHEN taxheadcode = 'PT_DECIMAL_CEILING_DEBIT' THEN adjustedamount ELSE 0 END)
-        + SUM(CASE WHEN taxheadcode = 'PT_DECIMAL_CEILING_CREDIT' THEN adjustedamount ELSE 0 END)) as adjustment,
-        sum(case when payment.paymentmode='CASH' then bad.adjustedamount else 0 end) as sumcash,
-        sum(case when payment.paymentmode='CHEQUE' then bad.adjustedamount else 0 end) as sumcheque,
-        COUNT(distinct case when payment.paymentmode='CHEQUE' then  concat(payment.paymentmode,payment.instrumentnumber,payment.ifsccode,payment.totalamountpaid)  end) as countcheque,
-        sum(case when payment.paymentmode='ONLINE' then bad.adjustedamount else 0 end) as sumonline,
-        (CASE WHEN payment.paymentmode!='ONLINE' THEN eg_user.name ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END) as collectorname, --for Online collecion show None as collectorname,
-        sum(bad.adjustedamount) as totalamount
-      FROM egcl_billaccountdetail as bad
-      INNER JOIN egcl_billdetial as bd on bd.id = bad.billdetailid
-      INNER JOIN egcl_paymentdetail as pd on pd.billid = bd.billid
-      INNER JOIN egcl_payment as payment on pd.paymentid=payment.id
-      LEFT OUTER JOIN eg_user ON eg_user.id = pd.createdby::INTEGER
-      WHERE bd.tenantid = $tenantid  and payment.paymentstatus != 'CANCELLED' and pd.businessservice='PT'
-  groupby: group by collectorname,bd.tenantid
+      SELECT tenantid AS ulb,instrumenttype AS paymentmode,COUNT(DISTINCT pdid) AS noofassessments, 
+      SUM(adhocpenalty) AS adhocpenalty,SUM(adhocrebate) AS adhocrebate,
+      SUM(firecess) AS firecess,SUM(cancercess) AS cancercess,SUM(interest) AS interest,
+      SUM(penalty) AS penalty,SUM(rebate) AS rebate,SUM(propertytax) AS propertytax,
+      SUM(exemption) AS exemption,SUM(adjustment) AS adjustment,
+      SUM(CASE WHEN instrumenttype = 'CASH' THEN adjustment ELSE 0 END) AS sumcash,
+      SUM(CASE WHEN instrumenttype = 'CHEQUE' THEN adjustment ELSE 0 END) AS sumcheque,
+      COUNT(DISTINCT CASE WHEN instrumenttype = 'CHEQUE' THEN CONCAT(instrumenttype, amount) END) AS countcheque,
+      SUM(CASE WHEN instrumenttype = 'ONLINE' THEN adjustment ELSE 0 END) AS sumonline,
+      CASE WHEN instrumenttype != 'ONLINE' THEN collectorname ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END AS collectorname,
+      SUM(adjustment) AS totalamount
+      FROM public.mv_pt_receipt_regiester
+      WHERE tenantid = $tenantid
+  groupby: group by CASE WHEN instrumenttype != 'ONLINE' THEN collectorname ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END,tenantid,instrumenttype
   
 - reportName: StateReceiptRegisterSummary_V2
   summary: Receipt Register Summary
