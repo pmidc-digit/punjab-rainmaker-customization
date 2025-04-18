@@ -485,7 +485,7 @@ ReportDefinitions:
       (SELECT consumercode, totalamount, amount FROM egcl_receiptheader_v1 AS rh 
       LEFT OUTER JOIN egcl_receiptinstrument_v1 AS ri ON rh.id = ri.receiptheader 
       LEFT OUTER JOIN egcl_instrumentheader_v1 AS ih ON ri.instrumentheader = ih.id 
-      and ih.instrumentstatus     != 'CANCELLED' 
+      and ih.instrumentstatus	 != 'CANCELLED' 
       where rh.status != 'Cancelled'
       ) AS instrument_data ON (pd.property || ':' || pd.assessmentnumber) = instrument_data.consumercode 
     WHERE tenantid = $tenantid
@@ -784,7 +784,7 @@ ReportDefinitions:
       FROM eg_pt_propertydetail_v2 AS pd 
       LEFT OUTER JOIN (SELECT consumercode, totalamount, amount, collectiontype, receiptdate FROM egcl_receiptheader_v1 AS rh 
       LEFT OUTER JOIN egcl_receiptinstrument_v1 AS ri ON rh.id = ri.receiptheader 
-      LEFT OUTER JOIN egcl_instrumentheader_v1 AS ih ON ri.instrumentheader = ih.id and ih.instrumentstatus     != 'CANCELLED' 
+      LEFT OUTER JOIN egcl_instrumentheader_v1 AS ih ON ri.instrumentheader = ih.id and ih.instrumentstatus	 != 'CANCELLED' 
       where rh.status != 'Cancelled' and rh.tenantid != 'pb.testing'  and businessdetails='PT'
       ) AS tbl_amounts ON (pd.property || ':' || pd.assessmentnumber) = tbl_amounts.consumercode 
       WHERE tenantid not in ('pb.testing','pb.ludhiana_legacy')
@@ -874,7 +874,7 @@ ReportDefinitions:
       FROM eg_pt_propertydetail_v2 AS pd 
       LEFT OUTER JOIN (SELECT consumercode, totalamount, amount, collectiontype, receiptdate FROM egcl_receiptheader_v1 AS rh 
       LEFT OUTER JOIN egcl_receiptinstrument_v1 AS ri ON rh.id = ri.receiptheader 
-      LEFT OUTER JOIN egcl_instrumentheader_v1 AS ih ON ri.instrumentheader = ih.id and ih.instrumentstatus     != 'CANCELLED' 
+      LEFT OUTER JOIN egcl_instrumentheader_v1 AS ih ON ri.instrumentheader = ih.id and ih.instrumentstatus	 != 'CANCELLED' 
       where rh.status != 'Cancelled'
       ) AS tbl_amounts ON (pd.property || ':' || pd.assessmentnumber) = tbl_amounts.consumercode 
       WHERE tenantid LIKE CONCAT(SPLIT_PART($tenantid, '.', 1), '%') and tenantid = $tenantid
@@ -1006,7 +1006,7 @@ ReportDefinitions:
     isMandatory: true
     searchClause: AND rh.receiptdate <= $toDate
   query: |
-    --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property    Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id    Address
+    --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property	Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id	Address
     with eg_pt_unit_v2_ot as (
       select 
         propertydetail, 
@@ -1363,7 +1363,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND pta.locality IN ($localityArray)
   query: |
-    --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property    Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id    Address
+    --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property	Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id	Address
     with eg_pt_unit_v2_ot as (
       select 
         propertydetail, 
@@ -2038,7 +2038,7 @@ ReportDefinitions:
     isMandatory: true
     searchClause: AND pta.locality IN ($localityArray)
   query: |
-   --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Type Of Property    Mobile Number       Address
+   --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Type Of Property	Mobile Number   	Address
     with eg_pt_unit_v2_ot as (
      select
        propertydetail,
@@ -2439,13 +2439,13 @@ ReportDefinitions:
     type: epoch
     source: pt
     isMandatory: true
-    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
+    searchClause: AND pd.receiptdate >= $fromDate
   - name: toDate
     label: reports.pt.toDate
     type: epoch
     source: pt
     isMandatory: true
-    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
+    searchClause: AND pd.receiptdate <= $toDate
   - name: financialyear
     label: Financial Year
     type: singlevaluelist
@@ -2453,25 +2453,83 @@ ReportDefinitions:
     source: pt
     wrapper: true
     isMandatory: false
-    searchClause: AND financialyear =$financialyear
+    searchClause: AND concat(to_char((To_timestamp(get_fromperiod(pd.billid)/1000) at time Zone 'Asia/Kolkata'),'YYYY'),'-', to_char((To_timestamp(get_toperiod(pd.billid)/1000) at time Zone 'Asia/Kolkata'),'YY')) = $financialyear
   - name: paymentMode
     label: Payment Mode
     type: singlevaluelist
     pattern: 'list://CARD:Card,CASH:Cash,CHEQUE:Cheque,DD:DD,OFFLINE_NEFT:NEFT,OFFLINE_RTGS:RTGS,ONLINE:Online,POSTAL_ORDER:PostalOrder'
     source: pt
     isMandatory: false
-    searchClause: AND instrumenttype = replace($paymentMode,',','_')
+    searchClause: AND payment.paymentmode = replace($paymentMode,',','_')
   query: |
-      -- Use CTE to force query plan, compute & use CTE later 
-      Select receiptnumber as receiptnumber,receiptdate as receiptdate,g8issuedate as g8issuedate,
-      g8receiptno as g8receiptno,amount as amount,propertytax as propertytax,firecess as firecess,
-      cancercess as cancercess,rebate as rebate,adhocrebate as adhocrebate,penalty as penalty,
-      adhocpenalty as adhocpenalty,interest as interest,exemption as exemption,adjustment as adjustment,
-      pendingamount as pendingamount,consumercode as consumercode,usagetype as usagetype,
-      instrumenttype as instrumenttype,transactionnumber as transactionnumber,transactiondate as transactiondate, 
-      bankname as bankname, collectorname as collectorname,financialyear as financialyear from public.mv_pt_receipt_regiester 
-      where tenantid=$tenantid
-  orderby: ORDER BY receiptnumber DESC;
+      -- Use CTE to force query plan, compute & use CTE later
+      WITH receipt_breakup AS (
+      SELECT
+      pd.id AS pdid,
+      SUM(CASE WHEN taxheadcode = 'PT_ADHOC_PENALTY' THEN adjustedamount ELSE 0 END) AS adhocpenalty,
+      SUM(CASE WHEN taxheadcode = 'PT_ADHOC_REBATE' THEN adjustedamount ELSE 0 END) AS adhocrebate,
+      SUM(CASE WHEN taxheadcode = 'PT_FIRE_CESS' THEN adjustedamount ELSE 0 END) AS firecess,
+      SUM(CASE WHEN taxheadcode = 'PT_CANCER_CESS' THEN adjustedamount ELSE 0 END) AS cancercess,
+      SUM(CASE WHEN taxheadcode = 'PT_TIME_INTEREST' THEN adjustedamount ELSE 0 END) AS interest,
+      SUM(CASE WHEN taxheadcode = 'PT_TIME_PENALTY' THEN adjustedamount ELSE 0 END) AS penalty,
+      SUM(CASE WHEN taxheadcode = 'PT_TIME_REBATE' THEN adjustedamount ELSE 0 END) AS rebate,
+      SUM(CASE WHEN taxheadcode = 'PT_TAX' THEN bad.amount ELSE 0 END) AS propertytax,
+      SUM(CASE WHEN taxheadcode = 'PT_TAX' THEN adjustedamount ELSE 0 END) AS paidpropertytax,
+      (SUM(CASE WHEN taxheadcode = 'PT_UNIT_USAGE_EXEMPTION' THEN bad.amount ELSE 0 END)
+      + SUM(CASE WHEN taxheadcode = 'PT_OWNER_EXEMPTION' THEN bad.amount ELSE 0 END)) AS exemption,
+      (SUM(CASE WHEN taxheadcode = 'PT_ROUNDOFF' THEN adjustedamount ELSE 0 END)
+      + SUM(CASE WHEN taxheadcode = 'PT_DECIMAL_CEILING_DEBIT' THEN adjustedamount ELSE 0 END)
+      + SUM(CASE WHEN taxheadcode = 'PT_DECIMAL_CEILING_CREDIT' THEN adjustedamount ELSE 0 END)) AS adjustment
+      FROM egcl_billaccountdetail AS bad
+      INNER JOIN egcl_billdetial AS bd ON bd.id = bad.billdetailid and bd.tenantid=bad.tenantid
+      INNER JOIN egcl_paymentdetail AS pd ON pd.billid = bd.billid and bd.tenantid=pd.billid
+      INNER JOIN egcl_payment AS payment ON pd.paymentid = payment.id and payment.tenantid =bad.tenantid
+      WHERE payment.tenantid = $tenantid
+      AND payment.paymentstatus != 'CANCELLED'
+      AND pd.businessservice = 'PT'
+      AND pd.receiptdate >= $fromDate
+      AND pd.receiptdate <= $toDate
+      GROUP BY pdid
+      )
+      SELECT 
+      pd.tenantid AS tenantid,
+      pd.id,
+      pt.propertyid AS consumercode,
+      pt.surveyid AS surveyid,
+      TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate,
+      CONCAT(bank_branches.bank_name, ' ', bank_branches.branch) AS bankname,
+      receiptnumber,
+      payment.totalamountpaid AS amount,
+      payment.paymentmode AS instrumenttype,
+      payment.transactionnumber,
+      CONCAT(TO_CHAR(TO_TIMESTAMP(get_fromperiod(pd.billid) / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY'),'-',
+      TO_CHAR(TO_TIMESTAMP(get_toperiod(pd.billid) / 1000) AT TIME ZONE 'Asia/Kolkata', 'YY')
+      ) AS financialyear,
+      TO_CHAR(TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS transactiondate,
+      payment.totaldue - payment.totalamountpaid AS pendingamount,
+      INITCAP(CASE WHEN pt.usagecategory LIKE '%.%' THEN SPLIT_PART(pt.usagecategory, '.', 2) ELSE pt.usagecategory END) AS usagetype,
+      COALESCE(eg_user.name, '30048|21Fj+c3k2ldB0X3AzIh7atXB') AS collectorname,
+      receipt_breakup.*,
+      TO_CHAR(TO_TIMESTAMP(pd.manualreceiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS g8issuedate,
+      manualreceiptnumber AS g8receiptno
+      FROM egcl_paymentdetail pd
+      LEFT OUTER JOIN eg_user ON eg_user.id = pd.createdby::INTEGER
+      LEFT OUTER JOIN egcl_payment payment ON pd.paymentid = payment.id
+      LEFT OUTER JOIN bank_branches ON bank_branches.ifsc = payment.ifsccode
+      LEFT OUTER JOIN (
+      SELECT *
+      FROM (
+      SELECT *, ROW_NUMBER() OVER (PARTITION BY propertyid ORDER BY lastmodifiedtime DESC) AS rw
+      FROM eg_pt_property WHERE tenantid = $tenantid) pts
+      WHERE rw = 1
+      ) AS pt ON pt.propertyid = pd.billid
+      LEFT JOIN receipt_breakup ON receipt_breakup.pdid = pd.id
+      WHERE payment.paymentstatus != 'CANCELLED'
+      AND pd.businessservice = 'PT'
+      AND payment.tenantid = $tenantid AND pd.tenantid = $tenantid
+      AND pd.receiptdate >= $fromDate
+      AND pd.receiptdate <= $toDate
+  orderby: ORDER BY pd.receiptdate DESC;
   
   
 - reportName: CancelledReceiptRegister_V2
@@ -2651,9 +2709,9 @@ ReportDefinitions:
                     + SUM(CASE WHEN taxheadcode = 'PT_DECIMAL_CEILING_DEBIT' THEN adjustedamount ELSE 0 END)
                     + SUM(CASE WHEN taxheadcode = 'PT_DECIMAL_CEILING_CREDIT' THEN adjustedamount ELSE 0 END)) as adjustment
                   FROM egcl_billaccountdetail as bad
-                  INNER JOIN egcl_billdetial as bd on bd.id = bad.billdetailid and bd.tenantid=bad.tenantid
-                  INNER JOIN egcl_paymentdetail as pd on pd.billid = bd.billid and bd.tenantid=pd.billid
-                  INNER JOIN egcl_payment as payment on pd.paymentid=payment.id and payment.tenantid =bad.tenantid
+                  INNER JOIN egcl_billdetial as bd on bd.id = bad.billdetailid
+                  INNER JOIN egcl_paymentdetail as pd on pd.billid = bd.billid
+                  INNER JOIN egcl_payment as payment on pd.paymentid=payment.id
                   WHERE payment.tenantid = $tenantid and payment.paymentstatus = 'CANCELLED' and  pd.businessservice='PT'
                   GROUP BY pdid
       )
@@ -2734,7 +2792,7 @@ ReportDefinitions:
       (SELECT consumercode, totalamount, amount FROM egcl_receiptheader_v1 AS rh 
       LEFT OUTER JOIN egcl_receiptinstrument_v1 AS ri ON rh.id = ri.receiptheader 
       LEFT OUTER JOIN egcl_instrumentheader_v1 AS ih ON ri.instrumentheader = ih.id 
-      and ih.instrumentstatus     != 'CANCELLED' 
+      and ih.instrumentstatus	 != 'CANCELLED' 
       where rh.status != 'Cancelled'
       ) AS instrument_data ON (pd.property || ':' || pd.assessmentnumber) = instrument_data.consumercode 
     WHERE tenantid = $tenantid
@@ -2941,7 +2999,7 @@ ReportDefinitions:
         Initcap(case when pt.usagecategory like '%.%' then split_part(pt.usagecategory,'.',2) else pt.usagecategory end) as usagetype,
         (CASE WHEN billd.collectiontype='COUNTER' THEN eg_user.name ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END) as collectorname,
         receipt_breakup.*,
-        to_char((To_timestamp(pd.manualreceiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') AS g8issuedate,         manualreceiptnumber as g8receiptno,
+        to_char((To_timestamp(pd.manualreceiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') AS g8issuedate, 		manualreceiptnumber as g8receiptno,
         payment.paymentstatus as paystatus
       FROM egcl_paymentdetail pd, eg_user, eg_pt_property    as pt, egcl_billdetial as billd, egcl_payment payment,receipt_breakup, egcl_bill bill, (select bill.id as billid, min(bd.fromperiod) fromperiod, max(bd.toperiod) toperiod from egcl_billdetial bd, egcl_bill bill where bill.id=bd.billid group by bill.id) bd
       WHERE pd.paymentid=payment.id and  eg_user.id = pd.createdby::INTEGER and pt.propertyid = bill.consumercode and bill.id=pd.billid and bill.id=billd.billid and bd.billid=bill.id and payment.paymentstatus = 'CANCELLED' and pd.businessservice='PT' and payment.tenantid not in ('pb.testing','pb.ludhiana_legacy') and receipt_breakup.pdid=pd.id
@@ -3222,20 +3280,20 @@ ReportDefinitions:
     searchClause: AND eg_user.id = $collectorname::INTEGER
   query: |
       -- Use CTE to force query plan, compute & use CTE later
-      SELECT     
-        pt.propertyid as propertyid,    
-        to_char((To_timestamp(pd.receiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') as transactiondate,    
-        payment.ifsccode AS bankname,     
-        receiptnumber,    
-        payment.totalamountpaid as amount,     
-        payment.paymentmode as instrumenttype,     
-        payment.transactionnumber as transactionnumber,    
+      SELECT 	
+        pt.propertyid as propertyid,	
+        to_char((To_timestamp(pd.receiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') as transactiondate,	
+        payment.ifsccode AS bankname, 	
+        receiptnumber,	
+        payment.totalamountpaid as amount, 	
+        payment.paymentmode as instrumenttype, 	
+        payment.transactionnumber as transactionnumber,	
         --concat(to_char((To_timestamp(bd.fromperiod/1000) at time Zone 'Asia/Kolkata'),'YYYY'),'-', to_char((To_timestamp(bd.toperiod/1000) at time Zone 'Asia/Kolkata'),'YYYY')) AS financialyear,
         --concat(to_char((To_timestamp(get_fromperiod(pd.billid)/1000) at time Zone 'Asia/Kolkata'),'YYYY'),'-', to_char((To_timestamp(get_toperiod(pd.billid)/1000) at time Zone 'Asia/Kolkata'),'YY')) as financialyear,
         getfinancialyear(pd.billid) as financialyear,
         (case when eg_user.name is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else eg_user.name end)  as collectorname,
-        --receipt_breakup.*,    
-        to_char((To_timestamp(pd.manualreceiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') AS g8issuedate,     
+        --receipt_breakup.*,	
+        to_char((To_timestamp(pd.manualreceiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') AS g8issuedate, 	
         manualreceiptnumber as g8receiptno,
         'NA' as remarks
       FROM egcl_paymentdetail pd Left outer join eg_user on eg_user.id = pd.createdby::INTEGER, egcl_payment payment, eg_pt_property as pt, 
@@ -3360,7 +3418,7 @@ ReportDefinitions:
     searchClause: AND eg_user.id = $collectorname::INTEGER
   query: |
       -- Use CTE to force query plan, compute & use CTE later
-      SELECT     
+      SELECT 	
         pt.propertyid as propertyid,
         oldpropertyid,
         to_char((To_timestamp(pd.receiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') as transactiondate,
@@ -3487,7 +3545,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND pta.locality IN ($localityArray)
   query: |
-    --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property    Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id    Address
+    --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property	Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id	Address
     with eg_pt_unit_v2_ot as (
       select 
         propertyid 
@@ -3528,7 +3586,7 @@ ReportDefinitions:
     from egcl_paymentdetail as payd
     inner join egcl_payment as payment on payment.id = payd.paymentid        
     inner join egcl_bill as bill on bill.id = payd.billid 
-    inner join egcl_billdetial as billd on billd.billid=bill.id         
+    inner join egcl_billdetial as billd on billd.billid=bill.id		 
     inner join eg_pt_property    as pt on pt.propertyid = bill.consumercode
     inner join eg_pt_owner as po on po.propertyid = pt.id  and po.status='ACTIVE'
     inner join eg_user as eu on eu.uuid     = po.userid
@@ -3784,11 +3842,6 @@ ReportDefinitions:
     type: string
     source: pt
     total: false
-  - name: paymentmode
-    label: reports.pt.paymentmode
-    type: string
-    source: pt
-    total: false
   - name: adhocpenalty
     label: reports.pt.adhocpenalty
     type: string
@@ -3875,18 +3928,7 @@ ReportDefinitions:
     source: pt
     total: false
   searchParams:
-  - name: fromDate
-    label: reports.pt.fromDate
-    type: epoch
-    source: pt
-    isMandatory: true
-    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
-  - name: toDate
-    label: reports.pt.toDate
-    type: epoch
-    source: pt
-    isMandatory: true
-    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
+  
   - name: collectorname
     label: reports.pt.collectorname
     type: singlevaluelist
@@ -3894,23 +3936,38 @@ ReportDefinitions:
     source: pt
     wrapper: true
     isMandatory: false
-    searchClause: AND collectorname = $collectorname::INTEGER
+    searchClause: AND eg_user.id = $collectorname::INTEGER
   query: |
       -- Use CTE to force query plan, compute & use CTE later
-      SELECT tenantid AS ulb,instrumenttype AS paymentmode,COUNT(DISTINCT pdid) AS noofassessments, 
-      SUM(adhocpenalty) AS adhocpenalty,SUM(adhocrebate) AS adhocrebate,
-      SUM(firecess) AS firecess,SUM(cancercess) AS cancercess,SUM(interest) AS interest,
-      SUM(penalty) AS penalty,SUM(rebate) AS rebate,SUM(propertytax) AS propertytax,
-      SUM(exemption) AS exemption,SUM(adjustment) AS adjustment,
-      SUM(CASE WHEN instrumenttype = 'CASH' THEN adjustment ELSE 0 END) AS sumcash,
-      SUM(CASE WHEN instrumenttype = 'CHEQUE' THEN adjustment ELSE 0 END) AS sumcheque,
-      COUNT(DISTINCT CASE WHEN instrumenttype = 'CHEQUE' THEN CONCAT(instrumenttype, amount) END) AS countcheque,
-      SUM(CASE WHEN instrumenttype = 'ONLINE' THEN adjustment ELSE 0 END) AS sumonline,
-      CASE WHEN instrumenttype != 'ONLINE' THEN collectorname ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END AS collectorname,
-      SUM(adjustment) AS totalamount
-      FROM public.mv_pt_receipt_regiester
-      WHERE tenantid = $tenantid
-  groupby: group by CASE WHEN instrumenttype != 'ONLINE' THEN collectorname ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END,tenantid,instrumenttype
+      SELECT
+        split_part(bd.tenantid,'.',2) as ulb,
+        Count (distinct pd.paymentid) as noofassessments,
+        SUM(CASE WHEN taxheadcode = 'PT_ADHOC_PENALTY' THEN adjustedamount ELSE 0 END) as adhocpenalty,
+        SUM(CASE WHEN taxheadcode = 'PT_ADHOC_REBATE' THEN adjustedamount ELSE 0 END) as adhocrebate,
+        SUM(CASE WHEN taxheadcode = 'PT_FIRE_CESS' THEN adjustedamount ELSE 0 END) as firecess,
+        SUM(CASE WHEN taxheadcode = 'PT_CANCER_CESS' THEN adjustedamount ELSE 0 END) as cancercess,
+        SUM(CASE WHEN taxheadcode = 'PT_TIME_INTEREST' THEN adjustedamount ELSE 0 END) as interest,
+        SUM(CASE WHEN taxheadcode = 'PT_TIME_PENALTY' THEN adjustedamount ELSE 0 END) as penalty,
+        SUM(CASE WHEN taxheadcode = 'PT_TIME_REBATE' THEN adjustedamount ELSE 0 END) as rebate,
+        SUM(CASE WHEN taxheadcode = 'PT_TAX' THEN adjustedamount ELSE 0 END) as propertytax,
+        (SUM(CASE WHEN taxheadcode = 'PT_UNIT_USAGE_EXEMPTION' THEN adjustedamount ELSE 0 END)
+        + SUM(CASE WHEN taxheadcode = 'PT_OWNER_EXEMPTION' THEN adjustedamount ELSE 0 END) )as exemption,
+        ( SUM(CASE WHEN taxheadcode = 'PT_ROUNDOFF' THEN adjustedamount ELSE 0 END)
+        + SUM(CASE WHEN taxheadcode = 'PT_DECIMAL_CEILING_DEBIT' THEN adjustedamount ELSE 0 END)
+        + SUM(CASE WHEN taxheadcode = 'PT_DECIMAL_CEILING_CREDIT' THEN adjustedamount ELSE 0 END)) as adjustment,
+        sum(case when payment.paymentmode='CASH' then bad.adjustedamount else 0 end) as sumcash,
+        sum(case when payment.paymentmode='CHEQUE' then bad.adjustedamount else 0 end) as sumcheque,
+        COUNT(distinct case when payment.paymentmode='CHEQUE' then  concat(payment.paymentmode,payment.instrumentnumber,payment.ifsccode,payment.totalamountpaid)  end) as countcheque,
+        sum(case when payment.paymentmode='ONLINE' then bad.adjustedamount else 0 end) as sumonline,
+        (CASE WHEN payment.paymentmode!='ONLINE' THEN eg_user.name ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END) as collectorname, --for Online collecion show None as collectorname,
+        sum(bad.adjustedamount) as totalamount
+      FROM egcl_billaccountdetail as bad
+      INNER JOIN egcl_billdetial as bd on bd.id = bad.billdetailid and bd.tenantid = bad.tenantid
+      INNER JOIN egcl_paymentdetail as pd on pd.billid = bd.billid and pd.tenantid = bad.tenantid
+      INNER JOIN egcl_payment as payment on pd.paymentid=payment.id and payment.tenantid = pd.tenantid
+      LEFT OUTER JOIN eg_user ON eg_user.id = pd.createdby::INTEGER and pd.tenantid = eg_user.tenantid
+      WHERE bd.tenantid = $tenantid  and to_timestamp(pd.receiptdate)::date = CURRENT_DATE and payment.paymentstatus != 'CANCELLED' and pd.businessservice='PT'
+  groupby: group by collectorname,bd.tenantid
   
 - reportName: StateReceiptRegisterSummary_V2
   summary: Receipt Register Summary
@@ -4369,7 +4426,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND pta.locality IN ($localityArray)
   query: |
-   --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Type Of Property    Mobile Number       Address
+   --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Type Of Property	Mobile Number   	Address
    with eg_pt_unit_v2_ot as (
      select 
         propertyid, 
@@ -4397,7 +4454,7 @@ ReportDefinitions:
      
      inner join egcl_payment as payment on payment.id = payd.paymentid        
      inner join egcl_bill as bill on bill.id = payd.billid 
-     inner join egcl_billdetial as billd on billd.billid=bill.id         
+     inner join egcl_billdetial as billd on billd.billid=bill.id		 
      inner join eg_pt_property    as pt on pt.propertyid = bill.consumercode
      inner join eg_pt_owner as po on po.propertyid = pt.id  and po.status='ACTIVE'
      inner join eg_user as eu on eu.uuid     = po.userid
@@ -4451,7 +4508,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND pta.locality IN ($localityArray)
   query: |
-   --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Type Of Property    Mobile Number       Address
+   --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Type Of Property	Mobile Number   	Address
     with eg_pt_unit_v2_ot as (
       select 
         propertyid, 
@@ -4480,7 +4537,7 @@ ReportDefinitions:
     from eg_pt_property pt
     --inner join egcl_payment as payment on payment.id = payd.paymentid        
     --inner join egcl_bill as bill on bill.id = payd.billid 
-    --inner join egcl_billdetial as billd on billd.billid=bill.id         
+    --inner join egcl_billdetial as billd on billd.billid=bill.id		 
     --inner join     as pt on pt.propertyid = bill.consumercode
     inner join eg_pt_owner as po on po.propertyid = pt.id  and po.status='ACTIVE' 
     inner join eg_user as eu on eu.uuid = po.userid
@@ -4545,7 +4602,7 @@ ReportDefinitions:
     source: pt
     total: false
   query: |
-   --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Type Of Property    Mobile Number       Address
+   --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Type Of Property	Mobile Number   	Address
     with props as 
      (select 
        pt.propertyid as "propertytaxuniqueid",
@@ -4672,7 +4729,7 @@ ReportDefinitions:
     isMandatory: true
     searchClause: AND 1=1
   query: |
-   --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Type Of Property    Mobile Number       Address
+   --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Type Of Property	Mobile Number   	Address
     with props as 
      (select 
        pt.propertyid as "propertytaxuniqueid",
@@ -4774,7 +4831,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND pt.tenantid = $ulb
   query: |
-   --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Type Of Property    Mobile Number       Address
+   --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Type Of Property	Mobile Number   	Address
     with eg_pt_unit_v2_ot as (
       select 
         propertyid, 
@@ -4812,7 +4869,7 @@ ReportDefinitions:
     from eg_pt_property pt
     --inner join egcl_payment as payment on payment.id = payd.paymentid        
     --inner join egcl_bill as bill on bill.id = payd.billid 
-    --inner join egcl_billdetial as billd on billd.billid=bill.id         
+    --inner join egcl_billdetial as billd on billd.billid=bill.id		 
     --inner join     as pt on pt.propertyid = bill.consumercode
     inner join eg_pt_owner as po on po.propertyid = pt.id  and po.status='ACTIVE' 
     inner join eg_user as eu on eu.uuid     = po.userid
@@ -4851,7 +4908,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND 1=1
   query: |
-   --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Type Of Property    Mobile Number       Address
+   --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Type Of Property	Mobile Number   	Address
     select mobilenumber,name from eg_user 
     where uuid in (select userid from eg_pt_owner where propertyid in
     (select id from eg_pt_property where status='ACTIVE' and tenantid=$ulb 
@@ -5666,7 +5723,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND egcl_billdetial.tenantid=$ulb
   query: |
-   --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Type Of Property    Mobile Number       Address
+   --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Type Of Property	Mobile Number   	Address
     select distinct bill.consumercode,pt.usagecategory,pd.receiptnumber ,p.totalamountpaid,
       concat(pa.doorno,' ',pa.buildingname,pa.street,' ',pa.city,' ,',pa.pincode) as address, u.name as ownername, u.mobilenumber as mobileno
       from egcl_payment p inner join
@@ -6145,7 +6202,7 @@ ReportDefinitions:
     label: reports.pt.transactiondate
     type: string
     source: pt
-    total: false    
+    total: false	
   - name: g8issuedate
     label: reports.pt.g8issuedate
     type: string
@@ -6392,7 +6449,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND pt.localitycode IN ($localityArray)
   query: |
-    --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property    Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id    Address
+    --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property	Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id	Address
     with owners as 
       (
       select 
@@ -8348,7 +8405,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: and 1=1
   query: |
-   --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Type Of Property    Mobile Number       Address
+   --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Type Of Property	Mobile Number   	Address
     select distinct bd.consumercode,pt.usagecategory,pd.receiptnumber ,p.totalamountpaid,
       to_char((To_timestamp(bd.fromperiod/1000) at time Zone 'Asia/Kolkata'),'YYYY') || '-' || to_char((To_timestamp(bd.toperiod/1000) at time Zone 'Asia/Kolkata'),'YY') as fy,
       concat(pa.doorno,' ',pa.buildingname,pa.street,' ',pa.city,' ,',pa.pincode) as address, u.name as ownername, u.mobilenumber as mobileno
@@ -8425,7 +8482,7 @@ ReportDefinitions:
     isMandatory: true
     searchClause: AND to_char((To_timestamp(bd.fromperiod/1000) at time Zone 'Asia/Kolkata'),'YYYY') || '-' || to_char((To_timestamp(bd.toperiod/1000) at time Zone 'Asia/Kolkata'),'YY')=$finYear
   query: |
-   --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Type Of Property    Mobile Number       Address
+   --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Type Of Property	Mobile Number   	Address
     select distinct bd.consumercode,pt.usagecategory,pd.receiptnumber ,p.totalamountpaid,
       to_char((To_timestamp(bd.fromperiod/1000) at time Zone 'Asia/Kolkata'),'YYYY') || '-' || to_char((To_timestamp(bd.toperiod/1000) at time Zone 'Asia/Kolkata'),'YY') as fy,
       concat(pa.doorno,' ',pa.buildingname,pa.street,' ',pa.city,' ,',pa.pincode) as address, u.name as ownername, u.mobilenumber as mobileno
@@ -8526,7 +8583,7 @@ ReportDefinitions:
     searchClause: AND eg_user.id = $collectorname::INTEGER
   query: |
       -- Use CTE to force query plan, compute & use CTE later
-      SELECT     
+      SELECT 	
         pt.propertyid as propertyid,
         to_char((To_timestamp(pd.receiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') as transactiondate,        
         receiptnumber,
@@ -8731,14 +8788,14 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND pt.tenantid = $ulb    
   query: |
-    --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property    Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id    Address
+    --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property	Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id	Address
     with owners as 
       (
       select 
           split_part(string_agg(ownername,','),',',1) as ownername,
           split_part(string_agg(mobilenumber,','),',',1) as mobilenumber,
           split_part(string_agg(guardianname,','),',',1) as guardianname,
-          split_part(string_agg(emailid,','),',',1) as emailid,              
+          split_part(string_agg(emailid,','),',',1) as emailid,			  
           propertyid
           from report_owners where status='ACTIVE' and tenantid =$ulb                
           group by propertyid
@@ -8884,7 +8941,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND upper(pt.additionalDetails->>'businessName') LIKE CONCAT('%',upper($nameofbusiness),'%')
   query: |
-    --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property    Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id    Address
+    --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property	Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id	Address
     with properties as
     (
       select distinct propertyid as propertyid from eg_pt_unit where tenantid=$tenantid and usagecategory LIKE CONCAT('%',upper($category),'%') --like '%EDUCATION%'  
@@ -9041,7 +9098,7 @@ ReportDefinitions:
     isMandatory: true
     searchClause: AND 1=1
   query: |
-    --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property    Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id    Address
+    --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property	Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id	Address
     with properties as
     (
       select distinct propertyid as propertyid from eg_pt_unit where tenantid=$tenantid and usagecategory LIKE CONCAT('%',upper($category),'%') --like '%EDUCATION%'
@@ -9207,7 +9264,7 @@ ReportDefinitions:
     isMandatory: true
     searchClause: AND 1=1
   query: |
-    --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property    Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id    Address
+    --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property	Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id	Address
     with owners as
     ( 
     select
@@ -9374,7 +9431,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND upper(localityname) LIKE CONCAT('%',upper($localityname),'%')
   query: |
-    --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property    Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id    Address
+    --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property	Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id	Address
     WITH owners AS (
     SELECT propertyid,
     SPLIT_PART(STRING_AGG(ownername, ','), ',', 1) AS ownername,
@@ -9545,7 +9602,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND pt.tenantid = $ulb    
   query: |
-    --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property    Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id    Address
+    --S.no    Service Name	ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number	Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property	Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id	Address
     with owners as
     ( 
     select
@@ -9656,12 +9713,14 @@ ReportDefinitions:
     searchClause: AND split_part(rp.propertyusagetype,'.',1) = $usageType
   - name: fromDate
     label: reports.pt.fromDate
+    type: singlevaluelist
     type: epoch 
     source: pt
     isMandatory: false
     searchClause: AND rp.createdtime >= $fromDate 
   - name: toDate
     label: reports.pt.toDate
+    type: singlevaluelist
     type: epoch 
     source: pt
     isMandatory: false
@@ -9994,4 +10053,4 @@ ReportDefinitions:
       where p.tenantid=$tenantid and p.status='ACTIVE' 
       and 
       o.propertyid in (select id  from eg_pt_property where tenantid=$tenantid and status='ACTIVE')
-  orderby: ORDER BY p.propertyid
+  orderby: ORDER BY p.propertyid    
