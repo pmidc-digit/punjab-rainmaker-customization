@@ -2487,7 +2487,7 @@ ReportDefinitions:
       WHERE payment.tenantid = $tenantid
       AND payment.paymentstatus != 'CANCELLED'
       AND pd.businessservice = 'PT'
-      to_timestamp(pd.receiptdate)::date = CURRENT_DATE 
+      to_timestamp(pd.receiptdate / 1000)::date = = CURRENT_DATE 
       GROUP BY pdid
       )
       SELECT 
@@ -2526,8 +2526,8 @@ ReportDefinitions:
       LEFT JOIN receipt_breakup ON receipt_breakup.pdid = pd.id
       WHERE payment.paymentstatus != 'CANCELLED'
       AND pd.businessservice = 'PT'
-      AND payment.tenantid = $tenantid AND pd.tenantid = $tenantid
-      to_timestamp(pd.receiptdate)::date = CURRENT_DATE 
+      AND payment.tenantid = $tenantid AND pd.tenantid = $tenantid AND
+      to_timestamp(pd.receiptdate / 1000)::date = = CURRENT_DATE 
       
   orderby: ORDER BY pd.receiptdate DESC;
   
@@ -3966,7 +3966,7 @@ ReportDefinitions:
       INNER JOIN egcl_paymentdetail as pd on pd.billid = bd.billid and pd.tenantid = bad.tenantid
       INNER JOIN egcl_payment as payment on pd.paymentid=payment.id and payment.tenantid = pd.tenantid
       LEFT OUTER JOIN eg_user ON eg_user.id = pd.createdby::INTEGER and pd.tenantid = eg_user.tenantid
-      WHERE bd.tenantid = $tenantid  and to_timestamp(pd.receiptdate)::date = CURRENT_DATE and payment.paymentstatus != 'CANCELLED' and pd.businessservice='PT'
+      WHERE bd.tenantid = $tenantid  and to_timestamp(pd.receiptdate / 1000)::date = = CURRENT_DATE and payment.paymentstatus != 'CANCELLED' and pd.businessservice='PT'
   groupby: group by collectorname,bd.tenantid
   
 - reportName: StateReceiptRegisterSummary_V2
