@@ -2487,8 +2487,7 @@ ReportDefinitions:
       WHERE payment.tenantid = $tenantid
       AND payment.paymentstatus != 'CANCELLED'
       AND pd.businessservice = 'PT'
-      AND pd.receiptdate >= $fromDate
-      AND pd.receiptdate <= $toDate
+      to_timestamp(pd.receiptdate)::date = CURRENT_DATE 
       GROUP BY pdid
       )
       SELECT 
@@ -2516,19 +2515,20 @@ ReportDefinitions:
       LEFT OUTER JOIN eg_user ON eg_user.id = pd.createdby::INTEGER
       LEFT OUTER JOIN egcl_payment payment ON pd.paymentid = payment.id
       LEFT OUTER JOIN bank_branches ON bank_branches.ifsc = payment.ifsccode
+      LEFT JOIN egcl_bill bill ON bill.id = pd.billid AND bill.tenantid = pd.tenantid
       LEFT OUTER JOIN (
       SELECT *
       FROM (
       SELECT *, ROW_NUMBER() OVER (PARTITION BY propertyid ORDER BY lastmodifiedtime DESC) AS rw
       FROM eg_pt_property WHERE tenantid = $tenantid) pts
       WHERE rw = 1
-      ) AS pt ON pt.propertyid = pd.billid
+      ) AS pt ON pt.propertyid = bill.consumercode
       LEFT JOIN receipt_breakup ON receipt_breakup.pdid = pd.id
       WHERE payment.paymentstatus != 'CANCELLED'
       AND pd.businessservice = 'PT'
       AND payment.tenantid = $tenantid AND pd.tenantid = $tenantid
-      AND pd.receiptdate >= $fromDate
-      AND pd.receiptdate <= $toDate
+      to_timestamp(pd.receiptdate)::date = CURRENT_DATE 
+      
   orderby: ORDER BY pd.receiptdate DESC;
   
   
