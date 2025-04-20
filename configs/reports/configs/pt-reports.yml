@@ -2475,7 +2475,7 @@ ReportDefinitions:
       WHERE payment.tenantid = $tenantid
       AND payment.paymentstatus != 'CANCELLED'
       AND pd.businessservice = 'PT' AND
-      to_timestamp(pd.receiptdate / 1000)::date = = CURRENT_DATE 
+      to_timestamp(pd.receiptdate / 1000)::date = CURRENT_DATE 
       GROUP BY pdid
       )
       SELECT 
