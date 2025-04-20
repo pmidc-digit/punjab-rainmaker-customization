@@ -2474,7 +2474,7 @@ ReportDefinitions:
       INNER JOIN egcl_payment AS payment ON pd.paymentid = payment.id and payment.tenantid =bad.tenantid
       WHERE payment.tenantid = $tenantid
       AND payment.paymentstatus != 'CANCELLED'
-      AND pd.businessservice = 'PT'
+      AND pd.businessservice = 'PT' AND
       to_timestamp(pd.receiptdate / 1000)::date = = CURRENT_DATE 
       GROUP BY pdid
       )
