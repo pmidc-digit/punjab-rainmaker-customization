@@ -46,49 +46,60 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND ta.tenantid =$tenantselected
     query: |
-        WITH total_appl AS
-          (SELECT pp.tenantid,
-          CASE WHEN pp.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal'
-          WHEN pp.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
-          WHEN pp.businessservice IN ('NewWS1') THEN 'WS-Service'
-          WHEN pp.businessservice IN ('NewSW1') THEN 'SW-Service'
-          WHEN pp.businessservice IN ('FIRENOC') THEN 'FireNoc'
-          WHEN pp.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment'
-          END as servicename,
-          count(*) as total_appl
-          FROM public.eg_wf_processinstance_v2 pp
-          WHERE pp.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.CREATEWITHWNS')
-          AND PP.ASSIGNEE IS NOT NULL
-          GROUP BY pp.tenantid,CASE WHEN pp.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal'
-          WHEN pp.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
-          WHEN pp.businessservice IN ('NewWS1') THEN 'WS-Service'
-          WHEN pp.businessservice IN ('NewSW1') THEN 'SW-Service'
-          WHEN pp.businessservice IN ('FIRENOC') THEN 'FireNoc'
-          WHEN pp.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment'
-          END),
-          pending_appl AS
-         (SELECT p.tenantid, CASE WHEN p.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal'
-          WHEN p.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
-          WHEN p.businessservice IN ('NewWS1') THEN 'WS-Service'
-          WHEN p.businessservice IN ('NewSW1') THEN 'SW-Service'
-          WHEN p.businessservice IN ('FIRENOC') THEN 'FireNoc'
-          WHEN p.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment' END as servicename,
-          count(*) as pending_appl
-          FROM public.eg_wf_processinstance_v2 p
-          JOIN  public.eg_wf_businessservice_v2 b ON p.businessservice=b.businessservice
-          WHERE (to_timestamp(p.lastmodifiedtime / 1000.0) - to_timestamp(p.createdtime / 1000.0)) > (b.businessservicesla / (1000 * 60 * 60 * 24)) * interval '1 day'
-          AND b.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.CREATEWITHWNS')
-          AND P.ASSIGNEE IS NOT NULL
-          GROUP BY p.tenantid,CASE WHEN p.businessservice IN ('NEWTL.HAZ','DIRECTRENEWAL','EDITRENEWAL','NewTL') THEN 'TL-Renewal'
-          WHEN p.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
-          WHEN p.businessservice IN ('NewWS1') THEN 'WS-Service'
-          WHEN p.businessservice IN ('NewSW1') THEN 'SW-Service'
-          WHEN p.businessservice IN ('FIRENOC') THEN 'FireNoc'
-          WHEN p.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment' END)
-          SELECT ta.tenantid as tenantid,ta.servicename as servicename,ta.total_appl as total_application,COALESCE(pa.pending_appl,0) as pending_application_out_of_sla,
-          ROUND(CASE WHEN ta.total_appl > 0 THEN (COALESCE(pa.pending_appl, 0) * 100.0 / ta.total_appl) ELSE 0 END, 2) AS pendingapplpercentage
-          FROM total_appl ta 
-          LEFT JOIN pending_appl pa ON ta.tenantid=pa.tenantid AND ta.servicename=pa.servicename WHERE ta.tenantid NOT IN ('pb','pb.testing')
+        WITH total_appl AS (
+        SELECT tenantid, 'WS-Service' AS servicename, COUNT(applicationno) AS total_appl
+        FROM eg_ws_connection
+        WHERE connectionno IS NULL
+        GROUP BY tenantid
+        UNION ALL
+        SELECT tenantid, 'SW-Service' AS servicename, COUNT(applicationno) AS total_appl
+        FROM eg_sw_connection
+        WHERE connectionno IS NULL
+        GROUP BY tenantid
+        UNION ALL
+        SELECT tenantid, 'TL-Service' AS servicename, COUNT(applicationnumber) AS total_appl
+        FROM eg_tl_tradelicense
+        WHERE licensenumber IS NULL
+        GROUP BY tenantid
+        UNION ALL
+        SELECT tenantid, 'FirezNOC' AS servicename, COUNT(applicationnumber) AS total_appl
+        FROM eg_fn_firenocdetail
+        WHERE firestationid IS NULL
+        GROUP BY tenantid ),
+        pending_appl AS (
+        SELECT tenantid, 'WS-Service' AS servicename, COUNT(applicationno) AS pending_appl
+        FROM eg_ws_connection
+        WHERE connectionno IS NULL
+        AND applicationstatus NOT IN ('CONNECTION_ACTIVATED', 'INITIATED', 'REJECTED', 'PENDING_FOR_CONNECTION_ACTIVATION', 'PENDING_FOR_PAYMENT')
+        AND createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 15 * 24 * 60 * 60 * 1000)
+        GROUP BY tenantid
+        UNION ALL
+        SELECT tenantid, 'SW-Service' AS servicename, COUNT(applicationno) AS pending_appl
+        FROM eg_sw_connection
+        WHERE connectionno IS NULL
+        AND applicationstatus NOT IN ('CONNECTION_ACTIVATED', 'INITIATED', 'REJECTED', 'PENDING_FOR_CONNECTION_ACTIVATION', 'PENDING_FOR_PAYMENT')
+        AND createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 15 * 24 * 60 * 60 * 1000)
+        GROUP BY tenantid
+        UNION ALL
+        SELECT tenantid, 'TL-Service' AS servicename, COUNT(applicationnumber) AS pending_appl
+        FROM eg_tl_tradelicense
+        WHERE licensenumber IS NULL
+        AND status NOT IN ('INITIATED', 'REJECTED', 'PENDINGPAYMENT', 'APPLIED', 'CANCELLED')
+        AND createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 15 * 24 * 60 * 60 * 1000)
+        GROUP BY tenantid
+        UNION ALL
+        SELECT tenantid, 'FirezNOC' AS servicename, COUNT(applicationnumber) AS pending_appl
+        FROM eg_fn_firenocdetail
+        WHERE firestationid IS NULL
+        AND status NOT IN ('INITIATED', 'REJECTED', 'PENDINGPAYMENT', 'CANCELLED', 'APPROVED', 'CITIZENACTIONREQUIRED', 'CITIZENACTIONREQUIRED-DV')
+        AND createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 15 * 24 * 60 * 60 * 1000)
+        GROUP BY tenantid)
+        SELECT ta.tenantid as tenantid,ta.servicename as servicename,ta.total_appl AS total_application,
+        COALESCE(pa.pending_appl, 0) AS pending_application_out_of_sla,ROUND(CASE WHEN ta.total_appl > 0 THEN (COALESCE(pa.pending_appl, 0) * 100.0 / ta.total_appl)
+        ELSE 0 END, 2) AS pendingapplpercentage
+        FROM total_appl ta
+        LEFT JOIN pending_appl pa ON ta.tenantid = pa.tenantid AND ta.servicename = pa.servicename
+        WHERE ta.tenantid NOT IN ('pb', 'pb.testing')
 
           
   - reportName: department
