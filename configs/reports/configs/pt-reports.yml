@@ -3902,12 +3902,12 @@ ReportDefinitions:
       SUM(firecess) AS firecess,SUM(cancercess) AS cancercess,SUM(interest) AS interest,
       SUM(penalty) AS penalty,SUM(rebate) AS rebate,SUM(propertytax) AS propertytax,
       SUM(exemption) AS exemption,SUM(adjustment) AS adjustment,
-      SUM(CASE WHEN instrumenttype = 'CASH' THEN adjustment ELSE 0 END) AS sumcash,
-      SUM(CASE WHEN instrumenttype = 'CHEQUE' THEN adjustment ELSE 0 END) AS sumcheque,
+      SUM(CASE WHEN instrumenttype = 'CASH' THEN amount ELSE 0 END) AS sumcash,
+      SUM(CASE WHEN instrumenttype = 'CHEQUE' THEN amount ELSE 0 END) AS sumcheque,
       COUNT(DISTINCT CASE WHEN instrumenttype = 'CHEQUE' THEN CONCAT(instrumenttype, amount) END) AS countcheque,
-      SUM(CASE WHEN instrumenttype = 'ONLINE' THEN adjustment ELSE 0 END) AS sumonline,
+      SUM(CASE WHEN instrumenttype = 'ONLINE' THEN amount ELSE 0 END) AS sumonline,
       CASE WHEN instrumenttype != 'ONLINE' THEN collectorname ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END AS collectorname,
-      SUM(adjustment) AS totalamount
+      SUM(amount) AS totalamount
       FROM public.mv_pt_receipt_regiester
       WHERE tenantid = $tenantid
   groupby: group by CASE WHEN instrumenttype != 'ONLINE' THEN collectorname ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END,tenantid,instrumenttype
