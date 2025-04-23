@@ -1,0 +1,47 @@
+serviceMaps:
+  serviceName: egov-ndc-services
+  mappings:
+    - version: 1.0
+      description: Persists NDC applications in eg_ndc_Applicants and eg_ndc_details tables
+      fromTopic: save-ndc-application
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO eg_ndc_Applicants (uuid,firstname, lastname, mobile, email, address, applicationstatus, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?);
+          basePath: Applicant
+          jsonMaps:
+            - jsonPath: $.Applicant.uuid
+            - jsonPath: $.Applicant.firstname
+            - jsonPath: $.Applicant.lastname
+            - jsonPath: $.Applicant.mobile
+            - jsonPath: $.Applicant.email
+            - jsonPath: $.Applicant.address
+            - jsonPath: $.Applicant.applicationStatus
+            - jsonPath: $.Applicant.createdby
+            - jsonPath: $.Applicant.lastmodifiedby
+            - jsonPath: $.Applicant.createdtime
+            - jsonPath: $.Applicant.lastmodifiedtime
+
+        - query: INSERT INTO eg_ndc_details (uuid,Applicantid, businessservice, consumercode, additionaldetails, dueamount, status) VALUES (?, ?, ?, ?, ?, ?,?);
+          basePath: NdcDetails.*
+          jsonMaps:
+            - jsonPath: $.NdcDetails.*.uuid
+            - jsonPath: $.NdcDetails.*.applicantId
+            - jsonPath: $.NdcDetails.*.businessService
+            - jsonPath: $.NdcDetails.*.consumerCode
+            - jsonPath: $.NdcDetails.*.additionalDetails
+              type: JSON
+              dbType: JSONB
+            - jsonPath: $.NdcDetails.*.dueAmount
+            - jsonPath: $.NdcDetails.*.status
+
+        - query: INSERT INTO eg_ndc_documents (uuid, applicantid, documenttype, documentattachment, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: NdcApplication.Documents.*
+          jsonMaps:
+            - jsonPath: $.NdcApplication.Documents.*.uuid
+            - jsonPath: $.NdcApplication.Documents.*.applicantId
+            - jsonPath: $.NdcApplication.Documents.*.documentType
+            - jsonPath: $.NdcApplication.Documents.*.documentAttachment
+            - jsonPath: $.NdcApplication.Documents.*.createdby
+            - jsonPath: $.NdcApplication.Documents.*.lastmodifiedby
+            - jsonPath: $.NdcApplication.Documents.*.createdtime
+            - jsonPath: $.NdcApplication.Documents.*.lastmodifiedtime
