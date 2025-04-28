@@ -1932,7 +1932,7 @@ ReportDefinitions:
     LEFT JOIN eg_ws_connection d4 ON d4.connectionno = d1.consumercode
     LEFT JOIN eg_ws_service ser ON d4.id = ser.connection_id
     LEFT JOIN eg_pt_property d5 ON d4.property_id = d5.propertyid
-    WHERE d1.taxperiodfrom >= $fromfy and d1.taxperiodfrom <= $tofy
+    WHERE d1.taxperiodfrom::text >= $fromfy and d1.taxperiodfrom::text <= $tofy
     AND d1.tenantid = $tenantid
       AND d1.status != 'CANCELLED'
       AND d1.businessservice = 'WS' and ser.connectiontype!='Metered'
