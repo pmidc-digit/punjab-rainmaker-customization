@@ -1901,12 +1901,13 @@ ReportDefinitions:
     source: ws
     total: false
   searchParams:
-  - name: fromDate
-    label: reports.pt.fromDate
-    type: epoch
-    source: pt
+  - name: fy
+    label: FY
+    type: singlevaluelist
+    pattern: 'list://1680201000000 and 1711823400000:2023-24,1711823400000 and 1743359400000:2024-25'
+    source: ws
     isMandatory: true
-    searchClause: and 1=1
+    searchClause: 1=1
   query: |
     WITH quarterly_data AS (
     SELECT
@@ -1924,7 +1925,7 @@ ReportDefinitions:
     LEFT JOIN eg_ws_connection d4 ON d4.connectionno = d1.consumercode
     LEFT JOIN eg_ws_service ser ON d4.id = ser.connection_id
     LEFT JOIN eg_pt_property d5 ON d4.property_id = d5.propertyid
-    WHERE d1.taxperiodfrom >= $fromDate
+    WHERE d1.taxperiodfrom between $fy
     AND d1.tenantid = $tenantid
       AND d1.status != 'CANCELLED'
       AND d1.businessservice = 'WS' and ser.connectiontype!='Metered'
