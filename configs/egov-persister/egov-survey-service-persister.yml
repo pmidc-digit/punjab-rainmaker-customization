@@ -324,7 +324,7 @@ serviceMaps:
         - query: INSERT INTO eg_ss_survey_response (uuid, surveyuuid, citizenid, tenantid, locality,coordinates, status, createdby, lastmodifiedby, createdtime, lastmodifiedtime)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (uuid)
-            DO UPDATE SET status = EXCLUDED.status, lastmodifiedby = EXCLUDED.lastmodifiedby, lastmodifiedtime = EXCLUDED.lastmodifiedtime;
+            DO UPDATE SET status = EXCLUDED.status,tenantid=EXCLUDED.tenantid,locality=EXCLUDED.locality, coordinates=EXCLUDED.coordinates, lastmodifiedby = EXCLUDED.lastmodifiedby, lastmodifiedtime = EXCLUDED.lastmodifiedtime;
           basePath: SurveyResponse
           jsonMaps:
             - jsonPath: $.SurveyResponse.uuid
