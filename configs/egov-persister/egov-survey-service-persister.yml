@@ -235,12 +235,13 @@ serviceMaps:
             - jsonPath: $.Questions.*.auditDetails.lastModifiedTime
             - jsonPath: $.Questions.*.qorder
             - jsonPath: $.Questions.*.categoryId
-        - query: INSERT INTO eg_ss_question_option( uuid,questionuuid,optiontext,weightage,createdby,lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?,?,?,?,?,?,?,?);
+        - query: INSERT INTO eg_ss_question_option( uuid,questionuuid,optiontext,optionorder,weightage,createdby,lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?,?,?,?,?,?,?,?,?);
           basePath: $.Questions.*.options.*
           jsonMaps:
             - jsonPath: $.Questions.*.options.*.uuid
             - jsonPath: $.Questions.*.options.*.questionUuid
             - jsonPath: $.Questions.*.options.*.optionText
+            - jsonPath: $.Questions.*.options.*.optionOrder
             - jsonPath: $.Questions.*.options.*.weightage
             - jsonPath: $.Questions.*.options.*.auditDetails.createdBy
             - jsonPath: $.Questions.*.options.*.auditDetails.lastModifiedBy
