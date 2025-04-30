@@ -32,8 +32,8 @@ serviceMaps:
         - query: >
             INSERT INTO eg_swach_address_v2(id, tenantid, parentid, doorno, plotno, buildingname,
             street, landmark, city, pincode, locality, district, region, state, country, latitude,
-            longitude, additionaldetails, createdby, createdtime, lastmodifiedby, lastmodifiedtime)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            longitude,  createdby, createdtime, lastmodifiedby, lastmodifiedtime)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
           basePath: service.address
           jsonMaps:
             - jsonPath: $.service.address.id
@@ -53,9 +53,6 @@ serviceMaps:
             - jsonPath: $.service.address.country
             - jsonPath: $.service.address.geoLocation.latitude
             - jsonPath: $.service.address.geoLocation.longitude
-            - jsonPath: $.service.address.additionalDetails
-              type: JSON
-              dbType: JSONB
             - jsonPath: $.service.auditDetails.createdBy
             - jsonPath: $.service.auditDetails.createdTime
             - jsonPath: $.service.auditDetails.lastModifiedBy
@@ -88,7 +85,7 @@ serviceMaps:
         - query: >
             UPDATE eg_swach_address_v2 SET doorno=?, plotno=?, buildingname=?, street=?, landmark=?,
             city=?, pincode=?, locality=?, district=?, region=?, state=?, country=?, latitude=?,
-            longitude=?, additionaldetails=?, lastmodifiedby=?, lastmodifiedtime=? WHERE id=?;
+            longitude=?,  lastmodifiedby=?, lastmodifiedtime=? WHERE id=?;
           basePath: service.address
           jsonMaps:
             - jsonPath: $.service.address.doorNo
@@ -105,9 +102,6 @@ serviceMaps:
             - jsonPath: $.service.address.country
             - jsonPath: $.service.address.geoLocation.latitude
             - jsonPath: $.service.address.geoLocation.longitude
-            - jsonPath: $.service.address.additionalDetails
-              type: JSON
-              dbType: JSONB
             - jsonPath: $.service.auditDetails.lastModifiedBy
             - jsonPath: $.service.auditDetails.lastModifiedTime
             - jsonPath: $.service.address.id
