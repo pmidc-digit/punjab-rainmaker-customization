@@ -1923,25 +1923,25 @@ ReportDefinitions:
             WHEN EXTRACT(MONTH FROM to_timestamp(d1.taxperiodfrom / 1000)) BETWEEN 4 AND 6 THEN 'Quarter 1'
             WHEN EXTRACT(MONTH FROM to_timestamp(d1.taxperiodfrom / 1000)) BETWEEN 7 AND 9 THEN 'Quarter 2'
             WHEN EXTRACT(MONTH FROM to_timestamp(d1.taxperiodfrom / 1000)) BETWEEN 10 AND 12 THEN 'Quarter 3'
-			ELSE 'Quarter 4'
-        END AS quarter,
-		 to_char(to_timestamp(d1.taxperiodfrom / 1000), 'YYYY-MM-DD') AS tax_period_from_date,
-		COUNT(DISTINCT d1.consumercode) AS distinct_consumercode_count,
-		SUM(d2.taxamount) AS total_demand_amount,
-		SUM(d2.collectionamount) AS total_collected_amount,
-		SUM(d2.taxamount - d2.collectionamount ) AS arrears,
-		d5.usagecategory AS UsageType
-    FROM
+            ELSE 'Quarter 4'
+            END AS quarter,
+            to_char(to_timestamp(d1.taxperiodfrom / 1000), 'YYYY-MM-DD') AS tax_period_from_date,
+            COUNT(DISTINCT d1.consumercode) AS distinct_consumercode_count,
+            SUM(d2.taxamount) AS total_demand_amount,
+            SUM(d2.collectionamount) AS total_collected_amount,
+            SUM(d2.taxamount - d2.collectionamount ) AS arrears,
+            d5.usagecategory AS UsageType
+        FROM
         egbs_demand_v1 d1
         LEFT JOIN egbs_demanddetail_v1 d2 ON d1.id = d2.demandid
         LEFT JOIN eg_ws_connection d4 ON d4.connectionno = d1.consumercode
-		LEFT JOIN eg_pt_property  d5 ON d4.property_id = d5.propertyid 
-    WHERE d1.taxperiodfrom::text >= $fromfy and d1.taxperiodfrom::text <= $tofy
-	  AND d1.tenantid = $tenantid
-      AND d1.status != 'CANCELLED'
-	  AND d4.status = 'Active'
-      AND d1.businessservice = 'WS' 
-    GROUP BY
+        LEFT JOIN eg_pt_property  d5 ON d4.property_id = d5.propertyid
+        WHERE d1.taxperiodfrom::text >= $fromfy and d1.taxperiodfrom::text <= $tofy
+        AND d1.tenantid = $tenantid
+        AND d1.status != 'CANCELLED'
+        AND d4.status = 'Active'
+        AND d1.businessservice = 'WS'
+        GROUP BY
         year, quarter, tax_period_from_date ,UsageType
     )
 
@@ -1950,12 +1950,12 @@ ReportDefinitions:
      tax_period_from_date,
      COALESCE(CAST(total_demand_amount AS TEXT), 'No Tax amount') AS total_demand_amount,
      COALESCE(CAST(total_collected_amount AS TEXT), 'No Collection Amount') AS total_collected_amount,
-	  COALESCE(CAST(arrears AS TEXT), 'Nill') AS Arrears,
+     COALESCE(CAST(arrears AS TEXT), 'Nill') AS Arrears,
      COALESCE(CAST(distinct_consumercode_count AS TEXT), '0') AS distinct_consumercode_count,
-	 UsageType
+     UsageType
     FROM
     quarterly_data where 1=1
-    
+
 - reportName: GeneratSWDemandReport
   summary: Sewerage Demand Report
   version: 1.0.0
@@ -3864,7 +3864,7 @@ ReportDefinitions:
       --and pt_addr.propertyid=pt.id 
   orderby: ORDER BY pd.receiptdate DESC;
 
-- reportName: waterPendingSlaReport
+- reportName: waterPendingSlaApplications
   summary:  Water SLA Pendency Report
   version: 1.0.0
   moduleName: rainmaker-ws
@@ -3978,30 +3978,30 @@ ReportDefinitions:
         c.tenantid as tenantid,
         c.applicationno as applicationno,
         c.applicationstatus as applicationstatus,
-	c.connectionno as connectionno,
-	c.additionaldetails->>'ledgerId' as ledgerid,
-	c.additionaldetails->>'groups' as group,
-	c.additionaldetails->>'waterSubUsageType' as usagecategory,
-	c.additionaldetails->>'connectionCategory' as connctionCategory,
+        c.connectionno as connectionno,
+        c.additionaldetails->>'ledgerId' as ledgerid,
+        c.additionaldetails->>'groups' as group,
+        c.additionaldetails->>'waterSubUsageType' as usagecategory,
+        c.additionaldetails->>'connectionCategory' as connctionCategory,
         TO_CHAR(TO_TIMESTAMP(c.createdtime / 1000), 'dd-MM-yyyy') AS createdon,
-	TO_CHAR(TO_TIMESTAMP(s.connectionexecutiondate / 1000), 'dd-MM-yyyy') as executiondate,
-	TO_CHAR(TO_TIMESTAMP(pist.createdtime / 1000), 'dd-MM-yyyy') as paymentdate,
+        TO_CHAR(TO_TIMESTAMP(s.connectionexecutiondate / 1000), 'dd-MM-yyyy') as executiondate,
+        TO_CHAR(TO_TIMESTAMP(pist.createdtime / 1000), 'dd-MM-yyyy') as paymentdate,
         e.code AS assignedemployee,
         TO_CHAR(TO_TIMESTAMP(assigned.createdtime / 1000), 'dd-MM-yyyy') AS assignedon,
         FLOOR((EXTRACT(EPOCH FROM NOW()) - c.createdtime / 1000) / 86400) AS dayspendency,
         FLOOR((EXTRACT(EPOCH FROM NOW()) - assigned.createdtime / 1000) / 86400) AS assignedfordays,
-	pt.plotsize,
-	pt.oldpropertyid as oldpropertyid,
-	pt.address as address,
-	pt.localityname as localityname,
-	pt.propertyusagetype as propertyusagetype
-   FROM eg_ws_connection c
-   INNER JOIN (
+        pt.plotsize,
+        pt.oldpropertyid as oldpropertyid,
+        pt.address as address,
+        pt.localityname as localityname,
+        pt.propertyusagetype as propertyusagetype
+    FROM eg_ws_connection c
+    INNER JOIN (
     SELECT id, businessid 
     FROM eg_wf_processinstance_v2 pi
-    WHERE (businessid, createdtime) IN (
+    WHERE tenantid=$tenantid and (businessid, createdtime) IN (
         SELECT businessid, MAX(createdtime)
-        FROM eg_wf_processinstance_v2
+        FROM eg_wf_processinstance_v2 where tenantid=$tenantid
         GROUP BY businessid
     )
     ) pi ON pi.businessid = c.applicationno
@@ -4010,12 +4010,12 @@ ReportDefinitions:
     inner join report_properties pt on (pt.propertyid=c.property_id and pt.propertystatus='ACTIVE')
     inner join eg_ws_service s on s.connection_id=c.id
     left outer join eg_wf_processinstance_v2 pist on (pist.businessid=c.applicationno and pist.action='PAY')
-    WHERE c.tenantid = 'pb.patiala' 
+    WHERE c.tenantid = $tenantid
     and c.applicationstatus in ('PENDING_FOR_DOCUMENT_VERIFICATION','PENDING_FOR_FIELD_INSPECTION','PENDING_FOR_APPROVAL','PENDING_APPROVAL_FOR_CONNECTION')
     and c.createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 9 * 24 * 60 * 60 * 1000)
 
 
-- reportName: seweragePendingSlaReport
+- reportName: seweragePendingSlaApplications
   summary:  Sewerage SLA Pendency Report
   version: 1.0.0
   moduleName: rainmaker-ws
@@ -4129,30 +4129,30 @@ ReportDefinitions:
         c.tenantid as tenantid,
         c.applicationno as applicationno,
         c.applicationstatus as applicationstatus,
-	c.connectionno as connectionno,
-	c.additionaldetails->>'ledgerId' as ledgerid,
-	c.additionaldetails->>'groups' as group,
-	c.additionaldetails->>'waterSubUsageType' as usagecategory,
-	c.additionaldetails->>'connectionCategory' as connctionCategory,
+        c.connectionno as connectionno,
+        c.additionaldetails->>'ledgerId' as ledgerid,
+        c.additionaldetails->>'groups' as group,
+        c.additionaldetails->>'waterSubUsageType' as usagecategory,
+        c.additionaldetails->>'connectionCategory' as connctionCategory,
         TO_CHAR(TO_TIMESTAMP(c.createdtime / 1000), 'dd-MM-yyyy') AS createdon,
-	TO_CHAR(TO_TIMESTAMP(s.connectionexecutiondate / 1000), 'dd-MM-yyyy') as executiondate,
-	TO_CHAR(TO_TIMESTAMP(pist.createdtime / 1000), 'dd-MM-yyyy') as paymentdate,
+        TO_CHAR(TO_TIMESTAMP(s.connectionexecutiondate / 1000), 'dd-MM-yyyy') as executiondate,
+        TO_CHAR(TO_TIMESTAMP(pist.createdtime / 1000), 'dd-MM-yyyy') as paymentdate,
         e.code AS assignedemployee,
         TO_CHAR(TO_TIMESTAMP(assigned.createdtime / 1000), 'dd-MM-yyyy') AS assignedon,
         FLOOR((EXTRACT(EPOCH FROM NOW()) - c.createdtime / 1000) / 86400) AS dayspendency,
         FLOOR((EXTRACT(EPOCH FROM NOW()) - assigned.createdtime / 1000) / 86400) AS assignedfordays,
-	pt.plotsize,
-	pt.oldpropertyid as oldpropertyid,
-	pt.address as address,
-	pt.localityname as localityname,
-	pt.propertyusagetype as propertyusagetype
-   FROM eg_sw_connection c
-   INNER JOIN (
+        pt.plotsize,
+        pt.oldpropertyid as oldpropertyid,
+        pt.address as address,
+        pt.localityname as localityname,
+        pt.propertyusagetype as propertyusagetype
+    FROM eg_sw_connection c
+    INNER JOIN (
     SELECT id, businessid 
     FROM eg_wf_processinstance_v2 pi
-    WHERE (businessid, createdtime) IN (
+    WHERE tenantid=$tenantid and (businessid, createdtime) IN (
         SELECT businessid, MAX(createdtime)
-        FROM eg_wf_processinstance_v2
+        FROM eg_wf_processinstance_v2 where tenantid=$tenantid
         GROUP BY businessid
     )
     ) pi ON pi.businessid = c.applicationno
@@ -4161,9 +4161,6 @@ ReportDefinitions:
     inner join report_properties pt on (pt.propertyid=c.property_id and pt.propertystatus='ACTIVE')
     inner join eg_sw_service s on s.connection_id=c.id
     left outer join eg_wf_processinstance_v2 pist on (pist.businessid=c.applicationno and pist.action='PAY')
-    WHERE c.tenantid = 'pb.patiala' 
+    WHERE c.tenantid = $tenantid 
     and c.applicationstatus in ('PENDING_FOR_DOCUMENT_VERIFICATION','PENDING_FOR_FIELD_INSPECTION','PENDING_FOR_APPROVAL','PENDING_APPROVAL_FOR_CONNECTION')
     and c.createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 9 * 24 * 60 * 60 * 1000)
-
-
-    
