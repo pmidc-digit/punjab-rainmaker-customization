@@ -133,14 +133,6 @@ ReportDefinitions:
         type: string
         source: rainmaker-misc
         total: false
-    searchParams:
-      - name: financialyear
-        label: Financial Year
-        type: singlevaluelist
-        pattern: 'list://1427846400000:2015-16,1459468800000:2016-17,1491004800000:2017-18,1522521000000:2018-19,1522540800000:2019-20,1554076800000:2020-21,1617215400000:2021-22,1648751400000:2022-23,1680287400000:2023-24,1711909800000:2024-25'
-        source: rainmaker-misc
-        isMandatory: false
-        searchClause: and ta.financialyear not like concat('%',$financialyear,'%')
     query: |
         WITH ws_data AS (SELECT tenantid, applicationno, applicationstatus, createdtime, 'WS-Service' AS servicename,
         CASE WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(createdtime / 1000)) >= 4 THEN TO_CHAR(TO_TIMESTAMP(createdtime / 1000), 'YYYY') || '-' ||
@@ -229,13 +221,6 @@ ReportDefinitions:
         wrapper: true
         isMandatory: false
         searchClause: AND ta.tenantid =$tenantid
-      - name: financialyear
-        label: Financial Year
-        type: singlevaluelist
-        pattern: 'list://1427846400000:2015-16,1459468800000:2016-17,1491004800000:2017-18,1522521000000:2018-19,1522540800000:2019-20,1554076800000:2020-21,1617215400000:2021-22,1648751400000:2022-23,1680287400000:2023-24,1711909800000:2024-25'
-        source: rainmaker-misc
-        isMandatory: false
-        searchClause: and ta.financialyear not like concat('%',$financialyear,'%')
     query: |
        WITH ws_data AS (SELECT tenantid, applicationno, applicationstatus, createdtime, 'WS-Service' AS servicename,
        CASE WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(createdtime / 1000)) >= 4 THEN TO_CHAR(TO_TIMESTAMP(createdtime / 1000), 'YYYY') || '-' ||
@@ -335,13 +320,6 @@ ReportDefinitions:
         wrapper: true
         isMandatory: false
         searchClause: AND ta.tenantid =$tenantid
-      - name: financialyear
-        label: Financial Year
-        type: singlevaluelist
-        pattern: 'list://1427846400000:2015-16,1459468800000:2016-17,1491004800000:2017-18,1522521000000:2018-19,1522540800000:2019-20,1554076800000:2020-21,1617215400000:2021-22,1648751400000:2022-23,1680287400000:2023-24,1711909800000:2024-25'
-        source: rainmaker-misc
-        isMandatory: false
-        searchClause: and ta.financialyear not like concat('%',$financialyear,'%')
     query: |
         WITH ws_data AS (SELECT tenantid, applicationno, applicationstatus, createdtime, 'WS-Service' AS servicename,
         CASE WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(createdtime / 1000)) >= 4 THEN TO_CHAR(TO_TIMESTAMP(createdtime / 1000), 'YYYY') || '-' ||
