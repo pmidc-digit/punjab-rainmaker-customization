@@ -189,7 +189,6 @@ ReportDefinitions:
         AND pa.servicename = ta.servicename
         AND pa.financialyear = ta.financialyear
         WHERE ta.tenantid NOT IN ('pb.testing')
-        AND ta.financialyear = $financialyear
         
   - reportName: authority
     summary: Tenant Wise Pendency Report
@@ -230,27 +229,60 @@ ReportDefinitions:
         wrapper: true
         isMandatory: false
         searchClause: AND ta.tenantid =$tenantid
+      - name: financialyear
+        label: Financial Year
+        type: singlevaluelist
+        pattern: 'list://1427846400000:2015-16,1459468800000:2016-17,1491004800000:2017-18,1522521000000:2018-19,1522540800000:2019-20,1554076800000:2020-21,1617215400000:2021-22,1648751400000:2022-23,1680287400000:2023-24,1711909800000:2024-25'
+        source: rainmaker-misc
+        isMandatory: false
+        searchClause: and ta.financialyear not like concat('%',$financialyear,'%')
     query: |
-        WITH total_appl AS
-        (SELECT pp.tenantid,count(*) as total_appl
-        FROM public.eg_wf_processinstance_v2 pp
-        WHERE pp.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.CREATEWITHWNS')
-        AND pp.ASSIGNEE IS NOT NULL
-        AND pp.tenantid NOT IN ('pb','pb.testing')
-        GROUP BY pp.tenantid),
-        pending_appl AS
-        (SELECT p.tenantid,count(*) as pending_appl
-        FROM public.eg_wf_processinstance_v2 p
-        JOIN  public.eg_wf_businessservice_v2 b ON p.businessservice=b.businessservice
-        WHERE (to_timestamp(p.lastmodifiedtime / 1000.0) - to_timestamp(p.createdtime / 1000.0)) > (b.businessservicesla / (1000 * 60 * 60 * 24)) * interval '1 day'
-        AND b.businessservice NOT IN ('ModifyWSConnection','ModifySWConnection','PT.CREATE','PT.UPDATE','PT.CREATEWITHWNS')
-        AND P.ASSIGNEE IS NOT NULL
-        AND p.tenantid NOT IN ('pb','pb.testing')
-        GROUP BY p.tenantid)
-        SELECT ta.tenantid as authorityID,
-        UPPER(SUBSTR(REPLACE(ta.tenantid, 'pb.', ''), 1, 1)) || LOWER(SUBSTR(REPLACE(ta.tenantid, 'pb.', ''), 2)) AS authorityName,
-        '1' as departmentID, ta.total_appl as TotalApplicationReceived,COALESCE(pa.pending_appl,0)  as PendingBeyondTimelineApplicationCount
-        FROM total_appl ta LEFT JOIN pending_appl pa ON ta.tenantid=pa.tenantid WHERE 1=1
+       WITH ws_data AS (SELECT tenantid, applicationno, applicationstatus, createdtime, 'WS-Service' AS servicename,
+       CASE WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(createdtime / 1000)) >= 4 THEN TO_CHAR(TO_TIMESTAMP(createdtime / 1000), 'YYYY') || '-' ||
+       RIGHT(TO_CHAR(TO_TIMESTAMP(createdtime / 1000) + INTERVAL '1 year', 'YYYY'), 2) ELSE TO_CHAR(TO_TIMESTAMP(createdtime / 1000) - INTERVAL '1 year', 'YYYY') || '-' ||
+       RIGHT(TO_CHAR(TO_TIMESTAMP(createdtime / 1000), 'YYYY'), 2) END AS financialyear
+       FROM eg_ws_connection WHERE connectionno IS NULL),
+       sw_data AS (SELECT tenantid, applicationno, applicationstatus, createdtime,'SW-Service' AS servicename,
+       CASE WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(createdtime / 1000)) >= 4 THEN TO_CHAR(TO_TIMESTAMP(createdtime / 1000), 'YYYY') || '-' ||
+       RIGHT(TO_CHAR(TO_TIMESTAMP(createdtime / 1000) + INTERVAL '1 year', 'YYYY'), 2) ELSE TO_CHAR(TO_TIMESTAMP(createdtime / 1000) - INTERVAL '1 year', 'YYYY') || '-' ||
+       RIGHT(TO_CHAR(TO_TIMESTAMP(createdtime / 1000), 'YYYY'), 2) END AS financialyear
+       FROM eg_sw_connection WHERE connectionno IS NULL),
+       tl_data AS (SELECT tenantid, applicationnumber, status, createdtime,'TL-Service' AS servicename, financialyear
+       FROM eg_tl_tradelicense WHERE licensenumber IS NULL),
+       fn_data AS (SELECT tenantid, applicationnumber,status,createdtime,'FirezNOC' AS servicename,financialyear
+       FROM eg_fn_firenocdetail WHERE firestationid IS NULL),
+       total_appl AS (SELECT tenantid, servicename, COUNT(*) AS cnt, financialyear FROM ws_data GROUP BY tenantid, servicename, financialyear
+       UNION ALL
+       SELECT tenantid, servicename, COUNT(*) AS cnt, financialyear FROM sw_data GROUP BY tenantid, servicename, financialyear
+       UNION ALL
+       SELECT tenantid, servicename, COUNT(*) AS cnt, financialyear FROM tl_data GROUP BY tenantid, servicename, financialyear
+       UNION ALL
+       SELECT tenantid, servicename, COUNT(*) AS cnt, financialyear FROM fn_data GROUP BY tenantid, servicename, financialyear),
+       pending_appl AS (SELECT tenantid, applicationstatus, servicename, COUNT(*) AS cnt, financialyear
+       FROM ws_data WHERE applicationstatus NOT IN ('CONNECTION_ACTIVATED', 'INITIATED','REJECTED','PENDING_FOR_CONNECTION_ACTIVATION','PENDING_FOR_PAYMENT')
+       AND createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 11 * 24 * 60 * 60 * 1000)
+       GROUP BY tenantid, applicationstatus, servicename, financialyear
+       UNION ALL
+       SELECT tenantid, applicationstatus, servicename, COUNT(*) AS cnt, financialyear
+       FROM sw_data WHERE applicationstatus NOT IN ('CONNECTION_ACTIVATED', 'INITIATED','REJECTED','PENDING_FOR_CONNECTION_ACTIVATION','PENDING_FOR_PAYMENT')
+       AND createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 11 * 24 * 60 * 60 * 1000)
+       GROUP BY tenantid, applicationstatus, servicename, financialyear
+       UNION ALL
+       SELECT tenantid, status AS applicationstatus, servicename, COUNT(*) AS cnt, financialyear
+       FROM tl_data WHERE status NOT IN ('INITIATED','REJECTED','PENDINGPAYMENT' , 'APPLIED','CANCELLED','APPROVED','CITIZENACTIONREQUIRED')
+       AND createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 18 * 24 * 60 * 60 * 1000)
+       GROUP BY tenantid, status, servicename, financialyear
+       UNION ALL
+       SELECT tenantid, status AS applicationstatus, servicename, COUNT(*) AS cnt, financialyear
+       FROM fn_data WHERE status NOT IN ('INITIATED','REJECTED','PENDINGPAYMENT','CANCELLED','APPROVED','CITIZENACTIONREQUIRED','CITIZENACTIONREQUIRED-DV')
+       AND createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 20 * 24 * 60 * 60 * 1000)
+       GROUP BY tenantid, status, servicename, financialyear)
+       SELECT ta.tenantid as authorityID,
+       UPPER(SUBSTR(REPLACE(ta.tenantid, 'pb.', ''), 1, 1)) || LOWER(SUBSTR(REPLACE(ta.tenantid, 'pb.', ''), 2)) AS authorityName,
+       '1' as departmentID, SUM(ta.cnt) AS TotalApplicationReceived, COALESCE(SUM(pa.cnt), 0) AS PendingBeyondTimelineApplicationCount
+       FROM total_appl ta LEFT JOIN pending_appl pa ON pa.tenantid = ta.tenantid AND pa.servicename = ta.servicename
+       AND pa.financialyear = ta.financialyear WHERE ta.tenantid NOT IN ('pb.testing')
+    groupby: GROUP BY ta.tenantid
         
   - reportName: service
     summary: Service Wise Pendency Report
@@ -303,75 +335,62 @@ ReportDefinitions:
         wrapper: true
         isMandatory: false
         searchClause: AND ta.tenantid =$tenantid
+      - name: financialyear
+        label: Financial Year
+        type: singlevaluelist
+        pattern: 'list://1427846400000:2015-16,1459468800000:2016-17,1491004800000:2017-18,1522521000000:2018-19,1522540800000:2019-20,1554076800000:2020-21,1617215400000:2021-22,1648751400000:2022-23,1680287400000:2023-24,1711909800000:2024-25'
+        source: rainmaker-misc
+        isMandatory: false
+        searchClause: and ta.financialyear not like concat('%',$financialyear,'%')
     query: |
-        WITH total_appl AS (
-              SELECT 
-                  CASE 
-                      WHEN pp.businessservice IN ('NEWTL.HAZ', 'DIRECTRENEWAL', 'EDITRENEWAL', 'NewTL') THEN 'TL-Renewal'
-                      WHEN pp.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
-                      WHEN pp.businessservice IN ('NewWS1') THEN 'WS-Service'
-                      WHEN pp.businessservice IN ('NewSW1') THEN 'SW-Service'
-                      WHEN pp.businessservice IN ('FIRENOC') THEN 'FireNoc'
-                      WHEN pp.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment'
-                  END AS servicename,
-                  pp.tenantid,  -- Added tenantid
-                  COUNT(*) AS total_appl
-              FROM public.eg_wf_processinstance_v2 pp
-              WHERE pp.businessservice NOT IN ('ModifyWSConnection', 'ModifySWConnection', 'PT.CREATE', 'PT.UPDATE', 'PT.CREATEWITHWNS')
-                  AND pp.assignee IS NOT NULL
-                  AND pp.tenantid NOT IN ('pb', 'pb.testing')
-              GROUP BY pp.tenantid, 
-                  CASE 
-                      WHEN pp.businessservice IN ('NEWTL.HAZ', 'DIRECTRENEWAL', 'EDITRENEWAL', 'NewTL') THEN 'TL-Renewal'
-                      WHEN pp.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
-                      WHEN pp.businessservice IN ('NewWS1') THEN 'WS-Service'
-                      WHEN pp.businessservice IN ('NewSW1') THEN 'SW-Service'
-                      WHEN pp.businessservice IN ('FIRENOC') THEN 'FireNoc'
-                      WHEN pp.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment'
-                  END
-          ),
-          pending_appl AS (
-              SELECT 
-                  CASE 
-                      WHEN p.businessservice IN ('NEWTL.HAZ', 'DIRECTRENEWAL', 'EDITRENEWAL', 'NewTL') THEN 'TL-Renewal'
-                      WHEN p.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
-                      WHEN p.businessservice IN ('NewWS1') THEN 'WS-Service'
-                      WHEN p.businessservice IN ('NewSW1') THEN 'SW-Service'
-                      WHEN p.businessservice IN ('FIRENOC') THEN 'FireNoc'
-                      WHEN p.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment' 
-                  END AS servicename,
-                  p.tenantid,  -- Added tenantid
-                  COUNT(*) AS pending_appl
-              FROM public.eg_wf_processinstance_v2 p
-              JOIN public.eg_wf_businessservice_v2 b ON p.businessservice = b.businessservice
-              WHERE (TO_TIMESTAMP(p.lastmodifiedtime / 1000.0) - TO_TIMESTAMP(p.createdtime / 1000.0)) > 
-                    (b.businessservicesla / (1000 * 60 * 60 * 24)) * INTERVAL '1 day'
-                  AND b.businessservice NOT IN ('ModifyWSConnection', 'ModifySWConnection', 'PT.CREATE', 'PT.UPDATE', 'PT.CREATEWITHWNS')
-                  AND p.assignee IS NOT NULL
-                  AND p.tenantid NOT IN ('pb', 'pb.testing')
-              GROUP BY p.tenantid, 
-                  CASE 
-                      WHEN p.businessservice IN ('NEWTL.HAZ', 'DIRECTRENEWAL', 'EDITRENEWAL', 'NewTL') THEN 'TL-Renewal'
-                      WHEN p.businessservice IN ('PT.MUTATION') THEN 'PT-Service'
-                      WHEN p.businessservice IN ('NewWS1') THEN 'WS-Service'
-                      WHEN p.businessservice IN ('NewSW1') THEN 'SW-Service'
-                      WHEN p.businessservice IN ('FIRENOC') THEN 'FireNoc'
-                      WHEN p.businessservice IN ('BS.AMENDMENT') THEN 'Bill Amendment' 
-                  END
-          )
-          SELECT 
-              '' as serviceID,
-              ta.servicename AS serviceName,
-              ta.tenantid AS authorityID,
-              '1' as departmentID,
-              ta.total_appl AS TotalApplicationReceived,
-              COALESCE(pa.pending_appl, 0) AS PendingBeyondTimelineApplicationCount
-          FROM total_appl ta 
-          LEFT JOIN pending_appl pa 
-              ON ta.servicename = pa.servicename 
-              AND ta.tenantid = pa.tenantid
-          WHERE 1=1
-
+        WITH ws_data AS (SELECT tenantid, applicationno, applicationstatus, createdtime, 'WS-Service' AS servicename,
+        CASE WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(createdtime / 1000)) >= 4 THEN TO_CHAR(TO_TIMESTAMP(createdtime / 1000), 'YYYY') || '-' ||
+        RIGHT(TO_CHAR(TO_TIMESTAMP(createdtime / 1000) + INTERVAL '1 year', 'YYYY'), 2) ELSE TO_CHAR(TO_TIMESTAMP(createdtime / 1000) - INTERVAL '1 year', 'YYYY') || '-' ||
+        RIGHT(TO_CHAR(TO_TIMESTAMP(createdtime / 1000), 'YYYY'), 2) END AS financialyear
+        FROM eg_ws_connection WHERE connectionno IS NULL),
+        sw_data AS (SELECT tenantid, applicationno, applicationstatus, createdtime,'SW-Service' AS servicename,
+        CASE WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(createdtime / 1000)) >= 4 THEN TO_CHAR(TO_TIMESTAMP(createdtime / 1000), 'YYYY') || '-' ||
+        RIGHT(TO_CHAR(TO_TIMESTAMP(createdtime / 1000) + INTERVAL '1 year', 'YYYY'), 2) ELSE TO_CHAR(TO_TIMESTAMP(createdtime / 1000) - INTERVAL '1 year', 'YYYY') || '-' ||
+        RIGHT(TO_CHAR(TO_TIMESTAMP(createdtime / 1000), 'YYYY'), 2) END AS financialyear
+        FROM eg_sw_connection WHERE connectionno IS NULL),
+        tl_data AS (SELECT tenantid, applicationnumber, status, createdtime,'TL-Service' AS servicename, financialyear
+        FROM eg_tl_tradelicense WHERE licensenumber IS NULL),
+        fn_data AS (SELECT tenantid, applicationnumber,status,createdtime,'FirezNOC' AS servicename,financialyear
+        FROM eg_fn_firenocdetail WHERE firestationid IS NULL),
+        total_appl AS (SELECT tenantid, servicename, COUNT(*) AS cnt, financialyear FROM ws_data GROUP BY tenantid, servicename, financialyear
+        UNION ALL
+        SELECT tenantid, servicename, COUNT(*) AS cnt, financialyear FROM sw_data GROUP BY tenantid, servicename, financialyear
+        UNION ALL
+        SELECT tenantid, servicename, COUNT(*) AS cnt, financialyear FROM tl_data GROUP BY tenantid, servicename, financialyear
+        UNION ALL
+        SELECT tenantid, servicename, COUNT(*) AS cnt, financialyear FROM fn_data GROUP BY tenantid, servicename, financialyear),
+        pending_appl AS (SELECT tenantid, applicationstatus, servicename, COUNT(*) AS cnt, financialyear
+        FROM ws_data WHERE applicationstatus NOT IN ('CONNECTION_ACTIVATED', 'INITIATED','REJECTED','PENDING_FOR_CONNECTION_ACTIVATION','PENDING_FOR_PAYMENT')
+        AND createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 11 * 24 * 60 * 60 * 1000)
+        GROUP BY tenantid, applicationstatus, servicename, financialyear
+        UNION ALL
+        SELECT tenantid, applicationstatus, servicename, COUNT(*) AS cnt, financialyear
+        FROM sw_data WHERE applicationstatus NOT IN ('CONNECTION_ACTIVATED', 'INITIATED','REJECTED','PENDING_FOR_CONNECTION_ACTIVATION','PENDING_FOR_PAYMENT')
+        AND createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 11 * 24 * 60 * 60 * 1000)
+        GROUP BY tenantid, applicationstatus, servicename, financialyear
+        UNION ALL
+        SELECT tenantid, status AS applicationstatus, servicename, COUNT(*) AS cnt, financialyear
+        FROM tl_data WHERE status NOT IN ('INITIATED','REJECTED','PENDINGPAYMENT' , 'APPLIED','CANCELLED','APPROVED','CITIZENACTIONREQUIRED')
+        AND createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 18 * 24 * 60 * 60 * 1000)
+        GROUP BY tenantid, status, servicename, financialyear
+        UNION ALL
+        SELECT tenantid, status AS applicationstatus, servicename, COUNT(*) AS cnt, financialyear
+        FROM fn_data WHERE status NOT IN ('INITIATED','REJECTED','PENDINGPAYMENT','CANCELLED','APPROVED','CITIZENACTIONREQUIRED','CITIZENACTIONREQUIRED-DV')
+        AND createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 20 * 24 * 60 * 60 * 1000)
+        GROUP BY tenantid, status, servicename, financialyear)
+        SELECT '' as serviceID,ta.servicename AS serviceName,ta.tenantid AS authorityID,'1' as departmentID,
+        SUM(ta.cnt) AS TotalApplicationReceived, 
+        COALESCE(SUM(pa.cnt), 0) AS PendingBeyondTimelineApplicationCount
+        FROM total_appl ta LEFT JOIN pending_appl pa ON pa.tenantid = ta.tenantid
+        AND pa.servicename = ta.servicename
+        AND pa.financialyear = ta.financialyear
+        WHERE ta.tenantid NOT IN ('pb.testing')
+    groupby: GROUP BY ta.tenantid, ta.servicename
 
   - reportName: wspendencydetails
     summary: Pendency Details - Water Service
