@@ -1150,13 +1150,14 @@ ReportDefinitions:
         source: uc
         isMandatory: true
         searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
-      - name: servicecategory
-        label: singlevaluelpaydetail.businessservicepe: singlevaluelist
+      - name: businessservice
+        label: reports.uc.businessservice
+        type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?moduleName=BillingService&masterName=BusinessService&tenantId=$tenantid|$.MdmsRes.BillingService.BusinessService[*].code|$.MdmsRes.BillingService.BusinessService[*].code
         source: uc
         wrapper: true
         isMandatory: false
-        searchClause: AND businessdetails = $servicecategory
+        searchClause: AND businessdetails = $businessservice
       - name: collectorname
         label: reports.uc.collectorname
         type: singlevaluelist
@@ -1919,8 +1920,9 @@ ReportDefinitions:
         source: uc
         isMandatory: false
         searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
-      - name: businessdetails
-        label: singlevaluelpaydetail.businessservicepe: singlevaluelist
+      - name: businessservice
+        label: reports.uc.businessservice
+        type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?moduleName=BillingService&masterName=BusinessService&tenantId=$tenantid|$.MdmsRes.BillingService.BusinessService[*].code|$.MdmsRes.BillingService.BusinessService[*].code
         source: uc
         wrapper: true
