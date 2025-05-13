@@ -60,7 +60,7 @@ ReportDefinitions:
         type: string
         source: rainmaker-swach
         total: false
-      - name: mobilenumber
+      - name: mobileNumber
         label: mobilenumber
         type: string
         source: rainmaker-swach
@@ -68,5 +68,6 @@ ReportDefinitions:
     query: |
         SELECT swach.id, swach.tenant_id as tenantid, swach.uuid, swach.latitude, swach.longitude, swach.locality, 
         swach.imagerurl, swach.created_time as createdtime, swach.created_by as createdby, swach.last_updated_time as lastupdatedtime, 
-        swach.last_updated_by as lastupdatedby, us.username,us.mobilenumber FROM public.egov_swach_imagedata  swach
+        swach.last_updated_by as lastupdatedby, us.username,us.mobilenumber as mobileNumber
+        FROM public.egov_swach_imagedata  swach
         INNER JOIN public.eg_user us ON us.uuid = swach.uuid
