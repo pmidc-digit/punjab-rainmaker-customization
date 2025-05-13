@@ -1,1 +1,71 @@
-
+ReportDefinitions:
+  - reportName: PendencyReportMiscellaneous
+    summary: Pendency Report Miscellaneous
+    version: 1.0.0
+    moduleName: rainmaker-misc
+    sourceColumns:
+      - name: id
+        label: swachId
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: uuid
+        label: uuid
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: latitude
+        label: latitude
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: longitude
+        label: longitude
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: locality
+        label: locality
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: imagerurl
+        label: imagerurl
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: createdtime
+        label: createdtime
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: createdby
+        label: createdby
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: lastupdatedby
+        label: lastupdatedby
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: username
+        label: username
+        type: string
+        source: rainmaker-misc
+        total: false
+      - name: mobilenumber
+        label: mobilenumber
+        type: string
+        source: rainmaker-misc
+        total: false
+    query: |
+        SELECT swach.id, swach.tenant_id as tenantid, swach.uuid, swach.latitude, swach.longitude, swach.locality, 
+        swach.imagerurl, swach.created_time as createdtime, swach.created_by as createdby, swach.last_updated_time as lastupdatedtime, 
+        swach.last_updated_by as lastupdatedby, us.username,us.mobilenumber FROM public.egov_swach_imagedata  swach
+        INNER JOIN public.eg_user us ON us.uuid = swach.uuid
