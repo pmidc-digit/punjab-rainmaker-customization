@@ -1,7 +1,7 @@
 ---
 ReportDefinitions:
   - reportName: Attendance_report_swach
-    decryptionPathId: ALL_ACCESS
+    decryptionPathId: ULBPTDataDumpReport_V2
     summary: Swach Attendence Report
     version: 1.0.0
     moduleName: rainmaker-swach
@@ -59,12 +59,12 @@ ReportDefinitions:
         type: string
         source: rainmaker-swach
         total: false
-      - name: username
+      - name: ownername
         label: username
         type: string
         source: rainmaker-swach
         total: false
-      - name: mobileNumber
+      - name: mobileno
         label: mobilenumber
         type: string
         source: rainmaker-swach
@@ -72,6 +72,6 @@ ReportDefinitions:
     query: |
         SELECT swach.id, swach.tenant_id as tenantid, swach.uuid, swach.latitude, swach.longitude, swach.locality, 
         swach.imagerurl, swach.created_time as createdtime, swach.created_by as createdby, swach.last_updated_time as lastupdatedtime, 
-        swach.last_updated_by as lastupdatedby, us.username,us.mobilenumber as mobileNumber
+        swach.last_updated_by as lastupdatedby, us.name as ownername,us.mobilenumber as mobileno
         FROM public.egov_swach_imagedata  swach
         INNER JOIN public.eg_user us ON us.uuid = swach.uuid
