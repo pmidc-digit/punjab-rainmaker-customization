@@ -1,0 +1,62 @@
+---
+ReportDefinitions:
+  - reportName: Attendance_report_swach
+    decryptionPathId: ULBPTDataDumpReport_V2
+    summary: Swach Attendence Report
+    version: 1.0.0
+    moduleName: rainmaker-swach
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: id
+        label: swachId
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: latitude
+        label: latitude
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: longitude
+        label: longitude
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: locality
+        label: locality
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: imagerurl
+        label: imagerurl
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: createdtime
+        label: createdtime
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: ownername
+        label: username
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: mobileno
+        label: mobilenumber
+        type: string
+        source: rainmaker-swach
+        total: false
+    query: |
+        SELECT swach.id, swach.tenant_id as tenantid, swach.uuid, swach.latitude, swach.longitude, swach.locality, 
+        swach.imagerurl, to_char((To_timestamp(swach.created_time/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') as createdtime, swach.created_by as createdby, to_char((To_timestamp(swach.last_updated_time/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') as lastupdatedtime, 
+        swach.last_updated_by as lastupdatedby, us.name as ownername,us.mobilenumber as mobileno
+        FROM public.egov_swach_imagedata  swach
+        INNER JOIN public.eg_user us ON us.uuid = swach.uuid
