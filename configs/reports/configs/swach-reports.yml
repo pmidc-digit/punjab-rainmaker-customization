@@ -54,9 +54,23 @@ ReportDefinitions:
         type: string
         source: rainmaker-swach
         total: false
+    searchParams:
+      - name: fromDate
+        label: reports.uc.fromDate
+        type: epoch
+        source: uc
+        isMandatory: true
+        searchClause: AND swach.created_time >= $fromDate
+      - name: toDate
+        label: reports.uc.toDate
+        type: epoch
+        source: uc
+        isMandatory: true
+        searchClause: AND swach.created_time <= $toDate
     query: |
         SELECT swach.id, swach.tenant_id as tenantid, swach.uuid, swach.latitude, swach.longitude, swach.locality, 
-        swach.imagerurl, to_char((To_timestamp(swach.created_time/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') as createdtime, swach.created_by as createdby, to_char((To_timestamp(swach.last_updated_time/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') as lastupdatedtime, 
+        swach.imagerurl, TO_CHAR((TO_TIMESTAMP(swach.created_time/1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY HH24:MI:SS') as createdtime,
+        swach.created_by as createdby, TO_CHAR((TO_TIMESTAMP(swach.last_updated_time/1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY HH24:MI:SS') as lastupdatedtime, 
         swach.last_updated_by as lastupdatedby, us.name as ownername,us.mobilenumber as mobileno
         FROM public.egov_swach_imagedata  swach
         INNER JOIN public.eg_user us ON us.uuid = swach.uuid
