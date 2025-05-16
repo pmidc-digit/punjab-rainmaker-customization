@@ -56,17 +56,18 @@ ReportDefinitions:
         total: false
     searchParams:
       - name: fromDate
-        label: reports.uc.fromDate
+        label: From Date
         type: epoch
         source: uc
         isMandatory: true
         searchClause: AND swach.created_time >= $fromDate
       - name: toDate
-        label: reports.uc.toDate
+        label: To Date
         type: epoch
         source: uc
         isMandatory: true
         searchClause: AND swach.created_time <= $toDate
+        
     query: |
         SELECT swach.id, swach.tenant_id as tenantid, swach.uuid, swach.latitude, swach.longitude, swach.locality, 
         swach.imagerurl, TO_CHAR((TO_TIMESTAMP(swach.created_time/1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY HH24:MI:SS') as createdtime,
