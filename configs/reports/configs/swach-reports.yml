@@ -75,3 +75,286 @@ ReportDefinitions:
         swach.last_updated_by as lastupdatedby, us.name as ownername,us.mobilenumber as mobileno
         FROM public.egov_swach_imagedata  swach
         INNER JOIN public.eg_user us ON us.uuid = swach.uuid
+
+        
+  - reportName: SwachComplaintTypesReport_v2
+    summary: Fetches complaint stats based on complaint types for a ULB
+    version: 1.0.0
+    moduleName: rainmaker-swach
+    sourceColumns:
+    - name: tenantid
+      label: reports.rainmaker-swach.tenantid
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: complainttype
+      label: reports.rainmaker-swach.complainttype
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: open
+      label: reports.rainmaker-swach.status.open
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: assigned
+      label: reports.rainmaker-swach.status.assigned
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: closed
+      label: reports.rainmaker-swach.status.closed
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: reassignrequested
+      label: reports.rainmaker-swach.status.reassignrequested
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: rejected
+      label: reports.rainmaker-swach.status.rejected
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: total
+      label: reports.rainmaker-swach.total
+      type: string
+      source: rainmaker-swach
+      total: true
+    searchParams:
+    - name: ulb
+      label: ULB
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: pt
+      wrapper: true
+      isMandatory: false
+      searchClause: AND tenantid = $ulb
+    - name: fromDate
+      label: reports.rainmaker-swach.datefrom
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND createdtime >= $fromDate
+    - name: toDate
+      label: reports.rainmaker-swach.dateto
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND createdtime <= $toDate
+    query: |
+      select 
+      initcap(split_part(tenantid, '.', 2)) as tenantid,
+      regexp_replace(servicecode, '([a-z])([A-Z])', '\1 \2','g') as complainttype,
+      SUM(CASE WHEN applicationstatus ='open' THEN 1 ELSE 0 END) as open,
+      SUM(CASE WHEN applicationstatus ='assigned' THEN 1 ELSE 0 END) as assigned,
+      SUM(CASE WHEN applicationstatus in ('closed', 'resolved') THEN 1 ELSE 0 END) as closed,
+      SUM(CASE WHEN applicationstatus ='reassignrequested' THEN 1 ELSE 0 END) as reassignrequested,
+      SUM(CASE WHEN applicationstatus ='rejected' THEN 1 ELSE 0 END) as rejected,
+      count(applicationstatus) as total
+      from eg_swach_service_v2
+      WHERE tenantid != 'pb.testing'
+    groupby: GROUP BY tenantid,servicecode
+    orderby: ORDER BY tenantid,servicecode
+
+  - reportName: SwachStateSourceReport_v2
+    summary: Source of complaints across tenants
+    version: 1.0.0
+    moduleName: rainmaker-swach
+    sourceColumns:
+    - name: tenantid
+      label: reports.rainmaker-swach.tenantid
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: whatsapp
+      label: reports.rainmaker-swach.source.whatsapp
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: ivr
+      label: reports.rainmaker-swach.source.ivr
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: mobileapp
+      label: reports.rainmaker-swach.source.mobileapp
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: web
+      label: reports.rainmaker-swach.source.web
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: unknown
+      label: reports.rainmaker-swach.source.unknown
+      type: string
+      source: rainmaker-swach
+      total: true
+    searchParams:
+    - name: fromDate
+      label: reports.rainmaker-swach.datefrom
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND createdtime >= $fromDate
+    - name: toDate
+      label: reports.rainmaker-swach.dateto
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND createdtime <= $toDate
+    query: |
+      select initcap(split_part(tenantid, '.', 2)) as tenantid,
+      SUM(CASE WHEN source ='whatsapp' THEN 1 ELSE 0 END) as whatsapp,
+      SUM(CASE WHEN source ='ivr' THEN 1 ELSE 0 END) as ivr,
+      SUM(CASE WHEN source ='mobile' THEN 1 ELSE 0 END) as mobileapp,
+      SUM(CASE WHEN source ='web' THEN 1 ELSE 0 END) as web,
+      SUM(CASE WHEN source NOT IN ('web', 'ivr', 'mobile','whatsapp')  OR source is NULL THEN 1 ELSE 0 END) as unknown
+      from eg_swach_service_v2
+      WHERE tenantid != 'pb.testing'
+    groupby: GROUP BY tenantid
+    orderby: ORDER BY tenantid
+
+  - reportName: SwachStateDescriptionReport_v2
+    decryptionPathId: DescriptionReport_v2
+    summary: Fetches state description wise reports 
+    version: 1.0.0
+    moduleName: rainmaker-swach
+    externalService:
+    - entity: $.MdmsRes.rainmaker-swach.ServiceDefs
+      apiURL: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?moduleName=rainmaker-swach&masterName=ServiceDefs&tenantId=$tenantId
+      keyOrder: serviceCode,department,slaHours
+      tableName: tbl_dept
+    - entity: $.MdmsRes.common-masters.Department
+      apiURL: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?moduleName=common-masters&masterName=Department&tenantId=$tenantId
+      keyOrder: name,code
+      tableName: tbl_def_dept
+    sourceColumns:
+    - name: department
+      label: reports.rainmaker-swach.department
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: servicecode
+      label: reports.rainmaker-swach.servicecode
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: complaintNo
+      label: reports.rainmaker-swach.complaintNo
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: date
+      label: reports.rainmaker-swach.date
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: name
+      label: reports.rainmaker-swach.name
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: phone
+      label: reports.rainmaker-swach.phone
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: address
+      label: reports.rainmaker-swach.address
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: landmark
+      label: reports.rainmaker-swach.landmark
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: description
+      label: reports.rainmaker-swach.description
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: lastassignedto
+      label: reports.rainmaker-swach.lastassignedto
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: status
+      label: reports.rainmaker-swach.status
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: actiondate
+      label: reports.rainmaker-swach.actiondate
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: source
+      label: reports.rainmaker-swach.source
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: tenantid
+      label: reports.rainmaker-swach.tenantid
+      type: string
+      source: rainmaker-swach
+      total: false
+    searchParams:
+    - name: fromDate
+      label: reports.rainmaker-swach.datefrom
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND ess.createdtime >= $fromDate
+    - name: toDate
+      label: reports.rainmaker-swach.dateto
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND ess.createdtime <= $toDate
+    - name: ulb
+      label: ULB
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: rainmaker-swach
+      wrapper: true
+      isMandatory: false
+      searchClause: AND ess.tenantid = $ulb  
+    - name: appstatus
+      label: reports.rainmaker-swach.status
+      type: singlevaluelist
+      pattern: 'list://assigned:assigned,closed:closed,open:open,reassignrequested:reassignrequested,rejected:rejected,resolved:resolved'
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND ess.status=$appstatus
+    query: |
+      SELECT 
+      DISTINCT ON (servicerequestid)
+      (case when ua.name is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else ua.name end) as lastassignedto,
+      (SELECT deptmap_def.name FROM (VALUES tbl_def_dept) AS deptmap_def(name,code) INNER JOIN (VALUES tbl_dept) AS deptmap(serviceCode, department, slaHours) on deptmap.serviceCode = ess.servicecode and deptmap_def.code = deptmap.department) AS department, 
+      regexp_replace(servicecode, '([a-z])([A-Z])', '\1 \2','g') AS servicecode,
+      servicerequestid AS complaintNo, 
+      to_char(to_timestamp(TRUNC(CAST(ess.createdtime AS bigint) / 1000)), 'DD/MM/YYYY') AS date, 
+      (case when eg_user.name is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else eg_user.name end) as name,  --value for NULL
+      eg_user.mobilenumber, 
+      esa.landmark, 
+      esa.doorno||', '||esa.plotno||', '||esa.buildingname||', '||esa.street as address, 
+      description,
+      source,
+      ess.tenantid,
+      Initcap(ess.applicationstatus) as status,
+      to_char((To_timestamp(ess.createdtime/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY')  AS actiondate
+      FROM eg_swach_service_v2 ess
+      left outer join eg_swach_address_v2 esa on ess.id = esa.parentid
+      left outer join eg_user on eg_user.id::text = ess.createdby
+      left outer join eg_pgr_action as epa on epa.businesskey = ess.servicerequestid and epa.action in ('assign','reassign','resolve')
+      left outer join eg_user as ua on (ua.id = epa.assignee::int or ua.id = split_part(epa.by,':',1)::INTEGER)
+      WHERE 
+      ess.tenantid !='pb.testing'
+      --AND ess.status IN ('open','assigned','reassigrequested','rejected','closed','resolved')
+   
+    orderby: ORDER BY servicerequestid, ess.createdtime desc
