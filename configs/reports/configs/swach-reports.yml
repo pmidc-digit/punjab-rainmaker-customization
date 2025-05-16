@@ -369,48 +369,38 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: id
-        label: swachId
+      - name: createdby
+        label: createdby
         type: string
         source: rainmaker-swach
         total: false
-      - name: tenantid
-        label: tenantid
+      - name: city
+        label: city
         type: string
         source: rainmaker-swach
         total: false
-      - name: latitude
-        label: latitude
+      - name: PENDINGATLME
+        label: PENDINGATLME
         type: string
         source: rainmaker-swach
         total: false
-      - name: longitude
-        label: longitude
+      - name: REJECTED
+        label: REJECTED
         type: string
         source: rainmaker-swach
         total: false
-      - name: locality
-        label: locality
+      - name: PENDINGFORREASSIGNMENT
+        label: PENDINGFORREASSIGNMENT
         type: string
         source: rainmaker-swach
         total: false
-      - name: imagerurl
-        label: imagerurl
+      - name: PENDINGFORASSIGNMENT
+        label: PENDINGFORASSIGNMENT
         type: string
         source: rainmaker-swach
         total: false
-      - name: createdtime
-        label: createdtime
-        type: string
-        source: rainmaker-swach
-        total: false
-      - name: ownername
-        label: username
-        type: string
-        source: rainmaker-swach
-        total: false
-      - name: mobileno
-        label: mobilenumber
+      - name: Total
+        label: Total
         type: string
         source: rainmaker-swach
         total: false
@@ -430,7 +420,7 @@ ReportDefinitions:
     query: |
       SELECT 
         serv.createdby,
-        serv.tenantid,
+        serv.tenantid as city,
         COUNT(*) FILTER (WHERE serv.applicationstatus = 'PENDINGATLME') AS "PENDINGATLME",
         COUNT(*) FILTER (WHERE serv.applicationstatus = 'REJECTED') AS "REJECTED",
         COUNT(*) FILTER (WHERE serv.applicationstatus = 'PENDINGFORREASSIGNMENT') AS "PENDINGFORREASSIGNMENT",
