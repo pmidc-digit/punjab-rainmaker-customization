@@ -132,13 +132,13 @@ ReportDefinitions:
       isMandatory: false
       searchClause: AND tenantid = $ulb
     - name: fromDate
-      label: reports.rainmaker-swach.datefrom
+      label: From Date
       type: epoch
       source: rainmaker-swach
       isMandatory: false
       searchClause: AND createdtime >= $fromDate
     - name: toDate
-      label: reports.rainmaker-swach.dateto
+      label: To Date
       type: epoch
       source: rainmaker-swach
       isMandatory: false
@@ -195,13 +195,13 @@ ReportDefinitions:
       total: true
     searchParams:
     - name: fromDate
-      label: reports.rainmaker-swach.datefrom
+      label: From Date
       type: epoch
       source: rainmaker-swach
       isMandatory: false
       searchClause: AND createdtime >= $fromDate
     - name: toDate
-      label: reports.rainmaker-swach.dateto
+      label: To Date
       type: epoch
       source: rainmaker-swach
       isMandatory: false
@@ -305,13 +305,13 @@ ReportDefinitions:
       total: false
     searchParams:
     - name: fromDate
-      label: reports.rainmaker-swach.datefrom
+      label: From Date
       type: epoch
       source: rainmaker-swach
       isMandatory: false
       searchClause: AND ess.createdtime >= $fromDate
     - name: toDate
-      label: reports.rainmaker-swach.dateto
+      label: To Date
       type: epoch
       source: rainmaker-swach
       isMandatory: false
@@ -358,3 +358,88 @@ ReportDefinitions:
       --AND ess.status IN ('open','assigned','reassigrequested','rejected','closed','resolved')
    
     orderby: ORDER BY servicerequestid, ess.createdtime desc
+
+
+ - reportName: Complaints_Summary_Report
+    decryptionPathId: ULBPTDataDumpReport_V2
+    summary: Swach Complaints Report
+    version: 1.0.0
+    moduleName: rainmaker-swach
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: id
+        label: swachId
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: latitude
+        label: latitude
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: longitude
+        label: longitude
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: locality
+        label: locality
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: imagerurl
+        label: imagerurl
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: createdtime
+        label: createdtime
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: ownername
+        label: username
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: mobileno
+        label: mobilenumber
+        type: string
+        source: rainmaker-swach
+        total: false
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: uc
+        isMandatory: true
+        searchClause: AND serv.createdtime >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: uc
+        isMandatory: true
+        searchClause: AND serv.createdtime <= $toDate        
+    query: |
+	   	SELECT 
+        serv.createdby,
+        serv.tenantid,
+        COUNT(*) FILTER (WHERE serv.applicationstatus = 'PENDINGATLME') AS "PENDINGATLME",
+        COUNT(*) FILTER (WHERE serv.applicationstatus = 'REJECTED') AS "REJECTED",
+        COUNT(*) FILTER (WHERE serv.applicationstatus = 'PENDINGFORREASSIGNMENT') AS "PENDINGFORREASSIGNMENT",
+        COUNT(*) FILTER (WHERE serv.applicationstatus = 'PENDINGFORASSIGNMENT') AS "PENDINGFORASSIGNMENT",
+        COUNT(*) AS Total
+        FROM eg_swach_service_v2 serv
+        INNER JOIN eg_wf_processinstance_v2 instan
+        ON instan.businessid = serv.servicerequestid
+        INNER JOIN eg_user us 
+        ON serv.createdby = us.uuid
+        GROUP BY serv.createdby, serv.tenantid
+        ORDER BY serv.tenantid, serv.createdby;
