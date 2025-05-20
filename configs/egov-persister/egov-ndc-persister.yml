@@ -6,7 +6,7 @@ serviceMaps:
       fromTopic: save-ndc-application
       isTransaction: true
       queryMaps:
-        - query: INSERT INTO eg_ndc_Applicants (uuid,firstname, lastname, mobile, email, address, applicationstatus, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?);
+        - query: INSERT INTO eg_ndc_Applicants (uuid,firstname, lastname, mobile, email, address, applicationstatus,active, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?);
           basePath: Applicant
           jsonMaps:
             - jsonPath: $.Applicant.uuid
@@ -16,6 +16,7 @@ serviceMaps:
             - jsonPath: $.Applicant.email
             - jsonPath: $.Applicant.address
             - jsonPath: $.Applicant.applicationStatus
+            - jsonPath: $.Applicant.active
             - jsonPath: $.Applicant.createdby
             - jsonPath: $.Applicant.lastmodifiedby
             - jsonPath: $.Applicant.createdtime
@@ -51,7 +52,7 @@ serviceMaps:
       fromTopic: update-ndc-application
       isTransaction: true
       queryMaps:
-        - query: INSERT INTO eg_ndc_Applicants (uuid, firstname, lastname, mobile, email, address, applicationstatus, createdby, lastmodifiedby, createdtime, lastmodifiedtime)
+        - query: INSERT INTO eg_ndc_Applicants (uuid,tenantid, firstname, lastname, mobile, email, address, applicationstatus, createdby, lastmodifiedby, createdtime, lastmodifiedtime)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (uuid) DO UPDATE SET
               tenantid = EXCLUDED.tenantid,
@@ -61,6 +62,7 @@ serviceMaps:
               email = EXCLUDED.email,
               address = EXCLUDED.address,
               applicationstatus = EXCLUDED.applicationstatus,
+              active = EXCLUDED.active,
               createdby = EXCLUDED.createdby,
               lastmodifiedby = EXCLUDED.lastmodifiedby,
               createdtime = EXCLUDED.createdtime,
@@ -68,12 +70,14 @@ serviceMaps:
           basePath: Applicant
           jsonMaps:
             - jsonPath: $.Applicant.uuid
+            - jsonPath: $.Applicant.tenantId
             - jsonPath: $.Applicant.firstname
             - jsonPath: $.Applicant.lastname
             - jsonPath: $.Applicant.mobile
             - jsonPath: $.Applicant.email
             - jsonPath: $.Applicant.address
             - jsonPath: $.Applicant.applicationStatus
+            - jsonPath: $.Applicant.active
             - jsonPath: $.Applicant.createdby
             - jsonPath: $.Applicant.lastmodifiedby
             - jsonPath: $.Applicant.createdtime
@@ -120,4 +124,17 @@ serviceMaps:
             - jsonPath: $.Documents.*.lastmodifiedby
             - jsonPath: $.Documents.*.createdtime
             - jsonPath: $.Documents.*.lastmodifiedtime
+
+    - version: 1.0
+      description: Soft delete NDC applications in eg_ndc_Applicants
+      fromTopic: delete-ndc-application
+      isTransaction: true
+      queryMaps:
+        - query: UPDATE eg_ndc_Applicants SET active=?, lastmodifiedtime=?, lastmodifiedby=? WHERE uuid=?;
+          basePath: $
+          jsonMaps:
+            - jsonPath: $.active
+            - jsonPath: $.lastModifiedTime
+            - jsonPath: $.lastModifiedBy
+            - jsonPath: $.uuid
 
