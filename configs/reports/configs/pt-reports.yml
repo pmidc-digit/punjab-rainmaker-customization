@@ -2439,13 +2439,13 @@ ReportDefinitions:
     type: epoch
     source: pt
     isMandatory: true
-    searchClause: AND receiptdate >= $fromDate
+    searchClause: AND receiptdate >= TO_DATE(TO_CHAR(TO_TIMESTAMP($fromDate / 1000), 'YYYY-MM-DD'), 'YYYY-MM-DD')
   - name: toDate
     label: reports.pt.toDate
     type: epoch
     source: pt
     isMandatory: true
-    searchClause: AND receiptdate <= $toDate 
+    searchClause: AND receiptdate <= TO_DATE(TO_CHAR(TO_TIMESTAMP($fromDate / 1000), 'YYYY-MM-DD'), 'YYYY-MM-DD') 
   - name: financialyear
     label: Financial Year
     type: singlevaluelist
