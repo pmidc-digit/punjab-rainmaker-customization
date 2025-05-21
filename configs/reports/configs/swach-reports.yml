@@ -146,13 +146,13 @@ ReportDefinitions:
     query: |
       select 
       initcap(split_part(tenantid, '.', 2)) as tenantid,
-      regexp_replace(servicecode, '([a-z])([A-Z])', '\1 \2','g') as complainttype,
-      SUM(CASE WHEN applicationstatus ='open' THEN 1 ELSE 0 END) as open,
-      SUM(CASE WHEN applicationstatus ='assigned' THEN 1 ELSE 0 END) as assigned,
-      SUM(CASE WHEN applicationstatus in ('closed', 'resolved') THEN 1 ELSE 0 END) as closed,
-      SUM(CASE WHEN applicationstatus ='reassignrequested' THEN 1 ELSE 0 END) as reassignrequested,
-      SUM(CASE WHEN applicationstatus ='rejected' THEN 1 ELSE 0 END) as rejected,
-      count(applicationstatus) as total
+      regexp_replace(servicecode, '([a-z])([A-Z])', '\1 \2','g') as "complaint type",
+      SUM(CASE WHEN applicationstatus ='PENDINGATLME' THEN 1 ELSE 0 END) as "Pending at LME",
+      SUM(CASE WHEN applicationstatus ='PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END) as "To be assigned",
+      SUM(CASE WHEN applicationstatus ='PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END) as "reassign requested",
+      SUM(CASE WHEN applicationstatus ='rejected' THEN 1 ELSE 0 END) as Rejected,
+      SUM(CASE WHEN applicationstatus in ('resolved') THEN 1 ELSE 0 END) as Closed,
+      count(applicationstatus) as Total
       from eg_swach_service_v2
       WHERE tenantid != 'pb.testing'
     groupby: GROUP BY tenantid,servicecode
