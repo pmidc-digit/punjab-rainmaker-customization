@@ -87,18 +87,23 @@ ReportDefinitions:
       type: string
       source: rainmaker-swach
       total: false
-    - name: complainttype
+    - name: complaint type
       label: reports.rainmaker-swach.complainttype
       type: string
       source: rainmaker-swach
       total: false
-    - name: open
-      label: reports.rainmaker-swach.status.open
+    - name: Pending at LME
+      label: reports.rainmaker-swach.status.PENDINGATLME
       type: string
       source: rainmaker-swach
       total: true
-    - name: assigned
-      label: reports.rainmaker-swach.status.assigned
+    - name: PENDING FOR ASSIGNMENT
+      label: reports.rainmaker-swach.status.pendingforassignment
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: PENDING FOR REASSIGNMENT
+      label: reports.rainmaker-swach.status.PENDINGFORREASSIGNMENT
       type: string
       source: rainmaker-swach
       total: true
@@ -107,12 +112,7 @@ ReportDefinitions:
       type: string
       source: rainmaker-swach
       total: true
-    - name: reassignrequested
-      label: reports.rainmaker-swach.status.reassignrequested
-      type: string
-      source: rainmaker-swach
-      total: true
-    - name: rejected
+    - name: Rejected
       label: reports.rainmaker-swach.status.rejected
       type: string
       source: rainmaker-swach
@@ -148,10 +148,10 @@ ReportDefinitions:
       initcap(split_part(tenantid, '.', 2)) as tenantid,
       regexp_replace(servicecode, '([a-z])([A-Z])', '\1 \2','g') as "complaint type",
       SUM(CASE WHEN applicationstatus ='PENDINGATLME' THEN 1 ELSE 0 END) as "Pending at LME",
-      SUM(CASE WHEN applicationstatus ='PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END) as "To be assigned",
-      SUM(CASE WHEN applicationstatus ='PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END) as "reassign requested",
+      SUM(CASE WHEN applicationstatus ='PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END) as "PENDING FOR ASSIGNMENT",
+      SUM(CASE WHEN applicationstatus ='PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END) as "PENDINGFORREASSIGNMENT",
       SUM(CASE WHEN applicationstatus ='rejected' THEN 1 ELSE 0 END) as Rejected,
-      SUM(CASE WHEN applicationstatus in ('resolved') THEN 1 ELSE 0 END) as Closed,
+      SUM(CASE WHEN applicationstatus ='resolved' THEN 1 ELSE 0 END) as Closed,
       count(applicationstatus) as Total
       from eg_swach_service_v2
       WHERE tenantid != 'pb.testing'
