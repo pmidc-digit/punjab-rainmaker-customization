@@ -107,8 +107,8 @@ ReportDefinitions:
       type: string
       source: rainmaker-swach
       total: true
-    - name: closed
-      label: reports.rainmaker-swach.status.closed
+    - name: Closed
+      label: reports.rainmaker-swach.status.Closed
       type: string
       source: rainmaker-swach
       total: true
@@ -150,8 +150,8 @@ ReportDefinitions:
       SUM(CASE WHEN applicationstatus ='PENDINGATLME' THEN 1 ELSE 0 END) as "Pending at LME",
       SUM(CASE WHEN applicationstatus ='PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END) as "PENDING FOR ASSIGNMENT",
       SUM(CASE WHEN applicationstatus ='PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END) as "PENDINGFORREASSIGNMENT",
-      SUM(CASE WHEN applicationstatus ='rejected' THEN 1 ELSE 0 END) as Rejected,
-      SUM(CASE WHEN applicationstatus ='resolved' THEN 1 ELSE 0 END) as closed,
+      SUM(CASE WHEN applicationstatus ='REJECTED' THEN 1 ELSE 0 END) as Rejected,
+      SUM(CASE WHEN applicationstatus ='RESOLVED' THEN 1 ELSE 0 END) as Closed,
       count(applicationstatus) as Total
       from eg_swach_service_v2
       WHERE tenantid != 'pb.testing'
