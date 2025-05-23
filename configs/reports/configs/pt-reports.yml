@@ -9678,7 +9678,7 @@ ReportDefinitions:
           rp.propertyusagetype as propertyusagetype,
           rp.createdtime as createdtime
       from  report_owners ro
-      inner join report_properties rp on (ro.propertyid=rp.propertyid and propertystatus='ACTIVE')
+      inner join report_properties rp on (ro.propertyid=rp.propertyid and propertystatus in ('ACTIVE','PENDINGWS'))
       where 1=1 
       
 - reportName: PropertyListReport
