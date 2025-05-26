@@ -9631,6 +9631,11 @@ ReportDefinitions:
     type: string
     source: pt
     total: false
+  - name: propertystatus
+    label: reports.pt.propertystatus
+    type: string
+    source: pt
+    total: false
   searchParams:
   - name: ulb
     label: ULB
@@ -9666,9 +9671,16 @@ ReportDefinitions:
     source: pt
     isMandatory: false
     searchClause: AND rp.createdtime <= $toDate 
+  - name: pstatus
+    label: status
+    type: singlevaluelist
+    pattern: 'list://ACTIVE:ACTIVE,PENDINGWS:PENDINGWS,INWORKFLOW:INWORKFLOW'
+    source: pt
+    isMandatory: false
+    searchClause: AND rp.propertystatus=$pstatus
   query: |
       -- Use CTE to force query plan, compute & use CTE later
-            SELECT 
+          SELECT 
           rp.tenantid as tenantid,
           rp.propertyid as propertyid,
           ownername as ownername,
@@ -9676,9 +9688,10 @@ ReportDefinitions:
           mobilenumber as  mobileno,
           rp.localitycode as localitycode,
           rp.propertyusagetype as propertyusagetype,
-          rp.createdtime as createdtime
+          rp.createdtime as createdtime,
+          rp.propertystatus as propertystatus
       from  report_owners ro
-      inner join report_properties rp on (ro.propertyid=rp.propertyid and propertystatus in ('ACTIVE','PENDINGWS'))
+      inner join report_properties rp on ro.propertyid=rp.propertyid
       where 1=1 
       
 - reportName: PropertyListReport
