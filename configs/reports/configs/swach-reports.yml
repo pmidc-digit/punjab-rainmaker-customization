@@ -360,7 +360,7 @@ ReportDefinitions:
     orderby: ORDER BY servicerequestid, ess.createdtime desc
 
   - reportName: Detailed_Attendance_report_swach
-    decryptionPathId: ULBPTDataDumpReport_V2
+    decryptionPathId: ULBPTDataDumpReport_V2 
     summary: Detailed Attendance Report
     version: 1.0.0
     moduleName: rainmaker-swach
@@ -369,7 +369,7 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
       - name: ownername
-        label: ownername
+        label: username
         type: string
         source: rainmaker-swach
         total: false
@@ -378,7 +378,7 @@ ReportDefinitions:
         type: string
         source: rainmaker-swach
         total: false
-      - name: mobilenumber
+      - name: mobileno
         label: mobilenumber
         type: string
         source: rainmaker-swach
@@ -423,6 +423,13 @@ ReportDefinitions:
         type: string
         source: rainmaker-swach
         total: false
+    searchParams:
+      - name: fromDate
+        label: select a date
+        type: epoch
+        source: uc
+        isMandatory: true
+        searchClause: AND sc.created_time = $toDate
     query: |
       WITH attendance_cte AS  ( SELECT  eu.mobilenumber,
       TO_CHAR((TO_TIMESTAMP(sc.created_time / 1000) AT TIME ZONE
