@@ -423,13 +423,6 @@ ReportDefinitions:
         type: string
         source: rainmaker-swach
         total: false
-    searchParams:
-      - name: selectDate
-        label: select a date
-        type: epoch
-        source: uc
-        isMandatory: true
-        searchClause: AND sc.created_time = $toDate
     query: |
       WITH attendance_cte AS  ( SELECT  eu.mobilenumber,
       TO_CHAR((TO_TIMESTAMP(sc.created_time / 1000) AT TIME ZONE
@@ -448,5 +441,5 @@ ReportDefinitions:
       NULL THEN 'Absent' ELSE 'Present' END AS attendance_status FROM
       public.eg_user eu JOIN eg_userrole_v1 eur ON eu.id = eur.user_id LEFT JOIN
       attendance_cte a ON eu.mobilenumber = a.mobilenumber WHERE eur.role_code =
-      'PESCO' and sc.created_time =
+      'PESCO'
     groupby: group by eu.name, eu.username, eu.mobilenumber
