@@ -429,7 +429,7 @@ ReportDefinitions:
         type: epoch
         source: uc
         isMandatory: true
-        searchClause: AND sc.created_time = $toDate
+        searchClause: AND sc.created_time = $fromDate
     query: |
       WITH attendance_cte AS  ( SELECT  eu.mobilenumber,
       TO_CHAR((TO_TIMESTAMP(sc.created_time / 1000) AT TIME ZONE
