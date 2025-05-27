@@ -3908,7 +3908,7 @@ ReportDefinitions:
       SUM(CASE WHEN instrumenttype = 'ONLINE' THEN amount ELSE 0 END) AS sumonline,
       CASE WHEN instrumenttype != 'ONLINE' THEN collectorname ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END AS collectorname,
       SUM(amount) AS totalamount
-      FROM public.mv_pt_receipt_regiester
+      FROM public.pt_receipt_summary_old
       WHERE tenantid = $tenantid
   groupby: group by CASE WHEN instrumenttype != 'ONLINE' THEN collectorname ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END,tenantid,instrumenttype
   
