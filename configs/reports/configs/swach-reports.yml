@@ -358,3 +358,95 @@ ReportDefinitions:
       --AND ess.status IN ('open','assigned','reassigrequested','rejected','closed','resolved')
    
     orderby: ORDER BY servicerequestid, ess.createdtime desc
+
+  - reportName: Detailed_Attendance_report_swach
+    decryptionPathId: ULBPTDataDumpReport_V2 
+    summary: Detailed Attendance Report
+    version: 1.0.0
+    moduleName: rainmaker-swach
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: ownername
+        label: username
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: username
+        label: username
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: mobileno
+        label: mobilenumber
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: tenantid_1
+        label: tenantid_1
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: tenantid_2
+        label: tenantid_2
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: tenantid_3
+        label: tenantid_3
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: createdtime_1
+        label: createdtime_1
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: createdtime_2
+        label: createdtime_2
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: createdtime_3
+        label: createdtime_3
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: attendance_status
+        label: attendance_status
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: createdtime
+        label: createdtime
+        type: string
+        source: rainmaker-swach
+        total: false
+    searchParams:
+      - name: fromDate
+        label: select a date
+        type: epoch
+        source: uc
+        isMandatory: true
+        searchClause: AND a.createdtime = $fromDate::text
+    query: |
+      WITH attendance_cte AS  ( SELECT  eu.mobilenumber,
+      TO_CHAR((TO_TIMESTAMP(sc.created_time / 1000) AT TIME ZONE
+      'Asia/Kolkata'), 'DD-MM-YYYY HH24:MI:SS') AS createdtime, sc.tenant_id,
+      ROW_NUMBER() OVER (PARTITION BY eu.mobilenumber ORDER BY sc.created_time)
+      AS rn FROM public.eg_user eu JOIN eg_userrole_v1 eur ON eu.id =
+      eur.user_id LEFT JOIN public.egov_swach_imagedata sc ON eu.uuid = sc.uuid
+      WHERE eur.role_code = 'PESCO' ) SELECT eu.name AS ownername, eu.username,
+      eu.mobilenumber, COALESCE(MAX(CASE WHEN a.rn = 1 THEN a.tenant_id END),
+      '') AS tenantid_1, COALESCE(MAX(CASE WHEN a.rn = 1 THEN a.createdtime
+      END), '') AS createdtime_1, COALESCE(MAX(CASE WHEN a.rn = 2 THEN
+      a.tenant_id END), '') AS tenantid_2, COALESCE(MAX(CASE WHEN a.rn = 2 THEN
+      a.createdtime END), '') AS createdtime_2, COALESCE(MAX(CASE WHEN a.rn = 3
+      THEN a.tenant_id END), '') AS tenantid_3, COALESCE(MAX(CASE WHEN a.rn = 3
+      THEN a.createdtime END), '') AS createdtime_3, CASE  WHEN MAX(a.rn) IS
+      NULL THEN 'Absent' ELSE 'Present' END AS attendance_status FROM
+      public.eg_user eu JOIN eg_userrole_v1 eur ON eu.id = eur.user_id LEFT JOIN
+      attendance_cte a ON eu.mobilenumber = a.mobilenumber WHERE eur.role_code =
+      'PESCO'
+    groupby: group by eu.name, eu.username, eu.mobilenumber
