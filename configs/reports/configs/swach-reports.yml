@@ -437,7 +437,8 @@ ReportDefinitions:
       ROW_NUMBER() OVER (PARTITION BY eu.mobilenumber ORDER BY sc.created_time)
       AS rn FROM public.eg_user eu JOIN eg_userrole_v1 eur ON eu.id =
       eur.user_id LEFT JOIN public.egov_swach_imagedata sc ON eu.uuid = sc.uuid
-      WHERE eur.role_code = 'PESCO' AND sc.createdtime BETWEEN $fromDate::bigint AND ($fromDate::bigint + 86399000)) SELECT eu.name AS ownername, eu.username,
+      WHERE eur.role_code = 'PESCO' AND sc.createdtime BETWEEN $fromDate::bigint AND ($fromDate::bigint + 86399000) 
+      ) SELECT eu.name AS ownername, eu.username,
       eu.mobilenumber, COALESCE(MAX(CASE WHEN a.rn = 1 THEN a.tenant_id END),
       '') AS tenantid_1, COALESCE(MAX(CASE WHEN a.rn = 1 THEN a.createdtime
       END), '') AS createdtime_1, COALESCE(MAX(CASE WHEN a.rn = 2 THEN
