@@ -1,123 +1,123 @@
 ServiceMaps:
-  serviceName: egov-ndc-services
-  version: 1.0.0
-  mappings:
-    - topic: save-ndc-application
-      configKey: INDEX
-      indexes:
-        - name: ndc-applicants-index
-          type: general
-          id: $.Applicant.uuid, $.Applicant.tenantId
-          isBulk: false
-          timeStampField: $.Applicant.createdtime
-          jsonPath: $
-          customJsonMapping:
-            indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","firstname":"firstname","lastname":"lastname",
-                                   "mobile":"mobile","email":"email","address":"address",
-                                   "applicationStatus":"applicationStatus","active":"active",
-                                   "createdby":"createdby","lastmodifiedby":"lastmodifiedby","createdtime":"createdtime",
-                                   "lastmodifiedtime":"lastmodifiedtime","action":"action","details":[],"documents:[]"}}
-            fieldMapping:
-              - inJsonPath: $.Applicant.uuid
-                outJsonPath: $.Data.uuid
-              - inJsonPath: $.Applicant.tenantId
-                outJsonPath: $.Data.tenantId
-              - inJsonPath: $.Applicant.firstname
-                outJsonPath: $.Data.firstname
-              - inJsonPath: $.Applicant.lastname
-                outJsonPath: $.Data.lastname
-              - inJsonPath: $.Applicant.mobile
-                outJsonPath: $.Data.mobile
-              - inJsonPath: $.Applicant.email
-                outJsonPath: $.Data.email
-              - inJsonPath: $.Applicant.address
-                outJsonPath: $.Data.address
-              - inJsonPath: $.Applicant.applicationStatus
-                outJsonPath: $.Data.applicationStatus
-              - inJsonPath: $.Applicant.active
-                outJsonPath: $.Data.active
-              - inJsonPath: $.Applicant.createdby
-                outJsonPath: $.Data.createdby
-              - inJsonPath: $.Applicant.lastmodifiedby
-                outJsonPath: $.Data.lastmodifiedby
-              - inJsonPath: $.Applicant.createdtime
-                outJsonPath: $.Data.createdtime
-              - inJsonPath: $.Applicant.lastmodifiedtime
-                outJsonPath: $.Data.lastmodifiedtime
-              - inJsonPath: $.Applicant.action
-                outJsonPath: $.Data.action
-              - inJsonPath: $.NdcDetails
-                outJsonPath: $.Data.details
-              - inJsonPath: $.Documents
-                outJsonPath: $.Data.documents
+ serviceName: egov-ndc-services
+ version: 1.0.0
+ mappings:
+  - topic: save-ndc-application
+    configKey: INDEX
+    indexes:
+    - name: ndc-applicants-index
+      type: general
+      id: $.Applicant.uuid, $.Applicant.tenantId
+      isBulk: false
+      timeStampField: $.Applicant.createdtime
+      jsonPath: $
+      customJsonMapping:
+        indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","firstname":"firstname","lastname":"lastname",
+                               "mobile":"mobile","email":"email","address":"address",
+                               "applicationStatus":"applicationStatus","active":"active",
+                               "createdby":"createdby","lastmodifiedby":"lastmodifiedby","createdtime":"createdtime",
+                               "lastmodifiedtime":"lastmodifiedtime","action":"action","details":[],"documents:[]"}}
+        fieldMapping:
+        - inJsonPath: $.Applicant.uuid
+          outJsonPath: $.Data.uuid
+        - inJsonPath: $.Applicant.tenantId
+          outJsonPath: $.Data.tenantId
+        - inJsonPath: $.Applicant.firstname
+          outJsonPath: $.Data.firstname
+        - inJsonPath: $.Applicant.lastname
+          outJsonPath: $.Data.lastname
+        - inJsonPath: $.Applicant.mobile
+          outJsonPath: $.Data.mobile
+        - inJsonPath: $.Applicant.email
+          outJsonPath: $.Data.email
+        - inJsonPath: $.Applicant.address
+          outJsonPath: $.Data.address
+        - inJsonPath: $.Applicant.applicationStatus
+          outJsonPath: $.Data.applicationStatus
+        - inJsonPath: $.Applicant.active
+          outJsonPath: $.Data.active
+        - inJsonPath: $.Applicant.createdby
+          outJsonPath: $.Data.createdby
+        - inJsonPath: $.Applicant.lastmodifiedby
+          outJsonPath: $.Data.lastmodifiedby
+        - inJsonPath: $.Applicant.createdtime
+          outJsonPath: $.Data.createdtime
+        - inJsonPath: $.Applicant.lastmodifiedtime
+          outJsonPath: $.Data.lastmodifiedtime
+        - inJsonPath: $.Applicant.action
+          outJsonPath: $.Data.action
+        - inJsonPath: $.NdcDetails
+          outJsonPath: $.Data.details
+        - inJsonPath: $.Documents
+          outJsonPath: $.Data.documents
 
-    - topic: update-ndc-application
-      configKey: INDEX
-      indexes:
-        - name: ndc-applicants-update-index
-          type: general
-          id: $.Applicant.uuid, $.Applicant.tenantId
-          isBulk: false
-          timeStampField: $.Applicant.lastmodifiedtime
-          jsonPath: $
-          customJsonMapping:
-            indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","firstname":"firstname","lastname":"lastname",
-                                   "mobile":"mobile","email":"email","address":"address",
-                                   "applicationStatus":"applicationStatus","active":"active",
-                                   "lastmodifiedby":"lastmodifiedby","lastmodifiedtime":"lastmodifiedtime",
-                                   "action":"action","details":[],"documents:[]"}}
-            fieldMapping:
-              - inJsonPath: $.Applicant.uuid
-                outJsonPath: $.Data.uuid
-              - inJsonPath: $.Applicant.tenantId
-                outJsonPath: $.Data.tenantId
-              - inJsonPath: $.Applicant.firstname
-                outJsonPath: $.Data.firstname
-              - inJsonPath: $.Applicant.lastname
-                outJsonPath: $.Data.lastname
-              - inJsonPath: $.Applicant.mobile
-                outJsonPath: $.Data.mobile
-              - inJsonPath: $.Applicant.email
-                outJsonPath: $.Data.email
-              - inJsonPath: $.Applicant.address
-                outJsonPath: $.Data.address
-              - inJsonPath: $.Applicant.applicationStatus
-                outJsonPath: $.Data.applicationStatus
-              - inJsonPath: $.Applicant.active
-                outJsonPath: $.Data.active
-              - inJsonPath: $.Applicant.createdby
-                outJsonPath: $.Data.createdby
-              - inJsonPath: $.Applicant.lastmodifiedby
-                outJsonPath: $.Data.lastmodifiedby
-              - inJsonPath: $.Applicant.createdtime
-                outJsonPath: $.Data.createdtime
-              - inJsonPath: $.Applicant.lastmodifiedtime
-                outJsonPath: $.Data.lastmodifiedtime
-              - inJsonPath: $.Applicant.action
-                outJsonPath: $.Data.action
-              - inJsonPath: $.NdcDetails
-                outJsonPath: $.Data.details
-              - inJsonPath: $.Documents
-                outJsonPath: $.Data.documents
+  - topic: update-ndc-application
+    configKey: INDEX
+    indexes:
+    - name: ndc-applicants-update-index
+      type: general
+      id: $.Applicant.uuid, $.Applicant.tenantId
+      isBulk: false
+      timeStampField: $.Applicant.lastmodifiedtime
+      jsonPath: $
+      customJsonMapping:
+        indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","firstname":"firstname","lastname":"lastname",
+                               "mobile":"mobile","email":"email","address":"address",
+                               "applicationStatus":"applicationStatus","active":"active",
+                               "lastmodifiedby":"lastmodifiedby","lastmodifiedtime":"lastmodifiedtime",
+                               "action":"action","details":[],"documents:[]"}}
+        fieldMapping:
+        - inJsonPath: $.Applicant.uuid
+          outJsonPath: $.Data.uuid
+        - inJsonPath: $.Applicant.tenantId
+          outJsonPath: $.Data.tenantId
+        - inJsonPath: $.Applicant.firstname
+          outJsonPath: $.Data.firstname
+        - inJsonPath: $.Applicant.lastname
+          outJsonPath: $.Data.lastname
+        - inJsonPath: $.Applicant.mobile
+          outJsonPath: $.Data.mobile
+        - inJsonPath: $.Applicant.email
+          outJsonPath: $.Data.email
+        - inJsonPath: $.Applicant.address
+          outJsonPath: $.Data.address
+        - inJsonPath: $.Applicant.applicationStatus
+          outJsonPath: $.Data.applicationStatus
+        - inJsonPath: $.Applicant.active
+          outJsonPath: $.Data.active
+        - inJsonPath: $.Applicant.createdby
+          outJsonPath: $.Data.createdby
+        - inJsonPath: $.Applicant.lastmodifiedby
+          outJsonPath: $.Data.lastmodifiedby
+        - inJsonPath: $.Applicant.createdtime
+          outJsonPath: $.Data.createdtime
+        - inJsonPath: $.Applicant.lastmodifiedtime
+          outJsonPath: $.Data.lastmodifiedtime
+        - inJsonPath: $.Applicant.action
+          outJsonPath: $.Data.action
+        - inJsonPath: $.NdcDetails
+          outJsonPath: $.Data.details
+        - inJsonPath: $.Documents
+          outJsonPath: $.Data.documents
 
-    - topic: delete-ndc-application
-      configKey: INDEX
-      indexes:
-        - name: ndc-applicants-delete-index
-          type: general
-          id: $.uuid, $.tenantId
-          isBulk: false
-          timeStampField: $.lastmodifiedtime
-          jsonPath: $
-          customJsonMapping:
-            indexMapping: {"Data":{"uuid":"uuid","active":"active","lastmodifiedby":
-              "lastmodifiedby","lastmodifiedtime":"lastmodifiedtime"}}
-            fieldMapping:
-              - inJsonPath: $.uuid
-                outJsonPath: $.Data.uuid
-              - inJsonPath: $.active
-                outJsonPath: $.Data.active
-              - inJsonPath: $.lastmodifiedby
-                outJsonPath: $.Data.lastmodifiedby
-              - inJsonPath: $.lastmodifiedtime
-                outJsonPath: $.Data.lastmodifiedtime
+  - topic: delete-ndc-application
+    configKey: INDEX
+    indexes:
+    - name: ndc-applicants-delete-index
+      type: general
+      id: $.uuid, $.tenantId
+      isBulk: false
+      timeStampField: $.lastmodifiedtime
+      jsonPath: $
+      customJsonMapping:
+        indexMapping: {"Data":{"uuid":"uuid","active":"active","lastmodifiedby":
+          "lastmodifiedby","lastmodifiedtime":"lastmodifiedtime"}}
+        fieldMapping:
+        - inJsonPath: $.uuid
+          outJsonPath: $.Data.uuid
+        - inJsonPath: $.active
+          outJsonPath: $.Data.active
+        - inJsonPath: $.lastmodifiedby
+          outJsonPath: $.Data.lastmodifiedby
+        - inJsonPath: $.lastmodifiedtime
+          outJsonPath: $.Data.lastmodifiedtime
