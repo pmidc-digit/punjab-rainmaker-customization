@@ -1,0 +1,144 @@
+serviceMaps:
+  serviceName: egov-ndc-services
+  mappings:
+    - version: 1.0
+      description: Persists NDC applications in eg_ndc_Applicants, eg_ndc_details and eg_ndc_documents tables
+      fromTopic: save-ndc-application
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO eg_ndc_Applicants (uuid,tenantid,firstname, lastname, mobile, email, address, applicationstatus,active, createdby, lastmodifiedby, createdtime, lastmodifiedtime, action) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?,?);
+          basePath: Applicant
+          jsonMaps:
+            - jsonPath: $.Applicant.uuid
+            - jsonPath: $.Applicant.tenantId
+            - jsonPath: $.Applicant.firstname
+            - jsonPath: $.Applicant.lastname
+            - jsonPath: $.Applicant.mobile
+            - jsonPath: $.Applicant.email
+            - jsonPath: $.Applicant.address
+            - jsonPath: $.Applicant.applicationStatus
+            - jsonPath: $.Applicant.active
+            - jsonPath: $.Applicant.createdby
+            - jsonPath: $.Applicant.lastmodifiedby
+            - jsonPath: $.Applicant.createdtime
+            - jsonPath: $.Applicant.lastmodifiedtime
+            - jsonPath: $.Applicant.action
+
+        - query: INSERT INTO eg_ndc_details (uuid,Applicantid, businessservice, consumercode, additionaldetails, dueamount, status) VALUES (?, ?, ?, ?, ?, ?,?);
+          basePath: NdcDetails.*
+          jsonMaps:
+            - jsonPath: $.NdcDetails.*.uuid
+            - jsonPath: $.NdcDetails.*.applicantId
+            - jsonPath: $.NdcDetails.*.businessService
+            - jsonPath: $.NdcDetails.*.consumerCode
+            - jsonPath: $.NdcDetails.*.additionalDetails
+              type: JSON
+              dbType: JSONB
+            - jsonPath: $.NdcDetails.*.dueAmount
+            - jsonPath: $.NdcDetails.*.status
+
+        - query: INSERT INTO eg_ndc_documents (uuid, applicantid, documenttype, documentattachment, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: Documents.*
+          jsonMaps:
+            - jsonPath: $.Documents.*.uuid
+            - jsonPath: $.Documents.*.applicantId
+            - jsonPath: $.Documents.*.documentType
+            - jsonPath: $.Documents.*.documentAttachment
+            - jsonPath: $.Documents.*.createdby
+            - jsonPath: $.Documents.*.lastmodifiedby
+            - jsonPath: $.Documents.*.createdtime
+            - jsonPath: $.Documents.*.lastmodifiedtime
+
+    - version: 1.0
+      description: Updates NDC applications in eg_ndc_Applicants, eg_ndc_details and eg_ndc_documents tables
+      fromTopic: update-ndc-application
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO eg_ndc_Applicants (uuid,tenantid, firstname, lastname, mobile, email, address, applicationstatus,active, createdby, lastmodifiedby, createdtime, lastmodifiedtime,action)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)
+            ON CONFLICT (uuid) DO UPDATE SET
+              tenantid = EXCLUDED.tenantid,
+              firstname = EXCLUDED.firstname,
+              lastname = EXCLUDED.lastname,
+              mobile = EXCLUDED.mobile,
+              email = EXCLUDED.email,
+              address = EXCLUDED.address,
+              applicationstatus = EXCLUDED.applicationstatus,
+              active = EXCLUDED.active,
+              createdby = EXCLUDED.createdby,
+              lastmodifiedby = EXCLUDED.lastmodifiedby,
+              createdtime = EXCLUDED.createdtime,
+              lastmodifiedtime = EXCLUDED.lastmodifiedtime,
+              action = EXCLUDED.action;
+          basePath: Applicant
+          jsonMaps:
+            - jsonPath: $.Applicant.uuid
+            - jsonPath: $.Applicant.tenantId
+            - jsonPath: $.Applicant.firstname
+            - jsonPath: $.Applicant.lastname
+            - jsonPath: $.Applicant.mobile
+            - jsonPath: $.Applicant.email
+            - jsonPath: $.Applicant.address
+            - jsonPath: $.Applicant.applicationStatus
+            - jsonPath: $.Applicant.active
+            - jsonPath: $.Applicant.createdby
+            - jsonPath: $.Applicant.lastmodifiedby
+            - jsonPath: $.Applicant.createdtime
+            - jsonPath: $.Applicant.lastmodifiedtime
+            - jsonPath: $.Applicant.action
+
+        - query: INSERT INTO eg_ndc_details (uuid, applicantid, businessservice, consumercode, additionaldetails, dueamount, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (uuid) DO UPDATE SET
+              applicantid = EXCLUDED.applicantid,
+              businessservice = EXCLUDED.businessservice,
+              consumercode = EXCLUDED.consumercode,
+              additionaldetails = EXCLUDED.additionaldetails,
+              dueamount = EXCLUDED.dueamount,
+              status = EXCLUDED.status;
+          basePath: NdcDetails.*
+          jsonMaps:
+            - jsonPath: $.NdcDetails.*.uuid
+            - jsonPath: $.NdcDetails.*.applicantId
+            - jsonPath: $.NdcDetails.*.businessService
+            - jsonPath: $.NdcDetails.*.consumerCode
+            - jsonPath: $.NdcDetails.*.additionalDetails
+              type: JSON
+              dbType: JSONB
+            - jsonPath: $.NdcDetails.*.dueAmount
+            - jsonPath: $.NdcDetails.*.status
+
+        - query: INSERT INTO eg_ndc_documents (uuid, applicantid, documenttype, documentattachment, createdby, lastmodifiedby, createdtime, lastmodifiedtime)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (uuid) DO UPDATE SET
+              applicantid = EXCLUDED.applicantid,
+              documenttype = EXCLUDED.documenttype,
+              documentattachment = EXCLUDED.documentattachment,
+              createdby = EXCLUDED.createdby,
+              lastmodifiedby = EXCLUDED.lastmodifiedby,
+              createdtime = EXCLUDED.createdtime,
+              lastmodifiedtime = EXCLUDED.lastmodifiedtime;
+          basePath: Documents.*
+          jsonMaps:
+            - jsonPath: $.Documents.*.uuid
+            - jsonPath: $.Documents.*.applicantId
+            - jsonPath: $.Documents.*.documentType
+            - jsonPath: $.Documents.*.documentAttachment
+            - jsonPath: $.Documents.*.createdby
+            - jsonPath: $.Documents.*.lastmodifiedby
+            - jsonPath: $.Documents.*.createdtime
+            - jsonPath: $.Documents.*.lastmodifiedtime
+
+    - version: 1.0
+      description: Soft delete NDC applications in eg_ndc_Applicants
+      fromTopic: delete-ndc-application
+      isTransaction: true
+      queryMaps:
+        - query: UPDATE eg_ndc_Applicants SET active=?, lastmodifiedby=?, lastmodifiedtime=? WHERE uuid=?;
+          basePath: $
+          jsonMaps:
+            - jsonPath: $.active
+            - jsonPath: $.lastmodifiedby
+            - jsonPath: $.lastmodifiedtime
+            - jsonPath: $.uuid
+

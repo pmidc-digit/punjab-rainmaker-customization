@@ -182,35 +182,191 @@ serviceMaps:
             - jsonPath: $.SurveyEntity.active
 
             - jsonPath: $.SurveyEntity.uuid
-            
+
+    - version: 1.0
+      description: Persists categories in eg_ss_category table
+      fromTopic: save-ss-category
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO eg_ss_category( id,label,tenantid,isactive,createdby,lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?,?,?,?,?,?,?,?);
+          basePath: Categories.*
+          jsonMaps:
+            - jsonPath: $.Categories.*.id
+            - jsonPath: $.Categories.*.label
+            - jsonPath: $.Categories.*.tenantId
+            - jsonPath: $.Categories.*.isActive
+            - jsonPath: $.Categories.*.auditDetails.createdBy
+            - jsonPath: $.Categories.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Categories.*.auditDetails.createdTime
+            - jsonPath: $.Categories.*.auditDetails.lastModifiedTime
+
+    - version: 1.0
+      description: Update categories in eg_ss_category table
+      fromTopic: update-ss-category
+      isTransaction: true
+      queryMaps:
+        - query: UPDATE eg_ss_category SET label = COALESCE(?, label), isactive = COALESCE(?, isactive), lastmodifiedby = ?,lastmodifiedtime = ? WHERE id = ?;
+          basePath: Categories.*
+          jsonMaps:
+            - jsonPath: $.Categories.*.label
+            - jsonPath: $.Categories.*.isActive
+            - jsonPath: $.Categories.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Categories.*.auditDetails.lastModifiedTime
+            - jsonPath: $.Categories.*.id
+
+    - version: 1.0
+      description: Persists questions in eg_ss_question table
+      fromTopic: save-ss-question
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO eg_ss_question( uuid,tenantid,surveyid,questionstatement,status,type,required,createdby,lastmodifiedby,createdtime,lastmodifiedtime,qorder,categoryid) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?);
+          basePath: Questions.*
+          jsonMaps:
+            - jsonPath: $.Questions.*.uuid
+            - jsonPath: $.Questions.*.tenantId
+            - jsonPath: $.Questions.*.surveyId
+            - jsonPath: $.Questions.*.questionStatement
+            - jsonPath: $.Questions.*.status
+            - jsonPath: $.Questions.*.type
+            - jsonPath: $.Questions.*.required
+            - jsonPath: $.Questions.*.auditDetails.createdBy
+            - jsonPath: $.Questions.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Questions.*.auditDetails.createdTime
+            - jsonPath: $.Questions.*.auditDetails.lastModifiedTime
+            - jsonPath: $.Questions.*.qorder
+            - jsonPath: $.Questions.*.categoryId
+        - query: INSERT INTO eg_ss_question_option( uuid,questionuuid,optiontext,optionorder,weightage,createdby,lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?,?,?,?,?,?,?,?,?);
+          basePath: $.Questions.*.options.*
+          jsonMaps:
+            - jsonPath: $.Questions.*.options.*.uuid
+            - jsonPath: $.Questions.*.options.*.questionUuid
+            - jsonPath: $.Questions.*.options.*.optionText
+            - jsonPath: $.Questions.*.options.*.optionOrder
+            - jsonPath: $.Questions.*.options.*.weightage
+            - jsonPath: $.Questions.*.options.*.auditDetails.createdBy
+            - jsonPath: $.Questions.*.options.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Questions.*.options.*.auditDetails.createdTime
+            - jsonPath: $.Questions.*.options.*.auditDetails.lastModifiedTime
+
+    - version: 1.0
+      description: Update questions in eg_ss_question table
+      fromTopic: update-ss-question
+      isTransaction: true
+      queryMaps:
+        - query: UPDATE eg_ss_question SET status = COALESCE(?, status), lastmodifiedby = ?,lastmodifiedtime = ? WHERE uuid = ?;
+          basePath: Questions.*
+          jsonMaps:
+            - jsonPath: $.Questions.*.status
+            - jsonPath: $.Questions.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Questions.*.auditDetails.lastModifiedTime
+            - jsonPath: $.Questions.*.uuid
+
     - version: 1.0
       description: Insert into scorecard survey related tables
       fromTopic: insert-scorecard-survey-entity
       isTransaction: true
       queryMaps:
-          - query: INSERT INTO eg_survey_entity (uuid,tenantid, title, category, description, startdate, enddate, postedby, active, answerscount, hasresponded) VALUES (?, ?, ?, ?, ?, NULL, NULL, NULL, NULL, NULL, NULL);
-            basePath: SurveyEntity
-            jsonMaps:
-              - jsonPath: $.SurveyEntity.uuid
-              - jsonPath: $.SurveyEntity.tenantId
-              - jsonPath: $.SurveyEntity.surveyTitle
-              - jsonPath: $.SurveyEntity.surveyCategory
-              - jsonPath: $.SurveyEntity.surveyDescription
+        - query: INSERT INTO eg_ss_survey_entity (uuid,tenantid, title, category, description, startdate, enddate, postedby, active, answerscount, hasresponded,createdby,lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?);
+          basePath: SurveyEntity
+          jsonMaps:
+            - jsonPath: $.SurveyEntity.uuid
+            - jsonPath: $.SurveyEntity.tenantId
+            - jsonPath: $.SurveyEntity.surveyTitle
+            - jsonPath: $.SurveyEntity.surveyCategory
+            - jsonPath: $.SurveyEntity.surveyDescription
+            - jsonPath: $.SurveyEntity.startDate
+            - jsonPath: $.SurveyEntity.endDate
+            - jsonPath: $.SurveyEntity.postedBy
+            - jsonPath: $.SurveyEntity.active
+            - jsonPath: $.SurveyEntity.answersCount
+            - jsonPath: $.SurveyEntity.hasResponded
+            - jsonPath: $.SurveyEntity.auditDetails.createdBy
+            - jsonPath: $.SurveyEntity.auditDetails.lastModifiedBy
+            - jsonPath: $.SurveyEntity.auditDetails.createdTime
+            - jsonPath: $.SurveyEntity.auditDetails.lastModifiedTime
 
-          - query: INSERT INTO eg_survey_section(uuid, surveyuuid, title, weightage) VALUES (?, ?, ?, ?);
-            basePath: SurveyEntity
-            jsonMaps:
-              - jsonPath: $.SurveyEntity.sections.*.uuid
-              - jsonPath: $.SurveyEntity.uuid
-              - jsonPath: $.SurveyEntity.sections.*.title
-              - jsonPath: $.SurveyEntity.sections.*.weightage
+        - query: INSERT INTO eg_ss_survey_section(uuid, surveyuuid, title, weightage,sectionorder) VALUES (?, ?, ?, ?,?);
+          basePath: SurveyEntity.sections.*
+          jsonMaps:
+            - jsonPath: $.SurveyEntity.sections.*.uuid
+            - jsonPath: $.SurveyEntity.uuid
+            - jsonPath: $.SurveyEntity.sections.*.title
+            - jsonPath: $.SurveyEntity.sections.*.weightage
+            - jsonPath: $.SurveyEntity.sections.*.sectionOrder
 
-          - query: INSERT INTO eg_question_weightage(weightage, qorder) VALUES (?, ?);
-            basePath: SurveyEntity
-            jsonMaps:
-              - jsonPath: $.SurveyEntity.sections.*.questions.*.questionUuid
-              - jsonPath: $.SurveyEntity.sections.*.uuid
-              - jsonPath: $.SurveyEntity.sections.*.questions.*.weightage
-              - jsonPath: $.SurveyEntity.sections.*.questions.*.qorder
+        - query: INSERT INTO eg_ss_question_weightage(questionuuid,sectionuuid,weightage, qorder, required) VALUES (?, ?, ?, ?, ?);
+          basePath: SurveyEntity.sections.*.questions.*
+          jsonMaps:
+            - jsonPath: $.SurveyEntity.sections.*.questions.*.questionUuid
+            - jsonPath: $.SurveyEntity.sections.*.questions.*.sectionUuid
+            - jsonPath: $.SurveyEntity.sections.*.questions.*.weightage
+            - jsonPath: $.SurveyEntity.sections.*.questions.*.qorder
+            - jsonPath: $.SurveyEntity.sections.*.required
 
-          
+
+    - version: 1.0
+      description: Updates activeness of survey
+      fromTopic: update-scorecard-survey-active
+      isTransaction: true
+      queryMaps:
+        - query: UPDATE eg_ss_survey_entity SET active=?, lastmodifiedtime=?, lastmodifiedby=? WHERE uuid=?;
+          basePath: $
+          jsonMaps:
+            - jsonPath: $.active
+            - jsonPath: $.lastModifiedTime
+            - jsonPath: $.lastModifiedBy
+            - jsonPath: $.uuid
+
+    - version: 1.0
+      description: Persists scorecard survey answers in eg_ss_answer table
+      fromTopic: insert-scorecard-survey-answer
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO eg_ss_survey_response (uuid, surveyuuid, citizenid, tenantid, locality,coordinates, status, createdby, lastmodifiedby, createdtime, lastmodifiedtime)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (uuid)
+            DO UPDATE SET status = EXCLUDED.status,tenantid=EXCLUDED.tenantid,locality=EXCLUDED.locality, coordinates=EXCLUDED.coordinates, lastmodifiedby = EXCLUDED.lastmodifiedby, lastmodifiedtime = EXCLUDED.lastmodifiedtime;
+          basePath: SurveyResponse
+          jsonMaps:
+            - jsonPath: $.SurveyResponse.uuid
+            - jsonPath: $.SurveyResponse.surveyUuid
+            - jsonPath: $.SurveyResponse.citizenId
+            - jsonPath: $.SurveyResponse.tenantId
+            - jsonPath: $.SurveyResponse.locality
+            - jsonPath: $.SurveyResponse.coordinates
+            - jsonPath: $.SurveyResponse.status
+            - jsonPath: $.SurveyResponse.answers.*.auditDetails.createdBy
+            - jsonPath: $.SurveyResponse.answers.*.auditDetails.lastModifiedBy
+            - jsonPath: $.SurveyResponse.answers.*.auditDetails.createdTime
+            - jsonPath: $.SurveyResponse.answers.*.auditDetails.lastModifiedTime
+        - query: INSERT INTO eg_ss_answer (uuid, questionuuid, surveyresponseuuid, sectionuuid,comments, createdby, lastmodifiedby, createdtime, lastmodifiedtime)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)
+            ON CONFLICT (uuid)
+            DO UPDATE SET lastmodifiedby = EXCLUDED.lastmodifiedby,comments=EXCLUDED.comments, lastmodifiedtime = EXCLUDED.lastmodifiedtime;
+          basePath: SurveyResponse.answers.*
+          jsonMaps:
+            - jsonPath: $.SurveyResponse.answers.*.uuid
+            - jsonPath: $.SurveyResponse.answers.*.questionUuid
+            - jsonPath: $.SurveyResponse.uuid
+            - jsonPath: $.SurveyResponse.answers.*.sectionUuid
+            - jsonPath: $.SurveyResponse.answers.*.comments
+            - jsonPath: $.SurveyResponse.answers.*.auditDetails.createdBy
+            - jsonPath: $.SurveyResponse.answers.*.auditDetails.lastModifiedBy
+            - jsonPath: $.SurveyResponse.answers.*.auditDetails.createdTime
+            - jsonPath: $.SurveyResponse.answers.*.auditDetails.lastModifiedTime
+
+        - query: INSERT INTO eg_ss_answer_detail (uuid, answeruuid, answertype, answercontent, weightage,createdby, lastmodifiedby, createdtime, lastmodifiedtime)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)
+            ON CONFLICT (uuid)
+            DO UPDATE SET answercontent = EXCLUDED.answercontent,weightage = EXCLUDED.weightage, lastmodifiedtime = EXCLUDED.lastmodifiedtime;
+          basePath: SurveyResponse.answers.*.answerDetails.*
+          jsonMaps:
+            - jsonPath: $.SurveyResponse.answers.*.answerDetails.*.uuid
+            - jsonPath: $.SurveyResponse.answers.*.answerDetails.*.answerUuid
+            - jsonPath: $.SurveyResponse.answers.*.answerDetails.*.answerType
+            - jsonPath: $.SurveyResponse.answers.*.answerDetails.*.answerContent
+            - jsonPath: $.SurveyResponse.answers.*.answerDetails.*.weightage
+            - jsonPath: $.SurveyResponse.answers.*.auditDetails.createdBy
+            - jsonPath: $.SurveyResponse.answers.*.auditDetails.lastModifiedBy
+            - jsonPath: $.SurveyResponse.answers.*.auditDetails.createdTime
+            - jsonPath: $.SurveyResponse.answers.*.auditDetails.lastModifiedTime
