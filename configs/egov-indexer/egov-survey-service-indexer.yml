@@ -1,0 +1,216 @@
+ServiceMaps:
+  serviceName: Survey Service
+  version: 1.0.0
+  mappings:
+    - topic: save-ss-category
+      configKey: INDEX
+      indexes:
+        - name: survey-category-index
+          type: general
+          id: $.id, $.tenantId
+          isBulk: true
+          timeStampField: $.auditDetails.createdTime
+          jsonPath: $.Categories.*
+          customJsonMapping:
+            indexMapping: {"Data":{"id": "id","label": "label","isActive": "isActive","tenantId": "","auditDetails": {}}}
+            fieldMapping:
+              - inJsonPath: $.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.label
+                outJsonPath: $.Data.label
+              - inJsonPath: $.isActive
+                outJsonPath: $.Data.isActive
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.auditDetails
+                outJsonPath: $.Data.auditDetails
+
+    - topic: update-ss-category
+      configKey: INDEX
+      indexes:
+        - name: survey-category-update-index
+          type: general
+          id: $.id, $.tenantId
+          isBulk: true
+          timeStampField: $.auditDetails.lastModifiedTime
+          jsonPath: $.Categories.*
+          customJsonMapping:
+            indexMapping: {"Data":{"id": "id","label": "label","isActive": "isActive","tenantId": "tenantId","lastModifiedBy": "lastModifiedBy","lastModifiedTime": "lastModifiedTime","auditDetails": {}}}
+            fieldMapping:
+              - inJsonPath: $.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.label
+                outJsonPath: $.Data.label
+              - inJsonPath: $.isActive
+                outJsonPath: $.Data.isActive
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+              - inJsonPath: $.auditDetails
+                outJsonPath: $.Data.auditDetails
+
+    - topic: save-ss-question
+      configKey: INDEX
+      indexes:
+        - name: survey-question-index
+          type: general
+          id: $.uuid, $.tenantId
+          isBulk: true
+          timeStampField: $.auditDetails.createdTime
+          jsonPath: $.Questions.*
+          customJsonMapping:
+            indexMapping: {"Data":{"uuid": "uuid","tenantId": "tenantId","questionStatement": "questionStatement","status": "status","type": "type","categoryId": "categoryId","auditDetails": {},"options": []}}
+            fieldMapping:
+              - inJsonPath: $.uuid
+                outJsonPath: $.Data.uuid
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.questionStatement
+                outJsonPath: $.Data.questionStatement
+              - inJsonPath: $.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.type
+                outJsonPath: $.Data.type
+              - inJsonPath: $.categoryId
+                outJsonPath: $.Data.categoryId
+              - inJsonPath: $.auditDetails
+                outJsonPath: $.Data.auditDetails
+              - inJsonPath: $.options.*.uuid
+                outJsonPath: $.Data.options
+              - inJsonPath: $.options.*.questionUuid
+                outJsonPath: $.Data.options
+              - inJsonPath: $.options.*.optionText
+                outJsonPath: $.Data.options
+              - inJsonPath: $.options.*.weightage
+                outJsonPath: $.Data.options
+              - inJsonPath: $.options.*.auditDetails
+                outJsonPath: $.Data.options
+
+    - topic: update-ss-question
+      configKey: INDEX
+      indexes:
+        - name: survey-question-update-index
+          type: general
+          id: $.uuid, $.tenantId
+          isBulk: true
+          timeStampField: $.auditDetails.lastModifiedTime
+          jsonPath: $.Questions.*
+          customJsonMapping:
+            indexMapping: {"Data":{"uuid": "uuid","tenantId": "tenantId","status": "status","lastModifiedBy": "lastModifiedBy","lastModifiedTime": "lastModifiedTime","auditDetails": {}}}
+            fieldMapping:
+              - inJsonPath: $.uuid
+                outJsonPath: $.Data.uuid
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+              - inJsonPath: $.auditDetails
+                outJsonPath: $.Data.auditDetails
+
+    - topic: insert-scorecard-survey-entity
+      configKey: INDEX
+      indexes:
+        - name: survey-entity-index
+          type: general
+          id: $.uuid, $.tenantId
+          isBulk: false
+          timeStampField: $.auditDetails.createdTime
+          jsonPath: $.SurveyEntity
+          customJsonMapping:
+            indexMapping: { "Data": { "uuid": "uuid", "tenantId": "tenantId", "surveyTitle": "surveyTitle", "surveyCategory": "surveyCategory", "surveyDescription": "surveyDescription", "startDate": "startDate", "endDate": "endDate", "postedBy": "postedBy", "active": "active", "answersCount": "answersCount", "hasResponded": "hasResponded", "auditDetails": {}, "sections": [] } }
+            fieldMapping:
+              - inJsonPath: $.uuid
+                outJsonPath: $.Data.uuid
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.surveyTitle
+                outJsonPath: $.Data.surveyTitle
+              - inJsonPath: $.surveyCategory
+                outJsonPath: $.Data.surveyCategory
+              - inJsonPath: $.surveyDescription
+                outJsonPath: $.Data.surveyDescription
+              - inJsonPath: $.startDate
+                outJsonPath: $.Data.startDate
+              - inJsonPath: $.endDate
+                outJsonPath: $.Data.endDate
+              - inJsonPath: $.postedBy
+                outJsonPath: $.Data.postedBy
+              - inJsonPath: $.active
+                outJsonPath: $.Data.active
+              - inJsonPath: $.answersCount
+                outJsonPath: $.Data.answersCount
+              - inJsonPath: $.hasResponded
+                outJsonPath: $.Data.hasResponded
+              - inJsonPath: $.auditDetails
+                outJsonPath: $.Data.auditDetails
+              - inJsonPath: $.sections
+                outJsonPath: $.Data.sections
+
+    - topic: update-scorecard-survey-active
+      configKey: INDEX
+      indexes:
+        - name: survey-entity-update-index
+          type: general
+          id: $.uuid, $.tenantId
+          isBulk: true
+          timeStampField: $.lastModifiedTime
+          jsonPath: $
+          customJsonMapping:
+            indexMapping: {"Data":{"uuid": "uuid","tenantId": "tenantId","active": "active","lastModifiedBy": "lastModifiedBy","lastModifiedTime": "lastModifiedTime","auditDetails": {}}}
+            fieldMapping:
+              - inJsonPath: $.uuid
+                outJsonPath: $.Data.uuid
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.active
+                outJsonPath: $.Data.active
+              - inJsonPath: $.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+              - inJsonPath: $.auditDetails
+                outJsonPath: $.Data.auditDetails
+    - topic: insert-scorecard-survey-answer
+      configKey: INDEX
+      indexes:
+        - name: survey-answer-index
+          type: general
+          id: $.uuid, $.citizenId, $.tenantId
+          isBulk: false
+          timeStampField: $.answers[0].auditDetails.createdTime
+          jsonPath: $.SurveyResponse
+          customJsonMapping:
+            indexMapping: {
+              "Data":{
+                "surveyResponseUuid": "uuid",
+                "surveyUuid": "surveyUuid",
+                "tenantId": "tenantId",
+                "citizenId": "citizenId",
+                "locality": "locality",
+                "coordinates": "coordinates",
+                "status": "status",
+                "answers": [ ]}}
+            fieldMapping:
+              - inJsonPath: $.uuid
+                outJsonPath: $.Data.surveyResponseUuid
+              - inJsonPath: $.surveyUuid
+                outJsonPath: $.Data.surveyUuid
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.citizenId
+                outJsonPath: $.Data.citizenId
+              - inJsonPath: $.locality
+                outJsonPath: $.Data.locality
+              - inJsonPath: $.coordinates
+                outJsonPath: $.Data.coordinates
+              - inJsonPath: $.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.answers[*]
+                outJsonPath: $.Data.answers
