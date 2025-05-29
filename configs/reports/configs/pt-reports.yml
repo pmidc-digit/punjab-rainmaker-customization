@@ -2463,7 +2463,7 @@ ReportDefinitions:
     searchClause: AND instrumenttype = replace($paymentMode,',','_')
   query: |
       -- Use CTE to force query plan, compute & use CTE later 
-      Select receiptnumber as receiptnumber,to_char((To_timestamp(receiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY')  AS  "receiptdate",g8issuedate as g8issuedate,
+      Select receiptnumber as receiptnumber,receiptdate as receiptdate,g8issuedate as g8issuedate,
       g8receiptno as g8receiptno,amount as amount,propertytax as propertytax,firecess as firecess,
       cancercess as cancercess,rebate as rebate,adhocrebate as adhocrebate,penalty as penalty,
       adhocpenalty as adhocpenalty,interest as interest,exemption as exemption,adjustment as adjustment,
