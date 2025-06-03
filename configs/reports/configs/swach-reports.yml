@@ -86,7 +86,7 @@ ReportDefinitions:
       type: string
       source: rainmaker-swach
       total: false
-    - name: ULB Type
+    - name: ULBType
       label: reports.rainmaker-swach.ULBType
       type: string
       source: rainmaker-swach
@@ -145,7 +145,7 @@ ReportDefinitions:
     query: |
       select 
       initcap(split_part(sc.tenantid, '.', 2)) as tenantid,
-      ulb.type as "ULB Type",
+      ulb.type as ULBType,
       SUM(CASE WHEN sc.applicationstatus ='PENDINGATLME' THEN 1 ELSE 0 END) as "Pending at LME",
       SUM(CASE WHEN sc.applicationstatus ='PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END) as "PENDING FOR ASSIGNMENT",
       SUM(CASE WHEN sc.applicationstatus ='PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END) as "PENDINGFORREASSIGNMENT",
@@ -155,7 +155,7 @@ ReportDefinitions:
       from eg_swach_service_v2 sc
       inner join ulb_data ulb on ulb.ulb_code = sc.tenantid
       WHERE sc.tenantid != 'pb.testing'
-    groupby: GROUP BY tenantid,"ULB Type"
+    groupby: GROUP BY tenantid,ULBType
     orderby: ORDER BY tenantid
 
         
