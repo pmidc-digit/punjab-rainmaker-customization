@@ -76,6 +76,88 @@ ReportDefinitions:
         FROM public.egov_swach_imagedata  swach
         INNER JOIN public.eg_user us ON us.uuid = swach.uuid
 
+  - reportName: ULBwiseComplaintCountReport
+    summary: Fetches complaint stats ULB wise
+    version: 1.0.0
+    moduleName: rainmaker-swach
+    sourceColumns:
+    - name: Tenantid
+      label: reports.rainmaker-swach.tenantid
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: ULB Type
+      label: reports.rainmaker-swach.ULBType
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: Pending at LME
+      label: reports.rainmaker-swach.status.PENDINGATLME
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: PENDING FOR ASSIGNMENT
+      label: reports.rainmaker-swach.status.pendingforassignment
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: PENDING FOR REASSIGNMENT
+      label: reports.rainmaker-swach.status.PENDINGFORREASSIGNMENT
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: Resolved
+      label: reports.rainmaker-swach.status.resolved
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: Rejected
+      label: reports.rainmaker-swach.status.rejected
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: Total
+      label: reports.rainmaker-swach.total
+      type: string
+      source: rainmaker-swach
+      total: true
+    searchParams:
+    - name: ulb
+      label: ULB
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: pt
+      wrapper: true
+      isMandatory: false
+      searchClause: AND tenantid = $ulb
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND createdtime >= $fromDate
+    - name: toDate
+      label: To Date
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND createdtime <= $toDate
+    query: |
+      select 
+      initcap(split_part(sc.tenantid, '.', 2)) as tenantid,
+      ulb.type as "ULB Type",
+      SUM(CASE WHEN sc.applicationstatus ='PENDINGATLME' THEN 1 ELSE 0 END) as "Pending at LME",
+      SUM(CASE WHEN sc.applicationstatus ='PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END) as "PENDING FOR ASSIGNMENT",
+      SUM(CASE WHEN sc.applicationstatus ='PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END) as "PENDINGFORREASSIGNMENT",
+      SUM(CASE WHEN sc.applicationstatus ='REJECTED' THEN 1 ELSE 0 END) as "Rejected",
+      SUM(CASE WHEN sc.applicationstatus ='RESOLVED' THEN 1 ELSE 0 END) as "Resolved",
+      count(sc.applicationstatus) as Total
+      from eg_swach_service_v2 sc
+      inner join ulb_data ulb on ulb.ulb_code = sc.tenantid
+      WHERE sc.tenantid != 'pb.testing'
+    groupby: GROUP BY tenantid,"ULB Type"
+    orderby: ORDER BY tenantid
+
         
   - reportName: SwachComplaintTypesReport_v2
     summary: Fetches complaint stats based on complaint types for a ULB
