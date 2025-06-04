@@ -81,6 +81,11 @@ ReportDefinitions:
     version: 1.0.0
     moduleName: rainmaker-swach
     sourceColumns:
+    - name: District
+      label: District
+      type: string
+      source: rainmaker-swach
+      total: false    
     - name: Tenantid
       label: Tenantid
       type: string
@@ -146,6 +151,7 @@ ReportDefinitions:
       select 
       initcap(split_part(sc.tenantid, '.', 2)) as Tenantid,
       ulb.type as ULBType,
+      ulb.district as District,
       SUM(CASE WHEN sc.applicationstatus ='PENDINGATLME' THEN 1 ELSE 0 END) as "Pending at LME",
       SUM(CASE WHEN sc.applicationstatus ='PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END) as "PENDING FOR ASSIGNMENT",
       SUM(CASE WHEN sc.applicationstatus ='PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END) as "PENDING FOR REASSIGNMENT",
@@ -155,7 +161,7 @@ ReportDefinitions:
       from eg_swach_service_v2 sc
       inner join ulb_data ulb on ulb.ulb_code = sc.tenantid
       WHERE sc.tenantid != 'pb.testing'
-    groupby: GROUP BY Tenantid,ULBType
+    groupby: GROUP BY Tenantid,ULBType,District
     orderby: ORDER BY Tenantid
 
         
