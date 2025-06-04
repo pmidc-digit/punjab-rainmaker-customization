@@ -68,7 +68,12 @@ ReportDefinitions:
     label: reports.ws.ownername1
     type: string
     source: ws
-    total: false   
+    total: false  
+  - name: user
+    label: user
+    type: string
+    source: ws
+    total: false      
   searchParams:
   - name: fromDate
     label: reports.pt.fromDate
@@ -112,23 +117,25 @@ ReportDefinitions:
   query: |
     -- Use CTE to force query plan, compute & use CTE later
     select
-      receiptnumber as receiptno,
-      bill.consumercode as connectionno,     
-      to_char((To_timestamp(pd.receiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') as receiptdate1,
-      bill.businessservice as service,   
-      paidby as payername,
-      amountpaid,
-      paymentmode,
-      paymentstatus,
-      instrumentnumber,
+      pd.receiptnumber AS receiptno,
+      bill.consumercode AS connectionno,     
+      TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate1,
+      bill.businessservice AS service,   
+      payment.paidby AS payername,
+      pd.amountpaid,
+      payment.paymentmode,
+      payment.paymentstatus,
+      payment.instrumentnumber,
       to_char((To_timestamp(payment.instrumentdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') AS transactiondate, 
       usr.name as collectorname,
-      payername as ownername1
+      payername as ownername1,
+      usr.id as user
     from egcl_paymentdetail pd
-    inner join egcl_bill as bill on bill.id=pd.billid    
+    inner join egcl_bill as bill on bill.id=pd.billid and pd.tenantid = $tenantid  
     inner join egcl_payment as payment on payment.id=pd.paymentid    
-    inner join eg_user as usr on usr.id=payment.createdby::integer and payment.paymentstatus!='CANCELLED'
-    where payment.tenantid=$tenantid and pd.businessservice in ('WS','SW','WS.ONE_TIME_FEE','SW.ONE_TIME_FEE') and bill.status='ACTIVE'
+    left join eg_user as usr on usr.id=payment.createdby::integer 
+    where bill.tenantid = $tenantid and pd.businessservice in ('WS','SW','WS.ONE_TIME_FEE','SW.ONE_TIME_FEE') and bill.status='ACTIVE'
+    and payment.paymentstatus != 'CANCELLED'
   orderby: order by pd.receiptdate desc
 
 
