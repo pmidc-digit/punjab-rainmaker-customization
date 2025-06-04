@@ -23,13 +23,6 @@ ReportDefinitions:
         type: string
         source: rainmaker-survey
         total: false
-    searchParams:
-      - name: questionuuid
-        label: question id
-        type: string
-        source: rainmaker-survey
-        isMandatory: false
-        searchClause: AND questionuuid = $questionuuid
     query: |
         SELECT res.tenantid,qw.questionuuid,sum(qw.weightage) as totalweightage 
         FROM eg_ss_survey_response res
