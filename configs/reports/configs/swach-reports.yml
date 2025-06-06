@@ -340,7 +340,7 @@ ReportDefinitions:
       type: string
       source: rainmaker-swach
       total: false
-    - name: mobilenumber
+    - name: mobileno
       label: mobilenumber
       type: string
       source: rainmaker-swach
@@ -422,7 +422,7 @@ ReportDefinitions:
       servicerequestid AS complaintNo, 
       to_char(to_timestamp(TRUNC(CAST(ess.createdtime AS bigint) / 1000)), 'DD/MM/YYYY') AS date, 
       (case when eg_user.name is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else eg_user.name end) as name,  --value for NULL
-      eg_user.mobilenumber AS mobilenumber, 
+      eg_user.mobilenumber AS mobileno, 
       esa.landmark as landmark, 
       esa.doorno||', '||esa.plotno||', '||esa.buildingname||', '||esa.street as address, 
       ess.description,
