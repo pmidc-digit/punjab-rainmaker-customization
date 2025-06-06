@@ -450,7 +450,7 @@ ReportDefinitions:
       to_char((To_timestamp(ess.createdtime/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY')  AS actiondate
       FROM eg_swach_service_v2 ess
       left outer join eg_swach_address_v2 esa on ess.id = esa.parentid
-      left outer join eg_user on eg_user.id::text = ess.createdby
+      left outer join eg_user on eg_user.uuid = ess.createdby
       left outer join eg_pgr_action as epa on epa.businesskey = ess.servicerequestid and epa.action in ('assign','reassign','resolve')
       left outer join eg_user as ua on (ua.id = epa.assignee::int or ua.id = split_part(epa.by,':',1)::INTEGER)
       WHERE 
