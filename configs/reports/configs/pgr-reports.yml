@@ -1058,6 +1058,13 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND eg_pgr_service.createdtime <= $toDate
   query: |
+    with comps as
+    (
+      select businesskey,max(eg_pgr_action.when) as actiontime
+      from eg_pgr_action
+      where tenantid=$tenantid
+      group by businesskey
+    )
     SELECT 
     DISTINCT ON (servicerequestid)
     (case when ua.name is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else ua.name end) as lastassignedto,  --value for Unassigned
@@ -1079,7 +1086,9 @@ ReportDefinitions:
     left outer join eg_pgr_address on eg_pgr_address.uuid = eg_pgr_service.addressid
     left outer join eg_user on eg_user.id = eg_pgr_service.accountid::int
     left outer join eg_pgr_action as epa on epa.businesskey = eg_pgr_service.servicerequestid and epa.action in ('assign','reassign','resolve')
-    left outer join eg_user as ua on (ua.id = epa.assignee::int or ua.id = split_part(epa.by,':',1)::INTEGER)
+    -- left outer join eg_user as ua on (ua.id = epa.assignee::int or ua.id = split_part(epa.by,':',1)::INTEGER)
+    left outer join eg_user as ua on (ua.id = (case when epa.assignee is not null then epa.assignee::integer  else  split_part(epa.by,':',1)::INTEGER end))
+
     WHERE 
     eg_pgr_service.tenantid LIKE  $tenantid 
     AND eg_pgr_address.uuid = eg_pgr_service.addressid
