@@ -422,11 +422,11 @@ ReportDefinitions:
       servicerequestid AS complaintNo, 
       to_char(to_timestamp(TRUNC(CAST(ess.createdtime AS bigint) / 1000)), 'DD/MM/YYYY') AS date, 
       (case when eg_user.name is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else eg_user.name end) as name,  --value for NULL
-      eg_user.mobilenumber, 
-      esa.landmark, 
+      eg_user.mobilenumber AS phone, 
+      esa.landmark as landmark, 
       esa.doorno||', '||esa.plotno||', '||esa.buildingname||', '||esa.street as address, 
-      description,
-      source,
+      ess.description,
+      ess.source,
       ess.tenantid,
       Initcap(ess.applicationstatus) as status,
       to_char((To_timestamp(ess.createdtime/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY')  AS actiondate
