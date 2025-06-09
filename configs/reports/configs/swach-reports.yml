@@ -358,8 +358,8 @@ ReportDefinitions:
       type: string
       source: rainmaker-swach
       total: false
-    - name: phone
-      label: phone
+    - name: mobileno
+      label: mobileno
       type: string
       source: rainmaker-swach
       total: false
@@ -440,7 +440,7 @@ ReportDefinitions:
       servicerequestid AS complaintNo, 
       to_char(to_timestamp(TRUNC(CAST(ess.createdtime AS bigint) / 1000)), 'DD/MM/YYYY') AS date, 
       (case when eg_user.name is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else eg_user.name end) as name,  --value for NULL
-      eg_user.mobilenumber AS phone, 
+      eg_user.mobilenumber AS mobileno, 
       esa.landmark as landmark, 
       esa.doorno||', '||esa.plotno||', '||esa.buildingname||', '||esa.street as address, 
       ess.description,
@@ -450,7 +450,7 @@ ReportDefinitions:
       to_char((To_timestamp(ess.createdtime/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY')  AS actiondate
       FROM eg_swach_service_v2 ess
       left outer join eg_swach_address_v2 esa on ess.id = esa.parentid
-      left outer join eg_user on eg_user.uuid = ess.createdby
+      left outer join eg_user on eg_user.uuid::text = ess.createdby
       left outer join eg_pgr_action as epa on epa.businesskey = ess.servicerequestid and epa.action in ('assign','reassign','resolve')
       left outer join eg_user as ua on (ua.id = epa.assignee::int or ua.id = split_part(epa.by,':',1)::INTEGER)
       WHERE 
