@@ -4171,3 +4171,318 @@ ReportDefinitions:
     WHERE c.tenantid = $tenantid 
     and c.applicationstatus in ('PENDING_FOR_DOCUMENT_VERIFICATION','PENDING_FOR_FIELD_INSPECTION','PENDING_FOR_APPROVAL','PENDING_APPROVAL_FOR_CONNECTION')
     and c.createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 9 * 24 * 60 * 60 * 1000)
+
+- reportName: waterPendingSlaApplicationsState
+  summary:  Water SLA Pendency Report
+  version: 1.0.0
+  moduleName: rainmaker-ws
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: tenantid
+    label: reports.ws.tenantid
+    type: string
+    source: ws
+    total: false
+  - name: applicationno
+    label: reports.ws.applicationno
+    type: string
+    source: ws
+    total: false
+  - name: applicationstatus
+    label: reports.ws.applicationstatus
+    type: string
+    source: ws
+    total: false  
+  - name: connectionno
+    label: reports.ws.connectionno
+    type: string
+    source: ws
+    total: false
+  - name: ledgerid
+    label: reports.ws.ledgerid
+    type: string
+    source: ws
+    total: false
+  - name: group
+    label: reports.ws.group
+    type: string
+    source: ws
+    total: false
+  - name: usagecategory
+    label: reports.ws.usagecategory
+    type: string
+    source: ws
+    total: false
+  - name: connectioncategory
+    label: reports.ws.connectioncategory
+    type: string
+    source: ws
+    total: false
+  - name: createdon
+    label: reports.ws.createdon
+    type: string
+    source: ws
+    total: false
+  - name: executiondate
+    label: reports.ws.executiondate
+    type: string
+    source: ws
+    total: false
+  - name: paymentdate
+    label: reports.ws.paymentdate
+    type: string
+    source: ws
+    total: false
+  - name: assignedemployee
+    label: reports.ws.assignedemployee
+    type: string
+    source: ws
+    total: false
+  - name: assignedon
+    label: reports.ws.assignedon
+    type: string
+    source: ws
+    total: false
+  - name: dayspendency
+    label: reports.ws.dayspendency
+    type: string
+    source: ws
+    total: false
+  - name: assignedfordays
+    label: reports.ws.assignedfordays
+    type: string
+    source: ws
+    total: false
+  - name: plotsize
+    label: reports.ws.plotsize
+    type: string
+    source: ws
+    total: false
+  - name: oldpropertyid
+    label: reports.ws.oldpropertyid
+    type: string
+    source: ws
+    total: false
+  - name: address
+    label: reports.ws.address
+    type: string
+    source: ws
+    total: false
+  - name: localityname
+    label: reports.ws.locality
+    type: string
+    source: ws
+    total: false
+  - name: propertyusagetype
+    label: reports.ws.propertyusagetype
+    type: string
+    source: ws
+    total: false
+  searchParams:
+  - name: ulb
+    label: ULB
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: pt
+    wrapper: true
+    isMandatory: true
+    searchClause: AND c.tenantid = $ulb
+  query: |
+    SELECT 
+        c.tenantid as tenantid,
+        c.applicationno as applicationno,
+        c.applicationstatus as applicationstatus,
+        c.connectionno as connectionno,
+        c.additionaldetails->>'ledgerId' as ledgerid,
+        c.additionaldetails->>'groups' as group,
+        c.additionaldetails->>'waterSubUsageType' as usagecategory,
+        c.additionaldetails->>'connectionCategory' as connctionCategory,
+        TO_CHAR(TO_TIMESTAMP(c.createdtime / 1000), 'dd-MM-yyyy') AS createdon,
+        TO_CHAR(TO_TIMESTAMP(s.connectionexecutiondate / 1000), 'dd-MM-yyyy') as executiondate,
+        TO_CHAR(TO_TIMESTAMP(pist.createdtime / 1000), 'dd-MM-yyyy') as paymentdate,
+        e.code AS assignedemployee,
+        TO_CHAR(TO_TIMESTAMP(assigned.createdtime / 1000), 'dd-MM-yyyy') AS assignedon,
+        FLOOR((EXTRACT(EPOCH FROM NOW()) - c.createdtime / 1000) / 86400) AS dayspendency,
+        FLOOR((EXTRACT(EPOCH FROM NOW()) - assigned.createdtime / 1000) / 86400) AS assignedfordays,
+        pt.plotsize,
+        pt.oldpropertyid as oldpropertyid,
+        pt.address as address,
+        pt.localityname as localityname,
+        pt.propertyusagetype as propertyusagetype
+    FROM eg_ws_connection c
+    INNER JOIN (
+    SELECT id, businessid 
+    FROM eg_wf_processinstance_v2 pi
+    WHERE tenantid=$ulb and (businessid, createdtime) IN (
+        SELECT businessid, MAX(createdtime)
+        FROM eg_wf_processinstance_v2 where tenantid=$ulb
+        GROUP BY businessid
+    )
+    ) pi ON pi.businessid = c.applicationno
+    LEFT OUTER JOIN eg_wf_assignee_v2 assigned ON assigned.processinstanceid = pi.id
+    LEFT OUTER JOIN eg_hrms_employee e ON e.uuid = assigned.assignee
+    inner join report_properties pt on (pt.propertyid=c.property_id and pt.propertystatus='ACTIVE')
+    inner join eg_ws_service s on s.connection_id=c.id
+    left outer join eg_wf_processinstance_v2 pist on (pist.businessid=c.applicationno and pist.action='PAY')
+    WHERE c.applicationstatus in ('PENDING_FOR_DOCUMENT_VERIFICATION','PENDING_FOR_FIELD_INSPECTION','PENDING_FOR_APPROVAL','PENDING_APPROVAL_FOR_CONNECTION')
+    and c.createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 9 * 24 * 60 * 60 * 1000)
+
+
+- reportName: seweragePendingSlaApplicationsState
+  summary:  Sewerage SLA Pendency Report
+  version: 1.0.0
+  moduleName: rainmaker-ws
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: tenantid
+    label: reports.ws.tenantid
+    type: string
+    source: ws
+    total: false
+  - name: applicationno
+    label: reports.ws.applicationno
+    type: string
+    source: ws
+    total: false
+  - name: applicationstatus
+    label: reports.ws.applicationstatus
+    type: string
+    source: ws
+    total: false  
+  - name: connectionno
+    label: reports.ws.connectionno
+    type: string
+    source: ws
+    total: false
+  - name: ledgerid
+    label: reports.ws.ledgerid
+    type: string
+    source: ws
+    total: false
+  - name: group
+    label: reports.ws.group
+    type: string
+    source: ws
+    total: false
+  - name: usagecategory
+    label: reports.ws.usagecategory
+    type: string
+    source: ws
+    total: false
+  - name: connectioncategory
+    label: reports.ws.connectioncategory
+    type: string
+    source: ws
+    total: false
+  - name: createdon
+    label: reports.ws.createdon
+    type: string
+    source: ws
+    total: false
+  - name: executiondate
+    label: reports.ws.executiondate
+    type: string
+    source: ws
+    total: false
+  - name: paymentdate
+    label: reports.ws.paymentdate
+    type: string
+    source: ws
+    total: false
+  - name: assignedemployee
+    label: reports.ws.assignedemployee
+    type: string
+    source: ws
+    total: false
+  - name: assignedon
+    label: reports.ws.assignedon
+    type: string
+    source: ws
+    total: false
+  - name: dayspendency
+    label: reports.ws.dayspendency
+    type: string
+    source: ws
+    total: false
+  - name: assignedfordays
+    label: reports.ws.assignedfordays
+    type: string
+    source: ws
+    total: false
+  - name: plotsize
+    label: reports.ws.plotsize
+    type: string
+    source: ws
+    total: false
+  - name: oldpropertyid
+    label: reports.ws.oldpropertyid
+    type: string
+    source: ws
+    total: false
+  - name: address
+    label: reports.ws.address
+    type: string
+    source: ws
+    total: false
+  - name: localityname
+    label: reports.ws.locality
+    type: string
+    source: ws
+    total: false
+  - name: propertyusagetype
+    label: reports.ws.propertyusagetype
+    type: string
+    source: ws
+    total: false
+  searchParams:
+  - name: ulb
+    label: ULB
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: pt
+    wrapper: true
+    isMandatory: true
+    searchClause: AND c.tenantid = $ulb
+  query: |
+    SELECT 
+        c.tenantid as tenantid,
+        c.applicationno as applicationno,
+        c.applicationstatus as applicationstatus,
+        c.connectionno as connectionno,
+        c.additionaldetails->>'ledgerId' as ledgerid,
+        c.additionaldetails->>'groups' as group,
+        c.additionaldetails->>'waterSubUsageType' as usagecategory,
+        c.additionaldetails->>'connectionCategory' as connctionCategory,
+        TO_CHAR(TO_TIMESTAMP(c.createdtime / 1000), 'dd-MM-yyyy') AS createdon,
+        TO_CHAR(TO_TIMESTAMP(s.connectionexecutiondate / 1000), 'dd-MM-yyyy') as executiondate,
+        TO_CHAR(TO_TIMESTAMP(pist.createdtime / 1000), 'dd-MM-yyyy') as paymentdate,
+        e.code AS assignedemployee,
+        TO_CHAR(TO_TIMESTAMP(assigned.createdtime / 1000), 'dd-MM-yyyy') AS assignedon,
+        FLOOR((EXTRACT(EPOCH FROM NOW()) - c.createdtime / 1000) / 86400) AS dayspendency,
+        FLOOR((EXTRACT(EPOCH FROM NOW()) - assigned.createdtime / 1000) / 86400) AS assignedfordays,
+        pt.plotsize,
+        pt.oldpropertyid as oldpropertyid,
+        pt.address as address,
+        pt.localityname as localityname,
+        pt.propertyusagetype as propertyusagetype
+    FROM eg_sw_connection c
+    INNER JOIN (
+    SELECT id, businessid 
+    FROM eg_wf_processinstance_v2 pi
+    WHERE tenantid=$ulb and (businessid, createdtime) IN (
+        SELECT businessid, MAX(createdtime)
+        FROM eg_wf_processinstance_v2 where tenantid=$ulb
+        GROUP BY businessid
+    )
+    ) pi ON pi.businessid = c.applicationno
+    LEFT OUTER JOIN eg_wf_assignee_v2 assigned ON assigned.processinstanceid = pi.id
+    LEFT OUTER JOIN eg_hrms_employee e ON e.uuid = assigned.assignee
+    inner join report_properties pt on (pt.propertyid=c.property_id and pt.propertystatus='ACTIVE')
+    inner join eg_sw_service s on s.connection_id=c.id
+    left outer join eg_wf_processinstance_v2 pist on (pist.businessid=c.applicationno and pist.action='PAY')
+    WHERE c.applicationstatus in ('PENDING_FOR_DOCUMENT_VERIFICATION','PENDING_FOR_FIELD_INSPECTION','PENDING_FOR_APPROVAL','PENDING_APPROVAL_FOR_CONNECTION')
+    and c.createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 9 * 24 * 60 * 60 * 1000)
