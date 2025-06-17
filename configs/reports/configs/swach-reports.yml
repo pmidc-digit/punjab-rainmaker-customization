@@ -308,7 +308,7 @@ ReportDefinitions:
       source: rainmaker-swach
       total: true
     - name: Total
-      label: Unknown
+      label: Total
       type: string
       source: rainmaker-swach
       total: true      
@@ -355,72 +355,72 @@ ReportDefinitions:
       tableName: tbl_def_dept
     sourceColumns:
     - name: department
-      label: department
+      label: Department
       type: string
       source: rainmaker-swach
       total: false
     - name: servicecode
-      label: servicecode
+      label: Servicecode
       type: string
       source: rainmaker-swach
       total: false
     - name: complaintNo
-      label: complaintNo
+      label: Complaint No.
       type: string
       source: rainmaker-swach
       total: false
     - name: date
-      label: date
+      label: Date
       type: string
       source: rainmaker-swach
       total: false
     - name: name
-      label: name
+      label: Name
       type: string
       source: rainmaker-swach
       total: false
     - name: mobileno
-      label: mobileno
+      label: Mob.No.
       type: string
       source: rainmaker-swach
       total: false
     - name: address
-      label: address
+      label: Address
       type: string
       source: rainmaker-swach
       total: false
     - name: landmark
-      label: landmark
+      label: Landmark
       type: string
       source: rainmaker-swach
       total: false
     - name: description
-      label: description
+      label: Description
       type: string
       source: rainmaker-swach
       total: false
     - name: lastassignedto
-      label: lastassignedto
+      label: Last Assigned To
       type: string
       source: rainmaker-swach
       total: false
     - name: status
-      label: status
+      label: Status
       type: string
       source: rainmaker-swach
       total: false
     - name: actiondate
-      label: actiondate
+      label: Action Date
       type: string
       source: rainmaker-swach
       total: false
     - name: source
-      label: source
+      label: Source of Complaint
       type: string
       source: rainmaker-swach
       total: false
     - name: tenantid
-      label: tenantid
+      label: ULB
       type: string
       source: rainmaker-swach
       total: false
@@ -456,6 +456,7 @@ ReportDefinitions:
       SELECT 
       DISTINCT ON (servicerequestid)
       (case when ua.name is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else ua.name end) as lastassignedto,
+      initcap(split_part(ess.tenantid, '.', 2)) as "ULB",
       (SELECT deptmap_def.name FROM (VALUES tbl_def_dept) AS deptmap_def(name,code) INNER JOIN (VALUES tbl_dept) AS deptmap(serviceCode, department, slaHours) on deptmap.serviceCode = ess.servicecode and deptmap_def.code = deptmap.department) AS department, 
       regexp_replace(servicecode, '([a-z])([A-Z])', '\1 \2','g') AS servicecode,
       servicerequestid AS complaintNo, 
@@ -473,7 +474,9 @@ ReportDefinitions:
       left outer join eg_swach_address_v2 esa on ess.id = esa.parentid
       left outer join eg_user on eg_user.uuid::text = ess.createdby
       left outer join eg_pgr_action as epa on epa.businesskey = ess.servicerequestid and epa.action in ('assign','reassign','resolve')
-      left outer join eg_user as ua on (ua.id = epa.assignee::int or ua.id = split_part(epa.by,':',1)::INTEGER)
+      left outer join eg_user as ua on (ua.id = epa.assignee::int 
+      -- or ua.id = split_part(epa.by,':',1)::INTEGER
+      )
       WHERE 
       ess.tenantid !='pb.testing'
       --AND ess.status IN ('open','assigned','reassigrequested','rejected','closed','resolved')
