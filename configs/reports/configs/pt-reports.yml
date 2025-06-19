@@ -2652,7 +2652,7 @@ ReportDefinitions:
                     + SUM(CASE WHEN taxheadcode = 'PT_DECIMAL_CEILING_CREDIT' THEN adjustedamount ELSE 0 END)) as adjustment
                   FROM egcl_billaccountdetail as bad
                   INNER JOIN egcl_billdetial as bd on bd.id = bad.billdetailid and bd.tenantid=bad.tenantid
-                  INNER JOIN egcl_paymentdetail as pd on pd.billid = bd.billid and bd.tenantid=pd.billid
+                  INNER JOIN egcl_paymentdetail as pd on pd.billid = bd.billid and bd.tenantid=pd.tenantid
                   INNER JOIN egcl_payment as payment on pd.paymentid=payment.id and payment.tenantid =bad.tenantid
                   WHERE payment.tenantid = $tenantid and payment.paymentstatus = 'CANCELLED' and  pd.businessservice='PT'
                   GROUP BY pdid
