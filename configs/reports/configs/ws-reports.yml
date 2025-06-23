@@ -3871,7 +3871,7 @@ ReportDefinitions:
       --and pt_addr.propertyid=pt.id 
   orderby: ORDER BY pd.receiptdate DESC;
 
-- reportName: waterPendingSlaApplications
+- reportName: waterPendingSlaReport
   summary:  Water SLA Pendency Report
   version: 1.0.0
   moduleName: rainmaker-ws
@@ -4022,7 +4022,7 @@ ReportDefinitions:
     and c.createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 9 * 24 * 60 * 60 * 1000)
 
 
-- reportName: seweragePendingSlaApplications
+- reportName: seweragePendingSlaReport
   summary:  Sewerage SLA Pendency Report
   version: 1.0.0
   moduleName: rainmaker-ws
@@ -4173,6 +4173,7 @@ ReportDefinitions:
     and c.createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 9 * 24 * 60 * 60 * 1000)
 
 - reportName: waterPendingSlaApplicationsState
+  decryptionPathId: MiscReceiptULB_v2
   summary:  Water SLA Pendency Report
   version: 1.0.0
   moduleName: rainmaker-ws
@@ -4180,8 +4181,18 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
-  - name: tenantid
-    label: reports.ws.tenantid
+  - name: district
+    label: reports.ws.district
+    type: string
+    source: ws
+    total: false
+  - name: ulbname
+    label: reports.ws.ulbname
+    type: string
+    source: ws
+    total: false
+  - name: ulbtype
+    label: reports.ws.ulbtype
     type: string
     source: ws
     total: false
@@ -4235,7 +4246,7 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
-  - name: assignedemployee
+  - name: collectorname
     label: reports.ws.assignedemployee
     type: string
     source: ws
@@ -4291,7 +4302,10 @@ ReportDefinitions:
     searchClause: AND c.tenantid = $ulb
   query: |
     SELECT 
-        c.tenantid as tenantid,
+        --c.tenantid as tenantid,
+        ud.district as district,
+        ud.name_of_ulb as ulbname,
+        ud.type as ulbtype,
         c.applicationno as applicationno,
         c.applicationstatus as applicationstatus,
         c.connectionno as connectionno,
@@ -4302,7 +4316,8 @@ ReportDefinitions:
         TO_CHAR(TO_TIMESTAMP(c.createdtime / 1000), 'dd-MM-yyyy') AS createdon,
         TO_CHAR(TO_TIMESTAMP(s.connectionexecutiondate / 1000), 'dd-MM-yyyy') as executiondate,
         TO_CHAR(TO_TIMESTAMP(pist.createdtime / 1000), 'dd-MM-yyyy') as paymentdate,
-        e.code AS assignedemployee,
+        --e.code AS assignedemployee,
+        u.name as collectorname, -- application currently assigned to employee
         TO_CHAR(TO_TIMESTAMP(assigned.createdtime / 1000), 'dd-MM-yyyy') AS assignedon,
         FLOOR((EXTRACT(EPOCH FROM NOW()) - c.createdtime / 1000) / 86400) AS dayspendency,
         FLOOR((EXTRACT(EPOCH FROM NOW()) - assigned.createdtime / 1000) / 86400) AS assignedfordays,
@@ -4322,15 +4337,18 @@ ReportDefinitions:
     )
     ) pi ON pi.businessid = c.applicationno
     LEFT OUTER JOIN eg_wf_assignee_v2 assigned ON assigned.processinstanceid = pi.id
-    LEFT OUTER JOIN eg_hrms_employee e ON e.uuid = assigned.assignee
+    --LEFT OUTER JOIN eg_hrms_employee e ON e.uuid = assigned.assignee
     inner join report_properties pt on (pt.propertyid=c.property_id and pt.propertystatus='ACTIVE')
     inner join eg_ws_service s on s.connection_id=c.id
+    inner join ulb_data ud on ud.ulb_code=c.tenantid
+    left outer join eg_user u on assigned.assignee=u.uuid
     left outer join eg_wf_processinstance_v2 pist on (pist.businessid=c.applicationno and pist.action='PAY')
     WHERE c.applicationstatus in ('PENDING_FOR_DOCUMENT_VERIFICATION','PENDING_FOR_FIELD_INSPECTION','PENDING_FOR_APPROVAL','PENDING_APPROVAL_FOR_CONNECTION')
     and c.createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 9 * 24 * 60 * 60 * 1000)
 
 
 - reportName: seweragePendingSlaApplicationsState
+  decryptionPathId: MiscReceiptULB_v2
   summary:  Sewerage SLA Pendency Report
   version: 1.0.0
   moduleName: rainmaker-ws
@@ -4338,8 +4356,18 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
-  - name: tenantid
-    label: reports.ws.tenantid
+  - name: district
+    label: reports.ws.district
+    type: string
+    source: ws
+    total: false
+  - name: ulbname
+    label: reports.ws.ulbname
+    type: string
+    source: ws
+    total: false
+  - name: ulbtype
+    label: reports.ws.ulbtype
     type: string
     source: ws
     total: false
@@ -4393,7 +4421,7 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
-  - name: assignedemployee
+  - name: collectorname
     label: reports.ws.assignedemployee
     type: string
     source: ws
@@ -4449,7 +4477,10 @@ ReportDefinitions:
     searchClause: AND c.tenantid = $ulb
   query: |
     SELECT 
-        c.tenantid as tenantid,
+        --c.tenantid as tenantid,
+        ud.district as district,
+        ud.name_of_ulb as ulbname,
+        ud.type as ulbtype,
         c.applicationno as applicationno,
         c.applicationstatus as applicationstatus,
         c.connectionno as connectionno,
@@ -4460,7 +4491,8 @@ ReportDefinitions:
         TO_CHAR(TO_TIMESTAMP(c.createdtime / 1000), 'dd-MM-yyyy') AS createdon,
         TO_CHAR(TO_TIMESTAMP(s.connectionexecutiondate / 1000), 'dd-MM-yyyy') as executiondate,
         TO_CHAR(TO_TIMESTAMP(pist.createdtime / 1000), 'dd-MM-yyyy') as paymentdate,
-        e.code AS assignedemployee,
+        --e.code AS assignedemployee,
+        u.name as collectorname, -- application currently assigned to employee
         TO_CHAR(TO_TIMESTAMP(assigned.createdtime / 1000), 'dd-MM-yyyy') AS assignedon,
         FLOOR((EXTRACT(EPOCH FROM NOW()) - c.createdtime / 1000) / 86400) AS dayspendency,
         FLOOR((EXTRACT(EPOCH FROM NOW()) - assigned.createdtime / 1000) / 86400) AS assignedfordays,
@@ -4480,9 +4512,11 @@ ReportDefinitions:
     )
     ) pi ON pi.businessid = c.applicationno
     LEFT OUTER JOIN eg_wf_assignee_v2 assigned ON assigned.processinstanceid = pi.id
-    LEFT OUTER JOIN eg_hrms_employee e ON e.uuid = assigned.assignee
+    --LEFT OUTER JOIN eg_hrms_employee e ON e.uuid = assigned.assignee
     inner join report_properties pt on (pt.propertyid=c.property_id and pt.propertystatus='ACTIVE')
     inner join eg_sw_service s on s.connection_id=c.id
+    inner join ulb_data ud on ud.ulb_code=c.tenantid
+    left outer join eg_user u on assigned.assignee=u.uuid
     left outer join eg_wf_processinstance_v2 pist on (pist.businessid=c.applicationno and pist.action='PAY')
     WHERE c.applicationstatus in ('PENDING_FOR_DOCUMENT_VERIFICATION','PENDING_FOR_FIELD_INSPECTION','PENDING_FOR_APPROVAL','PENDING_APPROVAL_FOR_CONNECTION')
     and c.createdtime < (EXTRACT(EPOCH FROM now()) * 1000 - 9 * 24 * 60 * 60 * 1000)
