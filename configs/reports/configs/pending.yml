@@ -54,26 +54,26 @@ ReportDefinitions:
     query: |
       select ud.district, ud.name_of_ulb, ud.ulb_code as tenantid, ud.type,
       'WS-Service'  as Service ,ws.applicationstatus 
-      as  ApplicationStatus ,count(ws.applicationno) as applicaitoncount
+      as  ApplicationStatus ,count(ws.applicationno) as applicationcount
       from eg_ws_connection ws inner join ulb_data ud on ws.tenantid = ud.ulb_code
       where ws.connectionno is null and ws.applicationstatus not IN ( 'CONNECTION_ACTIVATED',        
       'INITIATED','REJECTED','PENDING_FOR_PAYMENT','PENDING_FOR_CITIZEN_ACTION') 
       group by ws.applicationstatus, ud.district, ud.name_of_ulb, ud.type ,ud.ulb_code
       UNION
-      select ud.district, ud.name_of_ulb, ud.type, ud.ulb_code as tenantid, 'SW-Service'  as servicename , ws.applicationstatus as ApplicationStatus ,count(applicationno) as applicaitoncount
+      select ud.district, ud.name_of_ulb, ud.type, ud.ulb_code as tenantid, 'SW-Service'  as servicename , ws.applicationstatus as ApplicationStatus ,count(applicationno) as applicationcount
       from eg_ws_connection ws inner join ulb_data ud on ws.tenantid = ud.ulb_code
       where ws.connectionno is null
       and ws.applicationstatus not IN ( 'CONNECTION_ACTIVATED', 'INITIATED','REJECTED','PENDING_FOR_PAYMENT','PENDING_FOR_CITIZEN_ACTION') 
       group by ws.applicationstatus , ud.district, ud.name_of_ulb, ud.type ,ud.ulb_code
       UNION
       select ud.district, ud.name_of_ulb, ud.type, ud.ulb_code as tenantid,'TL-Renewal'  as  servicename, tl.status as ApplicationStatus
-      ,count(applicationnumber) as applicaitoncount
+      ,count(applicationnumber) as applicationcount
       from eg_tl_tradelicense  tl inner join ulb_data ud on tl.tenantid = ud.ulb_code
       where licensenumber IS NULL 
       and status  NOT IN ('INITIATED','REJECTED','PENDINGPAYMENT' , 'APPLIED','CANCELLED')
       group by applicationstatus , ud.district, ud.name_of_ulb, ud.type ,ud.ulb_code
       UNION
-      SELECT ud.district, ud.name_of_ulb, ud.type, ud.ulb_code as tenantid,'FireNoc'  as servicename , detail.status,count(applicationnumber) as applicationnumber
+      SELECT ud.district, ud.name_of_ulb, ud.type, ud.ulb_code as tenantid,'FireNoc'  as servicename , detail.status,count(applicationnumber) as applicationcount
       FROM eg_fn_firenocdetail detail inner join eg_fn_firenoc noc on  detail.firenocuuid = noc.uuid 
       inner join ulb_data ud on noc.tenantid = ud.ulb_code
       WHERE  
