@@ -475,6 +475,12 @@
                 }
               },
               {
+                "variable": "ledgerId",
+                "value": {
+                  "path": "$.connection.additionalDetails.value.ledgerId"
+                }
+              },
+              {
                 "variable": "latePaymentc",
                 "value": {
                   "path": "$.additionalDetails.latePaymentc"
@@ -560,7 +566,7 @@
               {
                 "variable": "taxCharge",
                 "value": {
-                  "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_TAX' || @.taxHeadCode == 'TL_TAX' || @.taxHeadCode == 'FIRENOC_TAXES' || @.taxHeadCode == 'WS_CHARGE' || @.taxHeadCode == 'SW_CHARGE')].amount"
+                  "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_TAX' || @.taxHeadCode == 'TL_TAX' || @.taxHeadCode == 'FIRENOC_TAXES' || @.taxHeadCode == 'WS_CHARGE' || @.taxHeadCode == 'SW_CHARGE' )].amount"
                 }
               },
               {
@@ -690,7 +696,7 @@
             "derived": [
               {
                 "variable": "charge",
-                "formula": "{{ws_charge}}+{{ws_discharge}}"
+                "formula": "{{ws_charge}}"
               },
               {
                 "variable": "penalty",
@@ -714,11 +720,11 @@
               },
               {
                 "variable": "arrears",
-                "formula": "{{billTotalAmount}}>={{demandTotalAmount}}?({{billTotalAmount}}-{{demandTotalAmount}}).toFixed(2):0"
+                "formula": "{{billTotalAmount}}>{{demandTotalAmount}}?({{billTotalAmount}}-{{demandTotalAmount}}).toFixed(2):0"
               },
               {
                 "variable": "advanceAdjusted",
-                "formula": "{{billTotalAmount}}> 0?({{billTotalAmount}}<{{demandTotalAmount}}?({{billTotalAmount}}-{{demandTotalAmount}}).toFixed(2):0):{{demandTotalAmount}} * -1"
+                "formula": "{{billTotalAmount}}>=0?({{billTotalAmount}}<{{demandTotalAmount}}?({{billTotalAmount}}-{{demandTotalAmount}}).toFixed(2):0):{{demandTotalAmount}} * -1"
               },
               {
                 "variable": "advanceAvailable",
@@ -795,10 +801,6 @@
                     "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_CHARGE')].taxAmount"
                   },
                   {
-                    "variable": "ws_discharge",
-                    "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_DISCHARGE_CHARGES')].taxAmount"
-                  },
-                  {
                     "variable": "ws_water_cess",
                     "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_WATER_CESS')].taxAmount"
                   },
@@ -828,6 +830,10 @@
                   {
                     "variable": "houseNo",
                     "value": "$.Properties[0].address.doorNo"
+                  },
+                  {
+                    "variable": "buildingName",
+                    "value": "$.Properties[0].address.buildingName"
                   },
                   {
                     "variable": "streetName",
