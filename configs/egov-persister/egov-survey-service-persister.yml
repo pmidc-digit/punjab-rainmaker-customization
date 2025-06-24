@@ -355,8 +355,8 @@ serviceMaps:
             - jsonPath: $.SurveyResponse.answers.*.auditDetails.createdTime
             - jsonPath: $.SurveyResponse.answers.*.auditDetails.lastModifiedTime
 
-        - query: INSERT INTO eg_ss_answer_detail (uuid, answeruuid, answertype, answercontent, weightage,createdby, lastmodifiedby, createdtime, lastmodifiedtime)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)
+        - query: INSERT INTO eg_ss_answer_detail (uuid, answeruuid, answertype, answercontent, weightage,createdby, lastmodifiedby, createdtime, lastmodifiedtime,userdetails)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?)
             ON CONFLICT (uuid)
             DO UPDATE SET answercontent = EXCLUDED.answercontent,weightage = EXCLUDED.weightage, lastmodifiedtime = EXCLUDED.lastmodifiedtime;
           basePath: SurveyResponse.answers.*.answerDetails.*
@@ -370,3 +370,6 @@ serviceMaps:
             - jsonPath: $.SurveyResponse.answers.*.auditDetails.lastModifiedBy
             - jsonPath: $.SurveyResponse.answers.*.auditDetails.createdTime
             - jsonPath: $.SurveyResponse.answers.*.auditDetails.lastModifiedTime
+            - jsonPath: $.SurveyResponse.answers.*.answerDetails.*.userDetails
+              type: JSON
+              dbType: JSONB
