@@ -5957,18 +5957,6 @@ ReportDefinitions:
     source: pt
     total: false
   searchParams:
-  - name: fromDate
-    label: reports.pt.fromDate
-    type: epoch
-    source: pt
-    isMandatory: false
-    searchClause: AND p.createdtime >= $fromDate
-  - name: toDate
-    label: reports.pt.toDate
-    type: epoch
-    source: pt
-    isMandatory: false
-    searchClause: AND p.createdtime <= $toDate
   - name: ulb
     label: ULB
     type: singlevaluelist
@@ -5984,7 +5972,7 @@ ReportDefinitions:
       on o.userid=u.uuid and o.status='ACTIVE' inner join eg_pt_address as a on p.id=a.propertyid 
       left outer join eg_bndry_mohalla as localnames on a.locality=localnames.localitycode
       where p.tenantid!='pb.testing' and p.status='ACTIVE' 
-      and 
+      and  p.surveyid is not null and 
       o.propertyid in (select id  from eg_pt_property where tenantid!='pb.testing' and status='ACTIVE')
   orderby: ORDER BY p.propertyid
   
