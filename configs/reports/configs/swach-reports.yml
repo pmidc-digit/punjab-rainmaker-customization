@@ -83,6 +83,7 @@ ReportDefinitions:
         INNER JOIN public.eg_user us ON us.uuid = swach.uuid
 
   - reportName: ULBwiseComplaintCountReport
+    decryptionPathId: ULBPTDataDumpReport_V2
     summary: Fetches complaint stats ULB wise
     version: 1.0.0
     moduleName: rainmaker-swach
@@ -94,6 +95,11 @@ ReportDefinitions:
       total: false    
     - name: ULB
       label: ULB
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: ownername
+      label: Name
       type: string
       source: rainmaker-swach
       total: false
@@ -159,6 +165,7 @@ ReportDefinitions:
       select 
       initcap(split_part(sc.tenantid, '.', 2)) as "ULB",
       ulb.district as District,
+      us.name as ownername,
       SUM(CASE WHEN sc.applicationstatus ='PENDINGATLME' THEN 1 ELSE 0 END) as "Pending at LME",
       SUM(CASE WHEN sc.applicationstatus in ('PENDINGATLME','PENDINGFORASSIGNMENT','PENDINGFORREASSIGNMENT') THEN 1 ELSE 0 END) as "Total Pending",
       SUM(CASE WHEN sc.applicationstatus ='PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END) as "PENDING FOR ASSIGNMENT",
@@ -167,9 +174,10 @@ ReportDefinitions:
       SUM(CASE WHEN sc.applicationstatus ='RESOLVED' THEN 1 ELSE 0 END) as "Resolved",
       count(sc.applicationstatus) as "Total"
       from eg_swach_service_v2 sc
+      inner join public.eg_user us ON us.uuid = sc.createdby
       inner join ulb_data ulb on ulb.ulb_code = sc.tenantid
       WHERE sc.tenantid != 'pb.testing'
-    groupby: GROUP BY Tenantid,District
+    groupby: GROUP BY Tenantid,ownername,District
     orderby: ORDER BY Tenantid
 
         
