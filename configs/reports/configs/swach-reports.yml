@@ -177,8 +177,8 @@ ReportDefinitions:
       inner join public.eg_user us ON us.uuid = sc.createdby
       inner join ulb_data ulb on ulb.ulb_code = sc.tenantid
       WHERE sc.tenantid != 'pb.testing'
-    groupby: GROUP BY Tenantid,ownername,District
-    orderby: ORDER BY Tenantid
+    groupby: GROUP BY sc.tenantid,ownername,District
+    orderby: ORDER BY sc.tenantid
 
         
   - reportName: SwachComplaintTypesReport_v2
