@@ -2324,6 +2324,11 @@ ReportDefinitions:
     type: string
     source: pt
     total: false
+  - name: amount
+    label: reports.pt.amount
+    type: string
+    source: pt
+    total: true
   - name: propertytax
     label: reports.pt.propertyTax
     type: string
@@ -2471,7 +2476,7 @@ ReportDefinitions:
       pendingamount as pendingamount,consumercode as consumercode,usagetype as usagetype,
       instrumenttype as instrumenttype,transactionnumber as transactionnumber,transactiondate as transactiondate, 
       bankname as bankname, collectorname as collectorname,financialyear as financialyear,(
-      COALESCE(propertytax, 0) + COALESCE(firecess, 0) +
+      COALESCE(amount, 0) + COALESCE(propertytax, 0) + COALESCE(firecess, 0) +
       COALESCE(cancercess, 0) + COALESCE(rebate, 0) + COALESCE(adhocrebate, 0) +
       COALESCE(penalty, 0) + COALESCE(adhocpenalty, 0) + COALESCE(interest, 0) +
       COALESCE(exemption, 0) + COALESCE(adjustment, 0) + COALESCE(pendingamount, 0)
