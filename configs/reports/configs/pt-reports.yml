@@ -3791,6 +3791,11 @@ ReportDefinitions:
     type: string
     source: pt
     total: false
+  - name: amount
+    lable: reports.pt.amount
+    type: string
+    source: pt
+    total: true
   - name: paymentmode
     label: reports.pt.paymentmode
     type: string
@@ -3914,14 +3919,15 @@ ReportDefinitions:
       SUM(firecess) AS firecess,SUM(cancercess) AS cancercess,SUM(interest) AS interest,
       SUM(penalty) AS penalty,SUM(rebate) AS rebate,SUM(propertytax) AS propertytax,
       SUM(exemption) AS exemption,SUM(adjustment) AS adjustment,SUM(pendingamount) AS pendingamount,
+      SUM(amount) AS amount,
       SUM(CASE WHEN instrumenttype = 'CASH' THEN amount ELSE 0 END) AS sumcash,
       SUM(CASE WHEN instrumenttype = 'CHEQUE' THEN amount ELSE 0 END) AS sumcheque,
       COUNT(DISTINCT CASE WHEN instrumenttype = 'CHEQUE' THEN CONCAT(instrumenttype, amount) END) AS countcheque,
       SUM(CASE WHEN instrumenttype = 'ONLINE' THEN amount ELSE 0 END) AS sumonline,
       CASE WHEN instrumenttype != 'ONLINE' THEN collectorname ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END AS collectorname,
-      ( SUM(COALESCE(adhocpenalty, 0)) + SUM(COALESCE(adhocrebate, 0)) + SUM(COALESCE(firecess, 0)) +
+      ( SUM(COALESCE(adhocpenalty, 0)) + SUM(COALESCE(adhocrebate, 0)) + SUM(COALESCE(amount, 0)) + SUM(COALESCE(firecess, 0)) +
       SUM(COALESCE(cancercess, 0)) +SUM(COALESCE(interest, 0)) +SUM(COALESCE(penalty, 0)) +SUM(COALESCE(rebate, 0)) +
-      SUM(COALESCE(propertytax, 0)) +SUM(COALESCE(exemption, 0)) +
+      SUM(COALESCE(propertytax, 0)) +SUM(COALESCE(exemption, 0)) +SUM(COALESCE(amount,0))+
       SUM(COALESCE(adjustment, 0))+SUM(COALESCE(pendingamount,0))
       ) AS totalamount
 
