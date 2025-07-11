@@ -9996,3 +9996,93 @@ ReportDefinitions:
       and 
       o.propertyid in (select id  from eg_pt_property where tenantid=$tenantid and status='ACTIVE')
   orderby: ORDER BY p.propertyid
+
+- reportName: PTunsynchSummaryReport
+  summary: PT UnSynch Summary Report
+  version: 1.0.0
+  moduleName: rainmaker-pt
+  sourceColumns:
+  - name: fromdate
+    label: reports.pt.fromdate
+    type: string
+    source: pt
+    total: false
+  - name: todate
+    label: reports.pt.todate
+    type: string
+    source: pt
+    total: false
+  - name: propertytax
+    label: reports.pt.propertytax
+    type: string
+    source: pt
+    total: true
+  - name: cancercess
+    label: reports.pt.cancercess
+    type: string
+    source: pt
+    total: true
+  - name: firecess
+    label: reports.pt.firecess
+    type: string
+    source: pt
+    total: true
+  - name: interest
+    label: reports.pt.interest
+    type: string
+    source: pt
+    total: true
+  - name: penalty
+    label: reports.pt.penalty
+    type: string
+    source: pt
+    total: true
+  - name: rebate
+    label: reports.pt.rebate
+    type: string
+    source: pt
+    total: true
+  - name: totalamount
+    label: reports.pt.totalamount
+    type: string
+    source: pt
+    total: true
+  - name: adhocpenalty
+    label: reports.pt.adhocpenalty
+    type: string
+    source: pt
+    total: true
+  - name: adhocrebate
+    label: reports.pt.adhocrebate
+    type: string
+    source: pt
+    total: true
+  searchParams:
+  - name: fromDate
+    label: reports.pt.fromDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND lastmodifiedtime>=$fromDate
+  - name: toDate
+    label: reports.pt.toDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND lastmodifiedtime<=$toDate
+  query: |
+    SELECT 
+      to_char(to_timestamp($fromDate / 1000), 'dd-Mon-YYYY') AS fromdate,
+      to_char(to_timestamp($toDate / 1000), 'dd-Mon-YYYY') AS todate,
+      sum(propertytax) as propertytax,
+      SUM(cancercess) AS cancercess,
+      SUM(firecess) AS firecess,
+      sum(interest) as interest,
+      sum(penalty) as penalty,
+      sum(rebate) as rebate,
+      sum(totalamount) as totalamount,
+      sum(adhocpenalty) as adhocpenalty,
+      sum(adhocrebate) as adhocrebate
+      FROM report_assessments
+      WHERE tenantid = $tenantid 
+      and paymentstatus!='CANCELLED'
