@@ -10072,8 +10072,8 @@ ReportDefinitions:
     searchClause: AND lastmodifiedtime<=$toDate
   query: |
     SELECT 
-      to_char(to_timestamp($fromDate / 1000), 'dd-Mon-YYYY') AS fromdate,
-      to_char(to_timestamp($toDate / 1000), 'dd-Mon-YYYY') AS todate,
+      to_char((To_timestamp($fromDate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY')  AS fromdate,
+      to_char((To_timestamp($toDate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') AS todate,
       sum(propertytax) as propertytax,
       SUM(cancercess) AS cancercess,
       SUM(firecess) AS firecess,
