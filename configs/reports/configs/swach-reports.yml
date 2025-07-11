@@ -117,6 +117,11 @@ ReportDefinitions:
       type: string
       source: rainmaker-swach
       total: true
+    - name: Pending %
+      label: Pending %
+      type: string
+      source: rainmaker-swach
+      total: true
     - name: PENDING FOR ASSIGNMENT
       label: PENDING FOR ASSIGNMENT
       type: string
@@ -166,6 +171,9 @@ ReportDefinitions:
       SUM(CASE WHEN sc.applicationstatus ='REJECTED' THEN 1 ELSE 0 END) as "Rejected",
       SUM(CASE WHEN sc.applicationstatus ='RESOLVED' THEN 1 ELSE 0 END) as "Resolved",
       count(sc.applicationstatus) as "Total"
+      ROUND(
+        ( SUM(CASE WHEN sc.applicationstatus IN ('PENDINGATLME','PENDINGFORASSIGNMENT','PENDINGFORREASSIGNMENT') THEN 1 ELSE 0 END)::numeric 
+            / NULLIF(COUNT(sc.applicationstatus), 0) ) * 100, 2 )::text || '%' AS "Pending %"
       from eg_swach_service_v2 sc
       inner join ulb_data ulb on ulb.ulb_code = sc.tenantid
       WHERE sc.tenantid != 'pb.testing'
