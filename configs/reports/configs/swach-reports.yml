@@ -170,7 +170,7 @@ ReportDefinitions:
       SUM(CASE WHEN sc.applicationstatus ='PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END) as "PENDING FOR REASSIGNMENT",
       SUM(CASE WHEN sc.applicationstatus ='REJECTED' THEN 1 ELSE 0 END) as "Rejected",
       SUM(CASE WHEN sc.applicationstatus ='RESOLVED' THEN 1 ELSE 0 END) as "Resolved",
-      count(sc.applicationstatus) as "Total"
+      count(sc.applicationstatus) as "Total" ,
       ROUND(
         ( SUM(CASE WHEN sc.applicationstatus IN ('PENDINGATLME','PENDINGFORASSIGNMENT','PENDINGFORREASSIGNMENT') THEN 1 ELSE 0 END)::numeric 
             / NULLIF(COUNT(sc.applicationstatus), 0) ) * 100, 2 )::text || '%' AS "Pending %"
