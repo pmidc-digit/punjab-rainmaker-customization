@@ -172,8 +172,14 @@ ReportDefinitions:
       SUM(CASE WHEN sc.applicationstatus ='RESOLVED' THEN 1 ELSE 0 END) as "Resolved",
       count(sc.applicationstatus) as "Total" ,
       ROUND(
-        ( SUM(CASE WHEN sc.applicationstatus IN ('PENDINGATLME','PENDINGFORASSIGNMENT','PENDINGFORREASSIGNMENT') THEN 1 ELSE 0 END)::numeric 
-            / NULLIF(COUNT(sc.applicationstatus), 0) ) * 100, 2 )::text || '%' AS "Pending %"
+        (
+          (SUM(CASE 
+            WHEN sc.applicationstatus IN ('PENDINGATLME', 'PENDINGFORASSIGNMENT', 'PENDINGFORREASSIGNMENT') 
+            THEN 1 ELSE 0 END))::numeric
+          / NULLIF(COUNT(sc.applicationstatus), 0)
+        ) * 100, 2
+      )::text
+       END AS "PENDING %"
       from eg_swach_service_v2 sc
       inner join ulb_data ulb on ulb.ulb_code = sc.tenantid
       WHERE sc.tenantid != 'pb.testing'
