@@ -15,7 +15,7 @@ ReportDefinitions:
     source: ws
     total: false
   - name: connectionno
-    label: reports.ws.connectionno
+    label: reports..connectionno
     type: string
     source: ws
     total: false 
@@ -2184,66 +2184,91 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
-  - name: usagecat
-    label: reports.ws.usagecat
+  - name: usagecategory
+    label: reports.ws.usagecategory
     type: string
     source: ws
     total: false
-  - name: zonename
-    label: reports.ws.zonename
+  - name: amtpaid
+    label: reports.ws.amtpaid
     type: string
     source: ws
     total: false
-  - name: propertyid
-    label: reports.ws.propertyid
+  - name: bill_status
+    label: reports.ws.bill_status
     type: string
     source: ws
     total: false
-  - name: address
-    label: reports.ws.address
+  - name: locality
+    label: reports.ws.locality
     type: string
     source: ws
     total: false
-  - name: blockname
-    label: reports.ws.blockname
+  - name: payeraddress
+    label: reports.ws.payeraddress
     type: string
     source: ws
     total: false
-  - name: total_tax_amount
-    label: reports.ws.total_tax_amount
+  - name: mobilenumber
+    label: reports.ws.mobilenumber
     type: string
     source: ws
-    total: true
+    total: false
+  - name: payername
+    label: reports.ws.payername
+    type: string
+    source: ws
+    total: false
+  - name: finyear
+    label: reports.ws.finyear
+    type: string
+    source: ws
+    total: false
+  searchParams:
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: ws
+        isMandatory: true
+        searchClause: wc.tenantid = $tenantid
   query: |
-    WITH demand_summary AS (
-    SELECT 
-        consumercode, 
-        SUM(minimumamountpayable) AS total_tax_amount
-    FROM 
-        egbs_demand_v1
-    WHERE 
-        businessservice = 'WS'
-        AND tenantid =  $tenantid
-        AND ispaymentcompleted = 'false'
-        AND status = 'ACTIVE'
-        AND minimumamountpayable != 0
-    GROUP BY 
-        consumercode
-    )
-    SELECT 
-        ws.connectionno AS consumercode, 
-        addd.propertyusagetype AS usagecat, 
-        addd.zonename,
-        addd.propertyid,
-        addd.address,
-        addd.blockname,
-        demand_summary.total_tax_amount
-    FROM 
-        eg_ws_connection AS ws
-    JOIN 
-        demand_summary ON ws.connectionno = demand_summary.consumercode
-    JOIN 
-        report_properties AS addd ON ws.property_id = addd.propertyid
+      WITH cte AS (
+      SELECT 
+        to_char(
+            (to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') || '-' || 
+        to_char(
+            (to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM' ) AS finyear,
+        pt.usagecategory,wc.connectionno,wc.property_id,
+        wc.locality,  bill.billid,bill.totalamount,
+        bill.consumercode, wc.status AS wc_status, pt.landarea,
+        b.payername AS payername,  b.status AS bill_status,b.payeraddress,  b.mobilenumber   
+       FROM 
+        eg_ws_connection wc
+        JOIN eg_pt_property pt 
+            ON wc.property_id = pt.propertyid
+            AND wc.status = 'Active'
+            AND pt.status IN ('ACTIVE', 'PENDINGWS')
+        INNER JOIN egbs_billdetail_v1 bill 
+            ON bill.consumercode = wc.connectionno
+            AND wc.status = 'Active'
+            AND bill.businessservice = 'WS'
+        JOIN egbs_bill_v1 b 
+            ON bill.billid = b.id
+       WHERE 
+        wc.tenantid = $tenantid
+        AND wc.connectionno IS NOT NULL
+        AND bill.businessservice = 'WS'
+        AND pt.usagecategory IN ('RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL', 'MIXED')
+        )SELECT 
+        cte.consumercode, cte.usagecategory,
+        SUM(cte.totalamount) AS amtpaid, cte.bill_status,
+        cte.locality,  cte.payeraddress,    cte.mobilenumber,  
+        cte.payername,   STRING_AGG(cte.finyear, ', ') AS finyear  
+        FROM 
+        cte
+       WHERE  cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED')
+       groupby:  GROUP BY  cte.consumercode,  cte.bill_status, cte.payername,  
+       cte.usagecategory,cte.locality, cte.mobilenumber, cte.payeraddress;  
             
 - reportName: SwDefaulterReport
   summary: Sw Defaulter Report
