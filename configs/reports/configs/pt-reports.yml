@@ -2765,7 +2765,7 @@ ReportDefinitions:
         WHERE payment.paymentstatus::text <> 'CANCELLED'::text AND pd.businessservice::text = 'PT'::text 
         AND payment.tenantid::text = pd.tenantid::text 
         AND pd.receiptdate >= (EXTRACT(EPOCH FROM (now() - INTERVAL '30 days')) * 1000)::bigint
-        AND pd.receiptdate <= (EXTRACT(EPOCH FROM now()) * 1000)::bigint AND tenantid=$tenantid
+        AND pd.receiptdate <= (EXTRACT(EPOCH FROM now()) * 1000)::bigint AND pd.tenantid=$tenantid
   
     orderby: ORDER BY receiptnumber DESC;
   - reportName: CancelledReceiptRegister_V2
