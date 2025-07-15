@@ -2318,3 +2318,102 @@ ReportDefinitions:
       (SELECT propertyid FROM eg_pt_property WHERE landarea >= 251 AND status IN ('ACTIVE', 'PENDINGWS') AND tenantid = $tenantid) AND wc.status = 'Active' AND wc.tenantid = $tenantid AND wc.connectionno IS NOT NULL) r,
       (SELECT COUNT(sc.connectionno) AS morethantenmarlasewerage FROM eg_sw_connection sc WHERE sc.property_id IN 
       (SELECT propertyid FROM eg_pt_property WHERE landarea >= 251 AND status IN ('ACTIVE', 'PENDINGWS') AND tenantid = $tenantid) AND sc.status = 'Active' AND sc.tenantid = $tenantid AND sc.connectionno IS NOT NULL) s
+
+- reportName: WsDefaulterReport
+  summary: Ws Defaulter Report
+  version: 1.0.0
+  moduleName: rainmaker-ws
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: consumercode
+    label: reports.ws.consumercode
+    type: string
+    source: ws
+    total: false
+  - name: usagecategory
+    label: reports.ws.usagecategory
+    type: string
+    source: ws
+    total: false
+  - name: amtpaid
+    label: reports.ws.amtpaid
+    type: string
+    source: ws
+    total: false
+  - name: bill_status
+    label: reports.ws.bill_status
+    type: string
+    source: ws
+    total: false
+  - name: locality
+    label: reports.ws.locality
+    type: string
+    source: ws
+    total: false
+  - name: payeraddress
+    label: reports.ws.payeraddress
+    type: string
+    source: ws
+    total: false
+  - name: mobilenumber
+    label: reports.ws.mobilenumber
+    type: string
+    source: ws
+    total: false
+  - name: payername
+    label: reports.ws.payername
+    type: string
+    source: ws
+    total: false
+  - name: finyear
+    label: reports.ws.finyear
+    type: string
+    source: ws
+    total: false
+  searchParams:
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: ws
+        isMandatory: true
+        searchClause: wc.tenantid = $tenantid
+  query: |
+      WITH cte AS (
+      SELECT 
+        to_char(
+            (to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') || '-' || 
+        to_char(
+            (to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM' ) AS finyear,
+        pt.usagecategory,wc.connectionno,wc.property_id,
+        wc.locality,  bill.billid,bill.totalamount,
+        bill.consumercode, wc.status AS wc_status, pt.landarea,
+        b.payername AS payername,  b.status AS bill_status,b.payeraddress,  b.mobilenumber   
+       FROM 
+        eg_ws_connection wc
+        JOIN eg_pt_property pt 
+            ON wc.property_id = pt.propertyid
+            AND wc.status = 'Active'
+            AND pt.status IN ('ACTIVE', 'PENDINGWS')
+        INNER JOIN egbs_billdetail_v1 bill 
+            ON bill.consumercode = wc.connectionno
+            AND wc.status = 'Active'
+            AND bill.businessservice = 'WS'
+        JOIN egbs_bill_v1 b 
+            ON bill.billid = b.id
+       WHERE 
+        wc.tenantid = $tenantid
+        AND wc.connectionno IS NOT NULL
+        AND bill.businessservice = 'WS'
+        AND pt.usagecategory IN ('RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL', 'MIXED'))
+        SELECT 
+        cte.consumercode, cte.usagecategory,
+        SUM(cte.totalamount) AS amtpaid, cte.bill_status,
+        cte.locality,  cte.payeraddress,    cte.mobilenumber,  
+        cte.payername,   STRING_AGG(cte.finyear, ', ') AS finyear  
+        FROM 
+        cte
+       WHERE  cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED')
+  groupby:  GROUP BY  cte.consumercode,  cte.bill_status, cte.payername,  
+       cte.usagecategory,cte.locality, cte.mobilenumber, cte.payeraddress;  
