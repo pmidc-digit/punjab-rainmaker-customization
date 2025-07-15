@@ -2380,9 +2380,7 @@ ReportDefinitions:
         isMandatory: true
         searchClause: wc.tenantid = $tenantid
     query: |
-      WITH cte AS (
-
-      SELECT 
+      WITH cte AS ( SELECT
         to_char(
             (to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') || '-' || 
         to_char(
@@ -2416,5 +2414,4 @@ ReportDefinitions:
         FROM 
         cte
        WHERE  cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED')
-    groupby: GROUP BY  cte.consumercode,  cte.bill_status, cte.payername,
-      cte.usagecategory,cte.locality, cte.mobilenumber, cte.payeraddress;
+    groupby: GROUP BY  cte.consumercode,  cte.bill_status, cte.payername, cte.usagecategory,cte.locality, cte.mobilenumber, cte.payeraddress;
