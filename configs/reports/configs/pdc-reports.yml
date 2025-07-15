@@ -52,13 +52,13 @@ ReportDefinitions:
   - name: fromDate
     label: fromDate
     type: epoch
-    source: rainmaker-pdc
-    isMandatory: true
+    source: pt
+    isMandatory: false
     searchClause: AND pd.receiptdate >= $fromDate
   - name: tenantid
     label: tenantid
     type: string
-    source: rainmaker-pdc
+    source: pt
     isMandatory: false
     searchClause: AND d.tenantid = $tenantid
   query: |
@@ -122,13 +122,13 @@ ReportDefinitions:
   - name: fromDate
     label: fromDate
     type: epoch
-    source: rainmaker-pdc
-    isMandatory: true
+    source: pt
+    isMandatory: false
     searchClause: AND billdate > $fromDate
   - name: tenantid
     label: tenantid
     type: string
-    source: rainmaker-pdc
+    source: pt
     isMandatory: false
     searchClause: AND d.tenantid = $tenantid
   query: |
