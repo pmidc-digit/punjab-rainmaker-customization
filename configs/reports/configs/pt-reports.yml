@@ -2560,7 +2560,7 @@ ReportDefinitions:
         total: false
     searchParams:
       - name: fromDate
-        label: reports.pt.fromDate
+        label: Only 30 days data fetch
         type: epoch
         source: pt
         isMandatory: true
@@ -2765,9 +2765,8 @@ ReportDefinitions:
         WHERE payment.paymentstatus::text <> 'CANCELLED'::text AND pd.businessservice::text = 'PT'::text 
         AND payment.tenantid::text = pd.tenantid::text 
         AND pd.receiptdate >= (EXTRACT(EPOCH FROM (now() - INTERVAL '30 days')) * 1000)::bigint
-        AND pd.receiptdate <= (EXTRACT(EPOCH FROM now()) * 1000)::bigint
+        AND pd.receiptdate <= (EXTRACT(EPOCH FROM now()) * 1000)::bigint AND tenantid=$tenantid
   
-      where tenantid=$tenantid
     orderby: ORDER BY receiptnumber DESC;
   - reportName: CancelledReceiptRegister_V2
     decryptionPathId: CancelledReceiptRegister_V2
