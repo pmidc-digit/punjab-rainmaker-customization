@@ -2380,28 +2380,28 @@ ReportDefinitions:
         isMandatory: true
         searchClause: wc.tenantid = $tenantid
     query: |
-      WITH cte AS ( SELECT
+        WITH cte AS ( SELECT
         to_char(
-            (to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') || '-' || 
+        (to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') || '-' || 
         to_char(
-            (to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM' ) AS finyear,
+        (to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM' ) AS finyear,
         pt.usagecategory,wc.connectionno,wc.property_id,
         wc.locality,  bill.billid,bill.totalamount,
         bill.consumercode, wc.status AS wc_status, pt.landarea,
         b.payername AS payername,  b.status AS bill_status,b.payeraddress,  b.mobilenumber   
-       FROM 
+        FROM 
         eg_ws_connection wc
         JOIN eg_pt_property pt 
-            ON wc.property_id = pt.propertyid
-            AND wc.status = 'Active'
-            AND pt.status IN ('ACTIVE', 'PENDINGWS')
+        ON wc.property_id = pt.propertyid
+        AND wc.status = 'Active'
+        AND pt.status IN ('ACTIVE', 'PENDINGWS')
         INNER JOIN egbs_billdetail_v1 bill 
-            ON bill.consumercode = wc.connectionno
-            AND wc.status = 'Active'
-            AND bill.businessservice = 'WS'
+        ON bill.consumercode = wc.connectionno
+        AND wc.status = 'Active'
+        AND bill.businessservice = 'WS'
         JOIN egbs_bill_v1 b 
-            ON bill.billid = b.id
-       WHERE 
+        ON bill.billid = b.id
+        WHERE 
         wc.tenantid = $tenantid
         AND wc.connectionno IS NOT NULL
         AND bill.businessservice = 'WS'
@@ -2412,6 +2412,5 @@ ReportDefinitions:
         cte.locality,  cte.payeraddress,    cte.mobilenumber,  
         cte.payername,   STRING_AGG(cte.finyear, ', ') AS finyear  
         FROM 
-        cte
-       WHERE  cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED')
-    groupby: GROUP BY  cte.consumercode,  cte.bill_status, cte.payername, cte.usagecategory,cte.locality, cte.mobilenumber, cte.payeraddress;
+        cte WHERE  cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED')
+    groupby: GROUP BY  cte.consumercode,  cte.bill_status, cte.payername, cte.usagecategory,cte.locality, cte.mobilenumber, cte.payeraddress
