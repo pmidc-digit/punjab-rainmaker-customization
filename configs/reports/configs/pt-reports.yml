@@ -10017,6 +10017,11 @@ ReportDefinitions:
     type: string
     source: pt
     total: true
+  - name: exemption
+    label: reports.pt.exemption
+    type: string
+    source: pt
+    total: true  
   - name: cancercess
     label: reports.pt.cancercess
     type: string
@@ -10075,6 +10080,7 @@ ReportDefinitions:
       to_char((To_timestamp($fromDate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY')  AS fromdate,
       to_char((To_timestamp($toDate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') AS todate,
       sum(propertytax) as propertytax,
+      sum(exemption) as exemption,
       SUM(cancercess) AS cancercess,
       SUM(firecess) AS firecess,
       sum(interest) as interest,
