@@ -2594,7 +2594,179 @@ ReportDefinitions:
       adhocpenalty as adhocpenalty,interest as interest,exemption as exemption,adjustment as adjustment,
       pendingamount as pendingamount,consumercode as consumercode,usagetype as usagetype,
       instrumenttype as instrumenttype,transactionnumber as transactionnumber,transactiondate as transactiondate, 
-      bankname as bankname, collectorname as collectorname,financialyear as financialyear from public.pt_receipt_summary 
+      bankname as bankname, collectorname as collectorname,financialyear as financialyear from 
+       WITH receipt_breakup AS (
+               SELECT pd_1.id AS pdid,
+                  sum(
+                      CASE
+                          WHEN bad.taxheadcode::text = 'PT_ADHOC_PENALTY'::text THEN bad.adjustedamount
+                          ELSE 0::numeric
+                      END) AS adhocpenalty,
+                  sum(
+                      CASE
+                          WHEN bad.taxheadcode::text = 'PT_ADHOC_REBATE'::text THEN bad.adjustedamount
+                          ELSE 0::numeric
+                      END) AS adhocrebate,
+                  sum(
+                      CASE
+                          WHEN bad.taxheadcode::text = 'PT_FIRE_CESS'::text THEN bad.adjustedamount
+                          ELSE 0::numeric
+                      END) AS firecess,
+                  sum(
+                      CASE
+                          WHEN bad.taxheadcode::text = 'PT_CANCER_CESS'::text THEN bad.adjustedamount
+                          ELSE 0::numeric
+                      END) AS cancercess,
+              sum(
+                  CASE
+                      WHEN bad.taxheadcode::text = 'PT_TIME_INTEREST'::text THEN bad.adjustedamount
+                      ELSE 0::numeric
+                  END) AS interest,
+              sum(
+                  CASE
+                      WHEN bad.taxheadcode::text = 'PT_TIME_PENALTY'::text THEN bad.adjustedamount
+                      ELSE 0::numeric
+                  END) AS penalty,
+              sum(
+                  CASE
+                      WHEN bad.taxheadcode::text = 'PT_TIME_REBATE'::text THEN bad.adjustedamount
+                      ELSE 0::numeric
+                  END) AS rebate,
+              sum(
+                  CASE
+                      WHEN bad.taxheadcode::text = 'PT_TAX'::text THEN bad.amount
+                      ELSE 0::numeric
+                  END) AS propertytax,
+              sum(
+                  CASE
+                      WHEN bad.taxheadcode::text = 'PT_TAX'::text THEN bad.adjustedamount
+                      ELSE 0::numeric
+                  END) AS paidpropertytax,
+              sum(
+                  CASE
+                      WHEN bad.taxheadcode::text = 'PT_UNIT_USAGE_EXEMPTION'::text THEN bad.amount
+                      ELSE 0::numeric
+                  END) + sum(
+                  CASE
+                      WHEN bad.taxheadcode::text = 'PT_OWNER_EXEMPTION'::text THEN bad.amount
+                      ELSE 0::numeric
+                  END) AS exemption,
+              sum(
+                  CASE
+                      WHEN bad.taxheadcode::text = 'PT_ROUNDOFF'::text THEN bad.adjustedamount
+                      ELSE 0::numeric
+                  END) + sum(
+                  CASE
+                      WHEN bad.taxheadcode::text = 'PT_DECIMAL_CEILING_DEBIT'::text THEN bad.adjustedamount
+                      ELSE 0::numeric
+                  END) + sum(
+                  CASE
+                      WHEN bad.taxheadcode::text = 'PT_DECIMAL_CEILING_CREDIT'::text THEN bad.adjustedamount
+                      ELSE 0::numeric
+                  END) AS adjustment
+             FROM egcl_billaccountdetail bad
+               JOIN egcl_billdetial bd ON bd.id::text = bad.billdetailid::text AND bd.tenantid::text = bad.tenantid::text
+               JOIN egcl_paymentdetail pd_1 ON pd_1.billid::text = bd.billid::text AND bd.tenantid::text = pd_1.tenantid::text
+               JOIN egcl_payment payment_1 ON pd_1.paymentid::text = payment_1.id::text AND payment_1.tenantid::text = bad.tenantid::text
+            WHERE payment_1.paymentstatus::text <> 'CANCELLED'::text AND pd_1.businessservice::text = 'PT'::text 
+       AND  pd_1.receiptdate >= (EXTRACT(EPOCH FROM (now() - INTERVAL '30 days')) * 1000)::bigint
+        AND pd_1.receiptdate <= (EXTRACT(EPOCH FROM now()) * 1000)::bigint          
+      GROUP BY pd_1.id
+              )
+       SELECT pd.tenantid, pd.id,
+          pt.propertyid AS consumercode,
+          pt.surveyid,
+          to_char((to_timestamp((pd.receiptdate / 1000)::double precision) AT TIME ZONE 'Asia/Kolkata'::text), 'DD-MM-YYYY'::text) AS receiptdate,
+          concat(bank_branches.bank_name, ' ', bank_branches.branch) AS bankname,
+          pd.receiptnumber,
+          payment.totalamountpaid AS amount,
+          payment.paymentmode AS instrumenttype,
+          payment.transactionnumber,
+          concat(to_char((to_timestamp((get_fromperiod(pd.billid) / 1000)::double precision) AT TIME ZONE 'Asia/Kolkata'::text), 'YYYY'::text), '-',       to_char((to_timestamp((get_toperiod(pd.billid) / 1000)::double precision) AT TIME ZONE 'Asia/Kolkata'::text), 'YY'::text)) AS financialyear,
+          to_char((to_timestamp((payment.instrumentdate / 1000)::double precision) AT TIME ZONE 'Asia/Kolkata'::text), 'DD-MM-YYYY'::text) AS transactiondate,
+          payment.totaldue - payment.totalamountpaid AS pendingamount,
+          initcap(
+              CASE
+                  WHEN pt.usagecategory::text ~~ '%.%'::text THEN split_part(pt.usagecategory::text, '.'::text, 2)::character varying
+                  ELSE pt.usagecategory
+              END::text) AS usagetype,
+          COALESCE(eg_user.name, '30048|21Fj+c3k2ldB0X3AzIh7atXB'::character varying) AS collectorname,
+          receipt_breakup.pdid,
+          receipt_breakup.adhocpenalty,
+          receipt_breakup.adhocrebate,
+          receipt_breakup.firecess,
+          receipt_breakup.cancercess,
+          receipt_breakup.interest,
+          receipt_breakup.penalty,
+          receipt_breakup.rebate,
+          receipt_breakup.propertytax,
+          receipt_breakup.paidpropertytax,
+          receipt_breakup.exemption,
+          receipt_breakup.adjustment,
+          to_char((to_timestamp((pd.manualreceiptdate / 1000)::double precision) AT TIME ZONE 'Asia/Kolkata'::text), 'DD-MM-YYYY'::text) AS g8issuedate,
+          pd.manualreceiptnumber AS g8receiptno
+         FROM egcl_paymentdetail pd
+           LEFT JOIN eg_user ON eg_user.id = pd.createdby::integer
+           LEFT JOIN egcl_payment payment ON pd.paymentid::text = payment.id::text
+           LEFT JOIN bank_branches ON bank_branches.ifsc::text = payment.ifsccode::text
+           LEFT JOIN egcl_bill bill ON bill.id::text = pd.billid::text AND bill.tenantid::text = pd.tenantid::text
+           LEFT JOIN ( SELECT pts.id,
+                  pts.propertyid,
+                  pts.tenantid,
+                  pts.surveyid,
+                  pts.accountid,
+                  pts.oldpropertyid,
+                  pts.status,
+                  pts.acknowldgementnumber,
+                  pts.propertytype,
+                  pts.ownershipcategory,
+                  pts.usagecategory,
+                  pts.creationreason,
+                  pts.nooffloors,
+                  pts.landarea,
+                  pts.superbuiltuparea,
+                  pts.linkedproperties,
+                  pts.source,
+                  pts.channel,
+                  pts.createdby,
+                  pts.lastmodifiedby,
+                  pts.createdtime,
+                  pts.lastmodifiedtime,
+                  pts.additionaldetails,
+                  pts.rw
+                 FROM ( SELECT eg_pt_property.id,
+                          eg_pt_property.propertyid,
+                          eg_pt_property.tenantid,
+                          eg_pt_property.surveyid,
+                          eg_pt_property.accountid,
+                          eg_pt_property.oldpropertyid,
+                          eg_pt_property.status,
+                          eg_pt_property.acknowldgementnumber,
+                          eg_pt_property.propertytype,
+                          eg_pt_property.ownershipcategory,
+                          eg_pt_property.usagecategory,
+                          eg_pt_property.creationreason,
+                          eg_pt_property.nooffloors,
+                          eg_pt_property.landarea,
+                          eg_pt_property.superbuiltuparea,
+                          eg_pt_property.linkedproperties,
+                          eg_pt_property.source,
+                          eg_pt_property.channel,
+                          eg_pt_property.createdby,
+                          eg_pt_property.lastmodifiedby,
+                          eg_pt_property.createdtime,
+                          eg_pt_property.lastmodifiedtime,
+                          eg_pt_property.additionaldetails,
+                          row_number() OVER (PARTITION BY eg_pt_property.propertyid ORDER BY eg_pt_property.lastmodifiedtime DESC) AS rw
+                         FROM eg_pt_property
+                        WHERE 1 = 1) pts
+                WHERE pts.rw = 1) pt ON pt.propertyid::text = bill.consumercode::text
+           LEFT JOIN receipt_breakup ON receipt_breakup.pdid::text = pd.id::text
+        WHERE payment.paymentstatus::text <> 'CANCELLED'::text AND pd.businessservice::text = 'PT'::text 
+        AND payment.tenantid::text = pd.tenantid::text 
+        AND pd.receiptdate >= (EXTRACT(EPOCH FROM (now() - INTERVAL '30 days')) * 1000)::bigint
+        AND pd.receiptdate <= (EXTRACT(EPOCH FROM now()) * 1000)::bigint
+  
       where tenantid=$tenantid
     orderby: ORDER BY receiptnumber DESC;
   - reportName: CancelledReceiptRegister_V2
