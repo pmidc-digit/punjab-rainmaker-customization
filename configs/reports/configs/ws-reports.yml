@@ -2386,7 +2386,7 @@ ReportDefinitions:
         to_char(
         (to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM' ) AS finyear,
         pt.usagecategory,wc.connectionno,wc.property_id,
-        wc.locality,  bill.billid,bill.totalamount,
+        wc.locality,  bill.billid,bill.totalamount,wc.tenantid AS tenantid,
         bill.consumercode, wc.status AS wc_status, pt.landarea,
         b.payername AS payername,  b.status AS bill_status,b.payeraddress,  b.mobilenumber   
         FROM 
@@ -2402,8 +2402,7 @@ ReportDefinitions:
         JOIN egbs_bill_v1 b 
         ON bill.billid = b.id
         WHERE 
-        wc.tenantid = $tenantid
-        AND wc.connectionno IS NOT NULL
+        wc.connectionno IS NOT NULL
         AND bill.businessservice = 'WS'
         AND pt.usagecategory IN ('RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL', 'MIXED'))
         SELECT 
@@ -2412,5 +2411,5 @@ ReportDefinitions:
         cte.locality,  cte.payeraddress,    cte.mobilenumber,  
         cte.payername,   STRING_AGG(cte.finyear, ', ') AS finyear  
         FROM 
-        cte WHERE  cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED')
+        cte WHERE  cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED') AND cte.tenantid = $tenantid
     groupby: GROUP BY  cte.consumercode,  cte.bill_status, cte.payername, cte.usagecategory,cte.locality, cte.mobilenumber, cte.payeraddress
