@@ -11,54 +11,54 @@ ReportDefinitions:
   - name: tenantid
     label: tenantid
     type: string
-    source: pdc
+    source: rainmaker-pdc
     total: false
   - name: district
     label: district
     type: string
-    source: pdc
+    source: rainmaker-pdc
     total: false
   - name: property_id
     label: property_id
     type: string
-    source: pdc
+    source: rainmaker-pdc
     total: false
   - name: amount_paid
     label: amount_paid
     type: string
-    source: pdc
+    source: rainmaker-pdc
     total: false
   - name: receipt_date
     label: receipt_date
     type: string
-    source: pdc
+    source: rainmaker-pdc
     total: false
   - name: receiptnumber
     label: receiptnumber
     type: string
-    source: pdc
+    source: rainmaker-pdc
     total: false
   - name: paymentstatus
     label: paymentstatus
     type: string
-    source: pdc
+    source: rainmaker-pdc
     total: false
   - name: paymentmode
     label: paymentmode
     type: string
-    source: pdc
+    source: rainmaker-pdc
     total: false
   searchParams:
   - name: fromDate
     label: fromDate
     type: epoch
-    source: pdc
+    source: rainmaker-pdc
     isMandatory: true
     searchClause: AND pd.receiptdate >= $fromDate
   - name: tenantid
     label: tenantid
     type: string
-    source: pdc
+    source: rainmaker-pdc
     isMandatory: false
     searchClause: AND d.tenantid = $tenantid
   query: |
@@ -106,29 +106,29 @@ ReportDefinitions:
   - name: tenantid
     label: tenantid
     type: string
-    source: pdc
+    source: rainmaker-pdc
     total: false
   - name: district
     label: district
     type: string
-    source: pdc
+    source: rainmaker-pdc
     total: false
   - name: property_id
     label: property_id
     type: string
-    source: pdc
+    source: rainmaker-pdc
     total: false
   searchParams:
   - name: fromDate
     label: fromDate
     type: epoch
-    source: pt
+    source: rainmaker-pdc
     isMandatory: true
     searchClause: AND billdate > $fromDate
   - name: tenantid
     label: tenantid
     type: string
-    source: pt
+    source: rainmaker-pdc
     isMandatory: false
     searchClause: AND d.tenantid = $tenantid
   query: |
