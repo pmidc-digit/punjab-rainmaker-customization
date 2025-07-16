@@ -6537,7 +6537,7 @@ ReportDefinitions:
       -- Use CTE to force query plan, compute & use CTE later
        WITH defaulters AS (
        SELECT tenantid, property_id
-         FROM public.pt_defaulter_ids
+         FROM pt_defaulter_ids
           ),
        bill_info AS (
        SELECT 
@@ -6606,7 +6606,7 @@ ReportDefinitions:
        -- Use CTE to force query plan, compute & use CTE later
        WITH defaulters AS (
        SELECT tenantid, property_id
-       FROM public.pt_defaulter_ids
+       FROM pt_defaulter_ids
        ),
        bills_after_april AS (
        SELECT tenantid, consumercode AS property_id
