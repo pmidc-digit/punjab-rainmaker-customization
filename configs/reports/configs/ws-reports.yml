@@ -2372,22 +2372,6 @@ ReportDefinitions:
         type: string
         source: ws
         total: false
-    searchParams:
-      - name: tenantid
-        label: tenantid
-        type: string
-        source: ws
-        isMandatory: true
-      - name: fromDate
-        label: reports.ws.fromDate
-        type: epoch
-        source: ws
-        isMandatory: false
-      - name: toDate
-        label: reports.ws.toDate
-        type: epoch
-        source: ws
-        isMandatory: false
     query: |
         WITH cte AS ( SELECT
           to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') || '-' || 
@@ -2420,5 +2404,5 @@ ReportDefinitions:
         FROM 
            cte
         WHERE  
-           cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED') AND cte.tenantid = $tenantid
+           cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED')
     groupby: GROUP BY  cte.consumercode,  cte.bill_status, cte.payername, cte.usagecategory,cte.locality, cte.mobilenumber, cte.payeraddress
