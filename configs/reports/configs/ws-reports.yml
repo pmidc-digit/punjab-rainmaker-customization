@@ -2378,37 +2378,47 @@ ReportDefinitions:
         type: string
         source: ws
         isMandatory: true
+      - name: fromDate
+        label: reports.ws.fromDate
+        type: epoch
+        source: ws
+        isMandatory: false
+      - name: toDate
+        label: reports.ws.toDate
+        type: epoch
+        source: ws
+        isMandatory: false
     query: |
         WITH cte AS ( SELECT
-        to_char(
-        (to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') || '-' || 
-        to_char(
-        (to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM' ) AS finyear,
-        pt.usagecategory,wc.connectionno,wc.property_id,
-        wc.locality,  bill.billid,bill.totalamount,wc.tenantid AS tenantid,
-        bill.consumercode, wc.status AS wc_status, pt.landarea,
-        b.payername AS payername,  b.status AS bill_status,b.payeraddress,  b.mobilenumber   
+          to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') || '-' || 
+          to_char((to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM' ) AS finyear,
+          pt.usagecategory,wc.connectionno,wc.property_id,
+          wc.locality,  bill.billid,bill.totalamount,wc.tenantid AS tenantid,
+          bill.consumercode, wc.status AS wc_status, pt.landarea,
+          b.payername AS payername,  b.status AS bill_status,b.payeraddress,  b.mobilenumber   
         FROM 
-        eg_ws_connection wc
+          eg_ws_connection wc
         JOIN eg_pt_property pt 
-        ON wc.property_id = pt.propertyid
-        AND wc.status = 'Active'
-        AND pt.status IN ('ACTIVE', 'PENDINGWS')
+          ON wc.property_id = pt.propertyid
+          AND wc.status = 'Active'
+          AND pt.status IN ('ACTIVE', 'PENDINGWS')
         INNER JOIN egbs_billdetail_v1 bill 
-        ON bill.consumercode = wc.connectionno
-        AND wc.status = 'Active'
-        AND bill.businessservice = 'WS'
+          ON bill.consumercode = wc.connectionno
+          AND wc.status = 'Active'
+          AND bill.businessservice = 'WS'
         JOIN egbs_bill_v1 b 
-        ON bill.billid = b.id
+          ON bill.billid = b.id
         WHERE 
-        wc.connectionno IS NOT NULL
-        AND bill.businessservice = 'WS'
-        AND pt.usagecategory IN ('RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL', 'MIXED'))
+           wc.connectionno IS NOT NULL
+           AND bill.businessservice = 'WS'
+           AND pt.usagecategory IN ('RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL', 'MIXED'))
         SELECT 
-        cte.consumercode, cte.usagecategory,
-        SUM(cte.totalamount) AS amtpaid, cte.bill_status,
-        cte.locality,  cte.payeraddress,    cte.mobilenumber,  
-        cte.payername,   STRING_AGG(cte.finyear, ', ') AS finyear  
+           cte.consumercode, cte.usagecategory,
+           SUM(cte.totalamount) AS amtpaid, cte.bill_status,
+           cte.locality,  cte.payeraddress,    cte.mobilenumber,  
+           cte.payername,   STRING_AGG(cte.finyear, ', ') AS finyear  
         FROM 
-        cte WHERE  cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED') AND cte.tenantid = $tenantid
+           cte
+        WHERE  
+           cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED') AND cte.tenantid = $tenantid
     groupby: GROUP BY  cte.consumercode,  cte.bill_status, cte.payername, cte.usagecategory,cte.locality, cte.mobilenumber, cte.payeraddress
