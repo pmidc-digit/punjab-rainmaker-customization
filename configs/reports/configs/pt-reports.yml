@@ -6472,3 +6472,157 @@ ReportDefinitions:
         name as ownername,
         guardian,
         mobilenumber as  mobileno from  eg_user where lower(name) like '%gurp%'
+  - reportName: PT_Defaulters
+    summary: Data for defaulter property_id
+    version: 1.0.0
+    moduleName: rainmaker-pt
+    additionalConfig:
+    print:
+        pdfPageSize: "A1"
+    sourceColumns:
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: pt
+        total: false
+      - name: district
+        label: district
+        type: string
+        source: pt
+        total: false
+      - name: property_id
+        label: property_id
+        type: string
+        source: pt
+        total: false
+      - name: amount_paid
+        label: amount_paid
+        type: string
+        source: pt
+        total: false
+      - name: receipt_date
+        label: receipt_date
+        type: string
+        source: pt
+        total: false
+      - name: receiptnumber
+        label: receiptnumber
+        type: string
+        source: pt
+        total: false
+      - name: paymentstatus
+        label: paymentstatus
+        type: string
+        source: pt
+        total: false
+      - name: paymentmode
+        label: paymentmode
+        type: string
+        source: pt
+        total: false
+  searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: pt
+        isMandatory: false
+        searchClause: AND pd.receiptdate >= $fromDate
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: pt
+        isMandatory: false
+        searchClause: AND d.tenantid = $tenantid
+  query: |
+      -- Use CTE to force query plan, compute & use CTE later
+       WITH defaulters AS (
+       SELECT tenantid, property_id
+         FROM public.pt_defaulter_ids
+          ),
+       bill_info AS (
+       SELECT 
+        b.id AS billid, b.tenantid, b.consumercode,
+        pd.amountpaid, pd.receiptdate, pd.receiptnumber,
+        p.paymentmode, p.paymentstatus
+       FROM egcl_bill b
+       JOIN egcl_paymentdetail pd ON b.id = pd.billid
+       JOIN egcl_payment p ON pd.paymentid = p.id
+       WHERE b.businessservice = 'PT'
+       AND pd.amountpaid > 0
+       AND pd.receiptdate IS NOT NULL
+       AND pd.receiptdate > $fromDate
+       ),
+       ulb_mapped AS (
+       SELECT ulb_code, district, name_of_ulb
+        FROM ulb_data
+       )
+       SELECT DISTINCT ON (d.property_id, bi.receiptnumber)
+       u.name_of_ulb AS tenantid, u.district,
+       d.property_id, bi.amountpaid AS amount_paid,
+       TO_TIMESTAMP(bi.receiptdate / 1000) AS receipt_date, bi.receiptnumber,
+       bi.paymentstatus, bi.paymentmode
+       FROM defaulters d
+       LEFT JOIN bill_info bi  ON d.property_id = bi.consumercode AND d.tenantid = bi.tenantid
+       LEFT JOIN ulb_mapped u  ON d.tenantid = u.ulb_code
+       WHERE d.tenantid= $tenantid
+  orderby: ORDER BY d.property_id, bi.receiptnumber, bi.receiptdate DESC;
+  - reportName: PT_Invalid_Defaulters
+    summary: Data for defaulter property_id with no receipt number
+    version: 1.0.0
+    moduleName: rainmaker-pt
+    additionalConfig:
+    print:
+        pdfPageSize: "A1"
+    sourceColumns:
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: pt
+        total: false
+      - name: district
+        label: district
+        type: string
+        source: pt
+        total: false
+      - name: property_id
+        label: property_id
+        type: string
+        source: PT
+        total: false
+  searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: pt
+        isMandatory: false
+        searchClause: AND billdate > $fromDate
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: pt
+        isMandatory: false
+       searchClause: AND d.tenantid = $tenantid
+  query: |
+       -- Use CTE to force query plan, compute & use CTE later
+       WITH defaulters AS (
+       SELECT tenantid, property_id
+       FROM public.pt_defaulter_ids
+       ),
+       bills_after_april AS (
+       SELECT tenantid, consumercode AS property_id
+       FROM egcl_bill
+       WHERE businessservice = 'PT'
+          AND billdate > $fromDate
+       ),
+       ulb_mapped AS (
+       SELECT ulb_code, district, name_of_ulb
+       FROM ulb_data
+       )
+       SELECT 
+       COALESCE(u.name_of_ulb, d.tenantid) AS tenantid,
+       COALESCE(u.district, 'UNKNOWN') AS district,d.property_id
+       FROM defaulters d
+       LEFT JOIN bills_after_april b ON d.property_id = b.property_id AND d.tenantid = b.tenantid
+       LEFT JOIN ulb_mapped u ON TRIM(LOWER(d.tenantid)) = TRIM(LOWER(u.ulb_code))
+       WHERE b.property_id IS NULL
+  orderby: ORDER BY d.property_id DESC;
