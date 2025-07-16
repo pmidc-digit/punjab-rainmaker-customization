@@ -162,7 +162,12 @@ ReportDefinitions:
       searchClause: AND createdtime <= $toDate
     query: |
       select 
-      initcap(split_part(ulb.ulb_code, '.', 2)) as "ULB",
+      CASE
+      WHEN initcap(split_part(sc.tenantid, '.', 2)) IN ('Abohar', 'Amritsar', 'Batala', 'Bathinda', 'Mohali', 'Moga',
+      'Pathankot', 'Phagwara', 'Patiala', 'Jalandhar', 'Kapurthala', 'Hoshiarpur', 'Ludhiana')
+      THEN 'MC_' || initcap(split_part(sc.tenantid, '.', 2))
+      ELSE initcap(split_part(sc.tenantid, '.', 2))
+      END AS "ULB",
       ulb.district as District,
       SUM(CASE WHEN sc.applicationstatus ='PENDINGATLME' THEN 1 ELSE 0 END) as "Pending at LME",
       SUM(CASE WHEN sc.applicationstatus in ('PENDINGATLME','PENDINGFORASSIGNMENT','PENDINGFORREASSIGNMENT') THEN 1 ELSE 0 END) as "Total Pending",
@@ -183,8 +188,7 @@ ReportDefinitions:
       from eg_swach_service_v2 sc
       inner join ulb_data ulb on ulb.ulb_code = sc.tenantid
       WHERE sc.tenantid != 'pb.testing'
-    groupby: GROUP BY Tenantid,District,ulb.ulb_code
-    orderby: ORDER BY Tenantid
+    groupby: GROUP BY initcap(split_part(sc.tenantid, '.', 2)), ulb.district
 
         
   - reportName: SwachComplaintTypesReport_v2
