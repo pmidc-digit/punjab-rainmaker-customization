@@ -6594,8 +6594,7 @@ ReportDefinitions:
         label: fromDate
         type: epoch
         source: pt
-        isMandatory: false
-        searchClause: AND egcl_bill.billdate > $fromDate
+        isMandatory: true
       - name: tenantid
         label: tenantid
         type: string
@@ -6612,7 +6611,7 @@ ReportDefinitions:
        SELECT tenantid, consumercode AS property_id
        FROM egcl_bill 
        WHERE businessservice = 'PT'
-          AND \billdate > $fromDate
+          AND billdate > $fromDate
        ),
        ulb_mapped AS (
        SELECT ulb_code, district, name_of_ulb
