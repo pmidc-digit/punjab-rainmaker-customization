@@ -6566,7 +6566,6 @@ ReportDefinitions:
        FROM defaulters d
        LEFT JOIN bill_info bi  ON d.property_id = bi.consumercode AND d.tenantid = bi.tenantid
        LEFT JOIN ulb_mapped u  ON d.tenantid = u.ulb_code
-       WHERE d.tenantid= $tenantid
     orderby: ORDER BY d.property_id, bi.receiptnumber, bi.receiptdate DESC;
   - reportName: PT_Invalid_Defaulters
     summary: Data for defaulter property_id with no receipt number
@@ -6628,5 +6627,5 @@ ReportDefinitions:
        FROM defaulters d
        LEFT JOIN bills_after_april b ON d.property_id = b.property_id AND d.tenantid = b.tenantid
        LEFT JOIN ulb_mapped u ON TRIM(LOWER(d.tenantid)) = TRIM(LOWER(u.ulb_code))
-       WHERE b.property_id IS NULL AND d.tenantid = $tenantid
+       WHERE b.property_id IS NULL 
     orderby: ORDER BY d.property_id DESC;
