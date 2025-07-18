@@ -2406,3 +2406,154 @@ ReportDefinitions:
         WHERE  
            cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED')
     groupby: GROUP BY  cte.consumercode,  cte.bill_status, cte.payername, cte.usagecategory,cte.locality, cte.mobilenumber, cte.payeraddress
+
+  - reportName: Water_Demand_Report
+    summary: Water Demand Report- This report provides the number of water connections and the total demand generated for a specific quarter in a financial year.
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: quarter
+        label: reports.ws.quarter
+        type: string
+        source: ws
+        total: false
+      - name: distinct_consumercode_count
+        label: reports.ws.distinct_consumercode_count
+        type: string
+        source: ws
+        total: true
+      - name: UsageType
+        label: reports.ws.UsageType
+        type: string
+        source: ws
+        total: false
+    searchParams:
+      - name: fromfy
+        label: From_FY
+        type: singlevaluelist
+        pattern: 'list://1617129000000:2021,1648665000000:2022,1680201000000:2023,1711823400000:2024,1743359400000:2025'
+        source: ws
+        isMandatory: true
+        searchClause: and 1=1
+      - name: tofy
+        label: To_FY
+        type: singlevaluelist
+        pattern: 'list://1648665000000:2022,1680201000000:2023,1711823400000:2024,1743359400000:2025,1774895400000:2026'
+        source: ws
+        isMandatory: true
+        searchClause: and 1=1
+    query: |
+        WITH quarterly_data AS (
+        SELECT
+         EXTRACT(YEAR FROM to_timestamp(d1.taxperiodfrom / 1000)) AS year,
+          CASE
+            WHEN EXTRACT(MONTH FROM to_timestamp(d1.taxperiodfrom / 1000)) BETWEEN 4 AND 6 THEN 'Quarter 1'
+            WHEN EXTRACT(MONTH FROM to_timestamp(d1.taxperiodfrom / 1000)) BETWEEN 7 AND 9 THEN 'Quarter 2'
+            WHEN EXTRACT(MONTH FROM to_timestamp(d1.taxperiodfrom / 1000)) BETWEEN 10 AND 12 THEN 'Quarter 3'
+            ELSE 'Quarter 4'
+            END AS quarter,
+            to_char(to_timestamp(d1.taxperiodfrom / 1000), 'YYYY-MM-DD') AS tax_period_from_date,
+            COUNT(DISTINCT d1.consumercode) AS distinct_consumercode_count,
+            SUM(d2.taxamount) AS total_demand_amount,
+            SUM(d2.collectionamount) AS total_collected_amount,
+            SUM(d2.taxamount - d2.collectionamount ) AS arrears,
+            d5.usagecategory AS UsageType
+        FROM
+        egbs_demand_v1 d1
+        LEFT JOIN egbs_demanddetail_v1 d2 ON d1.id = d2.demandid
+        LEFT JOIN eg_ws_connection d4 ON d4.connectionno = d1.consumercode
+        LEFT JOIN eg_pt_property  d5 ON d4.property_id = d5.propertyid
+        WHERE d1.taxperiodfrom::text >= $fromfy and d1.taxperiodfrom::text <= $tofy
+        AND d1.tenantid = $tenantid
+        AND d1.status != 'CANCELLED'
+        AND d4.status = 'Active'
+        AND d1.businessservice = 'WS'
+        GROUP BY
+        year, quarter, tax_period_from_date ,UsageType
+        )
+
+        SELECT
+        year || '->' || quarter AS quarter,
+        tax_period_from_date,
+        COALESCE(CAST(total_demand_amount AS TEXT), 'No Tax amount') AS total_demand_amount,
+        COALESCE(CAST(total_collected_amount AS TEXT), 'No Collection Amount') AS total_collected_amount,
+        COALESCE(CAST(arrears AS TEXT), 'Nill') AS Arrears,
+        COALESCE(CAST(distinct_consumercode_count AS TEXT), '0') AS distinct_consumercode_count,
+        UsageType
+        FROM
+        quarterly_data where 1=1
+
+  - reportName: Sewerage_Demand_Report
+    summary: Sewerage Demand Report- This report provides the number of Sewerage connections and the total demand generated for a specific quarter in a financial year.
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: quarter
+        label: reports.ws.quarter
+        type: string
+        source: ws
+        total: false
+      - name: distinct_consumercode_count
+        label: reports.ws.distinct_consumercode_count
+        type: string
+        source: ws
+        total: true
+      - name: UsageType
+        label: reports.ws.UsageType
+        type: string
+        source: ws
+        total: false
+    searchParams:
+      - name: fromfy
+        label: From_FY
+        type: singlevaluelist
+        pattern: 'list://1617129000000:2021,1648665000000:2022,1680201000000:2023,1711823400000:2024,1743359400000:2025'
+        source: ws
+        isMandatory: true
+        searchClause: and 1=1
+      - name: tofy
+        label: To_FY
+        type: singlevaluelist
+        pattern: 'list://1648665000000:2022,1680201000000:2023,1711823400000:2024,1743359400000:2025,1774895400000:2026'
+        source: ws
+        isMandatory: true
+        searchClause: and 1=1    
+    query: |
+       WITH quarterly_data AS (
+       SELECT
+        EXTRACT(YEAR FROM to_timestamp(d1.taxperiodfrom / 1000)) AS year,
+        CASE
+            WHEN EXTRACT(MONTH FROM to_timestamp(d1.taxperiodfrom / 1000)) BETWEEN 4 AND 6 THEN 'Quarter 1'
+            WHEN EXTRACT(MONTH FROM to_timestamp(d1.taxperiodfrom / 1000)) BETWEEN 7 AND 9 THEN 'Quarter 2'
+            WHEN EXTRACT(MONTH FROM to_timestamp(d1.taxperiodfrom / 1000)) BETWEEN 10 AND 12 THEN 'Quarter 3'
+            ELSE 'Quarter 4'
+        END AS quarter,
+        COUNT(DISTINCT d1.consumercode) AS distinct_consumercode_count,
+        d5.usagecategory AS UsageType
+       FROM
+        egbs_demand_v1 d1
+        LEFT JOIN eg_sw_connection d4 ON d4.connectionno = d1.consumercode
+        LEFT JOIN eg_sw_service ser ON d4.id = ser.connection_id
+        LEFT JOIN eg_pt_property d5 ON d4.property_id = d5.propertyid
+        WHERE d1.taxperiodfrom::text >= $fromfy and d1.taxperiodfrom::text <= $tofy
+        AND d1.tenantid = $tenantid
+        AND d1.status != 'CANCELLED'
+        AND d1.businessservice = 'SW' and ser.connectiontype!='Metered'
+        AND d5.usagecategory IS NOT NULL
+        GROUP BY
+        year, quarter, ser.connectiontype, d5.usagecategory
+        )
+        SELECT
+        year || '->' || quarter AS quarter,
+        COALESCE(CAST(distinct_consumercode_count AS TEXT), '0') AS distinct_consumercode_count,
+        UsageType
+        FROM
+        quarterly_data
+         where 1=1  
+  
