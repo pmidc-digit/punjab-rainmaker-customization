@@ -2421,7 +2421,7 @@ ReportDefinitions:
            cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED')
            AND  cte.finyear = $finyear
     groupby: GROUP BY  cte.consumercode,  cte.bill_status, cte.payername, cte.usagecategory,cte.locality, cte.mobilenumber, cte.payeraddress
-        HAVING
+    having: HAVING
          SUM(cte.totalamount) > $minamount;
 
   - reportName: Water_Demand_Report
