@@ -2377,8 +2377,14 @@ ReportDefinitions:
     - name: finyear
       label: Financial Year
       type: singlevaluelist
-      source: query
+      source: ws
       pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=egf-master&masterName=FinancialYear|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].code|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].name
+      isMandatory: true
+    - name: minamount
+      label: minimum amount
+      type: singlevaluelist
+      source: ws
+      pattern: minamount 
       isMandatory: true
     query: |
         WITH cte AS ( SELECT
@@ -2415,6 +2421,8 @@ ReportDefinitions:
            cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED')
            AND  cte.finyear = $finyear
     groupby: GROUP BY  cte.consumercode,  cte.bill_status, cte.payername, cte.usagecategory,cte.locality, cte.mobilenumber, cte.payeraddress
+        HAVING
+         SUM(cte.totalamount) > $minamount;
 
   - reportName: Water_Demand_Report
     summary: Water Demand Report- This report provides the number of water connections and the total demand generated for a specific quarter in a financial year.
