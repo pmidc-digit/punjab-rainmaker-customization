@@ -1,3 +1,4 @@
+
 ---
 ReportDefinitions:
   - reportName: ReceiptRegisterSW
@@ -2372,6 +2373,13 @@ ReportDefinitions:
       type: string
       source: ws
       total: false
+    searchParams:
+    - name: finyear
+      label: Financial Year
+      type: singlevaluelist
+      source: query
+      pattern: finyear
+      isMandatory: true
     query: |
         WITH cte AS ( SELECT
           to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') || '-' || 
@@ -2405,6 +2413,7 @@ ReportDefinitions:
            cte
         WHERE  
            cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED')
+           AND  cte.finyear = $finyear
     groupby: GROUP BY  cte.consumercode,  cte.bill_status, cte.payername, cte.usagecategory,cte.locality, cte.mobilenumber, cte.payeraddress
 
   - reportName: Water_Demand_Report
