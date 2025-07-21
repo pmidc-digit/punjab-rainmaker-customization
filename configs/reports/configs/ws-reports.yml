@@ -2327,51 +2327,51 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
     sourceColumns:
-      - name: consumercode
-        label: reports.ws.consumercode
-        type: string
-        source: ws
-        total: false
-      - name: usagecategory
-        label: reports.ws.usagecategory
-        type: string
-        source: ws
-        total: false
-      - name: amtpaid
-        label: reports.ws.amtpaid
-        type: string
-        source: ws
-        total: false
-      - name: bill_status
-        label: reports.ws.bill_status
-        type: string
-        source: ws
-        total: false
-      - name: locality
-        label: reports.ws.locality
-        type: string
-        source: ws
-        total: false
-      - name: payeraddress
-        label: reports.ws.payeraddress
-        type: string
-        source: ws
-        total: false
-      - name: mobilenumber
-        label: reports.ws.mobilenumber
-        type: string
-        source: ws
-        total: false
-      - name: payername
-        label: reports.ws.payername
-        type: string
-        source: ws
-        total: false
-      - name: finyear
-        label: reports.ws.finyear
-        type: string
-        source: ws
-        total: false
+    - name: consumercode
+      label: reports.ws.consumercode
+      type: string
+      source: ws
+      total: false
+    - name: usagecategory
+      label: reports.ws.usagecategory
+      type: string
+      source: ws
+      total: false
+    - name: amtpaid
+      label: reports.ws.amtpaid
+      type: string
+      source: ws
+      total: false
+    - name: bill_status
+      label: reports.ws.bill_status
+      type: string
+      source: ws
+      total: false
+    - name: locality
+      label: reports.ws.locality
+      type: string
+      source: ws
+      total: false
+    - name: payeraddress
+      label: reports.ws.payeraddress
+      type: string
+      source: ws
+      total: false
+    - name: mobilenumber
+      label: reports.ws.mobilenumber
+      type: string
+      source: ws
+      total: false
+    - name: payername
+      label: reports.ws.payername
+      type: string
+      source: ws
+      total: false
+    - name: finyear
+      label: reports.ws.finyear
+      type: string
+      source: ws
+      total: false
     query: |
         WITH cte AS ( SELECT
           to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') || '-' || 
@@ -2380,17 +2380,17 @@ ReportDefinitions:
           wc.locality,  bill.billid,bill.totalamount,wc.tenantid AS tenantid,
           bill.consumercode, wc.status AS wc_status, pt.landarea,
           b.payername AS payername,  b.status AS bill_status,b.payeraddress,  b.mobilenumber   
-        FROM 
+         FROM 
           eg_ws_connection wc
-        JOIN eg_pt_property pt 
+         JOIN eg_pt_property pt 
           ON wc.property_id = pt.propertyid
           AND wc.status = 'Active'
           AND pt.status IN ('ACTIVE', 'PENDINGWS')
-        INNER JOIN egbs_billdetail_v1 bill 
+         INNER JOIN egbs_billdetail_v1 bill 
           ON bill.consumercode = wc.connectionno
           AND wc.status = 'Active'
           AND bill.businessservice = 'WS'
-        JOIN egbs_bill_v1 b 
+         JOIN egbs_bill_v1 b 
           ON bill.billid = b.id
         WHERE 
            wc.connectionno IS NOT NULL
