@@ -2378,7 +2378,7 @@ ReportDefinitions:
       label: Financial Year
       type: singlevaluelist
       source: query
-      pattern: finyear
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=egf-master&masterName=FinancialYear|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].code|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].name
       isMandatory: true
     query: |
         WITH cte AS ( SELECT
