@@ -10146,7 +10146,7 @@ ReportDefinitions:
     label: fromDate
     type: epoch
     source: pt
-    isMandatory: false
+    isMandatory: true
     searchClause: AND bi.receiptdate >= $fromDate
   - name: tenantid
     label: tenantid
@@ -10154,7 +10154,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: pt
     wrapper: true
-    isMandatory: false
+    isMandatory: true
     searchClause: AND d.tenantid = $tenantid
   query: |
       -- Use CTE to force query plan, compute & use CTE later
@@ -10218,7 +10218,7 @@ ReportDefinitions:
     label: fromDate
     type: epoch
     source: pt
-    isMandatory: false
+    isMandatory: true
     searchClause: AND 1=1
   - name: tenantid
     label: tenantid
@@ -10226,7 +10226,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: pt
     wrapper: true
-    isMandatory: false
+    isMandatory: true
     searchClause: AND d.tenantid = $tenantid
   query: |
      -- Use CTE to force query plan, compute & use CTE later
