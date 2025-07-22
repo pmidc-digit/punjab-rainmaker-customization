@@ -10187,6 +10187,7 @@ ReportDefinitions:
        FROM defaulters d
        LEFT JOIN bill_info bi  ON d.property_id = bi.consumercode AND d.tenantid = bi.tenantid
        LEFT JOIN ulb_mapped u  ON d.tenantid = u.ulb_code
+       WHERE 1=1 
   orderby: ORDER BY d.property_id, bi.receiptnumber, bi.receiptdate DESC;
   
 - reportName: PT_Invalid_Defaulters
