@@ -1,13 +1,13 @@
 SearchDefinitions:
-  moduleName: ndc-inbox
+  moduleName: ndc-services
   summary: NDC Inbox Search API
   version: 1.0.0
   definitions:
     - name: inboxndcsearch
       query:
-        baseQuery: >
-          SELECT row_to_json(result) FROM (
-            SELECT DISTINCT ON (a.uuid)
+       baseQuery: >
+         SELECT row_to_json(result) FROM (
+            SELECT DISTINCT 
               a.uuid AS id,
               a.firstname AS fName,
               a.lastname AS lName,
@@ -36,7 +36,7 @@ SearchDefinitions:
               pi.lastmodifiedby AS wf_lastmodifiedby,
               assg.assignee AS wf_assignee
             FROM eg_ndc_applicants a
-            LEFT JOIN eg_ndc_details d ON auuid. = d.applicantid
+            LEFT JOIN eg_ndc_details d ON a.uuid = d.applicantid
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
@@ -49,56 +49,56 @@ SearchDefinitions:
             $pagination
           ) result
       searchParams:
-        condition: AND
-        params:
-          - name: a.tenantid
-            isMandatory: true
-            jsonPath: $.searchCriteria.tenantId
-          - name: a.uuid
-            isMandatory: false
-            jsonPath: $.searchCriteria.uuid
-          - name: a.applicationstatus
-            isMandatory: false
-            jsonPath: $.searchCriteria.status
-          - name: a.active
-            isMandatory: false
-            jsonPath: $.searchCriteria.active
-          - name: a.mobile
-            isMandatory: false
-            jsonPath: $.searchCriteria.mobileNumber
-          - name: d.businessservice
-            isMandatory: false
-            jsonPath: $.searchCriteria.businessservice
-          - name: d.consumercode
-            isMandatory: false
-            jsonPath: $.searchCriteria.consumerCode
-          - name: pi.status
-            isMandatory: false
-            jsonPath: $.searchCriteria.wfStatus
-          - name: assg.assignee
-            isMandatory: false
-            jsonPath: $.searchCriteria.assignee
-          - name: a.createdtime
-            isMandatory: false
-            jsonPath: $.searchCriteria.fromDate
-          - name: a.createdtime
-            isMandatory: false
-            jsonPath: $.searchCriteria.toDate
-          - name: concat(a.firstname, ' ', a.lastname)
-            isMandatory: false
-            jsonPath: $.searchCriteria.name
-        pagination:
-          noOfRecords: $.searchCriteria.noOfRecords
-          offset: $.searchCriteria.offset
+       condition: AND
+       params:
+       - name: a.tenantid
+         isMandatory: true
+         jsonPath: $.searchCriteria.tenantId
+       - name: a.uuid
+         isMandatory: false
+         jsonPath: $.searchCriteria.uuid
+       - name: a.applicationstatus
+         isMandatory: false
+         jsonPath: $.searchCriteria.status
+       - name: a.active
+         isMandatory: false
+         jsonPath: $.searchCriteria.active
+       - name: a.mobile
+         isMandatory: false
+         jsonPath: $.searchCriteria.mobileNumber
+       - name: d.businessservice
+         isMandatory: false
+         jsonPath: $.searchCriteria.businessservice
+       - name: d.consumercode
+         isMandatory: false
+         jsonPath: $.searchCriteria.consumerCode
+       - name: pi.status
+         isMandatory: false
+         jsonPath: $.searchCriteria.wfStatus
+       - name: assg.assignee
+         isMandatory: false
+         jsonPath: $.searchCriteria.assignee
+       - name: a.createdtime
+         isMandatory: false
+         jsonPath: $.searchCriteria.fromDate
+       - name: a.createdtime
+         isMandatory: false
+         jsonPath: $.searchCriteria.toDate
+       - name: concat(a.firstname, ' ', a.lastname)
+         isMandatory: false
+         jsonPath: $.searchCriteria.name
+       pagination:
+         noOfRecords: $.searchCriteria.noOfRecords
+         offset: $.searchCriteria.offset
       output:
-        jsonFormat: {"ResponseInfo": {}, "NDCApplications": []}
-        outJsonPath: $.Services
-        responseInfoPath: $.ResponseInfo
+       jsonFormat: {"ResponseInfo": {}, "NDCApplications": []}
+       outJsonPath: $.Services
+       responseInfoPath: $.ResponseInfo
 
     - name: inboxndcsearchcount
       query:
-        baseQuery: >
-          SELECT COUNT(DISTINCT a.uuid) AS TotalCount
+       baseQuery: >
+         SELECT COUNT(DISTINCT a.uuid) AS TotalCount
           FROM eg_ndc_applicants a
           LEFT JOIN eg_ndc_details d ON a.uuid = d.applicantid
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
@@ -110,53 +110,56 @@ SearchDefinitions:
             WHERE wf.businessid = a.uuid
           )
       searchParams:
-        condition: AND
-        params:
-          - name: a.tenantid
-            isMandatory: true
-            jsonPath: $.searchCriteria.tenantId
-          - name: a.uuid
-            isMandatory: false
-            jsonPath: $.searchCriteria.uuid
-          - name: a.applicationstatus
-            isMandatory: false
-            jsonPath: $.searchCriteria.status
-          - name: a.active
-            isMandatory: false
-            jsonPath: $.searchCriteria.active
-          - name: a.mobile
-            isMandatory: false
-            jsonPath: $.searchCriteria.mobileNumber
-          - name: d.businessservice
-            isMandatory: false
-            jsonPath: $.searchCriteria.businessservice
-          - name: d.consumercode
-            isMandatory: false
-            jsonPath: $.searchCriteria.consumerCode
-          - name: pi.status
-            isMandatory: false
-            jsonPath: $.searchCriteria.wfStatus
-          - name: assg.assignee
-            isMandatory: false
-            jsonPath: $.searchCriteria.assignee
-          - name: a.createdtime
-            isMandatory: false
-            jsonPath: $.searchCriteria.fromDate
-          - name: a.createdtime
-            isMandatory: false
-            jsonPath: $.searchCriteria.toDate
-          - name: concat(a.firstname, ' ', a.lastname)
-            isMandatory: false
-            jsonPath: $.searchCriteria.name
+       condition: AND
+       params:
+       - name: a.tenantid
+         isMandatory: true
+         jsonPath: $.searchCriteria.tenantId
+       - name: a.uuid
+         isMandatory: false
+         jsonPath: $.searchCriteria.uuid
+       - name: a.applicationstatus
+         isMandatory: false
+         jsonPath: $.searchCriteria.status
+       - name: a.active
+         isMandatory: false
+         jsonPath: $.searchCriteria.active
+       - name: a.mobile
+         isMandatory: false
+         jsonPath: $.searchCriteria.mobileNumber
+       - name: d.businessservice
+         isMandatory: false
+         jsonPath: $.searchCriteria.businessservice
+       - name: d.consumercode
+         isMandatory: false
+         jsonPath: $.searchCriteria.consumerCode
+       - name: pi.status
+         isMandatory: false
+         jsonPath: $.searchCriteria.wfStatus
+       - name: assg.assignee
+         isMandatory: false
+         jsonPath: $.searchCriteria.assignee
+       - name: a.createdtime
+         isMandatory: false
+         jsonPath: $.searchCriteria.fromDate
+       - name: a.createdtime
+         isMandatory: false
+         jsonPath: $.searchCriteria.toDate
+       - name: concat(a.firstname, ' ', a.lastname)
+         isMandatory: false
+         jsonPath: $.searchCriteria.name
+       pagination:
+         noOfRecords: $.searchCriteria.noOfRecords
+         offset: $.searchCriteria.offset  
       output:
-        jsonFormat: {"ResponseInfo": {}, "TotalCount": {}}
-        outJsonPath: $.TotalCount
-        responseInfoPath: $.ResponseInfo
+       jsonFormat: {"ResponseInfo": {}, "TotalCount": {}}
+       outJsonPath: $.TotalCount
+       responseInfoPath: $.ResponseInfo
 
     - name: inboxndcsearchdesc
       query:
-        baseQuery: >
-          SELECT row_to_json(result)
+       baseQuery: >
+         SELECT row_to_json(result)
           FROM (
             SELECT DISTINCT a.uuid AS uuid,
               a.firstname,
@@ -200,54 +203,56 @@ SearchDefinitions:
             LIMIT $limit
           ) result
       searchParams:
-        condition: AND
-        params:
-          - name: a.tenantid
-            isMandatory: true
-            jsonPath: $.searchCriteria.tenantId
-          - name: a.uuid
-            isMandatory: false
-            jsonPath: $.searchCriteria.uuid
-          - name: a.applicationstatus
-            isMandatory: false
-            jsonPath: $.searchCriteria.status
-          - name: a.active
-            isMandatory: false
-            jsonPath: $.searchCriteria.active
-          - name: a.mobile
-            isMandatory: false
-            jsonPath: $.searchCriteria.mobileNumber
-          - name: d.businessservice
-            isMandatory: false
-            jsonPath: $.searchCriteria.businessservice
-          - name: d.consumercode
-            isMandatory: false
-            jsonPath: $.searchCriteria.consumerCode
-          - name: pi.status
-            isMandatory: false
-            jsonPath: $.searchCriteria.wfStatus
-          - name: assg.assignee
-            isMandatory: false
-            jsonPath: $.searchCriteria.assignee
-          - name: a.createdtime
-            isMandatory: false
-            jsonPath: $.searchCriteria.fromDate
-          - name: a.createdtime
-            isMandatory: false
-            jsonPath: $.searchCriteria.toDate
-          - name: concat(a.firstname, ' ', a.lastname)
-            isMandatory: false
-            jsonPath: $.searchCriteria.name
-      pagination:
-        noOfRecords: $.searchCriteria.noOfRecords
-        offset: $.searchCriteria.offset
+       condition: AND
+       params:
+       - name: a.tenantid
+         isMandatory: true
+         jsonPath: $.searchCriteria.tenantId
+       - name: a.uuid
+         isMandatory: false
+         jsonPath: $.searchCriteria.uuid
+       - name: a.applicationstatus
+         isMandatory: false
+         jsonPath: $.searchCriteria.status
+       - name: a.active
+         isMandatory: false
+         jsonPath: $.searchCriteria.active
+       - name: a.mobile
+         isMandatory: false
+         jsonPath: $.searchCriteria.mobileNumber
+       - name: d.businessservice
+         isMandatory: false
+         jsonPath: $.searchCriteria.businessservice
+       - name: d.consumercode
+         isMandatory: false
+         jsonPath: $.searchCriteria.consumerCode
+       - name: pi.status
+         isMandatory: false
+         jsonPath: $.searchCriteria.wfStatus
+       - name: assg.assignee
+         isMandatory: false
+         jsonPath: $.searchCriteria.assignee
+       - name: a.createdtime
+         isMandatory: false
+         jsonPath: $.searchCriteria.fromDate
+       - name: a.createdtime
+         isMandatory: false
+         jsonPath: $.searchCriteria.toDate
+       - name: concat(a.firstname, ' ', a.lastname)
+         isMandatory: false
+         jsonPath: $.searchCriteria.name
+       pagination:
+         noOfRecords: $.searchCriteria.noOfRecords
+         offset: $.searchCriteria.offset
       output:
-        jsonFormat: {"ResponseInfo": {}, "NDCApplications": []}
-        outJsonPath: $.Services
-        responseInfoPath: $.ResponseInfo
+       jsonFormat: {"ResponseInfo": {}, "NDCApplications": []}
+       outJsonPath: $.Services
+       responseInfoPath: $.ResponseInfo
+
+      
     - name: inboxndcsearchall
       query:
-        baseQuery: >
+       baseQuery: >
           SELECT row_to_json(result) FROM (
             SELECT DISTINCT
               a.uuid AS uuid,
@@ -290,45 +295,48 @@ SearchDefinitions:
             ORDER BY a.createdtime DESC
           ) result
       searchParams:
-        condition: AND
-        params:
-          - name: a.tenantid
-            isMandatory: true
-            jsonPath: $.searchCriteria.tenantId
-          - name: a.uuid
-            isMandatory: false
-            jsonPath: $.searchCriteria.uuid
-          - name: a.applicationstatus
-            isMandatory: false
-            jsonPath: $.searchCriteria.status
-          - name: a.active
-            isMandatory: false
-            jsonPath: $.searchCriteria.active
-          - name: a.mobile
-            isMandatory: false
-            jsonPath: $.searchCriteria.mobileNumber
-          - name: d.businessservice
-            isMandatory: false
-            jsonPath: $.searchCriteria.businessservice
-          - name: d.consumercode
-            isMandatory: false
-            jsonPath: $.searchCriteria.consumerCode
-          - name: pi.status
-            isMandatory: false
-            jsonPath: $.searchCriteria.wfStatus
-          - name: assg.assignee
-            isMandatory: false
-            jsonPath: $.searchCriteria.assignee
-          - name: a.createdtime
-            isMandatory: false
-            jsonPath: $.searchCriteria.fromDate
-          - name: a.createdtime
-            isMandatory: false
-            jsonPath: $.searchCriteria.toDate
-          - name: concat(a.firstname, ' ', a.lastname)
-            isMandatory: false
-            jsonPath: $.searchCriteria.name
+       condition: AND
+       params:
+       - name: a.tenantid
+         isMandatory: true
+         jsonPath: $.searchCriteria.tenantId
+       - name: a.uuid
+         isMandatory: false
+         jsonPath: $.searchCriteria.uuid
+       - name: a.applicationstatus
+         isMandatory: false
+         jsonPath: $.searchCriteria.status
+       - name: a.active
+         isMandatory: false
+         jsonPath: $.searchCriteria.active
+       - name: a.mobile
+         isMandatory: false
+         jsonPath: $.searchCriteria.mobileNumber
+       - name: d.businessservice
+         isMandatory: false
+         jsonPath: $.searchCriteria.businessservice
+       - name: d.consumercode
+         isMandatory: false
+         jsonPath: $.searchCriteria.consumerCode
+       - name: pi.status
+         isMandatory: false
+         jsonPath: $.searchCriteria.wfStatus
+       - name: assg.assignee
+         isMandatory: false
+         jsonPath: $.searchCriteria.assignee
+       - name: a.createdtime
+         isMandatory: false
+         jsonPath: $.searchCriteria.fromDate
+       - name: a.createdtime
+         isMandatory: false
+         jsonPath: $.searchCriteria.toDate
+       - name: concat(a.firstname, ' ', a.lastname)
+         isMandatory: false
+         jsonPath: $.searchCriteria.name
+       pagination:
+         noOfRecords: $.searchCriteria.noOfRecords
+         offset: $.searchCriteria.offset
       output:
-        jsonFormat: {"ResponseInfo": {},"NDCApplications": []}
-        outJsonPath: $.Services
-        responseInfoPath: $.ResponseInfo
+       jsonFormat: {"ResponseInfo": {}, "NDCApplications": []}
+       outJsonPath: $.Services
+       responseInfoPath: $.ResponseInfo
