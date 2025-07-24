@@ -10250,5 +10250,5 @@ ReportDefinitions:
        FROM defaulters d
        LEFT JOIN bills_after_april b ON d.property_id = b.property_id AND d.tenantid = b.tenantid
        LEFT JOIN ulb_mapped u ON TRIM(LOWER(d.tenantid)) = TRIM(LOWER(u.ulb_code))
-       WHERE b.property_id IS NULL 
+       WHERE b.property_id IS NULL  AND d.tenatid = $tenantid
   orderby: ORDER BY d.property_id DESC;
