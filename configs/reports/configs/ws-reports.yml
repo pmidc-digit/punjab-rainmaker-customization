@@ -2628,7 +2628,7 @@ ReportDefinitions:
       type: string
       source: pt
       isMandatory: true
-      searchClause: AND ws.billingcyclestartdate >= $fromDate
+      searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(ws.billingcyclestartdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
     query: |
   
       -- Water Service Data
