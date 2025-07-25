@@ -2625,7 +2625,7 @@ ReportDefinitions:
     searchParams:
     - name: fromDate
       label: reports.pt.fromDate
-      type: string
+      type: epoch
       source: pt
       isMandatory: true
       searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(ws.billingcyclestartdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
