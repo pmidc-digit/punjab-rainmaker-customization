@@ -2602,8 +2602,8 @@ ReportDefinitions:
       type: string
       source: ws
       total: false
-    - name: fromDate
-      label: reports.ws.fromDate
+    - name: start_date
+      label: reports.ws.start_date
       type: string
       source: ws
       total: false
@@ -2628,7 +2628,7 @@ ReportDefinitions:
       type: epoch
       source: pt
       isMandatory: true
-      searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(ws.billingcyclestartdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
+      searchClause: AND ws.billingcyclestartdate >= $fromDate
     query: |
   
       -- Water Service Data
@@ -2637,7 +2637,7 @@ ReportDefinitions:
           bm.blockname,
           bm.localityname,
           ws.locality,
-          TO_CHAR((TO_TIMESTAMP(ws.billingcyclestartdate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS fromDate,
+          TO_CHAR((TO_TIMESTAMP(ws.billingcyclestartdate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS start_date,
           TO_CHAR((TO_TIMESTAMP(ws.billingcycleenddate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS end_date,
           TO_CHAR((TO_TIMESTAMP(ws.createdtime / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS createddate,
           COALESCE(conn.connection_count, 0) AS connection_count
@@ -2663,7 +2663,7 @@ ReportDefinitions:
           bm.blockname,
           bm.localityname,
           sw.locality,
-          TO_CHAR((TO_TIMESTAMP(sw.billingcyclestartdate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS fromDate,
+          TO_CHAR((TO_TIMESTAMP(sw.billingcyclestartdate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS start_date,
           TO_CHAR((TO_TIMESTAMP(sw.billingcycleenddate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS end_date,
           TO_CHAR((TO_TIMESTAMP(sw.createdtime / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS createddate,
           COALESCE(conn.connection_count, 0) AS connection_count
