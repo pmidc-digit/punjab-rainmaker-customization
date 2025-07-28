@@ -2577,111 +2577,101 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-    - name: blockname
-      label: reports.ws.blockname
-      type: string
-      source: ws
-      total: false
-    - name: localityname
-      label: reports.ws.localityname
-      type: string
-      source: ws
-      total: false
-    - name: locality
-      label: reports.ws.locality
-      type: string
-      source: ws
-      total: false
-    - name: status
-      label: reports.ws.status
-      type: string
-      source: ws
-      total: false
-    - name: service_type
-      label: reports.ws.service_type
-      type: string
-      source: ws
-      total: false
-    - name: start_date
-      label: reports.ws.start_date
-      type: string
-      source: ws
-      total: false
-    - name: end_date
-      label: reports.ws.end_date
-      type: string
-      source: ws
-      total: false
-    - name: createddate
-      label: reports.ws.createddate
-      type: string
-      source: ws
-      total: false
-    - name: connection_count
-      label: reports.ws.connection_count
-      type: string
-      source: ws
-      total: false
+      - name: blockname
+        label: reports.ws.blockname
+        type: string
+        source: ws
+        total: false
+      - name: localityname
+        label: reports.ws.localityname
+        type: string
+        source: ws
+        total: false
+      - name: locality
+        label: reports.ws.locality
+        type: string
+        source: ws
+        total: false
+      - name: status
+        label: reports.ws.status
+        type: string
+        source: ws
+        total: false
+      - name: service_type
+        label: reports.ws.service_type
+        type: string
+        source: ws
+        total: false
+      - name: start_date
+        label: reports.ws.start_date
+        type: string
+        source: ws
+        total: false
+      - name: end_date
+        label: reports.ws.end_date
+        type: string
+        source: ws
+        total: false
+      - name: createddate
+        label: reports.ws.createddate
+        type: string
+        source: ws
+        total: false
+      - name: connection_count
+        label: reports.ws.connection_count
+        type: string
+        source: ws
+        total: false
     searchParams:
-    - name: fromDate
-      label: reports.pt.fromDate
-      type: epoch
-      source: pt
-      isMandatory: true
-      searchClause: AND ws.billingcyclestartdate >= $fromDate
+      - name: fromDate
+        label: reports.pt.fromDate
+        type: epoch
+        source: pt
+        isMandatory: true
+        searchClause: AND ws.billingcyclestartdate >= $fromDate
     query: |
-  
-      -- Water Service Data
-      SELECT 
-          'Water' AS service_type,
-          bm.blockname,
-          bm.localityname,
-          ws.locality,
-          TO_CHAR((TO_TIMESTAMP(ws.billingcyclestartdate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS fromDate,
-          TO_CHAR((TO_TIMESTAMP(ws.billingcycleenddate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS end_date,
-          TO_CHAR((TO_TIMESTAMP(ws.createdtime / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS createddate,
-          COALESCE(conn.connection_count, 0) AS connection_count
-      FROM eg_bndry_mohalla bm
-      inner JOIN eg_ws_scheduler ws
-          ON TRIM(ws.locality) = TRIM(bm.localitycode)
-          AND ws.billingcyclestartdate = $fromDate
-          AND ws.tenantid = $tenantid
-      inner JOIN (
-          SELECT 
-              locality,
-              COUNT(connectionno) AS connection_count
-          FROM eg_ws_connection
-          WHERE tenantid = $tenantid
-            AND connectionno IS NOT NULL
-            AND status = 'Active'
-          GROUP BY locality
-      ) conn ON TRIM(conn.locality) = TRIM(bm.localitycode)
-      UNION ALL
-      -- -- Sewerage Service Data
-      SELECT 
-          'Sewerage' AS service_type,
-          bm.blockname,
-          bm.localityname,
-          sw.locality,
-          TO_CHAR((TO_TIMESTAMP(sw.billingcyclestartdate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS fromDate,
-          TO_CHAR((TO_TIMESTAMP(sw.billingcycleenddate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS end_date,
-          TO_CHAR((TO_TIMESTAMP(sw.createdtime / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS createddate,
-          COALESCE(conn.connection_count, 0) AS connection_count
-      FROM eg_bndry_mohalla bm
-      inner JOIN eg_sw_scheduler sw
-          ON TRIM(sw.locality) = TRIM(bm.localitycode)
-          AND sw.billingcyclestartdate = $fromDate
-          AND sw.tenantid = $tenantid
-      LEFT JOIN (
-          SELECT 
-              locality,
-              COUNT(connectionno) AS connection_count
-          FROM eg_sw_connection
-          WHERE tenantid = $tenantid
-            AND connectionno IS NOT NULL
-            AND status = 'Active'
-          GROUP BY locality
-      ) conn ON TRIM(conn.locality) = TRIM(bm.localitycode)
-      
-      ORDER BY locality, service_type;
+       -- Water Service Data
+       SELECT 
+       'Water' AS service_type,
+       bm.blockname,bm.localityname,ws.locality,
+       TO_CHAR((TO_TIMESTAMP(ws.billingcyclestartdate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS fromDate,
+       TO_CHAR((TO_TIMESTAMP(ws.billingcycleenddate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS end_date,
+       TO_CHAR((TO_TIMESTAMP(ws.createdtime / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS createddate,
+       COALESCE(conn.connection_count, 0) AS connection_count
+       FROM eg_bndry_mohalla bm
+       LEFT JOIN eg_ws_scheduler ws
+       ON TRIM(ws.locality) = TRIM(bm.localitycode)
+       AND ws.billingcyclestartdate = $fromDate
+       AND ws.tenantid = $tenantid
+       INNER JOIN (
+         SELECT 
+         locality,
+         COUNT(connectionno) AS connection_count FROM eg_ws_connection
+         WHERE tenantid = $tenantid
+         AND connectionno IS NOT NULL
+         AND status = 'Active'
+         GROUP BY locality) 
+         conn ON TRIM(conn.locality) = TRIM(bm.localitycode)
+       UNION ALL
+       -- Sewerage Service Data
+       SELECT 
+       'Sewerage' AS service_type,bm.blockname,bm.localityname,sw.locality,
+       TO_CHAR((TO_TIMESTAMP(sw.billingcyclestartdate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS fromDate,
+       TO_CHAR((TO_TIMESTAMP(sw.billingcycleenddate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS end_date,
+       TO_CHAR((TO_TIMESTAMP(sw.createdtime / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS createddate,
+       COALESCE(conn.connection_count, 0) AS connection_count
+       FROM eg_bndry_mohalla bm LEFT JOIN eg_sw_scheduler sw
+       ON TRIM(sw.locality) = TRIM(bm.localitycode)
+       AND sw.billingcyclestartdate = $fromDate
+       AND sw.tenantid = $tenantid
+       INNER JOIN (
+         SELECT locality,COUNT(connectionno) AS connection_count FROM eg_sw_connection
+         WHERE tenantid = $tenantid 
+         AND connectionno IS NOT NULL AND status = 'Active'
+         GROUP BY locality) 
+         conn ON TRIM(conn.locality) = TRIM(bm.localitycode)
+         
+       ORDER BY locality, service_type;
+
+    
   
