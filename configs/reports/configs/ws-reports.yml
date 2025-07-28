@@ -2631,44 +2631,62 @@ ReportDefinitions:
         searchClause: AND ws.billingcyclestartdate >= $fromDate
     query: |
        SELECT 
-       'Water' AS service_type,
-       bm.blockname,bm.localityname,ws.locality,
-       TO_CHAR((TO_TIMESTAMP(ws.billingcyclestartdate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS fromDate,
-       TO_CHAR((TO_TIMESTAMP(ws.billingcycleenddate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS end_date,
-       TO_CHAR((TO_TIMESTAMP(ws.createdtime / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS createddate,
-       COALESCE(conn.connection_count, 0) AS connection_count
-       FROM eg_bndry_mohalla bm
-       LEFT JOIN eg_ws_scheduler ws
-       ON TRIM(ws.locality) = TRIM(bm.localitycode)
-       AND ws.billingcyclestartdate = $fromDate
-       AND ws.tenantid = $tenantid
+           'Water' AS service_type,
+           bm.blockname,
+           bm.localityname,
+           ws.locality,
+           TO_CHAR((TO_TIMESTAMP(ws.billingcyclestartdate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS fromDate,
+           TO_CHAR((TO_TIMESTAMP(ws.billingcycleenddate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS end_date,
+           TO_CHAR((TO_TIMESTAMP(ws.createdtime / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS createddate,
+           COALESCE(conn.connection_count, 0) AS connection_count
+       FROM (
+           eg_bndry_mohalla bm
+           LEFT JOIN eg_ws_scheduler ws
+               ON TRIM(ws.locality) = TRIM(bm.localitycode)
+               AND ws.billingcyclestartdate = $fromDate
+               AND ws.tenantid = $tenantid
+       ) 
        INNER JOIN (
-         SELECT 
-         locality,
-         COUNT(connectionno) AS connection_count FROM eg_ws_connection
-         WHERE tenantid = $tenantid
-         AND connectionno IS NOT NULL
-         AND status = 'Active'
-         GROUP BY locality) 
-         conn ON TRIM(conn.locality) = TRIM(bm.localitycode)
+           SELECT 
+               locality,
+               COUNT(connectionno) AS connection_count 
+           FROM eg_ws_connection
+           WHERE tenantid = $tenantid
+             AND connectionno IS NOT NULL
+             AND status = 'Active'
+           GROUP BY locality
+       ) conn 
+       ON TRIM(conn.locality) = TRIM(bm.localitycode)
+       
        UNION ALL
+       
        SELECT 
-       'Sewerage' AS service_type,bm.blockname,bm.localityname,sw.locality,
-       TO_CHAR((TO_TIMESTAMP(sw.billingcyclestartdate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS fromDate,
-       TO_CHAR((TO_TIMESTAMP(sw.billingcycleenddate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS end_date,
-       TO_CHAR((TO_TIMESTAMP(sw.createdtime / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS createddate,
-       COALESCE(conn.connection_count, 0) AS connection_count
-       FROM eg_bndry_mohalla bm LEFT JOIN eg_sw_scheduler sw
-       ON TRIM(sw.locality) = TRIM(bm.localitycode)
-       AND sw.billingcyclestartdate = $fromDate
-       AND sw.tenantid = $tenantid
+           'Sewerage' AS service_type,
+           bm.blockname,
+           bm.localityname,
+           sw.locality,
+           TO_CHAR((TO_TIMESTAMP(sw.billingcyclestartdate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS fromDate,
+           TO_CHAR((TO_TIMESTAMP(sw.billingcycleenddate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS end_date,
+           TO_CHAR((TO_TIMESTAMP(sw.createdtime / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS createddate,
+           COALESCE(conn.connection_count, 0) AS connection_count
+       FROM (
+           eg_bndry_mohalla bm
+           LEFT JOIN eg_sw_scheduler sw
+               ON TRIM(sw.locality) = TRIM(bm.localitycode)
+               AND sw.billingcyclestartdate = $fromDate
+               AND sw.tenantid = $tenantid
+       ) 
        INNER JOIN (
-         SELECT locality,COUNT(connectionno) AS connection_count FROM eg_sw_connection
-         WHERE tenantid = $tenantid 
-         AND connectionno IS NOT NULL AND status = 'Active'
-         GROUP BY locality) 
-         conn ON TRIM(conn.locality) = TRIM(bm.localitycode)
-         
+           SELECT 
+               locality,
+               COUNT(connectionno) AS connection_count 
+           FROM eg_sw_connection
+           WHERE tenantid = $tenantid
+             AND connectionno IS NOT NULL
+             AND status = 'Active'
+           GROUP BY locality
+       ) conn 
+       ON TRIM(conn.locality) = TRIM(bm.localitycode)
   
 
     
