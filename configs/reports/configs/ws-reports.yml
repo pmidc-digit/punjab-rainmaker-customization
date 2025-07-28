@@ -2635,7 +2635,7 @@ ReportDefinitions:
          SELECT 
            'Water' AS service_type,
            bm.blockname,
-           bm.localityname,
+           bm.localityname,ws.status,
            ws.locality,
            ws.billingcyclestartdate,
            TO_CHAR((TO_TIMESTAMP(ws.billingcyclestartdate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS fromDate,
@@ -2663,7 +2663,7 @@ ReportDefinitions:
          SELECT 
            'Sewerage' AS service_type,
            bm.blockname,
-           bm.localityname,
+           bm.localityname,sw.status,
            sw.locality,
            sw.billingcyclestartdate,
            TO_CHAR((TO_TIMESTAMP(sw.billingcyclestartdate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS fromDate,
