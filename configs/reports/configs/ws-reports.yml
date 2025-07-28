@@ -2769,17 +2769,25 @@ ReportDefinitions:
         )
   groupby: GROUP BY   conn.connectionno
 
-    
-    
-- reportName: BillSchedulerReport
+- reportName: Water_SewerageBillingReport
   decryptionPathId: ULBPTDataDumpReport_V2
-  summary: Bill Scheduler Report
+  summary: Water Sewerage Billing Report
   version: 1.0.0
   moduleName: rainmaker-ws
   additionalConfig:
     print:
       pdfPageSize: A1
   sourceColumns:
+  - name: blockname
+    label: reports.ws.blockname
+    type: string
+    source: ws
+    total: false
+  - name: localityname
+    label: reports.ws.localityname
+    type: string
+    source: ws
+    total: false
   - name: locality
     label: reports.ws.locality
     type: string
@@ -2795,13 +2803,13 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
-  - name: billingcyclestartdate
-    label: reports.ws.billingcyclestartdate
+  - name: fromDate
+    label: reports.ws.fromDate
     type: string
     source: ws
     total: false
-  - name: billingcycleenddate
-    label: reports.ws.billingcycleenddate
+  - name: end_date
+    label: reports.ws.end_date
     type: string
     source: ws
     total: false
@@ -2810,55 +2818,76 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+  - name: connection_count
+    label: reports.ws.connection_count
+    type: string
+    source: ws
+    total: false
+  searchParams:
+  - name: fromDate
+    label: reports.pt.fromDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND billingcyclestartdate >= $fromDate
   query: |
-    WITH LatestWaterBill AS (SELECT 'Water' AS 
-    service_type,
-    s1.locality,
-    MAX(s1.billingcyclestartdate) AS billingcyclestartdate,
-    MAX(s1.billingcycleenddate) AS billingcycleenddate,
-    MAX(s1.createdtime) AS createddate
-    FROM
-    eg_ws_scheduler s1
-    WHERE s1.tenantid = $tenantid 
-    GROUP BY
-    s1.locality
-    ),
-    LatestSewerageBill AS (SELECT
-    'Sewerage' AS service_type,
-    s2.locality,
-    MAX(s2.billingcyclestartdate) AS billingcyclestartdate,
-    MAX(s2.billingcycleenddate) AS billingcycleenddate,
-    MAX(s2.createdtime) AS createddate
-    FROM eg_sw_scheduler s2 WHERE s2.tenantid = $tenantid 
-    GROUP BY
-    s2.locality),
-    CombinedLatestBill AS (
-    SELECT * FROM LatestWaterBill
-    UNION ALL
-    SELECT * FROM LatestSewerageBill
+    WITH WS_Billing_cte AS (
+      -- Water Service Data
+      SELECT 
+        'Water' AS service_type,
+        bm.blockname,
+        bm.localityname,
+        ws.locality,
+        ws.billingcyclestartdate,
+        TO_CHAR((TO_TIMESTAMP(ws.billingcyclestartdate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS fromDate,
+        TO_CHAR((TO_TIMESTAMP(ws.billingcycleenddate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS end_date,
+        TO_CHAR((TO_TIMESTAMP(ws.createdtime / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS createddate,
+        COALESCE(conn.connection_count, 0) AS connection_count
+      FROM eg_bndry_mohalla bm
+      LEFT JOIN eg_ws_scheduler ws
+        ON TRIM(ws.locality) = TRIM(bm.localitycode)
+        AND ws.tenantid = $tenantid
+      INNER JOIN (
+        SELECT 
+          locality,
+          COUNT(connectionno) AS connection_count
+        FROM eg_ws_connection
+        WHERE tenantid = $tenantid
+          AND connectionno IS NOT NULL
+          AND status = 'Active'
+        GROUP BY locality
+      ) conn ON TRIM(conn.locality) = TRIM(bm.localitycode)
+    
+      UNION ALL
+    
+      -- Sewerage Service Data
+      SELECT 
+        'Sewerage' AS service_type,
+        bm.blockname,
+        bm.localityname,
+        sw.locality,
+        sw.billingcyclestartdate,
+        TO_CHAR((TO_TIMESTAMP(sw.billingcyclestartdate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS fromDate,
+        TO_CHAR((TO_TIMESTAMP(sw.billingcycleenddate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS end_date,
+        TO_CHAR((TO_TIMESTAMP(sw.createdtime / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS createddate,
+        COALESCE(conn.connection_count, 0) AS connection_count
+      FROM eg_bndry_mohalla bm
+      LEFT JOIN eg_sw_scheduler sw
+        ON TRIM(sw.locality) = TRIM(bm.localitycode)
+        AND sw.tenantid = $tenantid
+      INNER JOIN (
+        SELECT 
+          locality,
+          COUNT(connectionno) AS connection_count
+        FROM eg_sw_connection
+        WHERE tenantid = $tenantid
+          AND connectionno IS NOT NULL
+          AND status = 'Active'
+        GROUP BY locality
+      ) conn ON TRIM(conn.locality) = TRIM(bm.localitycode)
     )
-    SELECT
-    s1.locality,
-    s1.status,
-    b1.service_type,
-    to_char(to_timestamp(b1.billingcyclestartdate / 1000), 'YYYY-MM-DD') as billingcyclestartdate,
-    to_char(to_timestamp(b1.billingcycleenddate / 1000), 'YYYY-MM-DD') as billingcycleenddate,
-    to_char(to_timestamp(b1.createddate / 1000), 'YYYY-MM-DD') as createddate
-    FROM
-    eg_ws_scheduler s1
-    INNER JOIN CombinedLatestBill b1 ON s1.locality = b1.locality AND s1.billingcyclestartdate = b1.billingcyclestartdate AND s1.billingcycleenddate = b1.billingcycleenddate
-    AND s1.createdtime = b1.createddate WHERE s1.tenantid = $tenantid  AND b1.service_type = 'Water'
-    UNION ALL 
-    SELECT
-    s2.locality,
-    s2.status,
-    b1.service_type,
-    to_char(to_timestamp(b1.billingcyclestartdate / 1000), 'YYYY-MM-DD') as billingcyclestartdate,
-    to_char(to_timestamp(b1.billingcycleenddate / 1000), 'YYYY-MM-DD') as billingcycleenddate,
-    to_char(to_timestamp(b1.createddate / 1000), 'YYYY-MM-DD') as createddate
-    FROM eg_sw_scheduler s2 INNER JOIN CombinedLatestBill b1 ON s2.locality = b1.locality AND s2.billingcyclestartdate = b1.billingcyclestartdate 
-    AND s2.billingcycleenddate = b1.billingcycleenddate AND s2.createdtime = b1.createddate WHERE s2.tenantid = $tenantid  AND b1.service_type = 'Sewerage'
-    ORDER BY locality, service_type;
+    
+    SELECT * FROM WS_Billing_cte where billingcyclestartdate >= $fromDate  
 
 - reportName:  SWDemandDetailReport
   decryptionPathId: ULBPTDataDumpReport_V2
