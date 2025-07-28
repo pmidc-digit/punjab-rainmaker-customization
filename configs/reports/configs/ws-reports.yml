@@ -2630,7 +2630,6 @@ ReportDefinitions:
         isMandatory: true
         searchClause: AND ws.billingcyclestartdate >= $fromDate
     query: |
-       -- Water Service Data
        SELECT 
        'Water' AS service_type,
        bm.blockname,bm.localityname,ws.locality,
@@ -2653,7 +2652,6 @@ ReportDefinitions:
          GROUP BY locality) 
          conn ON TRIM(conn.locality) = TRIM(bm.localitycode)
        UNION ALL
-       -- Sewerage Service Data
        SELECT 
        'Sewerage' AS service_type,bm.blockname,bm.localityname,sw.locality,
        TO_CHAR((TO_TIMESTAMP(sw.billingcyclestartdate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY') AS fromDate,
