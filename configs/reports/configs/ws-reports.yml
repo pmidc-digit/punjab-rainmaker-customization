@@ -2602,8 +2602,8 @@ ReportDefinitions:
         type: string
         source: ws
         total: false
-      - name: start_date
-        label: reports.ws.start_date
+      - name: fromDate
+        label: reports.ws.fromDate
         type: string
         source: ws
         total: false
@@ -2686,5 +2686,5 @@ ReportDefinitions:
          ) conn ON TRIM(conn.locality) = TRIM(bm.localitycode)
        )
        
-       SELECT * FROM WS_Billing_cte
+       SELECT * FROM WS_Billing_cte where billingcyclestartdate >= $fromDate
   
