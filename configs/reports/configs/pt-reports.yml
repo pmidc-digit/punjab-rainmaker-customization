@@ -6495,6 +6495,11 @@ ReportDefinitions:
         type: string
         source: pt
         total: false
+      - name: usagetype
+        label: usagetype
+        type: string
+        source: pt
+        total: false
       - name: amount_paid
         label: amount_paid
         type: string
@@ -6557,15 +6562,22 @@ ReportDefinitions:
        ulb_mapped AS (
        SELECT ulb_code, district, name_of_ulb
         FROM ulb_data
+        ),
+       property_usagetype AS (
+       SELECT
+        p.propertyid AS property_id,
+        p.usagecategory AS usagetype
+       FROM eg_pt_property p
        )
        SELECT DISTINCT ON (d.property_id, bi.receiptnumber)
        u.name_of_ulb AS tenantid, u.district,
-       d.property_id, bi.amountpaid AS amount_paid,
+       d.property_id, put.usagetype, bi.amountpaid AS amount_paid,
        TO_TIMESTAMP(bi.receiptdate / 1000) AS receipt_date, bi.receiptnumber,
        bi.paymentstatus, bi.paymentmode
        FROM defaulters d
        LEFT JOIN bill_info bi  ON d.property_id = bi.consumercode AND d.tenantid = bi.tenantid
        LEFT JOIN ulb_mapped u  ON d.tenantid = u.ulb_code
+       LEFT JOIN property_usagetype put ON d.property_id = put.property_id
     orderby: ORDER BY d.property_id, bi.receiptnumber, bi.receiptdate DESC;
   - reportName: PT_Invalid_Defaulters
     summary: Data for defaulter property_id with no receipt number
