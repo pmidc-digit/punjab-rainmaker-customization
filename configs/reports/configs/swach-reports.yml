@@ -579,7 +579,7 @@ ReportDefinitions:
           JOIN eg_userrole_v1 eur ON eu.id = eur.user_id
           LEFT JOIN public.egov_swach_imagedata sc ON eu.uuid = sc.uuid
           WHERE eur.role_code = 'PESCO'
-            AND sc.created_time BETWEEN 1748070957000::bigint AND (1748070957000::bigint + 86399000)
+            AND sc.created_time BETWEEN $fromDate::bigint AND ($fromDate::bigint + 86399000)
       ),
       
       -- Phase 1: Present Users
