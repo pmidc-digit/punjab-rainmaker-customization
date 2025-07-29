@@ -2381,42 +2381,44 @@ ReportDefinitions:
       source: ws 
       isMandatory: true
     query: |
-        WITH cte AS ( SELECT
-          to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') || '-' || 
-          to_char((to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM' ) AS finyear,
-          pt.usagecategory,wc.connectionno,wc.property_id,
-          wc.locality,  bill.billid,bill.totalamount,wc.tenantid AS tenantid,
-          bill.consumercode, wc.status AS wc_status, pt.landarea,
-          b.payername AS payername,  b.status AS bill_status,b.payeraddress,  b.mobilenumber   
-         FROM 
-          eg_ws_connection wc
-         JOIN eg_pt_property pt 
-          ON wc.property_id = pt.propertyid
-          AND wc.status = 'Active'
-          AND pt.status IN ('ACTIVE', 'PENDINGWS')
-         INNER JOIN egbs_billdetail_v1 bill 
-          ON bill.consumercode = wc.connectionno
-          AND wc.status = 'Active'
-          AND bill.businessservice = 'WS'
-         JOIN egbs_bill_v1 b 
-          ON bill.billid = b.id
-        WHERE 
-           wc.connectionno IS NOT NULL
-           AND bill.businessservice = 'WS'
-           AND pt.usagecategory IN ('RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL', 'MIXED'))
-        SELECT 
-           cte.consumercode, cte.usagecategory,
-           SUM(cte.totalamount) AS amtpaid, cte.bill_status,
-           cte.locality,  cte.payeraddress,    cte.mobilenumber,  
-           cte.payername,   STRING_AGG(cte.finyear, ', ') AS finyear  
-        FROM 
-           cte
-        WHERE  
-           cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED')
-           
-    groupby: GROUP BY  cte.consumercode,  cte.bill_status, cte.payername, cte.usagecategory,cte.locality, cte.mobilenumber, cte.payeraddress
+        query: |
+         WITH params AS (
+         SELECT 
+            $financialYear::TEXT AS finyear,
+            to_timestamp((split_part($financialYear, '-', 1) || '-04-01'), 'YYYY-MM-DD') AT TIME ZONE 'Asia/Kolkata' AS start_date,
+            to_timestamp(((CAST(split_part($financialYear, '-', 2) AS INTEGER) + 2000)::TEXT || '-03-31 23:59:59'), 'YYYY-MM-DD HH24:MI:SS') AT TIME ZONE 'Asia/Kolkata' AS end_date
+          ), cte AS (
+         SELECT
+            pt.usagecategory, wc.connectionno, wc.property_id, wc.locality,
+            bill.billid, bill.totalamount, wc.tenantid AS tenantid, bill.consumercode,
+            wc.status AS wc_status, pt.landarea, b.payername AS payername, b.status AS bill_status,
+            b.payeraddress, b.mobilenumber
+        FROM eg_ws_connection wc
+        JOIN eg_pt_property pt 
+            ON wc.property_id = pt.propertyid
+            AND wc.status = 'Active'
+            AND pt.status IN ('ACTIVE', 'PENDINGWS')
+        INNER JOIN egbs_billdetail_v1 bill 
+            ON bill.consumercode = wc.connectionno
+            AND wc.status = 'Active'
+            AND bill.businessservice = 'WS'
+        JOIN egbs_bill_v1 b  ON bill.billid = b.id
+        JOIN params p ON TRUE
+        WHERE  wc.connectionno IS NOT NULL
+            AND bill.businessservice = 'WS'
+            AND pt.usagecategory IN ('RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL', 'MIXED')
+            AND to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata' BETWEEN p.start_date AND p.end_date
+        )SELECT 
+        cte.consumercode, params.finyear, cte.usagecategory, SUM(cte.totalamount) AS amtpaid,
+        cte.bill_status, cte.locality, cte.payeraddress, cte.mobilenumber, cte.payername
+        FROM  cte
+        JOIN params ON TRUE
+        WHERE  cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED')
+    groupby: GROUP BY  cte.consumercode,params.finyear, cte.bill_status,cte.payername,
+        cte.usagecategory, cte.locality, cte.mobilenumber, cte.payeraddress
         HAVING
-         SUM(cte.totalamount) > $minamount
+        SUM(cte.totalamount) > $minamount
+
 
   - reportName: Water_Demand_Report
     summary: Water Demand Report- This report provides the number of water connections and the total demand generated for a specific quarter in a financial year.
