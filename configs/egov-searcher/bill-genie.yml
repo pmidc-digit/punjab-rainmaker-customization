@@ -622,15 +622,13 @@ SearchDefinitions:
    searchParams:
      condition: AND 
      params:
-          - name: b.tenantid
+          - name: conn.tenantid
             isMandatory: true
             jsonPath: $.searchCriteria.tenantId
           - name: conn.additionaldetails->>'groups'
             isMandatory: true
             jsonPath: $.searchCriteria.group
-          - name: bd.businessservice
-            isMandatory: true
-            jsonPath: $.searchCriteria.businesService
+
    output:
      jsonFormat:
         ResponseInfo: {}
