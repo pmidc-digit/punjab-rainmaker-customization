@@ -6,7 +6,7 @@ serviceMaps:
       fromTopic: save-ndc-application
       isTransaction: true
       queryMaps:
-        - query: INSERT INTO eg_ndc_Applicants (uuid,tenantid,firstname, lastname, mobile, email, address, applicationstatus,active, createdby, lastmodifiedby, createdtime, lastmodifiedtime, action) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?,?);
+        - query: INSERT INTO eg_ndc_Applicants (uuid,tenantid,firstname, lastname, mobile, email, address, applicationstatus,active, createdby, lastmodifiedby, createdtime, lastmodifiedtime, action, reason) VALUES (?,?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?,?);
           basePath: Applicant
           jsonMaps:
             - jsonPath: $.Applicant.uuid
@@ -23,6 +23,7 @@ serviceMaps:
             - jsonPath: $.Applicant.createdtime
             - jsonPath: $.Applicant.lastmodifiedtime
             - jsonPath: $.Applicant.action
+            - jsonPath: $.Applicant.reason
 
         - query: INSERT INTO eg_ndc_details (uuid,Applicantid, businessservice, consumercode, additionaldetails, dueamount, status) VALUES (?, ?, ?, ?, ?, ?,?);
           basePath: NdcDetails.*
@@ -54,7 +55,7 @@ serviceMaps:
       fromTopic: update-ndc-application
       isTransaction: true
       queryMaps:
-        - query: INSERT INTO eg_ndc_Applicants (uuid,tenantid, firstname, lastname, mobile, email, address, applicationstatus,active, createdby, lastmodifiedby, createdtime, lastmodifiedtime,action)
+        - query: INSERT INTO eg_ndc_Applicants (uuid,tenantid, firstname, lastname, mobile, email, address, applicationstatus,active, createdby, lastmodifiedby, createdtime, lastmodifiedtime,action,reason)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)
             ON CONFLICT (uuid) DO UPDATE SET
               tenantid = EXCLUDED.tenantid,
@@ -69,7 +70,8 @@ serviceMaps:
               lastmodifiedby = EXCLUDED.lastmodifiedby,
               createdtime = EXCLUDED.createdtime,
               lastmodifiedtime = EXCLUDED.lastmodifiedtime,
-              action = EXCLUDED.action;
+              action = EXCLUDED.action,
+              reason = EXCLUDED.reason;
           basePath: Applicant
           jsonMaps:
             - jsonPath: $.Applicant.uuid
@@ -86,6 +88,7 @@ serviceMaps:
             - jsonPath: $.Applicant.createdtime
             - jsonPath: $.Applicant.lastmodifiedtime
             - jsonPath: $.Applicant.action
+            - jsonPath: $.Applicant.reason
 
         - query: INSERT INTO eg_ndc_details (uuid, applicantid, businessservice, consumercode, additionaldetails, dueamount, status)
             VALUES (?, ?, ?, ?, ?, ?, ?)
