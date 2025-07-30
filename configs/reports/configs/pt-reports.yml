@@ -6641,3 +6641,143 @@ ReportDefinitions:
        LEFT JOIN ulb_mapped u ON TRIM(LOWER(d.tenantid)) = TRIM(LOWER(u.ulb_code))
        WHERE b.property_id IS NULL 
     orderby: ORDER BY d.property_id DESC;
+  - reportName: STATEDEFAULTER_REPORT_WITH_LOCALITY_UNPAID_DEMAND_NEW
+    decryptionPathId: ULBDEFAULTERPTREPORT_V2
+    summary: ULB_PT_DEFAULTER
+    version: 1.0.0
+    moduleName: rainmaker-pt
+    sourceColumns:
+      - name: propertyid
+        label: reports.pt.propertyId
+        type: string
+        source: pt
+        total: false
+      - name: oldpropertyid
+        label: reports.pt.oldpropertyId
+        type: string
+        source: pt
+        total: false
+      - name: businessname
+        label: reports.pt.busnessname
+        type: string
+        source: pt
+        total: false
+      - name: financialyear
+        label: reports.pt.financialyear
+        type: string
+        source: pt
+        total: false
+      - name: latestfy
+        label: reports.pt.latestfy
+        type: string
+        source: pt
+        total: false
+      - name: max_pt_tax
+        label: reports.pt.max_pt_tax
+        type: string
+        source: pt
+        total: true
+      - name: max_paid
+        label: reports.pt.max_paid
+        type: string
+        source: pt
+        total: true
+      - name: propertytype
+        label: reports.pt.propertytype
+        type: string
+        source: pt
+        total: false
+      - name: propertyusagetype
+        label: reports.pt.propertyusagetype
+        type: string
+        source: pt
+        total: false
+      - name: address
+        label: reports.pt.address
+        type: string
+        source: pt
+        total: false
+      - name: block
+        label: reports.pt.block
+        type: string
+        source: pt
+        total: false
+      - name: ownername
+        label: reports.pt.ownername
+        type: string
+        source: pt
+        total: false
+      - name: mobileno
+        label: reports.pt.mobileno
+        type: string
+        source: pt
+        total: false
+    searchParams:  
+      - name: finYear
+        label: Financial Year
+        type: singlevaluelist
+        pattern:   'list://2015-16:2015-16,2016-17:2016-17,2017-18:2017-18,2017-18:2017-18,2018-19:2018-19,2019-20:2019-20,2020-21:2020-21,2021-22:2021-22,2022-23:    2022-23,2023-24:2023-24,2024-25:2024-25,2025-26:2025-26'
+        source: pt
+        isMandatory: false
+        searchClause: AND 1=1
+      - name: usageType
+        label: Usage Type
+        type: singlevaluelist
+        pattern: 'list://RESIDENTIAL:Residential,NONRESIDENTIAL:NonResidential,MIXED:Mixed'
+        source: pt
+        isMandatory: false
+        searchClause: AND split_part(props.propertyusagetype,'.',1) = $usageType
+      - name: localityArray
+        label: reports.pt.zoneList
+        type: boundarylist
+        source: pt
+        isMandatory: false
+        searchClause: AND props.localitycode IN ($localityArray)
+      - name: ulb
+        label: ULB
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: pt
+        wrapper: true
+        isMandatory: false
+        searchClause: AND pt.tenantid = $ulb
+    query: |
+       with assessments as
+       (
+           select 
+               propertyid,
+               string_agg(concat(assessmentyears,' (Rs.',totalamount,')'),', ') as fy,
+               max(assessmentyears) as latest_fy,
+               max(totalamount) as maxtotal,
+               max(propertytax) as max_pt_tax
+           from report_assessments 
+           where tenantid=$tenantid and propertyid not in (select propertyid from report_assessments where tenantid=$tenantid and assessmentyears =$finYear)
+               group by propertyid
+       ),
+       owners as 
+       (
+           select 
+           split_part(string_agg(ownername,','),',',1) as ownername,
+           split_part(string_agg(mobileNumber,','),',',1) as mobileNumber,
+           propertyid
+           from report_owners where tenantid=$tenantid and status='ACTIVE'
+           group by propertyid
+       )
+       select 
+           assessments.propertyid as propertyid,
+           props.oldpropertyid as oldpropertyid,
+           props.firmbusinessname as businessname,
+           assessments.fy as financialyear,
+           assessments.latest_fy as latestfy,
+           assessments.max_pt_tax as max_pt_tax,
+           assessments.maxtotal as max_paid,
+           props.propertytype as propertytype,
+           propertyusagetype as propertyusagetype,
+           concat(address,' ',localityname) as address,
+           blockcode as block,
+           owners.ownername as ownername,
+           owners.mobileNumber as mobileno
+       from report_properties props
+       inner join assessments on assessments.propertyid=props.propertyid
+       inner join owners on owners.propertyid=props.propertyid 
+       where tenantid=$tenantid     
