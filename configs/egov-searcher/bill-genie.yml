@@ -543,8 +543,8 @@ SearchDefinitions:
                  INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id
              WHERE 
                  conn.status = 'Active'
-                 AND conn.additionaldetails->>'groups' = 'A-10'
-                 AND conn.tenantid = 'pb.patiala'
+                 AND conn.additionaldetails->>'groups' = $groups AND 
+                 AND conn.tenantid = $tenantid
          ),
          
          filtered_bills AS (
@@ -602,7 +602,7 @@ SearchDefinitions:
                  ad.additionaldetails AS ad_additionaldetails
              FROM 
                  filtered_conn fc
-                 INNER JOIN egbs_bill_v1 b ON fc.connectionno = b.consumercode AND b.tenantid = 'pb.patiala'
+                 INNER JOIN egbs_bill_v1 b ON fc.connectionno = b.consumercode AND b.tenantid = $tenantid
                  INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid AND bd.businessservice = 'WS'
                  INNER JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid
          ),
