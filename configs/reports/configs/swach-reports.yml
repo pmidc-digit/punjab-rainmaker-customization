@@ -579,47 +579,49 @@ ReportDefinitions:
           JOIN eg_userrole_v1 eur ON eu.id = eur.user_id
           LEFT JOIN public.egov_swach_imagedata sc ON eu.uuid = sc.uuid
           WHERE eur.role_code = 'PESCO'
-            AND sc.created_time BETWEEN 1748070957000::bigint AND (1748070957000::bigint + 86399000)
+            AND sc.created_time BETWEEN $fromDate::bigint AND ($fromDate::bigint + 86399000)
       )
       
-      -- Final result as UNION ALL of both blocks
-      SELECT 
-          eu.name AS ownername,
-          eu.username,
-          eu.mobilenumber AS mobileno,
-          COALESCE(MAX(CASE WHEN a.rn = 1 THEN a.tenant_id END), '') AS tenantid_1,
-          COALESCE(MAX(CASE WHEN a.rn = 1 THEN a.createdtime END), '') AS createdtime_1,
-          COALESCE(MAX(CASE WHEN a.rn = 2 THEN a.tenant_id END), '') AS tenantid_2,
-          COALESCE(MAX(CASE WHEN a.rn = 2 THEN a.createdtime END), '') AS createdtime_2,
-          COALESCE(MAX(CASE WHEN a.rn = 3 THEN a.tenant_id END), '') AS tenantid_3,
-          COALESCE(MAX(CASE WHEN a.rn = 3 THEN a.createdtime END), '') AS createdtime_3,
-          'Present' AS attendance_status
-      FROM public.eg_user eu
-      JOIN eg_userrole_v1 eur ON eu.id = eur.user_id
-      JOIN attendance_cte a ON eu.mobilenumber = a.mobilenumber
-      WHERE eur.role_code = 'PESCO'
-      GROUP BY eu.name, eu.username, eu.mobilenumber
+      SELECT * FROM (
+          -- Combine Present and Absent
+          SELECT 
+              eu.name AS ownername,
+              eu.username,
+              eu.mobilenumber AS mobileno,
+              COALESCE(MAX(CASE WHEN a.rn = 1 THEN a.tenant_id END), '') AS tenantid_1,
+              COALESCE(MAX(CASE WHEN a.rn = 1 THEN a.createdtime END), '') AS createdtime_1,
+              COALESCE(MAX(CASE WHEN a.rn = 2 THEN a.tenant_id END), '') AS tenantid_2,
+              COALESCE(MAX(CASE WHEN a.rn = 2 THEN a.createdtime END), '') AS createdtime_2,
+              COALESCE(MAX(CASE WHEN a.rn = 3 THEN a.tenant_id END), '') AS tenantid_3,
+              COALESCE(MAX(CASE WHEN a.rn = 3 THEN a.createdtime END), '') AS createdtime_3,
+              'Present' AS attendance_status
+          FROM public.eg_user eu
+          JOIN eg_userrole_v1 eur ON eu.id = eur.user_id
+          JOIN attendance_cte a ON eu.mobilenumber = a.mobilenumber
+          WHERE eur.role_code = 'PESCO'
+          GROUP BY eu.name, eu.username, eu.mobilenumber
       
-      UNION 
+          UNION
       
-      SELECT 
-          eu.name AS ownername,
-          eu.username,
-          eu.mobilenumber AS mobileno,
-          COALESCE((
-              SELECT sc2.tenant_id
-              FROM public.egov_swach_imagedata sc2
-              WHERE sc2.uuid = eu.uuid
-              ORDER BY sc2.created_time DESC
-              LIMIT 1
-          ), '') AS tenantid_1,
-          '' AS createdtime_1,
-          '' AS tenantid_2,
-          '' AS createdtime_2,
-          '' AS tenantid_3,
-          '' AS createdtime_3,
-          'Absent' AS attendance_status
-      FROM public.eg_user eu
-      JOIN eg_userrole_v1 eur ON eu.id = eur.user_id
-      WHERE eur.role_code = 'PESCO'
-        AND eu.mobilenumber NOT IN (SELECT DISTINCT mobilenumber FROM attendance_cte)
+          SELECT 
+              eu.name AS ownername,
+              eu.username,
+              eu.mobilenumber AS mobileno,
+              COALESCE((
+                  SELECT sc2.tenant_id
+                  FROM public.egov_swach_imagedata sc2
+                  WHERE sc2.uuid = eu.uuid
+                  ORDER BY sc2.created_time DESC
+                  LIMIT 1
+              ), '') AS tenantid_1,
+              '' AS createdtime_1,
+              '' AS tenantid_2,
+              '' AS createdtime_2,
+              '' AS tenantid_3,
+              '' AS createdtime_3,
+              'Absent' AS attendance_status
+          FROM public.eg_user eu
+          JOIN eg_userrole_v1 eur ON eu.id = eur.user_id
+          WHERE eur.role_code = 'PESCO'
+            AND eu.mobilenumber NOT IN (SELECT DISTINCT mobilenumber FROM attendance_cte)
+      ) AS final_result    
