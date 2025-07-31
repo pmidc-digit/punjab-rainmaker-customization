@@ -2695,4 +2695,1298 @@ ReportDefinitions:
        )
        
        SELECT * FROM WS_Billing_cte where billingcyclestartdate >= $fromDate
+  - reportName: Connectioncountreport
+    summary: Connection Count  Report
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+    - name: totalwaterconnections
+      label: reports.ws.totalwaterconnections
+      type: string
+      source: ws
+      total: true
+    - name: totalsewerageconnections
+      label: reports.ws.totalsewerageconnections
+      type: string
+      source: ws
+      total: true
+    - name: totalwateractive
+      label: reports.ws.totalwateractive
+      type: string
+      source: ws
+      total: true
+    - name: totalsewerageactive
+      label: reports.ws.totalsewerageactive
+      type: string
+      source: ws
+      total: true
+    - name: bothactiveconnection
+      label: reports.ws.bothactiveconnection
+      type: string
+      source: ws
+      total: true
+    - name: totalactiveresidentialinwater
+      label: reports.ws.totalactiveresidentialinwater
+      type: string
+      source: ws
+      total: true
+    - name: totalactiveresidentialinsewerage
+      label: reports.ws.totalactiveresidentialinsewerage
+      type: string
+      source: ws
+      total: true
+    - name: totalactivenonresidentialinsewerage
+      label: reports.ws.totalactivenonresidentialinsewerage
+      type: string
+      source: ws
+      total: true
+    - name: totalactivenonresidentialinwater
+      label: reports.ws.totalactivenonresidentialinwater
+      type: string
+      source: ws
+      total: true
+    - name: totalmeteredconnections
+      label: reports.ws.totalmeteredconnections
+      type: string
+      source: ws
+      total: true
+    - name: Total_Exempted_in_Water
+      label: reports.ws.Total_Exempted_in_Water
+      type: string
+      source: ws
+      total: true
+    - name: totalexemptedinwater
+      label: reports.ws.totalexemptedinwater
+      type: string
+      source: ws
+      total: true
+    - name: betweenfivemarlawater
+      label: reports.ws.betweenfivemarlawater
+      type: string
+      source: ws
+      total: true
+    - name: betweenfivemarlasewerage
+      label: reports.ws.betweenfivemarlasewerage
+      type: string
+      source: ws
+      total: true
+    - name: betweensixmarlawater
+      label: reports.ws.betweensixmarlawater
+      type: string
+      source: ws
+      total: true
+    - name: betweensixandtenmarlasewerage
+      label: reports.ws.betweensixandtenmarlasewerage
+      type: string
+      source: ws
+      total: true
+    - name: morethantenmarlawater
+      label: reports.ws.morethantenmarlawater
+      type: string
+      source: ws
+      total: true
+    - name: morethantenmarlasewerage
+      label: reports.ws.morethantenmarlasewerage
+      type: string
+      source: ws
+      total: true   
+    query: |      
+       SELECT 
+           a.totalwaterconnections,
+           b.totalsewerageconnections,
+           (a.totalwaterconnections+b.totalsewerageconnections) as totalconnections,
+           d.totalwateractive ,
+           e.totalsewerageactive,
+           (d.totalwateractive+e.totalsewerageactive) as totalActiveconnections,
+       
+           e2.Meteredconnections,
+           (a.totalwaterconnections+b.totalsewerageconnections - e2.Meteredconnections) as UnMeteredConnection,
+           e3.ActiveMeteredConnection,
+           (d.totalwateractive+e.totalsewerageactive-e3.ActiveMeteredConnection)as ActiveUnMeteredConnection,
+           g1.TotalResidentialWater,
+           h1.TotalResidentialSewerage,
+           (g1.TotalResidentialWater+h1.TotalResidentialSewerage) as TotalResWAndS,
+           g.totalactiveresidentialinwater,
+           h.totalactiveresidentialinsewerage,
+           ( g.totalactiveresidentialinwater+ h.totalactiveresidentialinsewerage)as TotalResActiveWS,
+           h2.MeteredResconn,
+           (g1.TotalResidentialWater+h1.TotalResidentialSewerage-h2.MeteredResconn)as UnmeteredResConn,
+           h3.MeteredResActiveconn,
+           (g.totalactiveresidentialinwater+ h.totalactiveresidentialinsewerage-h3.MeteredResActiveconn)as UnmeterdResActiveConnn,
+           h4.totalCommwater,
+           h5.totalcommsew,
+           (h4.totalCommwater+h5.totalcommsew)as TotalCommWS,
+           i.totalActiveCommwater,
+           j.totalActiveCommsew,
+           (i.totalActiveCommwater+j.totalActiveCommsew) as TotalActiveCommWS ,
+           j1.TotalMetCommConn,
+           (h4.totalCommwater+h5.totalcommsew-j1.TotalMetCommConn) as UnmeterdCommConn,
+           j2.TotalMetActiveCommConn,
+           (i.totalActiveCommwater+j.totalActiveCommsew-j2.TotalMetActiveCommConn)as UnmeterCommActiveConn,
+       --  k.totalmeteredconnections,
+           l.waterunder5Marla,
+           m.Sewunder5Marla,
+           (l.waterunder5Marla+ m.Sewunder5Marla) as TotalWSUnder5Marla,
+           l1.Actwaterunder5Marla,
+           m1.ActSewunder5Marla,
+           (l1.Actwaterunder5Marla+ m1.ActSewunder5Marla) as TotalActWSUnder5Marla,
+           m2.MetUnd5marla,
+           (l.waterunder5Marla+ m.Sewunder5Marla-m2.MetUnd5marla)as Unmetunder5marla,
+           m3.MetActUnd5marla,
+           (l1.Actwaterunder5Marla+ m1.ActSewunder5Marla-m3.MetActUnd5marla) as UnmetActUnder5marla,
+         --  n.betweenfivemarlawater,
+         --  o.betweenfivemarlasewerage,
+         aa1.Rwaterunder5Marla,
+           aa2.RSewunder5Marla,
+           (aa1.Rwaterunder5Marla+ aa2.RSewunder5Marla) as TotalWSUnder5MarlaR,
+           aa3.RActwaterunder5Marla,
+           aa4.RActSewunder5Marla,
+           (aa3.RActwaterunder5Marla+ aa4.RActSewunder5Marla) as TotalActWSUnder5MarlaR,
+           aa5.RMetUnd5marla,
+           (aa1.Rwaterunder5Marla+ aa2.Rsewunder5Marla-aa5.RMetUnd5marla)as Unmetunder5marlaR,
+           aa6.RMetActUnd5marla,
+           (aa3.RActwaterunder5Marla+ aa4.RActSewunder5Marla-aa6.RMetActUnd5marla) as UnmetActUnder5marlaR,
+         
+         aa7.cwaterunder5Marla,
+           aa8.CSewunder5Marla,
+           (aa7.Cwaterunder5Marla+ aa8.CSewunder5Marla) as TotalWSUnder5MarlaC,
+           aa9.CActwaterunder5Marla,
+           aa10.CActSewunder5Marla,
+           (aa9.CActwaterunder5Marla+ aa10.CActSewunder5Marla) as TotalActWSUnder5MarlaC,
+           aa11.CMetUnd5marla,
+           (aa7.Cwaterunder5Marla+ aa8.CSewunder5Marla-aa11.CMetUnd5marla)as Unmetunder5marlaC,
+           aa12.CMetActUnd5marla,
+           (aa9.CActwaterunder5Marla+ aa10.CActSewunder5Marla-aa12.CMetActUnd5marla) as UnmetActUnder5marlaC,
+         -- 6marla
+           aa13.waterunder6Marla,
+           aa14.Sewunder6Marla,
+           (aa13.waterunder6Marla+ aa14.Sewunder6Marla) as TotalWSUnder6Marla,
+           aa15.Actwaterunder6Marla,
+           aa16.ActSewunder6Marla,
+           (aa15.Actwaterunder6Marla+ aa16.ActSewunder6Marla) as TotalActWSUnder6Marla,
+           aa17.MetUnd6marla,
+           (aa13.waterunder6Marla+ aa14.Sewunder6Marla-aa17.MetUnd6marla)as Unmetunder6marla,
+           aa18.MetActUnd6marla,
+           (aa15.Actwaterunder6Marla+ aa16.ActSewunder6Marla-aa18.MetActUnd6marla) as UnmetActUnder6marla,
+         --  n.betweenfivemarlawater,
+         --  o.betweenfivemarlasewerage,
+         aa19.Rwaterunder6Marla,
+           aa20.RSewunder6Marla,
+           (aa19.Rwaterunder6Marla+ aa20.RSewunder6Marla) as TotalWSUnder6MarlaR,
+           aa21.RActwaterunder6Marla,
+           aa22.RActSewunder6Marla,
+           (aa21.RActwaterunder6Marla+ aa22.RActSewunder6Marla) as TotalActWSUnder6MarlaR,
+           aa23.RMetUnd6marla,
+           (aa19.Rwaterunder6Marla+ aa20.RSewunder6Marla-aa23.RMetUnd6marla)as Unmetunder6marlaR,
+           aa24.RMetActUnd6marla,
+           (aa21.RActwaterunder6Marla+ aa22.RActSewunder6Marla-aa24.RMetActUnd6marla) as UnmetActUnder6marlaR,
+         
+         aa25.cwaterunder6Marla,
+           aa26.CSewunder6Marla,
+           (aa25.cwaterunder6Marla+ aa26.CSewunder6Marla) as TotalWSUnder6MarlaC,
+           aa27.CActwaterunder6Marla,
+           aa28.CActSewunder6Marla,
+           (aa27.CActwaterunder6Marla+ aa28.CActSewunder6Marla) as TotalActWSUnder6MarlaC,
+           aa29.CMetUnd6marla,
+           (aa25.cwaterunder6Marla+ aa26.CSewunder6Marla-aa29.CMetUnd6marla)as Unmetunder6marlaC,
+           aa30.CMetActUnd6marla,
+           (aa27.CActwaterunder6Marla+ aa28.CActSewunder6Marla-aa30.CMetActUnd6marla) as UnmetActUnder6marlaC,
+           
+           -- 10 marla
+           
+          aa31.waterunder10Marla,
+           aa32.Sewunder10Marla,
+           (aa31.waterunder10Marla+ aa32.Sewunder10Marla) as TotalWSUnder10Marla,
+           aa33.Actwaterunder10Marla,
+           aa34.ActSewunder10Marla,
+           (aa33.Actwaterunder10Marla+ aa34.ActSewunder10Marla) as TotalActWSUnder10Marla,
+           aa35.MetUnd10marla,
+           (aa31.waterunder10Marla+ aa32.Sewunder10Marla-aa35.MetUnd10marla)as Unmetunder10marla,
+           aa36.MetActUnd10marla,
+           (aa33.Actwaterunder10Marla+ aa34.ActSewunder10Marla-aa36.MetActUnd10marla) as UnmetActUnder10marla,
+         --  n.betweenfivemarlawater,
+         --  o.betweenfivemarlasewerage,
+         aa37.Rwaterunder10Marla,
+           aa38.RSewunder10Marla,
+           (aa37.Rwaterunder10Marla+ aa38.RSewunder10Marla) as TotalWSUnder10MarlaR,
+           aa39.RActwaterunder10Marla,
+           aa40.RActSewunder10Marla,
+           (aa39.RActwaterunder10Marla+ aa40.RActSewunder10Marla) as TotalActWSUnder10MarlaR,
+           aa41.RMetUnd10marla,
+           (aa37.Rwaterunder10Marla+ aa38.RSewunder10Marla-aa41.RMetUnd10marla)as Unmetunder10marlaR,
+           aa42.RMetActUnd10marla,
+           (aa39.RActwaterunder10Marla+ aa40.RActSewunder10Marla-aa42.RMetActUnd10marla) as UnmetActUnder10marlaR,
+         
+         aa43.cwaterunder10Marla,
+           aa44.CSewunder10Marla,
+           (aa43.cwaterunder10Marla+ aa44.CSewunder10Marla) as TotalWSUnder10MarlaC,
+           aa45.CActwaterunder10Marla,
+           aa46.CActSewunder10Marla,
+           (aa45.CActwaterunder10Marla+ aa46.CActSewunder10Marla) as TotalActWSUnder10MarlaC,
+           aa47.CMetUnd10marla,
+           (aa43.cwaterunder10Marla+ aa44.CSewunder10Marla-aa47.CMetUnd10marla)as Unmetunder10marlaC,
+           aa48.CMetActUnd10marla,
+           (aa45.CActwaterunder10Marla+ aa46.CActSewunder10Marla-aa48.CMetActUnd10marla) as UnmetActUnder10marlaC
+         
+       FROM 
+           (SELECT COUNT(wc.connectionno) AS totalwaterconnections
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >=0 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   --AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              --AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) a,
+       
+           (SELECT COUNT(sc.connectionno) AS totalsewerageconnections
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >=0 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   --AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              --AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL)b,
+              
+           
+           (SELECT COUNT(distinct wc.connectionno) AS totalwateractive
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >=0
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   --AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) d,
+       
+          (SELECT COUNT(distinct sc.connectionno) AS totalsewerageactive
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >=0 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   --AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) e,
+       
+       (SELECT COUNT( distinct wc.connectionno) as Meteredconnections 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea >=0 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+            -- AND usagecategory IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       --AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)e2,
+       
+       (SELECT COUNT( distinct wc.connectionno) as ActiveMeteredConnection 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea >=0 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+             --AND usagecategory IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)e3,
+       
+          ------  Res
+          
+          
+           (SELECT COUNT(wc.connectionno) AS TotalResidentialWater
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >=0 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              --AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) g1,
+       
+           (SELECT COUNT(sc.connectionno) AS TotalResidentialSewerage
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >=0
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              --AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) h1,
+              
+              
+              (SELECT COUNT(distinct wc.connectionno) AS totalactiveresidentialinwater
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >=0 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) g,
+       
+           (SELECT COUNT(distinct sc.connectionno) AS totalactiveresidentialinsewerage
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >=0 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) h,
+       
+       (SELECT COUNT( distinct wc.connectionno) as MeteredResconn 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea >=0 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+            AND usagecategory IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       --AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)h2,
+       
+       (SELECT COUNT( distinct wc.connectionno) as MeteredResActiveconn 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea >=0 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+             AND usagecategory IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)h3,
+       
+          
+          ------under 5 Marla Comm
+          
+          (SELECT COUNT(wc.connectionno) AS totalCommwater
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >=0 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory NOT IN ('RESIDENTIAL') 
+                   AND tenantid = 'pb.amritsar') 
+              --AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) h4,
+       
+           (SELECT COUNT(sc.connectionno) AS totalcommsew
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >=0 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory NOT IN ('RESIDENTIAL')
+                   AND tenantid = 'pb.amritsar') 
+              --AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) h5,
+              
+              
+              (SELECT COUNT(distinct wc.connectionno) AS totalActiveCommwater
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >=0 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                 AND usagecategory NOT IN ('RESIDENTIAL')
+                   AND tenantid = 'pb.amritsar') 
+              AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) i,
+       
+           (SELECT COUNT(distinct sc.connectionno) AS totalActiveCommsew
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >=0 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                  AND usagecategory NOT IN ('RESIDENTIAL') 
+                   AND tenantid = 'pb.amritsar') 
+              AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) j,
+       
+       (SELECT COUNT( distinct wc.connectionno) as TotalMetCommConn 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea >=0 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+            AND usagecategory NOT IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       --AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)j1,
+       
+       (SELECT COUNT( distinct wc.connectionno) as TotalMetActiveCommConn 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea >=0 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+            AND usagecategory NOT IN ('RESIDENTIAL')
+             AND tenantid = 'pb.amritsar'
+       ) 
+       AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)j2,
+       
+          -------------- under 5 Marla
+       
+           (SELECT COUNT(wc.connectionno) AS waterunder5Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 0 AND 125 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   --AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              --AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) l,
+       
+           (SELECT COUNT(sc.connectionno) AS Sewunder5Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 0 AND 125 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   --AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              --AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) m,
+              
+              
+              (SELECT COUNT(distinct wc.connectionno) AS Actwaterunder5Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 0 AND 125 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   --AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) l1,
+       
+           (SELECT COUNT(distinct sc.connectionno) AS ActSewunder5Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 0 AND 125 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   --AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) m1,
+       
+       (SELECT COUNT( distinct wc.connectionno) as MetUnd5marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea BETWEEN 0 AND 125 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+            -- AND usagecategory IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       --AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)m2,
+       
+       (SELECT COUNT( distinct wc.connectionno) as MetActUnd5marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea BETWEEN 0 AND 125 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+             --AND usagecategory IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)m3,
+       
+          ------ under 5 marla Res
+          
+          
+           (SELECT COUNT(wc.connectionno) AS Rwaterunder5Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 0 AND 125 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              --AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) aa1,
+       
+           (SELECT COUNT(sc.connectionno) AS RSewunder5Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 0 AND 125 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              --AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) aa2,
+              
+              
+              (SELECT COUNT(distinct wc.connectionno) AS RActwaterunder5Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 0 AND 125 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) aa3,
+       
+           (SELECT COUNT(distinct sc.connectionno) AS RActSewunder5Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 0 AND 125 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) aa4,
+       
+       (SELECT COUNT( distinct wc.connectionno) as RMetUnd5marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea BETWEEN 0 AND 125 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+            AND usagecategory IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       --AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)aa5,
+       
+       (SELECT COUNT( distinct wc.connectionno) as RMetActUnd5marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea BETWEEN 0 AND 125 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+             AND usagecategory IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)aa6,
+       
+          
+          ------under 5 Marla Comm
+          
+          (SELECT COUNT(wc.connectionno) AS Cwaterunder5Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 0 AND 125 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory NOT IN ('RESIDENTIAL') 
+                   AND tenantid = 'pb.amritsar') 
+              --AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) aa7,
+       
+           (SELECT COUNT(sc.connectionno) AS CSewunder5Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 0 AND 125 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory NOT IN ('RESIDENTIAL')
+                   AND tenantid = 'pb.amritsar') 
+              --AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) aa8,
+              
+              
+              (SELECT COUNT(distinct wc.connectionno) AS CActwaterunder5Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 0 AND 125 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                 AND usagecategory NOT IN ('RESIDENTIAL')
+                   AND tenantid = 'pb.amritsar') 
+              AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) aa9,
+       
+           (SELECT COUNT(distinct sc.connectionno) AS CActSewunder5Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 0 AND 125 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                  AND usagecategory NOT IN ('RESIDENTIAL') 
+                   AND tenantid = 'pb.amritsar') 
+              AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) aa10,
+       
+       (SELECT COUNT( distinct wc.connectionno) as CMetUnd5marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea BETWEEN 0 AND 125 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+            AND usagecategory NOT IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       --AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)aa11,
+       
+       (SELECT COUNT( distinct wc.connectionno) as CMetActUnd5marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea BETWEEN 0 AND 125 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+            AND usagecategory NOT IN ('RESIDENTIAL')
+             AND tenantid = 'pb.amritsar'
+       ) 
+       AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)aa12,
+          
+          
+          
+          --------- betweensixmarlawater
+          
+        
+           (SELECT COUNT(wc.connectionno) AS waterunder6Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 126 AND 250 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   --AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              --AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) aa13,
+       
+           (SELECT COUNT(sc.connectionno) AS Sewunder6Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 126 AND 250 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   --AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              --AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) aa14,
+              
+              
+              (SELECT COUNT(distinct wc.connectionno) AS Actwaterunder6Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 126 AND 250 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   --AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) aa15,
+       
+           (SELECT COUNT(distinct sc.connectionno) AS ActSewunder6Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 126 AND 250 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   --AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) aa16,
+       
+       (SELECT COUNT( distinct wc.connectionno) as MetUnd6marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea BETWEEN 126 AND 250 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+            -- AND usagecategory IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       --AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)aa17,
+       
+       (SELECT COUNT( distinct wc.connectionno) as MetActUnd6marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea BETWEEN 126 AND 250 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+             --AND usagecategory IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)aa18,
+       
+          ------ betweensixmarlawater Res
+          
+          
+           (SELECT COUNT(wc.connectionno) AS Rwaterunder6Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 126 AND 250 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              --AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) aa19,
+       
+           (SELECT COUNT(sc.connectionno) AS RSewunder6Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 126 AND 250 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              --AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) aa20,
+              
+              
+              (SELECT COUNT(distinct wc.connectionno) AS RActwaterunder6Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 126 AND 250 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) aa21,
+       
+           (SELECT COUNT(distinct sc.connectionno) AS RActSewunder6Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 126 AND 250 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) aa22,
+       
+       (SELECT COUNT( distinct wc.connectionno) as RMetUnd6marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea BETWEEN 126 AND 250 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+            AND usagecategory IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       --AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)aa23,
+       
+       (SELECT COUNT( distinct wc.connectionno) as RMetActUnd6marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea BETWEEN 126 AND 250 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+             AND usagecategory IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)aa24,
+       
+          
+          ------betweensixmarlawater Comm
+          
+          (SELECT COUNT(wc.connectionno) AS Cwaterunder6Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 126 AND 250 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory NOT IN ('RESIDENTIAL') 
+                   AND tenantid = 'pb.amritsar') 
+              --AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) aa25,
+       
+           (SELECT COUNT(sc.connectionno) AS CSewunder6Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 126 AND 250 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory NOT IN ('RESIDENTIAL')
+                   AND tenantid = 'pb.amritsar') 
+              --AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) aa26,
+              
+              
+              (SELECT COUNT(distinct wc.connectionno) AS CActwaterunder6Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 126 AND 250
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                 AND usagecategory NOT IN ('RESIDENTIAL')
+                   AND tenantid = 'pb.amritsar') 
+              AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) aa27,
+       
+           (SELECT COUNT(distinct sc.connectionno) AS CActSewunder6Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea BETWEEN 126 AND 250 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                  AND usagecategory NOT IN ('RESIDENTIAL') 
+                   AND tenantid = 'pb.amritsar') 
+              AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) aa28,
+       
+       (SELECT COUNT( distinct wc.connectionno) as CMetUnd6marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea BETWEEN 126 AND 250 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+            AND usagecategory NOT IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       --AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)aa29,
+       
+       (SELECT COUNT( distinct wc.connectionno) as CMetActUnd6marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea BETWEEN 126 AND 250 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+            AND usagecategory NOT IN ('RESIDENTIAL')
+             AND tenantid = 'pb.amritsar'
+       ) 
+       AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)aa30,
+          
+          --------------10 marla
+          
+            --------- between10marlawater
+          
+        
+           (SELECT COUNT(wc.connectionno) AS waterunder10Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >= 251 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   --AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              --AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) aa31,
+       
+           (SELECT COUNT(sc.connectionno) AS Sewunder10Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >= 251 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   --AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              --AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) aa32,
+              
+              
+              (SELECT COUNT(distinct wc.connectionno) AS Actwaterunder10Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >= 251 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   --AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) aa33,
+       
+           (SELECT COUNT(distinct sc.connectionno) AS ActSewunder10Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >= 251 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   --AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) aa34,
+       
+       (SELECT COUNT( distinct wc.connectionno) as MetUnd10marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea >= 251 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+            -- AND usagecategory IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       --AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)aa35,
+       
+       (SELECT COUNT( distinct wc.connectionno) as MetActUnd10marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea >= 251 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+             --AND usagecategory IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)aa36,
+       
+          ------ between10marlawater Res
+          
+          
+           (SELECT COUNT(wc.connectionno) AS Rwaterunder10Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >= 251 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              --AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) aa37,
+       
+           (SELECT COUNT(sc.connectionno) AS RSewunder10Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >= 251 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              --AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) aa38,
+              
+              
+              (SELECT COUNT(distinct wc.connectionno) AS RActwaterunder10Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >= 251 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) aa39,
+       
+           (SELECT COUNT(distinct sc.connectionno) AS RActSewunder10Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >= 251 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory = 'RESIDENTIAL' 
+                   AND tenantid = 'pb.amritsar') 
+              AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) aa40,
+       
+       (SELECT COUNT( distinct wc.connectionno) as RMetUnd10marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea >= 251 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+            AND usagecategory IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       --AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)aa41,
+       
+       (SELECT COUNT( distinct wc.connectionno) as RMetActUnd10marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea >= 251 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+             AND usagecategory IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)aa42,
+       
+          
+          ------between10marlawater Comm
+          
+          (SELECT COUNT(wc.connectionno) AS Cwaterunder10Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >= 251 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory NOT IN ('RESIDENTIAL') 
+                   AND tenantid = 'pb.amritsar') 
+              --AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) aa43,
+       
+           (SELECT COUNT(sc.connectionno) AS CSewunder10Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >= 251
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                   AND usagecategory NOT IN ('RESIDENTIAL')
+                   AND tenantid = 'pb.amritsar') 
+              --AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) aa44,
+              
+              
+              (SELECT COUNT(distinct wc.connectionno) AS CActwaterunder10Marla
+            FROM eg_ws_connection wc 
+            WHERE wc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >= 251
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                 AND usagecategory NOT IN ('RESIDENTIAL')
+                   AND tenantid = 'pb.amritsar') 
+              AND wc.status = 'Active' 
+              AND wc.tenantid = 'pb.amritsar' 
+              AND wc.connectionno IS NOT NULL) aa45,
+       
+           (SELECT COUNT(distinct sc.connectionno) AS CActSewunder10Marla
+            FROM eg_sw_connection sc 
+            WHERE sc.property_id IN 
+                (SELECT propertyid 
+                 FROM eg_pt_property 
+                 WHERE landarea >= 251 
+                   AND status IN ('ACTIVE', 'PENDINGWS') 
+                  AND usagecategory NOT IN ('RESIDENTIAL') 
+                   AND tenantid = 'pb.amritsar') 
+              AND sc.status = 'Active' 
+              AND sc.tenantid = 'pb.amritsar' 
+              AND sc.connectionno IS NOT NULL) aa46,
+       
+       (SELECT COUNT( distinct wc.connectionno) as CMetUnd10marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea >= 251
+           and status IN ('ACTIVE', 'PENDINGWS') 
+            AND usagecategory NOT IN ('RESIDENTIAL') 
+             AND tenantid = 'pb.amritsar'
+       ) 
+       --AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)aa47,
+       
+       (SELECT COUNT( distinct wc.connectionno) as CMetActUnd10marla 
+       FROM eg_ws_connection wc 
+       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
+       WHERE wc.property_id IN (
+           SELECT propertyid 
+           FROM eg_pt_property 
+           WHERE landarea >= 251 
+           and status IN ('ACTIVE', 'PENDINGWS') 
+            AND usagecategory NOT IN ('RESIDENTIAL')
+             AND tenantid = 'pb.amritsar'
+       ) 
+       AND wc.status = 'Active' 
+       AND wc.tenantid = 'pb.amritsar' 
+       AND ws.connectiontype = 'Metered'  
+       AND wc.connectionno IS NOT NULL)aa48;
+          
+  
   
