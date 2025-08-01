@@ -10116,6 +10116,11 @@ ReportDefinitions:
     type: string
     source: pt
     total: false
+  - name: usagecategory
+    label: usagecategory
+    type: string
+    source: pt
+    total: false    
   searchParams:
   - name: fromDate
     label: fromDate
@@ -10150,11 +10155,12 @@ ReportDefinitions:
        u.name_of_ulb AS tenantid, u.district,
        d.property_id, bi.amountpaid AS amount_paid,
        TO_TIMESTAMP(bi.receiptdate / 1000) AS receipt_date, bi.receiptnumber,
-       bi.paymentstatus, bi.paymentmode
+       bi.paymentstatus, bi.paymentmode, p.usagecategory
        FROM defaulters d
+       inner join eg_pt_property p on d.property_id = p.propertyid and d.tenantid = p.tenantid
        LEFT JOIN bill_info bi  ON d.property_id = bi.consumercode AND d.tenantid = bi.tenantid
        LEFT JOIN ulb_mapped u  ON d.tenantid = u.ulb_code
-       WHERE 1=1 AND d.tenantid = $tenantid
+       WHERE 1=1 
   orderby: ORDER BY d.property_id, bi.receiptnumber, bi.receiptdate DESC;
   
 - reportName: PT_Invalid_Defaulters
@@ -10180,6 +10186,11 @@ ReportDefinitions:
     type: string
     source: pt
     total: false
+  - name: usagecategory
+    label: usagecategory
+    type: string
+    source: pt
+    total: false        
   searchParams:
   - name: fromDate
     label: fromDate
@@ -10206,8 +10217,9 @@ ReportDefinitions:
      )
      SELECT 
       COALESCE(u.name_of_ulb, d.tenantid) AS tenantid,
-      COALESCE(u.district, 'UNKNOWN') AS district,d.property_id
+      COALESCE(u.district, 'UNKNOWN') AS district,d.property_id,p.usagecategory
        FROM defaulters d
+       inner join eg_pt_property p on d.property_id = p.propertyid and d.tenantid = p.tenantid
        LEFT JOIN bills_after_april b ON d.property_id = b.property_id AND d.tenantid = b.tenantid
        LEFT JOIN ulb_mapped u ON TRIM(LOWER(d.tenantid)) = TRIM(LOWER(u.ulb_code))
        WHERE b.property_id IS NULL AND d.tenantid = $tenantid 
