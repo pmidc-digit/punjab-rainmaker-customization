@@ -10123,14 +10123,6 @@ ReportDefinitions:
     source: pt
     isMandatory: true
     searchClause: AND bi.receiptdate >= $fromDate
-  - name: tenantid
-    label: tenantid
-    type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_search?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-    source: pt
-    wrapper: true
-    isMandatory: true
-    searchClause: AND d.tenantid = $tenantid
   query: |
       -- Use CTE to force query plan, compute & use CTE later
        WITH defaulters AS (
@@ -10195,14 +10187,7 @@ ReportDefinitions:
     source: pt
     isMandatory: true
     searchClause: AND 1=1
-  - name: tenantid
-    label: tenantid
-    type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-    source: pt
-    wrapper: true
-    isMandatory: true
-    searchClause: AND d.tenantid = $tenantid
+
   query: |
      -- Use CTE to force query plan, compute & use CTE later
      WITH defaulters AS (
