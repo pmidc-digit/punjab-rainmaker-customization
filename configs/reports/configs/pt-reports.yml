@@ -10128,6 +10128,16 @@ ReportDefinitions:
     source: pt
     isMandatory: true
     searchClause: AND bi.receiptdate >= $fromDate
+  - name: tenantid
+    label: tenantid
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_search?tenantId=$tenantid&moduleName=tenant&masterName=tenants
+    key: $.MdmsRes.tenant.tenants.*.code 
+    value: $.MdmsRes.tenant.tenants.*.name
+    source: pt
+    wrapper: true
+    isMandatory: true
+    searchClause: AND d.tenantid = $tenantid    
   query: |
       -- Use CTE to force query plan, compute & use CTE later
        WITH defaulters AS (
@@ -10160,7 +10170,7 @@ ReportDefinitions:
        inner join eg_pt_property p on d.property_id = p.propertyid and d.tenantid = p.tenantid
        LEFT JOIN bill_info bi  ON d.property_id = bi.consumercode AND d.tenantid = bi.tenantid
        LEFT JOIN ulb_mapped u  ON d.tenantid = u.ulb_code
-       WHERE 1=1 
+       WHERE 1=1 AND d.tenantid = $tenantid
   orderby: ORDER BY d.property_id, bi.receiptnumber, bi.receiptdate DESC;
   
 - reportName: PT_Invalid_Defaulters
