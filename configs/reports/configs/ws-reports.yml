@@ -3901,12 +3901,14 @@ ReportDefinitions:
     source: ws
     total: false
   searchParams:
-      - name: tenantid
-        label: tenantid
-        type: string
-        source: ws
-        isMandatory: true
-        searchClause: tenantid = $tenantid
+    - name: ulb
+      label: ULB
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: pt
+      wrapper: true
+      isMandatory: false
+      searchClause: AND tenantid = $ulb
   query: |
       select consumercode as consumercode,usagecategory as usagecategory,amtpaid as amtpaid,
       bill_status as bill_status,
@@ -3970,12 +3972,14 @@ ReportDefinitions:
     source: ws
     total: false
   searchParams:
-      - name: tenantid
-        label: tenantid
-        type: string
-        source: ws
-        isMandatory: true
-        searchClause: tenantid = $tenantid
+    - name: ulb
+      label: ULB
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: pt
+      wrapper: true
+      isMandatory: false
+      searchClause: AND tenantid = $ulb
   query: |
       select consumercode as consumercode,usagecategory as usagecategory,amtpaid as amtpaid,
       bill_status as bill_status,
