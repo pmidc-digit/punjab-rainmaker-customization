@@ -21,13 +21,6 @@ SearchDefinitions:
               a.lastmodifiedby AS a_lastmodifiedby,
               a.createdtime AS a_createdtime,
               a.lastmodifiedtime AS a_lastmodifiedtime,
-              d.uuid AS d_uuid,
-              d.applicantid AS d_applicantid,
-              d.businessservice,
-              d.consumercode,
-              d.additionaldetails,
-              d.dueamount,
-              d.status AS d_status,
               pi.businessservice AS wf_businessservice,
               pi.action AS wf_action,
               pi.assigner AS wf_assigner,
@@ -36,7 +29,6 @@ SearchDefinitions:
               pi.lastmodifiedby AS wf_lastmodifiedby,
               assg.assignee AS wf_assignee
             FROM eg_ndc_applicants a
-            LEFT JOIN eg_ndc_details d ON a.uuid = d.applicantid
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
@@ -66,12 +58,9 @@ SearchDefinitions:
        - name: a.mobile
          isMandatory: false
          jsonPath: $.searchCriteria.mobileNumber
-       - name: d.businessservice
+       - name: pi.businessservice
          isMandatory: false
          jsonPath: $.searchCriteria.businessservice
-       - name: d.consumercode
-         isMandatory: false
-         jsonPath: $.searchCriteria.consumerCode
        - name: pi.status
          isMandatory: false
          jsonPath: $.searchCriteria.wfStatus
@@ -92,15 +81,15 @@ SearchDefinitions:
          offset: $.searchCriteria.offset
       output:
        jsonFormat: {"ResponseInfo": {}, "NDCApplications": []}
-       outJsonPath: $.Services
+       outJsonPath: $.NDCApplications
        responseInfoPath: $.ResponseInfo
 
     - name: inboxndcsearchcount
       query:
        baseQuery: >
-         SELECT COUNT(DISTINCT a.uuid) AS TotalCount
+         SELECT row_to_json(t) from (
+         SELECT COUNT(DISTINCT a.uuid) AS count
           FROM eg_ndc_applicants a
-          LEFT JOIN eg_ndc_details d ON a.uuid = d.applicantid
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
           $where
@@ -108,7 +97,7 @@ SearchDefinitions:
             SELECT MAX(wf.createdtime)
             FROM eg_wf_processinstance_v2 wf
             WHERE wf.businessid = a.uuid
-          )
+          ) )t
       searchParams:
        condition: AND
        params:
@@ -127,12 +116,9 @@ SearchDefinitions:
        - name: a.mobile
          isMandatory: false
          jsonPath: $.searchCriteria.mobileNumber
-       - name: d.businessservice
+       - name: pi.businessservice
          isMandatory: false
          jsonPath: $.searchCriteria.businessservice
-       - name: d.consumercode
-         isMandatory: false
-         jsonPath: $.searchCriteria.consumerCode
        - name: pi.status
          isMandatory: false
          jsonPath: $.searchCriteria.wfStatus
@@ -174,13 +160,6 @@ SearchDefinitions:
               a.lastmodifiedby AS a_lastmodifiedby,
               a.createdtime AS a_createdtime,
               a.lastmodifiedtime AS a_lastmodifiedtime,
-              d.uuid AS d_uuid,
-              d.applicantid AS d_applicantid,
-              d.businessservice,
-              d.consumercode,
-              d.additionaldetails,
-              d.dueamount,
-              d.status AS d_status,
               pi.businessservice AS wf_businessservice,
               pi.action AS wf_action,
               pi.assigner AS wf_assigner,
@@ -189,7 +168,6 @@ SearchDefinitions:
               pi.lastmodifiedby AS wf_lastmodifiedby,
               assg.assignee AS wf_assignee
             FROM eg_ndc_applicants a
-            LEFT JOIN eg_ndc_details d ON a.uuid = d.applicantid
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
@@ -220,12 +198,9 @@ SearchDefinitions:
        - name: a.mobile
          isMandatory: false
          jsonPath: $.searchCriteria.mobileNumber
-       - name: d.businessservice
+       - name: pi.businessservice
          isMandatory: false
          jsonPath: $.searchCriteria.businessservice
-       - name: d.consumercode
-         isMandatory: false
-         jsonPath: $.searchCriteria.consumerCode
        - name: pi.status
          isMandatory: false
          jsonPath: $.searchCriteria.wfStatus
@@ -246,7 +221,7 @@ SearchDefinitions:
          offset: $.searchCriteria.offset
       output:
        jsonFormat: {"ResponseInfo": {}, "NDCApplications": []}
-       outJsonPath: $.Services
+       outJsonPath: $.NDCApplications
        responseInfoPath: $.ResponseInfo
 
       
@@ -268,13 +243,6 @@ SearchDefinitions:
               a.lastmodifiedby AS a_lastmodifiedby,
               a.createdtime AS a_createdtime,
               a.lastmodifiedtime AS a_lastmodifiedtime,
-              d.uuid AS d_uuid,
-              d.applicantid AS d_applicantid,
-              d.businessservice,
-              d.consumercode,
-              d.additionaldetails,
-              d.dueamount,
-              d.status AS d_status,
               pi.businessservice AS wf_businessservice,
               pi.action AS wf_action,
               pi.assigner AS wf_assigner,
@@ -283,7 +251,6 @@ SearchDefinitions:
               pi.lastmodifiedby AS wf_lastmodifiedby,
               assg.assignee AS wf_assignee
             FROM eg_ndc_applicants a
-            LEFT JOIN eg_ndc_details d ON a.uuid = d.applicantid
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
@@ -312,12 +279,9 @@ SearchDefinitions:
        - name: a.mobile
          isMandatory: false
          jsonPath: $.searchCriteria.mobileNumber
-       - name: d.businessservice
+       - name: pi.businessservice
          isMandatory: false
          jsonPath: $.searchCriteria.businessservice
-       - name: d.consumercode
-         isMandatory: false
-         jsonPath: $.searchCriteria.consumerCode
        - name: pi.status
          isMandatory: false
          jsonPath: $.searchCriteria.wfStatus
@@ -338,5 +302,5 @@ SearchDefinitions:
          offset: $.searchCriteria.offset
       output:
        jsonFormat: {"ResponseInfo": {}, "NDCApplications": []}
-       outJsonPath: $.Services
+       outJsonPath: $.NDCApplications
        responseInfoPath: $.ResponseInfo
