@@ -3862,18 +3862,13 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
-  - name: usagecategory
-    label: reports.ws.usagecategory
+  - name: name
+    label: reports.ws.name
     type: string
     source: ws
-    total: false
-  - name: amtpending
-    label: reports.ws.amtpending
-    type: string
-    source: ws
-    total: false
-  - name: bill_status
-    label: reports.ws.bill_status
+    total: false    
+  - name: address
+    label: reports.ws.address
     type: string
     source: ws
     total: false
@@ -3882,18 +3877,43 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
-  - name: payeraddress
-    label: reports.ws.payeraddress
+  - name: wardno
+    label: reports.ws.wardno
     type: string
     source: ws
-    total: false
+    total: false    
+  - name: zonename
+    label: reports.ws.zonename
+    type: string
+    source: ws
+    total: false        
+  - name: zonecode
+    label: reports.ws.zonecode
+    type: string
+    source: ws
+    total: false    
   - name: mobilenumber
     label: reports.ws.mobilenumber
     type: string
     source: ws
+    total: false    
+  - name: amtarrear
+    label: reports.ws.amtarrear
+    type: string
+    source: ws
+    total: false    
+  - name: usagecategory
+    label: reports.ws.usagecategory
+    type: string
+    source: ws
     total: false
-  - name: payername
-    label: reports.ws.payername
+  - name: bill_status
+    label: reports.ws.bill_status
+    type: string
+    source: ws
+    total: false
+  - name: connectiontype
+    label: reports.ws.connectiontype
     type: string
     source: ws
     total: false
@@ -3902,6 +3922,11 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+  - name: landarea
+    label: reports.ws.landarea
+    type: string
+    source: ws
+    total: false    
   searchParams:
     - name: ulb
       label: ULB
@@ -3911,6 +3936,18 @@ ReportDefinitions:
       wrapper: true
       isMandatory: false
       searchClause: AND tenantid = $ulb
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: ws
+      isMandatory: false
+      searchClause: AND createdtime >= $fromDate
+    - name: toDate
+      label: To Date
+      type: epoch
+      source: ws
+      isMandatory: false
+      searchClause: AND createdtime <= $toDate 
   query: |
       select consumercode as consumercode,usagecategory as usagecategory,amtpending as amtpending,
       bill_status as bill_status,
@@ -3933,18 +3970,13 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
-  - name: usagecategory
-    label: reports.ws.usagecategory
+  - name: name
+    label: reports.ws.name
     type: string
     source: ws
-    total: false
-  - name: amtpending
-    label: reports.ws.amtpending
-    type: string
-    source: ws
-    total: false
-  - name: bill_status
-    label: reports.ws.bill_status
+    total: false    
+  - name: address
+    label: reports.ws.address
     type: string
     source: ws
     total: false
@@ -3953,18 +3985,43 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
-  - name: payeraddress
-    label: reports.ws.payeraddress
+  - name: wardno
+    label: reports.ws.wardno
     type: string
     source: ws
-    total: false
+    total: false    
+  - name: zonename
+    label: reports.ws.zonename
+    type: string
+    source: ws
+    total: false        
+  - name: zonecode
+    label: reports.ws.zonecode
+    type: string
+    source: ws
+    total: false    
   - name: mobilenumber
     label: reports.ws.mobilenumber
     type: string
     source: ws
+    total: false    
+  - name: amtarrear
+    label: reports.ws.amtarrear
+    type: string
+    source: ws
+    total: false    
+  - name: usagecategory
+    label: reports.ws.usagecategory
+    type: string
+    source: ws
     total: false
-  - name: payername
-    label: reports.ws.payername
+  - name: bill_status
+    label: reports.ws.bill_status
+    type: string
+    source: ws
+    total: false
+  - name: connectiontype
+    label: reports.ws.connectiontype
     type: string
     source: ws
     total: false
@@ -3973,6 +4030,11 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+  - name: landarea
+    label: reports.ws.landarea
+    type: string
+    source: ws
+    total: false    
   searchParams:
     - name: ulb
       label: ULB
@@ -3982,11 +4044,23 @@ ReportDefinitions:
       wrapper: true
       isMandatory: false
       searchClause: AND tenantid = $ulb
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: ws
+      isMandatory: false
+      searchClause: AND createdtime >= $fromDate
+    - name: toDate
+      label: To Date
+      type: epoch
+      source: ws
+      isMandatory: false
+      searchClause: AND createdtime <= $toDate 
   query: |
-      select consumercode as consumercode,usagecategory as usagecategory,amtpending as amtpending,
-      bill_status as bill_status,
-      finyear as finyear,payername as payername,
-      mobilenumber as mobilenumber,payeraddress as payeraddress,
+      select consumercode as consumercode,usagecategory as usagecategory,amtarrear as amtarrear,
+      bill_status as bill_status,connectiontype as connectiontype,
+      finyear as finyear,name as name, wardno as wardno, zonename as zonename,zonecode as zonecode,
+      mobilenumber as mobilenumber,address as address,landarea as landarea,
       locality as locality from public.mv_sw_defaulters
       WHERE tenantid = $tenantid
   
