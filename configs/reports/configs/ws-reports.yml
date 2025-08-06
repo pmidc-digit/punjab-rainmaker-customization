@@ -2652,142 +2652,143 @@ ReportDefinitions:
     wrapper: true
     isMandatory: false
     searchClause: AND wc.tenantid = $tenantid
-  query: |      
+  query: |     
     SELECT 
         a.totalwaterconnections,
         b.totalsewerageconnections,
-        (a.totalwaterconnections+b.totalsewerageconnections) as totalconnections,
-        d.totalwateractive ,
+    	(a.totalwaterconnections+b.totalsewerageconnections) as totalconnections,
+    	d.totalwateractive ,
         e.totalsewerageactive,
-        (d.totalwateractive+e.totalsewerageactive) as totalActiveconnections,
-        e2.Meteredconnections,
-        (a.totalwaterconnections+b.totalsewerageconnections - e2.Meteredconnections) as UnMeteredConnection,
-        e3.ActiveMeteredConnection,
-        (d.totalwateractive+e.totalsewerageactive-e3.ActiveMeteredConnection)as ActiveUnMeteredConnection,
-        g1.TotalResidentialWater,
-        h1.TotalResidentialSewerage,
-        (g1.TotalResidentialWater+h1.TotalResidentialSewerage) as TotalResWAndS,
+    	(d.totalwateractive+e.totalsewerageactive) as totalActiveconnections,
+    
+    	e2.Meteredconnections,
+    	(a.totalwaterconnections+b.totalsewerageconnections - e2.Meteredconnections) as UnMeteredConnection,
+    	e3.ActiveMeteredConnection,
+    	(d.totalwateractive+e.totalsewerageactive-e3.ActiveMeteredConnection)as ActiveUnMeteredConnection,
+    	g1.TotalResidentialWater,
+    	h1.TotalResidentialSewerage,
+    	(g1.TotalResidentialWater+h1.TotalResidentialSewerage) as TotalResWAndS,
         g.totalactiveresidentialinwater,
         h.totalactiveresidentialinsewerage,
-        ( g.totalactiveresidentialinwater+ h.totalactiveresidentialinsewerage)as TotalResActiveWS,
-        h2.MeteredResconn,
-        (g1.TotalResidentialWater+h1.TotalResidentialSewerage-h2.MeteredResconn)as UnmeteredResConn,
-        h3.MeteredResActiveconn,
-        (g.totalactiveresidentialinwater+ h.totalactiveresidentialinsewerage-h3.MeteredResActiveconn)as UnmeterdResActiveConnn,
-        h4.totalCommwater,
-        h5.totalcommsew,
-        (h4.totalCommwater+h5.totalcommsew)as TotalCommWS,
-        i.totalActiveCommwater,
-        j.totalActiveCommsew,
-        (i.totalActiveCommwater+j.totalActiveCommsew) as TotalActiveCommWS ,
-        j1.TotalMetCommConn,
-        (h4.totalCommwater+h5.totalcommsew-j1.TotalMetCommConn) as UnmeterdCommConn,
-        j2.TotalMetActiveCommConn,
-        (i.totalActiveCommwater+j.totalActiveCommsew-j2.TotalMetActiveCommConn)as UnmeterCommActiveConn,
-    --  k.totalmeteredconnections,
+    	( g.totalactiveresidentialinwater+ h.totalactiveresidentialinsewerage)as TotalResActiveWS,
+    	h2.MeteredResconn,
+    	(g1.TotalResidentialWater+h1.TotalResidentialSewerage-h2.MeteredResconn)as UnmeteredResConn,
+    	h3.MeteredResActiveconn,
+    	(g.totalactiveresidentialinwater+ h.totalactiveresidentialinsewerage-h3.MeteredResActiveconn)as UnmeterdResActiveConnn,
+    	h4.totalCommwater,
+    	h5.totalcommsew,
+    	(h4.totalCommwater+h5.totalcommsew)as TotalCommWS,
+    	i.totalActiveCommwater,
+    	j.totalActiveCommsew,
+     	(i.totalActiveCommwater+j.totalActiveCommsew) as TotalActiveCommWS ,
+    	j1.TotalMetCommConn,
+    	(h4.totalCommwater+h5.totalcommsew-j1.TotalMetCommConn) as UnmeterdCommConn,
+    	j2.TotalMetActiveCommConn,
+    	(i.totalActiveCommwater+j.totalActiveCommsew-j2.TotalMetActiveCommConn)as UnmeterCommActiveConn,
+    --	k.totalmeteredconnections,
         l.waterunder5Marla,
         m.Sewunder5Marla,
-        (l.waterunder5Marla+ m.Sewunder5Marla) as TotalWSUnder5Marla,
-        l1.Actwaterunder5Marla,
+    	(l.waterunder5Marla+ m.Sewunder5Marla) as TotalWSUnder5Marla,
+    	l1.Actwaterunder5Marla,
         m1.ActSewunder5Marla,
-        (l1.Actwaterunder5Marla+ m1.ActSewunder5Marla) as TotalActWSUnder5Marla,
-        m2.MetUnd5marla,
-        (l.waterunder5Marla+ m.Sewunder5Marla-m2.MetUnd5marla)as Unmetunder5marla,
-        m3.MetActUnd5marla,
-        (l1.Actwaterunder5Marla+ m1.ActSewunder5Marla-m3.MetActUnd5marla) as UnmetActUnder5marla,
+    	(l1.Actwaterunder5Marla+ m1.ActSewunder5Marla) as TotalActWSUnder5Marla,
+    	m2.MetUnd5marla,
+    	(l.waterunder5Marla+ m.Sewunder5Marla-m2.MetUnd5marla)as Unmetunder5marla,
+    	m3.MetActUnd5marla,
+    	(l1.Actwaterunder5Marla+ m1.ActSewunder5Marla-m3.MetActUnd5marla) as UnmetActUnder5marla,
       --  n.betweenfivemarlawater,
       --  o.betweenfivemarlasewerage,
       aa1.Rwaterunder5Marla,
         aa2.RSewunder5Marla,
-        (aa1.Rwaterunder5Marla+ aa2.RSewunder5Marla) as TotalWSUnder5MarlaR,
-        aa3.RActwaterunder5Marla,
+    	(aa1.Rwaterunder5Marla+ aa2.RSewunder5Marla) as TotalWSUnder5MarlaR,
+    	aa3.RActwaterunder5Marla,
         aa4.RActSewunder5Marla,
-        (aa3.RActwaterunder5Marla+ aa4.RActSewunder5Marla) as TotalActWSUnder5MarlaR,
-        aa5.RMetUnd5marla,
-        (aa1.Rwaterunder5Marla+ aa2.Rsewunder5Marla-aa5.RMetUnd5marla)as Unmetunder5marlaR,
-        aa6.RMetActUnd5marla,
-        (aa3.RActwaterunder5Marla+ aa4.RActSewunder5Marla-aa6.RMetActUnd5marla) as UnmetActUnder5marlaR,
+    	(aa3.RActwaterunder5Marla+ aa4.RActSewunder5Marla) as TotalActWSUnder5MarlaR,
+    	aa5.RMetUnd5marla,
+    	(aa1.Rwaterunder5Marla+ aa2.Rsewunder5Marla-aa5.RMetUnd5marla)as Unmetunder5marlaR,
+    	aa6.RMetActUnd5marla,
+    	(aa3.RActwaterunder5Marla+ aa4.RActSewunder5Marla-aa6.RMetActUnd5marla) as UnmetActUnder5marlaR,
       
       aa7.cwaterunder5Marla,
         aa8.CSewunder5Marla,
-        (aa7.Cwaterunder5Marla+ aa8.CSewunder5Marla) as TotalWSUnder5MarlaC,
-        aa9.CActwaterunder5Marla,
+    	(aa7.Cwaterunder5Marla+ aa8.CSewunder5Marla) as TotalWSUnder5MarlaC,
+    	aa9.CActwaterunder5Marla,
         aa10.CActSewunder5Marla,
-        (aa9.CActwaterunder5Marla+ aa10.CActSewunder5Marla) as TotalActWSUnder5MarlaC,
-        aa11.CMetUnd5marla,
-        (aa7.Cwaterunder5Marla+ aa8.CSewunder5Marla-aa11.CMetUnd5marla)as Unmetunder5marlaC,
-        aa12.CMetActUnd5marla,
-        (aa9.CActwaterunder5Marla+ aa10.CActSewunder5Marla-aa12.CMetActUnd5marla) as UnmetActUnder5marlaC,
+    	(aa9.CActwaterunder5Marla+ aa10.CActSewunder5Marla) as TotalActWSUnder5MarlaC,
+    	aa11.CMetUnd5marla,
+    	(aa7.Cwaterunder5Marla+ aa8.CSewunder5Marla-aa11.CMetUnd5marla)as Unmetunder5marlaC,
+    	aa12.CMetActUnd5marla,
+    	(aa9.CActwaterunder5Marla+ aa10.CActSewunder5Marla-aa12.CMetActUnd5marla) as UnmetActUnder5marlaC,
       -- 6marla
         aa13.waterunder6Marla,
         aa14.Sewunder6Marla,
-        (aa13.waterunder6Marla+ aa14.Sewunder6Marla) as TotalWSUnder6Marla,
-        aa15.Actwaterunder6Marla,
+    	(aa13.waterunder6Marla+ aa14.Sewunder6Marla) as TotalWSUnder6Marla,
+    	aa15.Actwaterunder6Marla,
         aa16.ActSewunder6Marla,
-        (aa15.Actwaterunder6Marla+ aa16.ActSewunder6Marla) as TotalActWSUnder6Marla,
-        aa17.MetUnd6marla,
-        (aa13.waterunder6Marla+ aa14.Sewunder6Marla-aa17.MetUnd6marla)as Unmetunder6marla,
-        aa18.MetActUnd6marla,
-        (aa15.Actwaterunder6Marla+ aa16.ActSewunder6Marla-aa18.MetActUnd6marla) as UnmetActUnder6marla,
+    	(aa15.Actwaterunder6Marla+ aa16.ActSewunder6Marla) as TotalActWSUnder6Marla,
+    	aa17.MetUnd6marla,
+    	(aa13.waterunder6Marla+ aa14.Sewunder6Marla-aa17.MetUnd6marla)as Unmetunder6marla,
+    	aa18.MetActUnd6marla,
+    	(aa15.Actwaterunder6Marla+ aa16.ActSewunder6Marla-aa18.MetActUnd6marla) as UnmetActUnder6marla,
       --  n.betweenfivemarlawater,
       --  o.betweenfivemarlasewerage,
       aa19.Rwaterunder6Marla,
         aa20.RSewunder6Marla,
-        (aa19.Rwaterunder6Marla+ aa20.RSewunder6Marla) as TotalWSUnder6MarlaR,
-        aa21.RActwaterunder6Marla,
+    	(aa19.Rwaterunder6Marla+ aa20.RSewunder6Marla) as TotalWSUnder6MarlaR,
+    	aa21.RActwaterunder6Marla,
         aa22.RActSewunder6Marla,
-        (aa21.RActwaterunder6Marla+ aa22.RActSewunder6Marla) as TotalActWSUnder6MarlaR,
-        aa23.RMetUnd6marla,
-        (aa19.Rwaterunder6Marla+ aa20.RSewunder6Marla-aa23.RMetUnd6marla)as Unmetunder6marlaR,
-        aa24.RMetActUnd6marla,
-        (aa21.RActwaterunder6Marla+ aa22.RActSewunder6Marla-aa24.RMetActUnd6marla) as UnmetActUnder6marlaR,
+    	(aa21.RActwaterunder6Marla+ aa22.RActSewunder6Marla) as TotalActWSUnder6MarlaR,
+    	aa23.RMetUnd6marla,
+    	(aa19.Rwaterunder6Marla+ aa20.RSewunder6Marla-aa23.RMetUnd6marla)as Unmetunder6marlaR,
+    	aa24.RMetActUnd6marla,
+    	(aa21.RActwaterunder6Marla+ aa22.RActSewunder6Marla-aa24.RMetActUnd6marla) as UnmetActUnder6marlaR,
       
       aa25.cwaterunder6Marla,
         aa26.CSewunder6Marla,
-        (aa25.cwaterunder6Marla+ aa26.CSewunder6Marla) as TotalWSUnder6MarlaC,
-        aa27.CActwaterunder6Marla,
+    	(aa25.cwaterunder6Marla+ aa26.CSewunder6Marla) as TotalWSUnder6MarlaC,
+    	aa27.CActwaterunder6Marla,
         aa28.CActSewunder6Marla,
-        (aa27.CActwaterunder6Marla+ aa28.CActSewunder6Marla) as TotalActWSUnder6MarlaC,
-        aa29.CMetUnd6marla,
-        (aa25.cwaterunder6Marla+ aa26.CSewunder6Marla-aa29.CMetUnd6marla)as Unmetunder6marlaC,
-        aa30.CMetActUnd6marla,
-        (aa27.CActwaterunder6Marla+ aa28.CActSewunder6Marla-aa30.CMetActUnd6marla) as UnmetActUnder6marlaC,
-        
-        -- 10 marla
-        
+    	(aa27.CActwaterunder6Marla+ aa28.CActSewunder6Marla) as TotalActWSUnder6MarlaC,
+    	aa29.CMetUnd6marla,
+    	(aa25.cwaterunder6Marla+ aa26.CSewunder6Marla-aa29.CMetUnd6marla)as Unmetunder6marlaC,
+    	aa30.CMetActUnd6marla,
+    	(aa27.CActwaterunder6Marla+ aa28.CActSewunder6Marla-aa30.CMetActUnd6marla) as UnmetActUnder6marlaC,
+    	
+    	-- 10 marla
+    	
        aa31.waterunder10Marla,
         aa32.Sewunder10Marla,
-        (aa31.waterunder10Marla+ aa32.Sewunder10Marla) as TotalWSUnder10Marla,
-        aa33.Actwaterunder10Marla,
+    	(aa31.waterunder10Marla+ aa32.Sewunder10Marla) as TotalWSUnder10Marla,
+    	aa33.Actwaterunder10Marla,
         aa34.ActSewunder10Marla,
-        (aa33.Actwaterunder10Marla+ aa34.ActSewunder10Marla) as TotalActWSUnder10Marla,
-        aa35.MetUnd10marla,
-        (aa31.waterunder10Marla+ aa32.Sewunder10Marla-aa35.MetUnd10marla)as Unmetunder10marla,
-        aa36.MetActUnd10marla,
-        (aa33.Actwaterunder10Marla+ aa34.ActSewunder10Marla-aa36.MetActUnd10marla) as UnmetActUnder10marla,
+    	(aa33.Actwaterunder10Marla+ aa34.ActSewunder10Marla) as TotalActWSUnder10Marla,
+    	aa35.MetUnd10marla,
+    	(aa31.waterunder10Marla+ aa32.Sewunder10Marla-aa35.MetUnd10marla)as Unmetunder10marla,
+    	aa36.MetActUnd10marla,
+    	(aa33.Actwaterunder10Marla+ aa34.ActSewunder10Marla-aa36.MetActUnd10marla) as UnmetActUnder10marla,
       --  n.betweenfivemarlawater,
       --  o.betweenfivemarlasewerage,
       aa37.Rwaterunder10Marla,
         aa38.RSewunder10Marla,
-        (aa37.Rwaterunder10Marla+ aa38.RSewunder10Marla) as TotalWSUnder10MarlaR,
-        aa39.RActwaterunder10Marla,
+    	(aa37.Rwaterunder10Marla+ aa38.RSewunder10Marla) as TotalWSUnder10MarlaR,
+    	aa39.RActwaterunder10Marla,
         aa40.RActSewunder10Marla,
-        (aa39.RActwaterunder10Marla+ aa40.RActSewunder10Marla) as TotalActWSUnder10MarlaR,
-        aa41.RMetUnd10marla,
-        (aa37.Rwaterunder10Marla+ aa38.RSewunder10Marla-aa41.RMetUnd10marla)as Unmetunder10marlaR,
-        aa42.RMetActUnd10marla,
-        (aa39.RActwaterunder10Marla+ aa40.RActSewunder10Marla-aa42.RMetActUnd10marla) as UnmetActUnder10marlaR,
+    	(aa39.RActwaterunder10Marla+ aa40.RActSewunder10Marla) as TotalActWSUnder10MarlaR,
+    	aa41.RMetUnd10marla,
+    	(aa37.Rwaterunder10Marla+ aa38.RSewunder10Marla-aa41.RMetUnd10marla)as Unmetunder10marlaR,
+    	aa42.RMetActUnd10marla,
+    	(aa39.RActwaterunder10Marla+ aa40.RActSewunder10Marla-aa42.RMetActUnd10marla) as UnmetActUnder10marlaR,
       
       aa43.cwaterunder10Marla,
         aa44.CSewunder10Marla,
-        (aa43.cwaterunder10Marla+ aa44.CSewunder10Marla) as TotalWSUnder10MarlaC,
-        aa45.CActwaterunder10Marla,
+    	(aa43.cwaterunder10Marla+ aa44.CSewunder10Marla) as TotalWSUnder10MarlaC,
+    	aa45.CActwaterunder10Marla,
         aa46.CActSewunder10Marla,
-        (aa45.CActwaterunder10Marla+ aa46.CActSewunder10Marla) as TotalActWSUnder10MarlaC,
-        aa47.CMetUnd10marla,
-        (aa43.cwaterunder10Marla+ aa44.CSewunder10Marla-aa47.CMetUnd10marla)as Unmetunder10marlaC,
-        aa48.CMetActUnd10marla,
-        (aa45.CActwaterunder10Marla+ aa46.CActSewunder10Marla-aa48.CMetActUnd10marla) as UnmetActUnder10marlaC
+    	(aa45.CActwaterunder10Marla+ aa46.CActSewunder10Marla) as TotalActWSUnder10MarlaC,
+    	aa47.CMetUnd10marla,
+    	(aa43.cwaterunder10Marla+ aa44.CSewunder10Marla-aa47.CMetUnd10marla)as Unmetunder10marlaC,
+    	aa48.CMetActUnd10marla,
+    	(aa45.CActwaterunder10Marla+ aa46.CActSewunder10Marla-aa48.CMetActUnd10marla) as UnmetActUnder10marlaC
       
     FROM 
         (SELECT COUNT(wc.connectionno) AS totalwaterconnections
@@ -2815,9 +2816,9 @@ ReportDefinitions:
            --AND sc.status = 'Active' 
            AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL)b,
-           
-        
-        (SELECT COUNT(distinct wc.connectionno) AS totalwateractive
+    	   
+    	
+    	(SELECT COUNT(distinct wc.connectionno) AS totalwateractive
          FROM eg_ws_connection wc 
          WHERE wc.property_id IN 
              (SELECT propertyid 
@@ -2850,7 +2851,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea >=0 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
          -- AND usagecategory IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -2866,7 +2867,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea >=0 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
           --AND usagecategory IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -2903,9 +2904,9 @@ ReportDefinitions:
            --AND sc.status = 'Active' 
            AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) h1,
-           
-           
-           (SELECT COUNT(distinct wc.connectionno) AS totalactiveresidentialinwater
+    	   
+    	   
+    	   (SELECT COUNT(distinct wc.connectionno) AS totalactiveresidentialinwater
          FROM eg_ws_connection wc 
          WHERE wc.property_id IN 
              (SELECT propertyid 
@@ -2938,7 +2939,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea >=0 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
          AND usagecategory IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -2946,7 +2947,7 @@ ReportDefinitions:
     AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)h2,
-    
+
     (SELECT COUNT( distinct wc.connectionno) as MeteredResActiveconn 
     FROM eg_ws_connection wc 
     JOIN eg_ws_service ws ON wc.id = ws.connection_id 
@@ -2954,7 +2955,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea >=0 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
           AND usagecategory IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -2991,9 +2992,9 @@ ReportDefinitions:
            --AND sc.status = 'Active' 
            AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) h5,
-           
-           
-           (SELECT COUNT(distinct wc.connectionno) AS totalActiveCommwater
+    	   
+    	   
+    	   (SELECT COUNT(distinct wc.connectionno) AS totalActiveCommwater
          FROM eg_ws_connection wc 
          WHERE wc.property_id IN 
              (SELECT propertyid 
@@ -3026,7 +3027,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea >=0 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
          AND usagecategory NOT IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -3042,7 +3043,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea >=0 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
          AND usagecategory NOT IN ('RESIDENTIAL')
           AND tenantid = $tenantid
     ) 
@@ -3078,9 +3079,9 @@ ReportDefinitions:
            --AND sc.status = 'Active' 
            AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) m,
-           
-           
-           (SELECT COUNT(distinct wc.connectionno) AS Actwaterunder5Marla
+    	   
+    	   
+    	   (SELECT COUNT(distinct wc.connectionno) AS Actwaterunder5Marla
          FROM eg_ws_connection wc 
          WHERE wc.property_id IN 
              (SELECT propertyid 
@@ -3113,7 +3114,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea BETWEEN 0 AND 125 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
          -- AND usagecategory IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -3129,7 +3130,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea BETWEEN 0 AND 125 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
           --AND usagecategory IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -3166,9 +3167,9 @@ ReportDefinitions:
            --AND sc.status = 'Active' 
            AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa2,
-           
-           
-           (SELECT COUNT(distinct wc.connectionno) AS RActwaterunder5Marla
+    	   
+    	   
+    	   (SELECT COUNT(distinct wc.connectionno) AS RActwaterunder5Marla
          FROM eg_ws_connection wc 
          WHERE wc.property_id IN 
              (SELECT propertyid 
@@ -3201,7 +3202,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea BETWEEN 0 AND 125 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
          AND usagecategory IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -3217,7 +3218,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea BETWEEN 0 AND 125 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
           AND usagecategory IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -3254,9 +3255,9 @@ ReportDefinitions:
            --AND sc.status = 'Active' 
            AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa8,
-           
-           
-           (SELECT COUNT(distinct wc.connectionno) AS CActwaterunder5Marla
+    	   
+    	   
+    	   (SELECT COUNT(distinct wc.connectionno) AS CActwaterunder5Marla
          FROM eg_ws_connection wc 
          WHERE wc.property_id IN 
              (SELECT propertyid 
@@ -3289,7 +3290,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea BETWEEN 0 AND 125 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
          AND usagecategory NOT IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -3305,7 +3306,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea BETWEEN 0 AND 125 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
          AND usagecategory NOT IN ('RESIDENTIAL')
           AND tenantid = $tenantid
     ) 
@@ -3344,9 +3345,9 @@ ReportDefinitions:
            --AND sc.status = 'Active' 
            AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa14,
-           
-           
-           (SELECT COUNT(distinct wc.connectionno) AS Actwaterunder6Marla
+    	   
+    	   
+    	   (SELECT COUNT(distinct wc.connectionno) AS Actwaterunder6Marla
          FROM eg_ws_connection wc 
          WHERE wc.property_id IN 
              (SELECT propertyid 
@@ -3379,7 +3380,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea BETWEEN 126 AND 250 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
          -- AND usagecategory IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -3395,7 +3396,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea BETWEEN 126 AND 250 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
           --AND usagecategory IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -3432,9 +3433,9 @@ ReportDefinitions:
            --AND sc.status = 'Active' 
            AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa20,
-           
-           
-           (SELECT COUNT(distinct wc.connectionno) AS RActwaterunder6Marla
+    	   
+    	   
+    	   (SELECT COUNT(distinct wc.connectionno) AS RActwaterunder6Marla
          FROM eg_ws_connection wc 
          WHERE wc.property_id IN 
              (SELECT propertyid 
@@ -3467,7 +3468,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea BETWEEN 126 AND 250 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
          AND usagecategory IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -3475,7 +3476,7 @@ ReportDefinitions:
     AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa23,
-    
+
     (SELECT COUNT( distinct wc.connectionno) as RMetActUnd6marla 
     FROM eg_ws_connection wc 
     JOIN eg_ws_service ws ON wc.id = ws.connection_id 
@@ -3483,7 +3484,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea BETWEEN 126 AND 250 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
           AND usagecategory IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -3520,9 +3521,9 @@ ReportDefinitions:
            --AND sc.status = 'Active' 
            AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa26,
-           
-           
-           (SELECT COUNT(distinct wc.connectionno) AS CActwaterunder6Marla
+    	   
+    	   
+    	   (SELECT COUNT(distinct wc.connectionno) AS CActwaterunder6Marla
          FROM eg_ws_connection wc 
          WHERE wc.property_id IN 
              (SELECT propertyid 
@@ -3555,7 +3556,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea BETWEEN 126 AND 250 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
          AND usagecategory NOT IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -3571,7 +3572,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea BETWEEN 126 AND 250 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
          AND usagecategory NOT IN ('RESIDENTIAL')
           AND tenantid = $tenantid
     ) 
@@ -3610,9 +3611,9 @@ ReportDefinitions:
            --AND sc.status = 'Active' 
            AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa32,
-           
-           
-           (SELECT COUNT(distinct wc.connectionno) AS Actwaterunder10Marla
+    	   
+    	   
+    	   (SELECT COUNT(distinct wc.connectionno) AS Actwaterunder10Marla
          FROM eg_ws_connection wc 
          WHERE wc.property_id IN 
              (SELECT propertyid 
@@ -3645,7 +3646,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea >= 251 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
          -- AND usagecategory IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -3661,7 +3662,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea >= 251 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
           --AND usagecategory IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -3698,9 +3699,9 @@ ReportDefinitions:
            --AND sc.status = 'Active' 
            AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa38,
-           
-           
-           (SELECT COUNT(distinct wc.connectionno) AS RActwaterunder10Marla
+    	   
+    	   
+    	   (SELECT COUNT(distinct wc.connectionno) AS RActwaterunder10Marla
          FROM eg_ws_connection wc 
          WHERE wc.property_id IN 
              (SELECT propertyid 
@@ -3733,7 +3734,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea >= 251 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
          AND usagecategory IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -3749,7 +3750,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea >= 251 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
           AND usagecategory IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -3758,7 +3759,7 @@ ReportDefinitions:
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa42,
     
-       
+   
        ------between10marlawater Comm
        
        (SELECT COUNT(wc.connectionno) AS Cwaterunder10Marla
@@ -3786,9 +3787,9 @@ ReportDefinitions:
            --AND sc.status = 'Active' 
            AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa44,
-           
-           
-           (SELECT COUNT(distinct wc.connectionno) AS CActwaterunder10Marla
+    	   
+    	   
+    	   (SELECT COUNT(distinct wc.connectionno) AS CActwaterunder10Marla
          FROM eg_ws_connection wc 
          WHERE wc.property_id IN 
              (SELECT propertyid 
@@ -3821,7 +3822,7 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea >= 251
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
          AND usagecategory NOT IN ('RESIDENTIAL') 
           AND tenantid = $tenantid
     ) 
@@ -3837,14 +3838,15 @@ ReportDefinitions:
         SELECT propertyid 
         FROM eg_pt_property 
         WHERE landarea >= 251 
-        and status IN ('ACTIVE', 'PENDINGWS') 
+    	and status IN ('ACTIVE', 'PENDINGWS') 
          AND usagecategory NOT IN ('RESIDENTIAL')
           AND tenantid = $tenantid
     ) 
     AND wc.status = 'Active' 
     AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
-    AND wc.connectionno IS NOT NULL)aa48
+    AND wc.connectionno IS NOT NULL)aa48;
+       
         
 - reportName: WsDefaulterReport
   summary: Ws Defaulter Report
