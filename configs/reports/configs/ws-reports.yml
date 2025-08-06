@@ -3949,10 +3949,10 @@ ReportDefinitions:
       isMandatory: false
       searchClause: AND createdtime <= $toDate 
   query: |
-      select consumercode as consumercode,usagecategory as usagecategory,amtpending as amtpending,
-      bill_status as bill_status,
-      finyear as finyear,payername as payername,
-      mobilenumber as mobilenumber,payeraddress as payeraddress,
+      select consumercode as consumercode,usagecategory as usagecategory,amtarrear as amtarrear,
+      bill_status as bill_status,connectiontype as connectiontype,
+      finyear as finyear,name as name, wardno as wardno, zonename as zonename,zonecode as zonecode,
+      mobilenumber as mobilenumber,address as address,landarea as landarea,
       locality as locality from public.mv_ws_defaulters
       WHERE tenantid = $tenantid
         
