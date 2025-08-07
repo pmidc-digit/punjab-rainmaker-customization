@@ -2650,8 +2650,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: pt
     wrapper: true
-    isMandatory: false
-    searchClause: AND sc.tenantid = $tenantid AND wc.tenantid = $tenantid
+    isMandatory: false 
   query: |     
     SELECT 
         a.totalwaterconnections,
@@ -2801,7 +2800,7 @@ ReportDefinitions:
                 --AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            --AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) a,
     
         (SELECT COUNT(sc.connectionno) AS totalsewerageconnections
@@ -2814,7 +2813,7 @@ ReportDefinitions:
                 --AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            --AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL)b,
     	   
     	
@@ -2828,7 +2827,7 @@ ReportDefinitions:
                 --AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) d,
     
        (SELECT COUNT(distinct sc.connectionno) AS totalsewerageactive
@@ -2841,7 +2840,7 @@ ReportDefinitions:
                 --AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) e,
     
     (SELECT COUNT( distinct wc.connectionno) as Meteredconnections 
@@ -2856,7 +2855,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     --AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)e2,
     
@@ -2872,7 +2871,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)e3,
     
@@ -2889,7 +2888,7 @@ ReportDefinitions:
                 AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            --AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) g1,
     
         (SELECT COUNT(sc.connectionno) AS TotalResidentialSewerage
@@ -2902,7 +2901,7 @@ ReportDefinitions:
                 AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            --AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) h1,
     	   
     	   
@@ -2916,7 +2915,7 @@ ReportDefinitions:
                 AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) g,
     
         (SELECT COUNT(distinct sc.connectionno) AS totalactiveresidentialinsewerage
@@ -2929,7 +2928,7 @@ ReportDefinitions:
                 AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) h,
     
     (SELECT COUNT( distinct wc.connectionno) as MeteredResconn 
@@ -2944,7 +2943,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     --AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)h2,
 
@@ -2960,7 +2959,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)h3,
     
@@ -2977,7 +2976,7 @@ ReportDefinitions:
                 AND usagecategory NOT IN ('RESIDENTIAL') 
                 AND tenantid = $tenantid) 
            --AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) h4,
     
         (SELECT COUNT(sc.connectionno) AS totalcommsew
@@ -2990,7 +2989,7 @@ ReportDefinitions:
                 AND usagecategory NOT IN ('RESIDENTIAL')
                 AND tenantid = $tenantid) 
            --AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) h5,
     	   
     	   
@@ -3004,7 +3003,7 @@ ReportDefinitions:
               AND usagecategory NOT IN ('RESIDENTIAL')
                 AND tenantid = $tenantid) 
            AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) i,
     
         (SELECT COUNT(distinct sc.connectionno) AS totalActiveCommsew
@@ -3017,7 +3016,7 @@ ReportDefinitions:
                AND usagecategory NOT IN ('RESIDENTIAL') 
                 AND tenantid = $tenantid) 
            AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) j,
     
     (SELECT COUNT( distinct wc.connectionno) as TotalMetCommConn 
@@ -3032,7 +3031,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     --AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)j1,
     
@@ -3048,7 +3047,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)j2,
     
@@ -3064,7 +3063,7 @@ ReportDefinitions:
                 --AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            --AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) l,
     
         (SELECT COUNT(sc.connectionno) AS Sewunder5Marla
@@ -3077,7 +3076,7 @@ ReportDefinitions:
                 --AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            --AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) m,
     	   
     	   
@@ -3091,7 +3090,7 @@ ReportDefinitions:
                 --AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) l1,
     
         (SELECT COUNT(distinct sc.connectionno) AS ActSewunder5Marla
@@ -3104,7 +3103,7 @@ ReportDefinitions:
                 --AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) m1,
     
     (SELECT COUNT( distinct wc.connectionno) as MetUnd5marla 
@@ -3119,7 +3118,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     --AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)m2,
     
@@ -3135,7 +3134,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)m3,
     
@@ -3152,7 +3151,7 @@ ReportDefinitions:
                 AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            --AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) aa1,
     
         (SELECT COUNT(sc.connectionno) AS RSewunder5Marla
@@ -3165,7 +3164,7 @@ ReportDefinitions:
                 AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            --AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa2,
     	   
     	   
@@ -3179,7 +3178,7 @@ ReportDefinitions:
                 AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) aa3,
     
         (SELECT COUNT(distinct sc.connectionno) AS RActSewunder5Marla
@@ -3192,7 +3191,7 @@ ReportDefinitions:
                 AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa4,
     
     (SELECT COUNT( distinct wc.connectionno) as RMetUnd5marla 
@@ -3207,7 +3206,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     --AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa5,
     
@@ -3223,7 +3222,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa6,
     
@@ -3240,7 +3239,7 @@ ReportDefinitions:
                 AND usagecategory NOT IN ('RESIDENTIAL') 
                 AND tenantid = $tenantid) 
            --AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) aa7,
     
         (SELECT COUNT(sc.connectionno) AS CSewunder5Marla
@@ -3253,7 +3252,7 @@ ReportDefinitions:
                 AND usagecategory NOT IN ('RESIDENTIAL')
                 AND tenantid = $tenantid) 
            --AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa8,
     	   
     	   
@@ -3267,7 +3266,7 @@ ReportDefinitions:
               AND usagecategory NOT IN ('RESIDENTIAL')
                 AND tenantid = $tenantid) 
            AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) aa9,
     
         (SELECT COUNT(distinct sc.connectionno) AS CActSewunder5Marla
@@ -3280,7 +3279,7 @@ ReportDefinitions:
                AND usagecategory NOT IN ('RESIDENTIAL') 
                 AND tenantid = $tenantid) 
            AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa10,
     
     (SELECT COUNT( distinct wc.connectionno) as CMetUnd5marla 
@@ -3295,7 +3294,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     --AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa11,
     
@@ -3311,7 +3310,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa12,
        
@@ -3330,7 +3329,7 @@ ReportDefinitions:
                 --AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            --AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) aa13,
     
         (SELECT COUNT(sc.connectionno) AS Sewunder6Marla
@@ -3343,7 +3342,7 @@ ReportDefinitions:
                 --AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            --AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa14,
     	   
     	   
@@ -3357,7 +3356,7 @@ ReportDefinitions:
                 --AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) aa15,
     
         (SELECT COUNT(distinct sc.connectionno) AS ActSewunder6Marla
@@ -3370,7 +3369,7 @@ ReportDefinitions:
                 --AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa16,
     
     (SELECT COUNT( distinct wc.connectionno) as MetUnd6marla 
@@ -3385,7 +3384,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     --AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa17,
     
@@ -3401,7 +3400,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa18,
     
@@ -3418,7 +3417,7 @@ ReportDefinitions:
                 AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            --AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) aa19,
     
         (SELECT COUNT(sc.connectionno) AS RSewunder6Marla
@@ -3431,7 +3430,7 @@ ReportDefinitions:
                 AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            --AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa20,
     	   
     	   
@@ -3445,7 +3444,7 @@ ReportDefinitions:
                 AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) aa21,
     
         (SELECT COUNT(distinct sc.connectionno) AS RActSewunder6Marla
@@ -3458,7 +3457,7 @@ ReportDefinitions:
                 AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa22,
     
     (SELECT COUNT( distinct wc.connectionno) as RMetUnd6marla 
@@ -3473,7 +3472,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     --AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa23,
 
@@ -3489,7 +3488,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa24,
     
@@ -3506,7 +3505,7 @@ ReportDefinitions:
                 AND usagecategory NOT IN ('RESIDENTIAL') 
                 AND tenantid = $tenantid) 
            --AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) aa25,
     
         (SELECT COUNT(sc.connectionno) AS CSewunder6Marla
@@ -3519,7 +3518,7 @@ ReportDefinitions:
                 AND usagecategory NOT IN ('RESIDENTIAL')
                 AND tenantid = $tenantid) 
            --AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa26,
     	   
     	   
@@ -3533,7 +3532,7 @@ ReportDefinitions:
               AND usagecategory NOT IN ('RESIDENTIAL')
                 AND tenantid = $tenantid) 
            AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) aa27,
     
         (SELECT COUNT(distinct sc.connectionno) AS CActSewunder6Marla
@@ -3546,7 +3545,7 @@ ReportDefinitions:
                AND usagecategory NOT IN ('RESIDENTIAL') 
                 AND tenantid = $tenantid) 
            AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa28,
     
     (SELECT COUNT( distinct wc.connectionno) as CMetUnd6marla 
@@ -3561,7 +3560,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     --AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa29,
     
@@ -3577,7 +3576,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa30,
        
@@ -3596,7 +3595,7 @@ ReportDefinitions:
                 --AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            --AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) aa31,
     
         (SELECT COUNT(sc.connectionno) AS Sewunder10Marla
@@ -3609,7 +3608,7 @@ ReportDefinitions:
                 --AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            --AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa32,
     	   
     	   
@@ -3623,7 +3622,7 @@ ReportDefinitions:
                 --AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) aa33,
     
         (SELECT COUNT(distinct sc.connectionno) AS ActSewunder10Marla
@@ -3636,7 +3635,7 @@ ReportDefinitions:
                 --AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa34,
     
     (SELECT COUNT( distinct wc.connectionno) as MetUnd10marla 
@@ -3651,7 +3650,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     --AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa35,
     
@@ -3667,7 +3666,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa36,
     
@@ -3684,7 +3683,7 @@ ReportDefinitions:
                 AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            --AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) aa37,
     
         (SELECT COUNT(sc.connectionno) AS RSewunder10Marla
@@ -3697,7 +3696,7 @@ ReportDefinitions:
                 AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            --AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa38,
     	   
     	   
@@ -3711,7 +3710,7 @@ ReportDefinitions:
                 AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) aa39,
     
         (SELECT COUNT(distinct sc.connectionno) AS RActSewunder10Marla
@@ -3724,7 +3723,7 @@ ReportDefinitions:
                 AND usagecategory = 'RESIDENTIAL' 
                 AND tenantid = $tenantid) 
            AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa40,
     
     (SELECT COUNT( distinct wc.connectionno) as RMetUnd10marla 
@@ -3739,7 +3738,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     --AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa41,
     
@@ -3755,7 +3754,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa42,
     
@@ -3772,7 +3771,7 @@ ReportDefinitions:
                 AND usagecategory NOT IN ('RESIDENTIAL') 
                 AND tenantid = $tenantid) 
            --AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) aa43,
     
         (SELECT COUNT(sc.connectionno) AS CSewunder10Marla
@@ -3785,7 +3784,7 @@ ReportDefinitions:
                 AND usagecategory NOT IN ('RESIDENTIAL')
                 AND tenantid = $tenantid) 
            --AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa44,
     	   
     	   
@@ -3799,7 +3798,7 @@ ReportDefinitions:
               AND usagecategory NOT IN ('RESIDENTIAL')
                 AND tenantid = $tenantid) 
            AND wc.status = 'Active' 
-           AND wc.tenantid = $tenantid 
+           --AND wc.tenantid = $tenantid 
            AND wc.connectionno IS NOT NULL) aa45,
     
         (SELECT COUNT(distinct sc.connectionno) AS CActSewunder10Marla
@@ -3812,7 +3811,7 @@ ReportDefinitions:
                AND usagecategory NOT IN ('RESIDENTIAL') 
                 AND tenantid = $tenantid) 
            AND sc.status = 'Active' 
-           AND sc.tenantid = $tenantid 
+           --AND sc.tenantid = $tenantid 
            AND sc.connectionno IS NOT NULL) aa46,
     
     (SELECT COUNT( distinct wc.connectionno) as CMetUnd10marla 
@@ -3827,7 +3826,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     --AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa47,
     
@@ -3843,7 +3842,7 @@ ReportDefinitions:
           AND tenantid = $tenantid
     ) 
     AND wc.status = 'Active' 
-    AND wc.tenantid = $tenantid 
+    --AND wc.tenantid = $tenantid 
     AND ws.connectiontype = 'Metered'  
     AND wc.connectionno IS NOT NULL)aa48
        
