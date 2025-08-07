@@ -3928,6 +3928,18 @@ ReportDefinitions:
     source: ws
     total: false    
   searchParams:
+    - name: fromperiod
+      label: fromDate
+      type: epoch
+      source: pt
+      isMandatory: false
+      searchClause: AND fromperiod <= $fromDate    
+    - name: toperiod
+      label: toDate
+      type: epoch
+      source: pt
+      isMandatory: false
+      searchClause: AND toperiod <= $toDate     
     - name: connectiontype
       label: reports.ws.connectiontype
       type: singlevaluelist
@@ -4036,6 +4048,18 @@ ReportDefinitions:
     source: ws
     total: false    
   searchParams:
+    - name: fromperiod
+      label: fromDate
+      type: epoch
+      source: pt
+      isMandatory: false
+      searchClause: AND fromperiod <= $fromDate    
+    - name: toperiod
+      label: toDate
+      type: epoch
+      source: pt
+      isMandatory: false
+      searchClause: AND toperiod <= $toDate          
     - name: connectiontype
       label: reports.ws.connectiontype
       type: singlevaluelist
