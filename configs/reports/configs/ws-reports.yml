@@ -2651,7 +2651,7 @@ ReportDefinitions:
     source: pt
     wrapper: true
     isMandatory: false
-    searchClause: AND $tenantid = $tenantid
+    searchClause: AND sc.tenantid = $tenantid AND wc.tenantid = $tenantid
   query: |     
     SELECT 
         a.totalwaterconnections,
@@ -3928,14 +3928,14 @@ ReportDefinitions:
     source: ws
     total: false    
   searchParams:
-    - name: fromperiod
-      label: fromDate
+    - name: fromDate
+      label: from Date
       type: epoch
       source: pt
       isMandatory: false
       searchClause: AND fromperiod >= $fromDate    
-    - name: toperiod
-      label: toDate
+    - name: toDate
+      label: to Date
       type: epoch
       source: pt
       isMandatory: false
@@ -4048,14 +4048,14 @@ ReportDefinitions:
     source: ws
     total: false    
   searchParams:
-    - name: fromperiod
-      label: fromDate
+    - name: fromDate
+      label: from Date
       type: epoch
       source: pt
       isMandatory: false
       searchClause: AND fromperiod >= $fromDate    
-    - name: toperiod
-      label: toDate
+    - name: toDate
+      label: to Date
       type: epoch
       source: pt
       isMandatory: false
