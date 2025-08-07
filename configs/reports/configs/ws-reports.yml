@@ -2651,7 +2651,7 @@ ReportDefinitions:
     source: pt
     wrapper: true
     isMandatory: false
-    searchClause: AND wc.tenantid = $tenantid
+    searchClause: AND $tenantid = $tenantid
   query: |     
     SELECT 
         a.totalwaterconnections,
@@ -3928,18 +3928,6 @@ ReportDefinitions:
     source: ws
     total: false    
   searchParams:
-    - name: fromDate
-      label: From Date
-      type: epoch
-      source: ws
-      isMandatory: false
-      searchClause: AND createdtime >= $fromDate
-    - name: toDate
-      label: To Date
-      type: epoch
-      source: ws
-      isMandatory: false
-      searchClause: AND createdtime <= $toDate 
     - name: connectiontype
       label: reports.ws.connectiontype
       type: singlevaluelist
@@ -3947,6 +3935,12 @@ ReportDefinitions:
       source: ws
       isMandatory: false
       searchClause: AND connectiontype=$connectiontype      
+    - name: minAmtarrear
+      label: reports.ws.minAmtarrear
+      type: string 
+      source: ws
+      isMandatory: false
+      searchClause: AND amtarrear::numeric > $minAmtarrear::numeric           
     - name: usagecategory
       label: reports.ws.usagecategory
       type: singlevaluelist
@@ -4042,18 +4036,6 @@ ReportDefinitions:
     source: ws
     total: false    
   searchParams:
-    - name: fromDate
-      label: From Date
-      type: epoch
-      source: ws
-      isMandatory: false
-      searchClause: AND createdtime >= $fromDate
-    - name: toDate
-      label: To Date
-      type: epoch
-      source: ws
-      isMandatory: false
-      searchClause: AND createdtime <= $toDate 
     - name: connectiontype
       label: reports.ws.connectiontype
       type: singlevaluelist
@@ -4061,6 +4043,12 @@ ReportDefinitions:
       source: ws
       isMandatory: false
       searchClause: AND connectiontype=$connectiontype      
+    - name: minAmtarrear
+      label: reports.ws.minAmtarrear
+      type: string 
+      source: ws
+      isMandatory: false
+      searchClause: AND amtarrear::numeric > $minAmtarrear::numeric     
     - name: usagecategory
       label: reports.ws.usagecategory
       type: singlevaluelist
