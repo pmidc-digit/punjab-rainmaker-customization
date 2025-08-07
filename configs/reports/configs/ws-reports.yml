@@ -3940,6 +3940,20 @@ ReportDefinitions:
       source: ws
       isMandatory: false
       searchClause: AND createdtime <= $toDate 
+    - name: connectiontype
+      label: reports.ws.connectiontype
+      type: singlevaluelist
+      pattern: 'list://Non Metered:Non Metered,Metered:Metered'
+      source: ws
+      isMandatory: false
+      searchClause: AND connectiontype=$connectiontype      
+    - name: usagecategory
+      label: reports.ws.usagecategory
+      type: singlevaluelist
+      pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+      source: ws
+      isMandatory: false
+      searchClause: AND usagecategory=$usagecategory        
   query: |
       select consumercode as consumercode,usagecategory as usagecategory,amtarrear as amtarrear,
       bill_status as bill_status,connectiontype as connectiontype,
@@ -4040,6 +4054,20 @@ ReportDefinitions:
       source: ws
       isMandatory: false
       searchClause: AND createdtime <= $toDate 
+    - name: connectiontype
+      label: reports.ws.connectiontype
+      type: singlevaluelist
+      pattern: 'list://Non Metered:Non Metered,Metered:Metered'
+      source: ws
+      isMandatory: false
+      searchClause: AND connectiontype=$connectiontype      
+    - name: usagecategory
+      label: reports.ws.usagecategory
+      type: singlevaluelist
+      pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+      source: ws
+      isMandatory: false
+      searchClause: AND usagecategory=$usagecategory           
   query: |
       select consumercode as consumercode,usagecategory as usagecategory,amtarrear as amtarrear,
       bill_status as bill_status,connectiontype as connectiontype,
