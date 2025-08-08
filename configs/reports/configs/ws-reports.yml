@@ -4505,4 +4505,230 @@ ReportDefinitions:
        AND wc.status = 'Active' 
        AND wc.tenantid = $tenantid 
        AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)aa48;
+       AND wc.connectionno IS NOT NULL)aa48
+  - reportName: WSQuaterly_Bill_Generate
+    summary: Ws Quaterly Bill Generate Report
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig: null
+    print:
+      pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: Consumercode
+        type: string
+        source: ws
+        total: false
+      - name:  payername
+        label: Name
+        type: string
+        source: ws
+        total: false
+      - name: Address
+        label: payeraddress
+        type: string
+        source: ws
+        total: false
+      - name: localityname
+        label: Locality
+        type: string
+        source: ws
+        total: false
+      - name: blockcode
+        label: Ward No
+        type: string
+        source: ws
+        total: false
+      - name: zonecode
+        label: Zone No
+        type: string
+        source: ws
+        total: false
+      - name: mobilenumber
+        label: Mobile
+        type: string
+        source: ws
+        total: false
+      - name: amtpaid
+        label: Bill Amount
+        type: string
+        source: ws
+        total: false
+      - name: usagecategory
+        label: Category
+        type: string
+        source: ws
+        total: false
+      - name: connectiontype
+        label: Connection Type
+        type: string
+        source: ws
+        total: false
+      - name: landarea
+        label: Land Area
+        type: string
+        source: ws
+        total: false
+      - name: bill_status
+        label: Bill Status
+        type: string
+        source: ws
+        total: false
+    searchParams:
+      - name: serviceType
+        label: Service Type
+        type: singlevaluelist
+        pattern: 'list://WS%:Water,SW%:Sewerage'
+        source: ws
+        isMandatory: true
+        searchClause: AND bill.businessservice like $serviceType
+      - name: fromperiod
+        label: From Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND bill.fromperiod = $fromDate
+      - name: toperiod
+        label: To Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND bill.fromperiod = $toDate
+      - name: usagecategory
+        label: Category
+        type: singlevaluelist
+        pattern:    'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTION  AL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+        source: ws
+        isMandatory: false
+        searchClause: AND usagecategory=$usagecategory  
+      - name: localityArray
+        label: zoneList
+        type: boundarylist
+        source: ws
+        isMandatory: false
+        searchClause: AND ebm.localitycode IN ($localityArray)
+      - name: connectiontype
+        label: Connection Type
+        type: singlevaluelist
+        pattern: 'list://Non Metered:Non Metered,Metered:Metered'
+        source: ws
+        isMandatory: false
+        searchClause: AND connectiontype=$connectiontype 
+    query: |
+      WITH base AS (
+          SELECT 
+              bill.businessservice,
+              bill.totalamount,
+              bill.consumercode,
+              bill.billno,
+              bill.billid,
+              bill.fromperiod,
+              bill.toperiod,
+              bill.tenantid,
+              b.payername,
+              b.payeraddress,
+              b.mobilenumber,
+              b.status AS bill_status,
+              COALESCE(sw.connectionno, ws.connectionno) AS connectionno,
+              COALESCE(sw.property_id, ws.property_id) AS property_id,
+              COALESCE(sw.id, ws.id) AS connection_id,
+              COALESCE(sw.locality, ws.locality) AS locality,
+              COALESCE(sw_service.connectiontype, ws_service.connectiontype) AS connectiontype
+          FROM egbs_billdetail_v1 bill
+          JOIN egbs_bill_v1 b ON bill.billid = b.id
+          LEFT JOIN eg_sw_connection sw ON bill.businessservice = 'SW' AND bill.consumercode = sw.connectionno AND sw.status IN ('Active', 'Inactive')
+          LEFT JOIN eg_ws_connection ws ON bill.businessservice = 'WS' AND bill.consumercode = ws.connectionno AND ws.status IN ('Active', 'Inactive')
+          LEFT JOIN eg_sw_service sw_service ON bill.businessservice = 'SW' AND sw.id = sw_service.connection_id
+          LEFT JOIN eg_ws_service ws_service ON bill.businessservice = 'WS' AND ws.id = ws_service.connection_id
+          WHERE bill.tenantid = $tenantid
+            AND (
+                  (bill.businessservice = 'SW' AND bill.fromperiod BETWEEN $fromDate AND $toDate) OR
+                  (bill.businessservice = 'WS' AND bill.fromperiod BETWEEN $fromDate AND $toDate)
+            )
+      )
+      
+      , cte AS (
+          SELECT 
+              base.businessservice,
+              to_char((to_timestamp(base.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
+              || '-' || 
+              to_char((to_timestamp(base.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS finyear,
+              pt.usagecategory,
+              base.connectionno,
+              base.totalamount,
+              base.consumercode,
+              base.billno,
+              base.payername,
+              base.payeraddress,
+              base.mobilenumber,
+              base.bill_status,
+              base.connectiontype,
+              ebm.zonename,
+              ebm.blockname,
+              ebm.localityname,
+              ebm.localitycode,
+              ebm.zonecode,
+              ebm.blockcode,
+              pt.landarea,
+              base.fromperiod,
+              base.toperiod,
+              pt.propertyid
+          FROM base
+          JOIN eg_pt_property pt ON pt.propertyid = base.property_id AND pt.status IN ('ACTIVE', 'PENDINGWS')
+          LEFT JOIN eg_bndry_mohalla ebm ON base.locality = ebm.localitycode AND base.tenantid = ebm.tenantid
+          WHERE pt.usagecategory IN (
+              'RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL',
+              'NONRESIDENTIAL.INSTITUTIONAL', 'MIXED',
+              'NONRESIDENTIAL', 'NONRESIDENTIAL.INDUSTRIAL',
+              'NONRESIDENTIAL.OTHERS'
+          )
+      )
+      
+      SELECT  
+          cte.businessservice,
+          cte.consumercode,
+          cte.payername,
+          cte.payeraddress,
+          cte.mobilenumber,
+          cte.usagecategory,
+          SUM(cte.totalamount) AS amtpaid,
+          cte.bill_status,
+          cte.billno,
+          cte.connectiontype,
+          cte.landarea,
+          cte.zonename,
+          cte.blockname,
+          cte.zonecode,
+          cte.blockcode,
+          cte.localityname,
+          cte.localitycode,
+          cte.fromperiod,
+          cte.toperiod,
+          cte.propertyid,
+          STRING_AGG(cte.finyear, ', ') AS finyear
+      FROM cte
+      WHERE cte.bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
+      GROUP BY 
+          cte.businessservice,
+          cte.consumercode,
+          cte.payername,
+          cte.payeraddress,
+          cte.mobilenumber,
+          cte.usagecategory,
+          cte.bill_status,
+          cte.billno,
+          cte.connectiontype,
+          cte.landarea,
+          cte.zonename,
+          cte.blockname,
+          cte.zonecode,
+          cte.blockcode,
+          cte.localityname,
+          cte.localitycode,
+          cte.fromperiod,
+          cte.toperiod,
+          cte.propertyid having 1=1
+      
+
+  
+      
