@@ -2791,12 +2791,6 @@ ReportDefinitions:
         source: ws
         isMandatory: false
         searchClause: AND usagecategory = $usagecategory
-      - name: localityArray
-        label: zoneList
-        type: boundarylist
-        source: ws
-        isMandatory: false
-        searchClause: AND ebm.localitycode IN ($localityArray)
       - name: connectiontype
         label: Connection Type
         type: singlevaluelist
@@ -2804,6 +2798,13 @@ ReportDefinitions:
         source: ws
         isMandatory: false
         searchClause: AND connectiontype = $connectiontype
+      - name: localityArray
+        label: zoneList
+        type: boundarylist
+        source: ws
+        isMandatory: false
+        searchClause: AND ebm.localitycode IN ($localityArray)
+
     query: >
       WITH base AS (
           SELECT 
