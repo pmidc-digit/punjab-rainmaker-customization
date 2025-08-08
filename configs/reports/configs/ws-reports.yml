@@ -2397,27 +2397,27 @@ ReportDefinitions:
             bill.billid, bill.totalamount, wc.tenantid AS tenantid, bill.consumercode,
             wc.status AS wc_status, pt.landarea, b.payername AS payername, b.status AS bill_status,
             b.payeraddress, b.mobilenumber
-        FROM eg_ws_connection wc
-        JOIN eg_pt_property pt 
+         FROM eg_ws_connection wc
+         JOIN eg_pt_property pt 
             ON wc.property_id = pt.propertyid
             AND wc.status = 'Active'
             AND pt.status IN ('ACTIVE', 'PENDINGWS')
-        INNER JOIN egbs_billdetail_v1 bill 
+         INNER JOIN egbs_billdetail_v1 bill 
             ON bill.consumercode = wc.connectionno
             AND wc.status = 'Active'
             AND bill.businessservice = 'WS'
-        JOIN egbs_bill_v1 b  ON bill.billid = b.id
-        JOIN params p ON TRUE
-        WHERE  wc.connectionno IS NOT NULL
+         JOIN egbs_bill_v1 b  ON bill.billid = b.id
+         JOIN params p ON TRUE
+         WHERE  wc.connectionno IS NOT NULL
             AND bill.businessservice = 'WS'
             AND pt.usagecategory IN ('RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL', 'MIXED')
             AND to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata' BETWEEN p.start_date AND p.end_date
-        )SELECT 
-        cte.consumercode, params.finyear, cte.usagecategory, SUM(cte.totalamount) AS amtpaid,
-        cte.bill_status, cte.locality, cte.payeraddress, cte.mobilenumber, cte.payername
-        FROM  cte
-        JOIN params ON TRUE
-        WHERE  cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED')
+         )SELECT 
+         cte.consumercode, params.finyear, cte.usagecategory, SUM(cte.totalamount) AS amtpaid,
+         cte.bill_status, cte.locality, cte.payeraddress, cte.mobilenumber, cte.payername
+         FROM  cte
+         JOIN params ON TRUE
+         WHERE  cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED')
     groupby: GROUP BY  cte.consumercode,params.finyear, cte.bill_status,cte.payername,
         cte.usagecategory, cte.locality, cte.mobilenumber, cte.payeraddress
         HAVING
