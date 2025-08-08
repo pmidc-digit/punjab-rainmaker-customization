@@ -2697,7 +2697,7 @@ ReportDefinitions:
        SELECT * FROM WS_Billing_cte where billingcyclestartdate >= $fromDate
 
   - reportName: WSQuaterly_Bill_Generate
-    summary: Ws Quaterly Bill Generate Report
+    summary: Ws Quarterly Bill Generate Report
     version: 1.0.0
     moduleName: rainmaker-ws
     additionalConfig: null
@@ -2709,7 +2709,7 @@ ReportDefinitions:
         type: string
         source: ws
         total: false
-      - name:  payername
+      - name: payername
         label: Name
         type: string
         source: ws
@@ -2768,10 +2768,10 @@ ReportDefinitions:
       - name: serviceType
         label: Service Type
         type: singlevaluelist
-        pattern: 'list://WS%:Water,SW%:Sewerage'
+        pattern: list://WS%:Water,SW%:Sewerage
         source: ws
         isMandatory: true
-        searchClause: AND bill.businessservice like $serviceType
+        searchClause: AND bill.businessservice LIKE $serviceType
       - name: fromperiod
         label: From Date
         type: epoch
@@ -2783,14 +2783,14 @@ ReportDefinitions:
         type: epoch
         source: ws
         isMandatory: true
-        searchClause: AND bill.fromperiod = $toDate
+        searchClause: AND bill.toperiod = $toDate
       - name: usagecategory
         label: Category
         type: singlevaluelist
-        pattern:    'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTION  AL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+        pattern: list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NON    RESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED
         source: ws
         isMandatory: false
-        searchClause: AND usagecategory=$usagecategory  
+        searchClause: AND usagecategory = $usagecategory
       - name: localityArray
         label: zoneList
         type: boundarylist
@@ -2800,11 +2800,11 @@ ReportDefinitions:
       - name: connectiontype
         label: Connection Type
         type: singlevaluelist
-        pattern: 'list://Non Metered:Non Metered,Metered:Metered'
+        pattern: list://Non Metered:Non Metered,Metered:Metered
         source: ws
         isMandatory: false
-        searchClause: AND connectiontype=$connectiontype 
-    query: |
+        searchClause: AND connectiontype = $connectiontype
+    query: >
       WITH base AS (
           SELECT 
               bill.businessservice,
@@ -2835,13 +2835,13 @@ ReportDefinitions:
                   (bill.businessservice = 'SW' AND bill.fromperiod BETWEEN $fromDate AND $toDate) OR
                   (bill.businessservice = 'WS' AND bill.fromperiod BETWEEN $fromDate AND $toDate)
             )
-      )
-      
-      , cte AS (
+      ),
+    
+      cte AS (
           SELECT 
               base.businessservice,
-              to_char((to_timestamp(base.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
-              || '-' || 
+              to_char((to_timestamp(base.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM')
+              || '-' ||
               to_char((to_timestamp(base.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS finyear,
               pt.usagecategory,
               base.connectionno,
@@ -2873,7 +2873,7 @@ ReportDefinitions:
               'NONRESIDENTIAL.OTHERS'
           )
       )
-      
+    
       SELECT  
           cte.businessservice,
           cte.consumercode,
@@ -2897,7 +2897,9 @@ ReportDefinitions:
           cte.propertyid,
           STRING_AGG(cte.finyear, ', ') AS finyear
       FROM cte
+    
       WHERE cte.bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
+    
       GROUP BY 
           cte.businessservice,
           cte.consumercode,
@@ -2917,8 +2919,6 @@ ReportDefinitions:
           cte.localitycode,
           cte.fromperiod,
           cte.toperiod,
-          cte.propertyid having 1=1
-      
-
-  
+          cte.propertyid
+      HAVING 1=1
       
