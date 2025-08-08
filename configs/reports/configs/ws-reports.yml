@@ -2645,7 +2645,7 @@ ReportDefinitions:
     total: true
   searchParams:
   - name: tenantid
-    label: tenantid
+    label: tenantid(Not required if already logged in from requred ULB)
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: pt
@@ -3947,7 +3947,7 @@ ReportDefinitions:
       isMandatory: false
       searchClause: AND connectiontype=$connectiontype      
     - name: minAmtarrear
-      label: minAmtarrear
+      label: Enter Amount
       type: string 
       source: ws
       isMandatory: false
