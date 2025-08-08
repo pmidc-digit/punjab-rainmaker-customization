@@ -2901,25 +2901,8 @@ ReportDefinitions:
     
       WHERE cte.bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
     
-      GROUP BY 
-          cte.businessservice,
-          cte.consumercode,
-          cte.payername,
-          cte.payeraddress,
-          cte.mobilenumber,
-          cte.usagecategory,
-          cte.bill_status,
-          cte.billno,
-          cte.connectiontype,
-          cte.landarea,
-          cte.zonename,
-          cte.blockname,
-          cte.zonecode,
-          cte.blockcode,
-          cte.localityname,
-          cte.localitycode,
-          cte.fromperiod,
-          cte.toperiod,
-          cte.propertyid
-      HAVING 1=1
+    groupby: GROUP BY cte.businessservice,cte.consumercode,cte.payername,cte.payeraddress,cte.mobilenumber,
+          cte.usagecategory,cte.bill_status,cte.billno,cte.connectiontype,cte.landarea,cte.zonename,
+          cte.blockname,cte.zonecode,cte.blockcode, cte.localityname,
+          cte.localitycode,cte.fromperiod,cte.toperiod,cte.propertyid HAVING 1=1
       
