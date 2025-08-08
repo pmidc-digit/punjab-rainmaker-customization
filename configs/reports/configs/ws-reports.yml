@@ -2771,14 +2771,14 @@ ReportDefinitions:
         pattern: list://WS%:Water,SW%:Sewerage
         source: ws
         isMandatory: true
-        searchClause: AND bill.businessservice LIKE $serviceType
-      - name: fromperiod
+        searchClause: AND bill.businessservice = $serviceType
+      - name: fromDate
         label: From Date
         type: epoch
         source: ws
         isMandatory: true
         searchClause: AND bill.fromperiod = $fromDate
-      - name: toperiod
+      - name: toDate
         label: To Date
         type: epoch
         source: ws
