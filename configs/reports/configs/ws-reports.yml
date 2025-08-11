@@ -2826,23 +2826,34 @@ ReportDefinitions:
               COALESCE(sw.locality, ws.locality) AS locality,
               COALESCE(sw_service.connectiontype, ws_service.connectiontype) AS connectiontype
           FROM egbs_billdetail_v1 bill
-          JOIN egbs_bill_v1 b ON bill.billid = b.id
-          LEFT JOIN eg_sw_connection sw ON bill.businessservice = 'SW' AND bill.consumercode = sw.connectionno AND sw.status IN ('Active', 'Inactive')
-          LEFT JOIN eg_ws_connection ws ON bill.businessservice = 'WS' AND bill.consumercode = ws.connectionno AND ws.status IN ('Active', 'Inactive')
-          LEFT JOIN eg_sw_service sw_service ON bill.businessservice = 'SW' AND sw.id = sw_service.connection_id
-          LEFT JOIN eg_ws_service ws_service ON bill.businessservice = 'WS' AND ws.id = ws_service.connection_id
-          WHERE bill.tenantid = $tenantid
+          JOIN egbs_bill_v1 b 
+              ON bill.billid = b.id
+          LEFT JOIN eg_sw_connection sw 
+              ON bill.businessservice = 'SW' 
+              AND bill.consumercode = sw.connectionno 
+              AND sw.status IN ('Active', 'Inactive')
+          LEFT JOIN eg_ws_connection ws 
+              ON bill.businessservice = 'WS' 
+              AND bill.consumercode = ws.connectionno 
+              AND ws.status IN ('Active', 'Inactive')
+          LEFT JOIN eg_sw_service sw_service 
+              ON bill.businessservice = 'SW' 
+              AND sw.id = sw_service.connection_id
+          LEFT JOIN eg_ws_service ws_service 
+              ON bill.businessservice = 'WS' 
+              AND ws.id = ws_service.connection_id
+          WHERE bill.tenantid = 'pb.amritsar'
             AND (
-                  (bill.businessservice = 'SW' AND bill.fromperiod BETWEEN $fromDate AND $toDate) OR
-                  (bill.businessservice = 'WS' AND bill.fromperiod BETWEEN $fromDate AND $toDate)
+                  (bill.businessservice = 'SW' AND bill.fromperiod BETWEEN 1735669800000 AND 1743445740000) OR
+                  (bill.businessservice = 'WS' AND bill.fromperiod BETWEEN 1711909800000 AND 1719772182000)
             )
       ),
-    
+      
       cte AS (
           SELECT 
               base.businessservice,
-              to_char((to_timestamp(base.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM')
-              || '-' ||
+              to_char((to_timestamp(base.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
+              || '-' || 
               to_char((to_timestamp(base.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS finyear,
               pt.usagecategory,
               base.connectionno,
@@ -2865,8 +2876,12 @@ ReportDefinitions:
               base.toperiod,
               pt.propertyid
           FROM base
-          JOIN eg_pt_property pt ON pt.propertyid = base.property_id AND pt.status IN ('ACTIVE', 'PENDINGWS')
-          LEFT JOIN eg_bndry_mohalla ebm ON base.locality = ebm.localitycode AND base.tenantid = ebm.tenantid
+          JOIN eg_pt_property pt 
+              ON pt.propertyid = base.property_id 
+              AND pt.status IN ('ACTIVE', 'PENDINGWS')
+          LEFT JOIN eg_bndry_mohalla ebm 
+              ON base.locality = ebm.localitycode 
+              AND base.tenantid = ebm.tenantid
           WHERE pt.usagecategory IN (
               'RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL',
               'NONRESIDENTIAL.INSTITUTIONAL', 'MIXED',
@@ -2874,7 +2889,7 @@ ReportDefinitions:
               'NONRESIDENTIAL.OTHERS'
           )
       )
-    
+      
       SELECT  
           cte.businessservice,
           cte.consumercode,
@@ -2898,11 +2913,11 @@ ReportDefinitions:
           cte.propertyid,
           STRING_AGG(cte.finyear, ', ') AS finyear
       FROM cte
-    
       WHERE cte.bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
-    
-    groupby: GROUP BY cte.businessservice,cte.consumercode,cte.payername,cte.payeraddress,cte.mobilenumber,
-          cte.usagecategory,cte.bill_status,cte.billno,cte.connectiontype,cte.landarea,cte.zonename,
-          cte.blockname,cte.zonecode,cte.blockcode, cte.localityname,
-          cte.localitycode,cte.fromperiod,cte.toperiod,cte.propertyid HAVING 1=1
+    groupby: GROUP BY cte.businessservice, cte.consumercode,cte.payername,cte.payeraddress,cte.mobilenumber,cte.usagecategory,cte.bill_status,cte.billno,
+          cte.connectiontype,cte.landarea,cte.zonename,cte.blockname,cte.zonecode,cte.blockcode,cte.localityname,
+          cte.localitycode,cte.fromperiod,cte.toperiod,cte.propertyid
+      HAVING 1=1
+      
+      
       
