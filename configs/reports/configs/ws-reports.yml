@@ -2777,33 +2777,33 @@ ReportDefinitions:
         type: epoch
         source: ws
         isMandatory: true
-        searchClause: AND bill.fromperiod = $fromDate
+        searchClause: AND cte.fromperiod = $fromDate
       - name: toDate
         label: To Date
         type: epoch
         source: ws
         isMandatory: true
-        searchClause: AND bill.toperiod = $toDate
+        searchClause: AND cte.toperiod = $toDate
       - name: usagecategory
         label: Category
         type: singlevaluelist
         pattern: list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NON    RESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED
         source: ws
         isMandatory: false
-        searchClause: AND usagecategory = $usagecategory
+        searchClause: AND cte.usagecategory = $usagecategory
       - name: connectiontype
         label: Connection Type
         type: singlevaluelist
         pattern: list://Non Metered:Non Metered,Metered:Metered
         source: ws
         isMandatory: false
-        searchClause: AND connectiontype = $connectiontype
+        searchClause: AND cte.connectiontype = $connectiontype
       - name: localityArray
         label: zoneList
         type: boundarylist
         source: ws
         isMandatory: false
-        searchClause: AND ebm.localityname IN ($localityArray)
+        searchClause: AND cte.localitycode IN ($localityArray
 
     query: >
       WITH base AS (
