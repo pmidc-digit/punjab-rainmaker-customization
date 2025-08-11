@@ -2798,79 +2798,79 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND cte.localitycode IN ($localityArray)        
     query: |
-      --------Water
-      WITH cte AS (
-          SELECT
-              bill.businessservice,   
-              to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
-              || '-' || 
-              to_char((to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS finyear,
-              pt.usagecategory,
-              wc.connectionno,
-              bill.totalamount,
-              bill.consumercode,
-              bill.billno,b.payername,b.payeraddress,b.mobilenumber,
-              b.status AS bill_status,
-              ct.connectiontype,
-              ebm.zonename,
-              ebm.blockname,
-              ebm.zonecode,
-              ebm.blockcode,
-              ebm.localityname,
-              ebm.localitycode,
-              pt.landarea,
-              bill.fromperiod,
-              bill.toperiod,
-              pt.propertyid
-          FROM eg_ws_connection wc 
-          JOIN eg_pt_property pt ON wc.property_id = pt.propertyid 
-              AND wc.status IN ('Active', 'Inactive') 
-              AND pt.status IN ('ACTIVE', 'PENDINGWS')
-          JOIN eg_ws_service ct ON wc.id = ct.connection_id
-          JOIN eg_bndry_mohalla ebm ON wc.locality = ebm.localitycode AND wc.tenantid = ebm.tenantid
-          JOIN egbs_billdetail_v1 bill 
-              ON bill.consumercode = wc.connectionno 
-              AND bill.businessservice = 'WS'
-              AND bill.fromperiod BETWEEN $fromDate AND $toDate
-          JOIN egbs_bill_v1 b 
-              ON bill.billid = b.id
-              AND bill.businessservice = 'WS'
-          WHERE wc.tenantid = $tenantid
-              AND pt.usagecategory IN (
-                  'RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL',
-                  'NONRESIDENTIAL.INSTITUTIONAL', 'MIXED',
-                  'NONRESIDENTIAL', 'NONRESIDENTIAL.INDUSTRIAL',
-                  'NONRESIDENTIAL.OTHERS'
-              )
-      )
-      
-      SELECT
-          cte.businessservice,  
-          cte.consumercode,
-          cte.payername,
-          cte.payeraddress,
-          cte.mobilenumber,
-          cte.usagecategory,
-          SUM(cte.totalamount) AS amtpaid,
-          cte.bill_status,
-          cte.billno,
-          cte.connectiontype,
-          cte.landarea,
-          cte.zonename,
-          cte.blockname,
-          cte.zonecode,
-          cte.blockcode,
-          cte.localityname,
-          cte.localitycode,
-          cte.fromperiod,
-          cte.toperiod,
-          cte.propertyid,
-          STRING_AGG(cte.finyear, ', ') AS finyear
-      FROM cte
-      WHERE cte.bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
+       --------Water
+       WITH cte AS (
+           SELECT
+               bill.businessservice,   
+               to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
+               || '-' || 
+               to_char((to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS finyear,
+               pt.usagecategory,
+               wc.connectionno,
+               bill.totalamount,
+               bill.consumercode,
+               bill.billno,b.payername,b.payeraddress,b.mobilenumber,
+               b.status AS bill_status,
+               ct.connectiontype,
+               ebm.zonename,
+               ebm.blockname,
+               ebm.zonecode,
+               ebm.blockcode,
+               ebm.localityname,
+               ebm.localitycode,
+               pt.landarea,
+               bill.fromperiod,
+               bill.toperiod,
+               pt.propertyid
+           FROM eg_ws_connection wc 
+           JOIN eg_pt_property pt ON wc.property_id = pt.propertyid 
+               AND wc.status IN ('Active', 'Inactive') 
+               AND pt.status IN ('ACTIVE', 'PENDINGWS')
+           JOIN eg_ws_service ct ON wc.id = ct.connection_id
+           JOIN eg_bndry_mohalla ebm ON wc.locality = ebm.localitycode AND wc.tenantid = ebm.tenantid
+           JOIN egbs_billdetail_v1 bill 
+               ON bill.consumercode = wc.connectionno 
+               AND bill.businessservice = 'WS'
+               AND bill.fromperiod BETWEEN $fromDate AND $toDate
+           JOIN egbs_bill_v1 b 
+               ON bill.billid = b.id
+               AND bill.businessservice = 'WS'
+           WHERE wc.tenantid = $tenantid
+               AND pt.usagecategory IN (
+                   'RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL',
+                   'NONRESIDENTIAL.INSTITUTIONAL', 'MIXED',
+                   'NONRESIDENTIAL', 'NONRESIDENTIAL.INDUSTRIAL',
+                   'NONRESIDENTIAL.OTHERS'
+               )
+       )
+       
+       SELECT
+           cte.businessservice,  
+           cte.consumercode,
+           cte.payername,
+           cte.payeraddress,
+           cte.mobilenumber,
+           cte.usagecategory,
+           SUM(cte.totalamount) AS amtpaid,
+           cte.bill_status,
+           cte.billno,
+           cte.connectiontype,
+           cte.landarea,
+           cte.zonename,
+           cte.blockname,
+           cte.zonecode,
+           cte.blockcode,
+           cte.localityname,
+           cte.localitycode,
+           cte.fromperiod,
+           cte.toperiod,
+           cte.propertyid,
+           STRING_AGG(cte.finyear, ', ') AS finyear
+       FROM cte
+       WHERE cte.bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
     groupby: GROUP BY cte.businessservice, cte.consumercode,cte.payername,cte.payeraddress,cte.mobilenumber,cte.usagecategory,cte.bill_status,cte.billno,
-          cte.connectiontype,cte.landarea,cte.zonename,cte.blockname,cte.zonecode,cte.blockcode,cte.localityname,
-          cte.localitycode,cte.fromperiod,cte.toperiod,cte.propertyid 
+             cte.connectiontype,cte.landarea,cte.zonename,cte.blockname,cte.zonecode,cte.blockcode,cte.localityname,
+             cte.localitycode,cte.fromperiod,cte.toperiod,cte.propertyid 
 
       
       
