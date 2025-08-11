@@ -2791,7 +2791,13 @@ ReportDefinitions:
         source: ws
         isMandatory: false
         searchClause: AND cte.connectiontype = $connectiontype
-    query: >
+      - name: localityArray
+        label: zoneList
+        type: boundarylist
+        source: ws
+        isMandatory: false
+        searchClause: AND cte.localitycode IN ($localityArray)        
+    query: |
       --------Water
       WITH cte AS (
           SELECT
