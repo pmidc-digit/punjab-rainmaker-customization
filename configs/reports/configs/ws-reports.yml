@@ -2765,13 +2765,6 @@ ReportDefinitions:
         source: ws
         total: false
     searchParams:
-      - name: serviceType
-        label: Service Type
-        type: singlevaluelist
-        pattern: list://WS%:Water,SW%:Sewerage
-        source: ws
-        isMandatory: true
-        searchClause: AND cte.businessservice = $serviceType
       - name: fromDate
         label: From Date
         type: epoch
@@ -2803,95 +2796,53 @@ ReportDefinitions:
         type: boundarylist
         source: ws
         isMandatory: false
-        searchClause: AND cte.localitycode IN ($localityArray
-
+        searchClause: AND cte.localitycode IN ($localityArray)
     query: >
-      WITH base AS (
-          SELECT 
-              bill.businessservice,
+      --------Water
+      WITH cte AS (
+          SELECT
+              bill.businessservice, 
+              to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
+              || '-' || 
+              to_char((to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS finyear,
+              pt.usagecategory,
+              wc.connectionno,
               bill.totalamount,
               bill.consumercode,
-              bill.billno,
-              bill.billid,
-              bill.fromperiod,
-              bill.toperiod,
-              bill.tenantid,
-              b.payername,
-              b.payeraddress,
-              b.mobilenumber,
+              bill.billno,b.payername,b.payeraddress,b.mobilenumber,
               b.status AS bill_status,
-              COALESCE(sw.connectionno, ws.connectionno) AS connectionno,
-              COALESCE(sw.property_id, ws.property_id) AS property_id,
-              COALESCE(sw.id, ws.id) AS connection_id,
-              COALESCE(sw.locality, ws.locality) AS locality,
-              COALESCE(sw_service.connectiontype, ws_service.connectiontype) AS connectiontype
-          FROM egbs_billdetail_v1 bill
-          JOIN egbs_bill_v1 b 
-              ON bill.billid = b.id
-          LEFT JOIN eg_sw_connection sw 
-              ON bill.businessservice = 'SW' 
-              AND bill.consumercode = sw.connectionno 
-              AND sw.status IN ('Active', 'Inactive')
-          LEFT JOIN eg_ws_connection ws 
-              ON bill.businessservice = 'WS' 
-              AND bill.consumercode = ws.connectionno 
-              AND ws.status IN ('Active', 'Inactive')
-          LEFT JOIN eg_sw_service sw_service 
-              ON bill.businessservice = 'SW' 
-              AND sw.id = sw_service.connection_id
-          LEFT JOIN eg_ws_service ws_service 
-              ON bill.businessservice = 'WS' 
-              AND ws.id = ws_service.connection_id
-          WHERE bill.tenantid = 'pb.amritsar'
-            AND (
-                  (bill.businessservice = 'SW' AND bill.fromperiod BETWEEN 1735669800000 AND 1743445740000) OR
-                  (bill.businessservice = 'WS' AND bill.fromperiod BETWEEN 1711909800000 AND 1719772182000)
-            )
-      ),
-      
-      cte AS (
-          SELECT 
-              base.businessservice,
-              to_char((to_timestamp(base.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
-              || '-' || 
-              to_char((to_timestamp(base.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS finyear,
-              pt.usagecategory,
-              base.connectionno,
-              base.totalamount,
-              base.consumercode,
-              base.billno,
-              base.payername,
-              base.payeraddress,
-              base.mobilenumber,
-              base.bill_status,
-              base.connectiontype,
+              ct.connectiontype,
               ebm.zonename,
               ebm.blockname,
-              ebm.localityname,
-              ebm.localitycode,
               ebm.zonecode,
               ebm.blockcode,
-              pt.landarea,
-              base.fromperiod,
-              base.toperiod,
-              pt.propertyid
-          FROM base
-          JOIN eg_pt_property pt 
-              ON pt.propertyid = base.property_id 
+              ebm.localityname,ebm.localitycode,
+              pt.landarea,bill.fromperiod,bill.toperiod,
+          pt.propertyid
+          FROM eg_ws_connection wc 
+          JOIN eg_pt_property pt ON wc.property_id = pt.propertyid 
+              AND wc.status IN ('Active', 'Inactive') 
               AND pt.status IN ('ACTIVE', 'PENDINGWS')
-          LEFT JOIN eg_bndry_mohalla ebm 
-              ON base.locality = ebm.localitycode 
-              AND base.tenantid = ebm.tenantid
-          WHERE pt.usagecategory IN (
-              'RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL',
-              'NONRESIDENTIAL.INSTITUTIONAL', 'MIXED',
-              'NONRESIDENTIAL', 'NONRESIDENTIAL.INDUSTRIAL',
-              'NONRESIDENTIAL.OTHERS'
-          )
+          JOIN eg_ws_service ct ON wc.id = ct.connection_id
+          JOIN eg_bndry_mohalla ebm ON wc.locality = ebm.localitycode AND wc.tenantid = ebm.tenantid
+          JOIN egbs_billdetail_v1 bill 
+              ON bill.consumercode = wc.connectionno 
+              AND bill.businessservice = 'WS'
+              AND bill.fromperiod BETWEEN $fromDate AND $toDate
+          JOIN egbs_bill_v1 b 
+              ON bill.billid = b.id
+              AND bill.businessservice = 'WS'
+          WHERE wc.tenantid = $tenantid
+              AND pt.usagecategory IN (
+                  'RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL',
+                  'NONRESIDENTIAL.INSTITUTIONAL', 'MIXED',
+                  'NONRESIDENTIAL', 'NONRESIDENTIAL.INDUSTRIAL',
+                  'NONRESIDENTIAL.OTHERS'
+              )
       )
       
-      SELECT  
-          cte.businessservice,
+      SELECT
+          cte.businessservice,  
           cte.consumercode,
           cte.payername,
           cte.payeraddress,
@@ -2908,8 +2859,7 @@ ReportDefinitions:
           cte.blockcode,
           cte.localityname,
           cte.localitycode,
-          cte.fromperiod,
-          cte.toperiod,
+          cte.fromperiod,cte.toperiod,
           cte.propertyid,
           STRING_AGG(cte.finyear, ', ') AS finyear
       FROM cte
