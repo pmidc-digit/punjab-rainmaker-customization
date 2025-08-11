@@ -469,6 +469,12 @@
                 }
               },
               {
+                "variable": "latePaymentc",
+                "value": {
+                  "path": "$.additionalDetails.latePaymentc"
+                }
+              },
+              {
                 "variable": "ledgerId",
                 "value": {
                   "path": "$.connection.additionalDetails.value.ledgerId"
@@ -481,9 +487,27 @@
                 }
               },
               {
-                "variable": "payerAddress",
+                "variable": "Addresscity",
                 "value": {
-                  "path": "$.payerAddress"
+                  "path": "$.address.city"
+                }
+              },
+              {
+                "variable": "Addresspincode",
+                "value": {
+                  "path": "$.address.pincode"
+                }
+              },
+              {
+                "variable": "AddressdoorNo",
+                "value": {
+                  "path": "$.address.doorNo"
+                }
+              },
+              {
+                "variable": "Addresslandmark",
+                "value": {
+                  "path": "$.address.landmark"
                 }
               },
               {
@@ -507,7 +531,7 @@
               {
                 "variable": "fromPeriod",
                 "value": {
-                  "path": "$.billDetails[0].fromPeriod"
+                  "path": "$.billDetails[(@.length-1)].fromPeriod"
                 },
                 "type": "date"
               },
@@ -724,10 +748,6 @@
               {
                 "variable": "calculatedTotal",
                 "formula": "{{billTotalAmount}}>0?{{billTotalAmount}}:0"
-              },
-              {
-                "variable": "msgTenantID",
-                "formula": "{{tenant}} === 'pb.patiala' ? '0% Late payment charges will be applied after due date' : '10% late payment charges For both water and sewerage' "
               }
             ]
           },
@@ -821,6 +841,10 @@
                   {
                     "variable": "houseNo",
                     "value": "$.Properties[0].address.doorNo"
+                  },
+                  {
+                    "variable": "buildingName",
+                    "value": "$.Properties[0].address.buildingName"
                   },
                   {
                     "variable": "streetName",

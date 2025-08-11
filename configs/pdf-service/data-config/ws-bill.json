@@ -4,7 +4,7 @@
     "serviceName": "rainmaker-common",
     "version": "1.0.0",
     "baseKeyPath": "$.Bill.*",
-    "entityIdPath": "$.billNumber" ,
+    "entityIdPath": "$.billNumber",
     "isCommonTableBorderRequired": true,
     "mappings": [
       {
@@ -467,7 +467,8 @@
                 "value": {
                   "path": "$.connection.oldConnectionNo"
                 }
-              }, {
+              },
+              {
                 "variable": "rate",
                 "value": {
                   "path": "$.additionalDetails.penaltyRate"
@@ -476,19 +477,49 @@
               {
                 "variable": "ledgerId",
                 "value": {
-                 "path": "$.connection.additionalDetails.value.ledgerId"
-                }
-              },
-               {
-                "variable": "groupId",
-                "value": {
-                 "path": "$.connection.additionalDetails.value.groups"
+                  "path": "$.connection.additionalDetails.value.ledgerId"
                 }
               },
               {
-                "variable": "payerAddress",
+                "variable": "latePaymentc",
                 "value": {
-                  "path": "$.payerAddress"
+                  "path": "$.additionalDetails.latePaymentc"
+                }
+              },
+              {
+                "variable": "ledgerId",
+                "value": {
+                  "path": "$.connection.additionalDetails.value.ledgerId"
+                }
+              },
+              {
+                "variable": "groupId",
+                "value": {
+                  "path": "$.connection.additionalDetails.value.groups"
+                }
+              },
+              {
+                "variable": "Addresscity",
+                "value": {
+                  "path": "$.address.city"
+                }
+              },
+              {
+                "variable": "Addresspincode",
+                "value": {
+                  "path": "$.address.pincode"
+                }
+              },
+              {
+                "variable": "AddressdoorNo",
+                "value": {
+                  "path": "$.address.doorNo"
+                }
+              },
+              {
+                "variable": "Addresslandmark",
+                "value": {
+                  "path": "$.address.landmark"
                 }
               },
               {
@@ -512,7 +543,7 @@
               {
                 "variable": "fromPeriod",
                 "value": {
-                  "path": "$.billDetails[0].fromPeriod"
+                  "path": "$.billDetails[(@.length-1)].fromPeriod"
                 },
                 "type": "date"
               },
@@ -553,7 +584,7 @@
               {
                 "variable": "taxCharge",
                 "value": {
-                  "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_TAX' || @.taxHeadCode == 'TL_TAX' || @.taxHeadCode == 'FIRENOC_TAXES' || @.taxHeadCode == 'WS_CHARGE' || @.taxHeadCode == 'SW_CHARGE')].amount"
+                  "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_TAX' || @.taxHeadCode == 'TL_TAX' || @.taxHeadCode == 'FIRENOC_TAXES' || @.taxHeadCode == 'WS_CHARGE' || @.taxHeadCode == 'SW_CHARGE' )].amount"
                 }
               },
               {
@@ -676,6 +707,11 @@
                 "value": {
                   "path": "$.AdvanceAdjustedValue"
                 }
+              },
+              {
+                "variable": "scissorImage",
+                "url": "http://www.pngall.com/wp-content/uploads/2016/03/Scissor-PNG-Clipart.png",
+                "type": "image"
               }
             ]
           },
@@ -683,7 +719,7 @@
             "derived": [
               {
                 "variable": "charge",
-                "formula": "{{ws_charge}}+{{ws_discharge}}"
+                "formula": "{{ws_charge}}"
               },
               {
                 "variable": "penalty",
@@ -707,11 +743,11 @@
               },
               {
                 "variable": "arrears",
-                "formula": "{{billTotalAmount}}>={{demandTotalAmount}}?({{billTotalAmount}}-{{demandTotalAmount}}).toFixed(2):0"
+                "formula": "{{billTotalAmount}}>{{demandTotalAmount}}?({{billTotalAmount}}-{{demandTotalAmount}}).toFixed(2):0"
               },
               {
                 "variable": "advanceAdjusted",
-                "formula": "{{billTotalAmount}}> 0?({{billTotalAmount}}<{{demandTotalAmount}}?({{billTotalAmount}}-{{demandTotalAmount}}).toFixed(2):0):{{demandTotalAmount}} * -1"
+                "formula": "{{billTotalAmount}}>=0?({{billTotalAmount}}<{{demandTotalAmount}}?({{billTotalAmount}}-{{demandTotalAmount}}).toFixed(2):0):{{demandTotalAmount}} * -1"
               },
               {
                 "variable": "advanceAvailable",
@@ -741,9 +777,10 @@
                   {
                     "variable": "phoneNumber",
                     "value": "$.MdmsRes.tenant.tenants[0].contactNumber"
-                  }, {
-                    "variable":"mcGrade",
-                    "value":"$.MdmsRes.tenant.tenants[0].city.pwssbGrade"
+                  },
+                  {
+                    "variable": "mcGrade",
+                    "value": "$.MdmsRes.tenant.tenants[0].city.pwssbGrade"
                   },
                   {
                     "variable": "website",
@@ -787,10 +824,6 @@
                     "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_CHARGE')].taxAmount"
                   },
                   {
-                    "variable": "ws_discharge",
-                    "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_DISCHARGE_CHARGES')].taxAmount"
-                  },
-                  {
                     "variable": "ws_water_cess",
                     "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_WATER_CESS')].taxAmount"
                   },
@@ -822,6 +855,10 @@
                     "value": "$.Properties[0].address.doorNo"
                   },
                   {
+                    "variable": "buildingName",
+                    "value": "$.Properties[0].address.buildingName"
+                  },
+                  {
                     "variable": "streetName",
                     "value": "$.Properties[0].address.street"
                   },
@@ -841,8 +878,6 @@
                     "variable": "guardianName",
                     "value": "$.Properties[0].owners[0].fatherOrHusbandName"
                   }
-
-
                 ]
               }
             ]

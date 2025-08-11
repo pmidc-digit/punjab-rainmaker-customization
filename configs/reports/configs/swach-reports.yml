@@ -1,0 +1,591 @@
+---
+ReportDefinitions:
+  - reportName: Attendance_report_swach
+    decryptionPathId: ULBPTDataDumpReport_V2
+    summary: Swach Attendence Report
+    version: 1.0.0
+    moduleName: rainmaker-swach
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: id
+        label: swachId
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: Tenantid
+        label: tenantid
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: latitude
+        label: latitude
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: longitude
+        label: longitude
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: locality
+        label: locality
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: imagerurl
+        label: imagerurl
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: createdtime
+        label: createdtime
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: ownername
+        label: username
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: mobileno
+        label: mobilenumber
+        type: string
+        source: rainmaker-swach
+        total: false
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: uc
+        isMandatory: true
+        searchClause: AND swach.created_time >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: uc
+        isMandatory: true
+        searchClause: AND swach.created_time <= $toDate
+        
+    query: |
+        SELECT swach.id, swach.tenant_id as tenantid, swach.uuid, swach.latitude, swach.longitude, swach.locality, 
+        swach.imagerurl, TO_CHAR((TO_TIMESTAMP(swach.created_time/1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY HH24:MI:SS') as createdtime,
+        swach.created_by as createdby, TO_CHAR((TO_TIMESTAMP(swach.last_updated_time/1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY HH24:MI:SS') as lastupdatedtime, 
+        swach.last_updated_by as lastupdatedby, us.name as ownername,us.mobilenumber as mobileno
+        FROM public.egov_swach_imagedata  swach
+        INNER JOIN public.eg_user us ON us.uuid = swach.uuid
+
+  - reportName: ULBwiseComplaintCountReport
+    summary: Fetches complaint stats ULB wise
+    version: 1.0.0
+    moduleName: rainmaker-swach
+    sourceColumns:
+    - name: Tenantid
+      label: Tenantid
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: ULBType
+      label: ULBType
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: Pending at LME
+      label: PENDING AT LME
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: PENDING %
+      label: PENDING %
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: PENDING FOR ASSIGNMENT
+      label: PENDING FOR ASSIGNMENT
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: PENDING FOR REASSIGNMENT
+      label: PENDING FOR REASSIGNMENT
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: Resolved
+      label: Resolved
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: Rejected
+      label: Rejected
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: Total
+      label: Total
+      type: string
+      source: rainmaker-swach
+      total: true
+    searchParams:
+    - name: ulb
+      label: ULB
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: pt
+      wrapper: true
+      isMandatory: false
+      searchClause: AND tenantid = $ulb
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND createdtime >= $fromDate
+    - name: toDate
+      label: To Date
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND createdtime <= $toDate
+    query: |
+      select 
+      initcap(split_part(sc.tenantid, '.', 2)) as Tenantid,
+      ulb.type as ULBType,
+      SUM(CASE WHEN sc.applicationstatus ='PENDINGATLME' THEN 1 ELSE 0 END) as "Pending at LME",
+      SUM(CASE WHEN sc.applicationstatus ='PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END) as "PENDING FOR ASSIGNMENT",
+      SUM(CASE WHEN sc.applicationstatus ='PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END) as "PENDING FOR REASSIGNMENT",
+      SUM(CASE WHEN sc.applicationstatus ='REJECTED' THEN 1 ELSE 0 END) as "Rejected",
+      SUM(CASE WHEN sc.applicationstatus ='RESOLVED' THEN 1 ELSE 0 END) as "Resolved",
+      count(sc.applicationstatus) as "Total" ,
+      CASE 
+       WHEN COUNT(sc.applicationstatus) = 0 THEN '0.00'
+       ELSE 
+      ROUND(
+        (
+          (SUM(CASE 
+            WHEN sc.applicationstatus IN ('PENDINGATLME', 'PENDINGFORASSIGNMENT', 'PENDINGFORREASSIGNMENT') 
+            THEN 1 ELSE 0 END))::numeric
+          / NULLIF(COUNT(sc.applicationstatus), 0)
+        ) * 100, 2
+      )::text
+       AS "PENDING %"
+      from eg_swach_service_v2 sc
+      inner join ulb_data ulb on ulb.ulb_code = sc.tenantid
+      WHERE sc.tenantid != 'pb.testing'
+    groupby: GROUP BY Tenantid,ULBType
+    orderby: ORDER BY Tenantid
+        
+  - reportName: SwachComplaintTypesReport_v2
+    summary: Fetches complaint stats based on complaint types for a ULB
+    version: 1.0.0
+    moduleName: rainmaker-swach
+    sourceColumns:
+    - name: Tenantid
+      label: Tenantid
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: Complaint Type
+      label: Complaint Type
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: Pending at LME
+      label: Pending at LME
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: PENDING FOR ASSIGNMENT
+      label: Pending For Assignment
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: PENDINGFORREASSIGNMENT
+      label: Pending For Reassignment
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: Resolved
+      label: Resolved
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: Rejected
+      label: Rejected
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: Total
+      label: Total
+      type: string
+      source: rainmaker-swach
+      total: true
+    searchParams:
+    - name: ulb
+      label: ULB
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: pt
+      wrapper: true
+      isMandatory: false
+      searchClause: AND tenantid = $ulb
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND createdtime >= $fromDate
+    - name: toDate
+      label: To Date
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND createdtime <= $toDate
+    query: |
+      select 
+      initcap(split_part(tenantid, '.', 2)) as tenantid,
+      regexp_replace(servicecode, '([a-z])([A-Z])', '\1 \2','g') as "Complaint Type",
+      SUM(CASE WHEN applicationstatus ='PENDINGATLME' THEN 1 ELSE 0 END) as "Pending at LME",
+      SUM(CASE WHEN applicationstatus ='PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END) as "PENDING FOR ASSIGNMENT",
+      SUM(CASE WHEN applicationstatus ='PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END) as "PENDINGFORREASSIGNMENT",
+      SUM(CASE WHEN applicationstatus ='REJECTED' THEN 1 ELSE 0 END) as Rejected,
+      SUM(CASE WHEN applicationstatus ='RESOLVED' THEN 1 ELSE 0 END) as Resolved,
+      count(applicationstatus) as Total
+      from eg_swach_service_v2
+      WHERE tenantid != 'pb.testing'
+    groupby: GROUP BY tenantid,servicecode
+    orderby: ORDER BY tenantid,servicecode
+
+  - reportName: SwachStateSourceReport_v2
+    summary: Source of complaints across tenants
+    version: 1.0.0
+    moduleName: rainmaker-swach
+    sourceColumns:
+    - name: tenantid
+      label: Tenantid
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: whatsapp
+      label: whatsapp
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: ivr
+      label: ivr
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: mobileapp
+      label: mobileapp
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: web
+      label: web
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: unknown
+      label: unknown
+      type: string
+      source: rainmaker-swach
+      total: true
+    searchParams:
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND createdtime >= $fromDate
+    - name: toDate
+      label: To Date
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND createdtime <= $toDate
+    query: |
+      select initcap(split_part(tenantid, '.', 2)) as tenantid,
+      SUM(CASE WHEN source ='whatsapp' THEN 1 ELSE 0 END) as whatsapp,
+      SUM(CASE WHEN source ='ivr' THEN 1 ELSE 0 END) as ivr,
+      SUM(CASE WHEN source ='mobile' THEN 1 ELSE 0 END) as mobileapp,
+      SUM(CASE WHEN source ='web' THEN 1 ELSE 0 END) as web,
+      SUM(CASE WHEN source NOT IN ('web', 'ivr', 'mobile','whatsapp')  OR source is NULL THEN 1 ELSE 0 END) as unknown
+      from eg_swach_service_v2
+      WHERE tenantid != 'pb.testing'
+    groupby: GROUP BY tenantid
+    orderby: ORDER BY tenantid
+
+  - reportName: SwachStateDescriptionReport_v2
+    decryptionPathId: DescriptionReport_v2
+    summary: Fetches state description wise reports 
+    version: 1.0.0
+    moduleName: rainmaker-swach
+    externalService:
+    - entity: $.MdmsRes.SwachReform.SwachBharatCategory
+      apiURL: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?moduleName=SwachReform&masterName=SwachBharatCategory&tenantId=$tenantId
+      keyOrder: serviceCode,department,slaHours
+      tableName: tbl_dept
+    - entity: $.MdmsRes.common-masters.Department
+      apiURL: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?moduleName=common-masters&masterName=Department&tenantId=$tenantId
+      keyOrder: name,code
+      tableName: tbl_def_dept
+    sourceColumns:
+    - name: department
+      label: department
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: servicecode
+      label: servicecode
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: complaintNo
+      label: complaintNo
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: date
+      label: date
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: name
+      label: name
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: mobileno
+      label: mobileno
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: address
+      label: address
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: landmark
+      label: landmark
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: description
+      label: description
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: lastassignedto
+      label: lastassignedto
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: status
+      label: status
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: actiondate
+      label: actiondate
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: source
+      label: source
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: tenantid
+      label: tenantid
+      type: string
+      source: rainmaker-swach
+      total: false
+    searchParams:
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND ess.createdtime >= $fromDate
+    - name: toDate
+      label: To Date
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND ess.createdtime <= $toDate
+    - name: ulb
+      label: ULB
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: pt
+      wrapper: true
+      isMandatory: false
+      searchClause: AND ess.tenantid = $ulb  
+    - name: appstatus
+      label: reports.rainmaker-swach.status
+      type: singlevaluelist
+      pattern: 'list://assigned:assigned,closed:closed,open:open,reassignrequested:reassignrequested,rejected:rejected,resolved:resolved'
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND ess.status=$appstatus
+    query: |
+      SELECT 
+      DISTINCT ON (servicerequestid)
+      (case when ua.name is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else ua.name end) as lastassignedto,
+      (SELECT deptmap_def.name FROM (VALUES tbl_def_dept) AS deptmap_def(name,code) INNER JOIN (VALUES tbl_dept) AS deptmap(serviceCode, department, slaHours) on deptmap.serviceCode = ess.servicecode and deptmap_def.code = deptmap.department) AS department, 
+      regexp_replace(servicecode, '([a-z])([A-Z])', '\1 \2','g') AS servicecode,
+      servicerequestid AS complaintNo, 
+      to_char(to_timestamp(TRUNC(CAST(ess.createdtime AS bigint) / 1000)), 'DD/MM/YYYY') AS date, 
+      (case when eg_user.name is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else eg_user.name end) as name,  --value for NULL
+      eg_user.mobilenumber AS mobileno, 
+      esa.landmark as landmark, 
+      esa.doorno||', '||esa.plotno||', '||esa.buildingname||', '||esa.street as address, 
+      ess.description,
+      ess.source,
+      ess.tenantid,
+      Initcap(ess.applicationstatus) as status,
+      to_char((To_timestamp(ess.createdtime/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY')  AS actiondate
+      FROM eg_swach_service_v2 ess
+      left outer join eg_swach_address_v2 esa on ess.id = esa.parentid
+      left outer join eg_user on eg_user.uuid::text = ess.createdby
+      left outer join eg_pgr_action as epa on epa.businesskey = ess.servicerequestid and epa.action in ('assign','reassign','resolve')
+      left outer join eg_user as ua on (ua.id = epa.assignee::int or ua.id = split_part(epa.by,':',1)::INTEGER)
+      WHERE 
+      ess.tenantid !='pb.testing'
+      --AND ess.status IN ('open','assigned','reassigrequested','rejected','closed','resolved')
+   
+    orderby: ORDER BY servicerequestid, ess.createdtime desc
+
+  - reportName: Detailed_Attendance_report_swach
+    decryptionPathId: ULBPTDataDumpReport_V2 
+    summary: Detailed Attendance Report
+    version: 1.0.0
+    moduleName: rainmaker-swach
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: ownername
+        label: username
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: mobileno
+        label: mobilenumber
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: tenantid_1
+        label: tenantid_1
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: createdtime_1
+        label: createdtime_1
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: tenantid_2
+        label: tenantid_2
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: createdtime_2
+        label: createdtime_2
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: tenantid_3
+        label: tenantid_3
+        type: string
+        source: rainmaker-swach
+        total: false          
+      - name: createdtime_3
+        label: createdtime_3
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: attendance_status
+        label: attendance_status
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: createdtime
+        label: createdtime
+        type: string
+        source: rainmaker-swach
+        total: false
+    searchParams:
+      - name: fromDate
+        label: select a date
+        type: epoch
+        source: uc
+        isMandatory: true
+        searchClause: and 1=1
+    query: |
+      WITH attendance_cte AS (
+          SELECT  
+              eu.mobilenumber,
+              TO_CHAR((TO_TIMESTAMP(sc.created_time / 1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY HH24:MI:SS') AS createdtime,
+              sc.tenant_id,
+              ROW_NUMBER() OVER (PARTITION BY eu.mobilenumber ORDER BY sc.created_time) AS rn
+          FROM 
+              public.eg_user eu
+          JOIN 
+              eg_userrole_v1 eur ON eu.id = eur.user_id
+          LEFT JOIN 
+              public.egov_swach_imagedata sc ON eu.uuid = sc.uuid
+          WHERE 
+              eur.role_code = 'PESCO' 
+              AND sc.created_time BETWEEN $fromDate::bigint AND ($fromDate::bigint + 86399000)
+      ),
+      absent_tenant AS (
+          SELECT DISTINCT
+              eg.mobilenumber,
+              sc.tenant_id
+          FROM 
+              public.egov_swach_imagedata sc
+          INNER JOIN 
+              eg_user eg ON eg.uuid = sc.uuid
+      )
+      SELECT 
+          eu.name AS ownername,
+          eu.username,
+          eu.mobilenumber AS mobileno,
+      
+          COALESCE(
+              MAX(CASE WHEN a.rn = 1 THEN a.tenant_id END),
+              MAX(CASE WHEN a.rn IS NULL THEN at.tenant_id END),
+              ''
+          ) AS tenantid_1,
+      
+          COALESCE(
+              MAX(CASE WHEN a.rn = 1 THEN a.createdtime END),
+              ''
+          ) AS createdtime_1,
+      
+          COALESCE(MAX(CASE WHEN a.rn = 2 THEN a.tenant_id END), '') AS tenantid_2,
+          COALESCE(MAX(CASE WHEN a.rn = 2 THEN a.createdtime END), '') AS createdtime_2,
+      
+          COALESCE(MAX(CASE WHEN a.rn = 3 THEN a.tenant_id END), '') AS tenantid_3,
+          COALESCE(MAX(CASE WHEN a.rn = 3 THEN a.createdtime END), '') AS createdtime_3,
+      
+          CASE  
+              WHEN MAX(a.rn) IS NULL THEN 'Absent' 
+              ELSE 'Present' 
+          END AS attendance_status
+      
+      FROM 
+          public.eg_user eu
+      JOIN 
+          eg_userrole_v1 eur ON eu.id = eur.user_id
+      LEFT JOIN 
+          attendance_cte a ON eu.mobilenumber = a.mobilenumber
+      LEFT JOIN 
+          absent_tenant at ON eu.mobilenumber = at.mobilenumber
+      
+      WHERE 
+          eur.role_code = 'PESCO'
+      
+    groupby: group by eu.name, eu.username, eu.mobilenumber
