@@ -165,25 +165,151 @@ serviceMaps:
             - jsonPath: $.PetRegistrationApplications.*.status
 
             - jsonPath: $.PetRegistrationApplications.*.applicationnumber
-    
+
     - version: 1.0
-      description: Update Pet Registration application
+      description: Partial-safe update of Pet Registration application (all tables, tenant isolated)
       fromTopic: update-ptr-application
       isTransaction: true
       queryMaps:
-        - query: UPDATE eg_ptr_registration SET status = ?, lastmodifiedby = ?, lastmodifiedtime = ?, pettoken = ?  WHERE id=?;
+
+        - query: UPDATE eg_ptr_registration
+              SET tenantid = COALESCE(?, tenantid),
+                  applicationnumber = COALESCE(?, applicationnumber),
+                  applicantname = COALESCE(?, applicantname),
+                  fathername = COALESCE(?, fathername),
+                  mobilenumber = COALESCE(?, mobilenumber),
+                  emailid = COALESCE(?, emailid),
+                  applicationtype = COALESCE(?, applicationtype),
+                  validitydate = COALESCE(?, validitydate),
+                  status = COALESCE(?, status),
+                  expireflag = COALESCE(?, expireflag),
+                  pettoken = COALESCE(?, pettoken),
+                  previousapplicationnumber = COALESCE(?, previousapplicationnumber),
+                  propertyid = COALESCE(?, propertyid),
+                  lastmodifiedby = ?,
+                  lastmodifiedtime = ?
+            WHERE id = ? AND tenantid = ?;
           basePath: PetRegistrationApplications.*
           jsonMaps:
-
+            - jsonPath: $.PetRegistrationApplications.*.tenantId
+            - jsonPath: $.PetRegistrationApplications.*.applicationNumber
+            - jsonPath: $.PetRegistrationApplications.*.applicantName
+            - jsonPath: $.PetRegistrationApplications.*.fatherName
+            - jsonPath: $.PetRegistrationApplications.*.mobileNumber
+            - jsonPath: $.PetRegistrationApplications.*.emailId
+            - jsonPath: $.PetRegistrationApplications.*.applicationType
+            - jsonPath: $.PetRegistrationApplications.*.validityDate
             - jsonPath: $.PetRegistrationApplications.*.status
-
-            - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedBy
-
-            - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedTime
-
+            - jsonPath: $.PetRegistrationApplications.*.expireFlag
             - jsonPath: $.PetRegistrationApplications.*.petToken
-
+            - jsonPath: $.PetRegistrationApplications.*.previousApplicationNumber
+            - jsonPath: $.PetRegistrationApplications.*.propertyId
+            - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedBy
+            - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedTime
             - jsonPath: $.PetRegistrationApplications.*.id
+            - jsonPath: $.PetRegistrationApplications.*.tenantId
+
+
+        - query: UPDATE eg_ptr_address
+              SET tenantid = COALESCE(?, tenantid),
+                  doorno = COALESCE(?, doorno),
+                  latitude = COALESCE(?, latitude),
+                  longitude = COALESCE(?, longitude),
+                  buildingname = COALESCE(?, buildingname),
+                  addressid = COALESCE(?, addressid),
+                  addressnumber = COALESCE(?, addressnumber),
+                  type = COALESCE(?, type),
+                  addressline1 = COALESCE(?, addressline1),
+                  addressline2 = COALESCE(?, addressline2),
+                  landmark = COALESCE(?, landmark),
+                  street = COALESCE(?, street),
+                  city = COALESCE(?, city),
+                  locality = COALESCE(?, locality),
+                  pincode = COALESCE(?, pincode),
+                  detail = COALESCE(?, detail),
+                  lastmodifiedby = ?,
+                  lastmodifiedtime = ?
+            WHERE id = ? AND tenantid = ?;
+          basePath: PetRegistrationApplications.*
+          jsonMaps:
+            - jsonPath: $.PetRegistrationApplications.*.address.tenantId
+            - jsonPath: $.PetRegistrationApplications.*.address.doorNo
+            - jsonPath: $.PetRegistrationApplications.*.address.latitude
+            - jsonPath: $.PetRegistrationApplications.*.address.longitude
+            - jsonPath: $.PetRegistrationApplications.*.address.buildingName
+            - jsonPath: $.PetRegistrationApplications.*.address.addressId
+            - jsonPath: $.PetRegistrationApplications.*.address.addressNumber
+            - jsonPath: $.PetRegistrationApplications.*.address.type
+            - jsonPath: $.PetRegistrationApplications.*.address.addressLine1
+            - jsonPath: $.PetRegistrationApplications.*.address.addressLine2
+            - jsonPath: $.PetRegistrationApplications.*.address.landmark
+            - jsonPath: $.PetRegistrationApplications.*.address.street
+            - jsonPath: $.PetRegistrationApplications.*.address.city
+            - jsonPath: $.PetRegistrationApplications.*.address.locality.name
+            - jsonPath: $.PetRegistrationApplications.*.address.pincode
+            - jsonPath: $.PetRegistrationApplications.*.address.detail
+            - jsonPath: $.PetRegistrationApplications.*.address.lastModifiedBy
+            - jsonPath: $.PetRegistrationApplications.*.address.lastModifiedTime
+            - jsonPath: $.PetRegistrationApplications.*.address.id
+            - jsonPath: $.PetRegistrationApplications.*.address.tenantId
+
+
+        - query: UPDATE eg_ptr_petdetails
+              SET petname = COALESCE(?, petname),
+                  pettype = COALESCE(?, pettype),
+                  breedtype = COALESCE(?, breedtype),
+                  petage = COALESCE(?, petage),
+                  petgender = COALESCE(?, petgender),
+                  clinicname = COALESCE(?, clinicname),
+                  doctorname = COALESCE(?, doctorname),
+                  lastvaccinedate = COALESCE(?, lastvaccinedate),
+                  vaccinationnumber = COALESCE(?, vaccinationnumber),
+                  petdetailsid = COALESCE(?, petdetailsid),
+                  petcolor = COALESCE(?, petcolor),
+                  adoptiondate = COALESCE(?, adoptiondate),
+                  birthdate = COALESCE(?, birthdate),
+                  identificationmark = COALESCE(?, identificationmark)
+            WHERE id = ?;
+          basePath: PetRegistrationApplications.*
+          jsonMaps:
+            - jsonPath: $.PetRegistrationApplications.*.petDetails.petName
+            - jsonPath: $.PetRegistrationApplications.*.petDetails.petType
+            - jsonPath: $.PetRegistrationApplications.*.petDetails.breedType
+            - jsonPath: $.PetRegistrationApplications.*.petDetails.petAge
+            - jsonPath: $.PetRegistrationApplications.*.petDetails.petGender
+            - jsonPath: $.PetRegistrationApplications.*.petDetails.clinicName
+            - jsonPath: $.PetRegistrationApplications.*.petDetails.doctorName
+            - jsonPath: $.PetRegistrationApplications.*.petDetails.lastVaccineDate
+            - jsonPath: $.PetRegistrationApplications.*.petDetails.vaccinationNumber
+            - jsonPath: $.PetRegistrationApplications.*.petDetails.petDetailsId
+            - jsonPath: $.PetRegistrationApplications.*.petDetails.petColor
+            - jsonPath: $.PetRegistrationApplications.*.petDetails.adoptionDate
+            - jsonPath: $.PetRegistrationApplications.*.petDetails.birthDate
+            - jsonPath: $.PetRegistrationApplications.*.petDetails.identificationMark
+            - jsonPath: $.PetRegistrationApplications.*.petDetails.id
+
+
+        - query: UPDATE eg_ptr_applicationdocuments
+              SET tenantId = COALESCE(?, tenantId),
+                  documenttype = COALESCE(?, documenttype),
+                  filestoreid = COALESCE(?, filestoreid),
+                  documentuid = COALESCE(?, documentuid),
+                  active = COALESCE(?, active),
+                  lastmodifiedby = ?,
+                  lastmodifiedtime = ?
+            WHERE id = ? AND tenantId = ?;
+          basePath: PetRegistrationApplications.*.documents.*
+          jsonMaps:
+            - jsonPath: $.PetRegistrationApplications.*.tenantId
+            - jsonPath: $.PetRegistrationApplications.*.documents.*.documentType
+            - jsonPath: $.PetRegistrationApplications.*.documents.*.filestoreId
+            - jsonPath: $.PetRegistrationApplications.*.documents.*.documentUid
+            - jsonPath: $.PetRegistrationApplications.*.documents.*.active
+            - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedBy
+            - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedTime
+            - jsonPath: $.PetRegistrationApplications.*.documents.*.id
+            - jsonPath: $.PetRegistrationApplications.*.tenantId
+
 
     - version: 1.0
       description: Persists Renew Pet details in tables
