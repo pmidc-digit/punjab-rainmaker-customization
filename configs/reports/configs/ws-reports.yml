@@ -2838,7 +2838,6 @@ ReportDefinitions:
            JOIN egbs_billdetail_v1 bill 
                ON bill.consumercode = wc.connectionno 
                AND bill.businessservice = 'WS'
-               AND bill.fromperiod BETWEEN $fromDate AND $toDate
            JOIN egbs_bill_v1 b 
                ON bill.billid = b.id
                AND bill.businessservice = 'WS'
