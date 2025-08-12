@@ -5,100 +5,86 @@ ServiceMaps:
     - topic: save-ndc-application
       configKey: INDEX
       indexes:
-        - name: ndc-applicants-index
+        - name: ndc-application-index
           type: general
-          id: $.Applicant.uuid, $.Applicant.tenantId
-          isBulk: false
-          timeStampField: $.Applicant.createdtime
+          id: $.Applications.*.uuid, $.Application.*.tenantId
+          isBulk: true
+          timeStampField: $.Applications.*.auditDetails.createdTime
           jsonPath: $
           customJsonMapping:
-            indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","firstname":"firstname","lastname":"lastname",
-                                   "mobile":"mobile","email":"email","address":"address",
+            indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","owners":[]
                                    "applicationStatus":"applicationStatus","active":"active",
                                    "createdby":"createdby","lastmodifiedby":"lastmodifiedby","createdtime":"createdtime",
-                                   "lastmodifiedtime":"lastmodifiedtime","action":"action","details":[],"documents:[]"}}
+                                   "lastmodifiedtime":"lastmodifiedtime","action":"action","details":[],"documents:[]","reason":"reason"}}
             fieldMapping:
-              - inJsonPath: $.Applicant.uuid
+              - inJsonPath: $.Applications.*uuid
                 outJsonPath: $.Data.uuid
-              - inJsonPath: $.Applicant.tenantId
+              - inJsonPath: $.Applications.*.tenantId
                 outJsonPath: $.Data.tenantId
-              - inJsonPath: $.Applicant.firstname
-                outJsonPath: $.Data.firstname
-              - inJsonPath: $.Applicant.lastname
-                outJsonPath: $.Data.lastname
-              - inJsonPath: $.Applicant.mobile
-                outJsonPath: $.Data.mobile
-              - inJsonPath: $.Applicant.email
-                outJsonPath: $.Data.email
-              - inJsonPath: $.Applicant.address
-                outJsonPath: $.Data.address
-              - inJsonPath: $.Applicant.applicationStatus
+              - inJsonPath: $.Applications.*.owners
+                outJsonPath: $.Data.owners
+              - inJsonPath: $.Applications.*.applicationStatus
                 outJsonPath: $.Data.applicationStatus
-              - inJsonPath: $.Applicant.active
+              - inJsonPath: $.Applications.*.active
                 outJsonPath: $.Data.active
-              - inJsonPath: $.Applicant.createdby
+              - inJsonPath: $.Applications.*.auditDetails.createdBy
                 outJsonPath: $.Data.createdby
-              - inJsonPath: $.Applicant.lastmodifiedby
+              - inJsonPath: $.Applications.*.auditDetails.lastModifiedBy
                 outJsonPath: $.Data.lastmodifiedby
-              - inJsonPath: $.Applicant.createdtime
+              - inJsonPath: $.Applications.*.auditDetails.createdTime
                 outJsonPath: $.Data.createdtime
-              - inJsonPath: $.Applicant.lastmodifiedtime
+              - inJsonPath: $.Applications.*.auditDetails.lastModifiedTime
                 outJsonPath: $.Data.lastmodifiedtime
-              - inJsonPath: $.Applicant.action
+              - inJsonPath: $.Applications.*.action
                 outJsonPath: $.Data.action
-              - inJsonPath: $.NdcDetails
+              - inJsonPath: $.Application.*.NdcDetails
                 outJsonPath: $.Data.details
-              - inJsonPath: $.Documents
+              - inJsonPath: $.Application.*.Documents
                 outJsonPath: $.Data.documents
+              - inJsonPath: $.Applications.*.reason
+                outJsonPath: $.Data.reason
 
     - topic: update-ndc-application
       configKey: INDEX
       indexes:
         - name: ndc-applicants-update-index
           type: general
-          id: $.Applicant.uuid, $.Applicant.tenantId
-          isBulk: false
-          timeStampField: $.Applicant.lastmodifiedtime
+          id: $.Applications.*.uuid, $.Applications.*.tenantId
+          isBulk: true
+          timeStampField: $.Applications.*.auditDetails.lastModifiedTime
           jsonPath: $
           customJsonMapping:
-            indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","firstname":"firstname","lastname":"lastname",
-                                   "mobile":"mobile","email":"email","address":"address",
+            indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","owners":[],
                                    "applicationStatus":"applicationStatus","active":"active",
                                    "lastmodifiedby":"lastmodifiedby","lastmodifiedtime":"lastmodifiedtime",
-                                   "action":"action","details":[],"documents:[]"}}
+                                   "action":"action","details":[],"documents:[]","reason":"reason"}}
             fieldMapping:
-              - inJsonPath: $.Applicant.uuid
+              - inJsonPath: $.Applications.*.uuid
                 outJsonPath: $.Data.uuid
-              - inJsonPath: $.Applicant.tenantId
+              - inJsonPath: $.Applications.*.tenantId
                 outJsonPath: $.Data.tenantId
-              - inJsonPath: $.Applicant.firstname
-                outJsonPath: $.Data.firstname
-              - inJsonPath: $.Applicant.lastname
-                outJsonPath: $.Data.lastname
-              - inJsonPath: $.Applicant.mobile
-                outJsonPath: $.Data.mobile
-              - inJsonPath: $.Applicant.email
-                outJsonPath: $.Data.email
-              - inJsonPath: $.Applicant.address
-                outJsonPath: $.Data.address
-              - inJsonPath: $.Applicant.applicationStatus
+              - inJsonPath: $.Applications.*.owners
+                outJsonPath: $.Data.owners
+              - inJsonPath: $.Applications.*.applicationStatus
                 outJsonPath: $.Data.applicationStatus
-              - inJsonPath: $.Applicant.active
+              - inJsonPath: $.Applications.*.active
                 outJsonPath: $.Data.active
-              - inJsonPath: $.Applicant.createdby
+              - inJsonPath: $.Applications.*.auditDetails.createdBy
                 outJsonPath: $.Data.createdby
-              - inJsonPath: $.Applicant.lastmodifiedby
+              - inJsonPath: $.Applications.*.auditDetails.lastModifiedBy
                 outJsonPath: $.Data.lastmodifiedby
-              - inJsonPath: $.Applicant.createdtime
+              - inJsonPath: $.Applications.*.auditDetails.createdTime
                 outJsonPath: $.Data.createdtime
-              - inJsonPath: $.Applicant.lastmodifiedtime
+              - inJsonPath: $.Applications.*.auditDetails.lastModifiedTime
                 outJsonPath: $.Data.lastmodifiedtime
-              - inJsonPath: $.Applicant.action
+              - inJsonPath: $.Applications.*.action
                 outJsonPath: $.Data.action
-              - inJsonPath: $.NdcDetails
+              - inJsonPath: $.Applications.*.NdcDetails
                 outJsonPath: $.Data.details
-              - inJsonPath: $.Documents
+              - inJsonPath: $.Applications.*.Documents
                 outJsonPath: $.Data.documents
+              - inJsonPath: $.Applications.*.reason
+                outJsonPath: $.Data.reason
 
     - topic: delete-ndc-application
       configKey: INDEX
