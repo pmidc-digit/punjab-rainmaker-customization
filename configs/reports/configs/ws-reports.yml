@@ -4945,111 +4945,181 @@ ReportDefinitions:
     groupby: GROUP BY cte.businessservice, cte.consumercode,cte.payername,cte.payeraddress,cte.mobilenumber,cte.usagecategory,cte.bill_status,cte.billno,
              cte.connectiontype,cte.landarea,cte.zonename,cte.blockname,cte.zonecode,cte.blockcode,cte.localityname,
              cte.localitycode,cte.fromperiod,cte.toperiod,cte.propertyid 
-
-- reportName: SWQaurterlyReport
-  summary:  SW Qaurter Report
-  version: 1.0.0
-  moduleName: rainmaker-ws
-  additionalConfig:
+  - reportName: SWQuaterly_Bill_Generate
+    summary: Sw Quarterly Bill Generate Report
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig: null
     print:
       pdfPageSize: A1
-  sourceColumns:
-  - name: property_id
-    label: reports.ws.property_id
-    type: string
-    source: ws
-    total: false
-  - name: connectionno
-    label: reports.ws.connectionno
-    type: string
-    source: ws
-    total: false
-  - name: connection_status
-    label: reports.ws.connection_status
-    type: string
-    source: ws
-    total: false
-  - name: usagecategory
-    label: reports.ws.usagecategory
-    type: string
-    source: ws
-    total: false
-  - name: plotsize
-    label: reports.ws.plotsize
-    type: string
-    source: ws
-    total: false
-  - name: demandid
-    label: reports.ws.demandid
-    type: string
-    source: ws
-    total: false
-  - name: businessservice
-    label: reports.ws.businessservice
-    type: string
-    source: ws
-    total: false
-  - name: taxperiodfrom
-    label: reports.ws.taxperiodfrom
-    type: string
-    source: ws
-    total: false
-  - name: taxperiodto
-    label: reports.ws.taxperiodto
-    type: string
-    source: ws
-    total: false
-  - name: demand_tenantid
-    label: reports.ws.demand_tenantid
-    type: string
-    source: ws
-    total: false
-  - name: minimumamountpayable
-    label: reports.ws.minimumamountpayable
-    type: string
-    source: ws
-    total: false
-  - name: demand_status
-    label: reports.ws.demand_status
-    type: string
-    source: ws
-    total: false
-  - name: ispaymentcompleted
-    label: reports.ws.ispaymentcompleted
-    type: string
-    source: ws
-    total: false
-  searchParams:
-  - name: quarter
-    label: Quarter
-    type: singlevaluelist
-    pattern: 'list://1704067200000:Q1_2024,1711929600000:Q2_2024,1719792000000:Q3_2024'
-    source: ws
-    isMandatory: true
-    searchClause: AND 1=1
-  query: |
-    SELECT 
-      w.property_id,
-      w.connectionno,
-      w.status AS connection_status,
-      p.usagecategory,
-      p.landarea  As plotsize,
-      d.id  AS demandid , 
-      d.businessservice,
-      d.taxperiodfrom,
-      d.taxperiodto,
-      d.tenantid AS demand_tenantid,
-      d.minimumamountpayable,
-      d.status AS demand_status,
-      d.ispaymentcompleted
-    FROM eg_sw_connection w
-    LEFT JOIN eg_pt_property p ON w.property_id = p.propertyid
-    LEFT JOIN  egbs_demand_v1 d ON (d.consumercode = w.connectionno AND d.businessservice = 'SW' AND d.taxperiodfrom = $quarter AND d.tenantid = $tenantid)
-    WHERE 
-      w.tenantid = $tenantid
-      AND w.status = 'Active'
-      AND w.connectionno IS NOT NULL
-      AND (d.status IS NULL OR d.status != 'CANCELLED')
+    sourceColumns:
+      - name: consumercode
+        label: Consumercode
+        type: string
+        source: ws
+        total: false
+      - name: payername
+        label: Name
+        type: string
+        source: ws
+        total: false
+      - name: Address
+        label: payeraddress
+        type: string
+        source: ws
+        total: false
+      - name: localityname
+        label: Locality
+        type: string
+        source: ws
+        total: false
+      - name: blockcode
+        label: Ward No
+        type: string
+        source: ws
+        total: false
+      - name: zonecode
+        label: Zone No
+        type: string
+        source: ws
+        total: false
+      - name: mobilenumber
+        label: Mobile
+        type: string
+        source: ws
+        total: false
+      - name: amtpaid
+        label: Bill Amount
+        type: string
+        source: ws
+        total: false
+      - name: usagecategory
+        label: Category
+        type: string
+        source: ws
+        total: false
+      - name: connectiontype
+        label: Connection Type
+        type: string
+        source: ws
+        total: false
+      - name: landarea
+        label: Land Area
+        type: string
+        source: ws
+        total: false
+      - name: bill_status
+        label: Bill Status
+        type: string
+        source: ws
+        total: false
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND cte.fromperiod >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND cte.toperiod <= $toDate       
+      - name: usagecategory
+        label: Category
+        type: singlevaluelist
+        pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+        source: ws
+        isMandatory: false
+        searchClause: AND cte.usagecategory = $usagecategory
+      - name: connectiontype
+        label: Connection Type
+        type: singlevaluelist
+        pattern: list://Non Metered:Non Metered,Metered:Metered
+        source: ws
+        isMandatory: false
+        searchClause: AND cte.connectiontype = $connectiontype
+      - name: localityArray
+        label: zoneList
+        type: boundarylist
+        source: ws
+        isMandatory: false
+        searchClause: AND cte.localitycode IN ($localityArray)
+    query: |
+       --------Water
+       WITH cte AS (
+           SELECT
+               bill.businessservice,   
+               to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
+               || '-' || 
+               to_char((to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS finyear,
+               pt.usagecategory,
+               wc.connectionno,
+               bill.totalamount,
+               bill.consumercode,
+               bill.billno,b.payername,b.payeraddress,b.mobilenumber,
+               b.status AS bill_status,
+               ct.connectiontype,
+               ebm.zonename,
+               ebm.blockname,
+               ebm.zonecode,
+               ebm.blockcode,
+               ebm.localityname,
+               ebm.localitycode,
+               pt.landarea,
+               bill.fromperiod,
+               bill.toperiod,
+               pt.propertyid
+           FROM eg_ws_connection wc 
+           JOIN eg_pt_property pt ON wc.property_id = pt.propertyid 
+               AND wc.status IN ('Active', 'Inactive') 
+               AND pt.status IN ('ACTIVE', 'PENDINGWS')
+           JOIN eg_ws_service ct ON wc.id = ct.connection_id
+           JOIN eg_bndry_mohalla ebm ON wc.locality = ebm.localitycode AND wc.tenantid = ebm.tenantid
+           JOIN egbs_billdetail_v1 bill 
+               ON bill.consumercode = wc.connectionno 
+               AND bill.businessservice = 'WS'
+           JOIN egbs_bill_v1 b 
+               ON bill.billid = b.id
+               AND bill.businessservice = 'WS'
+           WHERE wc.tenantid = $tenantid
+               AND pt.usagecategory IN (
+                   'RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL',
+                   'NONRESIDENTIAL.INSTITUTIONAL', 'MIXED',
+                   'NONRESIDENTIAL', 'NONRESIDENTIAL.INDUSTRIAL',
+                   'NONRESIDENTIAL.OTHERS'
+               )
+       )
+       
+       SELECT
+           cte.businessservice,  
+           cte.consumercode,
+           cte.payername,
+           cte.payeraddress,
+           cte.mobilenumber,
+           cte.usagecategory,
+           SUM(cte.totalamount) AS amtpaid,
+           cte.bill_status,
+           cte.billno,
+           cte.connectiontype,
+           cte.landarea,
+           cte.zonename,
+           cte.blockname,
+           cte.zonecode,
+           cte.blockcode,
+           cte.localityname,
+           cte.localitycode,
+           cte.fromperiod,
+           cte.toperiod,
+           cte.propertyid,
+           STRING_AGG(cte.finyear, ', ') AS finyear
+       FROM cte
+       WHERE cte.bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
+    groupby: GROUP BY cte.businessservice, cte.consumercode,cte.payername,cte.payeraddress,cte.mobilenumber,cte.usagecategory,cte.bill_status,cte.billno,
+             cte.connectiontype,cte.landarea,cte.zonename,cte.blockname,cte.zonecode,cte.blockcode,cte.localityname,
+             cte.localitycode,cte.fromperiod,cte.toperiod,cte.propertyid
+
 
 - reportName: WaterReportUlb
   decryptionPathId: ReceiptRegisterShort_V2
