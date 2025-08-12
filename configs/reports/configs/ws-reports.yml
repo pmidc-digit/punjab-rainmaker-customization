@@ -2770,13 +2770,13 @@ ReportDefinitions:
         type: epoch
         source: ws
         isMandatory: true
-        searchClause: AND cte.fromperiod = $fromDate
+        searchClause: AND cte.fromperiod >= $fromDate
       - name: toDate
         label: To Date
         type: epoch
         source: ws
         isMandatory: true
-        searchClause: AND cte.toperiod = $toDate
+        searchClause: AND cte.toperiod <= $toDate
       - name: tenantid
         label: tenantid
         type: singlevaluelist
