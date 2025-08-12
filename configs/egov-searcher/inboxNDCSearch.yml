@@ -9,14 +9,8 @@ SearchDefinitions:
          SELECT row_to_json(result) FROM (
             SELECT DISTINCT 
               a.uuid AS id,
-              a.firstname AS fName,
-              a.lastname AS lName,
-              a.tenantid,
-              a.mobile,
-              a.email,
-              a.address,
               a.applicationstatus,
-              a.active,
+              a.active,a.reason,
               a.createdby AS a_createdby,
               a.lastmodifiedby AS a_lastmodifiedby,
               a.createdtime AS a_createdtime,
@@ -28,7 +22,7 @@ SearchDefinitions:
               pi.createdby AS wf_createdby,
               pi.lastmodifiedby AS wf_lastmodifiedby,
               assg.assignee AS wf_assignee
-            FROM eg_ndc_applicants a
+            FROM eg_ndc_application a
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
@@ -73,15 +67,12 @@ SearchDefinitions:
        - name: a.createdtime
          isMandatory: false
          jsonPath: $.searchCriteria.toDate
-       - name: concat(a.firstname, ' ', a.lastname)
-         isMandatory: false
-         jsonPath: $.searchCriteria.name
        pagination:
          noOfRecords: $.searchCriteria.noOfRecords
          offset: $.searchCriteria.offset
       output:
-       jsonFormat: {"ResponseInfo": {}, "NDCApplications": []}
-       outJsonPath: $.NDCApplications
+       jsonFormat: {"ResponseInfo": {}, "Applications": []}
+       outJsonPath: $.Applications
        responseInfoPath: $.ResponseInfo
 
     - name: inboxndcsearchcount
@@ -89,7 +80,7 @@ SearchDefinitions:
        baseQuery: >
          SELECT row_to_json(t) from (
          SELECT COUNT(DISTINCT a.uuid) AS count
-          FROM eg_ndc_applicants a
+          FROM eg_ndc_application a
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
           $where
@@ -131,9 +122,6 @@ SearchDefinitions:
        - name: a.createdtime
          isMandatory: false
          jsonPath: $.searchCriteria.toDate
-       - name: concat(a.firstname, ' ', a.lastname)
-         isMandatory: false
-         jsonPath: $.searchCriteria.name
        pagination:
          noOfRecords: $.searchCriteria.noOfRecords
          offset: $.searchCriteria.offset  
@@ -148,14 +136,9 @@ SearchDefinitions:
          SELECT row_to_json(result)
           FROM (
             SELECT DISTINCT a.uuid AS uuid,
-              a.firstname,
-              a.lastname,
               a.tenantid,
-              a.mobile,
-              a.email,
-              a.address,
               a.applicationstatus,
-              a.active,
+              a.active,a.reason,
               a.createdby AS a_createdby,
               a.lastmodifiedby AS a_lastmodifiedby,
               a.createdtime AS a_createdtime,
@@ -167,7 +150,7 @@ SearchDefinitions:
               pi.createdby AS wf_createdby,
               pi.lastmodifiedby AS wf_lastmodifiedby,
               assg.assignee AS wf_assignee
-            FROM eg_ndc_applicants a
+            FROM eg_ndc_application a
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
@@ -213,15 +196,12 @@ SearchDefinitions:
        - name: a.createdtime
          isMandatory: false
          jsonPath: $.searchCriteria.toDate
-       - name: concat(a.firstname, ' ', a.lastname)
-         isMandatory: false
-         jsonPath: $.searchCriteria.name
        pagination:
          noOfRecords: $.searchCriteria.noOfRecords
          offset: $.searchCriteria.offset
       output:
-       jsonFormat: {"ResponseInfo": {}, "NDCApplications": []}
-       outJsonPath: $.NDCApplications
+       jsonFormat: {"ResponseInfo": {}, "Applications": []}
+       outJsonPath: $.Applications
        responseInfoPath: $.ResponseInfo
 
       
@@ -231,14 +211,9 @@ SearchDefinitions:
           SELECT row_to_json(result) FROM (
             SELECT DISTINCT
               a.uuid AS uuid,
-              a.firstname,
-              a.lastname,
               a.tenantid,
-              a.mobile,
-              a.email,
-              a.address,
               a.applicationstatus,
-              a.active,
+              a.active,a.reason
               a.createdby AS a_createdby,
               a.lastmodifiedby AS a_lastmodifiedby,
               a.createdtime AS a_createdtime,
@@ -250,7 +225,7 @@ SearchDefinitions:
               pi.createdby AS wf_createdby,
               pi.lastmodifiedby AS wf_lastmodifiedby,
               assg.assignee AS wf_assignee
-            FROM eg_ndc_applicants a
+            FROM eg_ndc_application a
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
@@ -294,13 +269,10 @@ SearchDefinitions:
        - name: a.createdtime
          isMandatory: false
          jsonPath: $.searchCriteria.toDate
-       - name: concat(a.firstname, ' ', a.lastname)
-         isMandatory: false
-         jsonPath: $.searchCriteria.name
        pagination:
          noOfRecords: $.searchCriteria.noOfRecords
          offset: $.searchCriteria.offset
       output:
-       jsonFormat: {"ResponseInfo": {}, "NDCApplications": []}
-       outJsonPath: $.NDCApplications
+       jsonFormat: {"ResponseInfo": {}, "Applications": []}
+       outJsonPath: $.Applications
        responseInfoPath: $.ResponseInfo
