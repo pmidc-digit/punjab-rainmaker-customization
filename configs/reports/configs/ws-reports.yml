@@ -2776,14 +2776,7 @@ ReportDefinitions:
         type: epoch
         source: ws
         isMandatory: true
-        searchClause: AND cte.toperiod <= $toDate
-      - name: tenantid
-        label: tenantid
-        type: singlevaluelist
-        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-        source: ws
-        isMandatory: false 
-        searchClause: AND 1=1       
+        searchClause: AND cte.toperiod <= $toDate       
       - name: usagecategory
         label: Category
         type: singlevaluelist
