@@ -2871,6 +2871,180 @@ ReportDefinitions:
              cte.connectiontype,cte.landarea,cte.zonename,cte.blockname,cte.zonecode,cte.blockcode,cte.localityname,
              cte.localitycode,cte.fromperiod,cte.toperiod,cte.propertyid 
 
+  - reportName: WSNew_Connection_Fee_Report
+    summary: WS New Connection Fee Report
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig: null
+    print:
+      pdfPageSize: A1
+    sourceColumns:
+      - name: applicationno
+        label: Application No
+        type: string
+        source: ws
+        total: false
+      - name: connectionno
+        label: Consumer No
+        type: string
+        source: ws
+        total: false
+      - name: receiptnumber
+        label: Reciept No
+        type: string
+        source: ws
+        total: false
+      - name: receiptdate
+        label: Reciept Date
+        type: string
+        source: ws
+        total: false
+      - name: payername
+        label: Name
+        type: string
+        source: ws
+        total: false
+      - name: address
+        label: Addres
+        type: string
+        source: ws
+        total: false
+      - name: locality
+        label: Localit
+        type: string
+        source: ws
+        total: false
+      - name: mobilenumber
+        label: Mobile
+        type: string
+        source: ws
+        total: false
+      - name: propertyid
+        label: Property Id
+        type: string
+        source: ws
+        total: false
+      - name: amount
+        label: Amount
+        type: string
+        source: ws
+        total: false
+      - name: instrumenttype
+        label: Payment Type
+        type: string
+        source: ws
+        total: false
+      - name: securityfee
+        label: Security Fee 
+        type: string
+        source: ws
+        total: false
+      - name: connectionfee
+        label: Connection Fee 
+        type: string
+        source: ws
+        total: false
+      - name: othefee
+        label: Other Fee
+        type: string
+        source: ws
+        total: false
+      - name: roadcutting
+        label: Road Cutting 
+        type: string
+        source: ws
+        total: false
+      - name: plotsize
+        label: Land Area
+        type: string
+        source: ws
+        total: false
+      - name: collectorname
+        label: Approved By
+        type: string
+        source: ws
+        total: false
+      - name: approvaldate
+        label: Approved Date
+        type: string
+        source: ws
+        total: false
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND pd.receiptdate >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND pd.receiptdate <= $toDate       
+      - name: localityArray
+        label: zoneList
+        type: boundarylist
+        source: ws
+        isMandatory: false
+        searchClause: AND pta.locality IN ($localityArray)
+    query: |
+       -------- Query for water
+       WITH receipt_breakup AS (
+       SELECT
+           pd.id AS pdid,                    
+           SUM(CASE WHEN taxheadcode LIKE 'WS_SECURITY_DEPOSIT' THEN adjustedamount ELSE 0 END) AS securityfee, 
+           SUM(CASE WHEN taxheadcode LIKE 'WS_CONNECTION_FEE' THEN adjustedamount ELSE 0 END) AS connectionfee, 
+           SUM(CASE WHEN taxheadcode LIKE 'WS_OTHER_FEE' THEN adjustedamount ELSE 0 END) AS othefee, 
+           SUM(CASE WHEN taxheadcode LIKE 'WS_ROAD_CUTTING_CHARGE' THEN adjustedamount ELSE 0 END) AS roadcutting                    
+       FROM egcl_billaccountdetail AS bad
+       INNER JOIN egcl_billdetial AS bd ON bd.id = bad.billdetailid
+       INNER JOIN egcl_paymentdetail AS pd ON pd.billid = bd.billid
+       INNER JOIN egcl_payment AS payment ON pd.paymentid = payment.id                  
+       WHERE payment.tenantid =$tenantid 
+         AND payment.paymentstatus != 'CANCELLED' 
+         AND pd.businessservice = 'WS.ONE_TIME_FEE'
+         AND pd.receiptdate >= $fromDate 
+          AND pd.receiptdate <= $toDate
+       GROUP BY pdid
+       )
+       SELECT 
+       pd.tenantid AS tenantid,
+       pd.id,
+       TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate,
+       pd.receiptnumber,
+       payment.totalamountpaid AS amount, 
+       payment.paymentmode AS instrumenttype, 
+       payment.transactionnumber,
+       receipt_breakup.*,
+       TO_CHAR(TO_TIMESTAMP(pd.manualreceiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS g8issuedate, 
+       pd.manualreceiptnumber AS g8receiptno,
+       ws.additionaldetails->>'waterSubUsageType' as usageType,
+       ws.additionaldetails->>'ledgerId' as ledgerid,
+       ws.connectionno as connectionno,
+       ws.applicationno as applicationno,
+       pt.propertyid as propertyid,
+       pt.landarea as plotsize,
+       concat(doorno,',',buildingname,',',street,',',city) as addrespayment.payername,payment.mobilenumber,
+       ws.additionaldetails->>'connectionCategory' as connectioncategory,
+       ws.additionaldetails->>'ownerName' as ownernampta.locality,
+       eu.name as collectorname,
+       TO_CHAR(TO_TIMESTAMP(pi.lastmodifiedtime / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') as approvaldate
+       FROM egcl_paymentdetail pd
+       INNER JOIN egcl_payment payment ON pd.paymentid = payment.id
+       INNER JOIN egcl_bill bill ON bill.id = pd.billid
+       INNER JOIN receipt_breakup ON receipt_breakup.pdid = pd.id
+       INNER JOIN eg_ws_connection ws ON ws.applicationno = bill.consumercode
+       inner join eg_pt_property pt on (ws.property_id=pt.propertyid and pt.status!='INACTIVE')
+       inner join eg_pt_address pta on (pta.propertyid=pt.id)
+       inner join eg_wf_processinstance_v2 pi on (pi.businessid=ws.applicationno and pi.action='APPROVE_FOR_CONNECTION')
+       inner join eg_user eu on eu.uuid=pi.lastmodifiedby
+       WHERE payment.paymentstatus != 'CANCELLED'
+       AND pd.businessservice = 'WS.ONE_TIME_FEE'
+       AND payment.tenantid =$tenantid
+    orderby: ORDER BY pd.receiptdate DESC
+               
+
       
       
       
