@@ -4820,6 +4820,11 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+  - name: demand_date
+    label: Demand Date
+    type: string
+    source: ws
+    total: false  
   - name: usagecategory
     label: Category
     type: string
@@ -4897,11 +4902,13 @@ ReportDefinitions:
               pt.landarea,
               bill.fromperiod,
               bill.toperiod,
-              pt.propertyid
+              pt.propertyid,
+              d.createdtime
           FROM eg_ws_connection wc 
           JOIN eg_pt_property pt ON wc.property_id = pt.propertyid 
               AND wc.status IN ('Active', 'Inactive') 
               AND pt.status IN ('ACTIVE', 'PENDINGWS')
+          JOIN egbs_demand_v1 d ON wc.property_id  = d.consumercode AND wc.tenantid = d.tenantid   
           JOIN eg_ws_service ct ON wc.id = ct.connection_id
           JOIN eg_bndry_mohalla ebm ON wc.locality = ebm.localitycode AND wc.tenantid = ebm.tenantid
           JOIN egbs_billdetail_v1 bill 
@@ -4927,6 +4934,7 @@ ReportDefinitions:
           cte.mobilenumber,
           cte.usagecategory,
           SUM(cte.totalamount) AS amtpaid,
+          MAX(cte.createdtime) AS demand_date,
           cte.bill_status,
           cte.billno,
           cte.connectiontype,
@@ -4996,6 +5004,11 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+  - name: demand_date
+    label: Demand Date
+    type: string
+    source: ws
+    total: false  
   - name: usagecategory
     label: Category
     type: string
@@ -5073,11 +5086,13 @@ ReportDefinitions:
               pt.landarea,
               bill.fromperiod,
               bill.toperiod,
-              pt.propertyid
+              pt.propertyid,
+              d.createdtime
           FROM eg_sw_connection  wc 
           JOIN eg_pt_property pt ON wc.property_id = pt.propertyid 
               AND wc.status IN ('Active', 'Inactive') 
               AND pt.status IN ('ACTIVE', 'PENDINGWS')
+          JOIN egbs_demand_v1 d ON wc.property_id  = d.consumercode AND wc.tenantid = d.tenantid    
           JOIN eg_sw_service  ct ON wc.id = ct.connection_id
           JOIN eg_bndry_mohalla ebm ON wc.locality = ebm.localitycode AND wc.tenantid = ebm.tenantid
           JOIN egbs_billdetail_v1 bill 
@@ -5103,6 +5118,7 @@ ReportDefinitions:
           cte.mobilenumber,
           cte.usagecategory,
           SUM(cte.totalamount) AS amtpaid,
+          MAX(cte.createdtime) AS demand_date,
           cte.bill_status,
           cte.billno,
           cte.connectiontype,
