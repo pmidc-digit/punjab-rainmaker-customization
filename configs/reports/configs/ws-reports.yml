@@ -5622,6 +5622,13 @@ ReportDefinitions:
     source: pt
     isMandatory: false
     searchClause: AND pd.receiptdate <= $toDate 
+  - name: collectortype
+    label: User Type
+    type: singlevaluelist
+    pattern: 'list://CITIZEN:CITIZEN,EMPLOYEE:EMPLOYEE,SYSTEM:SYSTEM' 
+    source: ws
+    isMandatory: false
+    searchClause: AND eu.type = $connectiontype 
   - name: collectorname
     label: User Name
     type: singlevaluelist
@@ -5629,14 +5636,7 @@ ReportDefinitions:
     source: ws
     wrapper: true
     isMandatory: false
-    searchClause: AND eu.name = $collectorname::INTEGER
-  - name: collectortype
-    label: User Type
-    type: singlevaluelist
-    pattern: 'list://CITIZEN:CITIZEN,EMPLOYEE:EMPLOYEE,SYSTEM:SYSTEM' 
-    source: ws
-    isMandatory: false
-    searchClause: AND eu.type = $connectiontype   
+    searchClause: AND eu.name = $collectorname::INTEGER 
   query: |
     SELECT 
         eu.name AS collectorname,
@@ -5665,8 +5665,6 @@ ReportDefinitions:
       AND eu.type IN ('EMPLOYEE','CITIZEN','SYSTEM') 
       AND pd.businessservice IN ('WS', 'WS.ONE_TIME_FEE') 
       AND payment.paymentstatus != 'CANCELLED'
-      AND pd.receiptdate BETWEEN EXTRACT(EPOCH FROM TO_DATE('12-08-2025', 'DD-MM-YYYY')) * 1000
-                              AND EXTRACT(EPOCH FROM (TO_DATE('12-08-2025', 'DD-MM-YYYY') + INTERVAL '1 day' - INTERVAL '1 second')) * 1000
   groupby: GROUP BY eu.name,payment.paymentmode,eu.type
   orderby: ORDER BY eu.name 
      
