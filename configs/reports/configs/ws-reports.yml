@@ -5555,9 +5555,9 @@ ReportDefinitions:
     select applicationstatus,count(*) as totalcount from eg_sw_connection where tenantid=$tenantid and applicationstatus not in ('INITIATED')
   groupby: group by applicationstatus
 
-- reportName: wssummaryregistercollection
+- reportName: WSUserwise_Collection_Summary
   decryptionPathId: MiscReceiptULB_v2
-  summary:  WS Summary register collection
+  summary:  WS Userwise Collection Summary
   version: 1.0.0
   moduleName: rainmaker-ws
   additionalConfig:
@@ -5565,57 +5565,110 @@ ReportDefinitions:
       pdfPageSize: A1
   sourceColumns:
   - name: collectorname
-    label: reports.ws.collectorname
+    label: User Name 
     type: string
     source: ws
     total: false
-  - name: count
-    label: reports.ws.count
-    type: string
-    source: ws
-    total: true
-  - name: sum
-    label: reports.ws.sum
-    type: string
-    source: ws
-    total: true
   - name: paymentmode
-    label: reports.ws.paymentmode
+    label: Paymentmode
     type: string
     source: ws
     total: false
-  - name: type
-    label: reports.ws.type
+  - name: Cash
+    label: Cash Amount 
+    type: string
+    source: ws
+    total: true
+  - name: Cheque
+    label: Cheque Amount
+    type: string
+    source: ws
+    total: true
+  - name: Card
+    label: Card Amount
+    type: string
+    source: ws
+    total: false
+  - name: DD
+    label: DD Amount
+    type: string
+    source: ws
+    total: false
+  - name: NEFT
+    label: NEFT Amount
+    type: string
+    source: ws
+    total: false
+  - name: OFFLINE_RTGS
+    label: RTGS Amount
+    type: string
+    source: ws
+    total: false
+  - name: ONLINE
+    label: Online Amount (UPI/Netbanking)
     type: string
     source: ws
     total: false
   searchParams:
   - name: fromDate
-    label: reports.pt.fromDate
+    label: FromDate
     type: epoch
     source: pt
     isMandatory: false
     searchClause: AND pd.receiptdate >= $fromDate
   - name: toDate
-    label: reports.pt.toDate
+    label: ToDate
     type: epoch
     source: pt
     isMandatory: false
-    searchClause: AND pd.receiptdate <= $toDate    
+    searchClause: AND pd.receiptdate <= $toDate 
+  - name: collectorname
+    label: User Name
+    type: singlevaluelist
+    pattern: 'http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=WS_CEMP,WS_CLERK,SW_CEMP,SW_CLERK|$.Employees[*].user.id|$.Employees[*].user.name'
+    source: ws
+    wrapper: true
+    isMandatory: false
+    searchClause: AND eu.name = $collectorname::INTEGER
+  - name: collectortype
+    label: User Type
+    type: singlevaluelist
+    pattern: 'list://CITIZEN:CITIZEN,EMPLOYEE:EMPLOYEE,SYSTEM:SYSTEM' 
+    source: ws
+    isMandatory: false
+    searchClause: AND eu.type = $connectiontype   
   query: |
     SELECT 
-    SUM(pd.amountpaid) AS sum,
-    COUNT(*) AS count,
-    CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END as paymentmode,
-    eu.name AS collectorname,
-    eu.type as type
+        eu.name AS collectorname,
+        eu.type AS collectortype,
+        COUNT(*) AS total_count,
+      payment.paymentmode,
+        SUM(CASE WHEN payment.paymentmode = 'CASH' THEN pd.amountpaid ELSE 0 END) AS Cash,
+        SUM(CASE WHEN payment.paymentmode = 'CHEQUE' THEN pd.amountpaid ELSE 0 END) AS Cheque,
+        SUM(CASE WHEN payment.paymentmode = 'OFFLINE_NEFT' THEN pd.amountpaid ELSE 0 END) AS NEFT,
+        SUM(CASE WHEN payment.paymentmode = 'CARD' THEN pd.amountpaid ELSE 0 END) AS CARD,
+        SUM(CASE WHEN payment.paymentmode = 'OFFLINE_RTGS' THEN pd.amountpaid ELSE 0 END) AS OFFLINE_RTGS,
+        SUM(CASE WHEN payment.paymentmode = 'DD' THEN pd.amountpaid ELSE 0 END) AS DD,
+        SUM(CASE WHEN payment.paymentmode = 'ONLINE' THEN pd.amountpaid ELSE 0 END) AS ONLINE,
+        SUM(CASE WHEN payment.paymentmode = 'QR_CODE' THEN pd.amountpaid ELSE 0 END) AS QR_CODE,
+        SUM(CASE WHEN payment.paymentmode = 'POSTAL_ORDER' THEN pd.amountpaid ELSE 0 END) AS POSTAL_ORDER,
+        SUM(pd.amountpaid) AS total_amount
     FROM egcl_paymentdetail pd
-    INNER JOIN  egcl_bill AS bill ON bill.id = pd.billid
-    INNER JOIN  eg_user as eu ON eu.id::text = pd.createdby::text
-    INNER JOIN egcl_payment as payment ON payment.id = pd.paymentid
-    WHERE pd.tenantid = $tenantid AND bill.status = 'ACTIVE' AND eu.type in ('EMPLOYEE','CITIZEN','SYSTEM') AND pd.businessservice IN ('WS', 'WS.ONE_TIME_FEE') AND payment.paymentstatus != 'CANCELLED'
-  groupby: GROUP BY eu.username, eu.name, CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END,eu.type
-  orderby: ORDER BY CASE WHEN payment.paymentmode!= 'CASH' THEN 'ONLINE' ELSE payment.paymentmode END DESC,eu.username;
+    INNER JOIN egcl_bill bill 
+        ON bill.id = pd.billid
+    INNER JOIN eg_user eu 
+        ON eu.id::text = pd.createdby::text
+    INNER JOIN egcl_payment payment 
+        ON payment.id = pd.paymentid
+    WHERE pd.tenantid = $tenantid 
+      AND bill.status = 'ACTIVE' 
+      AND eu.type IN ('EMPLOYEE','CITIZEN','SYSTEM') 
+      AND pd.businessservice IN ('WS', 'WS.ONE_TIME_FEE') 
+      AND payment.paymentstatus != 'CANCELLED'
+      AND pd.receiptdate BETWEEN EXTRACT(EPOCH FROM TO_DATE('12-08-2025', 'DD-MM-YYYY')) * 1000
+                              AND EXTRACT(EPOCH FROM (TO_DATE('12-08-2025', 'DD-MM-YYYY') + INTERVAL '1 day' - INTERVAL '1 second')) * 1000
+  groupby: GROUP BY eu.name,payment.paymentmode,eu.type
+  orderby: ORDER BY eu.name 
      
 - reportName: collector_wisesummary
   decryptionPathId: MiscReceiptULB_v2
