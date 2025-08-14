@@ -6026,6 +6026,19 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+  searchParams:
+  - name: fromDate
+    label: FromDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND ws.createdtime >= $fromDate
+  - name: toDate
+    label: ToDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND ws.createdtime <= $toDate    
   query: |
     WITH latest_wf AS (
         SELECT *
@@ -6171,6 +6184,19 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+  searchParams:
+  - name: fromDate
+    label: FromDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND ws.createdtime >= $fromDate
+  - name: toDate
+    label: ToDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND ws.createdtime <= $toDate   
   query: |
     WITH latest_wf AS (
         SELECT *
