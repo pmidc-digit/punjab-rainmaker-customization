@@ -8,7 +8,7 @@ SearchDefinitions:
        baseQuery: >
          SELECT row_to_json(result) FROM (
             SELECT DISTINCT 
-              a.uuid AS id,
+              a.uuid AS uuid,
               a.applicationstatus,
               a.active,a.reason,
               a.createdby AS a_createdby,
@@ -49,9 +49,6 @@ SearchDefinitions:
        - name: a.active
          isMandatory: false
          jsonPath: $.searchCriteria.active
-       - name: a.mobile
-         isMandatory: false
-         jsonPath: $.searchCriteria.mobileNumber
        - name: pi.businessservice
          isMandatory: false
          jsonPath: $.searchCriteria.businessservice
@@ -104,9 +101,6 @@ SearchDefinitions:
        - name: a.active
          isMandatory: false
          jsonPath: $.searchCriteria.active
-       - name: a.mobile
-         isMandatory: false
-         jsonPath: $.searchCriteria.mobileNumber
        - name: pi.businessservice
          isMandatory: false
          jsonPath: $.searchCriteria.businessservice
@@ -178,9 +172,6 @@ SearchDefinitions:
        - name: a.active
          isMandatory: false
          jsonPath: $.searchCriteria.active
-       - name: a.mobile
-         isMandatory: false
-         jsonPath: $.searchCriteria.mobileNumber
        - name: pi.businessservice
          isMandatory: false
          jsonPath: $.searchCriteria.businessservice
@@ -248,12 +239,12 @@ SearchDefinitions:
        - name: a.applicationstatus
          isMandatory: false
          jsonPath: $.searchCriteria.status
+       - name: assg.assignee
+         isMandatory: false
+         jsonPath: $.searchCriteria.assignee
        - name: a.active
          isMandatory: false
          jsonPath: $.searchCriteria.active
-       - name: a.mobile
-         isMandatory: false
-         jsonPath: $.searchCriteria.mobileNumber
        - name: pi.businessservice
          isMandatory: false
          jsonPath: $.searchCriteria.businessservice
