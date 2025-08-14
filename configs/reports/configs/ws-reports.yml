@@ -4778,26 +4778,16 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
-  - name: payeraddress 
-    label: Address
-    type: string
-    source: ws
-    total: false
   - name: localityname
     label: Locality
     type: string
     source: ws
     total: false
-  - name: blockcode
-    label: Ward No
+  - name: billno
+    label: Bill No
     type: string
     source: ws
-    total: false
-  - name: zonecode
-    label: Zone No
-    type: string
-    source: ws
-    total: false
+    total: false       
   - name: mobilenumber
     label: Mobile
     type: string
@@ -4808,8 +4798,8 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
-  - name: demand_date
-    label: Demand Date
+  - name: latest_demand_createdtime
+    label: Latest Demand Date
     type: epoch
     source: ws
     total: false  
@@ -4818,6 +4808,26 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+  - name: propertyid
+    label: propertyid
+    type: string
+    source: ws
+    total: false    
+  - name: localityname
+    label: localityname
+    type: string
+    source: ws
+    total: false        
+  - name: blockname
+    label: blockname
+    type: string
+    source: ws
+    total: false        
+  - name: zonename
+    label: zonename
+    type: string
+    source: ws
+    total: false           
   - name: connectiontype
     label: Connection Type
     type: string
@@ -4833,6 +4843,11 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+  - name: finyear
+    label: finyear
+    type: string
+    source: ws
+    total: false    
   searchParams:
     - name: fromDate
       label: From Date
@@ -4868,80 +4883,14 @@ ReportDefinitions:
       searchClause: AND cte.localitycode IN ($localityArray)
   query: |
       --------Water
-      WITH cte AS (
-          SELECT
-              bill.businessservice,   
-              to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
-              || '-' || 
-              to_char((to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS finyear,
-              pt.usagecategory,
-              wc.connectionno,
-              bill.totalamount,
-              bill.consumercode,
-              bill.billno,b.payername,b.payeraddress,b.mobilenumber,
-              b.status AS bill_status,
-              ct.connectiontype,
-              ebm.zonename,
-              ebm.blockname,
-              ebm.zonecode,
-              ebm.blockcode,
-              ebm.localityname,
-              ebm.localitycode,
-              pt.landarea,
-              bill.fromperiod,
-              bill.toperiod,
-              pt.propertyid,
-              d.createdtime
-          FROM eg_ws_connection wc 
-          JOIN eg_pt_property pt ON wc.property_id = pt.propertyid 
-              AND wc.status IN ('Active', 'Inactive') 
-              AND pt.status IN ('ACTIVE', 'PENDINGWS')
-          JOIN egbs_demand_v1 d ON wc.property_id  = d.consumercode AND wc.tenantid = d.tenantid   
-          JOIN eg_ws_service ct ON wc.id = ct.connection_id
-          JOIN eg_bndry_mohalla ebm ON wc.locality = ebm.localitycode AND wc.tenantid = ebm.tenantid
-          JOIN egbs_billdetail_v1 bill 
-              ON bill.consumercode = wc.connectionno 
-              AND bill.businessservice = 'WS'
-          JOIN egbs_bill_v1 b 
-              ON bill.billid = b.id
-              AND bill.businessservice = 'WS'
-          WHERE wc.tenantid = $tenantid
-              AND pt.usagecategory IN (
-                  'RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL',
-                  'NONRESIDENTIAL.INSTITUTIONAL', 'MIXED',
-                  'NONRESIDENTIAL', 'NONRESIDENTIAL.INDUSTRIAL',
-                  'NONRESIDENTIAL.OTHERS'
-              )
-      )
-      
-      SELECT
-          cte.businessservice,  
-          cte.consumercode,
-          cte.payername,
-          cte.payeraddress,
-          cte.mobilenumber,
-          cte.usagecategory,
-          SUM(cte.totalamount) AS amtpaid,
-          MAX(cte.createdtime) AS demand_date,
-          cte.bill_status,
-          cte.billno,
-          cte.connectiontype,
-          cte.landarea,
-          cte.zonename,
-          cte.blockname,
-          cte.zonecode,
-          cte.blockcode,
-          cte.localityname,
-          cte.localitycode,
-          cte.fromperiod,
-          cte.toperiod,
-          cte.propertyid,
-          STRING_AGG(cte.finyear, ', ') AS finyear
-      FROM cte
-      WHERE cte.bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
-  groupby: GROUP BY cte.businessservice, cte.consumercode,cte.payername,cte.payeraddress,cte.mobilenumber,cte.usagecategory,cte.bill_status,cte.billno,
-           cte.connectiontype,cte.landarea,cte.zonename,cte.blockname,cte.zonecode,cte.blockcode,cte.localityname,
-           cte.localitycode,cte.fromperiod,cte.toperiod,cte.propertyid 
+      select consumercode as consumercode,payername as payername,localityname as localityname,
+          billno as billno,mobilenumber as mobilenumber,amtpaid as amtpaid,
+              latest_demand_createdtime as latest_demand_createdtime,
+              usagecategory as usagecategory,propertyid as propertyid, 
+              localityname as localityname,blockname as blockname,zonename as zonename,
+              connectiontype as connectiontype,landarea as landarea,bill_status as bill_status,
+              finyear as finyear from public.ws_quaterly_bill_generate
+              where tenantid = $tenantid
            
 - reportName: SWQuaterly_Bill_Generate
   summary: Sw Quarterly Bill Generate Report
@@ -4962,26 +4911,16 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
-  - name: payeraddress 
-    label: Address
-    type: string
-    source: ws
-    total: false
   - name: localityname
     label: Locality
     type: string
     source: ws
     total: false
-  - name: blockcode
-    label: Ward No
+  - name: billno
+    label: Bill No
     type: string
     source: ws
-    total: false
-  - name: zonecode
-    label: Zone No
-    type: string
-    source: ws
-    total: false
+    total: false       
   - name: mobilenumber
     label: Mobile
     type: string
@@ -4992,8 +4931,8 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
-  - name: demand_date
-    label: Demand Date
+  - name: latest_demand_createdtime
+    label: Latest Demand Date
     type: epoch
     source: ws
     total: false  
@@ -5002,6 +4941,26 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+  - name: propertyid
+    label: propertyid
+    type: string
+    source: ws
+    total: false    
+  - name: localityname
+    label: localityname
+    type: string
+    source: ws
+    total: false        
+  - name: blockname
+    label: blockname
+    type: string
+    source: ws
+    total: false        
+  - name: zonename
+    label: zonename
+    type: string
+    source: ws
+    total: false           
   - name: connectiontype
     label: Connection Type
     type: string
@@ -5017,6 +4976,11 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+  - name: finyear
+    label: finyear
+    type: string
+    source: ws
+    total: false    
   searchParams:
     - name: fromDate
       label: From Date
@@ -5052,81 +5016,15 @@ ReportDefinitions:
       searchClause: AND cte.localitycode IN ($localityArray)
   query: |
       --------Sewerage
-      WITH cte AS (
-          SELECT
-              bill.businessservice,   
-              to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
-              || '-' || 
-              to_char((to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS finyear,
-              pt.usagecategory,
-              wc.connectionno,
-              bill.totalamount,
-              bill.consumercode,
-              bill.billno,b.payername,b.payeraddress,b.mobilenumber,
-              b.status AS bill_status,
-              ct.connectiontype,
-              ebm.zonename,
-              ebm.blockname,
-              ebm.zonecode,
-              ebm.blockcode,
-              ebm.localityname,
-              ebm.localitycode,
-              pt.landarea,
-              bill.fromperiod,
-              bill.toperiod,
-              pt.propertyid,
-              d.createdtime
-          FROM eg_sw_connection  wc 
-          JOIN eg_pt_property pt ON wc.property_id = pt.propertyid 
-              AND wc.status IN ('Active', 'Inactive') 
-              AND pt.status IN ('ACTIVE', 'PENDINGWS')
-          JOIN egbs_demand_v1 d ON wc.property_id  = d.consumercode AND wc.tenantid = d.tenantid    
-          JOIN eg_sw_service  ct ON wc.id = ct.connection_id
-          JOIN eg_bndry_mohalla ebm ON wc.locality = ebm.localitycode AND wc.tenantid = ebm.tenantid
-          JOIN egbs_billdetail_v1 bill 
-              ON bill.consumercode = wc.connectionno 
-              AND bill.businessservice = 'SW'
-          JOIN egbs_bill_v1 b 
-              ON bill.billid = b.id
-              AND bill.businessservice = 'SW'
-          WHERE wc.tenantid = $tenantid
-              AND pt.usagecategory IN (
-                  'RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL',
-                  'NONRESIDENTIAL.INSTITUTIONAL', 'MIXED',
-                  'NONRESIDENTIAL', 'NONRESIDENTIAL.INDUSTRIAL',
-                  'NONRESIDENTIAL.OTHERS'
-              )
-      )
-      
-      SELECT
-          cte.businessservice,  
-          cte.consumercode,
-          cte.payername,
-          cte.payeraddress,
-          cte.mobilenumber,
-          cte.usagecategory,
-          SUM(cte.totalamount) AS amtpaid,
-          MAX(cte.createdtime) AS demand_date,
-          cte.bill_status,
-          cte.billno,
-          cte.connectiontype,
-          cte.landarea,
-          cte.zonename,
-          cte.blockname,
-          cte.zonecode,
-          cte.blockcode,
-          cte.localityname,
-          cte.localitycode,
-          cte.fromperiod,
-          cte.toperiod,
-          cte.propertyid,
-          STRING_AGG(cte.finyear, ', ') AS finyear
-      FROM cte
-      WHERE cte.bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
-  groupby: GROUP BY cte.businessservice, cte.consumercode,cte.payername,cte.payeraddress,cte.mobilenumber,cte.usagecategory,cte.bill_status,cte.billno,
-           cte.connectiontype,cte.landarea,cte.zonename,cte.blockname,cte.zonecode,cte.blockcode,cte.localityname,
-           cte.localitycode,cte.fromperiod,cte.toperiod,cte.propertyid   
-           
+      select consumercode as consumercode,payername as payername,localityname as localityname,
+          billno as billno,mobilenumber as mobilenumber,amtpaid as amtpaid,
+              latest_demand_createdtime as latest_demand_createdtime,
+              usagecategory as usagecategory,propertyid as propertyid, 
+              localityname as localityname,blockname as blockname,zonename as zonename,
+              connectiontype as connectiontype,landarea as landarea,bill_status as bill_status,
+              finyear as finyear from public.sw_quaterly_bill_generate
+              where tenantid = $tenantid
+   
 - reportName: WSNew_Connection_Fee_Report
   decryptionPathId: ReceiptRegisterShort_V2
   summary:  WS New Connection Fee Report
