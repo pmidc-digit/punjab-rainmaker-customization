@@ -2044,7 +2044,7 @@ ReportDefinitions:
         (
           select businesskey,max(eg_pgr_action.when) as actiontime
           from eg_pgr_action
-          where tenantid=$tenantid
+          where tenantid=$ulb
           group by businesskey
         )
     SELECT 
@@ -2061,7 +2061,7 @@ ReportDefinitions:
         eg_pgr_address.housenoandstreetname as address, 
         description,
         source,
-        (SELECT (CASE WHEN (((SELECT deptmap.slaHours FROM (VALUES tbl_dept) AS deptmap(serviceCode, department, slaHours) WHERE deptmap.serviceCode =     eg_pgr_service.servicecode)::integer / 24) - (epa.when - eg_pgr_service.createdtime)::bigint/86400000) < 1 THEN CONCAT('Overdue by ', ((epa.when -     eg_pgr_service.createdtime)::bigint/86400000) - ((SELECT deptmap.slaHours FROM (VALUES tbl_dept) AS deptmap(serviceCode, department, slaHours) WHERE     deptmap.serviceCode = eg_pgr_service.servicecode)::integer / 24), ' days') ELSE CONCAT(((SELECT deptmap.slaHours FROM (VALUES tbl_dept) AS deptmap(    serviceCode, department, slaHours) WHERE deptmap.serviceCode = eg_pgr_service.servicecode)::integer / 24) - (epa.when -     eg_pgr_service.createdtime)::bigint/86400000, ' days remaining') END) as slaHours), 
+        (SELECT (CASE WHEN (((SELECT deptmap.slaHours FROM (VALUES tbl_dept) AS deptmap(serviceCode, department, slaHours) WHERE deptmap.serviceCode = eg_pgr_service.servicecode)::integer / 24) - (epa.when - eg_pgr_service.createdtime)::bigint/86400000) < 1 THEN CONCAT('Overdue by ', ((epa.when -     eg_pgr_service.createdtime)::bigint/86400000) - ((SELECT deptmap.slaHours FROM (VALUES tbl_dept) AS deptmap(serviceCode, department, slaHours) WHERE     deptmap.serviceCode = eg_pgr_service.servicecode)::integer / 24), ' days') ELSE CONCAT(((SELECT deptmap.slaHours FROM (VALUES tbl_dept) AS deptmap(    serviceCode, department, slaHours) WHERE deptmap.serviceCode = eg_pgr_service.servicecode)::integer / 24) - (epa.when -     eg_pgr_service.createdtime)::bigint/86400000, ' days remaining') END) as slaHours), 
         Initcap(eg_pgr_service.status) as status,
         to_char((To_timestamp(epa.when/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY')  AS actiondate
         FROM eg_pgr_service
@@ -2070,9 +2070,9 @@ ReportDefinitions:
         left outer join eg_pgr_action as epa on epa.businesskey = eg_pgr_service.servicerequestid and epa.action in ('assign','reassign','resolve')
         left outer join eg_user as ua on (ua.id = (case when epa.assignee is not null then epa.assignee::integer  else  split_part(epa.by,':',1)::INTEGER end))
     WHERE 
-        eg_pgr_service.tenantid !=$tenantid
+        eg_pgr_service.tenantid !=$ulb
         AND eg_pgr_address.uuid = eg_pgr_service.addressid
-        AND eg_pgr_service.status IN ('open','assigned','reassigrequested','rejected','closed','resolved')
+        AND eg_pgr_service.status IN ('open','assigned','assignrequested','rejected','closed','resolved')
   orderby: ORDER BY servicerequestid, epa."when" desc  
  
 - reportName: UlbwisePgrSlaReport_v2
