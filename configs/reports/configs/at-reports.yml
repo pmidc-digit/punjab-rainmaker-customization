@@ -1,160 +1,44 @@
 ---
 ReportDefinitions:
-- reportName: ReceiptRegisterSW_test
-  summary: Receipt Register Test
-  version: 1.0.0
-  moduleName: rainmaker-at
-  sourceColumns:
-  - name: receiptnumber
-    label: receiptNo
-    type: string
-    source: at
-    total: false
-  - name: transactiondate
-    label: receiptDate
-    type: string
-    source: at
-    total: false
-  - name: g8issuedate
-    label: g8issuedate
-    type: string
-    source: at
-    total: false
-  - name: g8receiptno
-    label: g8receiptno
-    type: string
-    source: at
-    total: false
-  - name: amount
-    label: amount
-    type: string
-    source: at
-    total: true
-  - name: propertytax
-    label: propertyTax
-    type: string
-    source: at
-    total: true
-  - name: firecess
-    label: fireCess
-    type: string
-    source: at
-    total: true
-  - name: cancercess
-    label: cancerCess
-    type: string
-    source: at
-    total: true
-  - name: rebate
-    label: rebate
-    type: string
-    source: at
-    total: true
-  - name: adhocrebate
-    label: adhocrebate
-    type: string
-    source: at
-    total: true
-  - name: penalty
-    label: penalty
-    type: string
-    source: at
-    total: true
-  - name: adhocpenalty
-    label: adhocpenalty
-    type: string
-    source: at
-    total: true
-  - name: interest
-    label: interest
-    type: string
-    source: at
-    total: true
-  - name: exemption
-    label: exemption
-    type: string
-    source: at
-    total: true
-  - name: adjusment
-    label: roundoff
-    type: string
-    source: at
-    total: true
-  - name: pendingamount
-    label: pendingamount
-    type: string
-    source: at
-    total: true
-  - name: propertyid
-    label: propertyId
-    type: string
-    source: at
-    total: false
-  - name: usagetype
-    label: usagetype
-    type: string
-    source: at
-    total: false
-  - name: assessmentnumber
-    label: assessmentNo
-    type: string
-    source: at
-    total: false
-  - name: financialyear
-    label: financialYear
-    type: string
-    source: at
-    total: false
-  - name: instrumenttype
-    label: paymentMode
-    type: string
-    source: at
-    total: false
-  - name: transactionnumber
-    label: ddChequeTransactionNo
-    type: string
-    source: at
-    total: false
-  - name: bankname
-    label: bankName
-    type: string
-    source: at
-    total: false
-  searchParams:
-  - name: fromDate
-    label: fromDate
-    type: epoch
-    source: at
-    isMandatory: false
-    searchClause: AND rh.receiptdate >= $fromDate
-  - name: toDate
-    label: toDate
-    type: epoch
-    source: at
-    isMandatory: false
-    searchClause: AND rh.receiptdate <= $toDate
-  - name: paymentMode
-    label: Payment Mode
-    type: singlevaluelist
-    pattern: 'list://Cash:Cash,Online:Online,Card:Card,DD:DD,Cheque:Cheque'
-    source: at
-    isMandatory: false
-    searchClause: AND instrumenttype = $paymentMode
-  - name: financialyear
-    label: Financial Year
-    type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=egf-master&masterName=FinancialYear|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].code|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].name
-    source: at
-    wrapper: true
-    isMandatory: false
-    searchClause: AND financialyear = $financialyear
-  - name: localityArray
-    label: zoneList
-    type: boundarylist
-    source: at
-    isMandatory: false
-    searchClause: AND pt_addr.locality IN ($localityArray)
-  query: |
+  - reportName: ReceiptRegisterSW_test
+    summary: Receipt Register Test
+    version: 1.0.0
+    moduleName: rainmaker-at
+    sourceColumns:
+    - name: receiptnumber
+      label: receiptNo
+      type: string
+      source: at
+      total: false
+    - name: transactiondate
+      label: receiptDate
+      type: string
+      source: at
+      total: false
+    - name: g8issuedate
+      label: g8issuedate
+      type: string
+      source: at
+      total: false
+    - name: g8receiptno
+      label: g8receiptno
+      type: string
+      source: at
+      total: false
+    searchParams:
+    - name: fromDate
+      label: fromDate
+      type: epoch
+      source: at
+      isMandatory: false
+      searchClause: AND rh.receiptdate >= $fromDate
+    - name: toDate
+      label: toDate
+      type: epoch
+      source: at
+      isMandatory: false
+      searchClause: AND rh.receiptdate <= $toDate
+    query: |
       -- Use CTE to force query plan, compute & use CTE later
       WITH receipt_breakup AS (
                   SELECT 
@@ -202,4 +86,4 @@ ReportDefinitions:
       JOIN eg_pt_propertydetail_v2 pt_detail ON CONCAT(pt_detail.property, ':', pt_detail.assessmentnumber) = rh.consumercode
       JOIN eg_pt_address_v2 pt_addr ON pt_detail.property = pt_addr.property
       WHERE rh.tenantid LIKE $tenantid and rh.status != 'Cancelled'
-  orderby: ORDER BY rh.receiptdate DESC
+    orderby: ORDER BY rh.receiptdate DESC
