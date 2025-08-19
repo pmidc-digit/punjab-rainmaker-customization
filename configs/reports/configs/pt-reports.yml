@@ -10130,6 +10130,12 @@ ReportDefinitions:
     source: pt
     isMandatory: true
     searchClause: AND bi.receiptdate >= $fromDate
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND bi.receiptdate <= $toDate    
   - name: tenantid
     label: tenantid
     type: singlevaluelist
@@ -10201,7 +10207,13 @@ ReportDefinitions:
     type: epoch
     source: pt
     isMandatory: true
-    searchClause: AND 1=1
+    searchClause: AND bi.receiptdate >= $fromDate
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND bi.receiptdate <= $toDate      
   - name: tenantid
     label: tenantid
     type: singlevaluelist
