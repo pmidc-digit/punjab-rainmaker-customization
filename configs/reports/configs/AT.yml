@@ -1,0 +1,139 @@
+---
+ReportDefinitions:
+- reportName: ReceiptRegisterSW
+  decryptionPathId: MiscReceiptULB_v2
+  summary: Receipt Register
+  version: 1.0.0
+  moduleName: rainmaker-at
+  additionalConfig:
+    print:
+      pdfPageSize: "A1"
+  sourceColumns:
+  - name: receiptno
+    label: reports.at.receiptno
+    type: string
+    source: at
+    total: false
+  - name: connectionno
+    label: reports..connectionno
+    type: string
+    source: at
+    total: false 
+  - name: receiptdate1
+    label: reports.at.receiptdate
+    type: string
+    source: at
+    total: false
+  - name: service
+    label: reports.at.serive
+    type: string
+    source: at
+    total: false
+  - name: collectorname
+    label: reports.at.collectorname
+    type: string
+    source: at
+    total: false
+  - name: transactiondate
+    label: reports.at.transactiondate
+    type: string
+    source: at
+    total: false
+  - name: instrumentnumber
+    label: reports.at.instrumentnumber
+    type: string
+    source: at
+    total: false    
+  - name: payername
+    label: reports.at.payername
+    type: string
+    source: at
+    total: false
+  - name: amountpaid
+    label: reports.at.amountpaid
+    type: string
+    source: at
+    total: true
+  - name: paymentmode
+    label: reports.at.paymentmode
+    type: string
+    source: at
+    total: false
+  - name: paymentstatus
+    label: reports.at.paymentstatus
+    type: string
+    source: at
+    total: false
+  - name: ownername1
+    label: reports.at.ownername1
+    type: string
+    source: at
+    total: false  
+  - name: user
+    label: user
+    type: string
+    source: at
+    total: false      
+  searchParams:
+  - name: fromDate
+    label: reports.at.fromDate
+    type: epoch
+    source: at
+    isMandatory: true
+    searchClause: AND pd.receiptdate >= $fromDate
+  - name: toDate
+    label: reports.at.toDate
+    type: epoch
+    source: at
+    isMandatory: true
+    searchClause: AND pd.receiptdate <= $toDate
+  - name: serviceType
+    label: serviceType
+    type: singlevaluelist
+    pattern: 'list://at%:Water,SW%:Sewerage'
+    source: at
+    isMandatory: true
+    searchClause: AND pd.businessservice like $serviceType
+  - name: receiptNumber
+    label: receiptNumber
+    type: string
+    source: at
+    isMandatory: false
+    searchClause: AND pd.receiptnumber like $receiptNumber
+  - name: paymentStatus
+    label: paymentStatus
+    type: singlevaluelist
+    pattern: 'list://NEW:NEW,DEPOSITED:DEPOSITED'
+    source: at
+    isMandatory: false
+    searchClause: AND payment.paymentstatus like $paymentStatus
+  - name: paymentMode
+    label: paymentMode
+    type: singlevaluelist
+    pattern: 'list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT'
+    source: at
+    isMandatory: false
+    searchClause: AND payment.paymentmode like $paymentMode
+  query: |
+    -- Use CTE to force query plan, compute & use CTE later
+    select
+      pd.receiptnumber AS receiptno,
+      bill.consumercode AS connectionno,     
+      TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate1,
+      bill.businessservice AS service,   
+      payment.paidby AS payername,
+      pd.amountpaid,
+      payment.paymentmode,
+      payment.paymentstatus,
+      payment.instrumentnumber,
+      to_char((To_timestamp(payment.instrumentdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') AS transactiondate, 
+      usr.name as collectorname,
+      payername as ownername1,
+      usr.id as user
+    from egcl_paymentdetail pd
+    inner join egcl_bill as bill on bill.id=pd.billid and pd.tenantid = $tenantid  
+    inner join egcl_payment as payment on payment.id=pd.paymentid    
+    left join eg_user as usr on usr.id=payment.createdby::integer 
+    where bill.tenantid = $tenantid and pd.businessservice in ('at','SW','at.ONE_TIME_FEE','SW.ONE_TIME_FEE') and bill.status='ACTIVE'
+    and payment.paymentstatus != 'CANCELLED'
+  orderby: order by pd.receiptdate desc
