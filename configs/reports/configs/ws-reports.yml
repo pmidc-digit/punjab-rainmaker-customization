@@ -4854,33 +4854,33 @@ ReportDefinitions:
       type: epoch
       source: ws
       isMandatory: true
-      searchClause: AND cte.fromperiod >= $fromDate
+      searchClause: AND fromperiod >= $fromDate
     - name: toDate
       label: To Date
       type: epoch
       source: ws
       isMandatory: true
-      searchClause: AND cte.toperiod <= $toDate       
+      searchClause: AND toperiod <= $toDate       
     - name: usagecategory
       label: Category
       type: singlevaluelist
       pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIOL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
       source: ws
       isMandatory: false
-      searchClause: AND cte.usagecategory = $usagecategory
+      searchClause: AND usagecategory = $usagecategory
     - name: connectiontype
       label: Connection Type
       type: singlevaluelist
       pattern: list://Non Metered:Non Metered,Metered:Metered
       source: ws
       isMandatory: false
-      searchClause: AND cte.connectiontype = $connectiontype
+      searchClause: AND connectiontype = $connectiontype
     - name: localityArray
       label: zoneList
       type: boundarylist
       source: ws
       isMandatory: false
-      searchClause: AND cte.localitycode IN ($localityArray)
+      searchClause: AND localitycode IN ($localityArray)
   query: |
       --------Water
       select consumercode as consumercode,payername as payername,localityname as localityname,
@@ -4987,33 +4987,33 @@ ReportDefinitions:
       type: epoch
       source: ws
       isMandatory: true
-      searchClause: AND cte.fromperiod >= $fromDate
+      searchClause: AND fromperiod >= $fromDate
     - name: toDate
       label: To Date
       type: epoch
       source: ws
       isMandatory: true
-      searchClause: AND cte.toperiod <= $toDate       
+      searchClause: AND toperiod <= $toDate       
     - name: usagecategory
       label: Category
       type: singlevaluelist
       pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIOL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
       source: ws
       isMandatory: false
-      searchClause: AND cte.usagecategory = $usagecategory
+      searchClause: AND usagecategory = $usagecategory
     - name: connectiontype
       label: Connection Type
       type: singlevaluelist
       pattern: list://Non Metered:Non Metered,Metered:Metered
       source: ws
       isMandatory: false
-      searchClause: AND cte.connectiontype = $connectiontype
+      searchClause: AND connectiontype = $connectiontype
     - name: localityArray
       label: zoneList
       type: boundarylist
       source: ws
       isMandatory: false
-      searchClause: AND cte.localitycode IN ($localityArray)
+      searchClause: AND localitycode IN ($localityArray)
   query: |
       --------Sewerage
       select consumercode as consumercode,payername as payername,localityname as localityname,
