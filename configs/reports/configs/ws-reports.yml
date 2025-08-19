@@ -5823,102 +5823,32 @@ ReportDefinitions:
       pdfPageSize: A1
   sourceColumns:
   - name: tenantid
-    label: reports.ws.tenantid
+    label: Tenantid
     type: string
     source: ws
     total: false
   - name: applicationno
-    label: reports.ws.applicationno
+    label: Application No
     type: string
     source: ws
     total: false
   - name: applicationstatus
-    label: reports.ws.applicationstatus
-    type: string
-    source: ws
-    total: false  
-  - name: connectionno
-    label: reports.ws.connectionno
+    label: Application Status
     type: string
     source: ws
     total: false
-  - name: ledgerid
-    label: reports.ws.ledgerid
+  - name: name
+    label: Name
     type: string
     source: ws
-    total: false
-  - name: group
-    label: reports.ws.group
-    type: string
-    source: ws
-    total: false
-  - name: usagecategory
-    label: reports.ws.usagecategory
-    type: string
-    source: ws
-    total: false
-  - name: connectioncategory
-    label: reports.ws.connectioncategory
-    type: string
-    source: ws
-    total: false
+    total: false     
   - name: createdon
-    label: reports.ws.createdon
-    type: string
-    source: ws
-    total: false
-  - name: executiondate
-    label: reports.ws.executiondate
-    type: string
-    source: ws
-    total: false
-  - name: paymentdate
-    label: reports.ws.paymentdate
-    type: string
-    source: ws
-    total: false
-  - name: assignedemployee
-    label: reports.ws.assignedemployee
-    type: string
-    source: ws
-    total: false
-  - name: assignedon
-    label: reports.ws.assignedon
+    label: Created On
     type: string
     source: ws
     total: false
   - name: dayspendency
-    label: reports.ws.dayspendency
-    type: string
-    source: ws
-    total: false
-  - name: assignedfordays
-    label: reports.ws.assignedfordays
-    type: string
-    source: ws
-    total: false
-  - name: plotsize
-    label: reports.ws.plotsize
-    type: string
-    source: ws
-    total: false
-  - name: oldpropertyid
-    label: reports.ws.oldpropertyid
-    type: string
-    source: ws
-    total: false
-  - name: address
-    label: reports.ws.address
-    type: string
-    source: ws
-    total: false
-  - name: localityname
-    label: reports.ws.locality
-    type: string
-    source: ws
-    total: false
-  - name: propertyusagetype
-    label: reports.ws.propertyusagetype
+    label: Dayspendency
     type: string
     source: ws
     total: false
@@ -5970,8 +5900,7 @@ ReportDefinitions:
       )
       AND ws.tenantid = $tenantid
   orderby: order by applicationno
-
-
+  
 - reportName: seweragePendingSlaReport
   summary:  Sewerage SLA Pendency Report
   version: 1.0.0
@@ -5981,102 +5910,32 @@ ReportDefinitions:
       pdfPageSize: A1
   sourceColumns:
   - name: tenantid
-    label: reports.ws.tenantid
+    label: Tenantid
     type: string
     source: ws
     total: false
   - name: applicationno
-    label: reports.ws.applicationno
+    label: Application No
     type: string
     source: ws
     total: false
   - name: applicationstatus
-    label: reports.ws.applicationstatus
-    type: string
-    source: ws
-    total: false  
-  - name: connectionno
-    label: reports.ws.connectionno
+    label: Application Status
     type: string
     source: ws
     total: false
-  - name: ledgerid
-    label: reports.ws.ledgerid
+  - name: name
+    label: Name
     type: string
     source: ws
-    total: false
-  - name: group
-    label: reports.ws.group
-    type: string
-    source: ws
-    total: false
-  - name: usagecategory
-    label: reports.ws.usagecategory
-    type: string
-    source: ws
-    total: false
-  - name: connectioncategory
-    label: reports.ws.connectioncategory
-    type: string
-    source: ws
-    total: false
+    total: false     
   - name: createdon
-    label: reports.ws.createdon
-    type: string
-    source: ws
-    total: false
-  - name: executiondate
-    label: reports.ws.executiondate
-    type: string
-    source: ws
-    total: false
-  - name: paymentdate
-    label: reports.ws.paymentdate
-    type: string
-    source: ws
-    total: false
-  - name: assignedemployee
-    label: reports.ws.assignedemployee
-    type: string
-    source: ws
-    total: false
-  - name: assignedon
-    label: reports.ws.assignedon
+    label: Created On
     type: string
     source: ws
     total: false
   - name: dayspendency
-    label: reports.ws.dayspendency
-    type: string
-    source: ws
-    total: false
-  - name: assignedfordays
-    label: reports.ws.assignedfordays
-    type: string
-    source: ws
-    total: false
-  - name: plotsize
-    label: reports.ws.plotsize
-    type: string
-    source: ws
-    total: false
-  - name: oldpropertyid
-    label: reports.ws.oldpropertyid
-    type: string
-    source: ws
-    total: false
-  - name: address
-    label: reports.ws.address
-    type: string
-    source: ws
-    total: false
-  - name: localityname
-    label: reports.ws.locality
-    type: string
-    source: ws
-    total: false
-  - name: propertyusagetype
-    label: reports.ws.propertyusagetype
+    label: Dayspendency
     type: string
     source: ws
     total: false
@@ -6092,7 +5951,7 @@ ReportDefinitions:
     type: epoch
     source: pt
     isMandatory: true
-    searchClause: AND ws.createdtime <= $toDate   
+    searchClause: AND ws.createdtime <= $toDate    
   query: |
     WITH latest_wf AS (
         SELECT *
