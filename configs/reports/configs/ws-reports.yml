@@ -6443,7 +6443,7 @@ ReportDefinitions:
         SELECT DISTINCT bill.consumercode
         FROM egbs_billdetail_v1 bill
         WHERE bill.businessservice = 'WS'
-          AND bill.fromperiod >= $fromperiod AND bill.toperiod <= $toperiod
+          AND bill.fromperiod >= $fromDate AND bill.toperiod <= $toDate
     ),
     cte AS (
         SELECT 
@@ -6619,7 +6619,7 @@ ReportDefinitions:
         SELECT DISTINCT bill.consumercode
         FROM egbs_billdetail_v1 bill
         WHERE bill.businessservice = 'SW'
-          AND bill.fromperiod >= $fromperiod AND bill.toperiod <= $toperiod
+          AND bill.fromperiod >= $fromDate AND bill.toperiod <= $toDate
     ),
     cte AS (
         SELECT 
