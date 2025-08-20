@@ -3165,9 +3165,12 @@ ReportDefinitions:
                bill.consumercode,
                b.status AS bill_status,b.payername,b.payeraddress,b.mobilenumber,
                ct.connectiontype,
+       	    bill.fromperiod,
+       	    bill.toperiod,
                ebm.zonename,
                ebm.blockname,
                ebm.localityname,
+       	    ebm.localitycode,
                pt.landarea,
                pt.propertyid
            FROM eg_ws_connection wc 
@@ -3202,17 +3205,20 @@ ReportDefinitions:
        SELECT  
            consumercode,
            STRING_AGG(DISTINCT payername, ', ') AS payername,
-        STRING_AGG(DISTINCT payeraddress, ', ') AS payeraddress,
-        STRING_AGG(DISTINCT mobilenumber, ', ') AS mobilenumber,
+       	STRING_AGG(DISTINCT payeraddress, ', ') AS payeraddress,
+       	STRING_AGG(DISTINCT mobilenumber, ', ') AS mobilenumber,
            STRING_AGG(DISTINCT usagecategory, ', ') AS usagecategories,
            STRING_AGG(DISTINCT bill_status, ', ') AS bill_statuses,
            STRING_AGG(DISTINCT connectiontype, ', ') AS connectiontypes,
            STRING_AGG(DISTINCT zonename, ', ') AS zonenames,
+       	STRING_AGG(DISTINCT localitycode, ', ') AS localitycode,
            STRING_AGG(DISTINCT blockname, ', ') AS blocknames,
            STRING_AGG(DISTINCT localityname, ', ') AS localitynames,
            MAX(landarea) AS landarea,
+       	MAX(fromperiod) AS fromperiod,
+       	MAX(toperiod) AS toperiod,
            STRING_AGG(DISTINCT propertyid, ', ') AS propertyids,
-        STRING_AGG(DISTINCT finyear, ', ') AS finyears
+       	STRING_AGG(DISTINCT finyear, ', ') AS finyears
        FROM cte
        WHERE bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
     groupby: GROUP BY consumercode
