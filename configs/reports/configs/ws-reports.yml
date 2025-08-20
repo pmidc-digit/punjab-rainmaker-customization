@@ -5526,10 +5526,9 @@ ReportDefinitions:
     source: ws
     wrapper: true
     isMandatory: false
-    searchClause: AND eu.id = $collectorname
+    searchClause: AND eu.id::text = $collectorname
   query: |
     SELECT 
-        eu.id,
         eu.name AS collectorname,
         eu.type AS collectortype,
         COUNT(*) AS total_count,
@@ -5555,7 +5554,7 @@ ReportDefinitions:
       AND eu.type IN ('EMPLOYEE','CITIZEN','SYSTEM') 
       AND pd.businessservice IN ('WS', 'WS.ONE_TIME_FEE') 
       AND payment.paymentstatus != 'CANCELLED'
-  groupby: GROUP BY eu.name,eu.type,eu.id
+  groupby: GROUP BY eu.name,eu.type
   orderby: ORDER BY eu.name 
      
 - reportName: SWUserwise_Collection_Summary
@@ -5639,10 +5638,9 @@ ReportDefinitions:
     source: ws
     wrapper: true
     isMandatory: false
-    searchClause: AND eu.id = $collectorname
+    searchClause: AND eu.id::text = $collectorname
   query: |
     SELECT 
-        eu.id,
         eu.name AS collectorname,
         eu.type AS collectortype,
         COUNT(*) AS total_count,
@@ -5668,7 +5666,7 @@ ReportDefinitions:
       AND eu.type IN ('EMPLOYEE','CITIZEN','SYSTEM') 
       AND pd.businessservice IN ('SW', 'SW.ONE_TIME_FEE') 
       AND payment.paymentstatus != 'CANCELLED'
-  groupby: GROUP BY eu.name,eu.type,eu.id
+  groupby: GROUP BY eu.name,eu.type
   orderby: ORDER BY eu.name 
   
 - reportName: WSSWCancelledReceiptRegister_V2
