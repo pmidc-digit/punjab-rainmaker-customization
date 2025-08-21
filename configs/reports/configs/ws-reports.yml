@@ -5875,8 +5875,8 @@ ReportDefinitions:
         ws.applicationno,
         ws.applicationstatus,
         usr.name,
-        TO_CHAR(TO_TIMESTAMP(ws.createdtime / 1000), 'DD-MM-YYYY') AS createdon,
-        FLOOR((EXTRACT(EPOCH FROM NOW()) - ws.createdtime / 1000) / 86400) AS dayspendency
+        TO_CHAR(TO_TIMESTAMP(wf.createdtime / 1000), 'DD-MM-YYYY') AS createdon,
+        FLOOR((EXTRACT(EPOCH FROM NOW()) - wf.createdtime / 1000) / 86400) AS dayspendency
     FROM eg_ws_connection ws
     JOIN latest_wf wf
         ON ws.applicationno = wf.businessid
@@ -5963,8 +5963,8 @@ ReportDefinitions:
         ws.applicationno,
         ws.applicationstatus,
         usr.name,
-        TO_CHAR(TO_TIMESTAMP(ws.createdtime / 1000), 'DD-MM-YYYY') AS createdon,
-        FLOOR((EXTRACT(EPOCH FROM NOW()) - ws.createdtime / 1000) / 86400) AS dayspendency
+        TO_CHAR(TO_TIMESTAMP(wf.createdtime / 1000), 'DD-MM-YYYY') AS createdon,
+        FLOOR((EXTRACT(EPOCH FROM NOW()) - wf.createdtime / 1000) / 86400) AS dayspendency
     FROM eg_sw_connection ws
     JOIN latest_wf wf
         ON ws.applicationno = wf.businessid
