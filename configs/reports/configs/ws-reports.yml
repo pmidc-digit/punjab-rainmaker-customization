@@ -6454,6 +6454,8 @@ ReportDefinitions:
             bill.consumercode,
             b.status AS bill_status,b.payername,b.payeraddress,b.mobilenumber,
             ct.connectiontype,
+            bill.fromperiod,
+       	    bill.toperiod,
             ebm.zonename,
             ebm.blockname,
             ebm.localityname,
@@ -6502,6 +6504,8 @@ ReportDefinitions:
         STRING_AGG(DISTINCT localityname, ', ') AS localitynames,
         STRING_AGG(DISTINCT localitycode, ', ') AS localitycode,
         MAX(landarea) AS landarea,
+        MAX(fromperiod) AS fromperiod,
+       	MAX(toperiod) AS toperiod,
         STRING_AGG(DISTINCT propertyid, ', ') AS propertyids,
      STRING_AGG(DISTINCT finyear, ', ') AS finyears
     FROM cte
@@ -6632,6 +6636,8 @@ ReportDefinitions:
             bill.consumercode,
             b.status AS bill_status,b.payername,b.payeraddress,b.mobilenumber,
             ct.connectiontype,
+            bill.fromperiod,
+       	    bill.toperiod, 
             ebm.zonename,
             ebm.blockname,
             ebm.localityname,
@@ -6680,6 +6686,8 @@ ReportDefinitions:
         STRING_AGG(DISTINCT localityname, ', ') AS localitynames,
         STRING_AGG(DISTINCT localitycode, ', ') AS localitycode,
         MAX(landarea) AS landarea,
+        MAX(fromperiod) AS fromperiod,
+       	MAX(toperiod) AS toperiod,
         STRING_AGG(DISTINCT propertyid, ', ') AS propertyids,
      STRING_AGG(DISTINCT finyear, ', ') AS finyears
     FROM cte
