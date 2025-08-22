@@ -6443,8 +6443,9 @@ ReportDefinitions:
         SELECT DISTINCT bill.consumercode
         FROM egbs_billdetail_v1 bill
         WHERE bill.businessservice = 'WS'
-          AND bill.fromperiod >= $fromDate AND bill.toperiod <= $toDate
-    ),
+        AND to_char(to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD') = to_char(to_timestamp($fromDate/ 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')
+        AND to_char(to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD') = to_char(to_timestamp($toDate/ 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')
+           ),
     cte AS (
         SELECT 
             to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
@@ -6625,8 +6626,9 @@ ReportDefinitions:
         SELECT DISTINCT bill.consumercode
         FROM egbs_billdetail_v1 bill
         WHERE bill.businessservice = 'SW'
-          AND bill.fromperiod >= $fromDate AND bill.toperiod <= $toDate
-    ),
+        AND to_char(to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD') = to_char(to_timestamp($fromDate/ 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')
+        AND to_char(to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD') = to_char(to_timestamp($toDate/ 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')
+           ),
     cte AS (
         SELECT 
             to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
