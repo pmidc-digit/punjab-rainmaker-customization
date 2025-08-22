@@ -3122,13 +3122,13 @@ ReportDefinitions:
         type: epoch
         source: ws
         isMandatory: true
-        searchClause: AND 1=1
+        searchClause: AND cte.fromperiod >= $fromDate
       - name: toDate
         label: To Date
         type: epoch
         source: ws
         isMandatory: true
-        searchClause: AND 1=1     
+        searchClause: AND cte.toperiod <= $toDate    
       - name: usagecategory
         label: Category
         type: singlevaluelist
