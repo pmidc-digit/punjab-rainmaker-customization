@@ -3154,7 +3154,8 @@ ReportDefinitions:
            SELECT DISTINCT bill.consumercode
            FROM egbs_billdetail_v1 bill
            WHERE bill.businessservice = 'WS'
-             AND bill.fromperiod >= $fromDate AND bill.toperiod <= $toDate
+          AND to_char(to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD') = to_char(to_timestamp($fromDate/ 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')
+         AND to_char(to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD') = to_char(to_timestamp($toDate/ 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')
        ),
        cte AS (
            SELECT 
@@ -3223,6 +3224,7 @@ ReportDefinitions:
        WHERE bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
     groupby: GROUP BY consumercode
     orderby: ORDER BY consumercode 
+    
   - reportName: Zone_wise_Collection_Summary
     summary: Zone Wise Collection Summary
     version: 1.0.0
