@@ -558,6 +558,18 @@
                 }
               },
               {
+                "variable": "OTS_PENALTY_WAVEOFF",
+                "value": {
+                  "path": "$.billDetails[(@.length-1)].billAccountDetails[?(@.taxHeadCode == 'OTS_PENALTY_WAVEOFF')].amount"
+                }
+              },
+              {
+                "variable": "OTS_INTEREST_WAVEOFF",
+                "value": {
+                  "path": "$.billDetails[(@.length-1)].billAccountDetails[?(@.taxHeadCode == 'OTS_INTEREST_WAVEOFF')].amount"
+                }
+              },
+              {
                 "variable": "pt_arrearrs",
                 "value": {
                   "path": "$.billDetails[(@.length-1)].amount"
@@ -796,6 +808,14 @@
               {
                 "variable": "roundoff",
                 "formula": "{{pt_roundoff}}"
+              },
+              {
+                "variable": "OTS_INTEREST_WAVEOFF",
+                "formula": "{{OTS_INTEREST_WAVEOFF}}"
+              },
+              {
+                "variable": "OTS_PENALTY_WAVEOFF",
+                "formula": "{{OTS_PENALTY_WAVEOFF}}"
               },
               {
                 "variable": "arrearrs",
