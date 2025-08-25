@@ -89,7 +89,7 @@ ReportDefinitions:
         searchClause: AND a.lastmodifiedtime <= $toDate
       - name: tenantid
         label: reports.ndc.tenantid
-        type: epoch
+        type: string
         source: ndc
         isMandatory: false
         searchClause: AND a.tenantid = $tenantid
@@ -177,13 +177,13 @@ ReportDefinitions:
     searchParams:
       - name: tenantid
         label: reports.ndc.tenantid
-        type: epoch
+        type: string
         source: ndc
         isMandatory: false
         searchClause: AND payment.tenantid = $tenantid
       - name: businessservice
         label: reports.ndc.businessservice
-        type: epoch
+        type: string
         source: ndc
         isMandatory: true
         searchClause: AND pd.businessservice = $businessservice
