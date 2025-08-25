@@ -1,0 +1,23 @@
+serviceMaps:
+  serviceName: ws-calculator
+  mappings:
+    - version: 1.0
+      name: ws-calculator
+      description: Persists WS demand generation errors
+      fromTopic: ws-dead-letter-error-topic
+      isTransaction: true
+      queryMaps:
+        - query: |
+            INSERT INTO eg_ws_demand_generation_error
+              (connectionNo, tenantId, toDate, fromDate, assessmentYear, propertyId, errorMessage)
+            VALUES (?, ?, ?, ?, ?, ?, ?);
+          basePath: $
+          jsonMaps:
+            - jsonPath: $.connectionNo
+            - jsonPath: $.tenantId
+            - jsonPath: $.toDate
+            - jsonPath: $.fromDate
+            - jsonPath: $.assessmentYear
+            - jsonPath: $.propertyId
+            - jsonPath: $.errorMessage
+
