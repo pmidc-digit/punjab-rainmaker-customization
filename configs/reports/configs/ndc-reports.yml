@@ -10,82 +10,84 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
       - name: name
-        label: reports.ndc.name
+        label: name
         type: string
         source: ndc
         total: false
       - name: mobilenumber
-        label: reports.ndc.mobilenumber
+        label: mobilenumber
         type: string
         source: ndc
         total: false
       - name: emailid
-        label: reports.ndc.emailid
+        label: emailid
         type: string
         source: ndc
         total: false
       - name: tenantid
-        label: reports.ndc.tenantid
+        label: tenantid
         type: string
         source: ndc
         total: false
       - name: address
-        label: reports.ndc.address
+        label: address
         type: string
         source: ndc
         total: false
       - name: action
-        label: reports.ndc.action
+        label: action
         type: string
         source: ndc
         total: false
       - name: consumercode
-        label: reports.ndc.consumercode
+        label: consumercode
         type: string
         source: ndc
         total: false
       - name: applicationstatus
-        label: reports.ndc.applicationstatus
+        label: applicationstatus
         type: string
         source: ndc
         total: false
       - name: businessservice
-        label: reports.ndc.businessservice
+        label: businessservice
         type: string
         source: ndc
         total: false
       - name: dueamount
-        label: reports.ndc.dueamount
+        label: dueamount
         type: string
         source: ndc
         total: true
       - name: applicationid
-        label: reports.ndc.applicationid
+        label: applicationid
         type: string
         source: ndc
         total: false
       - name: status
-        label: reports.ndc.status
+        label: status
         type: string
         source: ndc
         total: false
     searchParams:
       - name: fromDate
-        label: reports.ndc.fromDate
+        label: fromDate
         type: epoch
         source: ndc
         isMandatory: true
         searchClause: AND a.createdtime >= $fromDate
       - name: toDate
-        label: reports.ndc.toDate
+        label: toDate
         type: epoch
         source: ndc
         isMandatory: true
         searchClause: AND a.createdtime <= $toDate
       - name: tenantid
-        label: reports.ndc.tenantid
-        type: string
+        label: tenantid
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: ndc
+        wrapper: true
         isMandatory: false
         searchClause: AND a.tenantid = $tenantid
     query: >
