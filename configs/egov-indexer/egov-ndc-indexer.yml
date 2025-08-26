@@ -7,12 +7,12 @@ ServiceMaps:
       indexes:
         - name: ndc-application-index
           type: general
-          id: $.Applications.*.uuid, $.Application.*.tenantId
+          id: $.uuid
           isBulk: true
-          timeStampField: $.Applications.*.auditDetails.createdTime
-          jsonPath: $
+          timeStampField: $.auditDetails.createdTime
+          jsonPath: $.Applications.*
           customJsonMapping:
-            indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","owners":[]
+            indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","owners":[],
                                    "applicationStatus":"applicationStatus","active":"active",
                                    "createdby":"createdby","lastmodifiedby":"lastmodifiedby","createdtime":"createdtime",
                                    "lastmodifiedtime":"lastmodifiedtime","action":"action","details":[],"documents:[]","reason":"reason"}}
@@ -49,10 +49,10 @@ ServiceMaps:
       indexes:
         - name: ndc-application-update-index
           type: general
-          id: $.Applications.*.uuid, $.Applications.*.tenantId
+          id: $.uuid, $.tenantId
           isBulk: true
-          timeStampField: $.Applications.*.auditDetails.lastModifiedTime
-          jsonPath: $
+          timeStampField: $.auditDetails.lastModifiedTime
+          jsonPath: $.Applications.*
           customJsonMapping:
             indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","owners":[],
                                    "applicationStatus":"applicationStatus","active":"active",
@@ -93,7 +93,7 @@ ServiceMaps:
           type: general
           id: $.uuid, $.tenantId
           isBulk: false
-          timeStampField: $.lastmodifiedtime
+          timeStampField: $.auditDetails.lastModifiedTime
           jsonPath: $
           customJsonMapping:
             indexMapping: {"Data":{"uuid":"uuid","active":"active","lastmodifiedby":
@@ -103,7 +103,7 @@ ServiceMaps:
                 outJsonPath: $.Data.uuid
               - inJsonPath: $.active
                 outJsonPath: $.Data.active
-              - inJsonPath: $.lastmodifiedby
+              - inJsonPath: $.auditDetails.lastModifiedBy
                 outJsonPath: $.Data.lastmodifiedby
-              - inJsonPath: $.lastmodifiedtime
+              - inJsonPath: $.auditDetails.lastModifiedTime
                 outJsonPath: $.Data.lastmodifiedtime
