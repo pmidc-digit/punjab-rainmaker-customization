@@ -91,14 +91,14 @@ ReportDefinitions:
     query: >
       -- Use CTE to force query plan, compute & use CTE later
       SELECT 
-        u.name, u.mobilenumber, u.emailid ,ua.address,a.tenantid,
+        eg_user.name, eg_user.mobilenumber, eg_user.emailid ,ua.address,a.tenantid,
         a.action, d.consumercode, a.applicationstatus, d.businessservice, 
         d.applicationid, d.dueamount, d.status
-       FROM eg_user AS u
+       FROM eg_user 
        JOIN eg_ndc_owner AS o ON u.uuid = o.uuid
        JOIN eg_ndc_details AS d ON o.ndcapplicationuuid = d.applicationid
        JOIN eg_ndc_application AS a ON a.uuid = o.ndcapplicationuuid
-       LEFT JOIN eg_user_address AS ua ON ua.userid = u.id
+       LEFT JOIN eg_user_address AS ua ON ua.userid = eg_user.id
        WHERE a.tenantid = $tenantid
   - reportName: CollectionsReport
     summary: Collections
