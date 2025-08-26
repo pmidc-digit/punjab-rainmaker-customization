@@ -3368,9 +3368,137 @@ ReportDefinitions:
        FROM cte
        WHERE bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
     groupby: GROUP BY consumercode
-    orderby: ORDER BY consumercode 
+    orderby: ORDER BY consumercode
+  - reportName: DeadMeterReport   
+    summary: Dead/Dameged Meter Report   
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig: null
+    print:
+      pdfPageSize: A1
+    sourceColumns:
+      - name: connectionno
+        label: ConnectionNo
+        type: string
+        source: ws
+        total: false
+        
+      - name: billingperiod
+        label: Billing Period
+        type: string
+        source: ws
+        total: false
     
-
-      
-      
-      
+      - name: propertyid
+        label: Property Id
+        type: string
+        source: pt
+        total: false
+    
+      - name: currentReading
+        label: Current Reading
+        type: string
+        source: ws
+        total: false
+    
+      - name: lastReading
+        label: Last Reading
+        type: string
+        source: ws
+        total: false
+    
+      - name: meterstatus
+        label: Meter status
+        type: string
+        source: ws
+        total: false
+    
+      - name: address
+        label: Address
+        type: string
+        source: pt
+        total: false
+    
+      - name: blockname
+        label: Block Name
+        type: string
+        source: pt
+        total: false
+    
+      - name: zonename
+        label: Zone Name
+        type: string
+        source: pt
+        total: false
+    
+      - name: zonecode
+        label: Zone code
+        type: string
+        source: pt
+        total: false
+    
+      - name: propertyusagetype
+        label: Property Usagetype
+        type: string
+        source: pt
+        total: false
+    
+      - name: propertytype
+        label: Property Type
+        type: string
+        source: pt
+        total: false
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND cte.fromperiod >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND cte.toperiod <= $toDate       
+      - name: usagecategory
+        label: Category
+        type: singlevaluelist
+        pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+        source: ws
+        isMandatory: false
+        searchClause: AND pt.propertyusagetyp = $usagecategory
+      - name: localityArray
+        label: zoneList
+        type: boundarylist
+        source: ws
+        isMandatory: false
+        searchClause: AND pt.zonecode IN ($localityArray)
+    query: |
+       SELECT
+       conn.connectionno,
+       MAX(mt.billingperiod) AS billingperiod,
+       MAX(pt.propertyid) AS propertyid,
+       MAX(mt.currentreading) AS currentReading,
+       MAX(mt.lastreading) AS lastReading,
+       MAX(mt.meterstatus) AS meterstatus,
+       MAX(pt.address) AS address,
+       MAX(pt.blockname) AS blockname,
+       MAX(pt.zonename) AS zonename,
+       MAX(pt.zonecode) AS zonecode,
+       MAX(pt.propertyusagetype) AS propertyusagetype,
+       MAX(pt.propertytype) AS propertytype FROM eg_ws_meterreading AS mt
+       INNER JOIN
+       eg_ws_connection AS conn ON mt.connectionno = conn.connectionno
+       INNER JOIN
+       report_properties AS pt ON pt.propertyid = conn.property_id
+       WHERE
+       conn.tenantid = $tenantid and mt.meterstatus in ('Locked','Breakdown')
+       # and mt.billingperiod ='31/03/2025 - 30/06/2025'
+       AND
+       mt.currentreadingdate = (
+       SELECT MAX(currentreadingdate)
+       FROM eg_ws_meterreading
+       WHERE connectionno = mt.connectionno
+       )
+    groupby: GROUP BY conn.connectionno          
