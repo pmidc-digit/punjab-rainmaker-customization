@@ -96,7 +96,7 @@ ReportDefinitions:
         eg_user.name, eg_user.mobilenumber, eg_user.emailid ,ua.address,a.tenantid,
         a.action, d.consumercode, a.applicationstatus, d.businessservice, 
         d.applicationid, d.dueamount, d.status
-       FROM  eg_user  
+      FROM  eg_user  
        JOIN eg_ndc_owner AS o ON u.uuid = o.uuid
        JOIN eg_ndc_details AS d ON o.ndcapplicationuuid = d.applicationid
        JOIN eg_ndc_application AS a ON a.uuid = o.ndcapplicationuuid
@@ -115,8 +115,8 @@ ReportDefinitions:
         type: string
         source: ndc
         total: false
-      - name: paymentmode
-        label: paymentmode
+      - name: payment_mode
+        label: payment_mode
         type: string
         source: ndc
         total: false
@@ -160,35 +160,35 @@ ReportDefinitions:
     query: >
       -- Use CTE to force query plan, compute & use CTE later
       WITH unique_transactions AS (
-      SELECT
-       p.id AS transaction_id, p.createdtime,p.totalamountpaid,
-        CASE
-        WHEN p.paymentmode IN ('POSTAL_ORDER','POTAL_ORDER') THEN 'POSTAL_ORDER'
-        WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN 'OFFLINE_RTGS'
-        WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN 'OFFLINE_NEFT'
-        WHEN p.paymentmode IN ('CASH','OFFLINE_CASH') THEN 'CASH'
-        WHEN p.paymentmode IN ('CARD','DEBIT_CARD','CREDIT_CARD','OFFLINE_CARD') THEN 'CARD'
-        WHEN p.paymentmode IN ('ONLINE') THEN 'ONLINE'
-        ELSE p.paymentmode
-        END AS mode_norm,
-        emp.code AS collector_code, pd.businessservice, p.tenantid
-      FROM egcl_paymentdetail pd
-      JOIN egcl_payment p ON pd.paymentid = p.id
-      JOIN egcl_bill bill ON bill.id = pd.billid
-      JOIN eg_ndc_details ndc ON ndc.consumercode = bill.consumercode
-      LEFT JOIN eg_user u ON u.id::text = p.createdby::text
+       SELECT
+         p.id AS transaction_id, p.createdtime,p.totalamountpaid,
+         CASE
+         WHEN p.paymentmode IN ('POSTAL_ORDER','POTAL_ORDER') THEN 'POSTAL_ORDER'
+         WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN 'OFFLINE_RTGS'
+         WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN 'OFFLINE_NEFT'
+         WHEN p.paymentmode IN ('CASH','OFFLINE_CASH') THEN 'CASH'
+         WHEN p.paymentmode IN ('CARD','DEBIT_CARD','CREDIT_CARD','OFFLINE_CARD') THEN 'CARD'
+         WHEN p.paymentmode IN ('ONLINE') THEN 'ONLINE'
+         ELSE p.paymentmode
+         END AS mode_norm,
+         emp.code AS collector_code, pd.businessservice, p.tenantid
+       FROM egcl_paymentdetail pd
+       JOIN egcl_payment p ON pd.paymentid = p.id
+       JOIN egcl_bill bill ON bill.id = pd.billid
+       JOIN eg_ndc_details ndc ON ndc.consumercode = bill.consumercode
+       LEFT JOIN eg_user u ON u.id::text = p.createdby::text
        LEFT JOIN eg_hrms_employee emp  ON emp.uuid::text = u.uuid::text
-      WHERE p.paymentstatus != 'CANCELLED'
-      AND p.tenantid =$tenantid
-      AND p.createdtime BETWEEN $fromdate AND $todate
+       WHERE p.paymentstatus != 'CANCELLED'
+       AND p.tenantid =$tenantid
+       AND p.createdtime BETWEEN $fromdate AND $todate
        )
-      SELECT
-      COALESCE(collector_code, 'SELF') AS collector_code,  
-      mode_norm AS payment_mode,
-      SUM(totalamountpaid) AS total_amount,
-      COUNT(transaction_id) AS total_count
-      FROM unique_transactions
-      WHERE collector_code = $collector_code
-      -- AND businessservice = 'WS'
+       SELECT
+       COALESCE(collector_code, 'SELF') AS collector_code,  
+       mode_norm AS payment_mode,
+       SUM(totalamountpaid) AS total_amount,
+       COUNT(transaction_id) AS total_count
+       FROM unique_transactions
+       WHERE collector_code = $collector_code
+       -- AND businessservice = 'WS'
     groupby: GROUP BY collector_code, mode_norm
     orderby: ORDER BY collector_code, total_amount DESC
