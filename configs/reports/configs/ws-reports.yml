@@ -3495,7 +3495,7 @@ ReportDefinitions:
        report_properties AS pt ON pt.propertyid = conn.property_id
        WHERE
        conn.tenantid = $tenantid and mt.meterstatus in ('Locked','Breakdown')
-       # and mt.billingperiod ='31/03/2025 - 30/06/2025'
+       --- and mt.billingperiod ='31/03/2025 - 30/06/2025
        AND
        mt.currentreadingdate = (
        SELECT MAX(currentreadingdate)
