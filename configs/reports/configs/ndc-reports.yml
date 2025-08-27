@@ -110,100 +110,85 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: month
-        label: reports.ndc.month
+      - name: collector_code
+        label: collector_code
         type: string
         source: ndc
         total: false
-      - name: totalamount
-        label: reports.pt.totalamount
+      - name: paymentmode
+        label: paymentmode
         type: string
         source: ndc
         total: false
-      - name: totalcount
-        label: reports.ndc.totalcount
+      - name: total_amount
+        label: total_amount
+        type: string
+        source: ndc
+        total: true
+      - name: total_count
+        label: total_count
         type: string
         source: ndc
         total: false
-      - name: online
-        label: reports.ndc.online
-        type: string
-        source: ndc
-        total: true
-      - name: cash
-        label: reports.ndc.cash
-        type: string
-        source: ndc
-        total: true
-      - name: cheque
-        label: reports.ndc.cheque
-        type: string
-        source: ndc
-        total: true
-      - name: dd
-        label: reports.ndc.dd
-        type: string
-        source: ndc
-        total: true
-      - name: card
-        label: reports.ndc.card
-        type: string
-        source: ndc
-        total: true
-      - name: neft
-        label: reports.ndc.neft
-        type: string
-        source: ndc
-        total: true
-      - name: rtgs
-        label: reports.ndc.rtgs
-        type: string
-        source: ndc
-        total: true
-      - name: po
-        label: reports.ndc.po
-        type: string
-        source: ndc
-        total: true
     searchParams:
       - name: tenantid
-        label: reports.ndc.tenantid
+        label: tenantid
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: ndc
+        wrapper: true
+        isMandatory: true
+        searchClause: AND tenantid = $tenantid
+      - name: collector_code
+        label: collector_code
         type: string
         source: ndc
         isMandatory: false
-        searchClause: AND payment.tenantid = $tenantid
-      - name: businessservice
-        label: reports.ndc.businessservice
-        type: string
+        searchClause: AND collector_code = $collector_code
+      - name: fromdate
+        label: fromdate
+        type: epoch
         source: ndc
         isMandatory: true
-        searchClause: AND pd.businessservice = $businessservice
+        searchClause: AND createdtime BETWEEN $fromdate
+      - name: todate
+        label: todate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND $todate
     query: >
       -- Use CTE to force query plan, compute & use CTE later
-
-      SELECT 
-      DATE_TRUNC('month', TO_TIMESTAMP(payment.createdtime / 1000) AT TIME ZONE 'Asia/Kolkata') AS month,
-      SUM(payment.totalamountpaid) AS totalamount,
-      COUNT(payment.totalamountpaid) AS totalcount,
-      SUM(CASE WHEN payment.paymentmode = 'ONLINE' THEN payment.totalamountpaid ELSE 0 END) AS online,
-      SUM(CASE WHEN payment.paymentmode = 'CASH' THEN payment.totalamountpaid ELSE 0 END) AS cash,
-      SUM(CASE WHEN payment.paymentmode = 'CHEQUE' THEN payment.totalamountpaid ELSE 0 END) AS cheque,
-      SUM(CASE WHEN payment.paymentmode = 'DD' THEN payment.totalamountpaid ELSE 0 END) AS dd,
-      SUM(CASE WHEN payment.paymentmode = 'CARD' THEN payment.totalamountpaid ELSE 0 END) AS card,
-      SUM(CASE WHEN payment.paymentmode = 'OFFLINE_RTGS' THEN payment.totalamountpaid ELSE 0 END) AS rtgs,
-      SUM(CASE WHEN payment.paymentmode = 'OFFLINE_NEFT' THEN payment.totalamountpaid ELSE 0 END) AS neft,
-      SUM(CASE WHEN payment.paymentmode = 'POTAL_ORDER' THEN payment.totalamountpaid ELSE 0 END) AS po
-      FROM 
-      egcl_paymentdetail pd
-      JOIN 
-      egcl_payment payment ON pd.paymentid = payment.id
-      JOIN 
-      egcl_bill bill ON bill.id = pd.billid
-      JOIN 
-      eg_ndc_details ndc ON ndc.consumercode = bill.consumercode
-      WHERE 
-      payment.paymentstatus != 'CANCELLED'
-      AND payment.tenantid = $tenantid  
-      AND pd.businessservice = $businessservice       
-    groupby: DATE_TRUNC('month', TO_TIMESTAMP(payment.createdtime / 1000) AT TIME ZONE 'Asia/Kolkata')
-    orderby: ORDER BY month
+      WITH unique_transactions AS (
+      SELECT
+       p.id AS transaction_id, p.createdtime,p.totalamountpaid,
+        CASE
+        WHEN p.paymentmode IN ('POSTAL_ORDER','POTAL_ORDER') THEN 'POSTAL_ORDER'
+        WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN 'OFFLINE_RTGS'
+        WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN 'OFFLINE_NEFT'
+        WHEN p.paymentmode IN ('CASH','OFFLINE_CASH') THEN 'CASH'
+        WHEN p.paymentmode IN ('CARD','DEBIT_CARD','CREDIT_CARD','OFFLINE_CARD') THEN 'CARD'
+        WHEN p.paymentmode IN ('ONLINE') THEN 'ONLINE'
+        ELSE p.paymentmode
+        END AS mode_norm,
+        emp.code AS collector_code, pd.businessservice, p.tenantid
+      FROM egcl_paymentdetail pd
+      JOIN egcl_payment p ON pd.paymentid = p.id
+      JOIN egcl_bill bill ON bill.id = pd.billid
+      JOIN eg_ndc_details ndc ON ndc.consumercode = bill.consumercode
+      LEFT JOIN eg_user u ON u.id::text = p.createdby::text
+       LEFT JOIN eg_hrms_employee emp  ON emp.uuid::text = u.uuid::text
+      WHERE p.paymentstatus != 'CANCELLED'
+      AND p.tenantid =$tenantid
+      AND p.createdtime BETWEEN $fromdate AND $todate
+       )
+      SELECT
+      COALESCE(collector_code, 'SELF') AS collector_code,  
+      mode_norm AS payment_mode,
+      SUM(totalamountpaid) AS total_amount,
+      COUNT(transaction_id) AS total_count
+      FROM unique_transactions
+      WHERE collector_code = $collector_code
+      -- AND businessservice = 'WS'
+    groupby: GROUP BY collector_code, mode_norm
+    orderby: ORDER BY collector_code, total_amount DESC
