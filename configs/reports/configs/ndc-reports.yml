@@ -180,7 +180,8 @@ ReportDefinitions:
        LEFT JOIN eg_hrms_employee emp  ON emp.uuid::text = u.uuid::text
        WHERE p.paymentstatus != 'CANCELLED'
        AND p.tenantid =$tenantid
-       AND p.createdtime BETWEEN $fromdate AND $todate )
+       AND p.createdtime BETWEEN $fromdate AND $todate 
+       )
        SELECT
        COALESCE(collector_code, 'SELF') AS collector_code,  
        mode_norm AS payment_mode,
