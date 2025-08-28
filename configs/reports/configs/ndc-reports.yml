@@ -271,25 +271,24 @@ ReportDefinitions:
            uuid, MAX(CASE WHEN upper(applicationstatus) = 'DOCUMENTVERIFY' THEN createdtime ELSE NULL END) AS docverify_time,
            MAX(CASE WHEN upper(applicationstatus) IN ('APPROVED','REJECTED') THEN lastmodifiedtime ELSE NULL END) AS final_time
          FROM wf_detailed
-         GROUP BY uuid
-          ),
+         GROUP BY uuid),
       sla_data AS (
-      SELECT
+       SELECT
         bs.businessservice,
         bs.businessservicesla
-      FROM eg_wf_businessservice_v2 bs
-      WHERE bs.businessservice = 'ndc-services'
+       FROM eg_wf_businessservice_v2 bs
+       WHERE bs.businessservice = 'ndc-services'
        )
-      SELECT 
-       ndc.tenantid,ndc.uuid,ndc.applicationstatus,
-       TO_CHAR( TO_TIMESTAMP(st.docverify_time / 1000), 'DD-MM-YYYY') AS documentverify_on,
-       TO_CHAR( TO_TIMESTAMP(st.final_time / 1000), 'DD-MM-YYYY') AS finalstatus_on,
-       FLOOR( (st.final_time - st.docverify_time) / 86400000 ) AS sla_days,
-       CASE 
+       SELECT 
+        ndc.tenantid,ndc.uuid,ndc.applicationstatus,
+        TO_CHAR( TO_TIMESTAMP(st.docverify_time / 1000), 'DD-MM-YYYY') AS documentverify_on,
+        TO_CHAR( TO_TIMESTAMP(st.final_time / 1000), 'DD-MM-YYYY') AS finalstatus_on,
+        FLOOR( (st.final_time - st.docverify_time) / 86400000 ) AS sla_days,
+        CASE 
          WHEN (st.final_time - st.docverify_time) > sla.businessservicesla THEN 'BREACHED'
         ELSE 'MEET'
         END AS sla_status
-      FROM eg_ndc_application ndc
+       FROM eg_ndc_application ndc
        JOIN status_times st
         ON ndc.uuid = st.uuid
        JOIN sla_data sla
