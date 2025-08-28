@@ -192,3 +192,108 @@ ReportDefinitions:
        -- AND businessservice = 'WS'
     groupby: GROUP BY collector_code, mode_norm
     orderby: ORDER BY collector_code, total_amount DESC
+  - reportName: SLAReport
+    summary: Sla report for ndc service
+    version: 1.0.0
+    moduleName: rainmaker-ndc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: ndc
+        total: false
+      - name: Applicationnumber
+        label: Applicationnumber
+        type: string
+        source: ndc
+        total: false
+      - name: Applicationstatus
+        label: Applicationstatus
+        type: string
+        source: ndc
+        total: false
+      - name: document_verified_on
+        label: document_verified_on
+        type: string
+        source: ndc
+        total: false
+      - name: final status verified on
+        label: final status verified on
+        type: string
+        source: ndc
+        total: false
+      - name: sla days
+        label: sla days
+        type: string
+        source: ndc
+        total: false
+      - name: sla status
+        label: sla status
+        type: string
+        source: ndc
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ndc
+        isMandatory: false
+        searchClause: AND a.createdtime >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ndc
+        isMandatory: false
+        searchClause: AND a.createdtime <= $toDate
+      - name: tenantid
+        label: tenantid
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: ndc
+        wrapper: true
+        isMandatory: true
+        searchClause: AND ndc.tenantid = $tenantid
+    query: >
+      -- Use CTE to force query plan, compute & use CTE later
+      WITH wf_detailed AS (
+       SELECT 
+        wf.businessid AS uuid,st.applicationstatus,wf.createdtime,wf.lastmodifiedtime
+       FROM eg_wf_processinstance_v2 wf
+       JOIN eg_wf_state_v2 st  ON wf.status = st.uuid
+       WHERE wf.tenantid = $tenantid
+          AND wf.businessservice = 'ndc-services' 
+          ),
+      status_times AS (
+         SELECT 
+           uuid, MAX(CASE WHEN upper(applicationstatus) = 'DOCUMENTVERIFY' THEN createdtime END) AS docverify_time,
+           MAX(CASE WHEN upper(applicationstatus) IN ('APPROVED','REJECTED') THEN lastmodifiedtime END) AS final_time
+         FROM wf_detailed
+         GROUP BY uuid
+          ),
+     sla_data AS (
+      SELECT
+        bs.businessservice,
+        bs.businessservicesla
+      FROM eg_wf_businessservice_v2 bs
+      WHERE bs.businessservice = 'ndc-services'
+       )
+      SELECT 
+       ndc.tenantid,ndc.uuid,ndc.applicationstatus,
+       TO_CHAR( TO_TIMESTAMP(st.docverify_time / 1000), 'DD-MM-YYYY') AS documentverify_on,
+       TO_CHAR( TO_TIMESTAMP(st.final_time / 1000), 'DD-MM-YYYY') AS finalstatus_on,
+       FLOOR( (st.final_time - st.docverify_time) / 86400000 ) AS sla_days,
+       CASE 
+         WHEN (st.final_time - st.docverify_time) > sla.businessservicesla THEN 'BREACHED'
+        ELSE 'MEET'
+        END AS sla_status
+      FROM eg_ndc_application ndc
+       JOIN status_times st
+        ON ndc.uuid = st.uuid
+       JOIN sla_data sla
+        ON 'ndc-services' = sla.businessservice
+        WHERE ndc.tenantid = $tenantid
+       AND upper(ndc.applicationstatus) IN ('REJECTED','APPROVED','DOCUMENTVERIFY')
+    orderby: ORDER BY tenantid,applicationstatus;
