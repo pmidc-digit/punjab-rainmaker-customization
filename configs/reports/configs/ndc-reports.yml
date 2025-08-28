@@ -180,7 +180,8 @@ ReportDefinitions:
        LEFT JOIN eg_hrms_employee emp  ON emp.uuid::text = u.uuid::text
        WHERE p.paymentstatus != 'CANCELLED'
        AND p.tenantid =$tenantid
-       AND p.createdtime BETWEEN $fromdate AND $todate 
+       AND p.createdtime BETWEEN $fromdate AND $todate
+       AND 1=1
        )
        SELECT
        COALESCE(collector_code, 'SELF') AS collector_code,  
@@ -271,7 +272,8 @@ ReportDefinitions:
            uuid, MAX(CASE WHEN upper(applicationstatus) = 'DOCUMENTVERIFY' THEN createdtime ELSE NULL END) AS docverify_time,
            MAX(CASE WHEN upper(applicationstatus) IN ('APPROVED','REJECTED') THEN lastmodifiedtime ELSE NULL END) AS final_time
          FROM wf_detailed
-         GROUP BY uuid),
+         GROUP BY uuid
+         ),
        sla_data AS (
        SELECT
         bs.businessservice,
