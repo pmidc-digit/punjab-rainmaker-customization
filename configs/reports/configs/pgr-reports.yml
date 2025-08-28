@@ -2027,6 +2027,13 @@ ReportDefinitions:
     source: eg_pgr_service
     isMandatory: false
     searchClause: AND eg_pgr_service.createdtime <= $toDate
+  - name: appstatus
+    label: reports.rainmaker-pgr.status
+    type: singlevaluelist
+    pattern: 'list://assigned:assigned,closed:closed,open:open,reassignrequested:reassignrequested,rejected:rejected,resolved:resolved'
+    source: eg_pgr_service
+    isMandatory: false
+    searchClause: AND eg_pgr_service.status=$appstatus    
   query: |
     SELECT 
     DISTINCT ON (servicerequestid)
