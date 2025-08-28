@@ -3043,8 +3043,451 @@ ReportDefinitions:
        AND pd.businessservice = 'WS.ONE_TIME_FEE'
        AND payment.tenantid =$tenantid
     orderby: ORDER BY pd.receiptdate DESC
-               
-
-      
-      
-      
+  - reportName: WSQuaterly_Bill_Not_Generate
+    summary: Ws Quarterly Bill Not Generate Report
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig: null
+    print:
+      pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: Consumercode
+        type: string
+        source: ws
+        total: false
+      - name: payername
+        label: Name
+        type: string
+        source: ws
+        total: false
+      - name: payeraddress
+        label: Address
+        type: string
+        source: ws
+        total: false
+      - name: mobilenumber
+        label: Mobile
+        type: string
+        source: ws
+        total: false
+      - name: usagecategories
+        label: Category
+        type: string
+        source: ws
+        total: false
+      - name: connectiontypes
+        label: Connection Type
+        type: string
+        source: ws
+        total: false
+      - name: zonenames
+        label: Zone Name
+        type: string
+        source: ws
+        total: false
+      - name: blocknames
+        label: Ward Name
+        type: string
+        source: ws
+        total: false                                
+      - name: localitynames
+        label: Locality
+        type: string
+        source: ws
+        total: false
+      - name: bill_statuses
+        label: Bill Status
+        type: string
+        source: ws
+        total: false        
+      - name: landarea
+        label: Land Area
+        type: string
+        source: ws
+        total: false
+      - name: propertyids
+        label: PropertyID
+        type: string
+        source: ws
+        total: false        
+      - name: finyears
+        label: FinYears
+        type: string
+        source: ws
+        total: false
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND 1=1
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND 1=1  
+      - name: usagecategory
+        label: Category
+        type: singlevaluelist
+        pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+        source: ws
+        isMandatory: false
+        searchClause: AND cte.usagecategory = $usagecategory
+      - name: connectiontype
+        label: Connection Type
+        type: singlevaluelist
+        pattern: list://Non Metered:Non Metered,Metered:Metered
+        source: ws
+        isMandatory: false
+        searchClause: AND cte.connectiontype = $connectiontype
+      - name: localityArray
+        label: zoneList
+        type: boundarylist
+        source: ws
+        isMandatory: false
+        searchClause: AND cte.localitycode IN ($localityArray)
+    query: |
+       WITH exclude_codes AS (
+           SELECT DISTINCT bill.consumercode
+           FROM egbs_billdetail_v1 bill
+           WHERE bill.businessservice = 'WS'
+          AND to_char(to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD') = to_char(to_timestamp($fromDate/ 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')
+         AND to_char(to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD') = to_char(to_timestamp($toDate/ 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')
+       ),
+       cte AS (
+           SELECT 
+               to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
+               || '-' || 
+               to_char((to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS finyear,
+               pt.usagecategory,
+               bill.consumercode,
+               b.status AS bill_status,b.payername,b.payeraddress,b.mobilenumber,
+               ct.connectiontype,
+       	    bill.fromperiod,
+       	    bill.toperiod,
+               ebm.zonename,
+               ebm.blockname,
+               ebm.localityname,
+       	    ebm.localitycode,
+               pt.landarea,
+               pt.propertyid
+           FROM eg_ws_connection wc 
+           JOIN eg_pt_property pt 
+               ON wc.property_id = pt.propertyid
+              AND wc.status IN ('Active') 
+              AND pt.status IN ('ACTIVE', 'PENDINGWS')
+           JOIN eg_ws_service ct 
+               ON wc.id = ct.connection_id
+           JOIN eg_bndry_mohalla ebm 
+               ON wc.locality = ebm.localitycode 
+              AND wc.tenantid = ebm.tenantid
+           JOIN egbs_billdetail_v1 bill 
+               ON bill.consumercode = wc.connectionno 
+              AND bill.businessservice = 'WS'
+           JOIN egbs_bill_v1 b 
+               ON bill.billid = b.id
+              AND bill.businessservice = 'WS'
+           WHERE wc.tenantid = $tenantid
+             AND pt.usagecategory IN (
+                   'RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL',
+                   'NONRESIDENTIAL.INSTITUTIONAL', 'MIXED',
+                   'NONRESIDENTIAL', 'NONRESIDENTIAL.INDUSTRIAL',
+                   'NONRESIDENTIAL.OTHERS'
+               )
+             AND bill.consumercode NOT IN (SELECT consumercode FROM exclude_codes)
+             AND (
+                   (ct.connectiontype = 'Non Metered' AND pt.landarea > 125)
+                   OR (ct.connectiontype = 'Metered')
+                 )
+       )
+       SELECT  
+           consumercode,
+           STRING_AGG(DISTINCT payername, ', ') AS payername,
+       	STRING_AGG(DISTINCT payeraddress, ', ') AS payeraddress,
+       	STRING_AGG(DISTINCT mobilenumber, ', ') AS mobilenumber,
+           STRING_AGG(DISTINCT usagecategory, ', ') AS usagecategories,
+           STRING_AGG(DISTINCT bill_status, ', ') AS bill_statuses,
+           STRING_AGG(DISTINCT connectiontype, ', ') AS connectiontypes,
+           STRING_AGG(DISTINCT zonename, ', ') AS zonenames,
+       	STRING_AGG(DISTINCT localitycode, ', ') AS localitycode,
+           STRING_AGG(DISTINCT blockname, ', ') AS blocknames,
+           STRING_AGG(DISTINCT localityname, ', ') AS localitynames,
+           MAX(landarea) AS landarea,
+       	MAX(fromperiod) AS fromperiod,
+       	MAX(toperiod) AS toperiod,
+           STRING_AGG(DISTINCT propertyid, ', ') AS propertyids,
+       	STRING_AGG(DISTINCT finyear, ', ') AS finyears
+       FROM cte
+       WHERE bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
+    groupby: GROUP BY consumercode
+    orderby: ORDER BY consumercode 
+    
+  - reportName: Zone_wise_Collection_Summary
+    summary: Zone Wise Collection Summary
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig: null
+    print:
+      pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: Bill Period
+        type: string
+        source: ws
+        total: false
+      - name: zonenames
+        label: Zone
+        type: string
+        source: ws
+        total: false
+      - name: blocknames
+        label: Ward
+        type: string
+        source: ws
+        total: false                               
+      - name: localitynames
+        label: Total Active Connection
+        type: string
+        source: ws
+        total: false
+      - name: bill_statuses
+        label: Billed Connection
+        type: string
+        source: ws
+        total: false        
+      - name: landarea
+        label: Reciepts generated
+        type: string
+        source: ws
+        total: false
+      - name: propertyids
+        label: Payment Collected
+        type: string
+        source: ws
+        total: false        
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND cte.fromperiod >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND cte.toperiod <= $toDate       
+      - name: usagecategory
+        label: Category
+        type: singlevaluelist
+        pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+        source: ws
+        isMandatory: false
+        searchClause: AND cte.usagecategory = $usagecategory
+      - name: connectiontype
+        label: Connection Type
+        type: singlevaluelist
+        pattern: list://Non Metered:Non Metered,Metered:Metered
+        source: ws
+        isMandatory: false
+        searchClause: AND cte.connectiontype = $connectiontype
+      - name: localityArray
+        label: zoneList
+        type: boundarylist
+        source: ws
+        isMandatory: false
+        searchClause: AND cte.localitycode IN ($localityArray)
+    query: |
+       WITH exclude_codes AS (
+           SELECT DISTINCT bill.consumercode
+           FROM egbs_billdetail_v1 bill
+           WHERE bill.businessservice = 'WS'
+             AND bill.fromperiod >= $fromperiod AND bill.toperiod <= $toperiod
+       ),
+       cte AS (
+           SELECT 
+               to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
+               || '-' || 
+               to_char((to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS finyear,
+               pt.usagecategory,
+               bill.consumercode,
+               b.status AS bill_status,b.payername,b.payeraddress,b.mobilenumber,
+               ct.connectiontype,
+               ebm.zonename,
+               ebm.blockname,
+               ebm.localityname,
+               pt.landarea,
+               pt.propertyid
+           FROM eg_ws_connection wc 
+           JOIN eg_pt_property pt 
+               ON wc.property_id = pt.propertyid
+              AND wc.status IN ('Active') 
+              AND pt.status IN ('ACTIVE', 'PENDINGWS')
+           JOIN eg_ws_service ct 
+               ON wc.id = ct.connection_id
+           JOIN eg_bndry_mohalla ebm 
+               ON wc.locality = ebm.localitycode 
+              AND wc.tenantid = ebm.tenantid
+           JOIN egbs_billdetail_v1 bill 
+               ON bill.consumercode = wc.connectionno 
+              AND bill.businessservice = 'WS'
+           JOIN egbs_bill_v1 b 
+               ON bill.billid = b.id
+              AND bill.businessservice = 'WS'
+           WHERE wc.tenantid = $tenantid
+             AND pt.usagecategory IN (
+                   'RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL',
+                   'NONRESIDENTIAL.INSTITUTIONAL', 'MIXED',
+                   'NONRESIDENTIAL', 'NONRESIDENTIAL.INDUSTRIAL',
+                   'NONRESIDENTIAL.OTHERS'
+               )
+             AND bill.consumercode NOT IN (SELECT consumercode FROM exclude_codes)
+             AND (
+                   (ct.connectiontype = 'Non Metered' AND pt.landarea > 125)
+                   OR (ct.connectiontype = 'Metered')
+                 )
+       )
+       SELECT  
+           consumercode,
+           STRING_AGG(DISTINCT payername, ', ') AS payername,
+        STRING_AGG(DISTINCT payeraddress, ', ') AS payeraddress,
+        STRING_AGG(DISTINCT mobilenumber, ', ') AS mobilenumber,
+           STRING_AGG(DISTINCT usagecategory, ', ') AS usagecategories,
+           STRING_AGG(DISTINCT bill_status, ', ') AS bill_statuses,
+           STRING_AGG(DISTINCT connectiontype, ', ') AS connectiontypes,
+           STRING_AGG(DISTINCT zonename, ', ') AS zonenames,
+           STRING_AGG(DISTINCT blockname, ', ') AS blocknames,
+           STRING_AGG(DISTINCT localityname, ', ') AS localitynames,
+           MAX(landarea) AS landarea,
+           STRING_AGG(DISTINCT propertyid, ', ') AS propertyids,
+        STRING_AGG(DISTINCT finyear, ', ') AS finyears
+       FROM cte
+       WHERE bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
+    groupby: GROUP BY consumercode
+    orderby: ORDER BY consumercode
+    
+  - reportName: DeadMeterReport  
+    summary: Dead/Dameged Meter Report   
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig: null
+    print:
+      pdfPageSize: A1
+    sourceColumns:
+      - name: connectionno
+        label: ConnectionNo
+        type: string
+        source: ws
+        total: false
+        
+      - name: billingperiod
+        label: Billing Period
+        type: string
+        source: ws
+        total: false
+    
+      - name: propertyid
+        label: Property Id
+        type: string
+        source: pt
+        total: false
+    
+      - name: currentReading
+        label: Current Reading
+        type: string
+        source: ws
+        total: false
+    
+      - name: lastReading
+        label: Last Reading
+        type: string
+        source: ws
+        total: false
+    
+      - name: meterstatus
+        label: Meter status
+        type: string
+        source: ws
+        total: false
+    
+      - name: address
+        label: Address
+        type: string
+        source: pt
+        total: false
+    
+      - name: blockname
+        label: Block Name
+        type: string
+        source: pt
+        total: false
+    
+      - name: zonename
+        label: Zone Name
+        type: string
+        source: pt
+        total: false
+    
+      - name: zonecode
+        label: Zone code
+        type: string
+        source: pt
+        total: false
+    
+      - name: propertyusagetype
+        label: Property Usagetype
+        type: string
+        source: pt
+        total: false
+    
+      - name: propertytype
+        label: Property Type
+        type: string
+        source: pt
+        total: false
+    searchParams:     
+      - name: usagecategory
+        label: Category
+        type: singlevaluelist
+        pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+        source: ws
+        isMandatory: false
+        searchClause: AND pt.propertyusagetype = $usagecategory
+      - name: localityArray
+        label: zoneList
+        type: boundarylist
+        source: pt
+        isMandatory: false
+        searchClause: AND pt.localitycode IN ($localityArray)
+    query: |
+       SELECT
+       conn.connectionno,
+       MAX(mt.billingperiod) AS billingperiod,
+       MAX(pt.propertyid) AS propertyid,
+       MAX(mt.currentreading) AS currentReading,
+       MAX(mt.lastreading) AS lastReading,
+       MAX(mt.meterstatus) AS meterstatus,
+       MAX(pt.address) AS address,
+       MAX(pt.blockname) AS blockname,
+       MAX(pt.zonename) AS zonename,
+       MAX(pt.zonecode) AS zonecode,
+       MAX(pt.propertyusagetype) AS propertyusagetype,
+       MAX(pt.propertytype) AS propertytype FROM eg_ws_meterreading AS mt
+       INNER JOIN
+       eg_ws_connection AS conn ON mt.connectionno = conn.connectionno
+       INNER JOIN
+       report_properties AS pt ON pt.propertyid = conn.property_id
+       WHERE
+       conn.tenantid = $tenantid and mt.meterstatus in ('Locked','Breakdown')
+       --- and mt.billingperiod ='31/03/2025 - 30/06/2025
+       AND
+       mt.currentreadingdate = (
+       SELECT MAX(currentreadingdate)
+       FROM eg_ws_meterreading
+       WHERE connectionno = mt.connectionno
+       )
+    groupby: GROUP BY conn.connectionno          

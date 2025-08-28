@@ -1,37 +1,94 @@
 serviceMaps:
- serviceName: Meter Connection Service
- mappings:
- - version: 1.0
-   name: MeterConnection
-   description: create meter reading for particular connection number
-   fromTopic: save-ws-meter
-   isTransaction: true
-   queryMaps:
-    - query: INSERT INTO eg_ws_meterreading (id, tenantid, connectionNo, billingPeriod, meterStatus, lastReading, lastReadingDate, currentReading, currentReadingDate, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?,?, ?);
-      basePath: $.meterReadings
-      jsonMaps:
-       - jsonPath: $.meterReadings.id
-       
-       - jsonPath: $.meterReadings.tenantId
-       
-       - jsonPath: $.meterReadings.connectionNo
+  serviceName: Meter Connection Service
+  mappings:
+    - version: 1.0
+      name: MeterConnection
+      description: create meter reading for particular connection number
+      fromTopic: save-ws-meter
+      isTransaction: true
+      queryMaps:
+        - query: >
+            INSERT INTO eg_ws_meterreading (id, tenantid, connectionNo, billingPeriod, meterStatus,
+                                            lastReading, lastReadingDate, currentReading, currentReadingDate,
+                                            createdby, lastmodifiedby, createdtime, lastmodifiedtime)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.meterReadings
+          jsonMaps:
+            - jsonPath: $.meterReadings.id
+            - jsonPath: $.meterReadings.tenantId
+            - jsonPath: $.meterReadings.connectionNo
+            - jsonPath: $.meterReadings.billingPeriod
+            - jsonPath: $.meterReadings.meterStatus
+            - jsonPath: $.meterReadings.lastReading
+            - jsonPath: $.meterReadings.lastReadingDate
+            - jsonPath: $.meterReadings.currentReading
+            - jsonPath: $.meterReadings.currentReadingDate
+            - jsonPath: $.meterReadings.auditDetails.createdBy
+            - jsonPath: $.meterReadings.auditDetails.lastModifiedBy
+            - jsonPath: $.meterReadings.auditDetails.createdTime
+            - jsonPath: $.meterReadings.auditDetails.lastModifiedTime
 
-       - jsonPath: $.meterReadings.billingPeriod
-       
-       - jsonPath: $.meterReadings.meterStatus
+    - version: 1.0
+      name: CancelDemand
+      fromTopic: cancel-demand-meter
+      isTransaction: true
+      queryMaps:
+        - query: >
+            UPDATE egbs_demand_v1 
+            SET status = 'CANCELLED' 
+            WHERE id = ? AND tenantid = ? AND consumerCode = ? AND businessservice = ?;
+          basePath: $
+          jsonMaps:
+            - jsonPath: $.id
+            - jsonPath: $.tenantId
+            - jsonPath: $.consumerCode
+            - jsonPath: $.businessService
 
-       - jsonPath: $.meterReadings.lastReading
-       
-       - jsonPath: $.meterReadings.lastReadingDate
+        - query: >
+            UPDATE egbs_bill_v1
+            SET status = 'EXPIRED'
+            FROM egbs_billdetail_v1
+            WHERE egbs_bill_v1.id = egbs_billdetail_v1.billid
+            AND egbs_bill_v1.status = 'ACTIVE' 
+            AND egbs_billdetail_v1.demandid = ?
+            AND egbs_bill_v1.tenantid = ?
+            AND egbs_billdetail_v1.businessservice = ?;
+          basePath: $
+          jsonMaps:
+            - jsonPath: $.id
+            - jsonPath: $.tenantId
+            - jsonPath: $.businessService
+    - version: 1.0
+      name: UpdateLatestMeterReading
+      description: Update only the latest meter reading for a connection
+      fromTopic: update-ws-meter
+      isTransaction: true
+      queryMaps:
+        - query: >
+            UPDATE eg_ws_meterreading 
+                SET tenantid = ?, 
+                    connectionNo = ?, 
+                    billingPeriod = ?, 
+                    meterStatus = ?, 
+                    lastReading = ?, 
+                    lastReadingDate = ?, 
+                    currentReading = ?, 
+                    currentReadingDate = ?, 
+                    lastmodifiedby = ?, 
+                    lastmodifiedtime = ?
+            WHERE id = ?;
+          basePath: $.meterReadings
+          jsonMaps:
+            - jsonPath: $.meterReadings.tenantId
+            - jsonPath: $.meterReadings.connectionNo
+            - jsonPath: $.meterReadings.billingPeriod
+            - jsonPath: $.meterReadings.meterStatus
+            - jsonPath: $.meterReadings.lastReading
+            - jsonPath: $.meterReadings.lastReadingDate
+            - jsonPath: $.meterReadings.currentReading
+            - jsonPath: $.meterReadings.currentReadingDate
+            - jsonPath: $.meterReadings.auditDetails.lastModifiedBy
+            - jsonPath: $.meterReadings.auditDetails.lastModifiedTime
+            - jsonPath: $.meterReadings.id
 
-       - jsonPath: $.meterReadings.currentReading
 
-       - jsonPath: $.meterReadings.currentReadingDate
-       
-       - jsonPath: $.meterReadings.auditDetails.createdBy
-
-       - jsonPath: $.meterReadings.auditDetails.lastModifiedBy
-
-       - jsonPath: $.meterReadings.auditDetails.createdTime
-
-       - jsonPath: $.meterReadings.auditDetails.lastModifiedTime

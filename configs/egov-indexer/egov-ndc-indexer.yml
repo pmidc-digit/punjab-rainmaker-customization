@@ -12,12 +12,12 @@ ServiceMaps:
           timeStampField: $.Applications.*.auditDetails.createdTime
           jsonPath: $
           customJsonMapping:
-            indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","owners":[]
+            indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","owners":[],
                                    "applicationStatus":"applicationStatus","active":"active",
                                    "createdby":"createdby","lastmodifiedby":"lastmodifiedby","createdtime":"createdtime",
                                    "lastmodifiedtime":"lastmodifiedtime","action":"action","details":[],"documents:[]","reason":"reason"}}
             fieldMapping:
-              - inJsonPath: $.Applications.*uuid
+              - inJsonPath: $.Applications.*.uuid
                 outJsonPath: $.Data.uuid
               - inJsonPath: $.Applications.*.tenantId
                 outJsonPath: $.Data.tenantId
