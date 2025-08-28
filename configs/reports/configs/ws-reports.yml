@@ -4491,6 +4491,129 @@ ReportDefinitions:
             WHERE connectionno = mt.connectionno
         )
   groupby: GROUP BY   conn.connectionno
+  
+- reportName: DeadMeterReport
+  decryptionPathId: ULBPTDataDumpReport_V2  
+  summary: Dead/Dameged Meter Report   
+  version: 1.0.0
+  moduleName: rainmaker-ws
+  additionalConfig: 
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: connectionno
+    label: ConnectionNo
+    type: string
+    source: ws
+    total: false
+    
+  - name: billingperiod
+    label: Billing Period
+    type: string
+    source: ws
+    total: false
+
+  - name: propertyid
+    label: Property Id
+    type: string
+    source: pt
+    total: false
+
+  - name: currentReading
+    label: Current Reading
+    type: string
+    source: ws
+    total: false
+
+  - name: lastReading
+    label: Last Reading
+    type: string
+    source: ws
+    total: false
+
+  - name: meterstatus
+    label: Meter status
+    type: string
+    source: ws
+    total: false
+
+  - name: address
+    label: Address
+    type: string
+    source: pt
+    total: false
+
+  - name: blockname
+    label: Block Name
+    type: string
+    source: pt
+    total: false
+
+  - name: zonename
+    label: Zone Name
+    type: string
+    source: pt
+    total: false
+
+  - name: zonecode
+    label: Zone code
+    type: string
+    source: pt
+    total: false
+
+  - name: propertyusagetype
+    label: Property Usagetype
+    type: string
+    source: pt
+    total: false
+
+  - name: propertytype
+    label: Property Type
+    type: string
+    source: pt
+    total: false
+  searchParams:     
+  - name: usagecategory
+    label: Category
+    type: singlevaluelist
+    pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIOL,NRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+    source: ws
+    isMandatory: false
+    searchClause: AND pt.propertyusagetype = $usagecategory
+  - name: localityArray
+    label: zoneList
+    type: boundarylist
+    source: pt
+    isMandatory: false
+    searchClause: AND pt.localitycode IN ($localityArray)
+  query: |
+    SELECT
+    conn.connectionno,
+    MAX(mt.billingperiod) AS billingperiod,
+    MAX(pt.propertyid) AS propertyid,
+    MAX(mt.currentreading) AS currentReading,
+    MAX(mt.lastreading) AS lastReading,
+    MAX(mt.meterstatus) AS meterstatus,
+    MAX(pt.address) AS address,
+    MAX(pt.blockname) AS blockname,
+    MAX(pt.zonename) AS zonename,
+    MAX(pt.zonecode) AS zonecode,
+    MAX(pt.propertyusagetype) AS propertyusagetype,
+    MAX(pt.propertytype) AS propertytype FROM eg_ws_meterreading AS mt
+    INNER JOIN
+    eg_ws_connection AS conn ON mt.connectionno = conn.connectionno
+    INNER JOIN
+    report_properties AS pt ON pt.propertyid = conn.property_id
+    WHERE
+    conn.tenantid = $tenantid and mt.meterstatus in ('Locked','Breakdown')
+    --- and mt.billingperiod ='31/03/2025 - 30/06/2025
+    AND
+    mt.currentreadingdate = (
+    SELECT MAX(currentreadingdate)
+    FROM eg_ws_meterreading
+    WHERE connectionno = mt.connectionno
+    )
+  groupby: GROUP BY conn.connectionno   
 
 - reportName: Water_SewerageBillingReport
   decryptionPathId: ULBPTDataDumpReport_V2
