@@ -266,13 +266,13 @@ ReportDefinitions:
        WHERE wf.tenantid = $tenantid
           AND wf.businessservice = 'ndc-services' 
           ),
-      status_times AS (
+       status_times AS (
          SELECT 
            uuid, MAX(CASE WHEN upper(applicationstatus) = 'DOCUMENTVERIFY' THEN createdtime ELSE NULL END) AS docverify_time,
            MAX(CASE WHEN upper(applicationstatus) IN ('APPROVED','REJECTED') THEN lastmodifiedtime ELSE NULL END) AS final_time
          FROM wf_detailed
          GROUP BY uuid),
-      sla_data AS (
+       sla_data AS (
        SELECT
         bs.businessservice,
         bs.businessservicesla
