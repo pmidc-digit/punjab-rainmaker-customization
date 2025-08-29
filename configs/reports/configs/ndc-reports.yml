@@ -96,12 +96,13 @@ ReportDefinitions:
         u.name, u.mobilenumber, u.emailid ,ua.address,a.tenantid,
         a.action, d.consumercode, a.applicationstatus, d.businessservice, 
         d.applicationid, d.dueamount, d.status
-      FROM  eg_user  u 
-       JOIN eg_ndc_owner AS o ON u.uuid = o.uuid
-       JOIN eg_ndc_details AS d ON o.ndcapplicationuuid = d.applicationid
-       JOIN eg_ndc_application AS a ON a.uuid = o.ndcapplicationuuid
-       LEFT JOIN eg_user_address AS ua ON ua.userid = u.id
-       WHERE a.tenantid = $tenantid
+      FROM  eg_user  u
+      
+      JOIN eg_ndc_owner AS o ON u.uuid = o.uuid
+      JOIN eg_ndc_details AS d ON o.ndcapplicationuuid = d.applicationid
+      JOIN eg_ndc_application AS a ON a.uuid = o.ndcapplicationuuid
+      LEFT JOIN eg_user_address AS ua ON ua.userid = u.id
+      WHERE a.tenantid = $tenantid
   - reportName: CollectionsReport
     summary: Collections
     version: 1.0.0
