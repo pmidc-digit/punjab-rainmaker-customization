@@ -90,7 +90,7 @@ ReportDefinitions:
         wrapper: true
         isMandatory: false
         searchClause: AND a.tenantid = $tenantid
-    query: >
+    query: |
       -- Use CTE to force query plan, compute & use CTE later
       SELECT 
         u.name, u.mobilenumber, u.emailid ,ua.address,a.tenantid,
@@ -158,7 +158,7 @@ ReportDefinitions:
         source: ndc
         isMandatory: true
         searchClause: AND $todate
-    query: >
+    query: |
       -- Use CTE to force query plan, compute & use CTE later
       WITH unique_transactions AS (
        SELECT
@@ -258,7 +258,7 @@ ReportDefinitions:
         wrapper: true
         isMandatory: true
         searchClause: AND ndc.tenantid = $tenantid
-    query: >
+    query: |
       -- Use CTE to force query plan, compute & use CTE later
       WITH wf_detailed AS (
        SELECT 
