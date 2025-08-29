@@ -108,13 +108,22 @@ serviceMaps:
             - jsonPath: $.bookingApplication.paymentReceiptFilestoreId
             - jsonPath: $.bookingApplication.bookingId
 
-        - query: UPDATE public.eg_adv_cart_detail SET status = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE cart_id = ?;
+
+        - query: UPDATE public.eg_adv_cart_detail SET add_type = ?, location = ?, face_area = ?, booking_date = ?::date,booking_from_time = ?::time, booking_to_time = ?::time, night_light = ?,status = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE cart_id = ?;
           basePath: bookingApplication.cartDetails.*
           jsonMaps:
+            - jsonPath: $.bookingApplication.cartDetails.*.addType
+            - jsonPath: $.bookingApplication.cartDetails.*.location
+            - jsonPath: $.bookingApplication.cartDetails.*.faceArea
+            - jsonPath: $.bookingApplication.cartDetails.*.bookingDate
+            - jsonPath: $.bookingApplication.cartDetails.*.bookingFromTime
+            - jsonPath: $.bookingApplication.cartDetails.*.bookingToTime
+            - jsonPath: $.bookingApplication.cartDetails.*.nightLight
             - jsonPath: $.bookingApplication.cartDetails.*.status
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedBy
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedTime
             - jsonPath: $.bookingApplication.cartDetails.*.cartId
+
 
         - query: INSERT INTO public.eg_adv_booking_detail_audit SELECT * FROM public.eg_adv_booking_detail WHERE booking_id = ?;
           basePath: bookingApplication
@@ -165,4 +174,4 @@ serviceMaps:
           basePath: advertisementDraftDetail
           jsonMaps:
 
-           - jsonPath: $.advertisementDraftDetail.draftId        
+            - jsonPath: $.advertisementDraftDetail.draftId
