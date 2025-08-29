@@ -73,22 +73,14 @@ ReportDefinitions:
     label: fromDate
     type: epoch
     source: ndc
-    isMandatory: true
+    isMandatory: false
     searchClause: AND a.createdtime >= $fromDate
   - name: toDate
     label: toDate
     type: epoch
     source: ndc
-    isMandatory: true
-    searchClause: AND a.createdtime <= $toDate
-  - name: tenantid
-    label: tenantid
-    type: singlevaluelist
-    pattern: http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=WS_CEMP,WS_CLERK,SW_CEMP,SW_CLERK|$.Employees[*].user.id|$.Employees[*].user.name
-    source: ndc
-    wrapper: true
     isMandatory: false
-    searchClause: AND a.tenantid = $tenantid
+    searchClause: AND a.createdtime <= $toDate
   query: |
     -- Use CTE to force query plan, compute & use CTE later
     SELECT 
