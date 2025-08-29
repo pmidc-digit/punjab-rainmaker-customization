@@ -85,7 +85,7 @@ ReportDefinitions:
       - name: tenantid
         label: tenantid
         type: singlevaluelist
-        pattern: http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=WS_CEMP,WS_CLERK,SW_CEMP,SW_CLERK|$.Employees[*].user.id|$.Employees[*].user.name
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: ndc
         wrapper: true
         isMandatory: false
@@ -151,13 +151,13 @@ ReportDefinitions:
         type: epoch
         source: ndc
         isMandatory: true
-        searchClause: AND createdtime BETWEEN $fromdate
+        searchClause: AND p.createdtim >= $fromdate
       - name: todate
         label: todate
         type: epoch
         source: ndc
         isMandatory: true
-        searchClause: AND $todate
+        searchClause: AND  p.createdtim <= $todate
     query: |
       -- Use CTE to force query plan, compute & use CTE later
       WITH unique_transactions AS (
@@ -298,4 +298,4 @@ ReportDefinitions:
         ON 'ndc-services' = sla.businessservice
         WHERE ndc.tenantid = $tenantid
        AND upper(ndc.applicationstatus) IN ('REJECTED','APPROVED','DOCUMENTVERIFY')
-    orderby: ORDER BY tenantid,applicationstatus;
+    orderby: ORDER BY tenantid,applicationstatus
