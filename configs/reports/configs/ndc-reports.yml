@@ -85,7 +85,7 @@ ReportDefinitions:
       - name: tenantid
         label: tenantid
         type: singlevaluelist
-        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        pattern: http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=WS_CEMP,WS_CLERK,SW_CEMP,SW_CLERK|$.Employees[*].user.id|$.Employees[*].user.name
         source: ndc
         wrapper: true
         isMandatory: false
