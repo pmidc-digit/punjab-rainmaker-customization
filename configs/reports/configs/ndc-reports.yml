@@ -151,13 +151,13 @@ ReportDefinitions:
     type: epoch
     source: ndc
     isMandatory: true
-    searchClause: AND createdtime BETWEEN $fromdate
+    searchClause: AND createdtime >= $fromdate
   - name: todate
     label: todate
     type: epoch
     source: ndc
     isMandatory: true
-    searchClause: AND $todate
+    searchClause: AND createdtime <= $todate
   query: |
       -- Use CTE to force query plan, compute & use CTE later
       WITH unique_transactions AS (
@@ -222,18 +222,18 @@ ReportDefinitions:
     type: string
     source: ndc
     total: false
-  - name: final status verified on
-    label: final status verified on
+  - name: final_status_verified_on
+    label: final_status_verified_on
     type: string
     source: ndc
     total: false
-  - name: sla days
-    label: sla days
+  - name: sla_days
+    label: sla_days
     type: string
     source: ndc
     total: false
-  - name: sla status
-    label: sla status
+  - name: sla_status
+    label: sla_status
     type: string
     source: ndc
     total: false
@@ -298,4 +298,4 @@ ReportDefinitions:
         ON 'ndc-services' = sla.businessservice
         WHERE ndc.tenantid = $tenantid
        AND upper(ndc.applicationstatus) IN ('REJECTED','APPROVED','DOCUMENTVERIFY')
-  orderby: ORDER BY tenantid,applicationstatus;
+  orderby: ORDER BY tenantid,applicationstatus
