@@ -21,7 +21,7 @@ serviceMaps:
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedBy
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedTime
 
-        - query: INSERT INTO public.eg_adv_cart_detail(cart_id, booking_id, add_type, location, face_area, night_light, booking_date, booking_from_time, booking_to_time, status, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?::DATE, ?::TIME, ?::TIME, ?, ?, ?, ?, ?);
+        - query: INSERT INTO public.eg_adv_cart_detail(cart_id, booking_id, add_type, location, face_area, night_light, booking_date, booking_from_time, booking_to_time, status, createdby, createdtime, lastmodifiedby, lastmodifiedtime, advertisementId) VALUES (?, ?, ?, ?, ?, ?, ?::DATE, ?::TIME, ?::TIME, ?, ?, ?, ?, ?, ?);
           basePath: bookingApplication.cartDetails.*
           jsonMaps:
             - jsonPath: $.bookingApplication.cartDetails.*.cartId
@@ -38,6 +38,7 @@ serviceMaps:
             - jsonPath: $.bookingApplication.auditDetails.createdTime
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedBy
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedTime
+            - jsonPath: $.bookingApplication.cartDetails.*.advertisementId
 
         - query: INSERT INTO public.eg_adv_document_detail(document_detail_id, booking_id, document_type, filestore_id, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
           basePath: bookingApplication.documents.*
