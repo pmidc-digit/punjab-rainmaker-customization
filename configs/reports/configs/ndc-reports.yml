@@ -1,163 +1,164 @@
 ---
 ReportDefinitions:
-  - reportName: ApplicationDetailReport
-    decryptionPathId: CITIZEN
-    summary: Details of applicant in ndc service
-    version: 1.0.0
-    moduleName: rainmaker-ndc
-    additionalConfig:
-      print:
-        pdfPageSize: A1
-    sourceColumns:
-      - name: name
-        label: name
-        type: string
-        source: ndc
-        total: false
-      - name: mobilenumber
-        label: mobilenumber
-        type: string
-        source: ndc
-        total: false
-      - name: emailid
-        label: emailid
-        type: string
-        source: ndc
-        total: false
-      - name: tenantid
-        label: tenantid
-        type: string
-        source: ndc
-        total: false
-      - name: address
-        label: address
-        type: string
-        source: ndc
-        total: false
-      - name: action
-        label: action
-        type: string
-        source: ndc
-        total: false
-      - name: consumercode
-        label: consumercode
-        type: string
-        source: ndc
-        total: false
-      - name: applicationstatus
-        label: applicationstatus
-        type: string
-        source: ndc
-        total: false
-      - name: businessservice
-        label: businessservice
-        type: string
-        source: ndc
-        total: false
-      - name: dueamount
-        label: dueamount
-        type: string
-        source: ndc
-        total: true
-      - name: applicationid
-        label: applicationid
-        type: string
-        source: ndc
-        total: false
-      - name: status
-        label: status
-        type: string
-        source: ndc
-        total: false
-    searchParams:
-      - name: fromDate
-        label: fromDate
-        type: epoch
-        source: ndc
-        isMandatory: true
-        searchClause: AND a.createdtime >= $fromDate
-      - name: toDate
-        label: toDate
-        type: epoch
-        source: ndc
-        isMandatory: true
-        searchClause: AND a.createdtime <= $toDate
-      - name: tenantid
-        label: tenantid
-        type: singlevaluelist
-        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-        source: ndc
-        wrapper: true
-        isMandatory: false
-        searchClause: AND a.tenantid = $tenantid
-    query: >
+- reportName: ApplicationDetailReport
+  decryptionPathId: CITIZEN
+  summary: Details of applicant in ndc service
+  version: 1.0.0
+  moduleName: rainmaker-ndc
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: name
+    label: name
+    type: string
+    source: ndc
+    total: false
+  - name: mobilenumber
+    label: mobilenumber
+    type: string
+    source: ndc
+    total: false
+  - name: emailid
+    label: emailid
+    type: string
+    source: ndc
+    total: false
+  - name: tenantid
+    label: tenantid
+    type: string
+    source: ndc
+    total: false
+  - name: address
+    label: address
+    type: string
+    source: ndc
+    total: false
+  - name: action
+    label: action
+    type: string
+    source: ndc
+    total: false
+  - name: consumercode
+    label: consumercode
+    type: string
+    source: ndc
+    total: false
+  - name: applicationstatus
+    label: applicationstatus
+    type: string
+    source: ndc
+    total: false
+  - name: businessservice
+    label: businessservice
+    type: string
+    source: ndc
+    total: false
+  - name: dueamount
+    label: dueamount
+    type: string
+    source: ndc
+    total: true
+  - name: applicationid
+    label: applicationid
+    type: string
+    source: ndc
+    total: false
+  - name: status
+    label: status
+    type: string
+    source: ndc
+    total: false
+  searchParams:
+  - name: fromDate
+    label: fromDate
+    type: epoch
+    source: ndc
+    isMandatory: true
+    searchClause: AND a.createdtime >= $fromDate
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: ndc
+    isMandatory: true
+    searchClause: AND a.createdtime <= $toDate
+  - name: tenantid
+    label: tenantid
+    type: singlevaluelist
+    pattern: http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=WS_CEMP,WS_CLERK,SW_CEMP,SW_CLERK|$.Employees[*].user.id|$.Employees[*].user.name
+    source: ndc
+    wrapper: true
+    isMandatory: false
+    searchClause: AND a.tenantid = $tenantid
+  query: |
       -- Use CTE to force query plan, compute & use CTE later
       SELECT 
         u.name, u.mobilenumber, u.emailid ,ua.address,a.tenantid,
         a.action, d.consumercode, a.applicationstatus, d.businessservice, 
         d.applicationid, d.dueamount, d.status
-      FROM  eg_user  u 
-       JOIN eg_ndc_owner AS o ON u.uuid = o.uuid
-       JOIN eg_ndc_details AS d ON o.ndcapplicationuuid = d.applicationid
-       JOIN eg_ndc_application AS a ON a.uuid = o.ndcapplicationuuid
-       LEFT JOIN eg_user_address AS ua ON ua.userid = u.id
-       WHERE a.tenantid = $tenantid
-  - reportName: CollectionsReport
-    summary: Collections
-    version: 1.0.0
-    moduleName: rainmaker-ndc
-    additionalConfig:
-      print:
-        pdfPageSize: A1
-    sourceColumns:
-      - name: collector_code
-        label: collector_code
-        type: string
-        source: ndc
-        total: false
-      - name: payment_mode
-        label: payment_mode
-        type: string
-        source: ndc
-        total: false
-      - name: total_amount
-        label: total_amount
-        type: string
-        source: ndc
-        total: true
-      - name: total_count
-        label: total_count
-        type: string
-        source: ndc
-        total: false
-    searchParams:
-      - name: tenantid
-        label: tenantid
-        type: singlevaluelist
-        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-        source: ndc
-        wrapper: true
-        isMandatory: true
-        searchClause: AND tenantid = $tenantid
-      - name: collector_code
-        label: collector_code
-        type: string
-        source: ndc
-        isMandatory: false
-        searchClause: AND collector_code = $collector_code
-      - name: fromdate
-        label: fromdate
-        type: epoch
-        source: ndc
-        isMandatory: true
-        searchClause: AND createdtime BETWEEN $fromdate
-      - name: todate
-        label: todate
-        type: epoch
-        source: ndc
-        isMandatory: true
-        searchClause: AND $todate
-    query: >
+      FROM  eg_user  u
+      
+      JOIN eg_ndc_owner AS o ON u.uuid = o.uuid
+      JOIN eg_ndc_details AS d ON o.ndcapplicationuuid = d.applicationid
+      JOIN eg_ndc_application AS a ON a.uuid = o.ndcapplicationuuid
+      LEFT JOIN eg_user_address AS ua ON ua.userid = u.id
+      WHERE a.tenantid = $tenantid
+- reportName: CollectionsReport
+  summary: Collections
+  version: 1.0.0
+  moduleName: rainmaker-ndc
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: collector_code
+    label: collector_code
+    type: string
+    source: ndc
+    total: false
+  - name: payment_mode
+    label: payment_mode
+    type: string
+    source: ndc
+    total: false
+  - name: total_amount
+    label: total_amount
+    type: string
+    source: ndc
+    total: true
+  - name: total_count
+    label: total_count
+    type: string
+    source: ndc
+    total: false
+  searchParams:
+  - name: tenantid
+    label: tenantid
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: ndc
+    wrapper: true
+    isMandatory: true
+    searchClause: AND tenantid = $tenantid
+  - name: collector_code
+    label: collector_code
+    type: string
+    source: ndc
+    isMandatory: false
+    searchClause: AND collector_code = $collector_code
+  - name: fromdate
+    label: fromdate
+    type: epoch
+    source: ndc
+    isMandatory: true
+    searchClause: AND createdtime BETWEEN $fromdate
+  - name: todate
+    label: todate
+    type: epoch
+    source: ndc
+    isMandatory: true
+    searchClause: AND $todate
+  query: |
       -- Use CTE to force query plan, compute & use CTE later
       WITH unique_transactions AS (
        SELECT
@@ -191,73 +192,73 @@ ReportDefinitions:
        FROM unique_transactions
        WHERE collector_code = $collector_code
        -- AND businessservice = 'WS'
-    groupby: GROUP BY collector_code, mode_norm
-    orderby: ORDER BY collector_code, total_amount DESC
-  - reportName: SLAReport
-    summary: Sla report for ndc service
-    version: 1.0.0
-    moduleName: rainmaker-ndc
-    additionalConfig:
-      print:
-        pdfPageSize: A1
-    sourceColumns:
-      - name: tenantid
-        label: tenantid
-        type: string
-        source: ndc
-        total: false
-      - name: Applicationnumber
-        label: Applicationnumber
-        type: string
-        source: ndc
-        total: false
-      - name: Applicationstatus
-        label: Applicationstatus
-        type: string
-        source: ndc
-        total: false
-      - name: document_verified_on
-        label: document_verified_on
-        type: string
-        source: ndc
-        total: false
-      - name: final status verified on
-        label: final status verified on
-        type: string
-        source: ndc
-        total: false
-      - name: sla days
-        label: sla days
-        type: string
-        source: ndc
-        total: false
-      - name: sla status
-        label: sla status
-        type: string
-        source: ndc
-        total: false
-    searchParams:
-      - name: fromDate
-        label: fromDate
-        type: epoch
-        source: ndc
-        isMandatory: false
-        searchClause: AND a.createdtime >= $fromDate
-      - name: toDate
-        label: toDate
-        type: epoch
-        source: ndc
-        isMandatory: false
-        searchClause: AND a.createdtime <= $toDate
-      - name: tenantid
-        label: tenantid
-        type: singlevaluelist
-        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-        source: ndc
-        wrapper: true
-        isMandatory: true
-        searchClause: AND ndc.tenantid = $tenantid
-    query: >
+  groupby: GROUP BY collector_code, mode_norm
+  orderby: ORDER BY collector_code, total_amount DESC
+- reportName: SLAReport
+  summary: Sla report for ndc service
+  version: 1.0.0
+  moduleName: rainmaker-ndc
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: tenantid
+    label: tenantid
+    type: string
+    source: ndc
+    total: false
+  - name: Applicationnumber
+    label: Applicationnumber
+    type: string
+    source: ndc
+    total: false
+  - name: Applicationstatus
+    label: Applicationstatus
+    type: string
+    source: ndc
+    total: false
+  - name: document_verified_on
+    label: document_verified_on
+    type: string
+    source: ndc
+    total: false
+  - name: final status verified on
+    label: final status verified on
+    type: string
+    source: ndc
+    total: false
+  - name: sla days
+    label: sla days
+    type: string
+    source: ndc
+    total: false
+  - name: sla status
+    label: sla status
+    type: string
+    source: ndc
+    total: false
+  searchParams:
+  - name: fromDate
+    label: fromDate
+    type: epoch
+    source: ndc
+    isMandatory: false
+    searchClause: AND a.createdtime >= $fromDate
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: ndc
+    isMandatory: false
+    searchClause: AND a.createdtime <= $toDate
+  - name: tenantid
+    label: tenantid
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: ndc
+    wrapper: true
+    isMandatory: true
+    searchClause: AND ndc.tenantid = $tenantid
+  query: |
       -- Use CTE to force query plan, compute & use CTE later
       WITH wf_detailed AS (
        SELECT 
@@ -297,4 +298,4 @@ ReportDefinitions:
         ON 'ndc-services' = sla.businessservice
         WHERE ndc.tenantid = $tenantid
        AND upper(ndc.applicationstatus) IN ('REJECTED','APPROVED','DOCUMENTVERIFY')
-    orderby: ORDER BY tenantid,applicationstatus;
+  orderby: ORDER BY tenantid,applicationstatus;
