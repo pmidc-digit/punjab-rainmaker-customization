@@ -10175,7 +10175,7 @@ ReportDefinitions:
   query: |
       -- Use CTE to force query plan, compute & use CTE later
        WITH defaulters AS (
-       SELECT tenantid, property_id
+       SELECT tenantid, property_id,usagecategory
          FROM pt_defaulter_ids
           ),
        bill_info AS (
@@ -10200,11 +10200,10 @@ ReportDefinitions:
        u.name_of_ulb AS tenantid, u.district,
        d.property_id, bi.amountpaid AS amount_paid,
        TO_TIMESTAMP(bi.receiptdate / 1000) AS receipt_date, bi.receiptnumber,
-       bi.paymentstatus, bi.paymentmode,pt.usagecategory
+       bi.paymentstatus, bi.paymentmode,d.usagecategory
        FROM defaulters d
        LEFT JOIN bill_info bi  ON d.property_id = bi.consumercode AND d.tenantid = bi.tenantid
        LEFT JOIN ulb_mapped u  ON d.tenantid = u.ulb_code
-       JOIN eg_pt_property pt ON d.property_id = pt.propertyid AND d.tenantid = pt.tenantid
        WHERE 1=1 
   orderby: ORDER BY d.property_id, bi.receiptnumber, bi.receiptdate DESC;
   
@@ -10261,7 +10260,7 @@ ReportDefinitions:
   query: |
      -- Use CTE to force query plan, compute & use CTE later
      WITH defaulters AS (
-     SELECT tenantid, property_id
+     SELECT tenantid, property_id,usagecategory
      FROM pt_defaulter_ids
      ),
      bills_after_april AS (
@@ -10277,10 +10276,9 @@ ReportDefinitions:
      )
      SELECT 
       COALESCE(u.name_of_ulb, d.tenantid) AS tenantid,
-      COALESCE(u.district, 'UNKNOWN') AS district,d.property_id,pt.usagecategory
+      COALESCE(u.district, 'UNKNOWN') AS district,d.property_id,d.usagecategory
        FROM defaulters d
        LEFT JOIN bills_after_april b ON d.property_id = b.property_id AND d.tenantid = b.tenantid
        LEFT JOIN ulb_mapped u ON TRIM(LOWER(d.tenantid)) = TRIM(LOWER(u.ulb_code))
-       JOIN eg_pt_property pt ON d.property_id = pt.propertyid AND d.tenantid = pt.tenantid
        WHERE b.property_id IS NULL  
   orderby: ORDER BY d.property_id DESC;
