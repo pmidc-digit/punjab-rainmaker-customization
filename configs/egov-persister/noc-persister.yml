@@ -88,6 +88,35 @@ serviceMaps:
             - jsonPath: $.Noc.nocDetails.auditDetails.lastModifiedTime
             - jsonPath: $.Noc.nocDetails.tenantId
 
+            
+        - query: > 
+            INSERT INTO eg_noc_owner (
+              id, tenantid, nocid, status, isprimaryowner,
+              ownertype, ownershippercentage, institutionid, relationship,
+              createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails
+            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Noc.owners.*
+
+          jsonMaps:
+            - jsonPath: $.Noc.owners.*.id
+            - jsonPath: $.Noc.owners.*.tenantId
+            - jsonPath: $.Noc.id  # nocid from eg_noc(id)
+            - jsonPath: $.Noc.owners.*.status
+            - jsonPath: $.Noc.owners.*.isPrimaryOwner
+            - jsonPath: $.Noc.owners.*.type
+            - jsonPath: $.Noc.owners.*.ownershipPercentage
+            - jsonPath: $.Noc.owners.*.institutionId
+            - jsonPath: $.Noc.owners.*.relationship
+            - jsonPath: $.Noc.owners.*.createdBy
+            - jsonPath: $.Noc.owners.*.createdDate
+            - jsonPath: $.Noc.owners.*.lastModifiedBy
+            - jsonPath: $.Noc.owners.*.lastModifiedDate
+            - jsonPath: $.Noc.owners.*.additionalDetails
+              type: JSON
+              dbType: JSONB
+
+
+
 
 
 
