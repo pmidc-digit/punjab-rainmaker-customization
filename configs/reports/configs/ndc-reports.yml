@@ -290,7 +290,7 @@ ReportDefinitions:
           WHEN st.docverify_time IS NOT NULL
              THEN FLOOR((EXTRACT(EPOCH FROM NOW()) * 1000 - st.docverify_time) / 86400000)
           ELSE NULL
-        END AS sla_days
+        END AS sla_days,
         CASE 
           WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL 
            THEN 
