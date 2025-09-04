@@ -150,13 +150,13 @@ ReportDefinitions:
     type: epoch
     source: ndc
     isMandatory: true
-    searchClause: AND createdtime BETWEEN $fromdate
+    searchClause: AND createdtime >= $fromdate
   - name: todate
     label: todate
     type: epoch
     source: ndc
     isMandatory: true
-    searchClause: AND $todate
+    searchClause: AND createdtime <= $todate
   query: |
       -- Use CTE to force query plan, compute & use CTE later
       WITH unique_transactions AS (
@@ -180,8 +180,8 @@ ReportDefinitions:
        LEFT JOIN eg_hrms_employee emp  ON emp.uuid::text = u.uuid::text
        WHERE p.paymentstatus != 'CANCELLED'
        AND p.tenantid =$tenantid
-       AND p.createdtime BETWEEN $fromdate AND $todate
-       AND 1=1
+       AND p.createdtime >= $fromdate
+       AND p.createdtime <= $todate
        )
        SELECT
        COALESCE(collector_code, 'SELF') AS collector_code,  
@@ -189,7 +189,7 @@ ReportDefinitions:
        SUM(totalamountpaid) AS total_amount,
        COUNT(transaction_id) AS total_count
        FROM unique_transactions
-       WHERE collector_code = $collector_code
+       WHERE 1=1
        -- AND businessservice = 'WS'
   groupby: GROUP BY collector_code, mode_norm
   orderby: ORDER BY collector_code, total_amount DESC
