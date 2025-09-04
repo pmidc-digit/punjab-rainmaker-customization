@@ -88,7 +88,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: ndc
     wrapper: true
-    isMandatory: false
+    isMandatory: true
     searchClause: AND a.tenantid = $tenantid
   query: |
       -- Use CTE to force query plan, compute & use CTE later
@@ -97,12 +97,11 @@ ReportDefinitions:
         a.action, d.consumercode, a.applicationstatus, d.businessservice, 
         d.applicationid, d.dueamount, d.status
       FROM  eg_user  u
-      
       JOIN eg_ndc_owner AS o ON u.uuid = o.uuid
       JOIN eg_ndc_details AS d ON o.ndcapplicationuuid = d.applicationid
       JOIN eg_ndc_application AS a ON a.uuid = o.ndcapplicationuuid
       LEFT JOIN eg_user_address AS ua ON ua.userid = u.id
-      WHERE a.tenantid = $tenantid
+      WHERE 1=1
 - reportName: CollectionsReport
   summary: Collections
   version: 1.0.0
