@@ -240,14 +240,14 @@ ReportDefinitions:
     label: fromDate
     type: epoch
     source: ndc
-    isMandatory: false
-    searchClause: AND a.createdtime >= $fromDate
+    isMandatory: true
+    searchClause: AND ndc.createdtime >= $fromDate
   - name: toDate
     label: toDate
     type: epoch
     source: ndc
-    isMandatory: false
-    searchClause: AND a.createdtime <= $toDate
+    isMandatory: true
+    searchClause: AND ndc.createdtime <= $toDate
   - name: tenantid
     label: tenantid
     type: singlevaluelist
@@ -268,8 +268,8 @@ ReportDefinitions:
           ),
        status_times AS (
          SELECT 
-           uuid, MAX(CASE WHEN upper(applicationstatus) = 'DOCUMENTVERIFY' THEN createdtime ELSE NULL END) AS docverify_time,
-           MAX(CASE WHEN upper(applicationstatus) IN ('APPROVED','REJECTED') THEN lastmodifiedtime ELSE NULL END) AS final_time
+           uuid, MAX(CASE WHEN upper(applicationstatus) = 'DOCUMENTVERIFY' THEN createdtime  END) AS docverify_time,
+           MAX(CASE WHEN upper(applicationstatus) IN ('APPROVED','REJECTED') THEN lastmodifiedtime END) AS final_time
          FROM wf_detailed
          GROUP BY uuid
          ),
@@ -284,16 +284,28 @@ ReportDefinitions:
         ndc.tenantid,ndc.uuid,ndc.applicationstatus,
         TO_CHAR( TO_TIMESTAMP(st.docverify_time / 1000), 'DD-MM-YYYY') AS documentverify_on,
         TO_CHAR( TO_TIMESTAMP(st.final_time / 1000), 'DD-MM-YYYY') AS finalstatus_on,
-        FLOOR( (st.final_time - st.docverify_time) / 86400000 ) AS sla_days,
+        CASE
+          WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL 
+            THEN  FLOOR ((st.final_time - st.docverify_time) / 86400000)
+          WHEN st.docverify_time IS NOT NULL
+             THEN FLOOR((EXTRACT(EPOCH FROM NOW()) * 1000 - st.docverify_time) / 86400000)
+          ELSE NULL
+        END AS sla_days
         CASE 
-         WHEN (st.final_time - st.docverify_time) > sla.businessservicesla THEN 'BREACHED'
-        ELSE 'MEET'
+          WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL 
+           THEN 
+            CASE 
+             WHEN (st.final_time - st.docverify_time) > sla.businessservicesla THEN 'BREACHED'
+             ELSE 'MEET'
+            END
+          WHEN st.docverify_time IS NOT NULL AND st.docverify_time IS NULL
+            THEN 'IN-PROGRESS'
+          ELSE 'AWAITING DOCVERIFY'
         END AS sla_status
        FROM eg_ndc_application ndc
-       JOIN status_times st
+       LEFT JOIN status_times st
         ON ndc.uuid = st.uuid
        JOIN sla_data sla
         ON 'ndc-services' = sla.businessservice
-        WHERE ndc.tenantid = $tenantid
-       AND upper(ndc.applicationstatus) IN ('REJECTED','APPROVED','DOCUMENTVERIFY')
-  orderby: ORDER BY tenantid,applicationstatus;
+        WHERE upper(ndc.applicationstatus) IN ('REJECTED','APPROVED','DOCUMENTVERIFY')
+  orderby: ORDER BY ndc.createdtime DESC ,tenantid,applicationstatus;
