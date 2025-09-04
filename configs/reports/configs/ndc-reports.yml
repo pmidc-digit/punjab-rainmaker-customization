@@ -145,18 +145,18 @@ ReportDefinitions:
     source: ndc
     isMandatory: false
     searchClause: AND collector_code = $collector_code
-  - name: fromdate
-    label: fromdate
+  - name: fromDate
+    label: fromDate
     type: epoch
     source: ndc
     isMandatory: true
-    searchClause: AND createdtime >= $fromdate
-  - name: todate
-    label: todate
+    searchClause: AND createdtime >= $fromDate
+  - name: toDate
+    label: toDate
     type: epoch
     source: ndc
     isMandatory: true
-    searchClause: AND createdtime <= $todate
+    searchClause: AND createdtime <= $toDate
   query: |
       -- Use CTE to force query plan, compute & use CTE later
       WITH unique_transactions AS (
@@ -180,8 +180,8 @@ ReportDefinitions:
        LEFT JOIN eg_hrms_employee emp  ON emp.uuid::text = u.uuid::text
        WHERE p.paymentstatus != 'CANCELLED'
        AND p.tenantid =$tenantid
-       AND p.createdtime >= $fromdate
-       AND p.createdtime <= $todate
+       AND p.createdtime >= $fromDate
+       AND p.createdtime <= $toDate
        )
        SELECT
        COALESCE(collector_code, 'SELF') AS collector_code,  
