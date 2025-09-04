@@ -215,23 +215,23 @@ ReportDefinitions:
     type: string
     source: ndc
     total: false
-  - name: document_verified_on
-    label: document_verified_on
+  - name: documentverify_on
+    label: documentverify_on
     type: string
     source: ndc
     total: false
-  - name: final status verified on
-    label: final status verified on
+  - name: finalstatus_on
+    label: finalstatus_on
     type: string
     source: ndc
     total: false
-  - name: sla days
-    label: sla days
+  - name: sla_days
+    label: sla_days
     type: string
     source: ndc
     total: false
-  - name: sla status
-    label: sla status
+  - name: sla_status
+    label: sla_status
     type: string
     source: ndc
     total: false
@@ -281,7 +281,7 @@ ReportDefinitions:
        WHERE bs.businessservice = 'ndc-services'
        )
        SELECT 
-        ndc.tenantid,ndc.uuid,ndc.applicationstatus,
+        ndc.tenantid,ndc.uuid AS Applicationnumber,ndc.applicationstatus,
         TO_CHAR( TO_TIMESTAMP(st.docverify_time / 1000), 'DD-MM-YYYY') AS documentverify_on,
         TO_CHAR( TO_TIMESTAMP(st.final_time / 1000), 'DD-MM-YYYY') AS finalstatus_on,
         CASE
