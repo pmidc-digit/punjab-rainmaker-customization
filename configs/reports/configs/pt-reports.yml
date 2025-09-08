@@ -6305,7 +6305,7 @@ ReportDefinitions:
         --p.blockcode as block
       from report_payments as rp
       inner join assessments as asmt on  asmt.billid = rp.billid -- asmt.billid like concat('%',rp.billid,'%')
-      --inner join report_properties p on (p.propertyid=rp.propertyid and p.propertystatus='ACTIVE')
+      inner join report_properties p on (p.propertyid=rp.propertyid) --and p.propertystatus='ACTIVE')
       where rp.paymentstatus!='CANCELLED' and rp.tenantid=$tenantid
   orderby: order by receiptnumber
   
