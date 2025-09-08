@@ -6838,21 +6838,38 @@ ReportDefinitions:
     isMandatory: true
     searchClause: AND 1=1
   query: |
-   --S.no    Service Name ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number Existing Property ID    Type Of Property Mobile Number    Address
+   --S.no    Service Name ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number Existing Property ID    Type Of Property Mobile NumberAddress
     with summary as
     (
-        select 
-          assessmentyears,
-          blockname,
-          sum(totalamount) as amount,
-          count(distinct receiptnumber) as totalcount
-        from report_assessments as asmt
-        inner join report_properties as pt on pt.propertyid=asmt.propertyid
-        inner join report_payments as payment on payment.billid=asmt.billid and (asmt.totalamount>0 or payment.amoutpaid=0)
-        where payment.paymentstatus!='CANCELLED' and pt.tenantid=$tenantid
-        and asmt.createdtime>=$fromDate
-        and asmt.createdtime<=$toDate
-        group by assessmentyears,blockname
+       WITH preferred_props AS (
+        SELECT *
+        FROM (
+          SELECT *,
+                 ROW_NUMBER() OVER (
+                   PARTITION BY propertyid
+                   ORDER BY CASE WHEN propertystatus = 'ACTIVE' THEN 1 ELSE 2 END
+                 ) AS rn
+          FROM report_properties
+        ) x
+        WHERE rn = 1
+      )
+      
+      SELECT 
+        assessmentyears,
+        blockname,
+          SUM(totalamount) AS amount,
+          COUNT(DISTINCT receiptnumber) AS totalcount   
+      FROM report_assessments AS asmt
+      INNER JOIN preferred_props AS pt
+          ON pt.propertyid = asmt.propertyid
+      INNER JOIN report_payments AS payment
+          ON payment.billid = asmt.billid
+      WHERE payment.paymentstatus != 'CANCELLED' 
+        AND pt.tenantid = $tenantid
+        AND payment.receiptdate >= $fromDate
+        AND payment.receiptdate <= $toDate 
+      GROUP BY assessmentyears,blockname
+
       )
     select
       blockname,
@@ -6883,8 +6900,8 @@ ReportDefinitions:
       sum(amount) as totalcollection,
       sum(totalcount) as totalptr
     from summary 
-    where 1=1
-  groupby: group by blockname
+    where 1=1 
+   group by blockname
   
 - reportName: PT_NO_PAYMENT_DEFAULTERS_REPORT
   summary: PT NO PAYMENT DEFAULTERS_REPORT
