@@ -6864,7 +6864,7 @@ ReportDefinitions:
           ON pt.propertyid = asmt.propertyid
       INNER JOIN report_payments AS payment
           ON payment.billid = asmt.billid
-      WHERE payment.paymentstatus != 'CANCELLED' 
+      WHERE payment.paymentstatus != 'CANCELLED' and pt.propertystatus = 'ACTIVE' 
         AND pt.tenantid = $tenantid
         AND payment.receiptdate >= $fromDate
         AND payment.receiptdate <= $toDate 
