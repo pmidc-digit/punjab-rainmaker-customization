@@ -3719,6 +3719,11 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+  - name: localityname
+    label: localityname
+    type: string
+    source: ws
+    total: false   
   - name: wardno
     label: wardno
     type: string
@@ -3801,7 +3806,7 @@ ReportDefinitions:
       bill_status as bill_status,connectiontype as connectiontype,
       finyear as finyear,name as name, wardno as wardno, zonename as zonename,zonecode as zonecode,
       mobilenumber as mobilenumber,address as address,landarea as landarea,
-      locality as locality from public.mv_ws_defaulters
+      locality as locality, localityname as localityname from public.mv_ws_defaulters
       WHERE tenantid = $tenantid
         
             
@@ -3833,6 +3838,11 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+  - name: localityname
+    label: localityname
+    type: string
+    source: ws
+    total: false    
   - name: wardno
     label: wardno
     type: string
@@ -3915,7 +3925,7 @@ ReportDefinitions:
       bill_status as bill_status,connectiontype as connectiontype,
       finyear as finyear,name as name, wardno as wardno, zonename as zonename,zonecode as zonecode,
       mobilenumber as mobilenumber,address as address,landarea as landarea,
-      locality as locality from public.mv_sw_defaulters
+      locality as locality, localityname as localityname from public.mv_sw_defaulters
       WHERE tenantid = $tenantid
   
 - reportName: MeterReadingReport
