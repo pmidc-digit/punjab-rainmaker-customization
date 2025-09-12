@@ -205,7 +205,7 @@ serviceMaps:
            - jsonPath: $.BPA.id
 
 
-       - query: UPDATE eg_bpa_buildingplan SET applicationno=?, approvalNo=?, applicationDate=?, status=?, additionaldetails=?, lastmodifiedby=?, lastmodifiedtime=?, approvalDate=? WHERE id=?;
+       - query: UPDATE eg_bpa_buildingplan SET applicationno=?, approvalNo=?, applicationDate=?, status=?, additionaldetails=?, lastmodifiedby=?, lastmodifiedtime=?, approvalDate=?, landId=? WHERE id=?;
          basePath: BPA
          jsonMaps:
           - jsonPath: $.BPA.applicationNo
@@ -225,6 +225,8 @@ serviceMaps:
           - jsonPath: $.BPA.auditDetails.lastModifiedTime
 
           - jsonPath: $.BPA.approvalDate
+
+          - jsonPath: $.BPA.landId
 
           - jsonPath: $.BPA.id
  - version: 1.0
