@@ -102,17 +102,23 @@ ServiceMaps:
       indexes:
         - name: ads-booking-application-update-index
           type: general
-          id: $.bookingId, $.tenantId
-          isBulk: true
+          id: $.bookingId
+          isBulk: false
           timeStampField: $.auditDetails.lastModifiedTime
-          jsonPath: $.bookingApplication.*
+          jsonPath: $.bookingApplication
           customJsonMapping:
             indexMapping: {"Data":{"bookingId":"bookingId","tenantId":"tenantId","bookingNo":"bookingNo",
-                                   "bookingStatus":"bookingStatus","paymentDate":"paymentDate","receiptNo":"receiptNo",
-                                   "applicantName":"applicantName","applicantMobileNo":"applicantMobileNo",
-                                   "lastModifiedBy":"lastModifiedBy","lastModifiedTime":"lastModifiedTime",
-                                   "addressLine1":"addressLine1","city":"city","pincode":"pincode",
-                                   "cartDetails":"cartDetails"}}
+                                   "applicationDate":"applicationDate","paymentDate":"paymentDate","draftId":"draftId",
+                                   "receiptNo":"receiptNo","permissionLetterFilestoreId":"permissionLetterFilestoreId","paymentReceiptFilestoreId":"paymentReceiptFilestoreId",
+                                   "bookingStatus":"bookingStatus","businessService":"businessService",
+                                   "applicantDetailId":"applicantDetailId","applicantName":"applicantName","applicantMobileNo":"applicantMobileNo",
+                                   "applicantAlternateMobileNo":"applicantAlternateMobileNo","applicantEmailId":"applicantEmailId",
+                             "lastModifiedBy":"lastModifiedBy",
+                                   "lastModifiedTime":"lastModifiedTime",
+                                   "addressId":"addressId","doorNo":"doorNo","houseNo":"houseNo","streetName":"streetName",
+                                   "addressLine1":"addressLine1","addressLine2":"addressLine2","landmark":"landmark",
+                                   "city":"city","cityCode":"cityCode","locality":"locality","localityCode":"localityCode","pincode":"pincode",
+                                   "cartDetails":"cartDetails","documents":"documents","workflow":"workflow"}}
             fieldMapping:
               - inJsonPath: $.bookingId
                 outJsonPath: $.Data.bookingId
@@ -136,12 +142,8 @@ ServiceMaps:
                 outJsonPath: $.Data.bookingStatus
               - inJsonPath: $.businessService
                 outJsonPath: $.Data.businessService
-              - inJsonPath: $.auditDetails.createdBy
-                outJsonPath: $.Data.createdBy
               - inJsonPath: $.auditDetails.lastModifiedBy
                 outJsonPath: $.Data.lastModifiedBy
-              - inJsonPath: $.auditDetails.createdTime
-                outJsonPath: $.Data.createdTime
               - inJsonPath: $.auditDetails.lastModifiedTime
                 outJsonPath: $.Data.lastModifiedTime
               - inJsonPath: $.applicantDetail.applicantDetailId
@@ -184,3 +186,62 @@ ServiceMaps:
                 outJsonPath: $.Data.documents
               - inJsonPath: $.workflow
                 outJsonPath: $.Data.workflow
+
+    - topic: create-draft-advertisement
+      configKey: INDEX
+      indexes:
+        - name: ads-draft-application-index
+          type: general
+          id: $.draftId
+          isBulk: false
+          timeStampField: $.auditDetails.createdTime
+          jsonPath: $.advertisementDraftDetail
+          customJsonMapping:
+            indexMapping: {"Data":{"draftId":"draftId","tenantId":"tenantId","userUuid":"userUuid",
+                                   "draftApplicationData":"draftApplicationData",
+                                   "createdBy":"createdBy","lastModifiedBy":"lastModifiedBy",
+                                   "createdTime":"createdTime","lastModifiedTime":"lastModifiedTime"}}
+            fieldMapping:
+              - inJsonPath: $.draftId
+                outJsonPath: $.Data.draftId
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.userUuid
+              - inJsonPath: $.draftApplicationData
+                outJsonPath: $.Data.draftApplicationData
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+
+    - topic: update-draft-advertisement
+      configKey: INDEX
+      indexes:
+        - name: ads-draft-application-update-index
+          type: general
+          id: $.draftId
+          isBulk: false
+          timeStampField: $.auditDetails.lastModifiedTime
+          jsonPath: $.advertisementDraftDetail
+          customJsonMapping:
+            indexMapping: {"Data":{"draftId":"draftId","tenantId":"tenantId","userUuid":"userUuid",
+                                   "draftApplicationData":"draftApplicationData",
+                                   "lastModifiedBy":"lastModifiedBy","lastModifiedTime":"lastModifiedTime"}}
+            fieldMapping:
+              - inJsonPath: $.draftId
+                outJsonPath: $.Data.draftId
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.userUuid
+              - inJsonPath: $.draftApplicationData
+                outJsonPath: $.Data.draftApplicationData
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
