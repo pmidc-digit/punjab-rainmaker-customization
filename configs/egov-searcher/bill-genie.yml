@@ -93,7 +93,7 @@ SearchDefinitions:
           ad_isactualdemand, ad.purpose AS ad_purpose, ad.additionaldetails as
           ad_additionaldetails, ptadd.doorNo as ptadd_doorNo, ptadd.landmark as
           ptadd_landmark, ptadd.city as ptadd_city, ptadd.pincode as
-          ptadd_pincode, ptadd.locality as ptadd_locality, ptown.userid as
+          ptadd_pincode, ptadd.locality as ptadd_locality, ptadd.street as ptadd_street, ptadd.region as ptadd_region, ptadd.plotno as ptadd_plotno, ptadd.buildingname as ptadd_buildingname, ptadd.district as ptadd_district, ptadd.state as ptadd_state, ptadd.latitude as ptadd_latitude, ptadd.longitude as ptadd_longitude, ptown.userid as
           ptown_userid
 
           FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid INNER JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid INNER JOIN eg_ws_connection conn ON bd.consumercode = conn.connectionno INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id $where and conn.status='Active')
@@ -176,7 +176,7 @@ SearchDefinitions:
           ad_isactualdemand, ad.purpose AS ad_purpose, ad.additionaldetails as
           ad_additionaldetails, ptadd.doorNo as ptadd_doorNo, ptadd.landmark as
           ptadd_landmark, ptadd.city as ptadd_city, ptadd.pincode as
-          ptadd_pincode, ptadd.locality as ptadd_locality, ptown.userid as
+          ptadd_pincode, ptadd.locality as ptadd_locality, ptadd.street as ptadd_street, ptadd.region as ptadd_region, ptadd.plotno as ptadd_plotno, ptadd.buildingname as ptadd_buildingname, ptadd.district as ptadd_district, ptadd.state as ptadd_state, ptadd.latitude as ptadd_latitude, ptadd.longitude as ptadd_longitude, ptown.userid as
           ptown_userid
 
           FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid INNER JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid INNER JOIN eg_sw_connection conn ON bd.consumercode = conn.connectionno INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id $where and conn.status='Active')
@@ -499,7 +499,7 @@ SearchDefinitions:
           ad_isactualdemand, ad.purpose AS ad_purpose, ad.additionaldetails as
           ad_additionaldetails, ptadd.doorNo as ptadd_doorNo, ptadd.landmark as
           ptadd_landmark, ptadd.city as ptadd_city, ptadd.pincode as
-          ptadd_pincode, ptadd.locality as ptadd_locality, ptown.userid as
+          ptadd_pincode, ptadd.locality as ptadd_locality, ptadd.street as ptadd_street, ptadd.region as ptadd_region, ptadd.plotno as ptadd_plotno, ptadd.buildingname as ptadd_buildingname, ptadd.district as ptadd_district, ptadd.state as ptadd_state, ptadd.latitude as ptadd_latitude, ptadd.longitude as ptadd_longitude, ptown.userid as
           ptown_userid FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON
           b.id = bd.billid AND b.tenantid = bd.tenantid INNER JOIN
           egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid
@@ -590,7 +590,7 @@ SearchDefinitions:
           ad_isactualdemand, ad.purpose AS ad_purpose, ad.additionaldetails as
           ad_additionaldetails, ptadd.doorNo as ptadd_doorNo, ptadd.landmark as
           ptadd_landmark, ptadd.city as ptadd_city, ptadd.pincode as
-          ptadd_pincode, ptadd.locality as ptadd_locality, ptown.userid as
+          ptadd_pincode, ptadd.locality as ptadd_locality, ptadd.street as ptadd_street, ptadd.region as ptadd_region, ptadd.plotno as ptadd_plotno, ptadd.buildingname as ptadd_buildingname, ptadd.district as ptadd_district, ptadd.state as ptadd_state, ptadd.latitude as ptadd_latitude, ptadd.longitude as ptadd_longitude, ptown.userid as
           ptown_userid FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON
           b.id = bd.billid AND b.tenantid = bd.tenantid INNER JOIN
           egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid
@@ -656,7 +656,7 @@ SearchDefinitions:
           SELECT 
            conn.connectionno,conn.status AS conn_status,conn.property_id AS pid, conn.oldConnectionNo AS oldpid,
            conn.additionaldetails AS conn_add,pt.id AS pt_id,ptadd.doorNo AS ptadd_doorNo,ptadd.landmark AS ptadd_landmark,
-           ptadd.city AS ptadd_city, ptadd.pincode AS ptadd_pincode,ptadd.locality AS ptadd_locality, ptown.userid AS ptown_userid
+           ptadd.city AS ptadd_city, ptadd.pincode AS ptadd_pincode,ptadd.locality AS ptadd_locality, ptadd.street as ptadd_street, ptadd.region as ptadd_region, ptadd.plotno as ptadd_plotno, ptadd.buildingname as ptadd_buildingname, ptadd.district as ptadd_district, ptadd.state as ptadd_state, ptadd.latitude as ptadd_latitude, ptadd.longitude as ptadd_longitude, ptown.userid AS ptown_userid
           FROM 
            eg_ws_connection conn
            INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid
