@@ -3527,7 +3527,7 @@ ReportDefinitions:
         pattern: list://WS%:Water,SW%:Sewerage
         source: pt
         isMandatory: true
-        searchClause: AND 1=1
+        searchClause: AND dd.businessservice like $connectionType
     query: >
       -- Use CTE to force query plan, compute & use CTE later
 
@@ -3535,7 +3535,7 @@ ReportDefinitions:
       SUM(dt.taxamount) AS amt,
       TO_CHAR((TO_TIMESTAMP(MAX(dd.taxperiodto) / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD') 
       AS max_taxperiodto_date FROM egbs_demand_v1 dd JOIN egbs_demanddetail_v1 dt  
-      ON dd.id = dt.demandid WHERE dd.tenantid = $tenantid  AND dd.businessservice = $connectionType  
+      ON dd.id = dt.demandid WHERE dd.tenantid = $tenantid   
       AND dd.status IN ('ACTIVE','EXPIRED')  
-      AND (TO_TIMESTAMP(dd.taxperiodto / 1000) AT TIME ZONE 'Asia/Kolkata')<= TO_DATE('2025-04-01','YYYY-MM-DD')   and 1=1
+      AND (TO_TIMESTAMP(dd.taxperiodto / 1000) AT TIME ZONE 'Asia/Kolkata')<= TO_DATE('2025-04-01','YYYY-MM-DD') 
     groupby: GROUP BY dd.consumercode, dd.businessservice HAVING SUM(dt.taxamount) <> 0   
