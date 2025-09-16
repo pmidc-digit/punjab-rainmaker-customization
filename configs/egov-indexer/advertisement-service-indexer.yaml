@@ -1,183 +1,247 @@
 ServiceMaps:
-  serviceName: adv-services
+  serviceName: advertisement-booking-services
   version: 1.0.0
   mappings:
 
     - topic: save-advertisement-booking
       configKey: INDEX
       indexes:
-        - name: advertisement-booking-index
+        - name: ads-booking-application-index
           type: general
           id: $.bookingId
-          isBulk: true
+          isBulk: false
           timeStampField: $.auditDetails.createdTime
           jsonPath: $.bookingApplication
           customJsonMapping:
-            indexMapping: {"Data":{"bookingId":"bookingId","bookingNo":"bookingNo","paymentDate":"paymentDate",
-                                   "applicationDate":"applicationDate","tenantId":"tenantId","bookingStatus":"bookingStatus",
-                                   "receiptNo":"receiptNo","createdby":"createdby","lastmodifiedby":"lastmodifiedby",
-                                   "createdtime":"createdtime","lastmodifiedtime":"lastmodifiedtime","cartDetails":[],"documents":[],
-                                   "applicantDetail":{},"address":{},"permissionLetterFilestoreId":"permissionLetterFilestoreId",
-                                   "paymentReceiptFilestoreId":"paymentReceiptFilestoreId"}}
+            indexMapping: {"Data":{"bookingId":"bookingId","tenantId":"tenantId","bookingNo":"bookingNo",
+                                   "applicationDate":"applicationDate","paymentDate":"paymentDate","draftId":"draftId",
+                                   "receiptNo":"receiptNo","permissionLetterFilestoreId":"permissionLetterFilestoreId","paymentReceiptFilestoreId":"paymentReceiptFilestoreId",
+                                   "bookingStatus":"bookingStatus","businessService":"businessService",
+                                   "applicantDetailId":"applicantDetailId","applicantName":"applicantName","applicantMobileNo":"applicantMobileNo",
+                                   "applicantAlternateMobileNo":"applicantAlternateMobileNo","applicantEmailId":"applicantEmailId",
+                                   "createdBy":"createdBy","lastModifiedBy":"lastModifiedBy",
+                                   "createdTime":"createdTime","lastModifiedTime":"lastModifiedTime",
+                                   "addressId":"addressId","doorNo":"doorNo","houseNo":"houseNo","streetName":"streetName",
+                                   "addressLine1":"addressLine1","addressLine2":"addressLine2","landmark":"landmark",
+                                   "city":"city","cityCode":"cityCode","locality":"locality","localityCode":"localityCode","pincode":"pincode",
+                                   "cartDetails":"cartDetails","documents":"documents","workflow":"workflow"}}
             fieldMapping:
-              - inJsonPath: $.bookingApplication.bookingId
+              - inJsonPath: $.bookingId
                 outJsonPath: $.Data.bookingId
-              - inJsonPath: $.bookingApplication.bookingNo
-                outJsonPath: $.Data.bookingNo
-              - inJsonPath: $.bookingApplication.paymentDate
-                outJsonPath: $.Data.paymentDate
-              - inJsonPath: $.bookingApplication.applicationDate
-                outJsonPath: $.Data.applicationDate
-              - inJsonPath: $.bookingApplication.tenantId
+              - inJsonPath: $.tenantId
                 outJsonPath: $.Data.tenantId
-              - inJsonPath: $.bookingApplication.bookingStatus
-                outJsonPath: $.Data.bookingStatus
-              - inJsonPath: $.bookingApplication.receiptNo
+              - inJsonPath: $.bookingNo
+                outJsonPath: $.Data.bookingNo
+              - inJsonPath: $.applicationDate
+                outJsonPath: $.Data.applicationDate
+              - inJsonPath: $.paymentDate
+                outJsonPath: $.Data.paymentDate
+              - inJsonPath: $.draftId
+                outJsonPath: $.Data.draftId
+              - inJsonPath: $.receiptNo
                 outJsonPath: $.Data.receiptNo
-              - inJsonPath: $.bookingApplication.auditDetails.createdBy
-                outJsonPath: $.Data.createdby
-              - inJsonPath: $.bookingApplication.auditDetails.lastModifiedBy
-                outJsonPath: $.Data.lastmodifiedby
-              - inJsonPath: $.bookingApplication.auditDetails.createdTime
-                outJsonPath: $.Data.createdtime
-              - inJsonPath: $.bookingApplication.auditDetails.lastModifiedTime
-                outJsonPath: $.Data.lastmodifiedtime
-              - inJsonPath: $.bookingApplication.cartDetails
-                outJsonPath: $.Data.cartDetails
-              - inJsonPath: $.bookingApplication.documents
-                outJsonPath: $.Data.documents
-              - inJsonPath: $.bookingApplication.applicantDetail
-                outJsonPath: $.Data.applicantDetail
-              - inJsonPath: $.bookingApplication.address
-                outJsonPath: $.Data.address
-              - inJsonPath: $.bookingApplication.permissionLetterFilestoreId
+              - inJsonPath: $.permissionLetterFilestoreId
                 outJsonPath: $.Data.permissionLetterFilestoreId
-              - inJsonPath: $.bookingApplication.paymentReceiptFilestoreId
+              - inJsonPath: $.paymentReceiptFilestoreId
                 outJsonPath: $.Data.paymentReceiptFilestoreId
+              - inJsonPath: $.bookingStatus
+                outJsonPath: $.Data.bookingStatus
+              - inJsonPath: $.businessService
+                outJsonPath: $.Data.businessService
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+              - inJsonPath: $.applicantDetail.applicantDetailId
+                outJsonPath: $.Data.applicantDetailId
+              - inJsonPath: $.applicantDetail.applicantName
+                outJsonPath: $.Data.applicantName
+              - inJsonPath: $.applicantDetail.applicantMobileNo
+                outJsonPath: $.Data.applicantMobileNo
+              - inJsonPath: $.applicantDetail.applicantAlternateMobileNo
+                outJsonPath: $.Data.applicantAlternateMobileNo
+              - inJsonPath: $.applicantDetail.applicantEmailId
+                outJsonPath: $.Data.applicantEmailId
+              - inJsonPath: $.address.addressId
+                outJsonPath: $.Data.addressId
+              - inJsonPath: $.address.doorNo
+                outJsonPath: $.Data.doorNo
+              - inJsonPath: $.address.houseNo
+                outJsonPath: $.Data.houseNo
+              - inJsonPath: $.address.streetName
+                outJsonPath: $.Data.streetName
+              - inJsonPath: $.address.addressLine1
+                outJsonPath: $.Data.addressLine1
+              - inJsonPath: $.address.addressLine2
+                outJsonPath: $.Data.addressLine2
+              - inJsonPath: $.address.landmark
+                outJsonPath: $.Data.landmark
+              - inJsonPath: $.address.city
+                outJsonPath: $.Data.city
+              - inJsonPath: $.address.cityCode
+                outJsonPath: $.Data.cityCode
+              - inJsonPath: $.address.locality
+                outJsonPath: $.Data.locality
+              - inJsonPath: $.address.localityCode
+                outJsonPath: $.Data.localityCode
+              - inJsonPath: $.address.pincode
+                outJsonPath: $.Data.pincode
+              - inJsonPath: $.cartDetails
+                outJsonPath: $.Data.cartDetails
+              - inJsonPath: $.documents
+                outJsonPath: $.Data.documents
+              - inJsonPath: $.workflow
+                outJsonPath: $.Data.workflow
 
     - topic: update-advertisement-booking
       configKey: INDEX
       indexes:
-        - name: advertisement-booking-update-index
+        - name: ads-booking-application-update-index
           type: general
-          id: $.bookingId, $.tenantId
-          isBulk: true
+          id: $.bookingId
+          isBulk: false
           timeStampField: $.auditDetails.lastModifiedTime
           jsonPath: $.bookingApplication
           customJsonMapping:
-            indexMapping: {"Data":{"bookingId":"bookingId","bookingNo":"bookingNo","paymentDate":"paymentDate",
-                                   "applicationDate":"applicationDate","tenantId":"tenantId","bookingStatus":"bookingStatus",
-                                   "receiptNo":"receiptNo","lastmodifiedby":"lastmodifiedby","lastmodifiedtime":"lastmodifiedtime",
-                                   "cartDetails":[],"documents":[],"applicantDetail":{},"address":{},"permissionLetterFilestoreId":"permissionLetterFilestoreId",
-                                   "paymentReceiptFilestoreId":"paymentReceiptFilestoreId"}}
+            indexMapping: {"Data":{"bookingId":"bookingId","tenantId":"tenantId","bookingNo":"bookingNo",
+                                   "applicationDate":"applicationDate","paymentDate":"paymentDate","draftId":"draftId",
+                                   "receiptNo":"receiptNo","permissionLetterFilestoreId":"permissionLetterFilestoreId","paymentReceiptFilestoreId":"paymentReceiptFilestoreId",
+                                   "bookingStatus":"bookingStatus","businessService":"businessService",
+                                   "applicantDetailId":"applicantDetailId","applicantName":"applicantName","applicantMobileNo":"applicantMobileNo",
+                                   "applicantAlternateMobileNo":"applicantAlternateMobileNo","applicantEmailId":"applicantEmailId",
+                                   "lastModifiedBy":"lastModifiedBy",
+                                   "lastModifiedTime":"lastModifiedTime",
+                                   "addressId":"addressId","doorNo":"doorNo","houseNo":"houseNo","streetName":"streetName",
+                                   "addressLine1":"addressLine1","addressLine2":"addressLine2","landmark":"landmark",
+                                   "city":"city","cityCode":"cityCode","locality":"locality","localityCode":"localityCode","pincode":"pincode",
+                                   "cartDetails":"cartDetails","documents":"documents","workflow":"workflow"}}
             fieldMapping:
-              - inJsonPath: $.bookingApplication.bookingId
+              - inJsonPath: $.bookingId
                 outJsonPath: $.Data.bookingId
-              - inJsonPath: $.bookingApplication.bookingNo
-                outJsonPath: $.Data.bookingNo
-              - inJsonPath: $.bookingApplication.paymentDate
-                outJsonPath: $.Data.paymentDate
-              - inJsonPath: $.bookingApplication.applicationDate
-                outJsonPath: $.Data.applicationDate
-              - inJsonPath: $.bookingApplication.tenantId
+              - inJsonPath: $.tenantId
                 outJsonPath: $.Data.tenantId
-              - inJsonPath: $.bookingApplication.bookingStatus
-                outJsonPath: $.Data.bookingStatus
-              - inJsonPath: $.bookingApplication.receiptNo
+              - inJsonPath: $.bookingNo
+                outJsonPath: $.Data.bookingNo
+              - inJsonPath: $.applicationDate
+                outJsonPath: $.Data.applicationDate
+              - inJsonPath: $.paymentDate
+                outJsonPath: $.Data.paymentDate
+              - inJsonPath: $.draftId
+                outJsonPath: $.Data.draftId
+              - inJsonPath: $.receiptNo
                 outJsonPath: $.Data.receiptNo
-              - inJsonPath: $.bookingApplication.auditDetails.lastModifiedBy
-                outJsonPath: $.Data.lastmodifiedby
-              - inJsonPath: $.bookingApplication.auditDetails.lastModifiedTime
-                outJsonPath: $.Data.lastmodifiedtime
-              - inJsonPath: $.bookingApplication.cartDetails
-                outJsonPath: $.Data.cartDetails
-              - inJsonPath: $.bookingApplication.documents
-                outJsonPath: $.Data.documents
-              - inJsonPath: $.bookingApplication.applicantDetail
-                outJsonPath: $.Data.applicantDetail
-              - inJsonPath: $.bookingApplication.address
-                outJsonPath: $.Data.address
-              - inJsonPath: $.bookingApplication.permissionLetterFilestoreId
+              - inJsonPath: $.permissionLetterFilestoreId
                 outJsonPath: $.Data.permissionLetterFilestoreId
-              - inJsonPath: $.bookingApplication.paymentReceiptFilestoreId
+              - inJsonPath: $.paymentReceiptFilestoreId
                 outJsonPath: $.Data.paymentReceiptFilestoreId
+              - inJsonPath: $.bookingStatus
+                outJsonPath: $.Data.bookingStatus
+              - inJsonPath: $.businessService
+                outJsonPath: $.Data.businessService
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+              - inJsonPath: $.applicantDetail.applicantDetailId
+                outJsonPath: $.Data.applicantDetailId
+              - inJsonPath: $.applicantDetail.applicantName
+                outJsonPath: $.Data.applicantName
+              - inJsonPath: $.applicantDetail.applicantMobileNo
+                outJsonPath: $.Data.applicantMobileNo
+              - inJsonPath: $.applicantDetail.applicantAlternateMobileNo
+                outJsonPath: $.Data.applicantAlternateMobileNo
+              - inJsonPath: $.applicantDetail.applicantEmailId
+                outJsonPath: $.Data.applicantEmailId
+              - inJsonPath: $.address.addressId
+                outJsonPath: $.Data.addressId
+              - inJsonPath: $.address.doorNo
+                outJsonPath: $.Data.doorNo
+              - inJsonPath: $.address.houseNo
+                outJsonPath: $.Data.houseNo
+              - inJsonPath: $.address.streetName
+                outJsonPath: $.Data.streetName
+              - inJsonPath: $.address.addressLine1
+                outJsonPath: $.Data.addressLine1
+              - inJsonPath: $.address.addressLine2
+                outJsonPath: $.Data.addressLine2
+              - inJsonPath: $.address.landmark
+                outJsonPath: $.Data.landmark
+              - inJsonPath: $.address.city
+                outJsonPath: $.Data.city
+              - inJsonPath: $.address.cityCode
+                outJsonPath: $.Data.cityCode
+              - inJsonPath: $.address.locality
+                outJsonPath: $.Data.locality
+              - inJsonPath: $.address.localityCode
+                outJsonPath: $.Data.localityCode
+              - inJsonPath: $.address.pincode
+                outJsonPath: $.Data.pincode
+              - inJsonPath: $.cartDetails
+                outJsonPath: $.Data.cartDetails
+              - inJsonPath: $.documents
+                outJsonPath: $.Data.documents
+              - inJsonPath: $.workflow
+                outJsonPath: $.Data.workflow
 
     - topic: create-draft-advertisement
       configKey: INDEX
       indexes:
-        - name: advertisement-draft-index
+        - name: ads-draft-application-index
           type: general
           id: $.draftId
-          isBulk: true
+          isBulk: false
           timeStampField: $.auditDetails.createdTime
           jsonPath: $.advertisementDraftDetail
           customJsonMapping:
             indexMapping: {"Data":{"draftId":"draftId","tenantId":"tenantId","userUuid":"userUuid",
-                                   "draftApplicationData":"draftApplicationData","createdby":"createdby","lastmodifiedby":"lastmodifiedby",
-                                   "createdtime":"createdtime","lastmodifiedtime":"lastmodifiedtime"}}
+                                   "draftApplicationData":"draftApplicationData",
+                                   "createdBy":"createdBy","lastModifiedBy":"lastModifiedBy",
+                                   "createdTime":"createdTime","lastModifiedTime":"lastModifiedTime"}}
             fieldMapping:
-              - inJsonPath: $.advertisementDraftDetail.draftId
+              - inJsonPath: $.draftId
                 outJsonPath: $.Data.draftId
-              - inJsonPath: $.advertisementDraftDetail.tenantId
+              - inJsonPath: $.tenantId
                 outJsonPath: $.Data.tenantId
-              - inJsonPath: $.advertisementDraftDetail.userUuid
+              - inJsonPath: $.auditDetails.createdBy
                 outJsonPath: $.Data.userUuid
-              - inJsonPath: $.advertisementDraftDetail.draftApplicationData
+              - inJsonPath: $.draftApplicationData
                 outJsonPath: $.Data.draftApplicationData
-              - inJsonPath: $.advertisementDraftDetail.auditDetails.createdBy
-                outJsonPath: $.Data.createdby
-              - inJsonPath: $.advertisementDraftDetail.auditDetails.lastModifiedBy
-                outJsonPath: $.Data.lastmodifiedby
-              - inJsonPath: $.advertisementDraftDetail.auditDetails.createdTime
-                outJsonPath: $.Data.createdtime
-              - inJsonPath: $.advertisementDraftDetail.auditDetails.lastModifiedTime
-                outJsonPath: $.Data.lastmodifiedtime
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
 
     - topic: update-draft-advertisement
       configKey: INDEX
       indexes:
-        - name: advertisement-draft-update-index
+        - name: ads-draft-application-update-index
           type: general
-          id: $.draftId, $.tenantId
-          isBulk: true
-          timeStampField: $.auditDetails.lastModifiedTime
-          jsonPath: $.advertisementDraftDetail
-          customJsonMapping:
-            indexMapping: {"Data":{"draftId":"draftId","tenantId":"tenantId","userUuid":"userUuid",
-                                   "draftApplicationData":"draftApplicationData","lastmodifiedby":"lastmodifiedby",
-                                   "lastmodifiedtime":"lastmodifiedtime"}}
-            fieldMapping:
-              - inJsonPath: $.advertisementDraftDetail.draftId
-                outJsonPath: $.Data.draftId
-              - inJsonPath: $.advertisementDraftDetail.tenantId
-                outJsonPath: $.Data.tenantId
-              - inJsonPath: $.advertisementDraftDetail.userUuid
-                outJsonPath: $.Data.userUuid
-              - inJsonPath: $.advertisementDraftDetail.draftApplicationData
-                outJsonPath: $.Data.draftApplicationData
-              - inJsonPath: $.advertisementDraftDetail.auditDetails.lastModifiedBy
-                outJsonPath: $.Data.lastmodifiedby
-              - inJsonPath: $.advertisementDraftDetail.auditDetails.lastModifiedTime
-                outJsonPath: $.Data.lastmodifiedtime
-
-    - topic: delete-draft-advertisement
-      configKey: INDEX
-      indexes:
-        - name: advertisement-draft-delete-index
-          type: general
-          id: $.draftId, $.tenantId
+          id: $.draftId
           isBulk: false
           timeStampField: $.auditDetails.lastModifiedTime
           jsonPath: $.advertisementDraftDetail
           customJsonMapping:
-            indexMapping: {"Data":{"draftId":"draftId","deleted":"deleted","lastmodifiedby":"lastmodifiedby",
-                                   "lastmodifiedtime":"lastmodifiedtime"}}
+            indexMapping: {"Data":{"draftId":"draftId","tenantId":"tenantId","userUuid":"userUuid",
+                                   "draftApplicationData":"draftApplicationData",
+                                   "lastModifiedBy":"lastModifiedBy","lastModifiedTime":"lastModifiedTime"}}
             fieldMapping:
-              - inJsonPath: $.advertisementDraftDetail.draftId
+              - inJsonPath: $.draftId
                 outJsonPath: $.Data.draftId
-              - jsonPath: "true"
-                outJsonPath: $.Data.deleted
-              - inJsonPath: $.advertisementDraftDetail.auditDetails.lastModifiedBy
-                outJsonPath: $.Data.lastmodifiedby
-              - inJsonPath: $.advertisementDraftDetail.auditDetails.lastModifiedTime
-                outJsonPath: $.Data.lastmodifiedtime
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.userUuid
+              - inJsonPath: $.draftApplicationData
+                outJsonPath: $.Data.draftApplicationData
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
