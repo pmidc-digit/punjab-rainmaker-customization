@@ -262,15 +262,19 @@ SearchDefinitions:
           ptadd_pincode, ptadd.locality as ptadd_locality, ptown.userid as
           ptown_userid
 
-          FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid AND b.status='ACTIVE' INNER JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid INNER JOIN  (
+          FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid AND b.status='ACTIVE'
+           INNER JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid AND bd.createdby = ad.createdby
+           INNER JOIN  (
             SELECT connectionno, property_id, oldConnectionNo, additionaldetails, status 
             FROM eg_ws_connection
             UNION ALL
             SELECT connectionno, property_id, oldConnectionNo, additionaldetails, status 
             FROM eg_sw_connection
-          ) conn ON bd.consumercode = conn.connectionno INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id $where AND bd.businessservice IN ('WS', 'SW') order by conn.property_id asc)
+          ) conn ON bd.consumercode = conn.connectionno INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid 
+          INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id
+           INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id $where AND bd.businessservice IN ('WS', 'SW') order by conn.property_id asc)
+           SELECT * ROM bill_data Limit 200;
 
-          select * from bill_data inner join (select max(b_createddate) as maxcreateddate,bd_businessservice as business from bill_data group by bd_businessservice) as max ON max.business=bd_businessservice
       searchParams:
         condition: AND
         params:
