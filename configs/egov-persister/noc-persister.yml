@@ -88,6 +88,35 @@ serviceMaps:
             - jsonPath: $.Noc.nocDetails.auditDetails.lastModifiedTime
             - jsonPath: $.Noc.nocDetails.tenantId
 
+            
+        - query: > 
+            INSERT INTO eg_noc_owner (
+              id, tenantid, nocid, status, isprimaryowner,
+              ownertype, ownershippercentage, institutionid, relationship,
+              createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails
+            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Noc.owners.*
+
+          jsonMaps:
+            - jsonPath: $.Noc.owners.*.id
+            - jsonPath: $.Noc.owners.*.tenantId
+            - jsonPath: $.Noc.id  # nocid from eg_noc(id)
+            - jsonPath: $.Noc.owners.*.status
+            - jsonPath: $.Noc.owners.*.isPrimaryOwner
+            - jsonPath: $.Noc.owners.*.type
+            - jsonPath: $.Noc.owners.*.ownershipPercentage
+            - jsonPath: $.Noc.owners.*.institutionId
+            - jsonPath: $.Noc.owners.*.relationship
+            - jsonPath: $.Noc.owners.*.createdBy
+            - jsonPath: $.Noc.owners.*.createdDate
+            - jsonPath: $.Noc.owners.*.lastModifiedBy
+            - jsonPath: $.Noc.owners.*.lastModifiedDate
+            - jsonPath: $.Noc.owners.*.additionalDetails
+              type: JSON
+              dbType: JSONB
+
+
+
 
 
 
@@ -151,7 +180,16 @@ serviceMaps:
              INSERT INTO eg_noc_document (
              uuid, documenttype,documentAttachment, documentuid, nocid,createdby,
              lastmodifiedby, createdtime, lastmodifiedtime
-             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+              ON CONFLICT (uuid) DO UPDATE SET
+               documenttype = EXCLUDED.documenttype,
+               documentAttachment = EXCLUDED.documentAttachment,
+               documentuid = EXCLUDED.documentuid,
+               nocid = EXCLUDED.nocid,
+               createdby = EXCLUDED.createdby,
+               lastmodifiedby = EXCLUDED.lastmodifiedby,
+               createdtime = EXCLUDED.createdtime,
+               lastmodifiedtime = EXCLUDED.lastmodifiedtime;
           basePath: $.Noc.documents.*
           jsonMaps:
             - jsonPath: $.Noc.documents.*.uuid

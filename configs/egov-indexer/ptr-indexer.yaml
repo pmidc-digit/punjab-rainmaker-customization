@@ -1,0 +1,298 @@
+ServiceMaps:
+  serviceName: pet-services
+  version: 1.0.0
+  mappings:
+
+    - topic: save-ptr-application
+      configKey: INDEX
+      indexes:
+        - name: ptr-application-index
+          type: general
+          id: $.id
+          isBulk: true
+          timeStampField: $.auditDetails.createdTime
+          jsonPath: $.PetRegistrationApplications.*
+          customJsonMapping:
+            indexMapping: {"Data":{"id":"id","tenantId":"tenantId","applicationNumber":"applicationNumber",
+                                   "applicantName":"applicantName","fatherName":"fatherName","mobileNumber":"mobileNumber",
+                                   "emailId":"emailId","applicationType":"applicationType","validityDate":"validityDate",
+                                   "status":"status","expireFlag":"expireFlag","petToken":"petToken","previousApplicationNumber":"previousApplicationNumber",
+                                   "propertyId":"propertyId","createdby":"createdby","lastmodifiedby":"lastmodifiedby",
+                                   "createdtime":"createdtime","lastmodifiedtime":"lastmodifiedtime","addressId":"addressId","addressLine1":"addressLine1","addressLine2":"addressLine2","city":"city","pincode":"pincode","petName":"petName","petType":"petType","breedType":"breedType","petAge":"petAge","petGender":"petGender","vaccinationNumber":"vaccinationNumber","petColor":"petColor"}}
+            fieldMapping:
+              - inJsonPath: $.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.applicationNumber
+                outJsonPath: $.Data.applicationNumber
+              - inJsonPath: $.applicantName
+                outJsonPath: $.Data.applicantName
+              - inJsonPath: $.fatherName
+                outJsonPath: $.Data.fatherName
+              - inJsonPath: $.mobileNumber
+                outJsonPath: $.Data.mobileNumber
+              - inJsonPath: $.emailId
+                outJsonPath: $.Data.emailId
+              - inJsonPath: $.applicationType
+                outJsonPath: $.Data.applicationType
+              - inJsonPath: $.validityDate
+                outJsonPath: $.Data.validityDate
+              - inJsonPath: $.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.expireFlag
+                outJsonPath: $.Data.expireFlag
+              - inJsonPath: $.petToken
+                outJsonPath: $.Data.petToken
+              - inJsonPath: $.previousApplicationNumber
+                outJsonPath: $.Data.previousApplicationNumber
+              - inJsonPath: $.propertyId
+                outJsonPath: $.Data.propertyId
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.createdby
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastmodifiedby
+              - inJsonPath: $.auditDetails.createdTime
+                outJsonPath: $.Data.createdtime
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastmodifiedtime
+              - inJsonPath: $.address.addressId
+                outJsonPath: $.Data.addressId
+              - inJsonPath: $.address.addressLine1
+                outJsonPath: $.Data.addressLine1
+              - inJsonPath: $.address.addressLine2
+                outJsonPath: $.Data.addressLine2
+              - inJsonPath: $.address.city
+                outJsonPath: $.Data.city
+              - inJsonPath: $.address.pincode
+                outJsonPath: $.Data.pincode
+              - inJsonPath: $.address.doorNo
+                outJsonPath: $.Data.doorNo
+              - inJsonPath: $.address.latitude
+                outJsonPath: $.Data.latitude
+              - inJsonPath: $.address.longitude
+                outJsonPath: $.Data.longitude
+              - inJsonPath: $.address.addressNumber
+                outJsonPath: $.Data.addressNumber
+              - inJsonPath: $.address.type
+                outJsonPath: $.Data.addressType
+              - inJsonPath: $.address.landmark
+                outJsonPath: $.Data.landmark
+              - inJsonPath: $.address.detail
+                outJsonPath: $.Data.detail
+              - inJsonPath: $.address.buildingName
+                outJsonPath: $.Data.buildingName
+              - inJsonPath: $.address.street
+                outJsonPath: $.Data.street
+              - inJsonPath: $.address.locality.code
+                outJsonPath: $.Data.localityCode
+              - inJsonPath: $.address.locality.name
+                outJsonPath: $.Data.localityName
+              - inJsonPath: $.address.locality.label
+                outJsonPath: $.Data.localityLabel
+              - inJsonPath: $.petDetails.id
+                outJsonPath: $.Data.petDetailsId
+              - inJsonPath: $.petDetails.petName
+                outJsonPath: $.Data.petName
+              - inJsonPath: $.petDetails.petType
+                outJsonPath: $.Data.petType
+              - inJsonPath: $.petDetails.breedType
+                outJsonPath: $.Data.breedType
+              - inJsonPath: $.petDetails.petAge
+                outJsonPath: $.Data.petAge
+              - inJsonPath: $.petDetails.petGender
+                outJsonPath: $.Data.petGender
+              - inJsonPath: $.petDetails.clinicName
+                outJsonPath: $.Data.clinicName
+              - inJsonPath: $.petDetails.doctorName
+                outJsonPath: $.Data.doctorName
+              - inJsonPath: $.petDetails.lastVaccineDate
+                outJsonPath: $.Data.lastVaccineDate
+              - inJsonPath: $.petDetails.vaccinationNumber
+                outJsonPath: $.Data.vaccinationNumber
+              - inJsonPath: $.petDetails.petColor
+                outJsonPath: $.Data.petColor
+              - inJsonPath: $.petDetails.adoptionDate
+                outJsonPath: $.Data.adoptionDate
+              - inJsonPath: $.petDetails.birthDate
+                outJsonPath: $.Data.birthDate
+              - inJsonPath: $.petDetails.identificationMark
+                outJsonPath: $.Data.petIdentificationMark
+              - inJsonPath: $.documents
+                outJsonPath: $.Data.documents
+
+    - topic: update-ptr-application
+      configKey: INDEX
+      indexes:
+        - name: ptr-application-update-index
+          type: general
+          id: $.id, $.tenantId
+          isBulk: true
+          timeStampField: $.auditDetails.lastModifiedTime
+          jsonPath: $.PetRegistrationApplications.*
+          customJsonMapping:
+            indexMapping: {"Data":{"id":"id","tenantId":"tenantId","applicationNumber":"applicationNumber",
+                                   "applicantName":"applicantName","fatherName":"fatherName","mobileNumber":"mobileNumber",
+                                   "emailId":"emailId","applicationType":"applicationType","validityDate":"validityDate",
+                                   "status":"status","expireFlag":"expireFlag","petToken":"petToken","previousApplicationNumber":"previousApplicationNumber",
+                                   "propertyId":"propertyId","lastmodifiedby":"lastmodifiedby","lastmodifiedtime":"lastmodifiedtime",
+                                   "addressId":"addressId","addressLine1":"addressLine1","addressLine2":"addressLine2","city":"city","pincode":"pincode","petName":"petName","petType":"petType","breedType":"breedType","petAge":"petAge","petGender":"petGender","vaccinationNumber":"vaccinationNumber","petColor":"petColor"}}
+            fieldMapping:
+              - inJsonPath: $.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.applicationNumber
+                outJsonPath: $.Data.applicationNumber
+              - inJsonPath: $.applicantName
+                outJsonPath: $.Data.applicantName
+              - inJsonPath: $.fatherName
+                outJsonPath: $.Data.fatherName
+              - inJsonPath: $.mobileNumber
+                outJsonPath: $.Data.mobileNumber
+              - inJsonPath: $.emailId
+                outJsonPath: $.Data.emailId
+              - inJsonPath: $.applicationType
+                outJsonPath: $.Data.applicationType
+              - inJsonPath: $.validityDate
+                outJsonPath: $.Data.validityDate
+              - inJsonPath: $.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.expireFlag
+                outJsonPath: $.Data.expireFlag
+              - inJsonPath: $.petToken
+                outJsonPath: $.Data.petToken
+              - inJsonPath: $.previousApplicationNumber
+                outJsonPath: $.Data.previousApplicationNumber
+              - inJsonPath: $.propertyId
+                outJsonPath: $.Data.propertyId
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastmodifiedby
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastmodifiedtime
+              - inJsonPath: $.address.addressId
+                outJsonPath: $.Data.addressId
+              - inJsonPath: $.address.addressLine1
+                outJsonPath: $.Data.addressLine1
+              - inJsonPath: $.address.addressLine2
+                outJsonPath: $.Data.addressLine2
+              - inJsonPath: $.address.city
+                outJsonPath: $.Data.city
+              - inJsonPath: $.address.pincode
+                outJsonPath: $.Data.pincode
+              - inJsonPath: $.petDetails.petName
+                outJsonPath: $.Data.petName
+              - inJsonPath: $.petDetails.petType
+                outJsonPath: $.Data.petType
+              - inJsonPath: $.petDetails.breedType
+                outJsonPath: $.Data.breedType
+              - inJsonPath: $.petDetails.petAge
+                outJsonPath: $.Data.petAge
+              - inJsonPath: $.petDetails.petGender
+                outJsonPath: $.Data.petGender
+              - inJsonPath: $.petDetails.vaccinationNumber
+                outJsonPath: $.Data.vaccinationNumber
+              - inJsonPath: $.petDetails.petColor
+                outJsonPath: $.Data.petColor
+
+    - topic: expire-ptr-application
+      configKey: INDEX
+      indexes:
+        - name: ptr-application-expire-index
+          type: general
+          id: $.id, $.tenantId
+          isBulk: false
+          timeStampField: $.auditDetails.lastModifiedTime
+          jsonPath: $.PetRegistrationApplications.*
+          customJsonMapping:
+            indexMapping: {"Data":{"id":"id","applicationNumber":"applicationNumber","status":"status",
+                                   "lastmodifiedby":"lastmodifiedby","lastmodifiedtime":"lastmodifiedtime"}}
+            fieldMapping:
+              - inJsonPath: $.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.applicationNumber
+                outJsonPath: $.Data.applicationNumber
+              - inJsonPath: $.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastmodifiedby
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastmodifiedtime
+
+    - topic: renew-ptr-application
+      configKey: INDEX
+      indexes:
+        - name: ptr-application-renew-index
+          type: general
+          id: $.id
+          isBulk: true
+          timeStampField: $.auditDetails.createdTime
+          jsonPath: $.PetRegistrationApplications.*
+          customJsonMapping:
+            indexMapping: {"Data":{"id":"id","tenantId":"tenantId","applicationNumber":"applicationNumber",
+                                   "applicantName":"applicantName","fatherName":"fatherName","mobileNumber":"mobileNumber",
+                                   "emailId":"emailId","applicationType":"applicationType","validityDate":"validityDate",
+                                   "status":"status","expireFlag":"expireFlag","petToken":"petToken","previousApplicationNumber":"previousApplicationNumber",
+                                   "propertyId":"propertyId","createdby":"createdby","lastmodifiedby":"lastmodifiedby",
+                                   "createdtime":"createdtime","lastmodifiedtime":"lastmodifiedtime","addressId":"addressId","addressLine1":"addressLine1","addressLine2":"addressLine2","city":"city","pincode":"pincode","petName":"petName","petType":"petType","breedType":"breedType","petAge":"petAge","petGender":"petGender","vaccinationNumber":"vaccinationNumber","petColor":"petColor"}}
+            fieldMapping:
+              - inJsonPath: $.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.applicationNumber
+                outJsonPath: $.Data.applicationNumber
+              - inJsonPath: $.applicantName
+                outJsonPath: $.Data.applicantName
+              - inJsonPath: $.fatherName
+                outJsonPath: $.Data.fatherName
+              - inJsonPath: $.mobileNumber
+                outJsonPath: $.Data.mobileNumber
+              - inJsonPath: $.emailId
+                outJsonPath: $.Data.emailId
+              - inJsonPath: $.applicationType
+                outJsonPath: $.Data.applicationType
+              - inJsonPath: $.validityDate
+                outJsonPath: $.Data.validityDate
+              - inJsonPath: $.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.expireFlag
+                outJsonPath: $.Data.expireFlag
+              - inJsonPath: $.petToken
+                outJsonPath: $.Data.petToken
+              - inJsonPath: $.previousApplicationNumber
+                outJsonPath: $.Data.previousApplicationNumber
+              - inJsonPath: $.propertyId
+                outJsonPath: $.Data.propertyId
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.createdby
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastmodifiedby
+              - inJsonPath: $.auditDetails.createdTime
+                outJsonPath: $.Data.createdtime
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastmodifiedtime
+              - inJsonPath: $.address.addressId
+                outJsonPath: $.Data.addressId
+              - inJsonPath: $.address.addressLine1
+                outJsonPath: $.Data.addressLine1
+              - inJsonPath: $.address.addressLine2
+                outJsonPath: $.Data.addressLine2
+              - inJsonPath: $.address.city
+                outJsonPath: $.Data.city
+              - inJsonPath: $.address.pincode
+                outJsonPath: $.Data.pincode
+              - inJsonPath: $.petDetails.petName
+                outJsonPath: $.Data.petName
+              - inJsonPath: $.petDetails.petType
+                outJsonPath: $.Data.petType
+              - inJsonPath: $.petDetails.breedType
+                outJsonPath: $.Data.breedType
+              - inJsonPath: $.petDetails.petAge
+                outJsonPath: $.Data.petAge
+              - inJsonPath: $.petDetails.petGender
+                outJsonPath: $.Data.petGender
+              - inJsonPath: $.petDetails.vaccinationNumber
+                outJsonPath: $.Data.vaccinationNumber
+              - inJsonPath: $.petDetails.petColor
+                outJsonPath: $.Data.petColor

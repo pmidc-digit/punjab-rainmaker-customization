@@ -3490,4 +3490,52 @@ ReportDefinitions:
        FROM eg_ws_meterreading
        WHERE connectionno = mt.connectionno
        )
-    groupby: GROUP BY conn.connectionno          
+    groupby: GROUP BY conn.connectionno
+
+  - reportName: OutstandingArrears
+    summary: Outstanding Arrears Report
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: consumercode
+        type: string
+        source: ws
+        total: false
+      - name: businessservice
+        label: businessservice
+        type: string
+        source: ws
+        total: true
+      - name: amt
+        label: totalamount
+        type: string
+        source: ws
+        total: true
+      - name: max_taxperiodto_date
+        label: max_taxperiodto_date
+        type: string
+        source: ws
+        total: true
+    searchParams:
+      - name: connectionType
+        label: connectionType
+        type: singlevaluelist
+        pattern: list://WS%:Water,SW%:Sewerage
+        source: pt
+        isMandatory: true
+        searchClause: AND dd.businessservice like $connectionType
+    query: >
+      -- Use CTE to force query plan, compute & use CTE later
+
+      SELECT dd.consumercode,dd.businessservice,
+      SUM(dt.taxamount) AS amt,
+      TO_CHAR((TO_TIMESTAMP(MAX(dd.taxperiodto) / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD') 
+      AS max_taxperiodto_date FROM egbs_demand_v1 dd JOIN egbs_demanddetail_v1 dt  
+      ON dd.id = dt.demandid WHERE dd.tenantid = $tenantid   
+      AND dd.status IN ('ACTIVE','EXPIRED')  
+      AND (TO_TIMESTAMP(dd.taxperiodto / 1000) AT TIME ZONE 'Asia/Kolkata')<= TO_DATE('2025-04-01','YYYY-MM-DD') 
+    groupby: GROUP BY dd.consumercode, dd.businessservice HAVING SUM(dt.taxamount) <> 0   

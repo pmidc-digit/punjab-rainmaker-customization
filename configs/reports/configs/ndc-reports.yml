@@ -1,7 +1,7 @@
 ---
 ReportDefinitions:
 - reportName: ApplicationDetailReport
-  decryptionPathId: CITIZEN
+  decryptionPathId: ALL_ACCESS
   summary: Details of applicant in ndc service
   version: 1.0.0
   moduleName: rainmaker-ndc
@@ -14,13 +14,13 @@ ReportDefinitions:
     type: string
     source: ndc
     total: false
-  - name: mobilenumber
-    label: mobilenumber
+  - name: mobileNumber
+    label: mobileNumber
     type: string
     source: ndc
     total: false
-  - name: emailid
-    label: emailid
+  - name: emailId
+    label: emailId
     type: string
     source: ndc
     total: false
@@ -88,7 +88,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: ndc
     wrapper: true
-    isMandatory: false
+    isMandatory: true
     searchClause: AND a.tenantid = $tenantid
   query: |
       -- Use CTE to force query plan, compute & use CTE later
@@ -97,12 +97,11 @@ ReportDefinitions:
         a.action, d.consumercode, a.applicationstatus, d.businessservice, 
         d.applicationid, d.dueamount, d.status
       FROM  eg_user  u
-      
       JOIN eg_ndc_owner AS o ON u.uuid = o.uuid
       JOIN eg_ndc_details AS d ON o.ndcapplicationuuid = d.applicationid
       JOIN eg_ndc_application AS a ON a.uuid = o.ndcapplicationuuid
       LEFT JOIN eg_user_address AS ua ON ua.userid = u.id
-      WHERE a.tenantid = $tenantid
+      WHERE 1=1
 - reportName: CollectionsReport
   summary: Collections
   version: 1.0.0
@@ -146,18 +145,18 @@ ReportDefinitions:
     source: ndc
     isMandatory: false
     searchClause: AND collector_code = $collector_code
-  - name: fromdate
-    label: fromdate
+  - name: fromDate
+    label: fromDate
     type: epoch
     source: ndc
     isMandatory: true
-    searchClause: AND createdtime BETWEEN $fromdate
-  - name: todate
-    label: todate
+    searchClause: AND createdtime >= $fromDate
+  - name: toDate
+    label: toDate
     type: epoch
     source: ndc
     isMandatory: true
-    searchClause: AND $todate
+    searchClause: AND createdtime <= $toDate
   query: |
       -- Use CTE to force query plan, compute & use CTE later
       WITH unique_transactions AS (
@@ -181,8 +180,8 @@ ReportDefinitions:
        LEFT JOIN eg_hrms_employee emp  ON emp.uuid::text = u.uuid::text
        WHERE p.paymentstatus != 'CANCELLED'
        AND p.tenantid =$tenantid
-       AND p.createdtime BETWEEN $fromdate AND $todate
-       AND 1=1
+       AND p.createdtime >= $fromDate
+       AND p.createdtime <= $toDate
        )
        SELECT
        COALESCE(collector_code, 'SELF') AS collector_code,  
@@ -190,7 +189,7 @@ ReportDefinitions:
        SUM(totalamountpaid) AS total_amount,
        COUNT(transaction_id) AS total_count
        FROM unique_transactions
-       WHERE collector_code = $collector_code
+       WHERE 1=1
        -- AND businessservice = 'WS'
   groupby: GROUP BY collector_code, mode_norm
   orderby: ORDER BY collector_code, total_amount DESC
@@ -217,23 +216,23 @@ ReportDefinitions:
     type: string
     source: ndc
     total: false
-  - name: document_verified_on
-    label: document_verified_on
+  - name: documentverify_on
+    label: documentverify_on
     type: string
     source: ndc
     total: false
-  - name: final status verified on
-    label: final status verified on
+  - name: finalstatus_on
+    label: finalstatus_on
     type: string
     source: ndc
     total: false
-  - name: sla days
-    label: sla days
+  - name: sla_days
+    label: sla_days
     type: string
     source: ndc
     total: false
-  - name: sla status
-    label: sla status
+  - name: sla_status
+    label: sla_status
     type: string
     source: ndc
     total: false
@@ -242,14 +241,14 @@ ReportDefinitions:
     label: fromDate
     type: epoch
     source: ndc
-    isMandatory: false
-    searchClause: AND a.createdtime >= $fromDate
+    isMandatory: true
+    searchClause: AND ndc.createdtime >= $fromDate
   - name: toDate
     label: toDate
     type: epoch
     source: ndc
-    isMandatory: false
-    searchClause: AND a.createdtime <= $toDate
+    isMandatory: true
+    searchClause: AND ndc.createdtime <= $toDate
   - name: tenantid
     label: tenantid
     type: singlevaluelist
@@ -270,8 +269,8 @@ ReportDefinitions:
           ),
        status_times AS (
          SELECT 
-           uuid, MAX(CASE WHEN upper(applicationstatus) = 'DOCUMENTVERIFY' THEN createdtime ELSE NULL END) AS docverify_time,
-           MAX(CASE WHEN upper(applicationstatus) IN ('APPROVED','REJECTED') THEN lastmodifiedtime ELSE NULL END) AS final_time
+           uuid, MAX(CASE WHEN upper(applicationstatus) = 'DOCUMENTVERIFY' THEN createdtime  END) AS docverify_time,
+           MAX(CASE WHEN upper(applicationstatus) IN ('APPROVED','REJECTED') THEN lastmodifiedtime END) AS final_time
          FROM wf_detailed
          GROUP BY uuid
          ),
@@ -283,19 +282,31 @@ ReportDefinitions:
        WHERE bs.businessservice = 'ndc-services'
        )
        SELECT 
-        ndc.tenantid,ndc.uuid,ndc.applicationstatus,
+        ndc.tenantid,ndc.uuid AS Applicationnumber,ndc.applicationstatus,
         TO_CHAR( TO_TIMESTAMP(st.docverify_time / 1000), 'DD-MM-YYYY') AS documentverify_on,
         TO_CHAR( TO_TIMESTAMP(st.final_time / 1000), 'DD-MM-YYYY') AS finalstatus_on,
-        FLOOR( (st.final_time - st.docverify_time) / 86400000 ) AS sla_days,
+        CASE
+          WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL 
+            THEN  FLOOR ((st.final_time - st.docverify_time) / 86400000)
+          WHEN st.docverify_time IS NOT NULL
+             THEN FLOOR((EXTRACT(EPOCH FROM NOW()) * 1000 - st.docverify_time) / 86400000)
+          ELSE NULL
+        END AS sla_days,
         CASE 
-         WHEN (st.final_time - st.docverify_time) > sla.businessservicesla THEN 'BREACHED'
-        ELSE 'MEET'
+          WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL 
+           THEN 
+            CASE 
+             WHEN (st.final_time - st.docverify_time) > sla.businessservicesla THEN 'BREACHED'
+             ELSE 'MEET'
+            END
+          WHEN st.docverify_time IS NOT NULL AND st.docverify_time IS NULL
+            THEN 'IN-PROGRESS'
+          ELSE 'AWAITING DOCVERIFY'
         END AS sla_status
        FROM eg_ndc_application ndc
-       JOIN status_times st
+       LEFT JOIN status_times st
         ON ndc.uuid = st.uuid
        JOIN sla_data sla
         ON 'ndc-services' = sla.businessservice
-        WHERE ndc.tenantid = $tenantid
-       AND upper(ndc.applicationstatus) IN ('REJECTED','APPROVED','DOCUMENTVERIFY')
-  orderby: ORDER BY tenantid,applicationstatus;
+        WHERE upper(ndc.applicationstatus) IN ('REJECTED','APPROVED','DOCUMENTVERIFY')
+  orderby: ORDER BY ndc.createdtime DESC ,tenantid,applicationstatus;
