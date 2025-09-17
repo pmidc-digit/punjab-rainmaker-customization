@@ -20,7 +20,7 @@ serviceMaps:
             - jsonPath: $.Applications.*.action
             - jsonPath: $.Applications.*.reason
 
-        - query: INSERT INTO eg_ndc_details (uuid,applicationid, businessservice, consumercode, additionaldetails,status) VALUES (?, ?, ?, ?, ?,?);
+        - query: INSERT INTO eg_ndc_details (uuid,applicationid, businessservice, consumercode, additionaldetails,status,isduepending) VALUES (?, ?, ?, ?, ?,?,?);
           basePath: Applications.*.NdcDetails.*
           jsonMaps:
             - jsonPath: $.Applications.*.NdcDetails.*.uuid
@@ -31,6 +31,7 @@ serviceMaps:
               type: JSON
               dbType: JSONB
             - jsonPath: $.Applications.*.NdcDetails.*.status
+            - jsonPath: $.Applications.*.NdcDetails.*.isDuePending
 
         - query: INSERT INTO eg_ndc_documents (uuid, applicationid, documenttype, documentattachment, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
           basePath: Applications.*.Documents.*
@@ -99,14 +100,15 @@ serviceMaps:
             - jsonPath: $.Applications.*.action
             - jsonPath: $.Applications.*.reason
 
-        - query: INSERT INTO eg_ndc_details (uuid, applicationid, businessservice, consumercode, additionaldetails, status)
-            VALUES (?, ?, ?, ?, ?, ?)
+        - query: INSERT INTO eg_ndc_details (uuid, applicationid, businessservice, consumercode, additionaldetails, status,isduepending)
+            VALUES (?, ?, ?, ?, ?, ?,?)
             ON CONFLICT (uuid) DO UPDATE SET
               applicationid = EXCLUDED.applicationid,
               businessservice = EXCLUDED.businessservice,
               consumercode = EXCLUDED.consumercode,
               additionaldetails = EXCLUDED.additionaldetails,
-              status = EXCLUDED.status;
+              status = EXCLUDED.status,
+              isduepending = EXCLUDED.isduepending;
           basePath: Applications.*.NdcDetails.*
           jsonMaps:
             - jsonPath: $.Applications.*.NdcDetails.*.uuid
@@ -117,6 +119,7 @@ serviceMaps:
               type: JSON
               dbType: JSONB
             - jsonPath: $.Applications.*.NdcDetails.*.status
+            - jsonPath: $.Applications.*.NdcDetails.*.isDuePending
 
         - query: INSERT INTO eg_ndc_documents (uuid, applicationid, documenttype, documentattachment, createdby, lastmodifiedby, createdtime, lastmodifiedtime)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
