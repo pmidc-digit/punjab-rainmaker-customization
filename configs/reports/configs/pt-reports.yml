@@ -6852,7 +6852,6 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND tenantid = $ulb
     query: |
-       -- Optimized version: reduces cross-join blow-up and precomputes defaulter flag
        WITH demand_with_details AS (
          SELECT
            dd.id AS demand_id,
@@ -6860,9 +6859,8 @@ ReportDefinitions:
            (to_timestamp(dd.taxperiodfrom::double precision / 1000) AT TIME ZONE 'UTC') + interval '5 hours 30 minutes' AS taxperiodfrom_ist,
            COALESCE(dtd.taxamount, 0)::numeric AS taxamount,
            COALESCE(dtd.collectionamount, 0)::numeric AS collectionamount
-         FROM egbs_demanddetail_v1 AS dtd
-         JOIN egbs_demand_v1 AS dd
-           ON dtd.demandid = dd.id
+         FROM egbs_demanddetail_v1 dtd
+         JOIN egbs_demand_v1 dd ON dtd.demandid = dd.id
          WHERE dd.tenantid = $ulb
            AND dd.status = 'ACTIVE'
            AND dd.businessservice = 'PT'
@@ -6895,20 +6893,11 @@ ReportDefinitions:
        ),
        
        minmax_by_consumercode AS (
-         SELECT
-           consumercode,
-           MIN(fy_start) AS min_fy_start,
-           MAX(fy_start) AS max_fy_start
+         SELECT consumercode, MIN(fy_start) AS min_fy_start, MAX(fy_start) AS max_fy_start
          FROM due_label
          GROUP BY consumercode
        ),
        
-       all_target_fys_labeled AS (
-         SELECT generate_series(2013, 2024) AS fy_start,
-                (generate_series(2013, 2024)::text || '-' || RIGHT((generate_series(2013, 2024) + 1)::text, 2)) AS fy_label
-       ),
-       
-       -- property base (only ACTIVE properties) with aggregated owners/localities
        property_base AS (
          SELECT
            p.propertyid AS propertyid_property,
@@ -6917,49 +6906,16 @@ ReportDefinitions:
            p.usagecategory,
            array_remove(array_agg(DISTINCT o.userid), NULL) AS owner_ids,
            array_remove(array_agg(DISTINCT a.locality), NULL) AS localities
-         FROM eg_pt_property AS p
-         LEFT JOIN eg_pt_owner AS o ON o.propertyid = p.id
-         LEFT JOIN eg_pt_address AS a ON a.propertyid = p.id
+         FROM eg_pt_property p
+         LEFT JOIN eg_pt_owner o ON o.propertyid = p.id
+         LEFT JOIN eg_pt_address a ON a.propertyid = p.id
          WHERE p.tenantid = $ulb
            AND p.status = 'ACTIVE'
          GROUP BY p.propertyid, p.id, p.landarea, p.usagecategory
        ),
        
-       -- properties that have demand history (we will expand FY rows only for these)
-       props_with_demand AS (
-         SELECT pb.*, mm.min_fy_start, mm.max_fy_start
-         FROM property_base pb
-         JOIN minmax_by_consumercode mm
-           ON mm.consumercode = pb.propertyid_property
-       ),
-       
-       -- Expand FY rows only for properties that have any demand history (12 rows each)
-       prop_fy_rows_demand AS (
-         SELECT
-           pw.propertyid_property,
-           pw.id,
-           pw.landarea,
-           pw.usagecategory,
-           pw.owner_ids,
-           pw.localities,
-           atf.fy_start,
-           atf.fy_label,
-           COALESCE(dl.due_amount, NULL) AS numeric_due_amount,
-           -- text cell exactly like Python: numeric -> text, missing between min..max -> marker, outside -> NULL
-           CASE
-             WHEN dl.due_amount IS NOT NULL THEN dl.due_amount::text
-             WHEN atf.fy_start BETWEEN pw.min_fy_start AND pw.max_fy_start THEN 'Demand not generated, hence not paid'
-             ELSE NULL
-           END AS fy_val_text
-         FROM props_with_demand pw
-         CROSS JOIN all_target_fys_labeled atf
-         LEFT JOIN due_label dl
-           ON dl.consumercode = pw.propertyid_property
-          AND dl.fy_start = atf.fy_start
-       ),
-       
-       -- For properties without any demand history, create a single row (all FYs will be NULL after pivot)
-       prop_rows_no_demand AS (
+       -- pivot numeric values per FY (one grouped scan)
+       prop_pivot AS (
          SELECT
            pb.propertyid_property,
            pb.id,
@@ -6967,94 +6923,112 @@ ReportDefinitions:
            pb.usagecategory,
            pb.owner_ids,
            pb.localities,
-           NULL::int AS fy_start,
-           NULL::text AS fy_label,
-           NULL::numeric AS numeric_due_amount,
-           NULL::text AS fy_val_text
+           MAX(CASE WHEN dl.fy_start = 2013 THEN dl.due_amount END) AS num_2013_14,
+           MAX(CASE WHEN dl.fy_start = 2014 THEN dl.due_amount END) AS num_2014_15,
+           MAX(CASE WHEN dl.fy_start = 2015 THEN dl.due_amount END) AS num_2015_16,
+           MAX(CASE WHEN dl.fy_start = 2016 THEN dl.due_amount END) AS num_2016_17,
+           MAX(CASE WHEN dl.fy_start = 2017 THEN dl.due_amount END) AS num_2017_18,
+           MAX(CASE WHEN dl.fy_start = 2018 THEN dl.due_amount END) AS num_2018_19,
+           MAX(CASE WHEN dl.fy_start = 2019 THEN dl.due_amount END) AS num_2019_20,
+           MAX(CASE WHEN dl.fy_start = 2020 THEN dl.due_amount END) AS num_2020_21,
+           MAX(CASE WHEN dl.fy_start = 2021 THEN dl.due_amount END) AS num_2021_22,
+           MAX(CASE WHEN dl.fy_start = 2022 THEN dl.due_amount END) AS num_2022_23,
+           MAX(CASE WHEN dl.fy_start = 2023 THEN dl.due_amount END) AS num_2023_24,
+           MAX(CASE WHEN dl.fy_start = 2024 THEN dl.due_amount END) AS num_2024_25,
+           MIN(mm.min_fy_start) AS min_fy_start,
+           MAX(mm.max_fy_start) AS max_fy_start
          FROM property_base pb
-         WHERE NOT EXISTS (
-           SELECT 1 FROM minmax_by_consumercode mm WHERE mm.consumercode = pb.propertyid_property
-         )
-       ),
-       
-       -- union rows
-       prop_fy_union AS (
-         SELECT * FROM prop_fy_rows_demand
-         UNION ALL
-         SELECT * FROM prop_rows_no_demand
-       ),
-       
-       -- pivot to columns (text FY columns so they carry the marker string)
-       pivoted AS (
-         SELECT
-           propertyid_property,
-           id,
-           landarea,
-           usagecategory,
-           owner_ids,
-           localities,
-           MAX(CASE WHEN fy_label = '2013-14' THEN fy_val_text END) AS "2013-14",
-           MAX(CASE WHEN fy_label = '2014-15' THEN fy_val_text END) AS "2014-15",
-           MAX(CASE WHEN fy_label = '2015-16' THEN fy_val_text END) AS "2015-16",
-           MAX(CASE WHEN fy_label = '2016-17' THEN fy_val_text END) AS "2016-17",
-           MAX(CASE WHEN fy_label = '2017-18' THEN fy_val_text END) AS "2017-18",
-           MAX(CASE WHEN fy_label = '2018-19' THEN fy_val_text END) AS "2018-19",
-           MAX(CASE WHEN fy_label = '2019-20' THEN fy_val_text END) AS "2019-20",
-           MAX(CASE WHEN fy_label = '2020-21' THEN fy_val_text END) AS "2020-21",
-           MAX(CASE WHEN fy_label = '2021-22' THEN fy_val_text END) AS "2021-22",
-           MAX(CASE WHEN fy_label = '2022-23' THEN fy_val_text END) AS "2022-23",
-           MAX(CASE WHEN fy_label = '2023-24' THEN fy_val_text END) AS "2023-24",
-           MAX(CASE WHEN fy_label = '2024-25' THEN fy_val_text END) AS "2024-25"
-         FROM prop_fy_union
-         GROUP BY propertyid_property, id, landarea, usagecategory, owner_ids, localities
-       ),
-       
-       -- precompute IsDefaulter flag (matches Python logic: any FY from 2019 onward that either has numeric due>0 OR would get the marker)
-       is_defaulter_flag AS (
-         SELECT
-           pb.propertyid_property,
-           CASE
-             WHEN EXISTS (
-               SELECT 1
-               FROM generate_series(2019, 2024) AS y(fy_start)
-               WHERE
-                 (
-                   -- positive numeric due exists for that FY
-                   EXISTS (
-                     SELECT 1 FROM due_label dl2
-                     WHERE dl2.consumercode = pb.propertyid_property
-                       AND dl2.fy_start = y.fy_start
-                       AND dl2.due_amount > 0
-                   )
-                   OR
-                   -- OR FY is between min and max (so Python would place the marker) and there is no numeric due row for that FY
-                   (
-                     EXISTS (SELECT 1 FROM minmax_by_consumercode mm2 WHERE mm2.consumercode = pb.propertyid_property)
-                     AND y.fy_start BETWEEN
-                         (SELECT mm3.min_fy_start FROM minmax_by_consumercode mm3 WHERE mm3.consumercode = pb.propertyid_property)
-                     AND (SELECT mm4.max_fy_start FROM minmax_by_consumercode mm4 WHERE mm4.consumercode = pb.propertyid_property)
-                     AND NOT EXISTS (
-                       SELECT 1 FROM due_label dl3
-                       WHERE dl3.consumercode = pb.propertyid_property
-                         AND dl3.fy_start = y.fy_start
-                     )
-                   )
-                 )
-             ) THEN 'Yes' ELSE 'No' END AS IsDefaulter
-         FROM property_base pb
+         LEFT JOIN due_label dl ON dl.consumercode = pb.propertyid_property
+         LEFT JOIN minmax_by_consumercode mm ON mm.consumercode = pb.propertyid_property
+         GROUP BY pb.propertyid_property, pb.id, pb.landarea, pb.usagecategory, pb.owner_ids, pb.localities
        )
        
        SELECT
-         p.propertyid_property AS propertyid_property,
+         p.propertyid_property AS "Property ID",
          p.id,
-         p.landarea,
-         p.usagecategory,
-         p.owner_ids AS owner_ids,
-         p.localities AS localities,
-         p."2013-14", p."2014-15", p."2015-16", p."2016-17", p."2017-18",
-         p."2018-19", p."2019-20", p."2020-21", p."2021-22", p."2022-23",
-         p."2023-24", p."2024-25",
-         COALESCE(d.IsDefaulter, 'No') AS IsDefaulter
-       FROM pivoted p
-       LEFT JOIN is_defaulter_flag d ON d.propertyid_property = p.propertyid_property and d.IsDefaulter='Yes'
-    orderby: ORDER BY p.propertyid_property;      
+         p.landarea AS "Plot size",
+         p.usagecategory AS "Propertyusagetype",
+         p.owner_ids AS "Owner Id",
+         p.localities AS "Locality",
+       
+         -- final text cells: numeric as text OR marker when within observed range and numeric is NULL
+         COALESCE(p.num_2013_14::text,
+                  CASE WHEN p.min_fy_start IS NOT NULL AND 2013 BETWEEN p.min_fy_start AND p.max_fy_start
+                       THEN 'Demand not generated, hence not paid' END) AS "2013-14",
+         COALESCE(p.num_2014_15::text,
+                  CASE WHEN p.min_fy_start IS NOT NULL AND 2014 BETWEEN p.min_fy_start AND p.max_fy_start
+                       THEN 'Demand not generated, hence not paid' END) AS "2014-15",
+         COALESCE(p.num_2015_16::text,
+                  CASE WHEN p.min_fy_start IS NOT NULL AND 2015 BETWEEN p.min_fy_start AND p.max_fy_start
+                       THEN 'Demand not generated, hence not paid' END) AS "2015-16",
+         COALESCE(p.num_2016_17::text,
+                  CASE WHEN p.min_fy_start IS NOT NULL AND 2016 BETWEEN p.min_fy_start AND p.max_fy_start
+                       THEN 'Demand not generated, hence not paid' END) AS "2016-17",
+         COALESCE(p.num_2017_18::text,
+                  CASE WHEN p.min_fy_start IS NOT NULL AND 2017 BETWEEN p.min_fy_start AND p.max_fy_start
+                       THEN 'Demand not generated, hence not paid' END) AS "2017-18",
+         COALESCE(p.num_2018_19::text,
+                  CASE WHEN p.min_fy_start IS NOT NULL AND 2018 BETWEEN p.min_fy_start AND p.max_fy_start
+                       THEN 'Demand not generated, hence not paid' END) AS "2018-19",
+         COALESCE(p.num_2019_20::text,
+                  CASE WHEN p.min_fy_start IS NOT NULL AND 2019 BETWEEN p.min_fy_start AND p.max_fy_start
+                       THEN 'Demand not generated, hence not paid' END) AS "2019-20",
+         COALESCE(p.num_2020_21::text,
+                  CASE WHEN p.min_fy_start IS NOT NULL AND 2020 BETWEEN p.min_fy_start AND p.max_fy_start
+                       THEN 'Demand not generated, hence not paid' END) AS "2020-21",
+         COALESCE(p.num_2021_22::text,
+                  CASE WHEN p.min_fy_start IS NOT NULL AND 2021 BETWEEN p.min_fy_start AND p.max_fy_start
+                       THEN 'Demand not generated, hence not paid' END) AS "2021-22",
+         COALESCE(p.num_2022_23::text,
+                  CASE WHEN p.min_fy_start IS NOT NULL AND 2022 BETWEEN p.min_fy_start AND p.max_fy_start
+                       THEN 'Demand not generated, hence not paid' END) AS "2022-23",
+         COALESCE(p.num_2023_24::text,
+                  CASE WHEN p.min_fy_start IS NOT NULL AND 2023 BETWEEN p.min_fy_start AND p.max_fy_start
+                       THEN 'Demand not generated, hence not paid' END) AS "2023-24",
+         COALESCE(p.num_2024_25::text,
+                  CASE WHEN p.min_fy_start IS NOT NULL AND 2024 BETWEEN p.min_fy_start AND p.max_fy_start
+                       THEN 'Demand not generated, hence not paid' END) AS "2024-25",
+       
+         -- IsDefaulter: Python rule (any FY 2019..2024 numeric>0 OR marker present)
+         CASE
+           WHEN (
+             COALESCE(p.num_2019_20, 0) > 0
+             OR COALESCE(p.num_2020_21, 0) > 0
+             OR COALESCE(p.num_2021_22, 0) > 0
+             OR COALESCE(p.num_2022_23, 0) > 0
+             OR COALESCE(p.num_2023_24, 0) > 0
+             OR COALESCE(p.num_2024_25, 0) > 0
+             OR (
+               p.min_fy_start IS NOT NULL AND (
+                 (2019 BETWEEN p.min_fy_start AND p.max_fy_start AND p.num_2019_20 IS NULL)
+                 OR (2020 BETWEEN p.min_fy_start AND p.max_fy_start AND p.num_2020_21 IS NULL)
+                 OR (2021 BETWEEN p.min_fy_start AND p.max_fy_start AND p.num_2021_22 IS NULL)
+                 OR (2022 BETWEEN p.min_fy_start AND p.max_fy_start AND p.num_2022_23 IS NULL)
+                 OR (2023 BETWEEN p.min_fy_start AND p.max_fy_start AND p.num_2023_24 IS NULL)
+                 OR (2024 BETWEEN p.min_fy_start AND p.max_fy_start AND p.num_2024_25 IS NULL)
+               )
+             )
+           ) THEN 'Yes' ELSE 'No' END AS IsDefaulter
+       
+       FROM prop_pivot p
+       WHERE
+         -- return only defaulters
+         (
+           COALESCE(p.num_2019_20, 0) > 0
+           OR COALESCE(p.num_2020_21, 0) > 0
+           OR COALESCE(p.num_2021_22, 0) > 0
+           OR COALESCE(p.num_2022_23, 0) > 0
+           OR COALESCE(p.num_2023_24, 0) > 0
+           OR COALESCE(p.num_2024_25, 0) > 0
+           OR (
+             p.min_fy_start IS NOT NULL AND (
+               (2019 BETWEEN p.min_fy_start AND p.max_fy_start AND p.num_2019_20 IS NULL)
+               OR (2020 BETWEEN p.min_fy_start AND p.max_fy_start AND p.num_2020_21 IS NULL)
+               OR (2021 BETWEEN p.min_fy_start AND p.max_fy_start AND p.num_2021_22 IS NULL)
+               OR (2022 BETWEEN p.min_fy_start AND p.max_fy_start AND p.num_2022_23 IS NULL)
+               OR (2023 BETWEEN p.min_fy_start AND p.max_fy_start AND p.num_2023_24 IS NULL)
+               OR (2024 BETWEEN p.min_fy_start AND p.max_fy_start AND p.num_2024_25 IS NULL)
+             )
+           )
+         )
+    orderby: ORDER BY p.propertyid_property;
