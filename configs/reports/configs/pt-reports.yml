@@ -10365,13 +10365,13 @@ ReportDefinitions:
     source: pt
     total: false                                
   searchParams:  
-  - name: ulb
-    label: ULB
+  - name: tenantid
+    label: tenantid
     type: singlevaluelist
-    pattern: http://egov-mdms-service:8080egov-mdms-servicv1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: pt
     wrapper: true
-    isMandatory: false
+    isMandatory: true
     searchClause: AND 1=1
   query: |
      WITH demand_with_details AS (
@@ -10384,7 +10384,7 @@ ReportDefinitions:
        FROM egbs_demanddetail_v1 AS dtd
        JOIN egbs_demand_v1 AS dd
          ON dtd.demandid = dd.id
-       WHERE dd.tenantid = $ulb
+       WHERE dd.tenantid = $tenantid
          AND dd.status = 'ACTIVE'
          AND dd.businessservice = 'PT'
      ),
@@ -10440,7 +10440,7 @@ ReportDefinitions:
        FROM eg_pt_property AS p
        LEFT JOIN eg_pt_owner AS o ON o.propertyid = p.id
        LEFT JOIN eg_pt_address AS a ON a.propertyid = p.id
-       WHERE p.tenantid = $ulb
+       WHERE p.tenantid = $tenantid
          AND p.status = 'ACTIVE'
        GROUP BY p.propertyid, p.id, p.landarea, p.usagecategory
      ),
