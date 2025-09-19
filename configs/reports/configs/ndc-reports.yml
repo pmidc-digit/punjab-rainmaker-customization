@@ -88,7 +88,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: ndc
     wrapper: true
-    isMandatory: true
+    isMandatory: false
     searchClause: AND a.tenantid = $tenantid
   query: |
       -- Use CTE to force query plan, compute & use CTE later
@@ -137,7 +137,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: ndc
     wrapper: true
-    isMandatory: true
+    isMandatory: false
     searchClause: AND tenantid = $tenantid
   - name: collector_code
     label: collector_code
@@ -255,7 +255,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: ndc
     wrapper: true
-    isMandatory: true
+    isMandatory: false
     searchClause: AND ndc.tenantid = $tenantid
   query: |
       -- Use CTE to force query plan, compute & use CTE later
