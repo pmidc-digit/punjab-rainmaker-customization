@@ -54,13 +54,13 @@ ReportDefinitions:
     type: string
     source: ndc
     total: false
-  - name: dueamount
-    label: dueamount
-    type: string
-    source: ndc
-    total: true
   - name: applicationid
     label: applicationid
+    type: string
+    source: ndc
+    total: false
+  - name: isduepending
+    label: isduepending
     type: string
     source: ndc
     total: false
@@ -95,7 +95,7 @@ ReportDefinitions:
       SELECT 
         u.name, u.mobilenumber, u.emailid ,ua.address,a.tenantid,
         a.action, d.consumercode, a.applicationstatus, d.businessservice, 
-        d.applicationid, d.dueamount, d.status
+        d.applicationid, d.isduepending, d.status
       FROM  eg_user  u
       JOIN eg_ndc_owner AS o ON u.uuid = o.uuid
       JOIN eg_ndc_details AS d ON o.ndcapplicationuuid = d.applicationid
