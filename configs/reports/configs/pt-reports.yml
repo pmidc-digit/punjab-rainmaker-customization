@@ -6852,198 +6852,190 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND 1=1
     query: |
-       WITH demand_with_details AS (
+       -- Defaulter-only report for tenant 'pb.phagwara'
+       WITH
+       props AS (
+         -- keep both id (PK) and propertyid (string used by demand.consumercode)
+         SELECT id, propertyid, tenantid, landarea, usagecategory
+         FROM eg_pt_property
+         WHERE tenantid = $ulb
+           AND status = 'ACTIVE'
+       ),
+       
+       -- owners aggregated by owner.propertyid (which references props.id)
+       -- skip NULL userids and produce sorted comma-separated string
+       owners_raw AS (
+         SELECT propertyid AS property_id,
+                string_agg(DISTINCT userid::text, ',' ORDER BY userid::text)
+                  FILTER (WHERE userid IS NOT NULL) AS owner_userids
+         FROM eg_pt_owner
+         -- if owner table lacks tenantid, joining through props below will restrict correctly
+         GROUP BY propertyid
+       ),
+       
+       -- addresses aggregated by address.propertyid (which references props.id)
+       addresses_raw AS (
+         SELECT propertyid AS property_id,
+                string_agg(DISTINCT trim(locality), ', ' ORDER BY trim(locality))
+                  FILTER (WHERE locality IS NOT NULL AND trim(locality) <> '') AS localities
+         FROM eg_pt_address
+         GROUP BY propertyid
+       ),
+       
+       -- ensure we only keep owners/addresses for this tenant's properties
+       owners AS (
+         SELECT o.property_id, o.owner_userids
+         FROM owners_raw o
+         JOIN props p ON o.property_id = p.id
+       ),
+       
+       addresses AS (
+         SELECT a.property_id, a.localities
+         FROM addresses_raw a
+         JOIN props p ON a.property_id = p.id
+       ),
+       
+       -- demand rows (unchanged)
+       demand_raw AS (
          SELECT
-           dd.id AS demand_id,
+           dd.id    AS demand_id,
            dd.consumercode,
            (to_timestamp(dd.taxperiodfrom::double precision / 1000) AT TIME ZONE 'UTC') + interval '5 hours 30 minutes' AS taxperiodfrom_ist,
-           COALESCE(dtd.taxamount, 0)::numeric AS taxamount,
-           COALESCE(dtd.collectionamount, 0)::numeric AS collectionamount
-         FROM egbs_demanddetail_v1 AS dtd
-         JOIN egbs_demand_v1 AS dd
-           ON dtd.demandid = dd.id
+           COALESCE(dtd.taxamount,0)::numeric AS taxamount,
+           COALESCE(dtd.collectionamount,0)::numeric AS collectionamount
+         FROM egbs_demand_v1 dd
+         JOIN egbs_demanddetail_v1 dtd ON dtd.demandid = dd.id
          WHERE dd.tenantid = $ulb
            AND dd.status = 'ACTIVE'
            AND dd.businessservice = 'PT'
        ),
        
-       due_by_consumercode_fy AS (
+       demand_fy AS (
          SELECT
            consumercode,
-           CASE WHEN extract(month FROM taxperiodfrom_ist) >= 4
+           CASE WHEN extract(month FROM taxperiodfrom_ist)::int >= 4
                 THEN extract(year FROM taxperiodfrom_ist)::int
                 ELSE (extract(year FROM taxperiodfrom_ist)::int - 1)
            END AS fy_start,
-           SUM(taxamount) AS tax_sum,
-           SUM(collectionamount) AS coll_sum
-         FROM demand_with_details
-         GROUP BY consumercode,
-                  CASE WHEN extract(month FROM taxperiodfrom_ist) >= 4
-                       THEN extract(year FROM taxperiodfrom_ist)::int
-                       ELSE (extract(year FROM taxperiodfrom_ist)::int - 1)
-                  END
+           ( CASE WHEN extract(month FROM taxperiodfrom_ist)::int >= 4
+                  THEN extract(year FROM taxperiodfrom_ist)::int
+                  ELSE (extract(year FROM taxperiodfrom_ist)::int - 1)
+             END
+           )::text
+           || '-' ||
+           lpad( ( (CASE WHEN extract(month FROM taxperiodfrom_ist)::int >= 4
+                        THEN extract(year FROM taxperiodfrom_ist)::int
+                        ELSE (extract(year FROM taxperiodfrom_ist)::int - 1)
+                   END + 1) % 100)::text, 2, '0')
+           AS fy,
+           taxamount,
+           collectionamount
+         FROM demand_raw
        ),
        
-       due_label AS (
-         SELECT
-           consumercode,
-           fy_start,
-           (fy_start::text || '-' || RIGHT((fy_start + 1)::text, 2)) AS fy_label,
-           (tax_sum - coll_sum) AS due_amount
-         FROM due_by_consumercode_fy
+       agg_due AS (
+         SELECT consumercode AS propertyid, fy, fy_start,
+                SUM(taxamount)   AS sum_taxamount,
+                SUM(collectionamount) AS sum_collectionamount,
+                SUM(taxamount) - SUM(collectionamount) AS due_amount
+         FROM demand_fy
+         GROUP BY consumercode, fy, fy_start
        ),
        
-       minmax_by_consumercode AS (
-         SELECT
-           consumercode,
-           MIN(fy_start) AS min_fy_start,
-           MAX(fy_start) AS max_fy_start
-         FROM due_label
-         GROUP BY consumercode
+       fy_list(fy, fy_index) AS (
+         VALUES
+          ('2013-14', 2013),('2014-15',2014),('2015-16',2015),('2016-17',2016),
+          ('2017-18',2017),('2018-19',2018),('2019-20',2019),('2020-21',2020),
+          ('2021-22',2021),('2022-23',2022),('2023-24',2023),('2024-25',2024)
        ),
        
-       all_target_fys_labeled AS (
-         SELECT generate_series(2013, 2024) AS fy_start,
-                (generate_series(2013, 2024)::text || '-' || RIGHT((generate_series(2013, 2024) + 1)::text, 2)) AS fy_label
+       prop_years AS (
+         SELECT p.propertyid, f.fy, f.fy_index
+         FROM props p
+         CROSS JOIN fy_list f
        ),
        
-       property_base AS (
-         SELECT
-           p.propertyid AS propertyid_property,
-           p.id,
-           p.landarea,
-           p.usagecategory,
-           array_remove(array_agg(DISTINCT o.userid), NULL) AS owner_ids,
-           array_remove(array_agg(DISTINCT a.locality), NULL) AS localities
-         FROM eg_pt_property AS p
-         LEFT JOIN eg_pt_owner AS o ON o.propertyid = p.id
-         LEFT JOIN eg_pt_address AS a ON a.propertyid = p.id
-         WHERE p.tenantid = $ulb
-           AND p.status = 'ACTIVE'
-         GROUP BY p.propertyid, p.id, p.landarea, p.usagecategory
+       joined AS (
+         SELECT py.propertyid, py.fy, py.fy_index, ad.due_amount
+         FROM prop_years py
+         LEFT JOIN agg_due ad
+           ON ad.propertyid = py.propertyid
+          AND ad.fy = py.fy
        ),
        
-       props_with_demand AS (
-         SELECT pb.*, mm.min_fy_start, mm.max_fy_start
-         FROM property_base pb
-         JOIN minmax_by_consumercode mm
-           ON mm.consumercode = pb.propertyid_property
+       minmax_idx AS (
+         SELECT propertyid,
+                MIN(CASE WHEN due_amount IS NOT NULL THEN fy_index END) AS first_nonnull_idx,
+                MAX(CASE WHEN due_amount IS NOT NULL THEN fy_index END) AS last_nonnull_idx
+         FROM joined
+         GROUP BY propertyid
        ),
        
-       prop_fy_rows_demand AS (
-         SELECT
-           pw.propertyid_property,
-           pw.id,
-           pw.landarea,
-           pw.usagecategory,
-           pw.owner_ids,
-           pw.localities,
-           atf.fy_start,
-           atf.fy_label,
-           COALESCE(dl.due_amount, NULL) AS numeric_due_amount,
+       final_values AS (
+         SELECT j.propertyid, j.fy, j.fy_index,
            CASE
-             WHEN dl.due_amount IS NOT NULL THEN dl.due_amount::text
-             WHEN atf.fy_start BETWEEN pw.min_fy_start AND pw.max_fy_start THEN 'Demand not generated, hence not paid'
-             ELSE NULL
-           END AS fy_val_text
-         FROM props_with_demand pw
-         CROSS JOIN all_target_fys_labeled atf
-         LEFT JOIN due_label dl
-           ON dl.consumercode = pw.propertyid_property
-          AND dl.fy_start = atf.fy_start
+             WHEN j.due_amount IS NULL
+                  AND m.first_nonnull_idx IS NOT NULL
+                  AND j.fy_index BETWEEN m.first_nonnull_idx AND m.last_nonnull_idx
+               THEN 'Demand not generated, hence not paid'
+             WHEN j.due_amount IS NULL THEN NULL
+             ELSE (j.due_amount::text)
+           END AS val,
+           j.due_amount
+         FROM joined j
+         LEFT JOIN minmax_idx m ON m.propertyid = j.propertyid
        ),
        
-       prop_rows_no_demand AS (
-         SELECT
-           pb.propertyid_property,
-           pb.id,
-           pb.landarea,
-           pb.usagecategory,
-           pb.owner_ids,
-           pb.localities,
-           NULL::int AS fy_start,
-           NULL::text AS fy_label,
-           NULL::numeric AS numeric_due_amount,
-           NULL::text AS fy_val_text
-         FROM property_base pb
-         WHERE NOT EXISTS (
-           SELECT 1 FROM minmax_by_consumercode mm WHERE mm.consumercode = pb.propertyid_property
-         )
+       defaulter_check AS (
+         SELECT fv.propertyid,
+                BOOL_OR(
+                  (fv.due_amount IS NOT NULL AND fv.due_amount > 0 AND fv.fy_index >= 2019)
+                  OR
+                  (fv.due_amount IS NULL AND fv.fy_index >= 2019
+                    AND EXISTS (
+                      SELECT 1 FROM minmax_idx mm
+                       WHERE mm.propertyid = fv.propertyid
+                         AND fv.fy_index BETWEEN mm.first_nonnull_idx AND mm.last_nonnull_idx
+                    )
+                  )
+                ) AS is_defaulter
+         FROM final_values fv
+         GROUP BY fv.propertyid
        ),
        
-       prop_fy_union AS (
-         SELECT * FROM prop_fy_rows_demand where 1=1 
-         UNION ALL
-         SELECT * FROM prop_rows_no_demand
-       ),
-       
-       pivoted AS (
-         SELECT
-           propertyid_property,
-           id,
-           landarea,
-           usagecategory,
-           owner_ids,
-           localities,
-           MAX(CASE WHEN fy_label = '2013-14' THEN fy_val_text END) AS "2013-14",
-           MAX(CASE WHEN fy_label = '2014-15' THEN fy_val_text END) AS "2014-15",
-           MAX(CASE WHEN fy_label = '2015-16' THEN fy_val_text END) AS "2015-16",
-           MAX(CASE WHEN fy_label = '2016-17' THEN fy_val_text END) AS "2016-17",
-           MAX(CASE WHEN fy_label = '2017-18' THEN fy_val_text END) AS "2017-18",
-           MAX(CASE WHEN fy_label = '2018-19' THEN fy_val_text END) AS "2018-19",
-           MAX(CASE WHEN fy_label = '2019-20' THEN fy_val_text END) AS "2019-20",
-           MAX(CASE WHEN fy_label = '2020-21' THEN fy_val_text END) AS "2020-21",
-           MAX(CASE WHEN fy_label = '2021-22' THEN fy_val_text END) AS "2021-22",
-           MAX(CASE WHEN fy_label = '2022-23' THEN fy_val_text END) AS "2022-23",
-           MAX(CASE WHEN fy_label = '2023-24' THEN fy_val_text END) AS "2023-24",
-           MAX(CASE WHEN fy_label = '2024-25' THEN fy_val_text END) AS "2024-25"
-         FROM prop_fy_union
-         GROUP BY propertyid_property, id, landarea, usagecategory, owner_ids, localities
-       ),
-       
-       is_defaulter_flag AS (
-         SELECT
-           pb.propertyid_property,
-           CASE
-             WHEN EXISTS (
-               SELECT 1
-               FROM generate_series(2019, 2024) AS y(fy_start)
-               WHERE (
-                 EXISTS (
-                   SELECT 1 FROM due_label dl2
-                   WHERE dl2.consumercode = pb.propertyid_property
-                     AND dl2.fy_start = y.fy_start
-                     AND dl2.due_amount > 0
-                 )
-                 OR (
-                   EXISTS (SELECT 1 FROM minmax_by_consumercode mm2 WHERE mm2.consumercode = pb.propertyid_property)
-                   AND y.fy_start BETWEEN
-                       (SELECT mm3.min_fy_start FROM minmax_by_consumercode mm3 WHERE mm3.consumercode = pb.propertyid_property)
-                   AND (SELECT mm4.max_fy_start FROM minmax_by_consumercode mm4 WHERE mm4.consumercode = pb.propertyid_property)
-                   AND NOT EXISTS (
-                     SELECT 1 FROM due_label dl3
-                     WHERE dl3.consumercode = pb.propertyid_property
-                       AND dl3.fy_start = y.fy_start
-                   )
-                 )
-               )
-             ) THEN 'Yes' ELSE 'No' END AS IsDefaulter
-         FROM property_base pb
+       pivot AS (
+         SELECT propertyid,
+           MAX(CASE WHEN fy = '2013-14' THEN val END) AS "2013-14",
+           MAX(CASE WHEN fy = '2014-15' THEN val END) AS "2014-15",
+           MAX(CASE WHEN fy = '2015-16' THEN val END) AS "2015-16",
+           MAX(CASE WHEN fy = '2016-17' THEN val END) AS "2016-17",
+           MAX(CASE WHEN fy = '2017-18' THEN val END) AS "2017-18",
+           MAX(CASE WHEN fy = '2018-19' THEN val END) AS "2018-19",
+           MAX(CASE WHEN fy = '2019-20' THEN val END) AS "2019-20",
+           MAX(CASE WHEN fy = '2020-21' THEN val END) AS "2020-21",
+           MAX(CASE WHEN fy = '2021-22' THEN val END) AS "2021-22",
+           MAX(CASE WHEN fy = '2022-23' THEN val END) AS "2022-23",
+           MAX(CASE WHEN fy = '2023-24' THEN val END) AS "2023-24",
+           MAX(CASE WHEN fy = '2024-25' THEN val END) AS "2024-25"
+         FROM final_values
+         GROUP BY propertyid
        )
        
        SELECT
-         p.propertyid_property AS propertyid_property,
-         p.id,
-         p.landarea,
-         p.usagecategory,
-         p.owner_ids AS owner_ids,
-         p.localities AS localities,
-         p."2013-14", p."2014-15", p."2015-16", p."2016-17", p."2017-18",
-         p."2018-19", p."2019-20", p."2020-21", p."2021-22", p."2022-23",
-         p."2023-24", p."2024-25",
-         d.IsDefaulter AS IsDefaulter
-       FROM pivoted p
-       JOIN is_defaulter_flag d
-         ON d.propertyid_property = p.propertyid_property
-         AND d.IsDefaulter = 'Yes'
-    orderby: ORDER BY p.propertyid_property
+         p.propertyid   AS "propertyid_property",
+         o.owner_userids   AS "owner_ids",   -- CSV string (from owners.propertyid -> props.id)
+         a.localities      AS "localities",   -- CSV string (from addresses.propertyid -> props.id)
+         p.landarea        AS "landarea",
+         p.usagecategory   AS "usagecategory",
+         pg."2013-14", pg."2014-15", pg."2015-16", pg."2016-17",
+         pg."2017-18", pg."2018-19", pg."2019-20", pg."2020-21",
+         pg."2021-22", pg."2022-23", pg."2023-24", pg."2024-25",
+         CASE WHEN dc.is_defaulter THEN 'Yes' ELSE 'No' END       AS "IsDefaulter"
+       FROM props p
+       LEFT JOIN owners o       ON o.property_id = p.id        -- <--- join on props.id
+       LEFT JOIN addresses a    ON a.property_id = p.id        -- <--- join on props.id
+       LEFT JOIN pivot pg       ON pg.propertyid = p.propertyid
+       LEFT JOIN defaulter_check dc ON dc.propertyid = p.propertyid
+       WHERE dc.is_defaulter = TRUE   -- <- defaulters only
+    orderby: ORDER BY p.propertyid;
+       
