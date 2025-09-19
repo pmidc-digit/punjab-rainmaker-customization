@@ -88,6 +88,8 @@ serviceMaps:
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedTime
             - jsonPath: $.PetRegistrationApplications.*.owner.additionalDetails
 
+
+
     - version: 1.0
       description: Update Status for expired application
       fromTopic: expire-ptr-application
@@ -236,7 +238,17 @@ serviceMaps:
             - jsonPath: $.PetRegistrationApplications.*.owner.uuid
             - jsonPath: $.PetRegistrationApplications.*.id
 
-        - query: INSERT INTO eg_ptr_applicationdocuments( id, tenantId, documentType, filestoreId, documentUid, petApplicationId, active, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        - query: INSERT INTO eg_ptr_applicationdocuments(id, tenantId, documentType, filestoreId, documentUid, petApplicationId, active, createdby, lastmodifiedby, createdtime, lastmodifiedtime)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (id) DO UPDATE SET
+            tenantId = EXCLUDED.tenantId,
+            documentType = EXCLUDED.documentType,
+            filestoreId = EXCLUDED.filestoreId,
+            documentUid = EXCLUDED.documentUid,
+            petApplicationId = EXCLUDED.petApplicationId,
+            active = EXCLUDED.active,
+            lastmodifiedby = EXCLUDED.lastmodifiedby,
+            lastmodifiedtime = EXCLUDED.lastmodifiedtime;
           basePath: PetRegistrationApplications.*.documents.*
           jsonMaps:
             - jsonPath: $.PetRegistrationApplications.*.id
