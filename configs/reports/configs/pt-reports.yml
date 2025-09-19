@@ -6853,9 +6853,9 @@ ReportDefinitions:
         searchClause: AND 1=1
     query: |
        -- Defaulter-only report for tenant 
-        select propertyid_property as propertyid_property,owner_ids as owner_ids,localities as localities,
-        landarea as landarea,usagecategory as usagecategory,2013-14 as 2013-14, 
-        2014-15 as 2014-15, 2015-16 as 2015-16,2016-17 as 2016-17,2017-18 as 2017-18,
-        2018-19 as 2018-19,2019-20 as 2019-20,2020-21 as 2020-21,2021-22 as 2021-22,
-        2022-23 as 2022-23,2023-24 as 2023-24,2024-25 as 2024-25, IsDefaulter as IsDefaulter from mv_pdc_defaulter_report where 1=1
-       
+       SELECT propertyid_property AS propertyid_property, owner_ids  AS owner_ids, localities   AS localities,
+       landarea  AS landarea,usagecategory  AS usagecategory,"2013-14"  AS "2013-14","2014-15"  AS "2014-15","2015-16" AS "2015-16",
+       "2016-17"  AS "2016-17","2017-18"  AS "2017-18","2018-19"  AS "2018-19",
+       "2019-20" AS "2019-20","2020-21" AS "2020-21", "2021-22"   AS "2021-22", "2022-23"  AS "2022-23",
+       "2023-24"   AS "2023-24","2024-25"   AS "2024-25",IsDefaulter  AS IsDefaulter FROM mv_pdc_defaulter_report WHERE 1=1
+  
