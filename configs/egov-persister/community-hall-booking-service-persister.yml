@@ -99,25 +99,25 @@ serviceMaps:
 
           - jsonPath: $.hallsBookingApplication.auditDetails.lastModifiedTime
           
-       - query: INSERT INTO public.eg_chb_document_detail(document_detail_id, booking_id, document_type, filestore_id, createdby,
-               lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-         basePath: hallsBookingApplication.documents.*
-         jsonMaps:
-          - jsonPath: $.hallsBookingApplication.documents.*.documentDetailId
-
-          - jsonPath: $.hallsBookingApplication.documents.*.bookingId
-
-          - jsonPath: $.hallsBookingApplication.documents.*.documentType
-
-          - jsonPath: $.hallsBookingApplication.documents.*.fileStoreId
-
-          - jsonPath: $.hallsBookingApplication.auditDetails.createdBy
-
-          - jsonPath: $.hallsBookingApplication.auditDetails.lastModifiedBy
-
-          - jsonPath: $.hallsBookingApplication.auditDetails.createdTime
-
-          - jsonPath: $.hallsBookingApplication.auditDetails.lastModifiedTime
+#       - query: INSERT INTO public.eg_chb_document_detail(document_detail_id, booking_id, document_type, filestore_id, createdby,
+#               lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+#         basePath: hallsBookingApplication.documents.*
+#         jsonMaps:
+#          - jsonPath: $.hallsBookingApplication.documents.*.documentDetailId
+#
+#          - jsonPath: $.hallsBookingApplication.documents.*.bookingId
+#
+#          - jsonPath: $.hallsBookingApplication.documents.*.documentType
+#
+#          - jsonPath: $.hallsBookingApplication.documents.*.fileStoreId
+#
+#          - jsonPath: $.hallsBookingApplication.auditDetails.createdBy
+#
+#          - jsonPath: $.hallsBookingApplication.auditDetails.lastModifiedBy
+#
+#          - jsonPath: $.hallsBookingApplication.auditDetails.createdTime
+#
+#          - jsonPath: $.hallsBookingApplication.auditDetails.lastModifiedTime
           
        - query: INSERT INTO public.eg_chb_applicant_detail(applicant_detail_id, booking_id, applicant_name, applicant_email_id, applicant_mobile_no, applicant_alternate_mobile_no, account_no, ifsc_code, bank_name, bank_branch_name, account_holder_name, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
          basePath: hallsBookingApplication.applicantDetail
@@ -224,3 +224,28 @@ serviceMaps:
          basePath: hallsBookingApplication.bookingSlotDetails.*
          jsonMaps:
             - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.slotId
+
+
+       - query: >
+           INSERT INTO public.eg_chb_document_detail (
+             document_detail_id, booking_id, document_type, filestore_id, createdby,
+             lastmodifiedby, createdtime, lastmodifiedtime
+           )
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+           ON CONFLICT (document_detail_id) DO UPDATE
+           SET
+             booking_id = EXCLUDED.booking_id,
+             document_type = EXCLUDED.document_type,
+             filestore_id = EXCLUDED.filestore_id,
+             lastmodifiedby = EXCLUDED.lastmodifiedby,
+             lastmodifiedtime = EXCLUDED.lastmodifiedtime;
+         basePath: $.hallsBookingApplication.documents.*
+         jsonMaps:
+           - jsonPath: $.hallsBookingApplication.documents.*.documentDetailId
+           - jsonPath: $.hallsBookingApplication.documents.*.bookingId
+           - jsonPath: $.hallsBookingApplication.documents.*.documentType
+           - jsonPath: $.hallsBookingApplication.documents.*.fileStoreId
+           - jsonPath: $.hallsBookingApplication.auditDetails.createdBy
+           - jsonPath: $.hallsBookingApplication.auditDetails.lastModifiedBy
+           - jsonPath: $.hallsBookingApplication.auditDetails.createdTime
+           - jsonPath: $.hallsBookingApplication.auditDetails.lastModifiedTime

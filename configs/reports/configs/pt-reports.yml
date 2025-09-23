@@ -6780,4 +6780,82 @@ ReportDefinitions:
        from report_properties props
        inner join assessments on assessments.propertyid=props.propertyid
        inner join owners on owners.propertyid=props.propertyid 
-       where tenantid=$tenantid     
+       where tenantid=$tenantid
+  - reportName: Defaulter_report_with_taxdue
+    decryptionPathId: ULBDEFAULTERPTREPORT_V2
+    summary: Defaulter report with tax due
+    version: 1.0.0
+    moduleName: rainmaker-pt
+    sourceColumns:
+      - name: propertyid_property
+        label: Property ID
+        type: string
+        source: pt
+        total: false
+      - name: owner_ids
+        label: Owner Id
+        type: string
+        source: pt
+        total: false
+      - name: localities
+        label: Locality
+        type: string
+        source: pt
+        total: false
+      - name: landarea
+        label: Plot size
+        type: string
+        source: pt
+        total: false
+      - name: usagecategory
+        label: Propertyusagetype
+        type: string
+        source: pt
+        total: false
+      - name: 2019-20
+        label: 2019-20
+        type: string
+        source: pt
+        total: false
+      - name: 2020-21
+        label: 2020-21
+        type: string
+        source: pt
+        total: false
+      - name: 2021-22
+        label: 2021-22
+        type: string
+        source: pt
+        total: false
+      - name: 2022-23
+        label: 2022-23
+        type: string
+        source: pt
+        total: false
+      - name: 2023-24
+        label: 2023-24
+        type: string
+        source: pt
+        total: false
+      - name: 2024-25
+        label: 2024-25
+        type: string
+        source: pt
+        total: false                                
+    searchParams:  
+      - name: ulb
+        label: ULB
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: pt
+        wrapper: true
+        isMandatory: true
+        searchClause: AND 1=1
+    query: |
+       -- Defaulter-only report for tenant 
+       SELECT propertyid_property AS propertyid_property, owner_ids  AS owner_ids, localities   AS localities,
+       landarea  AS landarea,usagecategory  AS usagecategory,"2013-14"  AS "2013-14","2014-15"  AS "2014-15","2015-16" AS "2015-16",
+       "2016-17"  AS "2016-17","2017-18"  AS "2017-18","2018-19"  AS "2018-19",
+       "2019-20" AS "2019-20","2020-21" AS "2020-21", "2021-22"   AS "2021-22", "2022-23"  AS "2022-23",
+       "2023-24"   AS "2023-24","2024-25"   AS "2024-25",IsDefaulter  AS IsDefaulter FROM mv_pdc_defaulter_report WHERE 1=1
+  
