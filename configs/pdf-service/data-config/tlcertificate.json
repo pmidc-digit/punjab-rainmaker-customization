@@ -720,7 +720,7 @@
           "responseMapping":[
             {            
               "variable":"approvedBy",
-              "value":"=if($.ProcessInstances[?(@.action == 'APPROVE')].assigner.name=='NA','SYSTEM',$.ProcessInstances[?(@.action == 'APPROVE')].assigner.name)"
+              "value":"$.ProcessInstances[?(@.action == 'APPROVE')].assigner.name"
             }
 
           ]
