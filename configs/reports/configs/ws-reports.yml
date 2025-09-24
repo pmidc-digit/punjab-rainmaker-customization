@@ -1200,31 +1200,41 @@ ReportDefinitions:
     and pd.businessservice in ('WS','SW','WS.ONE_TIME_FEE','SW.ONE_TIME_FEE') where payment.tenantid=$tenantid
   orderby: ORDER BY pd.receiptdate DESC
   
-- reportName: ArrearReport
-  summary: Arrear Report
+- reportName: OutstandingArrears
+  summary: Outstanding Arrears Report
   version: 1.0.0
   moduleName: rainmaker-ws
   additionalConfig:
     print:
-      pdfPageSize: "A1"
+      pdfPageSize: A1
   sourceColumns:
   - name: consumercode
-    label: reports.ws.consumercode
+    label: consumercode
     type: string
     source: ws
     total: false
-  - name: totalamount
-    label: reports.ws.totalamount
+  - name: businessservice
+    label: businessservice
     type: string
     source: ws
     total: true
-  - name: amountpaid
-    label: reports.ws.amountpaid
+  - name: total_demand
+    label: Total Demand
     type: string
     source: ws
     total: true
-  - name: dueamount
-    label: reports.ws.dueamount
+  - name: total_amt_paid
+    label: Total Amount Paid
+    type: string
+    source: ws
+    total: true 
+  - name: balance
+    label: Balance
+    type: string
+    source: ws
+    total: true       
+  - name: max_taxperiodto_date
+    label: Max taxperiod todate
     type: string
     source: ws
     total: true
@@ -1232,25 +1242,68 @@ ReportDefinitions:
   - name: connectionType
     label: connectionType
     type: singlevaluelist
-    pattern: 'list://WS%:Water,SW%:Sewerage'
-    source: pt
+    pattern: list://WS%:Water,SW%:Sewerage
+    source: ws
     isMandatory: true
-    searchClause: AND businessservice like $connectionType
-  query: |
-    -- Use CTE to force query plan, compute & use CTE later
-    with demands as
-    (
-      select demandid,sum(taxamount) as amount,sum(collectionamount) as collection,sum(taxamount-collectionamount) as arrear 
-      from egbs_demanddetail_v1 where tenantid=$tenantid
-      group by demandid
-      having sum(taxamount-collectionamount)>0
-    )
-    select consumercode,sum(amount) as totalamount,sum(collection) as amountpaid,sum(arrear) as dueamount 
-    from egbs_demand_v1 d 
-    inner join demands on demands.demandid=d.id  and status='ACTIVE'
-    where tenantid=$tenantid
-  groupby: group by consumercode
+    searchClause: AND 1=1
+  - name: toDate
+    label: To Date
+    type: epoch
+    source: ws
+    isMandatory: true
+    searchClause: AND 1=1        
+  query:
+    WITH demand AS (
+         SELECT 
+             dd.consumercode,
+             dd.businessservice,
+             SUM(dt.taxamount) AS total_demand,
+             TO_CHAR(
+                 (TO_TIMESTAMP(MAX(dd.taxperiodto) / 1000) AT TIME ZONE 'Asia/Kolkata'),
+                 'YYYY-MM-DD'
+             ) AS max_taxperiodto_date
+         FROM egbs_demand_v1 dd
+         JOIN egbs_demanddetail_v1 dt
+           ON dd.id = dt.demandid
+         JOIN eg_ws_connection sw
+           ON sw.connectionno = dd.consumercode
+         WHERE dd.tenantid = $tenantid
+           AND dd.businessservice = $connectionType
+           AND dd.status = 'ACTIVE'
+           AND sw.status = 'Active'
 
+       AND  dd.taxperiodto <= $toDate
+         GROUP BY dd.consumercode, dd.businessservice
+         HAVING SUM(dt.taxamount) <> 0
+     ),
+     payment AS (
+         SELECT 
+             bill.consumercode AS connectionno,     
+             bill.businessservice AS service,   
+             SUM(pd.amountpaid) AS total_amt_paid
+         FROM egcl_paymentdetail pd
+         INNER JOIN egcl_bill bill 
+             ON bill.id = pd.billid 
+            AND pd.tenantid = $tenantid
+         INNER JOIN egcl_payment payment 
+             ON payment.id = pd.paymentid
+     
+       where pd.receiptdate <= $toDate
+           AND bill.businessservice = $connectionType
+     and payment.paymentstatus != 'CANCELLED'
+         GROUP BY bill.consumercode, bill.businessservice
+     )
+     SELECT 
+         d.consumercode,
+         d.businessservice,
+         d.total_demand,
+          COALESCE(p.total_amt_paid, 0) AS total_amt_paid,
+         (d.total_demand - COALESCE(p.total_amt_paid, 0)) AS balance,
+         d.max_taxperiodto_date
+     FROM demand d
+     LEFT JOIN payment p
+       ON d.consumercode = p.connectionno
+      AND d.businessservice = p.service 
 
 - reportName: SearchWaterChargeReport
   summary: Search Water Charge Notice Report
