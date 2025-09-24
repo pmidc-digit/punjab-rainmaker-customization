@@ -3510,13 +3510,23 @@ ReportDefinitions:
         type: string
         source: ws
         total: true
-      - name: amt
-        label: totalamount
+      - name: total_demand
+        label: Total Demand
         type: string
         source: ws
         total: true
+      - name: total_amt_paid
+        label: Total Amount Paid
+        type: string
+        source: ws
+        total: true 
+      - name: balance
+        label: Balance
+        type: string
+        source: ws
+        total: true       
       - name: max_taxperiodto_date
-        label: max_taxperiodto_date
+        label: Max taxperiod todate
         type: string
         source: ws
         total: true
@@ -3538,7 +3548,7 @@ ReportDefinitions:
       WITH demand AS (
           SELECT 
               dd.consumercode,
-              dd.businessservice,
+              dd.businesservice,
               SUM(dt.taxamount) AS total_demand,
               TO_CHAR(
                   (TO_TIMESTAMP(MAX(dd.taxperiodto) / 1000) AT TIME ZONE 'Asia/Kolkata'),
