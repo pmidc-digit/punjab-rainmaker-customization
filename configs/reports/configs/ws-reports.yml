@@ -132,7 +132,7 @@ ReportDefinitions:
     from egcl_paymentdetail pd
     inner join egcl_bill as bill on bill.id=pd.billid and pd.tenantid = $tenantid  
     inner join egcl_payment as payment on payment.id=pd.paymentid    
-    inner join eg_user as usr on usr.id=payment.createdby::integer 
+    left join eg_user as usr on usr.id=payment.createdby::integer 
     where bill.tenantid = $tenantid and pd.businessservice in ('WS','SW','WS.ONE_TIME_FEE','SW.ONE_TIME_FEE') 
     --and bill.status='ACTIVE'
     and payment.paymentstatus != 'CANCELLED'
