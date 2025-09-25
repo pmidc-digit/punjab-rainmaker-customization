@@ -3509,7 +3509,7 @@ ReportDefinitions:
         label: businessservice
         type: string
         source: ws
-        total: true
+        total: false
       - name: total_demand
         label: Total Demand
         type: string
@@ -3527,9 +3527,9 @@ ReportDefinitions:
         total: true       
       - name: max_taxperiodto_date
         label: Max taxperiod todate
-        type: string
+        type: epoch
         source: ws
-        total: true
+        total: false
     searchParams:
       - name: connectionType
         label: connectionType
@@ -3550,10 +3550,11 @@ ReportDefinitions:
                dd.consumercode,
                dd.businessservice,
                SUM(dt.taxamount) AS total_demand,
-               TO_CHAR(
-                   (TO_TIMESTAMP(MAX(dd.taxperiodto) / 1000) AT TIME ZONE 'Asia/Kolkata'),
-                   'YYYY-MM-DD'
-               ) AS max_taxperiodto_date
+               dd.taxperiodto as max_taxperiodto_date
+               --TO_CHAR(
+                  -- (TO_TIMESTAMP(MAX(dd.taxperiodto) / 1000) AT TIME ZONE 'Asia/Kolkata'),
+                  -- 'YYYY-MM-DD'
+              -- ) AS max_taxperiodto_date
            FROM egbs_demand_v1 dd
            JOIN egbs_demanddetail_v1 dt
              ON dd.id = dt.demandid
