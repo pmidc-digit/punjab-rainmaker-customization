@@ -3560,7 +3560,7 @@ ReportDefinitions:
            JOIN eg_ws_connection sw
              ON sw.connectionno = dd.consumercode
            WHERE dd.tenantid = $tenantid
-             AND dd.businessservice = $connectionType
+             AND dd.businessservice like $connectionType
              AND dd.status = 'ACTIVE'
              AND sw.status = 'Active'
  
@@ -3581,7 +3581,7 @@ ReportDefinitions:
                ON payment.id = pd.paymentid
        
          where pd.receiptdate <= $toDate
-             AND bill.businessservice = $connectionType
+             AND bill.businessservice like $connectionType
        and payment.paymentstatus != 'CANCELLED'
            GROUP BY bill.consumercode, bill.businessservice
        )
