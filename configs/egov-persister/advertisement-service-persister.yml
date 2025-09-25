@@ -20,7 +20,7 @@ serviceMaps:
             - jsonPath: $.bookingApplication.auditDetails.createdTime
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedBy
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedTime
-
+            
         - query: INSERT INTO public.eg_adv_cart_detail(cart_id, booking_id, add_type, location, face_area, night_light, booking_date, booking_from_time, booking_to_time, status, createdby, createdtime, lastmodifiedby, lastmodifiedtime, advertisementId) VALUES (?, ?, ?, ?, ?, ?, ?::DATE, ?::TIME, ?::TIME, ?, ?, ?, ?, ?, ?);
           basePath: bookingApplication.cartDetails.*
           jsonMaps:
@@ -92,6 +92,31 @@ serviceMaps:
           basePath: bookingApplication.cartDetails.*
           jsonMaps:
             - jsonPath: $.bookingApplication.cartDetails.*.cartId
+
+
+        - query: INSERT INTO eg_adv_owner (uuid, tenantid, booking_id, status, isprimaryowner,ownertype, ownershippercentage, institutionid, relationship,createdby, createdtime,            lastmodifiedby, lastmodifiedtime, additionaldetails) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+          basePath: $.bookingApplication.owners.*
+
+          jsonMaps:
+            - jsonPath: $.bookingApplication.owners.*.uuid
+            - jsonPath: $.bookingApplication.owners.*.tenantId
+            - jsonPath: $.bookingApplication.bookingId                            # ✅ Correct path from root
+            - jsonPath: $.bookingApplication.owners.*.status                      # ✅ Ensure this field exists or default it
+            - jsonPath: $.bookingApplication.owners.*.isPrimaryOwner              # ✅ Ensure this field exists or default it
+            - jsonPath: $.bookingApplication.owners.*.ownerType                   # ✅ Corrected from 'type' to match JSON
+            - jsonPath: $.bookingApplication.owners.*.ownerShipPercentage         # ✅ Corrected spelling from 'ownershipPercentage'
+            - jsonPath: $.bookingApplication.owners.*.institutionId
+            - jsonPath: $.bookingApplication.owners.*.relationship
+            - jsonPath: $.bookingApplication.owners.*.createdBy                   # ✅ Owner-level createdBy
+            - jsonPath: $.bookingApplication.owners.*.createdDate
+            - jsonPath: $.bookingApplication.owners.*.lastModifiedBy
+            - jsonPath: $.bookingApplication.owners.*.lastModifiedDate
+            - jsonPath: $.bookingApplication.owners.*.additionalDetails
+              type: JSON
+              dbType: JSONB
+
+
 
     - version: 1.0
       description: Update advertisement booking details after application is changed
