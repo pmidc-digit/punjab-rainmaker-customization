@@ -1,0 +1,205 @@
+SearchDefinitions:
+  moduleName: noc-services
+  summary: NOC Services Inbox API
+  version: 1.0.0
+  definitions:
+    - name: inboxnocsearch
+      query:
+        baseQuery: |
+          Select row_to_json(result) from (
+            select DISTINCT(noc.applicationno), 
+                   pi.createdtime, 
+                   pi.status as status_id, 
+                   ws.state as status_name, 
+                   ws.applicationStatus,
+                   noc.id,
+                   noc.tenantid,
+                   noc.status,
+                   noc.createdby,
+                   noc.lastmodifiedby,
+                   noc.createdtime as application_date,
+                   noc.lastmodifiedtime,
+                   noc.applicationType,
+                   noc.accountid
+            from eg_noc as noc
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = noc.applicationno
+            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
+            LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            $where 
+            AND pi.createdtime IN (
+              select max(createdtime) 
+              from eg_wf_processinstance_v2 wf 
+              where wf.businessid = noc.applicationno 
+              GROUP BY wf.businessid
+            )
+            order by pi.createdtime asc
+            $pagination
+          ) result
+        groupBy:
+        orderBy:
+      searchParams:
+        condition: AND
+        params:
+          - name: noc.tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+          - name: noc.id
+            isMandatory: false
+            jsonPath: $.searchCriteria.id
+          - name: pi.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.status
+            operator: IN
+          - name: noc.applicationNo
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationNo
+          - name: pi.businessservice
+            isMandatory: false
+            jsonPath: $.searchCriteria.businessservice
+          - name: assg.assignee
+            isMandatory: false
+            jsonPath: $.searchCriteria.assignee
+          - name: noc.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.nocStatus
+          - name: noc.applicationType
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationType
+          - name: noc.accountid
+            isMandatory: false
+            jsonPath: $.searchCriteria.accountId
+        pagination:
+          noOfRecords: $.searchCriteria.noOfRecords
+          offset: $.searchCriteria.offset
+      output:
+        jsonFormat: {"ResponseInfo": {},"Noc": []}
+        outJsonPath: $.Noc
+        responseInfoPath: $.ResponseInfo
+
+    - name: inboxnocsearchcount
+      query:
+        baseQuery: |
+          Select row_to_json(result) from (
+            select COUNT(DISTINCT(noc.applicationno)) as totalCount
+            from eg_noc as noc
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = noc.applicationno
+            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
+            LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            $where
+            AND pi.createdtime IN (
+              select max(createdtime) 
+              from eg_wf_processinstance_v2 wf 
+              where wf.businessid = noc.applicationno 
+              GROUP BY wf.businessid
+            )
+          ) result
+        groupBy:
+        orderBy:
+      searchParams:
+        condition: AND
+        params:
+          - name: noc.tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+          - name: noc.id
+            isMandatory: false
+            jsonPath: $.searchCriteria.id
+          - name: pi.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.status
+            operator: IN
+          - name: noc.applicationNo
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationNo
+          - name: pi.businessservice
+            isMandatory: false
+            jsonPath: $.searchCriteria.businessservice
+          - name: assg.assignee
+            isMandatory: false
+            jsonPath: $.searchCriteria.assignee
+          - name: noc.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.nocStatus
+          - name: noc.applicationType
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationType
+          - name: noc.accountid
+            isMandatory: false
+            jsonPath: $.searchCriteria.accountId
+      output:
+        jsonFormat: {"ResponseInfo": {},"totalCount": []}
+        outJsonPath: $.totalCount
+        responseInfoPath: $.ResponseInfo
+
+    - name: inboxnocsearchdesc
+      query:
+        baseQuery: |
+          Select row_to_json(result) from (
+            select DISTINCT(noc.applicationno), 
+                   pi.createdtime, 
+                   pi.status as status_id,
+                   ws.state as status_name,
+                   ws.applicationStatus,
+                   noc.id,
+                   noc.tenantid,
+                   noc.status,
+                   noc.createdby,
+                   noc.lastmodifiedby,
+                   noc.createdtime as application_date,
+                   noc.lastmodifiedtime,
+                   noc.applicationType,
+                   noc.accountid
+            from eg_noc as noc
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = noc.applicationno
+            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
+            LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            $where
+            AND pi.createdtime IN (
+              select max(createdtime) 
+              from eg_wf_processinstance_v2 wf 
+              where wf.businessid = noc.applicationno 
+              GROUP BY wf.businessid
+            )
+            order by pi.createdtime desc
+            $pagination
+          ) result
+        groupBy:
+        orderBy:
+      searchParams:
+        condition: AND
+        params:
+          - name: noc.tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+          - name: noc.id
+            isMandatory: false
+            jsonPath: $.searchCriteria.id
+          - name: pi.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.status
+            operator: IN
+          - name: noc.applicationNo
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationNo
+          - name: pi.businessservice
+            isMandatory: false
+            jsonPath: $.searchCriteria.businessservice
+          - name: assg.assignee
+            isMandatory: false
+            jsonPath: $.searchCriteria.assignee
+          - name: noc.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.nocStatus
+          - name: noc.applicationType
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationType
+          - name: noc.accountid
+            isMandatory: false
+            jsonPath: $.searchCriteria.accountId
+        pagination:
+          noOfRecords: $.searchCriteria.noOfRecords
+          offset: $.searchCriteria.offset
+      output:
+        jsonFormat: {"ResponseInfo": {},"Noc": []}
+        outJsonPath: $.Noc
+        responseInfoPath: $.ResponseInfo

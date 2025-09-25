@@ -4,153 +4,90 @@ serviceMaps:
     - version: 1.0
       description: Persists Pet details in tables
       fromTopic: save-ptr-application
-      isTransaction: true	
+      isTransaction: true
       queryMaps:
 
-        - query: INSERT INTO eg_ptr_registration(id,tenantid,applicationnumber,applicantName,fathername,mobileNumber,emailId,applicationType,validityDate,status,expireFlag,petToken,previousApplicationNumber,propertyId,createdby,lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        - query: INSERT INTO eg_ptr_registration(id,tenantid,applicationnumber,applicationType,validityDate,status,expireFlag,petToken,previousApplicationNumber,propertyId,createdby,lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
           basePath: PetRegistrationApplications.*
           jsonMaps:
             - jsonPath: $.PetRegistrationApplications.*.id
-
             - jsonPath: $.PetRegistrationApplications.*.tenantId
-
             - jsonPath: $.PetRegistrationApplications.*.applicationNumber
-            
-            - jsonPath: $.PetRegistrationApplications.*.applicantName
-          
-            - jsonPath: $.PetRegistrationApplications.*.fatherName
-            
-            - jsonPath: $.PetRegistrationApplications.*.mobileNumber
-            
-            - jsonPath: $.PetRegistrationApplications.*.emailId
-            
             - jsonPath: $.PetRegistrationApplications.*.applicationType
-
             - jsonPath: $.PetRegistrationApplications.*.validityDate
-
             - jsonPath: $.PetRegistrationApplications.*.status
-
             - jsonPath: $.PetRegistrationApplications.*.expireFlag
-
             - jsonPath: $.PetRegistrationApplications.*.petToken
-
             - jsonPath: $.PetRegistrationApplications.*.previousApplicationNumber
-            
             - jsonPath: $.PetRegistrationApplications.*.propertyId
-
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.createdBy
-
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedBy
-
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.createdTime
-            
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedTime
 
         - query: INSERT INTO eg_ptr_address(id, tenantid, doorno, latitude, longitude, buildingname, addressid, addressnumber, type, addressline1, addressline2, landmark, street, city, locality, pincode, detail, registrationid, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
           basePath: PetRegistrationApplications.*
           jsonMaps:
             - jsonPath: $.PetRegistrationApplications.*.address.id
-
             - jsonPath: $.PetRegistrationApplications.*.address.tenantId
-
             - jsonPath: $.PetRegistrationApplications.*.address.doorNo
-
             - jsonPath: $.PetRegistrationApplications.*.address.latitude
-
             - jsonPath: $.PetRegistrationApplications.*.address.longitude
-
             - jsonPath: $.PetRegistrationApplications.*.address.buildingName
-
             - jsonPath: $.PetRegistrationApplications.*.address.addressId
-
             - jsonPath: $.PetRegistrationApplications.*.address.addressNumber
-
             - jsonPath: $.PetRegistrationApplications.*.address.type
-
             - jsonPath: $.PetRegistrationApplications.*.address.addressLine1
-
             - jsonPath: $.PetRegistrationApplications.*.address.addressLine2
-
             - jsonPath: $.PetRegistrationApplications.*.address.landmark
-
             - jsonPath: $.PetRegistrationApplications.*.address.street
-
             - jsonPath: $.PetRegistrationApplications.*.address.city
-
             - jsonPath: $.PetRegistrationApplications.*.address.locality.name
-
             - jsonPath: $.PetRegistrationApplications.*.address.pincode
-
             - jsonPath: $.PetRegistrationApplications.*.address.detail
-
             - jsonPath: $.PetRegistrationApplications.*.id
-
             - jsonPath: $.PetRegistrationApplications.*.address.createdBy
-
             - jsonPath: $.PetRegistrationApplications.*.address.lastModifiedBy
-
             - jsonPath: $.PetRegistrationApplications.*.address.createdTime
-
             - jsonPath: $.PetRegistrationApplications.*.address.lastModifiedTime
-            
+
         - query: INSERT INTO eg_ptr_petdetails(id, petName, petType, breedType, petAge, petGender, clinicName, doctorName, lastVaccineDate, vaccinationNumber, petDetailsId, petColor, adoptionDate, birthDate, identificationMark) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
           basePath: PetRegistrationApplications.*
           jsonMaps:
             - jsonPath: $.PetRegistrationApplications.*.petDetails.id
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.petName
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.petType
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.breedType
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.petAge
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.petGender
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.clinicName
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.doctorName
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.lastVaccineDate
-            
             - jsonPath: $.PetRegistrationApplications.*.petDetails.vaccinationNumber
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.petDetailsId
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.petColor
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.adoptionDate
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.birthDate
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.identificationMark
-        
-            
-        - query: INSERT INTO eg_ptr_applicationdocuments( id, tenantId, documentType, filestoreId, documentUid, petApplicationId, active, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-          basePath: PetRegistrationApplications.*.documents.*
+
+        - query: INSERT INTO eg_ptr_owner(uuid, tenantid, ptrregistrationid, status, isprimaryowner, ownertype, ownershippercentage, institutionid, relationship, createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb);
+          basePath: PetRegistrationApplications.*
           jsonMaps:
-            - jsonPath: $.PetRegistrationApplications.*.id
-
+            - jsonPath: $.PetRegistrationApplications.*.owner.uuid
             - jsonPath: $.PetRegistrationApplications.*.tenantId
- 
-            - jsonPath: $.PetRegistrationApplications.*.documentType
-
-            - jsonPath: $.PetRegistrationApplications.*.filestoreId
-
-            - jsonPath: $.PetRegistrationApplications.*.documentUid
-            
-            - jsonPath: $.PetRegistrationApplications.*.[?({id} in @.documents[*].id)].id
-             
-            - jsonPath: $.PetRegistrationApplications.*.active
-            
+            - jsonPath: $.PetRegistrationApplications.*.id
+            - jsonPath: $.PetRegistrationApplications.*.owner.status
+            - jsonPath: $.PetRegistrationApplications.*.owner.isPrimaryOwner
+            - jsonPath: $.PetRegistrationApplications.*.owner.ownerType
+            - jsonPath: $.PetRegistrationApplications.*.owner.ownershipPercentage
+            - jsonPath: $.PetRegistrationApplications.*.owner.institutionId
+            - jsonPath: $.PetRegistrationApplications.*.owner.relationship
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.createdBy
-            
-            - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedBy
-            
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.createdTime
-            
+            - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedBy
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedTime
+            - jsonPath: $.PetRegistrationApplications.*.owner.additionalDetails
+
 
 
     - version: 1.0
@@ -161,9 +98,7 @@ serviceMaps:
         - query: UPDATE eg_ptr_registration SET status = ? WHERE applicationnumber=?;
           basePath: PetRegistrationApplications.*
           jsonMaps:
-
             - jsonPath: $.PetRegistrationApplications.*.status
-
             - jsonPath: $.PetRegistrationApplications.*.applicationnumber
 
     - version: 1.0
@@ -173,30 +108,22 @@ serviceMaps:
       queryMaps:
 
         - query: UPDATE eg_ptr_registration
-              SET tenantid = COALESCE(?, tenantid),
-                  applicationnumber = COALESCE(?, applicationnumber),
-                  applicantname = COALESCE(?, applicantname),
-                  fathername = COALESCE(?, fathername),
-                  mobilenumber = COALESCE(?, mobilenumber),
-                  emailid = COALESCE(?, emailid),
-                  applicationtype = COALESCE(?, applicationtype),
-                  validitydate = COALESCE(?, validitydate),
-                  status = COALESCE(?, status),
-                  expireflag = COALESCE(?, expireflag),
-                  pettoken = COALESCE(?, pettoken),
-                  previousapplicationnumber = COALESCE(?, previousapplicationnumber),
-                  propertyid = COALESCE(?, propertyid),
-                  lastmodifiedby = ?,
-                  lastmodifiedtime = ?
+            SET tenantid = COALESCE(?, tenantid),
+            applicationnumber = COALESCE(?, applicationnumber),
+            applicationtype = COALESCE(?, applicationtype),
+            validitydate = COALESCE(?, validitydate),
+            status = COALESCE(?, status),
+            expireflag = COALESCE(?, expireflag),
+            pettoken = COALESCE(?, pettoken),
+            previousapplicationnumber = COALESCE(?, previousapplicationnumber),
+            propertyid = COALESCE(?, propertyid),
+            lastmodifiedby = ?,
+            lastmodifiedtime = ?
             WHERE id = ? AND tenantid = ?;
           basePath: PetRegistrationApplications.*
           jsonMaps:
             - jsonPath: $.PetRegistrationApplications.*.tenantId
             - jsonPath: $.PetRegistrationApplications.*.applicationNumber
-            - jsonPath: $.PetRegistrationApplications.*.applicantName
-            - jsonPath: $.PetRegistrationApplications.*.fatherName
-            - jsonPath: $.PetRegistrationApplications.*.mobileNumber
-            - jsonPath: $.PetRegistrationApplications.*.emailId
             - jsonPath: $.PetRegistrationApplications.*.applicationType
             - jsonPath: $.PetRegistrationApplications.*.validityDate
             - jsonPath: $.PetRegistrationApplications.*.status
@@ -209,26 +136,25 @@ serviceMaps:
             - jsonPath: $.PetRegistrationApplications.*.id
             - jsonPath: $.PetRegistrationApplications.*.tenantId
 
-
         - query: UPDATE eg_ptr_address
-              SET tenantid = COALESCE(?, tenantid),
-                  doorno = COALESCE(?, doorno),
-                  latitude = COALESCE(?, latitude),
-                  longitude = COALESCE(?, longitude),
-                  buildingname = COALESCE(?, buildingname),
-                  addressid = COALESCE(?, addressid),
-                  addressnumber = COALESCE(?, addressnumber),
-                  type = COALESCE(?, type),
-                  addressline1 = COALESCE(?, addressline1),
-                  addressline2 = COALESCE(?, addressline2),
-                  landmark = COALESCE(?, landmark),
-                  street = COALESCE(?, street),
-                  city = COALESCE(?, city),
-                  locality = COALESCE(?, locality),
-                  pincode = COALESCE(?, pincode),
-                  detail = COALESCE(?, detail),
-                  lastmodifiedby = ?,
-                  lastmodifiedtime = ?
+            SET tenantid = COALESCE(?, tenantid),
+            doorno = COALESCE(?, doorno),
+            latitude = COALESCE(?, latitude),
+            longitude = COALESCE(?, longitude),
+            buildingname = COALESCE(?, buildingname),
+            addressid = COALESCE(?, addressid),
+            addressnumber = COALESCE(?, addressnumber),
+            type = COALESCE(?, type),
+            addressline1 = COALESCE(?, addressline1),
+            addressline2 = COALESCE(?, addressline2),
+            landmark = COALESCE(?, landmark),
+            street = COALESCE(?, street),
+            city = COALESCE(?, city),
+            locality = COALESCE(?, locality),
+            pincode = COALESCE(?, pincode),
+            detail = COALESCE(?, detail),
+            lastmodifiedby = ?,
+            lastmodifiedtime = ?
             WHERE id = ? AND tenantid = ?;
           basePath: PetRegistrationApplications.*
           jsonMaps:
@@ -253,22 +179,21 @@ serviceMaps:
             - jsonPath: $.PetRegistrationApplications.*.address.id
             - jsonPath: $.PetRegistrationApplications.*.address.tenantId
 
-
         - query: UPDATE eg_ptr_petdetails
-              SET petname = COALESCE(?, petname),
-                  pettype = COALESCE(?, pettype),
-                  breedtype = COALESCE(?, breedtype),
-                  petage = COALESCE(?, petage),
-                  petgender = COALESCE(?, petgender),
-                  clinicname = COALESCE(?, clinicname),
-                  doctorname = COALESCE(?, doctorname),
-                  lastvaccinedate = COALESCE(?, lastvaccinedate),
-                  vaccinationnumber = COALESCE(?, vaccinationnumber),
-                  petdetailsid = COALESCE(?, petdetailsid),
-                  petcolor = COALESCE(?, petcolor),
-                  adoptiondate = COALESCE(?, adoptiondate),
-                  birthdate = COALESCE(?, birthdate),
-                  identificationmark = COALESCE(?, identificationmark)
+            SET petname = COALESCE(?, petname),
+            pettype = COALESCE(?, pettype),
+            breedtype = COALESCE(?, breedtype),
+            petage = COALESCE(?, petage),
+            petgender = COALESCE(?, petgender),
+            clinicname = COALESCE(?, clinicname),
+            doctorname = COALESCE(?, doctorname),
+            lastvaccinedate = COALESCE(?, lastvaccinedate),
+            vaccinationnumber = COALESCE(?, vaccinationnumber),
+            petdetailsid = COALESCE(?, petdetailsid),
+            petcolor = COALESCE(?, petcolor),
+            adoptiondate = COALESCE(?, adoptiondate),
+            birthdate = COALESCE(?, birthdate),
+            identificationmark = COALESCE(?, identificationmark)
             WHERE id = ?;
           basePath: PetRegistrationApplications.*
           jsonMaps:
@@ -288,182 +213,159 @@ serviceMaps:
             - jsonPath: $.PetRegistrationApplications.*.petDetails.identificationMark
             - jsonPath: $.PetRegistrationApplications.*.petDetails.id
 
-
-        - query: UPDATE eg_ptr_applicationdocuments
-              SET tenantId = COALESCE(?, tenantId),
-                  documenttype = COALESCE(?, documenttype),
-                  filestoreid = COALESCE(?, filestoreid),
-                  documentuid = COALESCE(?, documentuid),
-                  active = COALESCE(?, active),
-                  lastmodifiedby = ?,
-                  lastmodifiedtime = ?
-            WHERE id = ? AND tenantId = ?;
-          basePath: PetRegistrationApplications.*.documents.*
+        - query: UPDATE eg_ptr_owner
+            SET status = COALESCE(?, status),
+            isprimaryowner = COALESCE(?, isprimaryowner),
+            ownertype = COALESCE(?, ownertype),
+            ownershippercentage = COALESCE(?, ownershippercentage),
+            institutionid = COALESCE(?, institutionid),
+            relationship = COALESCE(?, relationship),
+            lastmodifiedby = ?,
+            lastmodifiedtime = ?,
+            additionaldetails = COALESCE(?::jsonb, additionaldetails)
+            WHERE uuid = ? AND ptrregistrationid = ?;
+          basePath: PetRegistrationApplications.*
           jsonMaps:
-            - jsonPath: $.PetRegistrationApplications.*.tenantId
-            - jsonPath: $.PetRegistrationApplications.*.documents.*.documentType
-            - jsonPath: $.PetRegistrationApplications.*.documents.*.filestoreId
-            - jsonPath: $.PetRegistrationApplications.*.documents.*.documentUid
-            - jsonPath: $.PetRegistrationApplications.*.documents.*.active
+            - jsonPath: $.PetRegistrationApplications.*.owner.status
+            - jsonPath: $.PetRegistrationApplications.*.owner.isPrimaryOwner
+            - jsonPath: $.PetRegistrationApplications.*.owner.ownerType
+            - jsonPath: $.PetRegistrationApplications.*.owner.ownershipPercentage
+            - jsonPath: $.PetRegistrationApplications.*.owner.institutionId
+            - jsonPath: $.PetRegistrationApplications.*.owner.relationship
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedBy
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedTime
-            - jsonPath: $.PetRegistrationApplications.*.documents.*.id
-            - jsonPath: $.PetRegistrationApplications.*.tenantId
+            - jsonPath: $.PetRegistrationApplications.*.owner.additionalDetails
+            - jsonPath: $.PetRegistrationApplications.*.owner.uuid
+            - jsonPath: $.PetRegistrationApplications.*.id
 
+        - query: INSERT INTO eg_ptr_applicationdocuments(id, tenantId, documentType, filestoreId, documentUid, petApplicationId, active, createdby, lastmodifiedby, createdtime, lastmodifiedtime)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (id) DO UPDATE SET
+            tenantId = EXCLUDED.tenantId,
+            documentType = EXCLUDED.documentType,
+            filestoreId = EXCLUDED.filestoreId,
+            documentUid = EXCLUDED.documentUid,
+            petApplicationId = EXCLUDED.petApplicationId,
+            active = EXCLUDED.active,
+            lastmodifiedby = EXCLUDED.lastmodifiedby,
+            lastmodifiedtime = EXCLUDED.lastmodifiedtime;
+          basePath: PetRegistrationApplications.*.documents.*
+          jsonMaps:
+            - jsonPath: $.PetRegistrationApplications.*.id
+            - jsonPath: $.PetRegistrationApplications.*.tenantId
+            - jsonPath: $.PetRegistrationApplications.*.documentType
+            - jsonPath: $.PetRegistrationApplications.*.filestoreId
+            - jsonPath: $.PetRegistrationApplications.*.documentUid
+            - jsonPath: $.PetRegistrationApplications.*.[?({id} in @.documents[*].id)].id
+            - jsonPath: $.PetRegistrationApplications.*.active
+            - jsonPath: $.PetRegistrationApplications.*.auditDetails.createdBy
+            - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedBy
+            - jsonPath: $.PetRegistrationApplications.*.auditDetails.createdTime
+            - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedTime
 
     - version: 1.0
       description: Persists Renew Pet details in tables
       fromTopic: renew-ptr-application
-      isTransaction: true	
+      isTransaction: true
       queryMaps:
 
-        - query: INSERT INTO eg_ptr_registration(id,tenantid,applicationnumber,applicantName,fathername,mobileNumber,emailId,applicationType,validityDate,status,expireFlag,petToken,previousApplicationNumber,propertyId,createdby,lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        - query: INSERT INTO eg_ptr_registration(id,tenantid,applicationnumber,applicationType,validityDate,status,expireFlag,petToken,previousApplicationNumber,propertyId,createdby,lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
           basePath: PetRegistrationApplications.*
           jsonMaps:
             - jsonPath: $.PetRegistrationApplications.*.id
-
             - jsonPath: $.PetRegistrationApplications.*.tenantId
-
             - jsonPath: $.PetRegistrationApplications.*.applicationNumber
-            
-            - jsonPath: $.PetRegistrationApplications.*.applicantName
-          
-            - jsonPath: $.PetRegistrationApplications.*.fatherName
-            
-            - jsonPath: $.PetRegistrationApplications.*.mobileNumber
-            
-            - jsonPath: $.PetRegistrationApplications.*.emailId
-            
             - jsonPath: $.PetRegistrationApplications.*.applicationType
-
             - jsonPath: $.PetRegistrationApplications.*.validityDate
-
             - jsonPath: $.PetRegistrationApplications.*.status
-
             - jsonPath: $.PetRegistrationApplications.*.expireFlag
-
             - jsonPath: $.PetRegistrationApplications.*.petToken
-
             - jsonPath: $.PetRegistrationApplications.*.previousApplicationNumber
-
             - jsonPath: $.PetRegistrationApplications.*.propertyId
-            
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.createdBy
-
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedBy
-
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.createdTime
-            
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedTime
 
         - query: INSERT INTO eg_ptr_address(id, tenantid, doorno, latitude, longitude, buildingname, addressid, addressnumber, type, addressline1, addressline2, landmark, street, city, locality, pincode, detail, registrationid, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
           basePath: PetRegistrationApplications.*
           jsonMaps:
             - jsonPath: $.PetRegistrationApplications.*.address.id
-
             - jsonPath: $.PetRegistrationApplications.*.address.tenantId
-
             - jsonPath: $.PetRegistrationApplications.*.address.doorNo
-
             - jsonPath: $.PetRegistrationApplications.*.address.latitude
-
             - jsonPath: $.PetRegistrationApplications.*.address.longitude
-
             - jsonPath: $.PetRegistrationApplications.*.address.buildingName
-
             - jsonPath: $.PetRegistrationApplications.*.address.addressId
-
             - jsonPath: $.PetRegistrationApplications.*.address.addressNumber
-
             - jsonPath: $.PetRegistrationApplications.*.address.type
-
             - jsonPath: $.PetRegistrationApplications.*.address.addressLine1
-
             - jsonPath: $.PetRegistrationApplications.*.address.addressLine2
-
             - jsonPath: $.PetRegistrationApplications.*.address.landmark
-
             - jsonPath: $.PetRegistrationApplications.*.address.street
-
             - jsonPath: $.PetRegistrationApplications.*.address.city
-
             - jsonPath: $.PetRegistrationApplications.*.address.locality.name
-
             - jsonPath: $.PetRegistrationApplications.*.address.pincode
-
             - jsonPath: $.PetRegistrationApplications.*.address.detail
-
             - jsonPath: $.PetRegistrationApplications.*.id
-
             - jsonPath: $.PetRegistrationApplications.*.address.createdBy
-
             - jsonPath: $.PetRegistrationApplications.*.address.lastModifiedBy
-
             - jsonPath: $.PetRegistrationApplications.*.address.createdTime
-
             - jsonPath: $.PetRegistrationApplications.*.address.lastModifiedTime
-            
+
         - query: INSERT INTO eg_ptr_petdetails(id, petName, petType, breedType, petAge, petGender, clinicName, doctorName, lastVaccineDate, vaccinationNumber, petDetailsId, petColor, adoptionDate, birthDate, identificationMark) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
           basePath: PetRegistrationApplications.*
           jsonMaps:
             - jsonPath: $.PetRegistrationApplications.*.petDetails.id
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.petName
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.petType
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.breedType
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.petAge
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.petGender
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.clinicName
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.doctorName
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.lastVaccineDate
-            
             - jsonPath: $.PetRegistrationApplications.*.petDetails.vaccinationNumber
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.petDetailsId
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.petColor
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.adoptionDate
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.birthDate
-
             - jsonPath: $.PetRegistrationApplications.*.petDetails.identificationMark
-        
-            
+
+        - query: INSERT INTO eg_ptr_owner(uuid, tenantid, ptrregistrationid, status, isprimaryowner, ownertype, ownershippercentage, institutionid, relationship, createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb);
+          basePath: PetRegistrationApplications.*
+          jsonMaps:
+            - jsonPath: $.PetRegistrationApplications.*.owner.uuid
+            - jsonPath: $.PetRegistrationApplications.*.tenantId
+            - jsonPath: $.PetRegistrationApplications.*.id
+            - jsonPath: $.PetRegistrationApplications.*.owner.status
+            - jsonPath: $.PetRegistrationApplications.*.owner.isPrimaryOwner
+            - jsonPath: $.PetRegistrationApplications.*.owner.ownerType
+            - jsonPath: $.PetRegistrationApplications.*.owner.ownershipPercentage
+            - jsonPath: $.PetRegistrationApplications.*.owner.institutionId
+            - jsonPath: $.PetRegistrationApplications.*.owner.relationship
+            - jsonPath: $.PetRegistrationApplications.*.auditDetails.createdBy
+            - jsonPath: $.PetRegistrationApplications.*.auditDetails.createdTime
+            - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedBy
+            - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedTime
+            - jsonPath: $.PetRegistrationApplications.*.owner.additionalDetails
+
         - query: INSERT INTO eg_ptr_applicationdocuments( id, tenantId, documentType, filestoreId, documentUid, petApplicationId, active, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
           basePath: PetRegistrationApplications.*.documents.*
           jsonMaps:
             - jsonPath: $.PetRegistrationApplications.*.id
-
             - jsonPath: $.PetRegistrationApplications.*.tenantId
- 
             - jsonPath: $.PetRegistrationApplications.*.documentType
-
             - jsonPath: $.PetRegistrationApplications.*.filestoreId
-
             - jsonPath: $.PetRegistrationApplications.*.documentUid
-            
             - jsonPath: $.PetRegistrationApplications.*.[?({id} in @.documents[*].id)].id
-             
             - jsonPath: $.PetRegistrationApplications.*.active
-            
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.createdBy
-            
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedBy
-            
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.createdTime
-            
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedTime
 
         - query: UPDATE eg_ptr_registration SET status = 'RENEWED' WHERE applicationNumber=?;
           basePath: PetRegistrationApplications.*
           jsonMaps:
-
             - jsonPath: $.PetRegistrationApplications.*.previousApplicationNumber

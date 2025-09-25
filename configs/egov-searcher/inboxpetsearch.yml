@@ -1,3 +1,4 @@
+
 SearchDefinitions:
   moduleName: pet-services
   summary: Pet Services Inbox API
@@ -5,15 +6,24 @@ SearchDefinitions:
   definitions:
     - name: inboxpetsearch
       query:
-        baseQuery: Select row_to_json(result) from
+        baseQuery: |
+          Select row_to_json(result) from
           (
-          select DISTINCT(pet.applicationNumber),pi.createdtime from eg_ptr_registration as pet
-          INNER JOIN eg_ptr_address ptadd ON ptadd.registrationId = pet.id
-          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber
-          LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
-          $where
-          AND pi.createdtime IN (select max(createdtime) from eg_wf_processinstance_v2 wf where wf.businessid = pet.applicationNumber GROUP BY wf.businessid)
-          order by pi.createdtime asc $pagination
+            select DISTINCT(pet.applicationNumber), pi.createdtime, pi.status as status_id, ws.state as status_name, ws.applicationStatus
+            from eg_ptr_registration as pet
+            INNER JOIN eg_ptr_address ptadd ON ptadd.registrationId = pet.id
+            INNER JOIN eg_ptr_petdetails ptdet ON ptdet.petdetailsid = pet.id
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber
+            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
+            LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            $where
+            AND pi.createdtime IN (
+              select max(createdtime) 
+              from eg_wf_processinstance_v2 wf 
+              where wf.businessid = pet.applicationNumber 
+              GROUP BY wf.businessid
+            )
+            order by pi.createdtime asc $pagination
           ) result
         groupBy:
         orderBy:
@@ -29,31 +39,58 @@ SearchDefinitions:
           - name: pi.status
             isMandatory: false
             jsonPath: $.searchCriteria.status
+            operator: IN
           - name: pet.applicationNumber
             isMandatory: false
             jsonPath: $.searchCriteria.applicationNumber
           - name: pi.businessservice
             isMandatory: false
             jsonPath: $.searchCriteria.businessservice
+          - name: ptdet.pettype
+            isMandatory: false
+            jsonPath: $.searchCriteria.petType
+          - name: ptdet.petname
+            isMandatory: false
+            jsonPath: $.searchCriteria.petName
+          - name: ptdet.breedtype
+            isMandatory: false
+            jsonPath: $.searchCriteria.breedType
+          - name: ptdet.petgender
+            isMandatory: false
+            jsonPath: $.searchCriteria.petGender
+          - name: ptdet.petcolor
+            isMandatory: false
+            jsonPath: $.searchCriteria.petColor
+          - name: assg.assignee
+            isMandatory: false
+            jsonPath: $.searchCriteria.assignee
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
-
       output:
-        jsonFormat: {"ResponseInfo": {},"PetRegistrationApplications": []}
+        jsonFormat: { "ResponseInfo": { },"PetRegistrationApplications": [ ] }
         outJsonPath: $.PetRegistrationApplications
         responseInfoPath: $.ResponseInfo
-    - name: inboxpetsearchdesc
+
+    - name: inboxpetsearchcount
       query:
-        baseQuery: Select row_to_json(result) from
-           (
-          select DISTINCT(pet.applicationNumber),pi.createdtime from eg_ptr_registration as pet
-          INNER JOIN eg_ptr_address ptadd ON ptadd.registrationId = pet.id
-          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber
-          LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
-          $where
-          AND pi.createdtime IN (select max(createdtime) from eg_wf_processinstance_v2 wf where wf.businessid = pet.applicationNumber GROUP BY wf.businessid)
-          order by pi.createdtime desc $pagination
+        baseQuery: |
+          Select row_to_json(result) from
+          (
+            select COUNT(DISTINCT(pet.applicationNumber)) as totalCount
+            from eg_ptr_registration as pet
+            INNER JOIN eg_ptr_address ptadd ON ptadd.registrationId = pet.id
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber
+            INNER JOIN eg_ptr_petdetails ptdet ON ptdet.petdetailsid = pet.id
+            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
+            LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            $where
+            AND pi.createdtime IN (
+              select max(createdtime) 
+              from eg_wf_processinstance_v2 wf 
+              where wf.businessid = pet.applicationNumber 
+              GROUP BY wf.businessid
+            )
           ) result
         groupBy:
         orderBy:
@@ -66,12 +103,77 @@ SearchDefinitions:
           - name: pet.id
             isMandatory: false
             jsonPath: $.searchCriteria.id
-          - name: pet.applicationNumber
-            isMandatory: false
-            jsonPath: $.searchCriteria.applicationNumber
           - name: pi.status
             isMandatory: false
             jsonPath: $.searchCriteria.status
+            operator: IN
+          - name: pet.applicationNumber
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationNumber
+          - name: ptdet.pettype
+            isMandatory: false
+            jsonPath: $.searchCriteria.petType
+          - name: ptdet.petname
+            isMandatory: false
+            jsonPath: $.searchCriteria.petName
+          - name: ptdet.breedtype
+            isMandatory: false
+            jsonPath: $.searchCriteria.breedType
+          - name: ptdet.petgender
+            isMandatory: false
+            jsonPath: $.searchCriteria.petGender
+          - name: ptdet.petcolor
+            isMandatory: false
+            jsonPath: $.searchCriteria.petColor
+          - name: assg.assignee
+            isMandatory: false
+            jsonPath: $.searchCriteria.assignee
+          - name: pi.businessservice
+            isMandatory: false
+            jsonPath: $.searchCriteria.businessservice
+
+      output:
+        jsonFormat: {"ResponseInfo": {},"totalCount": 0}
+        outJsonPath: $.totalCount
+        responseInfoPath: $.ResponseInfo
+
+    - name: inboxpetsearchdesc
+      query:
+        baseQuery: |
+          Select row_to_json(result) from
+          (
+            select DISTINCT(pet.applicationNumber), pi.createdtime, pi.status 
+            from eg_ptr_registration as pet
+            INNER JOIN eg_ptr_address ptadd ON ptadd.registrationId = pet.id
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber
+            LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            $where
+            AND pi.createdtime IN (
+              select max(createdtime) 
+              from eg_wf_processinstance_v2 wf 
+              where wf.businessid = pet.applicationNumber 
+              GROUP BY wf.businessid
+            )
+            order by pi.createdtime desc $pagination
+          ) result
+        groupBy:
+        orderBy:
+      searchParams:
+        condition: AND
+        params:
+          - name: pet.tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+          - name: pet.id
+            isMandatory: false
+            jsonPath: $.searchCriteria.id
+          - name: pi.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.status
+            operator: IN
+          - name: pet.applicationNumber
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationNumber
           - name: pi.businessservice
             isMandatory: false
             jsonPath: $.searchCriteria.businessservice

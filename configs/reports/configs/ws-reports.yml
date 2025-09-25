@@ -3456,7 +3456,7 @@ ReportDefinitions:
         pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
         source: ws
         isMandatory: false
-        searchClause: AND pt.propertyusagetyp = $usagecategory
+        searchClause: AND pt.propertyusagetype = $usagecategory
       - name: localityArray
         label: zoneList
         type: boundarylist
@@ -3490,4 +3490,101 @@ ReportDefinitions:
        FROM eg_ws_meterreading
        WHERE connectionno = mt.connectionno
        )
-    groupby: GROUP BY conn.connectionno          
+    groupby: GROUP BY conn.connectionno
+
+  - reportName: OutstandingArrears
+    summary: Outstanding Arrears Report
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: consumercode
+        type: string
+        source: ws
+        total: false
+      - name: businessservice
+        label: Business Service
+        type: string
+        source: ws
+        total: false
+      - name: total_demand
+        label: Total Demand
+        type: string
+        source: ws
+        total: true
+      - name: balance
+        label: Balance
+        type: string
+        source: ws
+        total: true     
+      - name: max_taxperiodto_date
+        label: Max taxperiod todate
+        type: epoch
+        source: ws
+        total: false
+    searchParams:
+      - name: connectionType
+        label: connectionType
+        type: singlevaluelist
+        pattern: list://WS%:Water,SW%:Sewerage
+        source: ws
+        isMandatory: true
+        searchClause: AND 1=1
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND 1=1        
+    query:
+      WITH demand AS (
+           SELECT 
+               dd.consumercode,
+               dd.businessservice,
+               SUM(dt.taxamount) AS total_demand,
+               MAX(dd.taxperiodto) as max_taxperiodto_date
+           FROM egbs_demand_v1 dd
+           JOIN egbs_demanddetail_v1 dt
+             ON dd.id = dt.demandid
+           JOIN eg_ws_connection sw
+             ON sw.connectionno = dd.consumercode
+           WHERE dd.tenantid = $tenantid
+             AND dd.businessservice like $connectionType
+             AND dd.status = 'ACTIVE'
+             AND sw.status = 'Active'
+ 
+         AND  dd.taxperiodto <= $toDate
+           GROUP BY dd.consumercode, dd.businessservice
+           HAVING SUM(dt.taxamount) <> 0
+       ),
+       payment AS (
+           SELECT 
+               bill.consumercode AS connectionno,     
+               bill.businessservice AS service,   
+               SUM(pd.amountpaid) AS total_amt_paid
+           FROM egcl_paymentdetail pd
+           INNER JOIN egcl_bill bill 
+               ON bill.id = pd.billid 
+              AND pd.tenantid = $tenantid
+           INNER JOIN egcl_payment payment 
+               ON payment.id = pd.paymentid
+       
+         where pd.receiptdate <= $toDate
+             AND bill.businessservice like $connectionType
+       and payment.paymentstatus != 'CANCELLED'
+           GROUP BY bill.consumercode, bill.businessservice
+       )
+       SELECT 
+           d.consumercode,
+           d.businessservice,
+           d.total_demand,
+            COALESCE(p.total_amt_paid, 0) AS total_amt_paid,
+           (d.total_demand - COALESCE(p.total_amt_paid, 0)) AS balance,
+           d.max_taxperiodto_date
+       FROM demand d
+       LEFT JOIN payment p
+         ON d.consumercode = p.connectionno
+        AND d.businessservice = p.service  
