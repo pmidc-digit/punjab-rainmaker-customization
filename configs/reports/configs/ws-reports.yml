@@ -1214,10 +1214,10 @@ ReportDefinitions:
     source: ws
     total: false
   - name: businessservice
-    label: businessservice
+    label: Business Service
     type: string
     source: ws
-    total: true
+    total: false
   - name: total_demand
     label: Total Demand
     type: string
@@ -1227,17 +1227,17 @@ ReportDefinitions:
     label: Total Amount Paid
     type: string
     source: ws
-    total: true 
+    total: true    
   - name: balance
     label: Balance
     type: string
     source: ws
-    total: true       
+    total: true     
   - name: max_taxperiodto_date
     label: Max taxperiod todate
-    type: string
+    type: epoch
     source: ws
-    total: true
+    total: false
   searchParams:
   - name: connectionType
     label: connectionType
@@ -1258,17 +1258,14 @@ ReportDefinitions:
              dd.consumercode,
              dd.businessservice,
              SUM(dt.taxamount) AS total_demand,
-             TO_CHAR(
-                 (TO_TIMESTAMP(MAX(dd.taxperiodto) / 1000) AT TIME ZONE 'Asia/Kolkata'),
-                 'YYYY-MM-DD'
-             ) AS max_taxperiodto_date
+             MAX(dd.taxperiodto) as max_taxperiodto_date
          FROM egbs_demand_v1 dd
          JOIN egbs_demanddetail_v1 dt
            ON dd.id = dt.demandid
          JOIN eg_ws_connection sw
            ON sw.connectionno = dd.consumercode
          WHERE dd.tenantid = $tenantid
-           AND dd.businessservice = $connectionType
+           AND dd.businessservice like $connectionType
            AND dd.status = 'ACTIVE'
            AND sw.status = 'Active'
 
@@ -1289,7 +1286,7 @@ ReportDefinitions:
              ON payment.id = pd.paymentid
      
        where pd.receiptdate <= $toDate
-           AND bill.businessservice = $connectionType
+           AND bill.businessservice like $connectionType
      and payment.paymentstatus != 'CANCELLED'
          GROUP BY bill.consumercode, bill.businessservice
      )
@@ -1303,7 +1300,7 @@ ReportDefinitions:
      FROM demand d
      LEFT JOIN payment p
        ON d.consumercode = p.connectionno
-      AND d.businessservice = p.service 
+      AND d.businessservice = p.service  
 
 - reportName: SearchWaterChargeReport
   summary: Search Water Charge Notice Report
