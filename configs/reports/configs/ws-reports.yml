@@ -3515,16 +3515,16 @@ ReportDefinitions:
         type: string
         source: ws
         total: true
-      - name: total_amt_paid
-        label: Total Amount Paid
+      - name: businessservice
+        label: Business Service
         type: string
         source: ws
-        total: true 
+        total: false
       - name: balance
         label: Balance
         type: string
         source: ws
-        total: true       
+        total: true     
       - name: max_taxperiodto_date
         label: Max taxperiod todate
         type: epoch
@@ -3550,11 +3550,7 @@ ReportDefinitions:
                dd.consumercode,
                dd.businessservice,
                SUM(dt.taxamount) AS total_demand,
-               dd.taxperiodto as max_taxperiodto_date
-               --TO_CHAR(
-                  -- (TO_TIMESTAMP(MAX(dd.taxperiodto) / 1000) AT TIME ZONE 'Asia/Kolkata'),
-                  -- 'YYYY-MM-DD'
-              -- ) AS max_taxperiodto_date
+               MAX(dd.taxperiodto) as max_taxperiodto_date
            FROM egbs_demand_v1 dd
            JOIN egbs_demanddetail_v1 dt
              ON dd.id = dt.demandid
