@@ -115,7 +115,9 @@ ServiceMaps:
         - inJsonPath: $.phone
           outJsonPath: $.Data.phone
         - inJsonPath: $.auditDetails.createdTime
-          outJsonPath: $.Data.dateOfComplaint
+          outJsonPath: $.Data.dateOfComplaint      
+        - inJsonPath: $.auditDetails
+          outJsonPath: $.Data.auditDetails
         - inJsonPath: $.description
           outJsonPath: $.Data.description
         - inJsonPath: $.address
@@ -219,7 +221,7 @@ ServiceMaps:
       fieldsToBeMasked: ["$.phone", "$.citizen.mobileNumber", "$.citizen.address", "$.citizen.aadhaarNumber", "$.citizen.pan", "$.citizen.emailId", "$.citizen.password"]
       timeStampField: $.auditDetails.createdTime
       customJsonMapping:
-        indexMapping: {"Data":{"serviceRequestId":"serviceRequestId","tenantId":"tenantId","complainCategory":"complainCategory","citizen":{},"phone":"phone","dateOfComplaint":null,"address":"","addressDetail":{},"status":"status","assignee":"assignee","gro":"gro","department":"department","complaintWard":{},"source":"source","description":"","slaHours":"slaHours","tenantData":{},"actionHistory":{},"@timestamp":"timestamp"}}
+        indexMapping: {"Data":{"serviceRequestId":"serviceRequestId","tenantId":"tenantId","complainCategory":"complainCategory","citizen":{},"phone":"phone","dateOfComplaint":null,"address":"","addressDetail":{},"status":"status","assignee":"assignee","gro":"gro","department":"department","complaintWard":{"name":"NA"},"source":"source","description":"","slaHours":"slaHours","tenantData":{},"actionHistory":{},"@timestamp":"timestamp"}}
         fieldMapping:
         - inJsonPath: $.serviceRequestId
           outJsonPath: $.Data.serviceRequestId
@@ -229,6 +231,8 @@ ServiceMaps:
           outJsonPath: $.Data.phone
         - inJsonPath: $.auditDetails.createdTime
           outJsonPath: $.Data.dateOfComplaint
+        - inJsonPath: $.auditDetails
+          outJsonPath: $.Data.auditDetails
         - inJsonPath: $.description
           outJsonPath: $.Data.description
         - inJsonPath: $.address
@@ -272,7 +276,7 @@ ServiceMaps:
         - path: http://egov-location.egov:8080/egov-location/location/v11/boundarys/_search
           queryParam: hierarchyTypeCode=ADMIN,boundaryType=Block,codes=$.addressDetail.mohalla,tenantId=$.tenantId
           apiRequest: {"RequestInfo": {"apiId": "org.egov.pt","ver": "1.0","ts": 1502890899493,"action": "asd","did": "4354648646","key": "xyz","msgId": "654654", "requesterId": "61",
-          "authToken": "02dbe5be-28df-4d82-954f-3d27c56cca7d","userInfo":{"id":73}}}
+          "authToken": "750d4aa9-2436-4bc4-a8f4-3796e3bfd465","userInfo":{"id":73}}}
           uriResponseMapping:
           - inJsonPath: $.TenantBoundary[0].boundary[0]
             outJsonPath: $.Data.complaintWard

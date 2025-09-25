@@ -3506,20 +3506,25 @@ ReportDefinitions:
         source: ws
         total: false
       - name: businessservice
-        label: businessservice
+        label: Business Service
+        type: string
+        source: ws
+        total: false
+      - name: total_demand
+        label: Total Demand
         type: string
         source: ws
         total: true
-      - name: amt
-        label: totalamount
+      - name: balance
+        label: Balance
         type: string
         source: ws
-        total: true
+        total: true     
       - name: max_taxperiodto_date
-        label: max_taxperiodto_date
-        type: string
+        label: Max taxperiod todate
+        type: epoch
         source: ws
-        total: true
+        total: false
     searchParams:
       - name: connectionType
         label: connectionType
@@ -3534,57 +3539,52 @@ ReportDefinitions:
         source: ws
         isMandatory: true
         searchClause: AND 1=1        
-    query: 
+    query:
       WITH demand AS (
-          SELECT 
-              dd.consumercode,
-              dd.businessservice,
-              SUM(dt.taxamount) AS total_demand,
-              TO_CHAR(
-                  (TO_TIMESTAMP(MAX(dd.taxperiodto) / 1000) AT TIME ZONE 'Asia/Kolkata'),
-                  'YYYY-MM-DD'
-              ) AS max_taxperiodto_date
-          FROM egbs_demand_v1 dd
-          JOIN egbs_demanddetail_v1 dt
-            ON dd.id = dt.demandid
-          JOIN eg_ws_connection sw
-            ON sw.connectionno = dd.consumercode
-          WHERE dd.tenantid = $tenantid
-            AND dd.businessservice = $connectionType
-            AND dd.status = 'ACTIVE'
-            AND sw.status = 'Active'
-      --       AND (TO_TIMESTAMP(dd.taxperiodto / 1000) AT TIME ZONE 'Asia/Kolkata') 
-      --             <= TO_DATE('2024-04-01','YYYY-MM-DD')
-        AND  dd.taxperiodto <= $toDate
-          GROUP BY dd.consumercode, dd.businessservice
-          HAVING SUM(dt.taxamount) <> 0
-      ),
-      payment AS (
-          SELECT 
-              bill.consumercode AS connectionno,     
-              bill.businessservice AS service,   
-              SUM(pd.amountpaid) AS total_amt_paid
-          FROM egcl_paymentdetail pd
-          INNER JOIN egcl_bill bill 
-              ON bill.id = pd.billid 
-             AND pd.tenantid = $tenantid
-          INNER JOIN egcl_payment payment 
-              ON payment.id = pd.paymentid
-      --     WHERE (TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata') 
-      --             <= TO_DATE('2024-04-01','YYYY-MM-DD')
-        where pd.receiptdate <= $toDate
-            AND bill.businessservice = $connectionType
-      and payment.paymentstatus != 'CANCELLED'
-          GROUP BY bill.consumercode, bill.businessservice
-      )
-      SELECT 
-          d.consumercode,
-          d.businessservice,
-          d.total_demand,
-           COALESCE(p.total_amt_paid, 0) AS total_amt_paid,
-          (d.total_demand - COALESCE(p.total_amt_paid, 0)) AS balance,
-          d.max_taxperiodto_date
-      FROM demand d
-      LEFT JOIN payment p
-        ON d.consumercode = p.connectionno
-       AND d.businessservice = p.service 
+           SELECT 
+               dd.consumercode,
+               dd.businessservice,
+               SUM(dt.taxamount) AS total_demand,
+               MAX(dd.taxperiodto) as max_taxperiodto_date
+           FROM egbs_demand_v1 dd
+           JOIN egbs_demanddetail_v1 dt
+             ON dd.id = dt.demandid
+           JOIN eg_ws_connection sw
+             ON sw.connectionno = dd.consumercode
+           WHERE dd.tenantid = $tenantid
+             AND dd.businessservice like $connectionType
+             AND dd.status = 'ACTIVE'
+             AND sw.status = 'Active'
+ 
+         AND  dd.taxperiodto <= $toDate
+           GROUP BY dd.consumercode, dd.businessservice
+           HAVING SUM(dt.taxamount) <> 0
+       ),
+       payment AS (
+           SELECT 
+               bill.consumercode AS connectionno,     
+               bill.businessservice AS service,   
+               SUM(pd.amountpaid) AS total_amt_paid
+           FROM egcl_paymentdetail pd
+           INNER JOIN egcl_bill bill 
+               ON bill.id = pd.billid 
+              AND pd.tenantid = $tenantid
+           INNER JOIN egcl_payment payment 
+               ON payment.id = pd.paymentid
+       
+         where pd.receiptdate <= $toDate
+             AND bill.businessservice like $connectionType
+       and payment.paymentstatus != 'CANCELLED'
+           GROUP BY bill.consumercode, bill.businessservice
+       )
+       SELECT 
+           d.consumercode,
+           d.businessservice,
+           d.total_demand,
+            COALESCE(p.total_amt_paid, 0) AS total_amt_paid,
+           (d.total_demand - COALESCE(p.total_amt_paid, 0)) AS balance,
+           d.max_taxperiodto_date
+       FROM demand d
+       LEFT JOIN payment p
+         ON d.consumercode = p.connectionno
+        AND d.businessservice = p.service  

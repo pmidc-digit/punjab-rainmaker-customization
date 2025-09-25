@@ -16,8 +16,6 @@ SearchDefinitions:
               a.createdtime AS a_createdtime,
               a.lastmodifiedtime AS a_lastmodifiedtime,
               pi.businessservice AS wf_businessservice,
-              pi.action AS wf_action,
-              pi.assigner AS wf_assigner,
               pi.status AS wf_status,
               pi.createdby AS wf_createdby,
               pi.lastmodifiedby AS wf_lastmodifiedby,
@@ -30,6 +28,7 @@ SearchDefinitions:
               SELECT MAX(wf.createdtime)
               FROM eg_wf_processinstance_v2 wf
               WHERE wf.businessid = a.uuid
+              GROUP BY wf.businessid
             )
             ORDER BY a.createdtime DESC
             $pagination
@@ -85,6 +84,7 @@ SearchDefinitions:
             SELECT MAX(wf.createdtime)
             FROM eg_wf_processinstance_v2 wf
             WHERE wf.businessid = a.uuid
+            GROUP BY wf.businessid
           ) )t
       searchParams:
        condition: AND
@@ -138,11 +138,7 @@ SearchDefinitions:
               a.createdtime AS a_createdtime,
               a.lastmodifiedtime AS a_lastmodifiedtime,
               pi.businessservice AS wf_businessservice,
-              pi.action AS wf_action,
-              pi.assigner AS wf_assigner,
               pi.status AS wf_status,
-              pi.createdby AS wf_createdby,
-              pi.lastmodifiedby AS wf_lastmodifiedby,
               assg.assignee AS wf_assignee
             FROM eg_ndc_application a
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
@@ -152,6 +148,7 @@ SearchDefinitions:
               SELECT MAX(wf.createdtime)
               FROM eg_wf_processinstance_v2 wf
               WHERE wf.businessid = a.uuid
+              GROUP BY wf.businessid
             )
             ORDER BY a.createdtime DESC
             OFFSET $offset
@@ -204,14 +201,13 @@ SearchDefinitions:
               a.uuid AS uuid,
               a.tenantid,
               a.applicationstatus,
-              a.active,a.reason
+              a.active,a.reason,
               a.createdby AS a_createdby,
               a.lastmodifiedby AS a_lastmodifiedby,
               a.createdtime AS a_createdtime,
               a.lastmodifiedtime AS a_lastmodifiedtime,
               pi.businessservice AS wf_businessservice,
-              pi.action AS wf_action,
-              pi.assigner AS wf_assigner,
+
               pi.status AS wf_status,
               pi.createdby AS wf_createdby,
               pi.lastmodifiedby AS wf_lastmodifiedby,
@@ -224,6 +220,7 @@ SearchDefinitions:
               SELECT MAX(wf.createdtime)
               FROM eg_wf_processinstance_v2 wf
               WHERE wf.businessid = a.uuid
+              GROUP BY wf.businessid
             )
             ORDER BY a.createdtime DESC
           ) result
