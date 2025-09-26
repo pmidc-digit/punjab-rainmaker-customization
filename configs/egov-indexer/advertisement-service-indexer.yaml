@@ -24,7 +24,7 @@ ServiceMaps:
                                    "addressId":"addressId","doorNo":"doorNo","houseNo":"houseNo","streetName":"streetName",
                                    "addressLine1":"addressLine1","addressLine2":"addressLine2","landmark":"landmark",
                                    "city":"city","cityCode":"cityCode","locality":"locality","localityCode":"localityCode","pincode":"pincode",
-                                   "cartDetails":"cartDetails","documents":"documents","workflow":"workflow"}}
+                                   "cartDetails":"cartDetails","documents":"documents","workflow":"workflow","owners":"owners"}}
             fieldMapping:
               - inJsonPath: $.bookingId
                 outJsonPath: $.Data.bookingId
@@ -96,6 +96,8 @@ ServiceMaps:
                 outJsonPath: $.Data.documents
               - inJsonPath: $.workflow
                 outJsonPath: $.Data.workflow
+              - inJsonPath: $.owners
+                outJsonPath: $.Data.owners
 
     - topic: update-advertisement-booking
       configKey: INDEX
@@ -118,7 +120,7 @@ ServiceMaps:
                                    "addressId":"addressId","doorNo":"doorNo","houseNo":"houseNo","streetName":"streetName",
                                    "addressLine1":"addressLine1","addressLine2":"addressLine2","landmark":"landmark",
                                    "city":"city","cityCode":"cityCode","locality":"locality","localityCode":"localityCode","pincode":"pincode",
-                                   "cartDetails":"cartDetails","documents":"documents","workflow":"workflow"}}
+                                   "cartDetails":"cartDetails","documents":"documents","workflow":"workflow","owners":"owners"}}
             fieldMapping:
               - inJsonPath: $.bookingId
                 outJsonPath: $.Data.bookingId
@@ -186,6 +188,8 @@ ServiceMaps:
                 outJsonPath: $.Data.documents
               - inJsonPath: $.workflow
                 outJsonPath: $.Data.workflow
+              - inJsonPath: $.owners
+                outJsonPath: $.Data.owners
 
     - topic: create-draft-advertisement
       configKey: INDEX
