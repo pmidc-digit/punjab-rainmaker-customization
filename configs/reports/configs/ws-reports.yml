@@ -9,63 +9,73 @@ ReportDefinitions:
     print:
       pdfPageSize: "A1"
   sourceColumns:
+  - name: manualreceiptnumber
+    label: manualreceiptnumber
+    type: string
+    source: ws
+    total: false
+  - name: manualreceiptdate
+    label: manualreceiptdate
+    type: epoch
+    source: ws
+    total: false  
   - name: receiptno
-    label: reports.ws.receiptno
+    label: receiptno
     type: string
     source: ws
     total: false
   - name: connectionno
-    label: reports..connectionno
+    label: connectionno
     type: string
     source: ws
     total: false 
   - name: receiptdate1
-    label: reports.ws.receiptdate
+    label: receiptdate
     type: string
     source: ws
     total: false
   - name: service
-    label: reports.ws.serive
+    label: serive
     type: string
     source: ws
     total: false
   - name: collectorname
-    label: reports.ws.collectorname
+    label: collectorname
     type: string
     source: ws
     total: false
   - name: transactiondate
-    label: reports.ws.transactiondate
+    label: transactiondate
     type: string
     source: ws
     total: false
   - name: instrumentnumber
-    label: reports.ws.instrumentnumber
+    label: instrumentnumber
     type: string
     source: ws
     total: false    
   - name: payername
-    label: reports.ws.payername
+    label: payername
     type: string
     source: ws
     total: false
   - name: amountpaid
-    label: reports.ws.amountpaid
+    label: amountpaid
     type: string
     source: ws
     total: true
   - name: paymentmode
-    label: reports.ws.paymentmode
+    label: paymentmode
     type: string
     source: ws
     total: false
   - name: paymentstatus
-    label: reports.ws.paymentstatus
+    label: paymentstatus
     type: string
     source: ws
     total: false
   - name: ownername1
-    label: reports.ws.ownername1
+    label: ownername1
     type: string
     source: ws
     total: false  
@@ -76,13 +86,13 @@ ReportDefinitions:
     total: false      
   searchParams:
   - name: fromDate
-    label: reports.pt.fromDate
+    label: fromDate
     type: epoch
     source: pt
     isMandatory: true
     searchClause: AND pd.receiptdate >= $fromDate
   - name: toDate
-    label: reports.pt.toDate
+    label: toDate
     type: epoch
     source: pt
     isMandatory: true
@@ -115,7 +125,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND payment.paymentmode like $paymentMode
   query: |
-    select
+    select pd.manualreceiptnumber,pd.manualreceiptdate,
     pd.receiptnumber AS receiptno,
     bill.consumercode AS connectionno,     
     TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate1,
