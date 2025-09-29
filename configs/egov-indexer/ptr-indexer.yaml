@@ -2,7 +2,6 @@ ServiceMaps:
   serviceName: pet-services
   version: 1.0.0
   mappings:
-
     - topic: save-ptr-application
       configKey: INDEX
       indexes:
@@ -13,12 +12,18 @@ ServiceMaps:
           timeStampField: $.auditDetails.createdTime
           jsonPath: $.PetRegistrationApplications.*
           customJsonMapping:
-            indexMapping: {"Data":{"id":"id","tenantId":"tenantId","applicationNumber":"applicationNumber",
-                                   "applicantName":"applicantName","fatherName":"fatherName","mobileNumber":"mobileNumber",
-                                   "emailId":"emailId","applicationType":"applicationType","validityDate":"validityDate",
-                                   "status":"status","expireFlag":"expireFlag","petToken":"petToken","previousApplicationNumber":"previousApplicationNumber",
-                                   "propertyId":"propertyId","createdby":"createdby","lastmodifiedby":"lastmodifiedby",
-                                   "createdtime":"createdtime","lastmodifiedtime":"lastmodifiedtime","addressId":"addressId","addressLine1":"addressLine1","addressLine2":"addressLine2","city":"city","pincode":"pincode","petName":"petName","petType":"petType","breedType":"breedType","petAge":"petAge","petGender":"petGender","vaccinationNumber":"vaccinationNumber","petColor":"petColor"}}
+            indexMapping: {
+              "Data": {
+                "id":"id","tenantId":"tenantId","applicationNumber":"applicationNumber",
+                "applicantName":"applicantName","fatherName":"fatherName","mobileNumber":"mobileNumber",
+                "emailId":"emailId","applicationType":"applicationType","validityDate":"validityDate",
+                "status":"status","expireFlag":"expireFlag","petToken":"petToken","previousApplicationNumber":"previousApplicationNumber",
+                "propertyId":"propertyId","createdby":"createdby","lastmodifiedby":"lastmodifiedby",
+                "createdtime":"createdtime","lastmodifiedtime":"lastmodifiedtime","addressId":"addressId","addressLine1":"addressLine1","addressLine2":"addressLine2",
+                "city":"city","pincode":"pincode","petName":"petName","petType":"petType","breedType":"breedType",
+                "petAge":"petAge","petGender":"petGender","vaccinationNumber":"vaccinationNumber","petColor":"petColor","owner":"owner"
+              }
+            }
             fieldMapping:
               - inJsonPath: $.id
                 outJsonPath: $.Data.id
@@ -26,13 +31,13 @@ ServiceMaps:
                 outJsonPath: $.Data.tenantId
               - inJsonPath: $.applicationNumber
                 outJsonPath: $.Data.applicationNumber
-              - inJsonPath: $.applicantName
+              - inJsonPath: $.owner.name
                 outJsonPath: $.Data.applicantName
               - inJsonPath: $.fatherName
                 outJsonPath: $.Data.fatherName
-              - inJsonPath: $.mobileNumber
+              - inJsonPath: $.owner.mobileNumber
                 outJsonPath: $.Data.mobileNumber
-              - inJsonPath: $.emailId
+              - inJsonPath: $.owner.emailId
                 outJsonPath: $.Data.emailId
               - inJsonPath: $.applicationType
                 outJsonPath: $.Data.applicationType
@@ -84,12 +89,7 @@ ServiceMaps:
                 outJsonPath: $.Data.buildingName
               - inJsonPath: $.address.street
                 outJsonPath: $.Data.street
-              - inJsonPath: $.address.locality.code
-                outJsonPath: $.Data.localityCode
-              - inJsonPath: $.address.locality.name
-                outJsonPath: $.Data.localityName
-              - inJsonPath: $.address.locality.label
-                outJsonPath: $.Data.localityLabel
+              # locality mapping removed; locality is null in payload
               - inJsonPath: $.petDetails.id
                 outJsonPath: $.Data.petDetailsId
               - inJsonPath: $.petDetails.petName
@@ -120,6 +120,8 @@ ServiceMaps:
                 outJsonPath: $.Data.petIdentificationMark
               - inJsonPath: $.documents
                 outJsonPath: $.Data.documents
+              - inJsonPath: $.owner.name
+                outJsonPath: $.Data.owner
 
     - topic: update-ptr-application
       configKey: INDEX
@@ -131,12 +133,15 @@ ServiceMaps:
           timeStampField: $.auditDetails.lastModifiedTime
           jsonPath: $.PetRegistrationApplications.*
           customJsonMapping:
-            indexMapping: {"Data":{"id":"id","tenantId":"tenantId","applicationNumber":"applicationNumber",
-                                   "applicantName":"applicantName","fatherName":"fatherName","mobileNumber":"mobileNumber",
-                                   "emailId":"emailId","applicationType":"applicationType","validityDate":"validityDate",
-                                   "status":"status","expireFlag":"expireFlag","petToken":"petToken","previousApplicationNumber":"previousApplicationNumber",
-                                   "propertyId":"propertyId","lastmodifiedby":"lastmodifiedby","lastmodifiedtime":"lastmodifiedtime",
-                                   "addressId":"addressId","addressLine1":"addressLine1","addressLine2":"addressLine2","city":"city","pincode":"pincode","petName":"petName","petType":"petType","breedType":"breedType","petAge":"petAge","petGender":"petGender","vaccinationNumber":"vaccinationNumber","petColor":"petColor"}}
+            indexMapping: {"Data":{
+              "id":"id","tenantId":"tenantId","applicationNumber":"applicationNumber",
+              "applicantName":"applicantName","fatherName":"fatherName","mobileNumber":"mobileNumber",
+              "emailId":"emailId","applicationType":"applicationType","validityDate":"validityDate",
+              "status":"status","expireFlag":"expireFlag","petToken":"petToken","previousApplicationNumber":"previousApplicationNumber",
+              "propertyId":"propertyId","lastmodifiedby":"lastmodifiedby","lastmodifiedtime":"lastmodifiedtime",
+              "addressId":"addressId","addressLine1":"addressLine1","addressLine2":"addressLine2","city":"city","pincode":"pincode",
+              "petName":"petName","petType":"petType","breedType":"breedType","petAge":"petAge","petGender":"petGender",
+              "vaccinationNumber":"vaccinationNumber","petColor":"petColor"}}
             fieldMapping:
               - inJsonPath: $.id
                 outJsonPath: $.Data.id
@@ -144,13 +149,13 @@ ServiceMaps:
                 outJsonPath: $.Data.tenantId
               - inJsonPath: $.applicationNumber
                 outJsonPath: $.Data.applicationNumber
-              - inJsonPath: $.applicantName
+              - inJsonPath: $.owner.name
                 outJsonPath: $.Data.applicantName
               - inJsonPath: $.fatherName
                 outJsonPath: $.Data.fatherName
-              - inJsonPath: $.mobileNumber
+              - inJsonPath: $.owner.mobileNumber
                 outJsonPath: $.Data.mobileNumber
-              - inJsonPath: $.emailId
+              - inJsonPath: $.owner.emailId
                 outJsonPath: $.Data.emailId
               - inJsonPath: $.applicationType
                 outJsonPath: $.Data.applicationType
@@ -205,8 +210,9 @@ ServiceMaps:
           timeStampField: $.auditDetails.lastModifiedTime
           jsonPath: $.PetRegistrationApplications.*
           customJsonMapping:
-            indexMapping: {"Data":{"id":"id","applicationNumber":"applicationNumber","status":"status",
-                                   "lastmodifiedby":"lastmodifiedby","lastmodifiedtime":"lastmodifiedtime"}}
+            indexMapping: {"Data":{
+              "id":"id","applicationNumber":"applicationNumber","status":"status",
+              "lastmodifiedby":"lastmodifiedby","lastmodifiedtime":"lastmodifiedtime"}}
             fieldMapping:
               - inJsonPath: $.id
                 outJsonPath: $.Data.id
@@ -229,12 +235,15 @@ ServiceMaps:
           timeStampField: $.auditDetails.createdTime
           jsonPath: $.PetRegistrationApplications.*
           customJsonMapping:
-            indexMapping: {"Data":{"id":"id","tenantId":"tenantId","applicationNumber":"applicationNumber",
-                                   "applicantName":"applicantName","fatherName":"fatherName","mobileNumber":"mobileNumber",
-                                   "emailId":"emailId","applicationType":"applicationType","validityDate":"validityDate",
-                                   "status":"status","expireFlag":"expireFlag","petToken":"petToken","previousApplicationNumber":"previousApplicationNumber",
-                                   "propertyId":"propertyId","createdby":"createdby","lastmodifiedby":"lastmodifiedby",
-                                   "createdtime":"createdtime","lastmodifiedtime":"lastmodifiedtime","addressId":"addressId","addressLine1":"addressLine1","addressLine2":"addressLine2","city":"city","pincode":"pincode","petName":"petName","petType":"petType","breedType":"breedType","petAge":"petAge","petGender":"petGender","vaccinationNumber":"vaccinationNumber","petColor":"petColor"}}
+            indexMapping: {"Data":{
+              "id":"id","tenantId":"tenantId","applicationNumber":"applicationNumber","applicantName":"applicantName",
+              "fatherName":"fatherName","mobileNumber":"mobileNumber","emailId":"emailId","applicationType":"applicationType",
+              "validityDate":"validityDate","status":"status","expireFlag":"expireFlag","petToken":"petToken",
+              "previousApplicationNumber":"previousApplicationNumber","propertyId":"propertyId","createdby":"createdby",
+              "lastmodifiedby":"lastmodifiedby","createdtime":"createdtime","lastmodifiedtime":"lastmodifiedtime",
+              "addressId":"addressId","addressLine1":"addressLine1","addressLine2":"addressLine2","city":"city",
+              "pincode":"pincode","petName":"petName","petType":"petType","breedType":"breedType","petAge":"petAge",
+              "petGender":"petGender","vaccinationNumber":"vaccinationNumber","petColor":"petColor"}}
             fieldMapping:
               - inJsonPath: $.id
                 outJsonPath: $.Data.id
@@ -242,13 +251,13 @@ ServiceMaps:
                 outJsonPath: $.Data.tenantId
               - inJsonPath: $.applicationNumber
                 outJsonPath: $.Data.applicationNumber
-              - inJsonPath: $.applicantName
+              - inJsonPath: $.owner.name
                 outJsonPath: $.Data.applicantName
               - inJsonPath: $.fatherName
                 outJsonPath: $.Data.fatherName
-              - inJsonPath: $.mobileNumber
+              - inJsonPath: $.owner.mobileNumber
                 outJsonPath: $.Data.mobileNumber
-              - inJsonPath: $.emailId
+              - inJsonPath: $.owner.emailId
                 outJsonPath: $.Data.emailId
               - inJsonPath: $.applicationType
                 outJsonPath: $.Data.applicationType
