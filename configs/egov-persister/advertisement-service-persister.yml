@@ -142,6 +142,28 @@ serviceMaps:
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedTime
             - jsonPath: $.bookingApplication.cartDetails.*.cartId
 
+
+        - query: INSERT INTO public.eg_adv_document_detail(document_detail_id, booking_id, document_type, filestore_id, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (document_detail_id) DO UPDATE SET
+              booking_id = EXCLUDED.booking_id,
+              document_type = EXCLUDED.document_type,
+              filestore_id = EXCLUDED.filestore_id,
+              createdby = EXCLUDED.createdby,
+              lastmodifiedby = EXCLUDED.lastmodifiedby,
+              createdtime = EXCLUDED.createdtime,
+              lastmodifiedtime = EXCLUDED.lastmodifiedtime;
+
+          basePath: bookingApplication.documents.*
+          jsonMaps:
+            - jsonPath: $.bookingApplication.documents.*.documentDetailId
+            - jsonPath: $.bookingApplication.documents.*.bookingId
+            - jsonPath: $.bookingApplication.documents.*.documentType
+            - jsonPath: $.bookingApplication.documents.*.fileStoreId
+            - jsonPath: $.bookingApplication.auditDetails.createdBy
+            - jsonPath: $.bookingApplication.auditDetails.lastModifiedBy
+            - jsonPath: $.bookingApplication.auditDetails.createdTime
+            - jsonPath: $.bookingApplication.auditDetails.lastModifiedTime
+
         - query: INSERT INTO public.eg_adv_booking_detail_audit SELECT * FROM public.eg_adv_booking_detail WHERE booking_id = ?;
           basePath: bookingApplication
           jsonMaps:
