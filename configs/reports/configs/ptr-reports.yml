@@ -19,8 +19,8 @@ ReportDefinitions:
     type: string
     source: ptr
     total: false
-  - name: mobilenumber
-    label: mobilenumber
+  - name: mobileNumber
+    label: mobileNumber
     type: string
     source: ptr
     total: false
@@ -112,7 +112,7 @@ ReportDefinitions:
         pd.petname,pd.pettype,pd.breedtype,
         pd.petage,pd.petgender,pd.petcolor,
         pd.identificationmark,pd.vaccinationnumber,pd.doctorname,
-        pd.clinicname,u.mobilenumber,u.name
+        pd.clinicname,u.mobilenumber as mobileNumber,u.name
        FROM eg_ptr_registration AS r
        LEFT JOIN eg_ptr_owner AS o ON o.ptrregistrationid = r.id
        LEFT JOIN eg_ptr_petdetails AS pd ON r.id = pd.petdetailsid
