@@ -195,7 +195,7 @@ ReportDefinitions:
        LEFT JOIN eg_user u ON u.id::text = p.createdby::text
        LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
        WHERE p.paymentstatus != 'CANCELLED'
-       AND pd.businessservice = 'pet-services'
+       AND bill.businessservice = 'pet-services'
        AND p.tenantid = $tenantid
        AND p.createdtime >= $fromDate
        AND p.createdtime <= $toDate
