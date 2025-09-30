@@ -14,13 +14,13 @@ ReportDefinitions:
     type: string
     source: ndc
     total: false
-  - name: mobilenumber
-    label: mobilenumber
+  - name: mobileNumber
+    label: mobileNumber
     type: string
     source: ndc
     total: false
-  - name: emailid
-    label: emailid
+  - name: emailId
+    label: emailId
     type: string
     source: ndc
     total: false
@@ -93,7 +93,7 @@ ReportDefinitions:
   query: |
       -- Use CTE to force query plan, compute & use CTE later
       SELECT 
-        u.name, u.mobilenumber, u.emailid ,ua.address,a.tenantid,
+        u.name, u.mobilenumber as mobileNumber, u.emailid as emailId,ua.address,a.tenantid,
         a.action, d.consumercode, a.applicationstatus, d.businessservice, 
         d.applicationid, d.isduepending, d.status
       FROM  eg_user  u
