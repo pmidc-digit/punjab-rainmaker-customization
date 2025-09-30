@@ -71,33 +71,35 @@ serviceMaps:
 
           - jsonPath: $.hallsBookingApplication.auditDetails.lastModifiedTime
 
-       - query: INSERT INTO public.eg_chb_slot_detail(slot_id, booking_id, hall_code, capacity, booking_date, booking_from_time, booking_to_time, status, 
-               createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?::DATE, ?::TIME, ?::TIME, ?, ?, ?, ?, ?);
+       - query: INSERT INTO public.eg_chb_slot_detail(slot_id, booking_id, hall_code, capacity, booking_date,booking_end_date ,booking_from_time, booking_to_time, status,
+           createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?::DATE, ?::DATE, ?::TIME, ?::TIME, ?, ?, ?, ?, ?);
          basePath: hallsBookingApplication.bookingSlotDetails.*
          jsonMaps:
-          - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.slotId
+           - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.slotId
 
-          - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.bookingId
+           - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.bookingId
 
-          - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.hallCode
+           - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.hallCode
 
-          - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.capacity
+           - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.capacity
 
-          - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.bookingDate
+           - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.bookingDate
 
-          - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.bookingFromTime
+           - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.bookingEndDate
 
-          - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.bookingToTime
+           - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.bookingFromTime
 
-          - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.status
+           - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.bookingToTime
 
-          - jsonPath: $.hallsBookingApplication.auditDetails.createdBy
+           - jsonPath: $.hallsBookingApplication.bookingSlotDetails.*.status
 
-          - jsonPath: $.hallsBookingApplication.auditDetails.createdTime
+           - jsonPath: $.hallsBookingApplication.auditDetails.createdBy
 
-          - jsonPath: $.hallsBookingApplication.auditDetails.lastModifiedBy
+           - jsonPath: $.hallsBookingApplication.auditDetails.createdTime
 
-          - jsonPath: $.hallsBookingApplication.auditDetails.lastModifiedTime
+           - jsonPath: $.hallsBookingApplication.auditDetails.lastModifiedBy
+
+           - jsonPath: $.hallsBookingApplication.auditDetails.lastModifiedTime
 
 #       - query: INSERT INTO public.eg_chb_document_detail(document_detail_id, booking_id, document_type, filestore_id, createdby,
 #               lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
