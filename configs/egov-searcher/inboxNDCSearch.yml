@@ -9,6 +9,7 @@ SearchDefinitions:
          SELECT row_to_json(result) FROM (
             SELECT DISTINCT 
               a.uuid AS uuid,
+              a.applicationno,
               a.applicationstatus,
               a.active,a.reason,
               a.createdby AS a_createdby,
@@ -21,13 +22,13 @@ SearchDefinitions:
               pi.lastmodifiedby AS wf_lastmodifiedby,
               assg.assignee AS wf_assignee
             FROM eg_ndc_application a
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
             AND pi.createdtime = (
               SELECT MAX(wf.createdtime)
               FROM eg_wf_processinstance_v2 wf
-              WHERE wf.businessid = a.uuid
+              WHERE wf.businessid = a.applicationno
               GROUP BY wf.businessid
             )
             ORDER BY a.createdtime DESC
@@ -42,6 +43,9 @@ SearchDefinitions:
        - name: a.uuid
          isMandatory: false
          jsonPath: $.searchCriteria.uuid
+       - name: a.applicationno
+         isMandatory: false
+         jsonPath: $.searchCriteria.applicationNo
        - name: a.applicationstatus
          isMandatory: false
          jsonPath: $.searchCriteria.status
@@ -77,13 +81,13 @@ SearchDefinitions:
          SELECT row_to_json(t) from (
          SELECT COUNT(DISTINCT a.uuid) AS count
           FROM eg_ndc_application a
-          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
+          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.applicationno
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
           $where
           AND pi.createdtime = (
             SELECT MAX(wf.createdtime)
             FROM eg_wf_processinstance_v2 wf
-            WHERE wf.businessid = a.uuid
+            WHERE wf.businessid = a.applicationno
             GROUP BY wf.businessid
           ) )t
       searchParams:
@@ -95,6 +99,9 @@ SearchDefinitions:
        - name: a.uuid
          isMandatory: false
          jsonPath: $.searchCriteria.uuid
+       - name: a.applicationno
+         isMandatory: false
+         jsonPath: $.searchCriteria.applicationNo
        - name: a.applicationstatus
          isMandatory: false
          jsonPath: $.searchCriteria.status
@@ -131,6 +138,7 @@ SearchDefinitions:
           FROM (
             SELECT DISTINCT a.uuid AS uuid,
               a.tenantid,
+              a.applicationno,
               a.applicationstatus,
               a.active,a.reason,
               a.createdby AS a_createdby,
@@ -141,13 +149,13 @@ SearchDefinitions:
               pi.status AS wf_status,
               assg.assignee AS wf_assignee
             FROM eg_ndc_application a
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
             AND pi.createdtime = (
               SELECT MAX(wf.createdtime)
               FROM eg_wf_processinstance_v2 wf
-              WHERE wf.businessid = a.uuid
+              WHERE wf.businessid = a.applicationno
               GROUP BY wf.businessid
             )
             ORDER BY a.createdtime DESC
@@ -163,6 +171,9 @@ SearchDefinitions:
        - name: a.uuid
          isMandatory: false
          jsonPath: $.searchCriteria.uuid
+       - name: a.applicationno
+         isMandatory: false
+         jsonPath: $.searchCriteria.applicationNo
        - name: a.applicationstatus
          isMandatory: false
          jsonPath: $.searchCriteria.status
@@ -199,6 +210,7 @@ SearchDefinitions:
           SELECT row_to_json(result) FROM (
             SELECT DISTINCT
               a.uuid AS uuid,
+              a.applicationno,
               a.tenantid,
               a.applicationstatus,
               a.active,a.reason,
@@ -213,13 +225,13 @@ SearchDefinitions:
               pi.lastmodifiedby AS wf_lastmodifiedby,
               assg.assignee AS wf_assignee
             FROM eg_ndc_application a
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
             AND pi.createdtime = (
               SELECT MAX(wf.createdtime)
               FROM eg_wf_processinstance_v2 wf
-              WHERE wf.businessid = a.uuid
+              WHERE wf.businessid = a.applicationno
               GROUP BY wf.businessid
             )
             ORDER BY a.createdtime DESC
@@ -233,6 +245,9 @@ SearchDefinitions:
        - name: a.uuid
          isMandatory: false
          jsonPath: $.searchCriteria.uuid
+       - name: a.applicationno
+         isMandatory: false
+         jsonPath: $.searchCriteria.applicationNo
        - name: a.applicationstatus
          isMandatory: false
          jsonPath: $.searchCriteria.status

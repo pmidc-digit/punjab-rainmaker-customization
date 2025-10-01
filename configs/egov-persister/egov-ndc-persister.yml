@@ -6,10 +6,11 @@ serviceMaps:
       fromTopic: save-ndc-application
       isTransaction: true
       queryMaps:
-        - query: INSERT INTO eg_ndc_application (uuid,tenantid ,applicationstatus,active, createdby, lastmodifiedby, createdtime, lastmodifiedtime, action,reason) VALUES (?, ?, ?, ?, ?,?, ?, ?, ?, ?);
+        - query: INSERT INTO eg_ndc_application (uuid,applicationno,tenantid ,applicationstatus,active, createdby, lastmodifiedby, createdtime, lastmodifiedtime, action,reason) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?);
           basePath: Applications.*
           jsonMaps:
             - jsonPath: $.Applications.*.uuid
+            - jsonPath: $.Applications.*.applicationNo
             - jsonPath: $.Applications.*.tenantId
             - jsonPath: $.Applications.*.applicationStatus
             - jsonPath: $.Applications.*.active
