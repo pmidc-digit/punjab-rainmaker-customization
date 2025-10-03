@@ -126,6 +126,9 @@ SearchDefinitions:
           - name: noc.accountid
             isMandatory: false
             jsonPath: $.searchCriteria.accountId
+        pagination:
+          noOfRecords: $.searchCriteria.noOfRecords
+          offset: $.searchCriteria.offset
       output:
         jsonFormat: {"ResponseInfo": {},"totalCount": []}
         outJsonPath: $.totalCount

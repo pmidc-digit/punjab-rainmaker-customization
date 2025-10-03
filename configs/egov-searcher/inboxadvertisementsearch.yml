@@ -121,6 +121,9 @@ SearchDefinitions:
           - name: applicant.applicant_mobile_no
             isMandatory: false
             jsonPath: $.searchCriteria.mobileNumber
+        pagination:
+          noOfRecords: $.searchCriteria.noOfRecords
+          offset: $.searchCriteria.offset
       output:
         jsonFormat: {"ResponseInfo": {},"totalCount": []}
         outJsonPath: $.totalCount
