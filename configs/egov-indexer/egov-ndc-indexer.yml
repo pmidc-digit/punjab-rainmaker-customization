@@ -12,13 +12,15 @@ ServiceMaps:
           timeStampField: $.auditDetails.createdTime
           jsonPath: $.Applications.*
           customJsonMapping:
-            indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","owners":[],
+            indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","owners":[],"applicationno":"applicationno",
                                    "applicationStatus":"applicationStatus","active":"active",
                                    "createdby":"createdby","lastmodifiedby":"lastmodifiedby","createdtime":"createdtime",
                                    "lastmodifiedtime":"lastmodifiedtime","action":"action","details":[],"documents:[]","reason":"reason"}}
             fieldMapping:
               - inJsonPath: $.uuid
                 outJsonPath: $.Data.uuid
+              - inJsonPath: $.applicationNo
+                outJsonPath: $.Data.applicationno
               - inJsonPath: $.tenantId
                 outJsonPath: $.Data.tenantId
               - inJsonPath: $.owners
@@ -54,13 +56,15 @@ ServiceMaps:
           timeStampField: $.auditDetails.lastModifiedTime
           jsonPath: $.Applications.*
           customJsonMapping:
-            indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","owners":[],
+            indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","owners":[],"applicationno":"applicationno",
                                    "applicationStatus":"applicationStatus","active":"active",
                                    "lastmodifiedby":"lastmodifiedby","lastmodifiedtime":"lastmodifiedtime",
                                    "action":"action","details":[],"documents:[]","reason":"reason" }}
             fieldMapping:
               - inJsonPath: $.uuid
                 outJsonPath: $.Data.uuid
+              - inJsonPath: $.applicationNo
+                outJsonPath: $.Data.applicationno
               - inJsonPath: $.tenantId
                 outJsonPath: $.Data.tenantId
               - inJsonPath: $.owners
