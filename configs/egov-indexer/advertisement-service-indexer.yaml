@@ -24,7 +24,7 @@ ServiceMaps:
                                    "addressId":"addressId","doorNo":"doorNo","houseNo":"houseNo","streetName":"streetName",
                                    "addressLine1":"addressLine1","addressLine2":"addressLine2","landmark":"landmark",
                                    "city":"city","cityCode":"cityCode","locality":"locality","localityCode":"localityCode","pincode":"pincode",
-                                   "cartDetails":"cartDetails","documents":"documents","workflow":"workflow","owners":"owners"}}
+                                   "cartDetails":"cartDetails","documents":"documents","workflow":"workflow","owners":"owners","advertisementId":"advertisementId"}}
             fieldMapping:
               - inJsonPath: $.bookingId
                 outJsonPath: $.Data.bookingId
@@ -98,6 +98,8 @@ ServiceMaps:
                 outJsonPath: $.Data.workflow
               - inJsonPath: $.owners
                 outJsonPath: $.Data.owners
+              - inJsonPath: $.advertisementId
+                outJsonPath: $.Data.advertisementId
 
     - topic: update-advertisement-booking
       configKey: INDEX
@@ -120,7 +122,7 @@ ServiceMaps:
                                    "addressId":"addressId","doorNo":"doorNo","houseNo":"houseNo","streetName":"streetName",
                                    "addressLine1":"addressLine1","addressLine2":"addressLine2","landmark":"landmark",
                                    "city":"city","cityCode":"cityCode","locality":"locality","localityCode":"localityCode","pincode":"pincode",
-                                   "cartDetails":"cartDetails","documents":"documents","workflow":"workflow","owners":"owners"}}
+                                   "cartDetails":"cartDetails","documents":"documents","workflow":"workflow","owners":"owners","advertisementId":"advertisementId"}}
             fieldMapping:
               - inJsonPath: $.bookingId
                 outJsonPath: $.Data.bookingId
@@ -190,6 +192,9 @@ ServiceMaps:
                 outJsonPath: $.Data.workflow
               - inJsonPath: $.owners
                 outJsonPath: $.Data.owners
+              - inJsonPath: $.advertisementId
+                outJsonPath: $.Data.advertisementId
+
 
     - topic: create-draft-advertisement
       configKey: INDEX
