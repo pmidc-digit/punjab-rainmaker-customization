@@ -330,9 +330,11 @@ serviceMaps:
 
           - jsonPath: $.LandInfo.address.id
 
-       - query: UPDATE eg_land_geolocation SET latitude =?, longitude=?, additionaldetails=?, addressid=? WHERE id = ?;
+       - query: INSERT INTO eg_land_geolocation( id, latitude, longitude, additionaldetails, addressid) VALUES (?, ?, ?, ?, ?) ON CONFLICT (id) WHERE id IS NOT NULL DO UPDATE SET latitude =?, longitude=?, additionaldetails=?, addressid=?;
          basePath: LandInfo.address.geoLocation
-         jsonMaps:         
+         jsonMaps: 
+          - jsonPath: $.LandInfo.address.geoLocation.id
+
           - jsonPath: $.LandInfo.address.geoLocation.latitude
             type: DOUBLE
             dbType: DOUBLE
@@ -347,7 +349,19 @@ serviceMaps:
 
           - jsonPath: $.LandInfo.address.id
 
-          - jsonPath: $.LandInfo.address.geoLocation.id
+          - jsonPath: $.LandInfo.address.geoLocation.latitude
+            type: DOUBLE
+            dbType: DOUBLE
+
+          - jsonPath: $.LandInfo.address.geoLocation.longitude
+            type: DOUBLE
+            dbType: DOUBLE
+
+          - jsonPath: $.LandInfo.address.geoLocation.additionalDetails
+            type: JSON
+            dbType: JSONB
+
+          - jsonPath: $.LandInfo.address.id
 
 
        - query: INSERT INTO eg_land_ownerInfo( id, uuid, isprimaryowner, status, ownershippercentage, institutionId, relationship, additionalDetails, landInfoId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id, landInfoId) WHERE id IS NOT NULL DO UPDATE SET uuid = ?, isPrimaryOwner=?, status=?, ownerShipPercentage=?, institutionId=?, relationship=?, additionalDetails=?, lastModifiedBy=?, lastModifiedTime=?;
