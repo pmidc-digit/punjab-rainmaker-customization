@@ -1,6 +1,6 @@
 {
-  "key": "petservice-receipt",
-  "documentType": "PETSERVICE_RECEIPT",
+  "key": "noc-receipt",
+  "documentType": "NOC_RECEIPT",
   "DataConfigs": {
     "moduleName": "rainmaker-common",
     "version": "1.0.0",
@@ -39,12 +39,16 @@
                 }
               },
               {
-                "variable": "payerAddress",
+                "variable": "paymentStatus",
                 "value": {
-                  "path": "$.payerAddress"
+                  "path": "$.paymentStatus"
+                },
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
                 }
               },
-
               {
                 "variable": "receiptNo",
                 "value": {
@@ -70,9 +74,9 @@
                 }
               },
               {
-                "variable": "service_charge",
+                "variable": "noc_clu_charges",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_SERVICE_CHARGE"
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_CLU_CHARGES"
                 },
                 "type": "label",
                 "localisation": {
@@ -82,15 +86,15 @@
                 }
               },
               {
-                "variable": "ServiceCharge",
+                "variable": "nocCluCharges",
                 "value": {
                   "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[0].adjustedAmount"
                 }
               },
               {
-                "variable": "pet_registration_fee",
+                "variable": "noc_mining_charges",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_PET_REGISTRATION_FEE"
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_MINING_CHARGES"
                 },
                 "type": "label",
                 "localisation": {
@@ -100,15 +104,15 @@
                 }
               },
               {
-                "variable": "PetRegistrationFee",
+                "variable": "nocMiningCharges",
                 "value": {
                   "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[1].adjustedAmount"
                 }
               },
               {
-                "variable": "penalty_fee",
+                "variable": "noc_gaushala_charges_cess",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_PENALTY_FEE"
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_GAUSHALA_CHARGES_CESS"
                 },
                 "type": "label",
                 "localisation": {
@@ -118,15 +122,15 @@
                 }
               },
               {
-                "variable": "PenaltyFee",
+                "variable": "nocGaushalaChargesCess",
                 "value": {
                   "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[2].adjustedAmount"
                 }
               },
               {
-                "variable": "interest_amount",
+                "variable": "noc_processing_fees",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_INTEREST_AMOUNT"
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_PROCESSING_FEES"
                 },
                 "type": "label",
                 "localisation": {
@@ -136,9 +140,173 @@
                 }
               },
               {
-                "variable": "InterestAmount",
+                "variable": "nocProcessingFees",
                 "value": {
                   "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[3].adjustedAmount"
+                }
+              },
+              {
+                "variable": "noc_labour_cess",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_LABOUR_CESS"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "nocLabourCess",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[4].adjustedAmount"
+                }
+              },
+              {
+                "variable": "noc_clubbing_charges",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_CLUBBING_CHARGES"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "nocClubbingCharges",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[5].adjustedAmount"
+                }
+              },
+              {
+                "variable": "noc_sub_division_charges",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_SUB_DIVISION_CHARGES"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+
+              {
+                "variable": "nocSubDivisionCharges",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[6].adjustedAmount"
+                }
+              },
+              {
+                "variable": "noc_urban_development_cess",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_URBAN_DEVELOPMENT_CESS"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "nocUrbanDevelopmentCess",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[7].adjustedAmount"
+                }
+              },
+              {
+                "variable": "noc_water_charges",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_WATER_CHARGES"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "nocWaterCharges",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[8].adjustedAmount"
+                }
+              },
+              {
+                "variable": "noc_external_development_charges",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_EXTERNAL_DEVELOPMENT_CHARGES"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "nocExternalDevelopmentCharges",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[9].adjustedAmount"
+                }
+              },
+              {
+                "variable": "noc_other_charges",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_OTHER_CHARGES"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "nocOtherCharges",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[10].adjustedAmount"
+                }
+              },
+              {
+                "variable": "noc_malba_charges",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_MALBA_CHARGES"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "nocMalbaCharges",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[11].adjustedAmount"
+                }
+              },
+
+              {
+                "variable": "noc_rain_water_harvesting_charges",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_RAIN_WATER_HARVESTING_CHARGES"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "nocRainWaterHarvestingCharges",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[12].adjustedAmount"
                 }
               },
 
