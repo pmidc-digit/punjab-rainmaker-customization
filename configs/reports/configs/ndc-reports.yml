@@ -267,13 +267,13 @@ ReportDefinitions:
     type: epoch
     source: ndc
     isMandatory: true
-    searchClause: AND ndc.createdtime >= $fromDate
+    searchClause: AND n.createdtime >= $fromDate
   - name: toDate
     label: To Date
     type: epoch
     source: ndc
     isMandatory: true
-    searchClause: AND ndc.createdtime <= $toDate
+    searchClause: AND n.createdtime <= $toDate
   - name: tenantid
     label: Tenant ID
     type: singlevaluelist
@@ -281,7 +281,7 @@ ReportDefinitions:
     source: ndc
     wrapper: true
     isMandatory: false
-    searchClause: AND ndc.tenantid = $tenantid
+    searchClause: AND n.tenantid = $tenantid
   query: |
       -- Use CTE to force query plan, compute & use CTE later     
        WITH wf_detailed AS (
