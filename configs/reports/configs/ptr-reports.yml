@@ -1,0 +1,334 @@
+---
+ReportDefinitions:
+- reportName: PetDetailsReport
+  decryptionPathId: ALL_ACCESS
+  summary: Details of pets in pet service
+  version: 1.0.0
+  moduleName: rainmaker-ptr
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: applicationnumber
+    label: applicationnumber
+    type: string
+    source: ptr
+    total: false
+  - name: name
+    label: name
+    type: string
+    source: ptr
+    total: false
+  - name: mobileNumber
+    label: mobileNumber
+    type: string
+    source: ptr
+    total: false
+  - name: tenantid
+    label: tenantid
+    type: string
+    source: ptr
+    total: false
+  - name: petname
+    label: petname
+    type: string
+    source: ptr
+    total: false
+  - name: pettype
+    label: pettype
+    type: string
+    source: ptr
+    total: false
+  - name: petgender
+    label: petgender
+    type: string
+    source: ptr
+    total: false
+  - name: petage
+    label: petage
+    type: string
+    source: ptr
+    total: false
+  - name: petcolor
+    label: petcolor
+    type: string
+    source: ptr
+    total: false
+  - name: breedtype
+    label: breedtype
+    type: string
+    source: ptr
+    total: false
+  - name: identificationmark
+    label: identificationmark
+    type: string
+    source: ptr
+    total: false
+  - name: vaccinationnumber
+    label: vaccinationnumber
+    type: string
+    source: ptr
+    total: false
+  - name: doctorname
+    label: doctorname
+    type: string
+    source: ptr
+    total: false
+  - name: clinicname
+    label: clinicname
+    type: string
+    source: ptr
+    total: false
+  - name: status
+    label: status
+    type: string
+    source: ptr
+    total: false
+  searchParams:
+  - name: fromDate
+    label: fromDate
+    type: epoch
+    source: ptr
+    isMandatory: true
+    searchClause: AND r.createdtime >= $fromDate
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: ptr
+    isMandatory: true
+    searchClause: AND r.createdtime <= $toDate
+  - name: tenantid
+    label: tenantid
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: ptr
+    wrapper: true
+    isMandatory: false
+    searchClause: AND r.tenantid = $tenantid
+  query: |
+      -- Use CTE to force query plan, compute & use CTE later
+       SELECT
+        r.applicationnumber,r.status,r.tenantid,
+        pd.petname,pd.pettype,pd.breedtype,
+        pd.petage,pd.petgender,pd.petcolor,
+        pd.identificationmark,pd.vaccinationnumber,pd.doctorname,
+        pd.clinicname,u.mobilenumber as mobileNumber,u.name
+       FROM eg_ptr_registration AS r
+       LEFT JOIN eg_ptr_owner AS o ON o.ptrregistrationid = r.id
+       LEFT JOIN eg_ptr_petdetails AS pd ON r.id = pd.petdetailsid
+       LEFT JOIN eg_user AS u ON u.uuid = o.uuid
+       WHERE 1=1
+- reportName: CollectionsReport
+  summary: Collections
+  version: 1.0.0
+  moduleName: rainmaker-ptr
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: collector_code
+    label: collector_code
+    type: string
+    source: ptr
+    total: false
+  - name: payment_mode
+    label: payment_mode
+    type: string
+    source: ptr
+    total: false
+  - name: total_amount
+    label: total_amount
+    type: string
+    source: ptr
+    total: true
+  - name: total_count
+    label: total_count
+    type: string
+    source: ptr
+    total: false
+  searchParams:
+  - name: tenantid
+    label: tenantid
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: ptr
+    wrapper: true
+    isMandatory: false
+    searchClause: AND tenantid = $tenantid
+  - name: collector_code
+    label: collector_code
+    type: string
+    source: ptr
+    isMandatory: false
+    searchClause: AND collector_code = $collector_code
+  - name: fromDate
+    label: fromDate
+    type: epoch
+    source: ptr
+    isMandatory: true
+    searchClause: AND createdtime >= $fromDate
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: ptr
+    isMandatory: true
+    searchClause: AND createdtime <= $toDate
+  query: |
+      -- Use CTE to force query plan, compute & use CTE later
+      WITH unique_transactions AS (
+      SELECT
+        p.id AS transaction_id,p.createdtime,p.totalamountpaid,
+        CASE
+        WHEN p.paymentmode IN ('POSTAL_ORDER','POTAL_ORDER') THEN 'POSTAL_ORDER'
+        WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN 'OFFLINE_RTGS'
+        WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN 'OFFLINE_NEFT'
+        WHEN p.paymentmode IN ('CASH','OFFLINE_CASH') THEN 'CASH'
+        WHEN p.paymentmode IN ('CARD','DEBIT_CARD','CREDIT_CARD','OFFLINE_CARD') THEN 'CARD'
+        WHEN p.paymentmode IN ('ONLINE') THEN 'ONLINE'
+       ELSE p.paymentmode
+       END AS mode_norm,
+       emp.code AS collector_code, pd.businessservice,p.tenantid
+       FROM egcl_paymentdetail pd
+       JOIN egcl_payment p ON pd.paymentid = p.id
+       JOIN egcl_bill bill ON bill.id = pd.billid
+       JOIN eg_ptr_registration r ON r.applicationnumber = bill.consumercode
+       LEFT JOIN eg_user u ON u.id::text = p.createdby::text
+       LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
+       WHERE p.paymentstatus != 'CANCELLED'
+       AND bill.businessservice = 'pet-services'
+       AND p.tenantid = $tenantid
+       AND p.createdtime >= $fromDate
+       AND p.createdtime <= $toDate
+        )
+       SELECT
+        COALESCE(collector_code, 'SELF') AS collector_code,
+        mode_norm AS payment_mode,
+        SUM(totalamountpaid) AS total_amount, COUNT(transaction_id) AS total_count
+       FROM unique_transactions
+       WHERE 1=1
+  groupby: GROUP BY collector_code, mode_norm
+  orderby: ORDER BY collector_code, total_amount DESC;
+- reportName: SLAReport
+  summary: Sla report for ptr service
+  version: 1.0.0
+  moduleName: rainmaker-ptr
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: tenantid
+    label: tenantid
+    type: string
+    source: ptr
+    total: false
+  - name: Applicationnumber
+    label: Applicationnumber
+    type: string
+    source: ptr
+    total: false
+  - name: applicationstatus
+    label: applicationstatus
+    type: string
+    source: ptr
+    total: false
+  - name: documentverify_on
+    label: documentverify_on
+    type: string
+    source: ptr
+    total: false
+  - name: finalstatus_on
+    label: finalstatus_on
+    type: string
+    source: ptr
+    total: false
+  - name: sla_days
+    label: sla_days
+    type: string
+    source: ptr
+    total: false
+  - name: sla_status
+    label: sla_status
+    type: string
+    source: ptr
+    total: false
+  searchParams:
+  - name: fromDate
+    label: fromDate
+    type: epoch
+    source: ptr
+    isMandatory: true
+    searchClause: AND ptr.createdtime >= $fromDate
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: ptr
+    isMandatory: true
+    searchClause: AND ptr.createdtime <= $toDate
+  - name: tenantid
+    label: tenantid
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: ptr
+    wrapper: true
+    isMandatory: false
+    searchClause: AND ptr.tenantid = $tenantid
+  query: |
+      -- Use CTE to force query plan, compute & use CTE later
+      WITH wf_detailed AS (
+       SELECT
+         wf.businessid AS uuid, st.applicationstatus , wf.createdtime , wf.lastmodifiedtime
+       FROM eg_wf_processinstance_v2 wf
+       JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+       WHERE wf.tenantid = $tenantid
+       AND wf.businessservice = 'ptr' 
+       ),
+      status_times AS (
+       SELECT
+        uuid,MAX(CASE WHEN UPPER(applicationstatus) = 'DOCUMENTVERIFY' THEN createdtime END) AS docverify_time,
+        MAX(CASE WHEN UPPER(applicationstatus) IN ('APPROVED', 'REJECTED') THEN lastmodifiedtime END) AS final_time
+       FROM wf_detailed
+       GROUP BY uuid
+        ),
+      latest_status AS (
+       SELECT uuid, applicationstatus
+        FROM (
+         SELECT
+           uuid,applicationstatus,lastmodifiedtime, ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY lastmodifiedtime DESC NULLS LAST) AS rn
+         FROM wf_detailed
+          ) z
+         WHERE rn = 1
+          ),
+      sla_data AS (
+       SELECT
+        bs.businessservice, bs.businessservicesla
+        FROM eg_wf_businessservice_v2 bs
+        WHERE bs.businessservice = 'ptr' 
+         )
+      SELECT
+       ptr.tenantid, ptr.applicationnumber AS Applicationnumber,
+       ls.applicationstatus, 
+       TO_CHAR(TO_TIMESTAMP(st.docverify_time / 1000), 'DD-MM-YYYY') AS documentverify_on,
+       TO_CHAR(TO_TIMESTAMP(st.final_time / 1000), 'DD-MM-YYYY') AS finalstatus_on,
+       CASE 
+       WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL
+       THEN FLOOR( (st.final_time - st.docverify_time) / 86400000 )
+       WHEN st.docverify_time IS NOT NULL
+       THEN FLOOR( (EXTRACT(EPOCH FROM NOW()) * 1000 - st.docverify_time) / 86400000 )
+       ELSE NULL
+       END AS sla_days,
+       CASE
+       WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL THEN
+       CASE
+       WHEN (st.final_time - st.docverify_time) > sla.businessservicesla THEN 'BREACHED'
+       ELSE 'MEET'
+       END
+       WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
+       THEN 'IN-PROGRESS'
+       ELSE 'AWAITING DOCVERIFY'
+       END AS sla_status
+       FROM eg_ptr_registration ptr
+       LEFT JOIN status_times st ON ptr.applicationnumber = st.uuid
+       LEFT JOIN latest_status ls ON ptr.applicationnumber = ls.uuid
+       JOIN sla_data sla ON 'ptr' = sla.businessservice
+       WHERE UPPER(ls.applicationstatus) IN ('REJECTED', 'APPROVED', 'DOCUMENTVERIFY')
+  orderby: ORDER BY ptr.createdtime DESC, tenantid, ls.applicationstatus;

@@ -6,7 +6,7 @@ serviceMaps:
       fromTopic: save-advertisement-booking
       isTransaction: true
       queryMaps:
-        - query: INSERT INTO public.eg_adv_booking_detail(booking_id, booking_no, payment_date, application_date, tenant_id, booking_status, receipt_no, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        - query: INSERT INTO public.eg_adv_booking_detail(booking_id, booking_no, payment_date, application_date, tenant_id, booking_status, receipt_no, createdby, createdtime, lastmodifiedby, lastmodifiedtime, advertisementId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?);
           basePath: bookingApplication
           jsonMaps:
             - jsonPath: $.bookingApplication.bookingId
@@ -20,8 +20,10 @@ serviceMaps:
             - jsonPath: $.bookingApplication.auditDetails.createdTime
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedBy
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedTime
+            - jsonPath: $.bookingApplication.advertisementId
 
-        - query: INSERT INTO public.eg_adv_cart_detail(cart_id, booking_id, add_type, location, face_area, night_light, booking_date, booking_from_time, booking_to_time, status, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?::DATE, ?::TIME, ?::TIME, ?, ?, ?, ?, ?);
+            
+        - query: INSERT INTO public.eg_adv_cart_detail(cart_id, booking_id, add_type, location, face_area, night_light, booking_date, booking_from_time, booking_to_time, status, createdby, createdtime, lastmodifiedby, lastmodifiedtime, advertisementId) VALUES (?, ?, ?, ?, ?, ?, ?::DATE, ?::TIME, ?::TIME, ?, ?, ?, ?, ?, ?);
           basePath: bookingApplication.cartDetails.*
           jsonMaps:
             - jsonPath: $.bookingApplication.cartDetails.*.cartId
@@ -38,6 +40,7 @@ serviceMaps:
             - jsonPath: $.bookingApplication.auditDetails.createdTime
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedBy
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedTime
+            - jsonPath: $.bookingApplication.cartDetails.*.advertisementId
 
         - query: INSERT INTO public.eg_adv_document_detail(document_detail_id, booking_id, document_type, filestore_id, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
           basePath: bookingApplication.documents.*
@@ -92,6 +95,32 @@ serviceMaps:
           jsonMaps:
             - jsonPath: $.bookingApplication.cartDetails.*.cartId
 
+
+        - query: INSERT INTO eg_adv_owner (uuid, tenantid, booking_id, status, isprimaryowner,ownertype, ownershippercentage, institutionid, relationship,createdby, createdtime,            lastmodifiedby, lastmodifiedtime, additionaldetails) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+          basePath: $.bookingApplication.owners.*
+
+          jsonMaps:
+            - jsonPath: $.bookingApplication.owners.*.uuid
+            - jsonPath: $.bookingApplication.owners.*.tenantId
+            - jsonPath: $.bookingApplication.bookingId
+            - jsonPath: $.bookingApplication.owners.*.status
+            - jsonPath: $.bookingApplication.owners.*.isPrimaryOwner
+            - jsonPath: $.bookingApplication.owners.*.ownerType
+            - jsonPath: $.bookingApplication.owners.*.ownerShipPercentage
+            - jsonPath: $.bookingApplication.owners.*.institutionId
+            - jsonPath: $.bookingApplication.owners.*.relationship
+            - jsonPath: $.bookingApplication.owners.*.createdBy
+            - jsonPath: $.bookingApplication.owners.*.createdDate
+            - jsonPath: $.bookingApplication.owners.*.lastModifiedBy
+            - jsonPath: $.bookingApplication.owners.*.lastModifiedDate
+            - jsonPath: $.bookingApplication.owners.*.additionalDetails
+              type: JSON
+              dbType: JSONB
+
+       
+
+
     - version: 1.0
       description: Update advertisement booking details after application is changed
       fromTopic: update-advertisement-booking
@@ -101,12 +130,14 @@ serviceMaps:
           basePath: bookingApplication
           jsonMaps:
             - jsonPath: $.bookingApplication.bookingStatus
+           
             - jsonPath: $.bookingApplication.paymentDate
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedBy
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedTime
             - jsonPath: $.bookingApplication.permissionLetterFilestoreId
             - jsonPath: $.bookingApplication.paymentReceiptFilestoreId
             - jsonPath: $.bookingApplication.bookingId
+            
 
         - query: UPDATE public.eg_adv_cart_detail SET status = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE cart_id = ?;
           basePath: bookingApplication.cartDetails.*
@@ -115,6 +146,28 @@ serviceMaps:
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedBy
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedTime
             - jsonPath: $.bookingApplication.cartDetails.*.cartId
+
+
+        - query: INSERT INTO public.eg_adv_document_detail(document_detail_id, booking_id, document_type, filestore_id, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (document_detail_id) DO UPDATE SET
+              booking_id = EXCLUDED.booking_id,
+              document_type = EXCLUDED.document_type,
+              filestore_id = EXCLUDED.filestore_id,
+              createdby = EXCLUDED.createdby,
+              lastmodifiedby = EXCLUDED.lastmodifiedby,
+              createdtime = EXCLUDED.createdtime,
+              lastmodifiedtime = EXCLUDED.lastmodifiedtime;
+
+          basePath: bookingApplication.documents.*
+          jsonMaps:
+            - jsonPath: $.bookingApplication.documents.*.documentDetailId
+            - jsonPath: $.bookingApplication.documents.*.bookingId
+            - jsonPath: $.bookingApplication.documents.*.documentType
+            - jsonPath: $.bookingApplication.documents.*.fileStoreId
+            - jsonPath: $.bookingApplication.auditDetails.createdBy
+            - jsonPath: $.bookingApplication.auditDetails.lastModifiedBy
+            - jsonPath: $.bookingApplication.auditDetails.createdTime
+            - jsonPath: $.bookingApplication.auditDetails.lastModifiedTime
 
         - query: INSERT INTO public.eg_adv_booking_detail_audit SELECT * FROM public.eg_adv_booking_detail WHERE booking_id = ?;
           basePath: bookingApplication

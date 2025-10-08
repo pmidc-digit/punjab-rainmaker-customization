@@ -2397,27 +2397,27 @@ ReportDefinitions:
             bill.billid, bill.totalamount, wc.tenantid AS tenantid, bill.consumercode,
             wc.status AS wc_status, pt.landarea, b.payername AS payername, b.status AS bill_status,
             b.payeraddress, b.mobilenumber
-        FROM eg_ws_connection wc
-        JOIN eg_pt_property pt 
+         FROM eg_ws_connection wc
+         JOIN eg_pt_property pt 
             ON wc.property_id = pt.propertyid
             AND wc.status = 'Active'
             AND pt.status IN ('ACTIVE', 'PENDINGWS')
-        INNER JOIN egbs_billdetail_v1 bill 
+         INNER JOIN egbs_billdetail_v1 bill 
             ON bill.consumercode = wc.connectionno
             AND wc.status = 'Active'
             AND bill.businessservice = 'WS'
-        JOIN egbs_bill_v1 b  ON bill.billid = b.id
-        JOIN params p ON TRUE
-        WHERE  wc.connectionno IS NOT NULL
+         JOIN egbs_bill_v1 b  ON bill.billid = b.id
+         JOIN params p ON TRUE
+         WHERE  wc.connectionno IS NOT NULL
             AND bill.businessservice = 'WS'
             AND pt.usagecategory IN ('RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL', 'MIXED')
             AND to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata' BETWEEN p.start_date AND p.end_date
-        )SELECT 
-        cte.consumercode, params.finyear, cte.usagecategory, SUM(cte.totalamount) AS amtpaid,
-        cte.bill_status, cte.locality, cte.payeraddress, cte.mobilenumber, cte.payername
-        FROM  cte
-        JOIN params ON TRUE
-        WHERE  cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED')
+         )SELECT 
+         cte.consumercode, params.finyear, cte.usagecategory, SUM(cte.totalamount) AS amtpaid,
+         cte.bill_status, cte.locality, cte.payeraddress, cte.mobilenumber, cte.payername
+         FROM  cte
+         JOIN params ON TRUE
+         WHERE  cte.bill_status NOT IN ('PAID', 'CANCELLED', 'EXPIRED')
     groupby: GROUP BY  cte.consumercode,params.finyear, cte.bill_status,cte.payername,
         cte.usagecategory, cte.locality, cte.mobilenumber, cte.payeraddress
         HAVING
@@ -2695,1819 +2695,9 @@ ReportDefinitions:
        )
        
        SELECT * FROM WS_Billing_cte where billingcyclestartdate >= $fromDate
-  - reportName: Connectioncountreport
-    summary: Connection Count  Report
-    version: 1.0.0
-    moduleName: rainmaker-ws
-    additionalConfig:
-      print:
-        pdfPageSize: A1
-    sourceColumns:
-      - name: totalwaterconnections
-        label: reports.ws.totalwaterconnections
-        type: string
-        source: ws
-        total: true
-      - name: totalsewerageconnections
-        label: reports.ws.totalsewerageconnections
-        type: string
-        source: ws
-        total: true
-      - name: totalconnections
-        label: reports.ws.totalconnections
-        type: string
-        source: ws
-        total: true
-      - name: totalwateractive
-        label: reports.ws.totalwateractive
-        type: string
-        source: ws
-        total: true
-      - name: totalsewerageactive
-        label: reports.ws.totalsewerageactive
-        type: string
-        source: ws
-        total: true
-      - name: totalactiveconnections
-        label: reports.ws.totalactiveconnections
-        type: string
-        source: ws
-        total: true
-      - name: meteredconnections
-        label: reports.ws.meteredconnections
-        type: string
-        source: ws
-        total: true
-      - name: unmeteredconnection
-        label: reports.ws.unmeteredconnection
-        type: string
-        source: ws
-        total: true
-      - name: activemeteredconnection
-        label: reports.ws.activemeteredconnection
-        type: string
-        source: ws
-        total: true
-      - name: activeunmeteredconnection
-        label: reports.ws.activeunmeteredconnection
-        type: string
-        source: ws
-        total: true
-      - name: totalresidentialwater
-        label: reports.ws.totalresidentialwater
-        type: string
-        source: ws
-        total: true
-      - name: totalresidentialsewerage
-        label: reports.ws.totalresidentialsewerage
-        type: string
-        source: ws
-        total: true
-      - name: totalreswands
-        label: reports.ws.totalreswands
-        type: string
-        source: ws
-        total: true
-      - name: totalactiveresidentialinwater
-        label: reports.ws.totalactiveresidentialinwater
-        type: string
-        source: ws
-        total: true
-      - name: totalactiveresidentialinsewerage
-        label: reports.ws.totalactiveresidentialinsewerage
-        type: string
-        source: ws
-        total: true
-      - name: totalresactivews
-        label: reports.ws.totalresactivews
-        type: string
-        source: ws
-        total: true
-      - name: meteredresconn
-        label: reports.ws.meteredresconn
-        type: string
-        source: ws
-        total: true
-      - name: unmeteredresconn
-        label: reports.ws.unmeteredresconn
-        type: string
-        source: ws
-        total: true
-      - name: meteredresactiveconn
-        label: reports.ws.meteredresactiveconn
-        type: string
-        source: ws
-        total: true
-      - name: unmeterdresactiveconnn
-        label: reports.ws.unmeterdresactiveconnn
-        type: string
-        source: ws
-        total: true
-      - name: totalcommwater
-        label: reports.ws.totalcommwater
-        type: string
-        source: ws
-        total: true
-      - name: totalcommsew
-        label: reports.ws.totalcommsew
-        type: string
-        source: ws
-        total: true
-      - name: totalcommws
-        label: reports.ws.totalcommws
-        type: string
-        source: ws
-        total: true
-      - name: totalactivecommwater
-        label: reports.ws.totalactivecommwater
-        type: string
-        source: ws
-        total: true
-      - name: totalactivecommsew
-        label: reports.ws.totalactivecommsew
-        type: string
-        source: ws
-        total: true
-      - name: totalactivecommws
-        label: reports.ws.totalactivecommws
-        type: string
-        source: ws
-        total: true
-      - name: totalmetcommconn
-        label: reports.ws.totalmetcommconn
-        type: string
-        source: ws
-        total: true
-      - name: unmeterdcommconn
-        label: reports.ws.unmeterdcommconn
-        type: string
-        source: ws
-        total: true
-      - name: totalmetactivecommconn
-        label: reports.ws.totalmetactivecommconn
-        type: string
-        source: ws
-        total: true
-      - name: unmetercommactiveconn
-        label: reports.ws.unmetercommactiveconn
-        type: string
-        source: ws
-        total: true
-      - name: waterunder5marla
-        label: reports.ws.waterunder5marla
-        type: string
-        source: ws
-        total: true
-      - name: sewunder5marla
-        label: reports.ws.sewunder5marla
-        type: string
-        source: ws
-        total: true
-      - name: totalwsunder5marla
-        label: reports.ws.totalwsunder5marla
-        type: string
-        source: ws
-        total: true
-      - name: actwaterunder5marla
-        label: reports.ws.actwaterunder5marla
-        type: string
-        source: ws
-        total: true
-      - name: actsewunder5marla
-        label: reports.ws.actsewunder5marla
-        type: string
-        source: ws
-        total: true
-      - name: totalactwsunder5marla
-        label: reports.ws.totalactwsunder5marla
-        type: string
-        source: ws
-        total: true
-      - name: metund5marla
-        label: reports.ws.metund5marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetunder5marla
-        label: reports.ws.unmetunder5marla
-        type: string
-        source: ws
-        total: true
-      - name: metactund5marla
-        label: reports.ws.metactund5marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetactunder5marla
-        label: reports.ws.unmetactunder5marla
-        type: string
-        source: ws
-        total: true
-      - name: rwaterunder5marla
-        label: reports.ws.rwaterunder5marla
-        type: string
-        source: ws
-        total: true
-      - name: rsewunder5marla
-        label: reports.ws.rsewunder5marla
-        type: string
-        source: ws
-        total: true
-      - name: totalwsunder5marlar
-        label: reports.ws.totalwsunder5marlar
-        type: string
-        source: ws
-        total: true
-      - name: ractwaterunder5marla
-        label: reports.ws.ractwaterunder5marla
-        type: string
-        source: ws
-        total: true
-      - name: ractsewunder5marla
-        label: reports.ws.ractsewunder5marla
-        type: string
-        source: ws
-        total: true
-      - name: totalactwsunder5marlar
-        label: reports.ws.totalactwsunder5marlar
-        type: string
-        source: ws
-        total: true
-      - name: rmetund5marla
-        label: reports.ws.rmetund5marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetunder5marlar
-        label: reports.ws.unmetunder5marlar
-        type: string
-        source: ws
-        total: true
-      - name: rmetactund5marla
-        label: reports.ws.rmetactund5marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetactunder5marlar
-        label: reports.ws.unmetactunder5marlar
-        type: string
-        source: ws
-        total: true
-      - name: cwaterunder5marla
-        label: reports.ws.cwaterunder5marla
-        type: string
-        source: ws
-        total: true
-      - name: csewunder5marla
-        label: reports.ws.csewunder5marla
-        type: string
-        source: ws
-        total: true
-      - name: totalwsunder5marlac
-        label: reports.ws.totalwsunder5marlac
-        type: string
-        source: ws
-        total: true
-      - name: cactwaterunder5marla
-        label: reports.ws.cactwaterunder5marla
-        type: string
-        source: ws
-        total: true
-      - name: cactsewunder5marla
-        label: reports.ws.cactsewunder5marla
-        type: string
-        source: ws
-        total: true
-      - name: totalactwsunder5marlac
-        label: reports.ws.totalactwsunder5marlac
-        type: string
-        source: ws
-        total: true
-      - name: cmetund5marla
-        label: reports.ws.cmetund5marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetunder5marlac
-        label: reports.ws.unmetunder5marlac
-        type: string
-        source: ws
-        total: true
-      - name: cmetactund5marla
-        label: reports.ws.cmetactund5marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetactunder5marlac
-        label: reports.ws.unmetactunder5marlac
-        type: string
-        source: ws
-        total: true
-      - name: waterunder6marla
-        label: reports.ws.waterunder6marla
-        type: string
-        source: ws
-        total: true
-      - name: sewunder6marla
-        label: reports.ws.sewunder6marla
-        type: string
-        source: ws
-        total: true
-      - name: totalwsunder6marla
-        label: reports.ws.totalwsunder6marla
-        type: string
-        source: ws
-        total: true
-      - name: actwaterunder6marla
-        label: reports.ws.actwaterunder6marla
-        type: string
-        source: ws
-        total: true
-      - name: actsewunder6marla
-        label: reports.ws.actsewunder6marla
-        type: string
-        source: ws
-        total: true
-      - name: totalactwsunder6marla
-        label: reports.ws.totalactwsunder6marla
-        type: string
-        source: ws
-        total: true
-      - name: metund6marla
-        label: reports.ws.metund6marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetunder6marla
-        label: reports.ws.unmetunder6marla
-        type: string
-        source: ws
-        total: true
-      - name: metactund6marla
-        label: reports.ws.metactund6marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetactunder6marla
-        label: reports.ws.unmetactunder6marla
-        type: string
-        source: ws
-        total: true
-      - name: rwaterunder6marla
-        label: reports.ws.rwaterunder6marla
-        type: string
-        source: ws
-        total: true
-      - name: rsewunder6marla
-        label: reports.ws.rsewunder6marla
-        type: string
-        source: ws
-        total: true
-      - name: totalwsunder6marlar
-        label: reports.ws.totalwsunder6marlar
-        type: string
-        source: ws
-        total: true
-      - name: ractwaterunder6marla
-        label: reports.ws.ractwaterunder6marla
-        type: string
-        source: ws
-        total: true
-      - name: ractsewunder6marla
-        label: reports.ws.ractsewunder6marla
-        type: string
-        source: ws
-        total: true
-      - name: totalactwsunder6marlar
-        label: reports.ws.totalactwsunder6marlar
-        type: string
-        source: ws
-        total: true
-      - name: rmetund6marla
-        label: reports.ws.rmetund6marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetunder6marlar
-        label: reports.ws.unmetunder6marlar
-        type: string
-        source: ws
-        total: true
-      - name: rmetactund6marla
-        label: reports.ws.rmetactund6marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetactunder6marlar
-        label: reports.ws.unmetactunder6marlar
-        type: string
-        source: ws
-        total: true
-      - name: cwaterunder6marla
-        label: reports.ws.cwaterunder6marla
-        type: string
-        source: ws
-        total: true
-      - name: csewunder6marla
-        label: reports.ws.csewunder6marla
-        type: string
-        source: ws
-        total: true
-      - name: totalwsunder6marlac
-        label: reports.ws.totalwsunder6marlac
-        type: string
-        source: ws
-        total: true
-      - name: cactwaterunder6marla
-        label: reports.ws.cactwaterunder6marla
-        type: string
-        source: ws
-        total: true
-      - name: cactsewunder6marla
-        label: reports.ws.cactsewunder6marla
-        type: string
-        source: ws
-        total: true
-      - name: totalactwsunder6marlac
-        label: reports.ws.totalactwsunder6marlac
-        type: string
-        source: ws
-        total: true
-      - name: cmetund6marla
-        label: reports.ws.cmetund6marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetunder6marlac
-        label: reports.ws.unmetunder6marlac
-        type: string
-        source: ws
-        total: true
-      - name: cmetactund6marla
-        label: reports.ws.cmetactund6marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetactunder6marlac
-        label: reports.ws.unmetactunder6marlac
-        type: string
-        source: ws
-        total: true
-      - name: waterunder10marla
-        label: reports.ws.waterunder10marla
-        type: string
-        source: ws
-        total: true
-      - name: sewunder10marla
-        label: reports.ws.sewunder10marla
-        type: string
-        source: ws
-        total: true
-      - name: totalwsunder10marla
-        label: reports.ws.totalwsunder10marla
-        type: string
-        source: ws
-        total: true
-      - name: actwaterunder10marla
-        label: reports.ws.actwaterunder10marla
-        type: string
-        source: ws
-        total: true
-      - name: actsewunder10marla
-        label: reports.ws.actsewunder10marla
-        type: string
-        source: ws
-        total: true
-      - name: totalactwsunder10marla
-        label: reports.ws.totalactwsunder10marla
-        type: string
-        source: ws
-        total: true
-      - name: metund10marla
-        label: reports.ws.metund10marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetunder10marla
-        label: reports.ws.unmetunder10marla
-        type: string
-        source: ws
-        total: true
-      - name: metactund10marla
-        label: reports.ws.metactund10marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetactunder10marla
-        label: reports.ws.unmetactunder10marla
-        type: string
-        source: ws
-        total: true
-      - name: rwaterunder10marla
-        label: reports.ws.rwaterunder10marla
-        type: string
-        source: ws
-        total: true
-      - name: rsewunder10marla
-        label: reports.ws.rsewunder10marla
-        type: string
-        source: ws
-        total: true
-      - name: totalwsunder10marlar
-        label: reports.ws.totalwsunder10marlar
-        type: string
-        source: ws
-        total: true
-      - name: ractwaterunder10marla
-        label: reports.ws.ractwaterunder10marla
-        type: string
-        source: ws
-        total: true
-      - name: ractsewunder10marla
-        label: reports.ws.ractsewunder10marla
-        type: string
-        source: ws
-        total: true
-      - name: totalactwsunder10marlar
-        label: reports.ws.totalactwsunder10marlar
-        type: string
-        source: ws
-        total: true
-      - name: rmetund10marla
-        label: reports.ws.rmetund10marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetunder10marlar
-        label: reports.ws.unmetunder10marlar
-        type: string
-        source: ws
-        total: true
-      - name: rmetactund10marla
-        label: reports.ws.rmetactund10marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetactunder10marlar
-        label: reports.ws.unmetactunder10marlar
-        type: string
-        source: ws
-        total: true
-      - name: cwaterunder10marla
-        label: reports.ws.cwaterunder10marla
-        type: string
-        source: ws
-        total: true
-      - name: csewunder10marla
-        label: reports.ws.csewunder10marla
-        type: string
-        source: ws
-        total: true
-      - name: totalwsunder10marlac
-        label: reports.ws.totalwsunder10marlac
-        type: string
-        source: ws
-        total: true
-      - name: cactwaterunder10marla
-        label: reports.ws.cactwaterunder10marla
-        type: string
-        source: ws
-        total: true
-      - name: cactsewunder10marla
-        label: reports.ws.cactsewunder10marla
-        type: string
-        source: ws
-        total: true
-      - name: totalactwsunder10marlac
-        label: reports.ws.totalactwsunder10marlac
-        type: string
-        source: ws
-        total: true
-      - name: cmetund10marla
-        label: reports.ws.cmetund10marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetunder10marlac
-        label: reports.ws.unmetunder10marlac
-        type: string
-        source: ws
-        total: true
-      - name: cmetactund10marla
-        label: reports.ws.cmetactund10marla
-        type: string
-        source: ws
-        total: true
-      - name: unmetactunder10marlac
-        label: reports.ws.unmetactunder10marlac
-        type: string
-        source: ws
-        total: true
-    searchParams:
-      - name: tenantid
-        label: tenantid
-        type: singlevaluelist
-        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants..code|$.MdmsRes.tenant.tenants..name
-        source: pt
-        wrapper: true
-        isMandatory: true
-        searchClause: AND wc.tenantid = $tenantid
-    query: |      
-       SELECT 
-           a.totalwaterconnections,
-           b.totalsewerageconnections,
-           (a.totalwaterconnections+b.totalsewerageconnections) as totalconnections,
-           d.totalwateractive ,
-           e.totalsewerageactive,
-           (d.totalwateractive+e.totalsewerageactive) as totalActiveconnections,
 
-           e2.Meteredconnections,
-           (a.totalwaterconnections+b.totalsewerageconnections - e2.Meteredconnections) as UnMeteredConnection,
-           e3.ActiveMeteredConnection,
-           (d.totalwateractive+e.totalsewerageactive-e3.ActiveMeteredConnection)as ActiveUnMeteredConnection,
-           g1.TotalResidentialWater,
-           h1.TotalResidentialSewerage,
-           (g1.TotalResidentialWater+h1.TotalResidentialSewerage) as TotalResWAndS,
-           g.totalactiveresidentialinwater,
-           h.totalactiveresidentialinsewerage,
-           ( g.totalactiveresidentialinwater+ h.totalactiveresidentialinsewerage)as TotalResActiveWS,
-           h2.MeteredResconn,
-           (g1.TotalResidentialWater+h1.TotalResidentialSewerage-h2.MeteredResconn)as UnmeteredResConn,
-           h3.MeteredResActiveconn,
-           (g.totalactiveresidentialinwater+ h.totalactiveresidentialinsewerage-h3.MeteredResActiveconn)as UnmeterdResActiveConnn,
-           h4.totalCommwater,
-           h5.totalcommsew,
-           (h4.totalCommwater+h5.totalcommsew)as TotalCommWS,
-           i.totalActiveCommwater,
-           j.totalActiveCommsew,
-           (i.totalActiveCommwater+j.totalActiveCommsew) as TotalActiveCommWS ,
-           j1.TotalMetCommConn,
-           (h4.totalCommwater+h5.totalcommsew-j1.TotalMetCommConn) as UnmeterdCommConn,
-           j2.TotalMetActiveCommConn,
-           (i.totalActiveCommwater+j.totalActiveCommsew-j2.TotalMetActiveCommConn)as UnmeterCommActiveConn,
-       --  k.totalmeteredconnections,
-           l.waterunder5Marla,
-           m.Sewunder5Marla,
-           (l.waterunder5Marla+ m.Sewunder5Marla) as TotalWSUnder5Marla,
-           l1.Actwaterunder5Marla,
-           m1.ActSewunder5Marla,
-           (l1.Actwaterunder5Marla+ m1.ActSewunder5Marla) as TotalActWSUnder5Marla,
-           m2.MetUnd5marla,
-           (l.waterunder5Marla+ m.Sewunder5Marla-m2.MetUnd5marla)as Unmetunder5marla,
-           m3.MetActUnd5marla,
-           (l1.Actwaterunder5Marla+ m1.ActSewunder5Marla-m3.MetActUnd5marla) as UnmetActUnder5marla,
-         --  n.betweenfivemarlawater,
-         --  o.betweenfivemarlasewerage,
-         aa1.Rwaterunder5Marla,
-           aa2.RSewunder5Marla,
-           (aa1.Rwaterunder5Marla+ aa2.RSewunder5Marla) as TotalWSUnder5MarlaR,
-           aa3.RActwaterunder5Marla,
-           aa4.RActSewunder5Marla,
-           (aa3.RActwaterunder5Marla+ aa4.RActSewunder5Marla) as TotalActWSUnder5MarlaR,
-           aa5.RMetUnd5marla,
-           (aa1.Rwaterunder5Marla+ aa2.Rsewunder5Marla-aa5.RMetUnd5marla)as Unmetunder5marlaR,
-           aa6.RMetActUnd5marla,
-           (aa3.RActwaterunder5Marla+ aa4.RActSewunder5Marla-aa6.RMetActUnd5marla) as UnmetActUnder5marlaR,
-         
-         aa7.cwaterunder5Marla,
-           aa8.CSewunder5Marla,
-           (aa7.Cwaterunder5Marla+ aa8.CSewunder5Marla) as TotalWSUnder5MarlaC,
-           aa9.CActwaterunder5Marla,
-           aa10.CActSewunder5Marla,
-           (aa9.CActwaterunder5Marla+ aa10.CActSewunder5Marla) as TotalActWSUnder5MarlaC,
-           aa11.CMetUnd5marla,
-           (aa7.Cwaterunder5Marla+ aa8.CSewunder5Marla-aa11.CMetUnd5marla)as Unmetunder5marlaC,
-           aa12.CMetActUnd5marla,
-           (aa9.CActwaterunder5Marla+ aa10.CActSewunder5Marla-aa12.CMetActUnd5marla) as UnmetActUnder5marlaC,
-         -- 6marla
-           aa13.waterunder6Marla,
-           aa14.Sewunder6Marla,
-           (aa13.waterunder6Marla+ aa14.Sewunder6Marla) as TotalWSUnder6Marla,
-           aa15.Actwaterunder6Marla,
-           aa16.ActSewunder6Marla,
-           (aa15.Actwaterunder6Marla+ aa16.ActSewunder6Marla) as TotalActWSUnder6Marla,
-           aa17.MetUnd6marla,
-           (aa13.waterunder6Marla+ aa14.Sewunder6Marla-aa17.MetUnd6marla)as Unmetunder6marla,
-           aa18.MetActUnd6marla,
-           (aa15.Actwaterunder6Marla+ aa16.ActSewunder6Marla-aa18.MetActUnd6marla) as UnmetActUnder6marla,
-         --  n.betweenfivemarlawater,
-         --  o.betweenfivemarlasewerage,
-         aa19.Rwaterunder6Marla,
-           aa20.RSewunder6Marla,
-           (aa19.Rwaterunder6Marla+ aa20.RSewunder6Marla) as TotalWSUnder6MarlaR,
-           aa21.RActwaterunder6Marla,
-           aa22.RActSewunder6Marla,
-           (aa21.RActwaterunder6Marla+ aa22.RActSewunder6Marla) as TotalActWSUnder6MarlaR,
-           aa23.RMetUnd6marla,
-           (aa19.Rwaterunder6Marla+ aa20.RSewunder6Marla-aa23.RMetUnd6marla)as Unmetunder6marlaR,
-           aa24.RMetActUnd6marla,
-           (aa21.RActwaterunder6Marla+ aa22.RActSewunder6Marla-aa24.RMetActUnd6marla) as UnmetActUnder6marlaR,
-         
-         aa25.cwaterunder6Marla,
-           aa26.CSewunder6Marla,
-           (aa25.cwaterunder6Marla+ aa26.CSewunder6Marla) as TotalWSUnder6MarlaC,
-           aa27.CActwaterunder6Marla,
-           aa28.CActSewunder6Marla,
-           (aa27.CActwaterunder6Marla+ aa28.CActSewunder6Marla) as TotalActWSUnder6MarlaC,
-           aa29.CMetUnd6marla,
-           (aa25.cwaterunder6Marla+ aa26.CSewunder6Marla-aa29.CMetUnd6marla)as Unmetunder6marlaC,
-           aa30.CMetActUnd6marla,
-           (aa27.CActwaterunder6Marla+ aa28.CActSewunder6Marla-aa30.CMetActUnd6marla) as UnmetActUnder6marlaC,
-           
-           -- 10 marla
-           
-          aa31.waterunder10Marla,
-           aa32.Sewunder10Marla,
-           (aa31.waterunder10Marla+ aa32.Sewunder10Marla) as TotalWSUnder10Marla,
-           aa33.Actwaterunder10Marla,
-           aa34.ActSewunder10Marla,
-           (aa33.Actwaterunder10Marla+ aa34.ActSewunder10Marla) as TotalActWSUnder10Marla,
-           aa35.MetUnd10marla,
-           (aa31.waterunder10Marla+ aa32.Sewunder10Marla-aa35.MetUnd10marla)as Unmetunder10marla,
-           aa36.MetActUnd10marla,
-           (aa33.Actwaterunder10Marla+ aa34.ActSewunder10Marla-aa36.MetActUnd10marla) as UnmetActUnder10marla,
-         --  n.betweenfivemarlawater,
-         --  o.betweenfivemarlasewerage,
-         aa37.Rwaterunder10Marla,
-           aa38.RSewunder10Marla,
-           (aa37.Rwaterunder10Marla+ aa38.RSewunder10Marla) as TotalWSUnder10MarlaR,
-           aa39.RActwaterunder10Marla,
-           aa40.RActSewunder10Marla,
-           (aa39.RActwaterunder10Marla+ aa40.RActSewunder10Marla) as TotalActWSUnder10MarlaR,
-           aa41.RMetUnd10marla,
-           (aa37.Rwaterunder10Marla+ aa38.RSewunder10Marla-aa41.RMetUnd10marla)as Unmetunder10marlaR,
-           aa42.RMetActUnd10marla,
-           (aa39.RActwaterunder10Marla+ aa40.RActSewunder10Marla-aa42.RMetActUnd10marla) as UnmetActUnder10marlaR,
-         
-         aa43.cwaterunder10Marla,
-           aa44.CSewunder10Marla,
-           (aa43.cwaterunder10Marla+ aa44.CSewunder10Marla) as TotalWSUnder10MarlaC,
-           aa45.CActwaterunder10Marla,
-           aa46.CActSewunder10Marla,
-           (aa45.CActwaterunder10Marla+ aa46.CActSewunder10Marla) as TotalActWSUnder10MarlaC,
-           aa47.CMetUnd10marla,
-           (aa43.cwaterunder10Marla+ aa44.CSewunder10Marla-aa47.CMetUnd10marla)as Unmetunder10marlaC,
-           aa48.CMetActUnd10marla,
-           (aa45.CActwaterunder10Marla+ aa46.CActSewunder10Marla-aa48.CMetActUnd10marla) as UnmetActUnder10marlaC
-         
-       FROM 
-           (SELECT COUNT(wc.connectionno) AS totalwaterconnections
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >=0 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   --AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              --AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) a,
-       
-           (SELECT COUNT(sc.connectionno) AS totalsewerageconnections
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >=0 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   --AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              --AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL)b,
-              
-           
-           (SELECT COUNT(distinct wc.connectionno) AS totalwateractive
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >=0
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   --AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) d,
-       
-          (SELECT COUNT(distinct sc.connectionno) AS totalsewerageactive
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >=0 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   --AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) e,
-       
-       (SELECT COUNT( distinct wc.connectionno) as Meteredconnections 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea >=0 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-            -- AND usagecategory IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       --AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)e2,
-       
-       (SELECT COUNT( distinct wc.connectionno) as ActiveMeteredConnection 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea >=0 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-             --AND usagecategory IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)e3,
-       
-          ------  Res
-          
-          
-           (SELECT COUNT(wc.connectionno) AS TotalResidentialWater
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >=0 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              --AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) g1,
-       
-           (SELECT COUNT(sc.connectionno) AS TotalResidentialSewerage
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >=0
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              --AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) h1,
-              
-              
-              (SELECT COUNT(distinct wc.connectionno) AS totalactiveresidentialinwater
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >=0 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) g,
-       
-           (SELECT COUNT(distinct sc.connectionno) AS totalactiveresidentialinsewerage
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >=0 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) h,
-       
-       (SELECT COUNT( distinct wc.connectionno) as MeteredResconn 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea >=0 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-            AND usagecategory IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       --AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)h2,
-       
-       (SELECT COUNT( distinct wc.connectionno) as MeteredResActiveconn 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea >=0 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-             AND usagecategory IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)h3,
-       
-          
-          ------under 5 Marla Comm
-          
-          (SELECT COUNT(wc.connectionno) AS totalCommwater
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >=0 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory NOT IN ('RESIDENTIAL') 
-                   AND tenantid = $tenantid) 
-              --AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) h4,
-       
-           (SELECT COUNT(sc.connectionno) AS totalcommsew
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >=0 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory NOT IN ('RESIDENTIAL')
-                   AND tenantid = $tenantid) 
-              --AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) h5,
-              
-              
-              (SELECT COUNT(distinct wc.connectionno) AS totalActiveCommwater
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >=0 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                 AND usagecategory NOT IN ('RESIDENTIAL')
-                   AND tenantid = $tenantid) 
-              AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) i,
-       
-           (SELECT COUNT(distinct sc.connectionno) AS totalActiveCommsew
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >=0 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                  AND usagecategory NOT IN ('RESIDENTIAL') 
-                   AND tenantid = $tenantid) 
-              AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) j,
-       
-       (SELECT COUNT( distinct wc.connectionno) as TotalMetCommConn 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea >=0 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-            AND usagecategory NOT IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       --AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)j1,
-       
-       (SELECT COUNT( distinct wc.connectionno) as TotalMetActiveCommConn 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea >=0 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-            AND usagecategory NOT IN ('RESIDENTIAL')
-             AND tenantid = $tenantid
-       ) 
-       AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)j2,
-       
-          -------------- under 5 Marla
-       
-           (SELECT COUNT(wc.connectionno) AS waterunder5Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 0 AND 125 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   --AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              --AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) l,
-       
-           (SELECT COUNT(sc.connectionno) AS Sewunder5Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 0 AND 125 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   --AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              --AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) m,
-              
-              
-              (SELECT COUNT(distinct wc.connectionno) AS Actwaterunder5Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 0 AND 125 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   --AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) l1,
-       
-           (SELECT COUNT(distinct sc.connectionno) AS ActSewunder5Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 0 AND 125 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   --AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) m1,
-       
-       (SELECT COUNT( distinct wc.connectionno) as MetUnd5marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea BETWEEN 0 AND 125 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-            -- AND usagecategory IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       --AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)m2,
-       
-       (SELECT COUNT( distinct wc.connectionno) as MetActUnd5marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea BETWEEN 0 AND 125 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-             --AND usagecategory IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)m3,
-       
-          ------ under 5 marla Res
-          
-          
-           (SELECT COUNT(wc.connectionno) AS Rwaterunder5Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 0 AND 125 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              --AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) aa1,
-       
-           (SELECT COUNT(sc.connectionno) AS RSewunder5Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 0 AND 125 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              --AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) aa2,
-              
-              
-              (SELECT COUNT(distinct wc.connectionno) AS RActwaterunder5Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 0 AND 125 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) aa3,
-       
-           (SELECT COUNT(distinct sc.connectionno) AS RActSewunder5Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 0 AND 125 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) aa4,
-       
-       (SELECT COUNT( distinct wc.connectionno) as RMetUnd5marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea BETWEEN 0 AND 125 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-            AND usagecategory IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       --AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)aa5,
-       
-       (SELECT COUNT( distinct wc.connectionno) as RMetActUnd5marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea BETWEEN 0 AND 125 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-             AND usagecategory IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)aa6,
-       
-          
-          ------under 5 Marla Comm
-          
-          (SELECT COUNT(wc.connectionno) AS Cwaterunder5Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 0 AND 125 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory NOT IN ('RESIDENTIAL') 
-                   AND tenantid = $tenantid) 
-              --AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) aa7,
-       
-           (SELECT COUNT(sc.connectionno) AS CSewunder5Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 0 AND 125 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory NOT IN ('RESIDENTIAL')
-                   AND tenantid = $tenantid) 
-              --AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) aa8,
-              
-              
-              (SELECT COUNT(distinct wc.connectionno) AS CActwaterunder5Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 0 AND 125 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                 AND usagecategory NOT IN ('RESIDENTIAL')
-                   AND tenantid = $tenantid) 
-              AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) aa9,
-       
-           (SELECT COUNT(distinct sc.connectionno) AS CActSewunder5Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 0 AND 125 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                  AND usagecategory NOT IN ('RESIDENTIAL') 
-                   AND tenantid = $tenantid) 
-              AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) aa10,
-       
-       (SELECT COUNT( distinct wc.connectionno) as CMetUnd5marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea BETWEEN 0 AND 125 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-            AND usagecategory NOT IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       --AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)aa11,
-       
-       (SELECT COUNT( distinct wc.connectionno) as CMetActUnd5marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea BETWEEN 0 AND 125 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-            AND usagecategory NOT IN ('RESIDENTIAL')
-             AND tenantid = $tenantid
-       ) 
-       AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)aa12,
-          
-          
-          
-          --------- betweensixmarlawater
-          
-        
-           (SELECT COUNT(wc.connectionno) AS waterunder6Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 126 AND 250 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   --AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              --AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) aa13,
-       
-           (SELECT COUNT(sc.connectionno) AS Sewunder6Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 126 AND 250 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   --AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              --AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) aa14,
-              
-              
-              (SELECT COUNT(distinct wc.connectionno) AS Actwaterunder6Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 126 AND 250 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   --AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) aa15,
-       
-           (SELECT COUNT(distinct sc.connectionno) AS ActSewunder6Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 126 AND 250 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   --AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) aa16,
-       
-       (SELECT COUNT( distinct wc.connectionno) as MetUnd6marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea BETWEEN 126 AND 250 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-            -- AND usagecategory IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       --AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)aa17,
-       
-       (SELECT COUNT( distinct wc.connectionno) as MetActUnd6marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea BETWEEN 126 AND 250 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-             --AND usagecategory IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)aa18,
-       
-          ------ betweensixmarlawater Res
-          
-          
-           (SELECT COUNT(wc.connectionno) AS Rwaterunder6Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 126 AND 250 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              --AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) aa19,
-       
-           (SELECT COUNT(sc.connectionno) AS RSewunder6Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 126 AND 250 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              --AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) aa20,
-              
-              
-              (SELECT COUNT(distinct wc.connectionno) AS RActwaterunder6Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 126 AND 250 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) aa21,
-       
-           (SELECT COUNT(distinct sc.connectionno) AS RActSewunder6Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 126 AND 250 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) aa22,
-       
-       (SELECT COUNT( distinct wc.connectionno) as RMetUnd6marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea BETWEEN 126 AND 250 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-            AND usagecategory IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       --AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)aa23,
-       
-       (SELECT COUNT( distinct wc.connectionno) as RMetActUnd6marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea BETWEEN 126 AND 250 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-             AND usagecategory IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)aa24,
-       
-          
-          ------betweensixmarlawater Comm
-          
-          (SELECT COUNT(wc.connectionno) AS Cwaterunder6Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 126 AND 250 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory NOT IN ('RESIDENTIAL') 
-                   AND tenantid = $tenantid) 
-              --AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) aa25,
-       
-           (SELECT COUNT(sc.connectionno) AS CSewunder6Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 126 AND 250 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory NOT IN ('RESIDENTIAL')
-                   AND tenantid = $tenantid) 
-              --AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) aa26,
-              
-              
-              (SELECT COUNT(distinct wc.connectionno) AS CActwaterunder6Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 126 AND 250
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                 AND usagecategory NOT IN ('RESIDENTIAL')
-                   AND tenantid = $tenantid) 
-              AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) aa27,
-       
-           (SELECT COUNT(distinct sc.connectionno) AS CActSewunder6Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea BETWEEN 126 AND 250 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                  AND usagecategory NOT IN ('RESIDENTIAL') 
-                   AND tenantid = $tenantid) 
-              AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) aa28,
-       
-       (SELECT COUNT( distinct wc.connectionno) as CMetUnd6marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea BETWEEN 126 AND 250 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-            AND usagecategory NOT IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       --AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)aa29,
-       
-       (SELECT COUNT( distinct wc.connectionno) as CMetActUnd6marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea BETWEEN 126 AND 250 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-            AND usagecategory NOT IN ('RESIDENTIAL')
-             AND tenantid = $tenantid
-       ) 
-       AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)aa30,
-          
-          --------------10 marla
-          
-            --------- between10marlawater
-          
-        
-           (SELECT COUNT(wc.connectionno) AS waterunder10Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >= 251 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   --AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              --AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) aa31,
-       
-           (SELECT COUNT(sc.connectionno) AS Sewunder10Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >= 251 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   --AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              --AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) aa32,
-              
-              
-              (SELECT COUNT(distinct wc.connectionno) AS Actwaterunder10Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >= 251 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   --AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) aa33,
-       
-           (SELECT COUNT(distinct sc.connectionno) AS ActSewunder10Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >= 251 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   --AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) aa34,
-       
-       (SELECT COUNT( distinct wc.connectionno) as MetUnd10marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea >= 251 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-            -- AND usagecategory IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       --AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)aa35,
-       
-       (SELECT COUNT( distinct wc.connectionno) as MetActUnd10marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea >= 251 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-             --AND usagecategory IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)aa36,
-       
-          ------ between10marlawater Res
-          
-          
-           (SELECT COUNT(wc.connectionno) AS Rwaterunder10Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >= 251 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              --AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) aa37,
-       
-           (SELECT COUNT(sc.connectionno) AS RSewunder10Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >= 251 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              --AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) aa38,
-              
-              
-              (SELECT COUNT(distinct wc.connectionno) AS RActwaterunder10Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >= 251 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) aa39,
-       
-           (SELECT COUNT(distinct sc.connectionno) AS RActSewunder10Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >= 251 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory = 'RESIDENTIAL' 
-                   AND tenantid = $tenantid) 
-              AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) aa40,
-       
-       (SELECT COUNT( distinct wc.connectionno) as RMetUnd10marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea >= 251 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-            AND usagecategory IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       --AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)aa41,
-       
-       (SELECT COUNT( distinct wc.connectionno) as RMetActUnd10marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea >= 251 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-             AND usagecategory IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)aa42,
-       
-          
-          ------between10marlawater Comm
-          
-          (SELECT COUNT(wc.connectionno) AS Cwaterunder10Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >= 251 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory NOT IN ('RESIDENTIAL') 
-                   AND tenantid = $tenantid) 
-              --AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) aa43,
-       
-           (SELECT COUNT(sc.connectionno) AS CSewunder10Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >= 251
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                   AND usagecategory NOT IN ('RESIDENTIAL')
-                   AND tenantid = $tenantid) 
-              --AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) aa44,
-              
-              
-              (SELECT COUNT(distinct wc.connectionno) AS CActwaterunder10Marla
-            FROM eg_ws_connection wc 
-            WHERE wc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >= 251
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                 AND usagecategory NOT IN ('RESIDENTIAL')
-                   AND tenantid = $tenantid) 
-              AND wc.status = 'Active' 
-              AND wc.tenantid = $tenantid 
-              AND wc.connectionno IS NOT NULL) aa45,
-       
-           (SELECT COUNT(distinct sc.connectionno) AS CActSewunder10Marla
-            FROM eg_sw_connection sc 
-            WHERE sc.property_id IN 
-                (SELECT propertyid 
-                 FROM eg_pt_property 
-                 WHERE landarea >= 251 
-                   AND status IN ('ACTIVE', 'PENDINGWS') 
-                  AND usagecategory NOT IN ('RESIDENTIAL') 
-                   AND tenantid = $tenantid) 
-              AND sc.status = 'Active' 
-              AND sc.tenantid = $tenantid 
-              AND sc.connectionno IS NOT NULL) aa46,
-       
-       (SELECT COUNT( distinct wc.connectionno) as CMetUnd10marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea >= 251
-           and status IN ('ACTIVE', 'PENDINGWS') 
-            AND usagecategory NOT IN ('RESIDENTIAL') 
-             AND tenantid = $tenantid
-       ) 
-       --AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)aa47,
-       
-       (SELECT COUNT( distinct wc.connectionno) as CMetActUnd10marla 
-       FROM eg_ws_connection wc 
-       JOIN eg_ws_service ws ON wc.id = ws.connection_id 
-       WHERE wc.property_id IN (
-           SELECT propertyid 
-           FROM eg_pt_property 
-           WHERE landarea >= 251 
-           and status IN ('ACTIVE', 'PENDINGWS') 
-            AND usagecategory NOT IN ('RESIDENTIAL')
-             AND tenantid = $tenantid
-       ) 
-       AND wc.status = 'Active' 
-       AND wc.tenantid = $tenantid 
-       AND ws.connectiontype = 'Metered'  
-       AND wc.connectionno IS NOT NULL)aa48
   - reportName: WSQuaterly_Bill_Generate
-    summary: Ws Quaterly Bill Generate Report
+    summary: Ws Quarterly Bill Generate Report
     version: 1.0.0
     moduleName: rainmaker-ws
     additionalConfig: null
@@ -4519,7 +2709,7 @@ ReportDefinitions:
         type: string
         source: ws
         total: false
-      - name:  payername
+      - name: payername
         label: Name
         type: string
         source: ws
@@ -4575,160 +2765,826 @@ ReportDefinitions:
         source: ws
         total: false
     searchParams:
-      - name: serviceType
-        label: Service Type
-        type: singlevaluelist
-        pattern: 'list://WS%:Water,SW%:Sewerage'
-        source: ws
-        isMandatory: true
-        searchClause: AND bill.businessservice like $serviceType
-      - name: fromperiod
+      - name: fromDate
         label: From Date
         type: epoch
         source: ws
         isMandatory: true
-        searchClause: AND bill.fromperiod = $fromDate
-      - name: toperiod
+        searchClause: AND cte.fromperiod >= $fromDate
+      - name: toDate
         label: To Date
         type: epoch
         source: ws
         isMandatory: true
-        searchClause: AND bill.fromperiod = $toDate
+        searchClause: AND cte.toperiod <= $toDate       
       - name: usagecategory
         label: Category
         type: singlevaluelist
-        pattern:    'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTION  AL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+        pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
         source: ws
         isMandatory: false
-        searchClause: AND usagecategory=$usagecategory  
+        searchClause: AND cte.usagecategory = $usagecategory
+      - name: connectiontype
+        label: Connection Type
+        type: singlevaluelist
+        pattern: list://Non Metered:Non Metered,Metered:Metered
+        source: ws
+        isMandatory: false
+        searchClause: AND cte.connectiontype = $connectiontype
       - name: localityArray
         label: zoneList
         type: boundarylist
         source: ws
         isMandatory: false
-        searchClause: AND ebm.localitycode IN ($localityArray)
+        searchClause: AND cte.localitycode IN ($localityArray)
+    query: |
+       --------Water
+       WITH cte AS (
+           SELECT
+               bill.businessservice,   
+               to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
+               || '-' || 
+               to_char((to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS finyear,
+               pt.usagecategory,
+               wc.connectionno,
+               bill.totalamount,
+               bill.consumercode,
+               bill.billno,b.payername,b.payeraddress,b.mobilenumber,
+               b.status AS bill_status,
+               ct.connectiontype,
+               ebm.zonename,
+               ebm.blockname,
+               ebm.zonecode,
+               ebm.blockcode,
+               ebm.localityname,
+               ebm.localitycode,
+               pt.landarea,
+               bill.fromperiod,
+               bill.toperiod,
+               pt.propertyid
+           FROM eg_ws_connection wc 
+           JOIN eg_pt_property pt ON wc.property_id = pt.propertyid 
+               AND wc.status IN ('Active', 'Inactive') 
+               AND pt.status IN ('ACTIVE', 'PENDINGWS')
+           JOIN eg_ws_service ct ON wc.id = ct.connection_id
+           JOIN eg_bndry_mohalla ebm ON wc.locality = ebm.localitycode AND wc.tenantid = ebm.tenantid
+           JOIN egbs_billdetail_v1 bill 
+               ON bill.consumercode = wc.connectionno 
+               AND bill.businessservice = 'WS'
+           JOIN egbs_bill_v1 b 
+               ON bill.billid = b.id
+               AND bill.businessservice = 'WS'
+           WHERE wc.tenantid = $tenantid
+               AND pt.usagecategory IN (
+                   'RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL',
+                   'NONRESIDENTIAL.INSTITUTIONAL', 'MIXED',
+                   'NONRESIDENTIAL', 'NONRESIDENTIAL.INDUSTRIAL',
+                   'NONRESIDENTIAL.OTHERS'
+               )
+       )
+       
+       SELECT
+           cte.businessservice,  
+           cte.consumercode,
+           cte.payername,
+           cte.payeraddress,
+           cte.mobilenumber,
+           cte.usagecategory,
+           SUM(cte.totalamount) AS amtpaid,
+           cte.bill_status,
+           cte.billno,
+           cte.connectiontype,
+           cte.landarea,
+           cte.zonename,
+           cte.blockname,
+           cte.zonecode,
+           cte.blockcode,
+           cte.localityname,
+           cte.localitycode,
+           cte.fromperiod,
+           cte.toperiod,
+           cte.propertyid,
+           STRING_AGG(cte.finyear, ', ') AS finyear
+       FROM cte
+       WHERE cte.bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
+    groupby: GROUP BY cte.businessservice, cte.consumercode,cte.payername,cte.payeraddress,cte.mobilenumber,cte.usagecategory,cte.bill_status,cte.billno,
+             cte.connectiontype,cte.landarea,cte.zonename,cte.blockname,cte.zonecode,cte.blockcode,cte.localityname,
+             cte.localitycode,cte.fromperiod,cte.toperiod,cte.propertyid 
+
+  - reportName: WSNew_Connection_Fee_Report
+    summary: WS New Connection Fee Report
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig: null
+    print:
+      pdfPageSize: A1
+    sourceColumns:
+      - name: applicationno
+        label: Application No
+        type: string
+        source: ws
+        total: false
+      - name: connectionno
+        label: Consumer No
+        type: string
+        source: ws
+        total: false
+      - name: receiptnumber
+        label: Reciept No
+        type: string
+        source: ws
+        total: false
+      - name: receiptdate
+        label: Reciept Date
+        type: string
+        source: ws
+        total: false
+      - name: payername
+        label: Name
+        type: string
+        source: ws
+        total: false
+      - name: address
+        label: Addres
+        type: string
+        source: ws
+        total: false
+      - name: locality
+        label: Localit
+        type: string
+        source: ws
+        total: false
+      - name: mobilenumber
+        label: Mobile
+        type: string
+        source: ws
+        total: false
+      - name: propertyid
+        label: Property Id
+        type: string
+        source: ws
+        total: false
+      - name: amount
+        label: Amount
+        type: string
+        source: ws
+        total: false
+      - name: instrumenttype
+        label: Payment Type
+        type: string
+        source: ws
+        total: false
+      - name: securityfee
+        label: Security Fee 
+        type: string
+        source: ws
+        total: false
+      - name: connectionfee
+        label: Connection Fee 
+        type: string
+        source: ws
+        total: false
+      - name: othefee
+        label: Other Fee
+        type: string
+        source: ws
+        total: false
+      - name: roadcutting
+        label: Road Cutting 
+        type: string
+        source: ws
+        total: false
+      - name: plotsize
+        label: Land Area
+        type: string
+        source: ws
+        total: false
+      - name: collectorname
+        label: Approved By
+        type: string
+        source: ws
+        total: false
+      - name: approvaldate
+        label: Approved Date
+        type: string
+        source: ws
+        total: false
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND pd.receiptdate >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND pd.receiptdate <= $toDate       
+      - name: localityArray
+        label: zoneList
+        type: boundarylist
+        source: ws
+        isMandatory: false
+        searchClause: AND pta.locality IN ($localityArray)
+    query: |
+       -------- Query for water
+       WITH receipt_breakup AS (
+       SELECT
+           pd.id AS pdid,                    
+           SUM(CASE WHEN taxheadcode LIKE 'WS_SECURITY_DEPOSIT' THEN adjustedamount ELSE 0 END) AS securityfee, 
+           SUM(CASE WHEN taxheadcode LIKE 'WS_CONNECTION_FEE' THEN adjustedamount ELSE 0 END) AS connectionfee, 
+           SUM(CASE WHEN taxheadcode LIKE 'WS_OTHER_FEE' THEN adjustedamount ELSE 0 END) AS othefee, 
+           SUM(CASE WHEN taxheadcode LIKE 'WS_ROAD_CUTTING_CHARGE' THEN adjustedamount ELSE 0 END) AS roadcutting                    
+       FROM egcl_billaccountdetail AS bad
+       INNER JOIN egcl_billdetial AS bd ON bd.id = bad.billdetailid
+       INNER JOIN egcl_paymentdetail AS pd ON pd.billid = bd.billid
+       INNER JOIN egcl_payment AS payment ON pd.paymentid = payment.id                  
+       WHERE payment.tenantid =$tenantid 
+         AND payment.paymentstatus != 'CANCELLED' 
+         AND pd.businessservice = 'WS.ONE_TIME_FEE'
+         AND pd.receiptdate >= $fromDate 
+          AND pd.receiptdate <= $toDate
+       GROUP BY pdid
+       )
+       SELECT 
+       pd.tenantid AS tenantid,
+       pd.id,
+       TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate,
+       pd.receiptnumber,
+       payment.totalamountpaid AS amount, 
+       payment.paymentmode AS instrumenttype, 
+       payment.transactionnumber,
+       receipt_breakup.*,
+       TO_CHAR(TO_TIMESTAMP(pd.manualreceiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS g8issuedate, 
+       pd.manualreceiptnumber AS g8receiptno,
+       ws.additionaldetails->>'waterSubUsageType' as usageType,
+       ws.additionaldetails->>'ledgerId' as ledgerid,
+       ws.connectionno as connectionno,
+       ws.applicationno as applicationno,
+       pt.propertyid as propertyid,
+       pt.landarea as plotsize,
+       concat(doorno,',',buildingname,',',street,',',city) as addrespayment.payername,payment.mobilenumber,
+       ws.additionaldetails->>'connectionCategory' as connectioncategory,
+       ws.additionaldetails->>'ownerName' as ownernampta.locality,
+       eu.name as collectorname,
+       TO_CHAR(TO_TIMESTAMP(pi.lastmodifiedtime / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') as approvaldate
+       FROM egcl_paymentdetail pd
+       INNER JOIN egcl_payment payment ON pd.paymentid = payment.id
+       INNER JOIN egcl_bill bill ON bill.id = pd.billid
+       INNER JOIN receipt_breakup ON receipt_breakup.pdid = pd.id
+       INNER JOIN eg_ws_connection ws ON ws.applicationno = bill.consumercode
+       inner join eg_pt_property pt on (ws.property_id=pt.propertyid and pt.status!='INACTIVE')
+       inner join eg_pt_address pta on (pta.propertyid=pt.id)
+       inner join eg_wf_processinstance_v2 pi on (pi.businessid=ws.applicationno and pi.action='APPROVE_FOR_CONNECTION')
+       inner join eg_user eu on eu.uuid=pi.lastmodifiedby
+       WHERE payment.paymentstatus != 'CANCELLED'
+       AND pd.businessservice = 'WS.ONE_TIME_FEE'
+       AND payment.tenantid =$tenantid
+    orderby: ORDER BY pd.receiptdate DESC
+  - reportName: WSQuaterly_Bill_Not_Generate
+    summary: Ws Quarterly Bill Not Generate Report
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig: null
+    print:
+      pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: Consumercode
+        type: string
+        source: ws
+        total: false
+      - name: payername
+        label: Name
+        type: string
+        source: ws
+        total: false
+      - name: payeraddress
+        label: Address
+        type: string
+        source: ws
+        total: false
+      - name: mobilenumber
+        label: Mobile
+        type: string
+        source: ws
+        total: false
+      - name: usagecategories
+        label: Category
+        type: string
+        source: ws
+        total: false
+      - name: connectiontypes
+        label: Connection Type
+        type: string
+        source: ws
+        total: false
+      - name: zonenames
+        label: Zone Name
+        type: string
+        source: ws
+        total: false
+      - name: blocknames
+        label: Ward Name
+        type: string
+        source: ws
+        total: false                                
+      - name: localitynames
+        label: Locality
+        type: string
+        source: ws
+        total: false
+      - name: bill_statuses
+        label: Bill Status
+        type: string
+        source: ws
+        total: false        
+      - name: landarea
+        label: Land Area
+        type: string
+        source: ws
+        total: false
+      - name: propertyids
+        label: PropertyID
+        type: string
+        source: ws
+        total: false        
+      - name: finyears
+        label: FinYears
+        type: string
+        source: ws
+        total: false
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND 1=1
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND 1=1  
+      - name: usagecategory
+        label: Category
+        type: singlevaluelist
+        pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+        source: ws
+        isMandatory: false
+        searchClause: AND cte.usagecategory = $usagecategory
       - name: connectiontype
         label: Connection Type
         type: singlevaluelist
-        pattern: 'list://Non Metered:Non Metered,Metered:Metered'
+        pattern: list://Non Metered:Non Metered,Metered:Metered
         source: ws
         isMandatory: false
-        searchClause: AND connectiontype=$connectiontype 
+        searchClause: AND cte.connectiontype = $connectiontype
+      - name: localityArray
+        label: zoneList
+        type: boundarylist
+        source: ws
+        isMandatory: false
+        searchClause: AND cte.localitycode IN ($localityArray)
     query: |
-      WITH base AS (
-          SELECT 
-              bill.businessservice,
-              bill.totalamount,
-              bill.consumercode,
-              bill.billno,
-              bill.billid,
-              bill.fromperiod,
-              bill.toperiod,
-              bill.tenantid,
-              b.payername,
-              b.payeraddress,
-              b.mobilenumber,
-              b.status AS bill_status,
-              COALESCE(sw.connectionno, ws.connectionno) AS connectionno,
-              COALESCE(sw.property_id, ws.property_id) AS property_id,
-              COALESCE(sw.id, ws.id) AS connection_id,
-              COALESCE(sw.locality, ws.locality) AS locality,
-              COALESCE(sw_service.connectiontype, ws_service.connectiontype) AS connectiontype
-          FROM egbs_billdetail_v1 bill
-          JOIN egbs_bill_v1 b ON bill.billid = b.id
-          LEFT JOIN eg_sw_connection sw ON bill.businessservice = 'SW' AND bill.consumercode = sw.connectionno AND sw.status IN ('Active', 'Inactive')
-          LEFT JOIN eg_ws_connection ws ON bill.businessservice = 'WS' AND bill.consumercode = ws.connectionno AND ws.status IN ('Active', 'Inactive')
-          LEFT JOIN eg_sw_service sw_service ON bill.businessservice = 'SW' AND sw.id = sw_service.connection_id
-          LEFT JOIN eg_ws_service ws_service ON bill.businessservice = 'WS' AND ws.id = ws_service.connection_id
-          WHERE bill.tenantid = $tenantid
-            AND (
-                  (bill.businessservice = 'SW' AND bill.fromperiod BETWEEN $fromDate AND $toDate) OR
-                  (bill.businessservice = 'WS' AND bill.fromperiod BETWEEN $fromDate AND $toDate)
-            )
-      )
-      
-      , cte AS (
-          SELECT 
-              base.businessservice,
-              to_char((to_timestamp(base.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
-              || '-' || 
-              to_char((to_timestamp(base.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS finyear,
-              pt.usagecategory,
-              base.connectionno,
-              base.totalamount,
-              base.consumercode,
-              base.billno,
-              base.payername,
-              base.payeraddress,
-              base.mobilenumber,
-              base.bill_status,
-              base.connectiontype,
-              ebm.zonename,
-              ebm.blockname,
-              ebm.localityname,
-              ebm.localitycode,
-              ebm.zonecode,
-              ebm.blockcode,
-              pt.landarea,
-              base.fromperiod,
-              base.toperiod,
-              pt.propertyid
-          FROM base
-          JOIN eg_pt_property pt ON pt.propertyid = base.property_id AND pt.status IN ('ACTIVE', 'PENDINGWS')
-          LEFT JOIN eg_bndry_mohalla ebm ON base.locality = ebm.localitycode AND base.tenantid = ebm.tenantid
-          WHERE pt.usagecategory IN (
-              'RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL',
-              'NONRESIDENTIAL.INSTITUTIONAL', 'MIXED',
-              'NONRESIDENTIAL', 'NONRESIDENTIAL.INDUSTRIAL',
-              'NONRESIDENTIAL.OTHERS'
-          )
-      )
-      
-      SELECT  
-          cte.businessservice,
-          cte.consumercode,
-          cte.payername,
-          cte.payeraddress,
-          cte.mobilenumber,
-          cte.usagecategory,
-          SUM(cte.totalamount) AS amtpaid,
-          cte.bill_status,
-          cte.billno,
-          cte.connectiontype,
-          cte.landarea,
-          cte.zonename,
-          cte.blockname,
-          cte.zonecode,
-          cte.blockcode,
-          cte.localityname,
-          cte.localitycode,
-          cte.fromperiod,
-          cte.toperiod,
-          cte.propertyid,
-          STRING_AGG(cte.finyear, ', ') AS finyear
-      FROM cte
-      WHERE cte.bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
-      GROUP BY 
-          cte.businessservice,
-          cte.consumercode,
-          cte.payername,
-          cte.payeraddress,
-          cte.mobilenumber,
-          cte.usagecategory,
-          cte.bill_status,
-          cte.billno,
-          cte.connectiontype,
-          cte.landarea,
-          cte.zonename,
-          cte.blockname,
-          cte.zonecode,
-          cte.blockcode,
-          cte.localityname,
-          cte.localitycode,
-          cte.fromperiod,
-          cte.toperiod,
-          cte.propertyid having 1=1
-      
+       WITH exclude_codes AS (
+           SELECT DISTINCT bill.consumercode
+           FROM egbs_billdetail_v1 bill
+           WHERE bill.businessservice = 'WS'
+          AND to_char(to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD') = to_char(to_timestamp($fromDate/ 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')
+         AND to_char(to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD') = to_char(to_timestamp($toDate/ 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD')
+       ),
+       cte AS (
+           SELECT 
+               to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
+               || '-' || 
+               to_char((to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS finyear,
+               pt.usagecategory,
+               bill.consumercode,
+               b.status AS bill_status,b.payername,b.payeraddress,b.mobilenumber,
+               ct.connectiontype,
+       	    bill.fromperiod,
+       	    bill.toperiod,
+               ebm.zonename,
+               ebm.blockname,
+               ebm.localityname,
+       	    ebm.localitycode,
+               pt.landarea,
+               pt.propertyid
+           FROM eg_ws_connection wc 
+           JOIN eg_pt_property pt 
+               ON wc.property_id = pt.propertyid
+              AND wc.status IN ('Active') 
+              AND pt.status IN ('ACTIVE', 'PENDINGWS')
+           JOIN eg_ws_service ct 
+               ON wc.id = ct.connection_id
+           JOIN eg_bndry_mohalla ebm 
+               ON wc.locality = ebm.localitycode 
+              AND wc.tenantid = ebm.tenantid
+           JOIN egbs_billdetail_v1 bill 
+               ON bill.consumercode = wc.connectionno 
+              AND bill.businessservice = 'WS'
+           JOIN egbs_bill_v1 b 
+               ON bill.billid = b.id
+              AND bill.businessservice = 'WS'
+           WHERE wc.tenantid = $tenantid
+             AND pt.usagecategory IN (
+                   'RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL',
+                   'NONRESIDENTIAL.INSTITUTIONAL', 'MIXED',
+                   'NONRESIDENTIAL', 'NONRESIDENTIAL.INDUSTRIAL',
+                   'NONRESIDENTIAL.OTHERS'
+               )
+             AND bill.consumercode NOT IN (SELECT consumercode FROM exclude_codes)
+             AND (
+                   (ct.connectiontype = 'Non Metered' AND pt.landarea > 125)
+                   OR (ct.connectiontype = 'Metered')
+                 )
+       )
+       SELECT  
+           consumercode,
+           STRING_AGG(DISTINCT payername, ', ') AS payername,
+       	STRING_AGG(DISTINCT payeraddress, ', ') AS payeraddress,
+       	STRING_AGG(DISTINCT mobilenumber, ', ') AS mobilenumber,
+           STRING_AGG(DISTINCT usagecategory, ', ') AS usagecategories,
+           STRING_AGG(DISTINCT bill_status, ', ') AS bill_statuses,
+           STRING_AGG(DISTINCT connectiontype, ', ') AS connectiontypes,
+           STRING_AGG(DISTINCT zonename, ', ') AS zonenames,
+       	STRING_AGG(DISTINCT localitycode, ', ') AS localitycode,
+           STRING_AGG(DISTINCT blockname, ', ') AS blocknames,
+           STRING_AGG(DISTINCT localityname, ', ') AS localitynames,
+           MAX(landarea) AS landarea,
+       	MAX(fromperiod) AS fromperiod,
+       	MAX(toperiod) AS toperiod,
+           STRING_AGG(DISTINCT propertyid, ', ') AS propertyids,
+       	STRING_AGG(DISTINCT finyear, ', ') AS finyears
+       FROM cte
+       WHERE bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
+    groupby: GROUP BY consumercode
+    orderby: ORDER BY consumercode 
+    
+  - reportName: Zone_wise_Collection_Summary
+    summary: Zone Wise Collection Summary
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig: null
+    print:
+      pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: Bill Period
+        type: string
+        source: ws
+        total: false
+      - name: zonenames
+        label: Zone
+        type: string
+        source: ws
+        total: false
+      - name: blocknames
+        label: Ward
+        type: string
+        source: ws
+        total: false                               
+      - name: localitynames
+        label: Total Active Connection
+        type: string
+        source: ws
+        total: false
+      - name: bill_statuses
+        label: Billed Connection
+        type: string
+        source: ws
+        total: false        
+      - name: landarea
+        label: Reciepts generated
+        type: string
+        source: ws
+        total: false
+      - name: propertyids
+        label: Payment Collected
+        type: string
+        source: ws
+        total: false        
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND cte.fromperiod >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND cte.toperiod <= $toDate       
+      - name: usagecategory
+        label: Category
+        type: singlevaluelist
+        pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+        source: ws
+        isMandatory: false
+        searchClause: AND cte.usagecategory = $usagecategory
+      - name: connectiontype
+        label: Connection Type
+        type: singlevaluelist
+        pattern: list://Non Metered:Non Metered,Metered:Metered
+        source: ws
+        isMandatory: false
+        searchClause: AND cte.connectiontype = $connectiontype
+      - name: localityArray
+        label: zoneList
+        type: boundarylist
+        source: ws
+        isMandatory: false
+        searchClause: AND cte.localitycode IN ($localityArray)
+    query: |
+       WITH exclude_codes AS (
+           SELECT DISTINCT bill.consumercode
+           FROM egbs_billdetail_v1 bill
+           WHERE bill.businessservice = 'WS'
+             AND bill.fromperiod >= $fromperiod AND bill.toperiod <= $toperiod
+       ),
+       cte AS (
+           SELECT 
+               to_char((to_timestamp(bill.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') 
+               || '-' || 
+               to_char((to_timestamp(bill.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS finyear,
+               pt.usagecategory,
+               bill.consumercode,
+               b.status AS bill_status,b.payername,b.payeraddress,b.mobilenumber,
+               ct.connectiontype,
+               ebm.zonename,
+               ebm.blockname,
+               ebm.localityname,
+               pt.landarea,
+               pt.propertyid
+           FROM eg_ws_connection wc 
+           JOIN eg_pt_property pt 
+               ON wc.property_id = pt.propertyid
+              AND wc.status IN ('Active') 
+              AND pt.status IN ('ACTIVE', 'PENDINGWS')
+           JOIN eg_ws_service ct 
+               ON wc.id = ct.connection_id
+           JOIN eg_bndry_mohalla ebm 
+               ON wc.locality = ebm.localitycode 
+              AND wc.tenantid = ebm.tenantid
+           JOIN egbs_billdetail_v1 bill 
+               ON bill.consumercode = wc.connectionno 
+              AND bill.businessservice = 'WS'
+           JOIN egbs_bill_v1 b 
+               ON bill.billid = b.id
+              AND bill.businessservice = 'WS'
+           WHERE wc.tenantid = $tenantid
+             AND pt.usagecategory IN (
+                   'RESIDENTIAL', 'NONRESIDENTIAL.COMMERCIAL',
+                   'NONRESIDENTIAL.INSTITUTIONAL', 'MIXED',
+                   'NONRESIDENTIAL', 'NONRESIDENTIAL.INDUSTRIAL',
+                   'NONRESIDENTIAL.OTHERS'
+               )
+             AND bill.consumercode NOT IN (SELECT consumercode FROM exclude_codes)
+             AND (
+                   (ct.connectiontype = 'Non Metered' AND pt.landarea > 125)
+                   OR (ct.connectiontype = 'Metered')
+                 )
+       )
+       SELECT  
+           consumercode,
+           STRING_AGG(DISTINCT payername, ', ') AS payername,
+        STRING_AGG(DISTINCT payeraddress, ', ') AS payeraddress,
+        STRING_AGG(DISTINCT mobilenumber, ', ') AS mobilenumber,
+           STRING_AGG(DISTINCT usagecategory, ', ') AS usagecategories,
+           STRING_AGG(DISTINCT bill_status, ', ') AS bill_statuses,
+           STRING_AGG(DISTINCT connectiontype, ', ') AS connectiontypes,
+           STRING_AGG(DISTINCT zonename, ', ') AS zonenames,
+           STRING_AGG(DISTINCT blockname, ', ') AS blocknames,
+           STRING_AGG(DISTINCT localityname, ', ') AS localitynames,
+           MAX(landarea) AS landarea,
+           STRING_AGG(DISTINCT propertyid, ', ') AS propertyids,
+        STRING_AGG(DISTINCT finyear, ', ') AS finyears
+       FROM cte
+       WHERE bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
+    groupby: GROUP BY consumercode
+    orderby: ORDER BY consumercode
+    
+  - reportName: DeadMeterReport  
+    summary: Dead/Dameged Meter Report   
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig: null
+    print:
+      pdfPageSize: A1
+    sourceColumns:
+      - name: connectionno
+        label: ConnectionNo
+        type: string
+        source: ws
+        total: false
+        
+      - name: billingperiod
+        label: Billing Period
+        type: string
+        source: ws
+        total: false
+    
+      - name: propertyid
+        label: Property Id
+        type: string
+        source: pt
+        total: false
+    
+      - name: currentReading
+        label: Current Reading
+        type: string
+        source: ws
+        total: false
+    
+      - name: lastReading
+        label: Last Reading
+        type: string
+        source: ws
+        total: false
+    
+      - name: meterstatus
+        label: Meter status
+        type: string
+        source: ws
+        total: false
+    
+      - name: address
+        label: Address
+        type: string
+        source: pt
+        total: false
+    
+      - name: blockname
+        label: Block Name
+        type: string
+        source: pt
+        total: false
+    
+      - name: zonename
+        label: Zone Name
+        type: string
+        source: pt
+        total: false
+    
+      - name: zonecode
+        label: Zone code
+        type: string
+        source: pt
+        total: false
+    
+      - name: propertyusagetype
+        label: Property Usagetype
+        type: string
+        source: pt
+        total: false
+    
+      - name: propertytype
+        label: Property Type
+        type: string
+        source: pt
+        total: false
+    searchParams:     
+      - name: usagecategory
+        label: Category
+        type: singlevaluelist
+        pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+        source: ws
+        isMandatory: false
+        searchClause: AND pt.propertyusagetype = $usagecategory
+      - name: localityArray
+        label: zoneList
+        type: boundarylist
+        source: pt
+        isMandatory: false
+        searchClause: AND pt.localitycode IN ($localityArray)
+    query: |
+       SELECT
+       conn.connectionno,
+       MAX(mt.billingperiod) AS billingperiod,
+       MAX(pt.propertyid) AS propertyid,
+       MAX(mt.currentreading) AS currentReading,
+       MAX(mt.lastreading) AS lastReading,
+       MAX(mt.meterstatus) AS meterstatus,
+       MAX(pt.address) AS address,
+       MAX(pt.blockname) AS blockname,
+       MAX(pt.zonename) AS zonename,
+       MAX(pt.zonecode) AS zonecode,
+       MAX(pt.propertyusagetype) AS propertyusagetype,
+       MAX(pt.propertytype) AS propertytype FROM eg_ws_meterreading AS mt
+       INNER JOIN
+       eg_ws_connection AS conn ON mt.connectionno = conn.connectionno
+       INNER JOIN
+       report_properties AS pt ON pt.propertyid = conn.property_id
+       WHERE
+       conn.tenantid = $tenantid and mt.meterstatus in ('Locked','Breakdown')
+       --- and mt.billingperiod ='31/03/2025 - 30/06/2025
+       AND
+       mt.currentreadingdate = (
+       SELECT MAX(currentreadingdate)
+       FROM eg_ws_meterreading
+       WHERE connectionno = mt.connectionno
+       )
+    groupby: GROUP BY conn.connectionno
 
-  
-      
+  - reportName: OutstandingArrears
+    summary: Outstanding Arrears Report
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: consumercode
+        type: string
+        source: ws
+        total: false
+      - name: businessservice
+        label: Business Service
+        type: string
+        source: ws
+        total: false
+      - name: total_demand
+        label: Total Demand
+        type: string
+        source: ws
+        total: true
+      - name: balance
+        label: Balance
+        type: string
+        source: ws
+        total: true     
+      - name: max_taxperiodto_date
+        label: Max taxperiod todate
+        type: epoch
+        source: ws
+        total: false
+    searchParams:
+      - name: connectionType
+        label: connectionType
+        type: singlevaluelist
+        pattern: list://WS%:Water,SW%:Sewerage
+        source: ws
+        isMandatory: true
+        searchClause: AND 1=1
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND 1=1        
+    query:
+      WITH demand AS (
+           SELECT 
+               dd.consumercode,
+               dd.businessservice,
+               SUM(dt.taxamount) AS total_demand,
+               MAX(dd.taxperiodto) as max_taxperiodto_date
+           FROM egbs_demand_v1 dd
+           JOIN egbs_demanddetail_v1 dt
+             ON dd.id = dt.demandid
+           JOIN eg_ws_connection sw
+             ON sw.connectionno = dd.consumercode
+           WHERE dd.tenantid = $tenantid
+             AND dd.businessservice like $connectionType
+             AND dd.status = 'ACTIVE'
+             AND sw.status = 'Active'
+ 
+         AND  dd.taxperiodto <= $toDate
+           GROUP BY dd.consumercode, dd.businessservice
+           HAVING SUM(dt.taxamount) <> 0
+       ),
+       payment AS (
+           SELECT 
+               bill.consumercode AS connectionno,     
+               bill.businessservice AS service,   
+               SUM(pd.amountpaid) AS total_amt_paid
+           FROM egcl_paymentdetail pd
+           INNER JOIN egcl_bill bill 
+               ON bill.id = pd.billid 
+              AND pd.tenantid = $tenantid
+           INNER JOIN egcl_payment payment 
+               ON payment.id = pd.paymentid
+       
+         where pd.receiptdate <= $toDate
+             AND bill.businessservice like $connectionType
+       and payment.paymentstatus != 'CANCELLED'
+           GROUP BY bill.consumercode, bill.businessservice
+       )
+       SELECT 
+           d.consumercode,
+           d.businessservice,
+           d.total_demand,
+            COALESCE(p.total_amt_paid, 0) AS total_amt_paid,
+           (d.total_demand - COALESCE(p.total_amt_paid, 0)) AS balance,
+           d.max_taxperiodto_date
+       FROM demand d
+       LEFT JOIN payment p
+         ON d.consumercode = p.connectionno
+        AND d.businessservice = p.service  

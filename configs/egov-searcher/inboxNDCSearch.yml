@@ -8,34 +8,28 @@ SearchDefinitions:
        baseQuery: >
          SELECT row_to_json(result) FROM (
             SELECT DISTINCT 
-              a.uuid AS id,
-              a.firstname AS fName,
-              a.lastname AS lName,
-              a.tenantid,
-              a.mobile,
-              a.email,
-              a.address,
+              a.uuid AS uuid,
+              a.applicationno,
               a.applicationstatus,
-              a.active,
+              a.active,a.reason,
               a.createdby AS a_createdby,
               a.lastmodifiedby AS a_lastmodifiedby,
               a.createdtime AS a_createdtime,
               a.lastmodifiedtime AS a_lastmodifiedtime,
               pi.businessservice AS wf_businessservice,
-              pi.action AS wf_action,
-              pi.assigner AS wf_assigner,
               pi.status AS wf_status,
               pi.createdby AS wf_createdby,
               pi.lastmodifiedby AS wf_lastmodifiedby,
               assg.assignee AS wf_assignee
-            FROM eg_ndc_applicants a
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
+            FROM eg_ndc_application a
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
             AND pi.createdtime = (
               SELECT MAX(wf.createdtime)
               FROM eg_wf_processinstance_v2 wf
-              WHERE wf.businessid = a.uuid
+              WHERE wf.businessid = a.applicationno
+              GROUP BY wf.businessid
             )
             ORDER BY a.createdtime DESC
             $pagination
@@ -49,15 +43,15 @@ SearchDefinitions:
        - name: a.uuid
          isMandatory: false
          jsonPath: $.searchCriteria.uuid
+       - name: a.applicationno
+         isMandatory: false
+         jsonPath: $.searchCriteria.applicationNo
        - name: a.applicationstatus
          isMandatory: false
          jsonPath: $.searchCriteria.status
        - name: a.active
          isMandatory: false
          jsonPath: $.searchCriteria.active
-       - name: a.mobile
-         isMandatory: false
-         jsonPath: $.searchCriteria.mobileNumber
        - name: pi.businessservice
          isMandatory: false
          jsonPath: $.searchCriteria.businessservice
@@ -73,15 +67,12 @@ SearchDefinitions:
        - name: a.createdtime
          isMandatory: false
          jsonPath: $.searchCriteria.toDate
-       - name: concat(a.firstname, ' ', a.lastname)
-         isMandatory: false
-         jsonPath: $.searchCriteria.name
        pagination:
          noOfRecords: $.searchCriteria.noOfRecords
          offset: $.searchCriteria.offset
       output:
-       jsonFormat: {"ResponseInfo": {}, "NDCApplications": []}
-       outJsonPath: $.NDCApplications
+       jsonFormat: {"ResponseInfo": {}, "Applications": []}
+       outJsonPath: $.Applications
        responseInfoPath: $.ResponseInfo
 
     - name: inboxndcsearchcount
@@ -89,14 +80,15 @@ SearchDefinitions:
        baseQuery: >
          SELECT row_to_json(t) from (
          SELECT COUNT(DISTINCT a.uuid) AS count
-          FROM eg_ndc_applicants a
-          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
+          FROM eg_ndc_application a
+          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.applicationno
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
           $where
           AND pi.createdtime = (
             SELECT MAX(wf.createdtime)
             FROM eg_wf_processinstance_v2 wf
-            WHERE wf.businessid = a.uuid
+            WHERE wf.businessid = a.applicationno
+            GROUP BY wf.businessid
           ) )t
       searchParams:
        condition: AND
@@ -107,15 +99,15 @@ SearchDefinitions:
        - name: a.uuid
          isMandatory: false
          jsonPath: $.searchCriteria.uuid
+       - name: a.applicationno
+         isMandatory: false
+         jsonPath: $.searchCriteria.applicationNo
        - name: a.applicationstatus
          isMandatory: false
          jsonPath: $.searchCriteria.status
        - name: a.active
          isMandatory: false
          jsonPath: $.searchCriteria.active
-       - name: a.mobile
-         isMandatory: false
-         jsonPath: $.searchCriteria.mobileNumber
        - name: pi.businessservice
          isMandatory: false
          jsonPath: $.searchCriteria.businessservice
@@ -131,9 +123,6 @@ SearchDefinitions:
        - name: a.createdtime
          isMandatory: false
          jsonPath: $.searchCriteria.toDate
-       - name: concat(a.firstname, ' ', a.lastname)
-         isMandatory: false
-         jsonPath: $.searchCriteria.name
        pagination:
          noOfRecords: $.searchCriteria.noOfRecords
          offset: $.searchCriteria.offset  
@@ -148,33 +137,26 @@ SearchDefinitions:
          SELECT row_to_json(result)
           FROM (
             SELECT DISTINCT a.uuid AS uuid,
-              a.firstname,
-              a.lastname,
               a.tenantid,
-              a.mobile,
-              a.email,
-              a.address,
+              a.applicationno,
               a.applicationstatus,
-              a.active,
+              a.active,a.reason,
               a.createdby AS a_createdby,
               a.lastmodifiedby AS a_lastmodifiedby,
               a.createdtime AS a_createdtime,
               a.lastmodifiedtime AS a_lastmodifiedtime,
               pi.businessservice AS wf_businessservice,
-              pi.action AS wf_action,
-              pi.assigner AS wf_assigner,
               pi.status AS wf_status,
-              pi.createdby AS wf_createdby,
-              pi.lastmodifiedby AS wf_lastmodifiedby,
               assg.assignee AS wf_assignee
-            FROM eg_ndc_applicants a
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
+            FROM eg_ndc_application a
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
             AND pi.createdtime = (
               SELECT MAX(wf.createdtime)
               FROM eg_wf_processinstance_v2 wf
-              WHERE wf.businessid = a.uuid
+              WHERE wf.businessid = a.applicationno
+              GROUP BY wf.businessid
             )
             ORDER BY a.createdtime DESC
             OFFSET $offset
@@ -189,15 +171,15 @@ SearchDefinitions:
        - name: a.uuid
          isMandatory: false
          jsonPath: $.searchCriteria.uuid
+       - name: a.applicationno
+         isMandatory: false
+         jsonPath: $.searchCriteria.applicationNo
        - name: a.applicationstatus
          isMandatory: false
          jsonPath: $.searchCriteria.status
        - name: a.active
          isMandatory: false
          jsonPath: $.searchCriteria.active
-       - name: a.mobile
-         isMandatory: false
-         jsonPath: $.searchCriteria.mobileNumber
        - name: pi.businessservice
          isMandatory: false
          jsonPath: $.searchCriteria.businessservice
@@ -213,15 +195,12 @@ SearchDefinitions:
        - name: a.createdtime
          isMandatory: false
          jsonPath: $.searchCriteria.toDate
-       - name: concat(a.firstname, ' ', a.lastname)
-         isMandatory: false
-         jsonPath: $.searchCriteria.name
        pagination:
          noOfRecords: $.searchCriteria.noOfRecords
          offset: $.searchCriteria.offset
       output:
-       jsonFormat: {"ResponseInfo": {}, "NDCApplications": []}
-       outJsonPath: $.NDCApplications
+       jsonFormat: {"ResponseInfo": {}, "Applications": []}
+       outJsonPath: $.Applications
        responseInfoPath: $.ResponseInfo
 
       
@@ -231,33 +210,29 @@ SearchDefinitions:
           SELECT row_to_json(result) FROM (
             SELECT DISTINCT
               a.uuid AS uuid,
-              a.firstname,
-              a.lastname,
+              a.applicationno,
               a.tenantid,
-              a.mobile,
-              a.email,
-              a.address,
               a.applicationstatus,
-              a.active,
+              a.active,a.reason,
               a.createdby AS a_createdby,
               a.lastmodifiedby AS a_lastmodifiedby,
               a.createdtime AS a_createdtime,
               a.lastmodifiedtime AS a_lastmodifiedtime,
               pi.businessservice AS wf_businessservice,
-              pi.action AS wf_action,
-              pi.assigner AS wf_assigner,
+
               pi.status AS wf_status,
               pi.createdby AS wf_createdby,
               pi.lastmodifiedby AS wf_lastmodifiedby,
               assg.assignee AS wf_assignee
-            FROM eg_ndc_applicants a
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.uuid
+            FROM eg_ndc_application a
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
             AND pi.createdtime = (
               SELECT MAX(wf.createdtime)
               FROM eg_wf_processinstance_v2 wf
-              WHERE wf.businessid = a.uuid
+              WHERE wf.businessid = a.applicationno
+              GROUP BY wf.businessid
             )
             ORDER BY a.createdtime DESC
           ) result
@@ -270,15 +245,18 @@ SearchDefinitions:
        - name: a.uuid
          isMandatory: false
          jsonPath: $.searchCriteria.uuid
+       - name: a.applicationno
+         isMandatory: false
+         jsonPath: $.searchCriteria.applicationNo
        - name: a.applicationstatus
          isMandatory: false
          jsonPath: $.searchCriteria.status
+       - name: assg.assignee
+         isMandatory: false
+         jsonPath: $.searchCriteria.assignee
        - name: a.active
          isMandatory: false
          jsonPath: $.searchCriteria.active
-       - name: a.mobile
-         isMandatory: false
-         jsonPath: $.searchCriteria.mobileNumber
        - name: pi.businessservice
          isMandatory: false
          jsonPath: $.searchCriteria.businessservice
@@ -294,13 +272,10 @@ SearchDefinitions:
        - name: a.createdtime
          isMandatory: false
          jsonPath: $.searchCriteria.toDate
-       - name: concat(a.firstname, ' ', a.lastname)
-         isMandatory: false
-         jsonPath: $.searchCriteria.name
        pagination:
          noOfRecords: $.searchCriteria.noOfRecords
          offset: $.searchCriteria.offset
       output:
-       jsonFormat: {"ResponseInfo": {}, "NDCApplications": []}
-       outJsonPath: $.NDCApplications
+       jsonFormat: {"ResponseInfo": {}, "Applications": []}
+       outJsonPath: $.Applications
        responseInfoPath: $.ResponseInfo
