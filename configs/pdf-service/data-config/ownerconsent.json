@@ -1,3 +1,4 @@
+
 {
   "key": "ownerconsent",
   "DataConfigs": {
@@ -18,6 +19,23 @@
                   }
                 },
                 {
+                  "variable": "Ulblisttype",
+                  "value": {
+                    "path": "$.applicationData.Ulblisttype"
+                  }
+                },
+                {
+                  "variable": "designationTitle",
+                  "value": {
+                    "path": "$.applicationData.Ulblisttype"
+                  },
+                  "transformation": {
+                    "Municipal Corporation": "The Municipal Commissioner",
+                    "*": "The Executive Officer"
+                  }
+                },
+
+                {
                   "variable": "planPermissionNo",
                   "value": {
                     "path": "$.approvalNo"
@@ -29,52 +47,92 @@
                     "path": "$.edcrNumber"
                   }
                 },
-                {
-                  "variable": "name",
+                 {
+                  "variable": "siteAddress",
                   "value": {
-                    "path": "$.applicationData.landInfo.owners[0].name"
+                    "path": "$.applicationData.siteAddress"
                   }
                 },
-                {
-                  "variable": "mobileNumber",
+                 {
+                  "variable": "architectId",
                   "value": {
-                    "path": "$.applicationData.landInfo.owners[0].mobileNumber"
+                    "path": "$.applicationData.architectId"
                   }
                 },
+                 {
+                  "variable": "proUserType",
+                  "value": {
+                    "path": "$.applicationData.typeOfArchitect"
+                  }
+                },
+
+
+                 {
+                "variable": "ownerEmail", 
+                "value": {
+                  "path": "$.userInfo.emailId"
+                },
+                "type": "selectFromRequestInfo"
+               
+              },
+
+
+                 {
+                "variable": "ownername", 
+                "value": {
+                  "path": "$.userInfo.name"
+                },
+                "type":"selectFromRequestInfo"  
+              },
+                 {
+                "variable": "mobileNumber", 
+                "value": {
+                  "path": "$.userInfo.userName"
+                },
+                "type":"selectFromRequestInfo"  
+              },
+               
                 {
                   "variable": "area",
                   "value": {
-                    "path": "$.applicationData.additionalDetails.area"
+                    "path": "$.applicationData.area"
                   }
                 },
                 {
                   "variable": "wardnumber",
                   "value": {
-                    "path": "$.applicationData.additionalDetails.wardnumber"
+                    "path": "$.applicationData.wardnumber"
                   }
                 },
                 {
                   "variable": "ulbname",
                   "value": {
-                    "path": "$.applicationData.additionalDetails.UlbName"
+                    "path": "$.applicationData.UlbName"
                   }
                 },
                 {
-                  "variable": "Ulblisttype",
+                  "variable": "ownerAddress",
                   "value": {
-                    "path": "$.applicationData.additionalDetails.Ulblisttype"
+                    "path": "$.landInfo.owners.correspondenceAddress"
+                  }
+                },
+               
+                {
+                  "variable": "Ulblisttypeori",
+                  "value": {
+                    "path": "$.applicationData.Ulblisttype"
                   }
                 },
                 {
                   "variable": "architectName",
                   "value": {
-                    "path": "$.applicationData.additionalDetails.stakeholderName"
+                    "path": "$.applicationData.architectName"
                   }
                 },
                 {
                   "variable": "architectMobileNumber",
                   "value": {
-                    "path": "$.applicationData.additionalDetails.architectMobileNumber"
+                    "path": "$.applicationData.architectMobileNumber"
                   }
                 },
                 {
@@ -87,25 +145,25 @@
                 {
                   "variable": "architecttype",
                   "value": {
-                    "path": "$.applicationData.additionalDetails.typeOfArchitect"
+                    "path": "$.applicationData.typeOfArchitect"
                   }
                 },
                 {
-                  "variable": "architectid",
+                  "variable": "proarchitectid",
                   "value": {
-                    "path": "$.applicationData.additionalDetails.architectid"
+                    "path": "$.applicationData.architectid"
                   }
                 },
                 {
                   "variable": "wardnumber",
                   "value": {
-                    "path": "$.applicationData.additionalDetails.wardnumber"
+                    "path": "$.applicationData.wardnumber"
                   }
                 },
                 {
                   "variable": "khasraNumber",
                   "value": {
-                    "path": "$.applicationData.additionalDetails.khasraNumber"
+                    "path": "$.applicationData.khasraNumber"
                   }
                 },  
                 {
@@ -562,7 +620,7 @@
                 {
                   "variable": "reportrunDate",
                   "value": {
-                    "path": "$.additionalDetails.runDate"
+                    "path": "$.runDate"
                   },
                   "type":"date"
                 },
@@ -580,6 +638,7 @@
                 }
               ]
           },
+         
           {
             "externalAPI": [
               {

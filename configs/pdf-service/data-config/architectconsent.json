@@ -1,3 +1,4 @@
+
 {
     "key": "architectconsent",
     "DataConfigs": {
@@ -29,6 +30,8 @@
                     "path": "$.edcrNumber"
                   }
                 },
+               
+               
                 {
                   "variable": "name",
                   "value": {
@@ -54,9 +57,21 @@
                   }
                 },
                 {
+                  "variable": "siteAddress",
+                  "value": {
+                    "path": "$.landInfo.address.locality.name"
+                  }
+                },
+                {
                   "variable": "otpverifiedtime",
                   "value": {
                     "path": "$.additionalDetails.TimeStamp"
+                  }
+                },
+                {
+                  "variable": "professionalAddress",
+                  "value": {
+                    "path": "$.landInfo.owners[0].correspondenceAddress"
                   }
                 },
                 {
@@ -65,6 +80,7 @@
                     "path": "$.additionalDetails.UlbName"
                   }
                 },
+               
                 {
                   "variable": "Ulblisttype",
                   "value": {
@@ -75,12 +91,6 @@
                   "variable": "architectName",
                   "value": {
                     "path": "$.additionalDetails.stakeholderName"
-                  }
-                },
-                {
-                  "variable": "zone",
-                  "value": {
-                    "path": "$.additionalDetails.zonenumber"
                   }
                 },
                 {
@@ -95,10 +105,26 @@
                     "path": "$.RequestInfo.userInfo.mobileNumber"
                   }
                 },
+               
+                 {
+                "variable": "architectEmail", 
+                "value": {
+                  "path": "$.userInfo.emailId"
+                },
+                "type": "selectFromRequestInfo"
+               
+              },
+                
                 {
                   "variable": "architecttype",
                   "value": {
                     "path": "$.additionalDetails.typeOfArchitect"
+                  }
+                },
+                {
+                  "variable": "permanentAddress",
+                  "value": {
+                    "path": "$.landInfo.owners[0].permanentAddress"
                   }
                 },
                 {
