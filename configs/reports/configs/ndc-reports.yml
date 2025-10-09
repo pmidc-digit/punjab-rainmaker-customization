@@ -139,12 +139,6 @@ ReportDefinitions:
     wrapper: true
     isMandatory: false
     searchClause: AND tenantid = $tenantid
-  - name: collector_code
-    label: collector_code
-    type: string
-    source: ndc
-    isMandatory: false
-    searchClause: AND collector_code = $collector_code
   - name: fromDate
     label: fromDate
     type: epoch
@@ -161,7 +155,7 @@ ReportDefinitions:
       -- Use CTE to force query plan, compute & use CTE later
       WITH unique_transactions AS (
        SELECT
-         p.id AS transaction_id, p.createdtime,p.totalamountpaid,
+         p.id AS transaction_id, p.createdtime,pd.amountpaid,
          CASE
          WHEN p.paymentmode IN ('POSTAL_ORDER','POTAL_ORDER') THEN 'POSTAL_ORDER'
          WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN 'OFFLINE_RTGS'
@@ -171,26 +165,26 @@ ReportDefinitions:
          WHEN p.paymentmode IN ('ONLINE') THEN 'ONLINE'
          ELSE p.paymentmode
          END AS mode_norm,
-         emp.code AS collector_code, pd.businessservice, p.tenantid
+         COALESCE(emp.code, 'SELF') AS collector_code,a.uuid AS ndc_id , a.applicationno
        FROM egcl_paymentdetail pd
        JOIN egcl_payment p ON pd.paymentid = p.id
        JOIN egcl_bill bill ON bill.id = pd.billid
-       JOIN eg_ndc_details ndc ON ndc.consumercode = bill.consumercode
+       JOIN eg_ndc_application a ON bill.consumercode = a.applicationno
        LEFT JOIN eg_user u ON u.id::text = p.createdby::text
        LEFT JOIN eg_hrms_employee emp  ON emp.uuid::text = u.uuid::text
-       WHERE p.paymentstatus != 'CANCELLED'
-       AND p.tenantid =$tenantid
-       AND p.createdtime >= $fromDate
-       AND p.createdtime <= $toDate
+       WHERE WHERE pd.businessservice = 'NDC'
+        AND p.paymentstatus != 'CANCELLED'
+        AND p.tenantid =$tenantid
+        AND p.createdtime >= $fromDate
+        AND p.createdtime <= $toDate
        )
        SELECT
-       COALESCE(collector_code, 'SELF') AS collector_code,  
+       collector_code,  
        mode_norm AS payment_mode,
-       SUM(totalamountpaid) AS total_amount,
+       SUM(amountpaid) AS total_amount,
        COUNT(transaction_id) AS total_count
        FROM unique_transactions
        WHERE 1=1
-       -- AND businessservice = 'WS'
   groupby: GROUP BY collector_code, mode_norm
   orderby: ORDER BY collector_code, total_amount DESC
 - reportName: SLAReport
