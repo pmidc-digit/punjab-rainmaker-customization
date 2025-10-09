@@ -207,17 +207,17 @@ ReportDefinitions:
     type: string
     source: ndc
     total: false
-  - name: Applicationnumber
+  - name: ndc_id
     label: Application Number
     type: string
     source: ndc
     total: false
-  - name: Applicationstatus
+  - name: applicationstatus
     label: Application Status
     type: string
     source: ndc
     total: false
-  - name: documentverify_on
+  - name: document_verify_on
     label: Document Verified On
     type: string
     source: ndc
@@ -287,7 +287,7 @@ ReportDefinitions:
       -- Use CTE to force query plan, compute & use CTE later     
        WITH wf_detailed AS (
         SELECT 
-          wf.businessid AS uuid,UPPER(st.applicationstatus) AS applicationstatus,
+          wf.businessid AS applicationno ,UPPER(st.applicationstatus) AS applicationstatus,
           wf.createdtime, wf.lastmodifiedtime, wf.businessservicesla,
           wf.tenantid, wf.id AS processinstanceid
          FROM eg_wf_processinstance_v2 wf 
@@ -297,7 +297,8 @@ ReportDefinitions:
           ),
       stage_times AS (
         SELECT
-         uuid, MAX(CASE WHEN applicationstatus = 'DOCUMENTVERIFY' THEN createdtime END) AS docverify_time,
+         applicationno ,
+         MAX(CASE WHEN applicationstatus = 'DOCUMENTVERIFY' THEN createdtime END) AS docverify_time,
          MAX(CASE WHEN applicationstatus LIKE 'PENDINGAPPROVAL' THEN createdtime END) AS pendingapproval_time,
          MAX(CASE WHEN applicationstatus = 'APPROVED' THEN createdtime END) AS approved_time,
          MAX(CASE WHEN applicationstatus = 'REJECTED' THEN createdtime END) AS rejected_time
@@ -305,8 +306,8 @@ ReportDefinitions:
         GROUP BY uuid
         ),
       stage_assignee AS (
-        SELECT DISTINCT ON (wd.uuid, UPPER(wd.applicationstatus))
-           wd.uuid, UPPER(wd.applicationstatus) AS applicationstatus,
+        SELECT DISTINCT ON (wd.applicationno, UPPER(wd.applicationstatus))
+           wd.applicationno, UPPER(wd.applicationstatus) AS applicationstatus,
            CASE 
              WHEN u.name IS NOT NULL AND u.name <> '' THEN u.name || ' (' || COALESCE(e.code, '') || ')'
               ELSE COALESCE(e.code, '')
@@ -319,7 +320,7 @@ ReportDefinitions:
         ),
       current_holder AS (
          SELECT DISTINCT ON (wf.businessid)
-            wf.businessid AS uuid,
+            wf.businessid AS applicationno,
               CASE 
                 WHEN u.name IS NOT NULL AND u.name <> '' THEN u.name || ' (' || COALESCE(e.code, '') || ')'
               ELSE COALESCE(e.code, '')
@@ -335,7 +336,7 @@ ReportDefinitions:
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
          )
       SELECT
-       n.uuid AS ndc_id, n.tenantid,
+       n.applicationno AS ndc_id, n.tenantid,
        TO_CHAR(TO_TIMESTAMP(st.docverify_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS document_verify_on,
        ROUND(
          CASE 
@@ -380,13 +381,13 @@ ReportDefinitions:
              ) AS employee_name,
             ca.current_stage
           FROM eg_ndc_application n
-          LEFT JOIN stage_times st ON n.uuid = st.uuid
-          LEFT JOIN wf_detailed wd_doc ON n.uuid = wd_doc.uuid AND wd_doc.applicationstatus = 'DOCUMENTVERIFY'
-          LEFT JOIN wf_detailed wd_approve ON n.uuid = wd_approve.uuid AND wd_approve.applicationstatus IN ('APPROVED', 'REJECTED')
-          LEFT JOIN stage_assignee sa_pending ON n.uuid = sa_pending.uuid AND sa_pending.applicationstatus LIKE '%PENDING%APPROVAL%'
-          LEFT JOIN stage_assignee sa_approved ON n.uuid = sa_approved.uuid AND sa_approved.applicationstatus = 'APPROVED'
-          LEFT JOIN stage_assignee sa_rejected ON n.uuid = sa_rejected.uuid AND sa_rejected.applicationstatus = 'REJECTED'
-          LEFT JOIN current_holder ca ON n.uuid = ca.uuid
+          LEFT JOIN stage_times st ON n.applicationno = st.applicationno
+          LEFT JOIN wf_detailed wd_doc ON n.applicationno = wd_doc.applicationno AND wd_doc.applicationstatus = 'DOCUMENTVERIFY'
+          LEFT JOIN wf_detailed wd_approve ON n.applicationno = wd_approve.applicationno AND wd_approve.applicationstatus IN ('APPROVED', 'REJECTED')
+          LEFT JOIN stage_assignee sa_pending ON n.applicationno = sa_pending.applicationno AND sa_pending.applicationstatus LIKE '%PENDING%APPROVAL%'
+          LEFT JOIN stage_assignee sa_approved ON n.applicationno = sa_approved.applicationno AND sa_approved.applicationstatus = 'APPROVED'
+          LEFT JOIN stage_assignee sa_rejected ON n.applicationno = sa_rejected.applicationno AND sa_rejected.applicationstatus = 'REJECTED'
+          LEFT JOIN current_holder ca ON n.applicationno = ca.applicationno
           WHERE n.tenantid = $tenantid
            AND (ca.current_stage IS NULL OR ca.current_stage NOT IN ('APPLY', 'INITIATED', 'PENDINGPAYMENT'))
   orderby: ORDER BY n.createdtime DESC;
