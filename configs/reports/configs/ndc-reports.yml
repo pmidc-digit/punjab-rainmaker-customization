@@ -303,7 +303,7 @@ ReportDefinitions:
          MAX(CASE WHEN applicationstatus = 'APPROVED' THEN createdtime END) AS approved_time,
          MAX(CASE WHEN applicationstatus = 'REJECTED' THEN createdtime END) AS rejected_time
         FROM wf_detailed
-        GROUP BY uuid
+        GROUP BY applicationno
         ),
       stage_assignee AS (
         SELECT DISTINCT ON (wd.applicationno, UPPER(wd.applicationstatus))
@@ -316,7 +316,7 @@ ReportDefinitions:
           JOIN eg_wf_assignee_v2 wa ON wd.processinstanceid = wa.processinstanceid
           LEFT JOIN eg_user u ON u.uuid = wa.assignee
           LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-          ORDER BY wd.uuid, UPPER(wd.applicationstatus), wa.createdtime DESC
+          ORDER BY wd.applicationno, UPPER(wd.applicationstatus), wa.createdtime DESC
         ),
       current_holder AS (
          SELECT DISTINCT ON (wf.businessid)
