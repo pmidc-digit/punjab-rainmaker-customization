@@ -29,11 +29,6 @@ ReportDefinitions:
     type: string
     source: ndc
     total: false
-  - name: address
-    label: address
-    type: string
-    source: ndc
-    total: false
   - name: action
     label: action
     type: string
@@ -54,8 +49,8 @@ ReportDefinitions:
     type: string
     source: ndc
     total: false
-  - name: applicationid
-    label: applicationid
+  - name: applicationno
+    label: applicationno
     type: string
     source: ndc
     total: false
@@ -93,9 +88,9 @@ ReportDefinitions:
   query: |
       -- Use CTE to force query plan, compute & use CTE later
       SELECT 
-        u.name, u.mobilenumber as mobileNumber, u.emailid as emailId,ua.address,a.tenantid,
+        u.name, u.mobilenumber as mobileNumber, u.emailid as emailId,a.tenantid,
         a.action, d.consumercode, a.applicationstatus, d.businessservice, 
-        d.applicationid, d.isduepending, d.status
+        a.applicationno, d.isduepending, d.status
       FROM  eg_user  u
       JOIN eg_ndc_owner AS o ON u.uuid = o.uuid
       JOIN eg_ndc_details AS d ON o.ndcapplicationuuid = d.applicationid
