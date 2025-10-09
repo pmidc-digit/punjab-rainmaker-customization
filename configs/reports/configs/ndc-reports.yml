@@ -167,7 +167,7 @@ ReportDefinitions:
        JOIN eg_ndc_application a ON bill.consumercode = a.applicationno
        LEFT JOIN eg_user u ON u.id::text = p.createdby::text
        LEFT JOIN eg_hrms_employee emp  ON emp.uuid::text = u.uuid::text
-       WHERE WHERE pd.businessservice = 'NDC'
+       WHERE pd.businessservice = 'NDC'
         AND p.paymentstatus != 'CANCELLED'
         AND p.tenantid =$tenantid
         AND p.createdtime >= $fromDate
