@@ -72,10 +72,10 @@
         "style": "noc-table",
         "table": {
           "widths": [
-            "26%",
-            "21%",
             "27%",
-            "26%"
+            "23%",
+            "25%",
+            "25%"
           ],
           "body": [
             [
@@ -124,7 +124,7 @@
             ],
             [
               {
-                "text": "{{payment_date}}",
+                "text": "Payment Date, Time ",
                 "border": [
                   true,
                   false,
@@ -134,7 +134,7 @@
                 "style": "receipt-table-value"
               },
               {
-                "text": "{{paymentDate}}",
+                "text": "{{payment_date_time}}",
                 "border": [
                   false,
                   false,
@@ -164,6 +164,49 @@
                 "style": "receipt-table"
               }
             ],
+
+             [
+              {
+                "text": "Property ID",
+                "border": [
+                  true,
+                  false,
+                  false,
+                  true
+                ],
+                "style": "receipt-table-value"
+              },
+              {
+                "text": "{{propertyID}}",
+                "border": [
+                  false,
+                  false,
+                  false,
+                  true
+                ],
+                "style": "receipt-table"
+              },
+              {
+                "text" : "Father's Name",
+                "border": [
+                  false,
+                  false,
+                  false,
+                  true
+                ],
+                "style": "receipt-table-value"
+              },
+              {
+                "text" : "{{fatherName}}",
+                "border": [
+                  false,
+                  false,
+                  true,
+                  true
+                ],
+                "style": "receipt-table"
+              }
+            ],
             [
               {
                 "text": "Applicant Contact",
@@ -185,18 +228,26 @@
                 ],
                 "style": "receipt-table"
               },
-             
               {
-                "text": "Address",
-                "border": [false,false,false,true],
+                "text" : "Address",
+                "border": [
+                  false,
+                  false,
+                  false,
+                  true
+                ],
                 "style": "receipt-table-value"
               },
               {
-                "text": "{{payerAddress}}",
-                "border": [false,false,true,true],
+                "text" : "{{address}}",
+                "border": [
+                  false,
+                  false,
+                  true,
+                  true
+                ],
                 "style": "receipt-table"
               }
-
             ]
           ]
         },
@@ -234,7 +285,7 @@
                 "style": "receipt-table"
               },
               {
-                "text": "Fee Detail",
+                "text": "Validity date",
                 "border": [
                   false,
                   true,
@@ -244,7 +295,7 @@
                 "style": "receipt-table-value"
               },
               {
-                "text": "{{billNumber}}",
+                "text": "{{fromPeriod}} {{to}} {{toPeriod}}",
                 "border": [
                   false,
                   true,
@@ -276,7 +327,7 @@
                 "style": "receipt-table"
               },
               {
-                "text": "{{paid_amount}}",
+                "text": "Fee Detail",
                 "border": [
                   false,
                   false,
@@ -286,7 +337,7 @@
                 "style": "receipt-table-value"
               },
               {
-                "text": "₹ {{paidAmount}}",
+                "text": "{{billNumber}}",
                 "border": [
                   false,
                   false,
@@ -296,7 +347,48 @@
                 "style": "receipt-table"
               }
             ],
-           
+            [
+              {
+                "text": "NDC Fee",
+                "border": [
+                  true,
+                  false,
+                  false,
+                  false
+                ],
+                "style": "receipt-table-value"
+              },
+              {
+                "text": "₹ {{totalAmount}}",
+                "border": [
+                  false,
+                  false,
+                  false,
+                  false
+                ],
+                "style": "receipt-table"
+              },
+              {
+                "text": "Cow Cess Fee(s)",
+                "border": [
+                  false,
+                  false,
+                  false,
+                  false
+                ],
+                "style": "receipt-table-value"
+              },
+              {
+                "text": "₹ {{cow_fee}}",
+                "border": [
+                  false,
+                  false,
+                  true,
+                  false
+                ],
+                "style": "receipt-table"
+              }
+            ],
             [
               {
                 "text": "{{payment_mode}}",
@@ -408,7 +500,7 @@
                         "style": "receipt-table-value-down"
                     },
                     {
-                        "text": "{{totalAmount}}",
+                        "text": "₹ {{totalAmount}}",
                         "border": [
                             false,
                             true,
@@ -453,8 +545,12 @@
           },
           {
             "text": [
+               {
+                "text": "Mobile No: ",
+                "bold": true
+              },
               {
-                "text": "{{designation}}",
+                "text": "{{generated_mobileNumber}}",
                 "bold": true
               }
             ],
@@ -468,10 +564,8 @@
           }
         ]
       },
-      {
-        "style": "no-signature",
-        "text": "{{no_signature}}"
-      },
+     
+
       {
         "style": "pt-disclaimer",
         "stack": [
@@ -481,31 +575,42 @@
             "style": "pt-disclaimer-value"
           },
           {
-            "text": "{{disclamer_1}}",
-            "bold": true,
-            "style": "pt-disclaimer-value"
-          },
-           {
-            "text": "{{disclamer_2}}",
-            "bold": true,
-            "style": "pt-disclaimer-value"
-          },
-           {
-            "text": "{{disclamer_3}}",
-            "bold": true,
-            "style": "pt-disclaimer-value"
-          },
-           {
-            "text": "{{disclamer_4}}",
-            "bold": true,
-            "style": "pt-disclaimer-value"
-          },
-           {
-            "text": "{{disclamer_5}}",
-            "bold": true,
-            "style": "pt-disclaimer-value"
+            "style": "pt-disclaimer-value",
+            "table": {
+              "widths": [
+                "120%",
+                "*",
+                "*",
+                "*"
+              ],
+              "body": ["{{#variable11}}[{\"text\":\"{{disclaimerContent}}\",\"border\":[false,false,false,false],\"style\":\"pt-disclaimer-value\"}]{{/variable11}}"]
+            },
+            "layout": {}
           }
         ]
+      },
+       {
+        "style": "receipt-approver",
+        "columns": [
+          {
+            "text": [
+              {
+                "text": "Note:- ",
+                "bold": true
+              },
+              {
+                "text": "{{note_section}}",
+                "bold": false
+              }
+            ],
+            "alignment": "left"
+          }
+         
+        ]
+      },
+            {
+        "style": "no-signature",
+        "text": "{{no_signature}}"
       }
     ],
     "styles": {

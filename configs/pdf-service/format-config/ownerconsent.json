@@ -1,3 +1,4 @@
+
 {
     "key": "ownerconsent",
     "config": {
@@ -24,9 +25,18 @@
           ],
           "margin": [0, 0, 0, 2]
         },
+
+         {
+          "text": [
+            "The Municipal Commissioner"
+          ],
+          "margin": [0, 0, 0, 2]
+        },
+       
+
         {
           "text": [
-            "{{Ulblisttype}}"
+            "{{Ulblisttypeori}}"
           ],
           "bold": true,
           "margin": [0, 0, 0, 0]
@@ -40,30 +50,49 @@
         },
         {
           "text": [
-            "Dear Sir or Madam,"
+            "Dear Sir/Madam,"
           ],
-  
+          
+          "bold": true,
           "margin": [0, 0, 0, 7]
         },
-        {
-          "text": [
-            "I/We, Shri/Smt/Kum. ",{"text": "{{name}}", "bold": true},"under signed owner of land bearing Kh. No ",{"text": "{{khasraNumber}}", "bold": true}," of"," ", {"text": "{{Ulblisttype}}", "bold":true}, " - ",{"text": "{{ulbname}}", "bold": true},
-            " Area ",{"text": "{{area}}", "bold": true}," (Sq.mts).",
-            " I/We hereby declare that the ",
-            {"text": "{{architectName}}", "bold": true},
-            " Registration No ",
-            {"text": "{{architectid}}", "bold": true},
-            " is appointed by me/us and is authorized to make representation/application with regard to aforesaid construction to any of the authorities."
-          ],
-          "alignment": "justify"
-        },
-        {
-          "text": [
-            "I/We further declare that I am/We are aware of all the action taken or representation made by the ", {"text": " {{architectName}} {{architecttype}}", "bold": true}," authorized by me/us."
-          ],
-          "alignment": "justify",
-          "margin": [0, 0, 0, 10]
-        },
+         {
+        "text": [
+          "I/We, Shri/Smt/Kum ",
+          { "text": "{{ownername}}", "bold": true },
+          " undersigned owner of land bearing Kh. No ",
+          { "text": "{{khasraNumber}}", "bold": true },
+          " of ",
+          { "text": "{{Ulblisttype}}", "bold": true },
+          " - ",
+          { "text": "{{ulbname}}", "bold": true },
+          " Area ",
+          { "text": "{{area}}", "bold": true },
+          " (Sq.mts), address ",
+          { "text": "{{siteAddress}}", "bold": true },
+          ". Ward Number - ",
+          { "text": "{{wardnumber}}", "bold": true },
+          " City ",
+          { "text": "{{ulbname}}", "bold": true },
+          "."
+        ],
+        "alignment": "justify",
+        "margin": [0, 0, 0, 7]
+      },
+
+     {
+        "text": [
+          "I/We hereby declare that the ","Professional’s Name ",{ "text": "{{proUserType}}", "bold": true }, " having Registration No ",{ "text": "{{proarchitectid}}", "bold": true }," is appointed by me/us and is authorized to make representation/application with regard to aforesaid construction to any of the authorities."
+        ],
+        "margin": [0, 0, 0, 7],
+        "alignment": "justify"
+      },
+
+      {
+        "text": "I/We further declare that I am/We are aware of all the actions taken or representations made by the ARCHITECT authorized by me/us.",
+        "margin": [0, 0, 0, 7]
+      },
+       
         {
           "ol": [
             "That I am/We are sole owner of the site.",
@@ -74,20 +103,46 @@
           "margin": [20, 0, 0, 10]
         },
         {
-          "text": "That above stated facts are true and all the requisite documents uploaded with this E-Naksha plan have been signed by the owner/owners in my presence",
+          "text": "That above stated facts are true and the requisite documents have been uploaded with this building plan and nothing has been concealed thereof.",
           "margin": [0, 0, 0, 25]
         },
+
+
+
+       
+
+        {
+          "text": [
+            "This Document is Verified By OTP at", {"text": " {{otpverifiedtimeowner}}", "bold": true}
+          ],
+          
+         
+          "margin": [0, 0, 0, 7]
+        },
+        
+       
         {
           "columns": [
+             {
+              "width": "auto",
+              "alignment": "left",
+              "stack": [
+                {"text": ["Date : ", {"text": "{{otpverifiedtimeowner}}", "bold": true}]}
+               
+              ]
+            },
             {
               "width": "*",
               "alignment": "right",
               "stack": [
-                {"text": ["Name of Owner : ", {"text": "{{name}}", "bold": true}]},
+                {"text": ["Name of Owner : ", {"text": "{{ownername}}", "bold": true}]},
                 {"text": ["Application Number : ", {"text": "{{applicationNo}}", "bold": true}]},
+                 {"text": ["Address : ", {"text": "{{ownerAddress}}", "bold": true}]},
+                 {"text": ["e-Mail : ", {"text": "{{ownerEmail}}", "bold": true}]},
                 {"text": ["Mobile : ", {"text": "{{mobileNumber}}", "bold": true}]},
                 {"text": ["Signature : ", {"text": "Verified by OTP at {{otpverifiedtimeowner}}", "bold": true}]}
-              ]
+              ],
+               "margin": [0, 20, 0, 0]
             }
           ]
         }
