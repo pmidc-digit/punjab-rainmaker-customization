@@ -1,0 +1,371 @@
+{
+  "key": "adv-permissionletter",
+  "config": {
+    "defaultStyle": {
+      "font": "Cambay"
+    },
+    "content": [
+      {
+        "style": "noc-head",
+        "table": {
+          "widths": [60, "*", 120],
+          "body": [
+            [
+              {
+                "image": "{{logoImage}}",
+                "width": 50,
+                "height": 61.25
+              },
+              {
+                "stack": [
+                  {
+                    "text": "{{logo-header}} {{Municipal_Corporation}}",
+                    "style": "receipt-logo-header"
+                  },
+                  {
+                    "text": "{{serviceType}} Permission Letter",
+                    "style": "receipt-logo-sub-header"
+                  }
+                ],
+                "alignment": "left",
+                "margin": [0, 10, 0, 0]
+              },
+              {
+                "stack": [
+                  {
+                    "text": "{{address}}"
+                  },
+                  {
+                    "text": "{{phoneNumber}}"
+                  },
+                  {
+                    "text": "{{website}}"
+                  },
+                  {
+                    "text": "{{email}}"
+                  }
+                ],
+                "alignment": "right",
+                "color": "#484848",
+                "margin": [-100, 0, -25, 0]
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+      {
+        "style": "noc-table",
+        "table": {
+          "widths": ["55%", "45%"],
+          "body": [
+            [
+              {
+                "text": "",
+                "border": [false, false, false, false]
+              },
+              {
+                "text": "Booking No: {{consumerID}}",
+                "style": "receipt-table-value",
+                "alignment": "right",
+                "border": [false, false, false, false],
+                "margin": [0, 5, 10, 5]
+              }
+            ],
+            [
+              {
+                "stack": [
+                  { "text": "To,", "margin": [0, 0, 0, 2] },
+                  { "text": "{{payerName}}", "margin": [20, 0, 0, 2] },
+                  { "text": "{{payerAddress}}", "margin": [20, 0, 0, 2] }
+                ],
+                "style": "receipt-table",
+                "alignment": "left",
+                "border": [false, false, false, false],
+                "margin": [10, 0, 0, 0]
+              },
+              {
+                "image": "{{qrcodeimage}}",
+                "width": 72,
+                "height": 72,
+                "alignment": "right",
+                "margin": [0, 0, 10, 0],
+                "border": [false, false, false, false]
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+      {
+        "style": "noc-table",
+        "table": {
+          "widths": ["100%"],
+          "body": [
+            [
+              {
+                "stack": [
+                  {
+                    "text": "Subject: Permission to use the Advertisement Holding",
+                    "style": "receipt-table",
+                    "alignment": "left",
+                    "margin": [0, 0, 0, 5],
+                    "bold": true
+                  },
+                  {
+                    "text": "Dear {{payerName}},",
+                    "style": "receipt-table",
+                    "alignment": "left",
+                    "margin": [0, 0, 0, 10]
+                  },
+                  {
+                    "text": "Permission is hereby accorded to use the following holdings for Advertisement purposes:",
+                    "style": "receipt-table",
+                    "alignment": "left",
+                    "margin": [0, 0, 0, 10]
+                  }
+                ],
+                "border": [false, false, false, false],
+                "margin": [0, 5, 0, 5]
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+      {
+        "style": "next-noc-table",
+        "table": {
+          "widths": ["10%", "35%", "35%", "20%"],
+          "body": [
+            [
+              {
+                "text": "Site Id",
+                "style": "receipt-table-value",
+                "border": [false, false, false, false],
+                "alignment": "left",
+                "margin": [10, 0, 0, 0]
+              },
+              {
+                "text": "Site Location",
+                "style": "receipt-table-value",
+                "border": [false, false, false, false],
+                "alignment": "left",
+                "margin": [8, 0, 0, 0]
+              },
+              {
+                "text": "Period of Booking From",
+                "style": "receipt-table-value",
+                "border": [false, false, false, false],
+                "alignment": "left",
+                "margin": [8, 0, 0, 0]
+              },
+              {
+                "text": "Ad Type",
+                "style": "receipt-table-value",
+                "border": [false, false, false, false],
+                "alignment": "left",
+                "margin": [8, 0, 0, 0]
+              }
+            ],
+            "{{#var_cartdetails}}[{\"text\":\"{{advertisementId}}\",\"style\":\"receipt-tableee\",\"alignment\":\"left\",\"border\":[false,false,false,false]},{\"text\":\"{{location}}\",\"style\":\"receipt-tableee\",\"alignment\":\"left\",\"border\":[false,false,false,false]},{\"stack\":[{\"text\":\"{{startDate}} to {{endDate}}\",\"alignment\":\"left\",\"border\":[false,false,false,false]},{\"text\":\"({{numberOfDays}} Days)\",\"alignment\":\"left\",\"margin\":[0,2,0,0],\"border\":[false,false,false,false]}],\"style\":\"receipt-tableee\",\"border\":[false,false,false,false]},{\"text\":\"{{addType}}\",\"style\":\"receipt-tableee\",\"alignment\":\"left\",\"border\":[false,false,false,false]}]{{/var_cartdetails}}"
+          ]
+        },
+        "layout": {}
+      },
+      {
+        "style": "next-noc-table",
+        "table": {
+          "widths": ["auto"],
+          "body": [
+            [
+              {
+                "text": "Total Amount Paid: ₹ {{totalAmount}}",
+                "border": [true, true, true, true],
+                "bold": true,
+                "style": "receipt-table-value-down",
+                "alignment": "left",
+                "margin": [10, 5, 10, 5]
+              }
+            ]
+          ]
+        },
+        "layout": {}
+      },
+      {
+        "style": "next-noc-table",
+        "table": {
+          "widths": ["100%"],
+          "body": [
+            [
+              {
+                "text": "TERMS AND CONDITIONS",
+                "bold": true,
+                "style": "receipt-table-value-down",
+                "alignment": "left",
+                "border": [false, false, false, false],
+                "margin": [0, 6, 0, 6]
+              }
+            ],
+            [
+              {
+                "stack": [
+                  {
+                    "text": "1. Advertisements must comply with all applicable laws and regulations.",
+                    "margin": [0, 2, 0, 2]
+                  },
+                  {
+                    "text": "2. The Provider reserves the right to approve or reject any advertisement submitted.",
+                    "margin": [0, 2, 0, 2]
+                  },
+                  {
+                    "text": "3. Advertisements should not contain any offensive, illegal, or misleading content.",
+                    "margin": [0, 2, 0, 2]
+                  },
+                  {
+                    "text": "4. Advertisers are responsible for ensuring their content does not infringe any intellectual property rights.",
+                    "margin": [0, 2, 0, 2]
+                  },
+                  {
+                    "text": "5. Payment must be made in full at the time of booking.",
+                    "margin": [0, 2, 0, 2]
+                  },
+                  {
+                    "text": "6. The advertisement placement is subject to availability and approval.",
+                    "margin": [0, 2, 0, 2]
+                  },
+                  {
+                    "text": "7. The Advertiser will be charged a cancellation fee if the ad is canceled after booking.",
+                    "margin": [0, 2, 0, 2]
+                  },
+                  {
+                    "text": "8. The Provider is not responsible for any losses caused by a delay in the advertisement placement.",
+                    "margin": [0, 2, 0, 2]
+                  },
+                  {
+                    "text": "9. Advertisers must comply with local noise, safety, and health regulations.",
+                    "margin": [0, 2, 0, 2]
+                  },
+                  {
+                    "text": "10. All advertisements are subject to the Provider’s final approval and may be modified as needed.",
+                    "margin": [0, 2, 0, 2]
+                  }
+                ],
+                "style": "receipt-table",
+                "alignment": "left",
+                "border": [false, false, false, false],
+                "margin": [10, 6, 10, 6]
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+      {
+        "style": "receipt-approver",
+        "columns": [
+          {
+            "text": [
+              {
+                "text": "{{generated_on}}: ",
+                "bold": true
+              },
+              {
+                "text": "{{currentDate}}",
+                "bold": false
+              }
+            ],
+            "alignment": "left"
+          }
+        ]
+      },
+      {
+        "style": "no-signature",
+        "text": "{{no_signature}}",
+        "alignment": "center"
+      }
+    ],
+    "styles": {
+      "noc-head": {
+        "margin": [-30, -30, 0, 1]
+      },
+      "receipt-logo-header": {
+        "color": "#000000",
+        "fontSize": 14,
+        "bold": true,
+        "letterSpacing": 0.74,
+        "margin": [0, 0, 0, 5]
+      },
+      "receipt-logo-sub-header": {
+        "color": "#000000",
+        "fontSize": 12,
+        "letterSpacing": 0.6
+      },
+      "noc-table": {
+        "fontSize": 10,
+        "color": "#000000",
+        "margin": [-25, 10, -22, -4]
+      },
+      "receipt-table-value-total-Qr": {
+        "alignment": "right",
+        "margin": [0, 3, 10, 0]
+      },
+      "receipt-table-value-down": {
+        "color": "#000000",
+        "bold": false,
+        "fontSize": 10,
+        "fontWeight": 400,
+        "alignment": "left",
+        "margin": [3, 5, 0, 5]
+      },
+      "next-noc-table": {
+        "fontSize": 10,
+        "color": "#000000",
+        "margin": [-25, 28, -22, -8]
+      },
+      "receipt-table-value": {
+        "color": "#000000",
+        "bold": true,
+        "fontSize": 10,
+        "fontWeight": 500,
+        "margin": [-2, 2, 0, 1]
+      },
+      "receipt-table": {
+        "color": "#000000",
+        "bold": false,
+        "fontSize": 10,
+        "fontWeight": 400,
+        "margin": [-30, 2, 0, 1]
+      },
+
+      "receipt-tableee": {
+        "color": "#000000",
+        "bold": false,
+        "fontSize": 10,
+        "fontWeight": 400,
+        "margin": [8, 0, 0, 0]
+      },
+      "receipt-approver": {
+        "fontSize": 10,
+        "bold": true,
+        "margin": [-27, 50, -10, 0],
+        "color": "#484848"
+      },
+      "no-signature": {
+        "fontSize": 12,
+        "margin": [-27, 35, -10, 0],
+        "color": "#484848"
+      },
+      "pt-disclaimer": {
+        "fontSize": 12,
+        "margin": [-27, 30, -10, 0],
+        "color": "#484848"
+      },
+      "pt-disclaimer-value": {
+        "fontSize": 12,
+        "margin": [2, 3, 0, 0],
+        "color": "#484848"
+      }
+    }
+  }
+}

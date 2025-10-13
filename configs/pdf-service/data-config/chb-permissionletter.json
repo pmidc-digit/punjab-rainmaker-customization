@@ -1,6 +1,6 @@
 {
-  "key": "adv-receipt",
-  "documentType": "ADV_RECEIPT",
+  "key": "chb-permissionletter",
+  "documentType": "CHB_PERMISSIONLETTER",
   "DataConfigs": {
     "moduleName": "rainmaker-common",
     "version": "1.0.0",
@@ -39,6 +39,65 @@
                 }
               },
               {
+                "variable": "payerAddress",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].address.addressLine1"
+                }
+              },
+              {
+                "variable": "hallCode",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].bookingSlotDetails[0].hallCode"
+                }
+              },
+              {
+                "variable": "communityHallName",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].communityHallName"
+                }
+              },
+              {
+                "variable": "bookingDate",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].bookingSlotDetails[0].bookingDate"
+                }
+              },
+              {
+                "variable": "bookingEndDate",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].bookingSlotDetails[0].bookingEndDate"
+                }
+              },
+              {
+                "variable": "purpose",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].purpose.purpose",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                }
+              },
+              {
+                "variable": "accountNumber",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].applicantDetail.accountNumber"
+                }
+              },
+              {
+                "variable": "ifscCode",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].applicantDetail.ifscCode"
+                }
+              },
+              {
+                "variable": "bankName",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].applicantDetail.bankName"
+                }
+              },
+              {
                 "variable": "paymentStatus",
                 "value": {
                   "path": "$.paymentStatus"
@@ -74,44 +133,7 @@
                 }
               },
               {
-                "variable": "adv_service_charge",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_SERVICE_CHARGE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "advServiceCharge",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[0].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "adv_booking_fees",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_BOOKING_FEES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "advBookingFees",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[1].adjustedAmount"
-                }
-              },
-              {
-                "variable": "adv_sgst",
+                "variable": "chb_sgst",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_SGST"
                 },
@@ -123,13 +145,275 @@
                 }
               },
               {
-                "variable": "advSgst",
+                "variable": "chbSgst",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[0].adjustedAmount"
+                }
+              },
+
+              {
+                "variable": "chb_service_charge",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_SERVICE_CHARGE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "chbServiceCharge",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[1].adjustedAmount"
+                }
+              },
+              {
+                "variable": "chb_booking_fees",
+                "value": {
+                  "path": "BILLINGSERVICE_BUSINESSSERVICE_RT_COMMUNITY_CENTRE_BOOKING_FEE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "chbBookingFees",
                 "value": {
                   "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[2].adjustedAmount"
                 }
               },
+
               {
-                "variable": "adv_cgst",
+                "variable": "chb_security_deposit",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWELDGMENT_SECURITY_DEPOSIT_LABEL"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              [
+                {
+                  "variable": "term_1",
+                  "value": {
+                    "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_1"
+                  },
+                  "type": "label",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                },
+                {
+                  "variable": "term_2",
+                  "value": {
+                    "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_2"
+                  },
+                  "type": "label",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                },
+                {
+                  "variable": "term_3",
+                  "value": {
+                    "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_3"
+                  },
+                  "type": "label",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                },
+                {
+                  "variable": "term_4",
+                  "value": {
+                    "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_4"
+                  },
+                  "type": "label",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                },
+                {
+                  "variable": "term_5",
+                  "value": {
+                    "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_5"
+                  },
+                  "type": "label",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                },
+                {
+                  "variable": "term_6",
+                  "value": {
+                    "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_6"
+                  },
+                  "type": "label",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                },
+                {
+                  "variable": "term_7",
+                  "value": {
+                    "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_7"
+                  },
+                  "type": "label",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                },
+                {
+                  "variable": "term_8",
+                  "value": {
+                    "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_8"
+                  },
+                  "type": "label",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                },
+                {
+                  "variable": "term_9",
+                  "value": {
+                    "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_9"
+                  },
+                  "type": "label",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                },
+                {
+                  "variable": "term_10",
+                  "value": {
+                    "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_10"
+                  },
+                  "type": "label",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                },
+                {
+                  "variable": "term_11",
+                  "value": {
+                    "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_11"
+                  },
+                  "type": "label",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                },
+                {
+                  "variable": "term_12",
+                  "value": {
+                    "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_12"
+                  },
+                  "type": "label",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                },
+                {
+                  "variable": "term_13",
+                  "value": {
+                    "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_13"
+                  },
+                  "type": "label",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                },
+                {
+                  "variable": "term_14",
+                  "value": {
+                    "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_14"
+                  },
+                  "type": "label",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                },
+                {
+                  "variable": "term_15",
+                  "value": {
+                    "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_15"
+                  },
+                  "type": "label",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                },
+                {
+                  "variable": "term_16",
+                  "value": {
+                    "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_16"
+                  },
+                  "type": "label",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                },
+                {
+                  "variable": "term_17",
+                  "value": {
+                    "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_17"
+                  },
+                  "type": "label",
+                  "localisation": {
+                    "required": true,
+                    "prefix": null,
+                    "module": "rainmaker-common"
+                  }
+                }
+              ],
+              {
+                "variable": "chbSecurityDeposit",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[3].adjustedAmount"
+                }
+              },
+              {
+                "variable": "chb_cgst",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_CGST"
                 },
@@ -141,26 +425,7 @@
                 }
               },
               {
-                "variable": "advCgst",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[3].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "adv_security_deposit",
-                "value": {
-                  "path": "ADV_SECURITY_DEPOSIT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "advSecurityDeposit",
+                "variable": "chbCgst",
                 "value": {
                   "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[4].adjustedAmount"
                 }

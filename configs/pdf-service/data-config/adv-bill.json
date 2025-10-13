@@ -1,6 +1,6 @@
 {
-  "key": "adv-receipt",
-  "documentType": "ADV_RECEIPT",
+  "key": "adv-bill",
+  "documentType": "ADV_BILL",
   "DataConfigs": {
     "moduleName": "rainmaker-common",
     "version": "1.0.0",
@@ -235,6 +235,20 @@
                 "type": "date"
               },
               {
+                "variable": "currentDate",
+                "value": {
+                  "path": "$.bookingData[0].currentTime"
+                },
+                "type": "date"
+              },
+              {
+                "variable": "currentTime",
+                "value": {
+                  "path": "$.bookingData[0].currentTime"
+                },
+                "type": "time"
+              },
+              {
                 "variable": "consumerID",
                 "value": {
                   "path": "$.paymentDetails[0].bill.consumerCode"
@@ -292,6 +306,18 @@
                 "variable": "payment_date",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAYMENT_DATE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "current_date",
+                "value": {
+                  "path": "ADS_DATE"
                 },
                 "type": "label",
                 "localisation": {
@@ -361,6 +387,18 @@
                 }
               },
               {
+                "variable": "booking_no",
+                "value": {
+                  "path": "ADS_BOOKING_NO"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
                 "variable": "paid_amount",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAID_AMOUNT"
@@ -370,6 +408,82 @@
                   "required": true,
                   "prefix": null,
                   "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "var_cartdetails",
+                "value": {
+                  "path": "$.bookingData[0].bookingApplication[0].cartDetails[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "string",
+                  "scema": [
+                    {
+                      "variable": "location",
+                      "value": "location",
+                      "localisation": {
+                        "required": true,
+                        "prefix": null,
+                        "module": "rainmaker-common"
+                      }
+                    },
+                    {
+                      "variable": "advertisementId",
+                      "value": "advertisementId"
+                    },
+                    {
+                      "variable": "startDate",
+                      "value": "startDate"
+                    },
+                    {
+                      "variable": "endDate",
+                      "value": "endDate"
+                    },
+                    {
+                      "variable": "numberOfDays",
+                      "value": "numberOfDays"
+                    },
+                    {
+                      "variable": "addType",
+                      "value": "addType",
+                      "localisation": {
+                        "required": true,
+                        "prefix": null,
+                        "module": "rainmaker-common"
+                      }
+                    },
+                    {
+                      "variable": "faceArea",
+                      "value": "faceArea",
+                      "localisation": {
+                        "required": true,
+                        "prefix": null,
+                        "module": "rainmaker-common"
+                      }
+                    },
+                    {
+                      "variable": "nightLight",
+                      "value": "nightLight"
+                    },
+                    {
+                      "variable": "status",
+                      "value": "status",
+                      "localisation": {
+                        "required": true,
+                        "prefix": null,
+                        "module": "rainmaker-common"
+                      }
+                    },
+                    {
+                      "variable": "amount",
+                      "value": "amount"
+                    },
+                    {
+                      "variable": "amountForDaysChosen",
+                      "value": "amountForDaysChosen"
+                    }
+                  ]
                 }
               },
               {
@@ -445,9 +559,9 @@
                 }
               },
               {
-                "variable": "generated_by",
+                "variable": "generated_on",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_GENERATED_BY"
+                  "path": "GENERATED_ON_DATE"
                 },
                 "type": "label",
                 "localisation": {
