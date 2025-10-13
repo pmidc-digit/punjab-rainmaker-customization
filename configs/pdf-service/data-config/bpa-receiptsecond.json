@@ -1,5 +1,5 @@
 {
-  "key": "bpa-receipt",
+  "key": "bpa-receiptsecond",
   "documentType":"BPA_RECEIPT",
   "DataConfigs": {
     "moduleName": "rainmaker-common",
@@ -19,6 +19,67 @@
                   "path": "$.payerName"
                 }
               },
+
+              {
+      "variable": "bpaLabourCess",
+      "value": { "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[0].amount" }
+    },
+    {
+      "variable": "bpaGaushalaChargesCess",
+      "value": { "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[1].amount" }
+    },
+    {
+      "variable": "bpaMiningCharges",
+      "value": { "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[2].amount" }
+    },
+    {
+      "variable": "bpaSubDivisionCharges",
+      "value": { "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[3].amount" }
+    },
+    {
+      "variable": "bpaDevelopmentCharges",
+      "value": { "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[4].amount" }
+    },
+    {
+      "variable": "bpaOtherCharges",
+      "value": { "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[5].amount" }
+    },
+    {
+      "variable": "bpaClubbingCharges",
+      "value": { "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[6].amount" }
+    },
+    {
+      "variable": "bpaMalbaCharges",
+      "value": { "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[7].amount" }
+    },
+    {
+      "variable": "bpaLessAdjustmentPlot",
+      "value": { "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[8].amount" }
+    },
+    {
+      "variable": "bpaRainWaterHarvestingCharges",
+      "value": { "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[9].amount" }
+    },
+    {
+      "variable": "bpaExternalDevelopmentCharges",
+      "value": { "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[10].amount" }
+    },
+    {
+      "variable": "bpaCluCharges",
+      "value": { "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[11].amount" }
+    },
+    {
+      "variable": "bpaWaterCharges",
+      "value": { "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[12].amount" }
+    },
+    {
+      "variable": "bpaProcessingFees",
+      "value": { "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[13].amount" }
+    },
+    {
+      "variable": "bpaUrbanDevelopmentCess",
+      "value": { "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[14].amount" }
+    },
          
              
               {
@@ -43,7 +104,7 @@
               {
                 "variable": "paymentType", 
                 "value": {
-                  "path": "BPA_PAYMENT_TYPE1"
+                  "path": "BPA_PAYMENT_TYPE2"
                 },
                 "type": "label",
                 "localisation": {
