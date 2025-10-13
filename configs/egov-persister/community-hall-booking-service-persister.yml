@@ -38,7 +38,7 @@ serviceMaps:
    isTransaction: true
    queryMaps:
 
-       - query: INSERT INTO public.eg_chb_booking_detail(booking_id, booking_no, payment_date, application_date, tenant_id, community_hall_code, booking_status, special_category, purpose, purpose_description, receipt_no, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+       - query: INSERT INTO public.eg_chb_booking_detail(booking_id, booking_no, payment_date, application_date, tenant_id, community_hall_code,community_hall_name,booking_status, special_category, purpose, purpose_description, receipt_no, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?);
          basePath: hallsBookingApplication
          jsonMaps:
           - jsonPath: $.hallsBookingApplication.bookingId
@@ -52,6 +52,8 @@ serviceMaps:
           - jsonPath: $.hallsBookingApplication.tenantId
 
           - jsonPath: $.hallsBookingApplication.communityHallCode
+
+          - jsonPath: $.hallsBookingApplication.communityHallName
 
           - jsonPath: $.hallsBookingApplication.bookingStatus
 
