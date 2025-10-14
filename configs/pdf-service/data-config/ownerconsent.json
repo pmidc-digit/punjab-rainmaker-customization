@@ -1,3 +1,4 @@
+
 {
   "key": "ownerconsent",
   "DataConfigs": {
@@ -18,9 +19,32 @@
                   }
                 },
                 {
+                  "variable": "Ulblisttype",
+                  "value": {
+                    "path": "$.applicationData.additionalDetails.Ulblisttype"
+                  }
+                },
+                {
+                  "variable": "designationTitle",
+                  "value": {
+                    "path": "$.applicationData.additionalDetails.Ulblisttype"
+                  },
+                  "transformation": {
+                    "Municipal Corporation": "The Municipal Commissioner",
+                    "*": "The Executive Officer"
+                  }
+                },
+
+                {
                   "variable": "planPermissionNo",
                   "value": {
                     "path": "$.approvalNo"
+                  }
+                },
+                {
+                  "variable": "stakeHolderName",
+                  "value": {
+                    "path": "$.applicationData.additionalDetails.stakeholderName"
                   }
                 },
                 {
@@ -29,18 +53,51 @@
                     "path": "$.edcrNumber"
                   }
                 },
-                {
-                  "variable": "name",
+                 {
+                  "variable": "siteAddress",
                   "value": {
-                    "path": "$.applicationData.additionalDetails.ownerName"
+                    "path": "$.applicationData.landInfo.address.locality.name"
                   }
                 },
-                {
-                  "variable": "mobileNumber",
+                 {
+                  "variable": "architectId",
                   "value": {
-                    "path": "$.applicationData.landInfo.owners[0].mobileNumber"
+                    "path": "$.applicationData.additionalDetails.architectId"
                   }
                 },
+                 {
+                  "variable": "proUserType",
+                  "value": {
+                    "path": "$.applicationData.additionalDetails.typeOfArchitect"
+                  }
+                },
+
+
+                 {
+                "variable": "ownerEmail", 
+                "value": {
+                  "path": "$.userInfo.emailId"
+                },
+                "type": "selectFromRequestInfo"
+               
+              },
+
+
+                 {
+                "variable": "ownername", 
+                "value": {
+                  "path": "$.userInfo.name"
+                },
+                "type":"selectFromRequestInfo"  
+              },
+                 {
+                "variable": "mobileNumber", 
+                "value": {
+                  "path": "$.userInfo.userName"
+                },
+                "type":"selectFromRequestInfo"  
+              },
+               
                 {
                   "variable": "area",
                   "value": {
@@ -54,13 +111,26 @@
                   }
                 },
                 {
+                  "variable": "zoneNumber",
+                  "value": {
+                    "path": "$.applicationData.additionalDetails.zonenumber"
+                  }
+                },
+                {
                   "variable": "ulbname",
                   "value": {
                     "path": "$.applicationData.additionalDetails.UlbName"
                   }
                 },
                 {
-                  "variable": "Ulblisttype",
+                  "variable": "ownerAddress",
+                  "value": {
+                    "path": "$.applicationData.landInfo.owners[0].permanentAddress"
+                  }
+                },
+               
+                {
+                  "variable": "Ulblisttypeori",
                   "value": {
                     "path": "$.applicationData.additionalDetails.Ulblisttype"
                   }
@@ -80,7 +150,7 @@
                 {
                   "variable": "otpverifiedtimeowner",
                   "value": {
-                    "path": "$.applicationData.additionalDetails.TimeStamp"
+                    "path": "$.applicationData.TimeStamp"
                   }
                 },
                 
@@ -91,7 +161,7 @@
                   }
                 },
                 {
-                  "variable": "architectid",
+                  "variable": "proarchitectid",
                   "value": {
                     "path": "$.applicationData.additionalDetails.architectid"
                   }
@@ -562,7 +632,7 @@
                 {
                   "variable": "reportrunDate",
                   "value": {
-                    "path": "$.additionalDetails.runDate"
+                    "path": "$.runDate"
                   },
                   "type":"date"
                 },
@@ -580,6 +650,7 @@
                 }
               ]
           },
+         
           {
             "externalAPI": [
               {

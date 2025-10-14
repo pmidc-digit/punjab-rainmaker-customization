@@ -75,7 +75,7 @@
               {
                 "variable": "ownerName",
                 "value": {
-                  "path": "$.additionalDetails.ownerName"
+                  "path": "$.landInfo.owners[0].name"
                 }
               },
               {
@@ -95,7 +95,7 @@
               {
                 "variable": "submissionDate",
                 "value": {
-                  "path": "$.additionalDetails.submissionDate"
+                  "path": "$.additionalDetails.runDate"
                 },
                 "type": "date"
               },
@@ -162,7 +162,13 @@
               {
                 "variable": "ownersWithAddress",
                 "value": {
-                  "path": "$.additionalDetails.ownersWithAddress"  
+                  "path": "$.landInfo.owners[0].name"  
+                }
+              },
+              {
+                "variable": "ownersWithName",
+                "value": {
+                  "path": "$.landInfo.owners[0].permanentAddress"  
                 }
               },
               {
@@ -372,7 +378,7 @@
                 }
               },
               {
-                "variable": "NAME_OF_STAKEHOLFDER_CONTENT",
+                "variable": "Name Of ",
                 "value": {
                   "path": "BPA_PDF_NAME_OF_STAKEHOLFDER_CONTENT"
                 },
@@ -419,18 +425,19 @@
                   "module": "rainmaker-bpa"
                 }
               },
-              {
+             {
                 "variable": "SUBJECT_CONTENT",
                 "value": {
-                  "path": "BPA_PDF_SUBJECT_CONTENT"
+                  "path": "$.additionalDetails.Ulblisttype"
                 },
                 "type": "label",
                 "localisation": {
                   "required": true,
-                  "prefix": null,
+                  "prefix": "BPA_PDF_SUBJECT_CONTENT_",
                   "module": "rainmaker-bpa"
                 }
               },
+
               {
                 "variable": "SUBJECT_CONTENT2",
                 "value": {
@@ -479,18 +486,14 @@
                   "module": "rainmaker-bpa"
                 }
               },
-              {
+               {
                 "variable": "RESIDENTIAL_PLOTTED",
                 "value": {
-                  "path": "BPA_PDF_RESIDENTIAL_PLOTTED"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-bpa"
+                  "path": "$.additionalDetails.usage"
+                  
                 }
               },
+             
               {
                 "variable": "BUILDING_HAVING",
                 "value": {
@@ -506,14 +509,10 @@
               {
                 "variable": "PLOT_SIZE",
                 "value": {
-                  "path": "BPA_PDF_PLOT_SIZE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-bpa"
+                  "path": "$.edcrDetail.planDetail.planInformation[0].plotArea"
                 }
+               
+              
               },
               {
                 "variable": "SELF_CERTIFIED_UNDER",
@@ -624,7 +623,7 @@
                 }
               },
               {
-                "variable": "TERMS",
+                "variable": "BPA_TERMS",
                 "value": {
                   "path": "BPA_PDF_TERMS"
                 },
@@ -636,7 +635,7 @@
                 }
               },
               {
-                "variable": "TERMS2",
+                "variable": "BPA_TERMS2",
                 "value": {
                   "path": "BPA_PDF_TERMS2"
                 },
@@ -648,7 +647,7 @@
                 }
               },
               {
-                "variable": "TERMS3",
+                "variable": "BPA_TERMS3",
                 "value": {
                   "path": "BPA_PDF_TERMS3"
                 },
@@ -660,7 +659,7 @@
                 }
               },
               {
-                "variable": "TERMS4",
+                "variable": "BPA_TERMS4",
                 "value": {
                   "path": "BPA_PDF_TERMS4"
                 },
@@ -672,7 +671,7 @@
                 }
               },
               {
-                "variable": "TERMS5",
+                "variable": "BPA_TERMS5",
                 "value": {
                   "path": "BPA_PDF_TERMS5"
                 },
@@ -684,7 +683,7 @@
                 }
               },
               {
-                "variable": "TERMS6",
+                "variable": "BPA_TERMS6",
                 "value": {
                   "path": "BPA_PDF_TERMS6"
                 },
@@ -696,7 +695,7 @@
                 }
               },
               {
-                "variable": "TERMS7",
+                "variable": "BPA_TERMS7",
                 "value": {
                   "path": "BPA_PDF_TERMS7"
                 },
@@ -708,7 +707,7 @@
                 }
               },
               {
-                "variable": "TERMS8",
+                "variable": "BPA_TERMS8",
                 "value": {
                   "path": "BPA_PDF_TERMS8"
                 },
@@ -720,7 +719,7 @@
                 }
               },
               {
-                "variable": "TERMS9",
+                "variable": "BPA_TERMS9",
                 "value": {
                   "path": "BPA_PDF_TERMS9"
                 },
@@ -732,7 +731,7 @@
                 }
               },
               {
-                "variable": "TERMS10",
+                "variable": "BPA_TERMS10",
                 "value": {
                   "path": "BPA_PDF_TERMS10"
                 },
@@ -744,7 +743,7 @@
                 }
               },
               {
-                "variable": "TERMS11",
+                "variable": "BPA_TERMS11",
                 "value": {
                   "path": "BPA_PDF_TERMS11"
                 },
@@ -756,7 +755,7 @@
                 }
               },
               {
-                "variable": "TERMS11",
+                "variable": "BPA_TERMS12",
                 "value": {
                   "path": "BPA_PDF_TERMS11"
                 },
@@ -1035,13 +1034,15 @@
                 "variable": "KHATA_NO",
                 "value": {
                   "path": "BPA_PDF_KHATANO_TXT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-bpa"
                 }
+               
+              },
+              {
+                "variable": "KHATA_NO",
+                "value": {
+                  "path": "BPA_PDF_KHATANO_TXT"
+                }
+               
               },
               {
                 "variable": "HOLDING_NO",
@@ -1311,7 +1312,13 @@
               {
                 "variable": "khataNo",
                 "value": {
-                  "path": "$.edcrDetail[0].planDetail.planInformation.khataNo"
+                  "path": "$.additionalDetails.wardnumber"
+                }
+              },
+              {
+                "variable": "wardNo",
+                "value": {
+                  "path": "$.edcrDetail[0].planDetail.planInfoProperties.KHATA_NO"
                 }
               },
               {
