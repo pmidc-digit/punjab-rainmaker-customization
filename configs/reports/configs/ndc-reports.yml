@@ -241,6 +241,11 @@ ReportDefinitions:
     type: string
     source: ndc
     total: false
+  - name: employee_code
+    label: Employee Code / Current Holder Code
+    type: string
+    source: ndc
+    total: false
   - name: current_stage
     label: Current Stage
     type: string
@@ -292,10 +297,8 @@ ReportDefinitions:
       stage_assignee AS (
         SELECT DISTINCT ON (wd.applicationno, UPPER(wd.applicationstatus))
            wd.applicationno, UPPER(wd.applicationstatus) AS applicationstatus,
-           CASE 
-             WHEN u.name IS NOT NULL AND u.name <> '' THEN u.name || ' (' || COALESCE(e.code, '') || ')'
-              ELSE COALESCE(e.code, '')
-           END AS assignee_name
+           u.name AS assignee_name_name,
+           e.code AS assignee_name_code
           FROM wf_detailed wd
           JOIN eg_wf_assignee_v2 wa ON wd.processinstanceid = wa.processinstanceid
           LEFT JOIN eg_user u ON u.uuid = wa.assignee
@@ -305,10 +308,8 @@ ReportDefinitions:
       current_holder AS (
          SELECT DISTINCT ON (wf.businessid)
             wf.businessid AS applicationno,
-              CASE 
-                WHEN u.name IS NOT NULL AND u.name <> '' THEN u.name || ' (' || COALESCE(e.code, '') || ')'
-              ELSE COALESCE(e.code, '')
-              END AS current_holder,
+            u.name AS current_holder_name,
+            e.code AS current_holder_code,
             UPPER(st.applicationstatus) AS current_stage
         FROM eg_wf_processinstance_v2 wf
         JOIN eg_wf_state_v2 st ON wf.status = st.uuid
@@ -360,9 +361,12 @@ ReportDefinitions:
              THEN 'BREACHED'
             ELSE NULL
            END AS approval_rejection_sla_status,
-          COALESCE(
-              sa_approved.assignee_name,   sa_rejected.assignee_name,   sa_pending.assignee_name,     ca.current_holder
-             ) AS employee_name,
+           COALESCE(
+             sa_approved.assignee_name_name, sa_rejected.assignee_name_name, sa_pending.assignee_name_name, ca.current_holder_name
+                ) AS employee_name,
+           COALESCE(
+             sa_approved.assignee_name_code, sa_rejected.assignee_name_code, sa_pending.assignee_name_code, ca.current_holder_code
+                 ) AS employee_code,
             ca.current_stage
           FROM eg_ndc_application n
           LEFT JOIN stage_times st ON n.applicationno = st.applicationno
