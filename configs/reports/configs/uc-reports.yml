@@ -1209,8 +1209,8 @@ ReportDefinitions:
         JOIN eg_user ON payment.createdby::integer = eg_user.id
         WHERE 
         egcl_bill.businessservice NOT IN ('PT', 'TL', 'FIRENOC', 'WS', 'SW', 'WS.ONE_TIME_FEE')
-          AND payment.paymentstatus <> 'CANCELLED'
-    groupby: GROUP BY eg_echallan.challanno, egcl_paymentdetail.receiptdate, payment.instrumentdate, egcl_paymentdetail.manualreceiptdate
+          AND payment.paymentstatus <> 'CANCELLED' AND payment.tenantid=$tenantid
+    groupby: GROUP BY eg_echallan.challanno, egcl_paymentdetail.receiptdate,egcl_paymentdetail.receiptnumber, payment.instrumentdate, egcl_paymentdetail.manualreceiptdate
     orderby: ORDER BY egcl_paymentdetail.receiptnumber DESC
 
 
