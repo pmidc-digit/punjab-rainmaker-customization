@@ -14,13 +14,13 @@ ReportDefinitions:
     type: string
     source: ndc
     total: false
-  - name: mobileNumber
-    label: mobileNumber
+  - name: mobilenumber
+    label: mobile Number
     type: string
     source: ndc
     total: false
-  - name: emailId
-    label: emailId
+  - name: email id
+    label: email Id
     type: string
     source: ndc
     total: false
@@ -88,7 +88,7 @@ ReportDefinitions:
   query: |
       -- Use CTE to force query plan, compute & use CTE later
       SELECT 
-        u.name, u.mobilenumber as mobileNumber, u.emailid as emailId,a.tenantid,
+        u.name, u.mobilenumber as mobilenumber, u.emailid as emailid,a.tenantid,
         a.action, d.consumercode, a.applicationstatus, d.businessservice, 
         a.applicationno, d.isduepending, d.status
       FROM  eg_user  u
@@ -201,11 +201,6 @@ ReportDefinitions:
     type: string
     source: ndc
     total: false
-  - name: applicationstatus
-    label: Application Status
-    type: string
-    source: ndc
-    total: false
   - name: document_verify_on
     label: Document Verified On
     type: string
@@ -241,7 +236,7 @@ ReportDefinitions:
     type: string
     source: ndc
     total: false
-  - name: employee_name
+  - name: name
     label: Employee / Current Holder
     type: string
     source: ndc
@@ -367,7 +362,7 @@ ReportDefinitions:
            END AS approval_rejection_sla_status,
           COALESCE(
               sa_approved.assignee_name,   sa_rejected.assignee_name,   sa_pending.assignee_name,     ca.current_holder
-             ) AS employee_name,
+             ) AS name,
             ca.current_stage
           FROM eg_ndc_application n
           LEFT JOIN stage_times st ON n.applicationno = st.applicationno
