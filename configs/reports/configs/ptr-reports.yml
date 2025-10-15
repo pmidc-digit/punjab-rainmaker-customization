@@ -362,7 +362,7 @@ ReportDefinitions:
               THEN 'IN-PROGRESS'
              ELSE 'AWAITING DOCVERIFY'
          END AS sla_status,
-         COALESCE(ae.employee_name, '-') AS _assigned_employee_name, COALESCE(ae.employee_code, '-') AS assigned_employee_code
+         COALESCE(ae.employee_name, '-') AS assigned_employee_name, COALESCE(ae.employee_code, '-') AS assigned_employee_code
          FROM eg_ptr_registration ptr
          LEFT JOIN status_times st ON ptr.applicationnumber = st.uuid
          LEFT JOIN latest_status ls ON ptr.applicationnumber = ls.uuid
