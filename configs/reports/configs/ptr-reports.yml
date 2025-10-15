@@ -24,7 +24,7 @@ ReportDefinitions:
     type: string
     source: ptr
     total: false
-  - name: tenantid
+  - name: tenant
     label: tenantid
     type: string
     source: ptr
@@ -88,7 +88,7 @@ ReportDefinitions:
   - name: applicationtype
     label: applicationtype
     type: singlevaluelist
-    pattern: list://NE%:NEWAPPLICATION,RE%:RENEW
+    pattern: list://NEWAPPLICATION:NEWAPPLICATION,RENEWAPPLICATION:RENEWAPPLICATION
     source: ptr
     isMandatory: true
     searchClause: AND r.applicationtype = $applicationtype
@@ -116,11 +116,11 @@ ReportDefinitions:
       -- Use CTE to force query plan, compute & use CTE later
        SELECT
           r.applicationnumber, r.applicationtype, r.status,
-          split_part(r.tenantid, '.', 2) AS tenant_shortname,
+          split_part(r.tenantid, '.', 2) AS tenant,
           pd.petname, pd.pettype, pd.breedtype, pd.petage,
           pd.petgender, pd.petcolor, pd.identificationmark,
           pd.vaccinationnumber, pd.doctorname, pd.clinicname,
-          u.mobilenumber AS mobilenumber, u.name AS ownername,
+          u.mobilenumber , u.name ,
           pay.totalamount,  pay.createdtime AS paymentcreatedtime
         FROM eg_ptr_registration AS r
         LEFT JOIN eg_ptr_owner AS o ON o.ptrregistrationid = r.id
@@ -263,8 +263,13 @@ ReportDefinitions:
     type: string
     source: ptr
     total: false
-  - name: assigned_employee
-    label: Assigned employee
+  - name: assigned_employee_name
+    label: assigned_employee_name
+    type: string
+    source: ptr
+    total: false
+  - name: assigned_employee_code
+    label: assigned_employee_code
     type: string
     source: ptr
     total: false
@@ -356,7 +361,7 @@ ReportDefinitions:
               THEN 'IN-PROGRESS'
              ELSE 'AWAITING DOCVERIFY'
          END AS sla_status,
-         COALESCE(ae.employee_name || ' (' || ae.employee_code || ')', '-') AS assigned_employee
+         COALESCE(ae.employee_name, '-') AS _assigned_employee_name, COALESCE(ae.employee_code, '-') AS assigned_employee_code
          FROM eg_ptr_registration ptr
          LEFT JOIN status_times st ON ptr.applicationnumber = st.uuid
          LEFT JOIN latest_status ls ON ptr.applicationnumber = ls.uuid
