@@ -1,0 +1,381 @@
+---
+ReportDefinitions:
+- reportName: ApplicationDetailReport
+  decryptionPathId: NDCAPPLICATION
+  summary: Details of applicant in ndc service
+  version: 1.0.0
+  moduleName: rainmaker-ndc
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: name
+    label: name
+    type: string
+    source: ndc
+    total: false
+  - name: mobilenumber
+    label: mobilenumber
+    type: string
+    source: ndc
+    total: false
+  - name: emailid
+    label: emailid
+    type: string
+    source: ndc
+    total: false
+  - name: tenantid
+    label: tenantid
+    type: string
+    source: ndc
+    total: false
+  - name: action
+    label: action
+    type: string
+    source: ndc
+    total: false
+  - name: consumercode
+    label: consumercode
+    type: string
+    source: ndc
+    total: false
+  - name: applicationstatus
+    label: applicationstatus
+    type: string
+    source: ndc
+    total: false
+  - name: businessservice
+    label: businessservice
+    type: string
+    source: ndc
+    total: false
+  - name: applicationno
+    label: applicationno
+    type: string
+    source: ndc
+    total: false
+  - name: isduepending
+    label: isduepending
+    type: string
+    source: ndc
+    total: false
+  - name: status
+    label: status
+    type: string
+    source: ndc
+    total: false
+  searchParams:
+  - name: fromDate
+    label: fromDate
+    type: epoch
+    source: ndc
+    isMandatory: true
+    searchClause: AND a.createdtime >= $fromDate
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: ndc
+    isMandatory: true
+    searchClause: AND a.createdtime <= $toDate
+  - name: tenantid
+    label: tenantid
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: ndc
+    wrapper: true
+    isMandatory: false
+    searchClause: AND a.tenantid = $tenantid
+  query: |
+      -- Use CTE to force query plan, compute & use CTE later
+      SELECT 
+        u.name, u.mobilenumber , u.emailid ,a.tenantid,
+        a.action, d.consumercode, a.applicationstatus, d.businessservice, 
+        a.applicationno, d.isduepending, d.status
+      FROM  eg_user  u
+      JOIN eg_ndc_owner AS o ON u.uuid = o.uuid
+      JOIN eg_ndc_details AS d ON o.ndcapplicationuuid = d.applicationid
+      JOIN eg_ndc_application AS a ON a.uuid = o.ndcapplicationuuid
+      LEFT JOIN eg_user_address AS ua ON ua.userid = u.id
+      WHERE 1=1
+- reportName: CollectionsReport
+  summary: Collections
+  version: 1.0.0
+  moduleName: rainmaker-ndc
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: collector_code
+    label: collector_code
+    type: string
+    source: ndc
+    total: false
+  - name: payment_mode
+    label: payment_mode
+    type: string
+    source: ndc
+    total: false
+  - name: total_amount
+    label: total_amount
+    type: string
+    source: ndc
+    total: true
+  - name: total_count
+    label: total_count
+    type: string
+    source: ndc
+    total: false
+  searchParams:
+  - name: tenantid
+    label: tenantid
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: ndc
+    wrapper: true
+    isMandatory: false
+    searchClause: AND tenantid = $tenantid
+  - name: fromDate
+    label: fromDate
+    type: epoch
+    source: ndc
+    isMandatory: true
+    searchClause: AND createdtime >= $fromDate
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: ndc
+    isMandatory: true
+    searchClause: AND createdtime <= $toDate
+  query: |
+      -- Use CTE to force query plan, compute & use CTE later
+      WITH unique_transactions AS (
+       SELECT
+         p.id AS transaction_id, p.createdtime,pd.amountpaid,
+         CASE
+         WHEN p.paymentmode IN ('POSTAL_ORDER','POTAL_ORDER') THEN 'POSTAL_ORDER'
+         WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN 'OFFLINE_RTGS'
+         WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN 'OFFLINE_NEFT'
+         WHEN p.paymentmode IN ('CASH','OFFLINE_CASH') THEN 'CASH'
+         WHEN p.paymentmode IN ('CARD','DEBIT_CARD','CREDIT_CARD','OFFLINE_CARD') THEN 'CARD'
+         WHEN p.paymentmode IN ('ONLINE') THEN 'ONLINE'
+         ELSE p.paymentmode
+         END AS mode_norm,
+         COALESCE(emp.code, 'SELF') AS collector_code,a.uuid AS ndc_id , a.applicationno
+       FROM egcl_paymentdetail pd
+       JOIN egcl_payment p ON pd.paymentid = p.id
+       JOIN egcl_bill bill ON bill.id = pd.billid
+       JOIN eg_ndc_application a ON bill.consumercode = a.applicationno
+       LEFT JOIN eg_user u ON u.id::text = p.createdby::text
+       LEFT JOIN eg_hrms_employee emp  ON emp.uuid::text = u.uuid::text
+       WHERE pd.businessservice = 'NDC'
+        AND p.paymentstatus != 'CANCELLED'
+        AND p.tenantid =$tenantid
+        AND p.createdtime >= $fromDate
+        AND p.createdtime <= $toDate
+       )
+       SELECT
+       collector_code,  
+       mode_norm AS payment_mode,
+       SUM(amountpaid) AS total_amount,
+       COUNT(transaction_id) AS total_count
+       FROM unique_transactions
+       WHERE 1=1
+  groupby: GROUP BY collector_code, mode_norm
+  orderby: ORDER BY collector_code, total_amount DESC
+- reportName: SLAReport
+  decryptionPathId: NDCAPPLICATION
+  summary: SLA report for NDC service
+  version: 1.0.0
+  moduleName: rainmaker-ndc
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: tenantid
+    label: tenantid
+    type: string
+    source: ndc
+    total: false
+  - name: ndc_id
+    label: Application Number
+    type: string
+    source: ndc
+    total: false
+  - name: document_verify_on
+    label: Document Verified On
+    type: string
+    source: ndc
+    total: false
+  - name: approval_or_rejection_on
+    label: Approval / Rejection On
+    type: string
+    source: ndc
+    total: false
+  - name: document_verify_sla_status
+    label: Document Verify SLA Status
+    type: string
+    source: ndc
+    total: false
+  - name: approval_rejection_sla_status
+    label: Approval / Rejection SLA Status
+    type: string
+    source: ndc
+    total: false
+  - name: actual_days_document_verify
+    label: Actual Days for Document Verify
+    type: string
+    source: ndc
+    total: false
+  - name: actual_days_approval_or_reject
+    label: Actual Days for Approve / Reject
+    type: string
+    source: ndc
+    total: false
+  - name: sla_days
+    label: SLA Days 
+    type: string
+    source: ndc
+    total: false
+  - name: employee_name
+    label: employee_name
+    type: string
+    source: ndc
+    total: false
+  - name: employee_code
+    label: Employee Code / Current Holder Code
+    type: string
+    source: ndc
+    total: false
+  - name: current_stage
+    label: Current Stage
+    type: string
+    source: ndc
+    total: false
+  searchParams:
+  - name: fromDate
+    label: From Date
+    type: epoch
+    source: ndc
+    isMandatory: true
+    searchClause: AND n.createdtime >= $fromDate
+  - name: toDate
+    label: To Date
+    type: epoch
+    source: ndc
+    isMandatory: true
+    searchClause: AND n.createdtime <= $toDate
+  - name: tenantid
+    label: Tenant ID
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: ndc
+    wrapper: true
+    isMandatory: false
+    searchClause: AND n.tenantid = $tenantid
+  query: |
+      -- Use CTE to force query plan, compute & use CTE later     
+       WITH wf_detailed AS (
+        SELECT 
+          wf.businessid AS applicationno ,UPPER(st.applicationstatus) AS applicationstatus,
+          wf.createdtime, wf.lastmodifiedtime, wf.businessservicesla,
+          wf.tenantid, wf.id AS processinstanceid
+         FROM eg_wf_processinstance_v2 wf 
+         JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+         WHERE wf.tenantid = $tenantid
+         AND wf.businessservice = 'ndc-services'
+          ),
+      stage_times AS (
+        SELECT
+         applicationno ,
+         MAX(CASE WHEN applicationstatus = 'DOCUMENTVERIFY' THEN createdtime END) AS docverify_time,
+         MAX(CASE WHEN applicationstatus LIKE 'PENDINGAPPROVAL' THEN createdtime END) AS pendingapproval_time,
+         MAX(CASE WHEN applicationstatus = 'APPROVED' THEN createdtime END) AS approved_time,
+         MAX(CASE WHEN applicationstatus = 'REJECTED' THEN createdtime END) AS rejected_time
+        FROM wf_detailed
+        GROUP BY applicationno
+        ),
+      stage_assignee AS (
+        SELECT DISTINCT ON (wd.applicationno, UPPER(wd.applicationstatus))
+           wd.applicationno, UPPER(wd.applicationstatus) AS applicationstatus,
+           u.name AS assignee_name_name,
+           e.code AS assignee_name_code
+          FROM wf_detailed wd
+          JOIN eg_wf_assignee_v2 wa ON wd.processinstanceid = wa.processinstanceid
+          LEFT JOIN eg_user u ON u.uuid = wa.assignee
+          LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+          ORDER BY wd.applicationno, UPPER(wd.applicationstatus), wa.createdtime DESC
+        ),
+      current_holder AS (
+         SELECT DISTINCT ON (wf.businessid)
+            wf.businessid AS applicationno,
+            u.name AS current_holder_name,
+            e.code AS current_holder_code,
+            UPPER(st.applicationstatus) AS current_stage
+        FROM eg_wf_processinstance_v2 wf
+        JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+        LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+        LEFT JOIN eg_user u ON u.uuid = wa.assignee
+        LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+        WHERE wf.tenantid = $tenantid
+        AND wf.businessservice = 'ndc-services'
+        ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+         )
+      SELECT
+       n.applicationno AS ndc_id, n.tenantid,
+       TO_CHAR(TO_TIMESTAMP(st.docverify_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS document_verify_on,
+       ROUND(
+         CASE 
+            WHEN st.pendingapproval_time IS NOT NULL AND st.docverify_time IS NOT NULL
+            THEN (st.pendingapproval_time - st.docverify_time) / 86400000.0
+         END
+       ) AS actual_days_document_verify,
+         CASE 
+            WHEN ca.current_stage = 'DOCUMENTVERIFY' THEN 'IN-PROGRESS'
+            WHEN st.pendingapproval_time IS NOT NULL 
+             AND st.docverify_time IS NOT NULL
+             AND (st.pendingapproval_time - st.docverify_time) <= wd_doc.businessservicesla
+         THEN 'MET'
+         WHEN st.pendingapproval_time IS NOT NULL 
+             AND st.docverify_time IS NOT NULL
+             AND (st.pendingapproval_time - st.docverify_time) > wd_doc.businessservicesla
+         THEN 'BREACHED'
+          ELSE NULL
+         END AS document_verify_sla_status,
+        TO_CHAR(TO_TIMESTAMP(COALESCE(st.approved_time, st.rejected_time) / 1000), 'DD-MM-YYYY HH24:MI:SS') AS approval_or_rejection_on,
+        ROUND(wd_approve.businessservicesla / 86400000.0) AS sla_days,
+        ROUND(
+           CASE 
+            WHEN st.pendingapproval_time IS NOT NULL AND COALESCE(st.approved_time, st.rejected_time) IS NOT NULL 
+             THEN (COALESCE(st.approved_time, st.rejected_time) - st.pendingapproval_time) / 86400000.0
+           END
+            ) AS actual_days_approval_or_reject,
+           CASE 
+             WHEN ca.current_stage LIKE '%PENDINGAPPROVAL%' THEN 'IN-PROGRESS'
+             WHEN st.pendingapproval_time IS NOT NULL 
+             AND COALESCE(st.approved_time, st.rejected_time) IS NOT NULL
+             AND (COALESCE(st.approved_time, st.rejected_time) - st.pendingapproval_time) <= wd_approve.businessservicesla
+            THEN 'MET'
+             WHEN st.pendingapproval_time IS NOT NULL 
+             AND COALESCE(st.approved_time, st.rejected_time) IS NOT NULL
+             AND (COALESCE(st.approved_time, st.rejected_time) - st.pendingapproval_time) > wd_approve.businessservicesla
+             THEN 'BREACHED'
+            ELSE NULL
+           END AS approval_rejection_sla_status,
+           COALESCE(
+             sa_approved.assignee_name_name, sa_rejected.assignee_name_name, sa_pending.assignee_name_name, ca.current_holder_name
+                ) AS employee_name,
+           COALESCE(
+             sa_approved.assignee_name_code, sa_rejected.assignee_name_code, sa_pending.assignee_name_code, ca.current_holder_code
+                 ) AS employee_code,
+            ca.current_stage
+          FROM eg_ndc_application n
+          LEFT JOIN stage_times st ON n.applicationno = st.applicationno
+          LEFT JOIN wf_detailed wd_doc ON n.applicationno = wd_doc.applicationno AND wd_doc.applicationstatus = 'DOCUMENTVERIFY'
+          LEFT JOIN wf_detailed wd_approve ON n.applicationno = wd_approve.applicationno AND wd_approve.applicationstatus IN ('APPROVED', 'REJECTED')
+          LEFT JOIN stage_assignee sa_pending ON n.applicationno = sa_pending.applicationno AND sa_pending.applicationstatus LIKE '%PENDING%APPROVAL%'
+          LEFT JOIN stage_assignee sa_approved ON n.applicationno = sa_approved.applicationno AND sa_approved.applicationstatus = 'APPROVED'
+          LEFT JOIN stage_assignee sa_rejected ON n.applicationno = sa_rejected.applicationno AND sa_rejected.applicationstatus = 'REJECTED'
+          LEFT JOIN current_holder ca ON n.applicationno = ca.applicationno
+          WHERE n.tenantid = $tenantid
+           AND (ca.current_stage IS NULL OR ca.current_stage NOT IN ('APPLY', 'INITIATED', 'PENDINGPAYMENT'))
+  orderby: ORDER BY n.createdtime DESC;
