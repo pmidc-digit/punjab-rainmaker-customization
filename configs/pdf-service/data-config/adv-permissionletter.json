@@ -1,6 +1,6 @@
 {
-  "key": "adv-receipt",
-  "documentType": "ADV_RECEIPT",
+  "key": "adv-permissionletter",
+  "documentType": "ADV_PERMISSIONLETTER",
   "DataConfigs": {
     "moduleName": "rainmaker-common",
     "version": "1.0.0",
@@ -89,6 +89,12 @@
                 "variable": "advServiceCharge",
                 "value": {
                   "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[0].adjustedAmount"
+                }
+              },
+              {
+                "variable": "payerAddress",
+                "value": {
+                  "path": "$.bookingData[0].bookingApplication[0].address.addressLine1"
                 }
               },
 
@@ -235,6 +241,20 @@
                 "type": "date"
               },
               {
+                "variable": "currentDate",
+                "value": {
+                  "path": "$.bookingData[0].currentTime"
+                },
+                "type": "date"
+              },
+              {
+                "variable": "currentTime",
+                "value": {
+                  "path": "$.bookingData[0].currentTime"
+                },
+                "type": "time"
+              },
+              {
                 "variable": "consumerID",
                 "value": {
                   "path": "$.paymentDetails[0].bill.consumerCode"
@@ -292,6 +312,18 @@
                 "variable": "payment_date",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAYMENT_DATE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "current_date",
+                "value": {
+                  "path": "ADS_DATE"
                 },
                 "type": "label",
                 "localisation": {
@@ -373,6 +405,90 @@
                 }
               },
               {
+                "variable": "var_cartdetails",
+                "value": {
+                  "path": "$.bookingData[0].bookingApplication[0].cartDetails[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "string",
+                  "scema": [
+                    {
+                      "variable": "location",
+                      "value": "location",
+                      "localisation": {
+                        "required": true,
+                        "prefix": null,
+                        "module": "rainmaker-common"
+                      }
+                    },
+                    {
+                      "variable": "advertisementId",
+                      "value": "advertisementId"
+                    },
+                    {
+                      "variable": "advertisementName",
+                      "value": "advertisementName"
+                    },
+                    {
+                      "variable": "poleNo",
+                      "value": "poleNo"
+                    },
+                    {
+                      "variable": "startDate",
+                      "value": "startDate"
+                    },
+                    {
+                      "variable": "endDate",
+                      "value": "endDate"
+                    },
+                    {
+                      "variable": "numberOfDays",
+                      "value": "numberOfDays"
+                    },
+                    {
+                      "variable": "addType",
+                      "value": "addType",
+                      "localisation": {
+                        "required": true,
+                        "prefix": null,
+                        "module": "rainmaker-common"
+                      }
+                    },
+                    {
+                      "variable": "faceArea",
+                      "value": "faceArea",
+                      "localisation": {
+                        "required": true,
+                        "prefix": null,
+                        "module": "rainmaker-common"
+                      }
+                    },
+                    {
+                      "variable": "nightLight",
+                      "value": "nightLight"
+                    },
+                    {
+                      "variable": "status",
+                      "value": "status",
+                      "localisation": {
+                        "required": true,
+                        "prefix": null,
+                        "module": "rainmaker-common"
+                      }
+                    },
+                    {
+                      "variable": "amount",
+                      "value": "amount"
+                    },
+                    {
+                      "variable": "amountForDaysChosen",
+                      "value": "amountForDaysChosen"
+                    }
+                  ]
+                }
+              },
+              {
                 "variable": "pending_amount",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PENDING_AMOUNT"
@@ -445,9 +561,9 @@
                 }
               },
               {
-                "variable": "generated_by",
+                "variable": "generated_on",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_GENERATED_BY"
+                  "path": "GENERATED_ON_DATE"
                 },
                 "type": "label",
                 "localisation": {
@@ -577,9 +693,180 @@
                 }
               },
               {
+                "variable": "Site_Id",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_SITE_ID"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+
+              {
+                "variable": "Site_Location",
+                "value": {
+                  "path": "CS_ADDCOMPLAINT_LOCATION"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+
+              {
+                "variable": "Period_of_Booking_From",
+                "value": {
+                  "path": "PERIOD_BOOKING"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "Ad_Type",
+                "value": {
+                  "path": "ADS_AD_TYPE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
                 "variable": "total_bill_amount",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_TOTAL_BILL_AMOUNT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+
+              {
+                "variable": "adv_term_1",
+                "value": {
+                  "path": "ADV_TERM_1"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "adv_term_2",
+                "value": {
+                  "path": "ADV_TERM_2"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "adv_term_3",
+                "value": {
+                  "path": "ADV_TERM_3"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "adv_term_4",
+                "value": {
+                  "path": "ADV_TERM_4"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "adv_term_5",
+                "value": {
+                  "path": "ADV_TERM_5"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "adv_term_6",
+                "value": {
+                  "path": "ADV_TERM_6"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "adv_term_7",
+                "value": {
+                  "path": "ADV_TERM_7"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "adv_term_8",
+                "value": {
+                  "path": "ADV_TERM_8"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "adv_term_9",
+                "value": {
+                  "path": "ADV_TERM_9"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "adv_term_10",
+                "value": {
+                  "path": "ADV_TERM_10"
                 },
                 "type": "label",
                 "localisation": {

@@ -1,7 +1,7 @@
 ---
 ReportDefinitions:
 - reportName: PetDetailsReport
-  decryptionPathId: ALL_ACCESS
+  decryptionPathId: PETREPORTS
   summary: Details of pets in pet service
   version: 1.0.0
   moduleName: rainmaker-ptr
@@ -19,12 +19,12 @@ ReportDefinitions:
     type: string
     source: ptr
     total: false
-  - name: mobileNumber
-    label: mobileNumber
+  - name: mobilenumber
+    label: mobilenumber
     type: string
     source: ptr
     total: false
-  - name: tenantid
+  - name: tenant
     label: tenantid
     type: string
     source: ptr
@@ -85,6 +85,13 @@ ReportDefinitions:
     source: ptr
     total: false
   searchParams:
+  - name: applicationtype
+    label: applicationtype
+    type: singlevaluelist
+    pattern: list://NEWAPPLICATION:NEWAPPLICATION,RENEWAPPLICATION:RENEWAPPLICATION
+    source: ptr
+    isMandatory: true
+    searchClause: AND r.applicationtype = $applicationtype
   - name: fromDate
     label: fromDate
     type: epoch
@@ -96,7 +103,7 @@ ReportDefinitions:
     type: epoch
     source: ptr
     isMandatory: true
-    searchClause: AND r.createdtime <= $toDate
+    searchClause: AND r.createdtime<=$toDate
   - name: tenantid
     label: tenantid
     type: singlevaluelist
@@ -108,16 +115,21 @@ ReportDefinitions:
   query: |
       -- Use CTE to force query plan, compute & use CTE later
        SELECT
-        r.applicationnumber,r.status,r.tenantid,
-        pd.petname,pd.pettype,pd.breedtype,
-        pd.petage,pd.petgender,pd.petcolor,
-        pd.identificationmark,pd.vaccinationnumber,pd.doctorname,
-        pd.clinicname,u.mobilenumber as mobileNumber,u.name
-       FROM eg_ptr_registration AS r
-       LEFT JOIN eg_ptr_owner AS o ON o.ptrregistrationid = r.id
-       LEFT JOIN eg_ptr_petdetails AS pd ON r.id = pd.petdetailsid
-       LEFT JOIN eg_user AS u ON u.uuid = o.uuid
-       WHERE 1=1
+          r.applicationnumber, r.applicationtype, r.status,
+          split_part(r.tenantid, '.', 2) AS tenant,
+          pd.petname, pd.pettype, pd.breedtype, pd.petage,
+          pd.petgender, pd.petcolor, pd.identificationmark,
+          pd.vaccinationnumber, pd.doctorname, pd.clinicname,
+          u.mobilenumber , u.name ,
+          pay.totalamount,  pay.createdtime AS paymentcreatedtime
+        FROM eg_ptr_registration AS r
+        LEFT JOIN eg_ptr_owner AS o ON o.ptrregistrationid = r.id
+        LEFT JOIN eg_ptr_petdetails AS pd ON r.id = pd.petdetailsid
+        LEFT JOIN eg_user AS u ON u.uuid = o.uuid
+        LEFT JOIN egcl_bill AS pay ON pay.consumercode = r.applicationnumber
+        WHERE r.status = 'APPROVED'
+        AND r.tenantid = $tenantid
+      
 - reportName: CollectionsReport
   summary: Collections
   version: 1.0.0
@@ -209,6 +221,7 @@ ReportDefinitions:
   groupby: GROUP BY collector_code, mode_norm
   orderby: ORDER BY collector_code, total_amount DESC;
 - reportName: SLAReport
+  decryptionPathId: PETREPORTS
   summary: Sla report for ptr service
   version: 1.0.0
   moduleName: rainmaker-ptr
@@ -221,13 +234,13 @@ ReportDefinitions:
     type: string
     source: ptr
     total: false
-  - name: Applicationnumber
-    label: Applicationnumber
+  - name: applicationnumber
+    label: Application number
     type: string
     source: ptr
     total: false
   - name: applicationstatus
-    label: applicationstatus
+    label: Application status
     type: string
     source: ptr
     total: false
@@ -248,6 +261,16 @@ ReportDefinitions:
     total: false
   - name: sla_status
     label: sla_status
+    type: string
+    source: ptr
+    total: false
+  - name: assigned_employee_name
+    label: assigned_employee_name
+    type: string
+    source: ptr
+    total: false
+  - name: assigned_employee_code
+    label: assigned_employee_code
     type: string
     source: ptr
     total: false
@@ -275,60 +298,75 @@ ReportDefinitions:
   query: |
       -- Use CTE to force query plan, compute & use CTE later
       WITH wf_detailed AS (
-       SELECT
-         wf.businessid AS uuid, st.applicationstatus , wf.createdtime , wf.lastmodifiedtime
-       FROM eg_wf_processinstance_v2 wf
-       JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-       WHERE wf.tenantid = $tenantid
-       AND wf.businessservice = 'ptr' 
+       SELECT 
+        wf.businessid AS uuid, UPPER(st.applicationstatus) AS applicationstatus, wf.createdtime,
+        wf.lastmodifiedtime,  wf.businessservicesla, wf.tenantid, wf.id AS processinstanceid
+        FROM eg_wf_processinstance_v2 wf
+        JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+        WHERE wf.tenantid = $tenantid
+        AND wf.businessservice = 'ptr'
        ),
       status_times AS (
        SELECT
-        uuid,MAX(CASE WHEN UPPER(applicationstatus) = 'DOCUMENTVERIFY' THEN createdtime END) AS docverify_time,
-        MAX(CASE WHEN UPPER(applicationstatus) IN ('APPROVED', 'REJECTED') THEN lastmodifiedtime END) AS final_time
+        uuid,
+        MAX(CASE WHEN applicationstatus = 'DOCUMENTVERIFY' THEN createdtime END) AS docverify_time,
+        MAX(CASE WHEN applicationstatus IN ('APPROVED', 'REJECTED') THEN lastmodifiedtime END) AS final_time
        FROM wf_detailed
        GROUP BY uuid
-        ),
+      ),
       latest_status AS (
        SELECT uuid, applicationstatus
         FROM (
-         SELECT
-           uuid,applicationstatus,lastmodifiedtime, ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY lastmodifiedtime DESC NULLS LAST) AS rn
-         FROM wf_detailed
-          ) z
+          SELECT
+            uuid, applicationstatus, lastmodifiedtime,
+            ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY lastmodifiedtime DESC NULLS LAST) AS rn
+           FROM wf_detailed
+         ) z
          WHERE rn = 1
-          ),
+        ),
       sla_data AS (
        SELECT
         bs.businessservice, bs.businessservicesla
-        FROM eg_wf_businessservice_v2 bs
-        WHERE bs.businessservice = 'ptr' 
-         )
-      SELECT
-       ptr.tenantid, ptr.applicationnumber AS Applicationnumber,
-       ls.applicationstatus, 
-       TO_CHAR(TO_TIMESTAMP(st.docverify_time / 1000), 'DD-MM-YYYY') AS documentverify_on,
-       TO_CHAR(TO_TIMESTAMP(st.final_time / 1000), 'DD-MM-YYYY') AS finalstatus_on,
-       CASE 
-       WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL
-       THEN FLOOR( (st.final_time - st.docverify_time) / 86400000 )
-       WHEN st.docverify_time IS NOT NULL
-       THEN FLOOR( (EXTRACT(EPOCH FROM NOW()) * 1000 - st.docverify_time) / 86400000 )
-       ELSE NULL
-       END AS sla_days,
-       CASE
-       WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL THEN
-       CASE
-       WHEN (st.final_time - st.docverify_time) > sla.businessservicesla THEN 'BREACHED'
-       ELSE 'MEET'
-       END
-       WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
-       THEN 'IN-PROGRESS'
-       ELSE 'AWAITING DOCVERIFY'
-       END AS sla_status
-       FROM eg_ptr_registration ptr
-       LEFT JOIN status_times st ON ptr.applicationnumber = st.uuid
-       LEFT JOIN latest_status ls ON ptr.applicationnumber = ls.uuid
-       JOIN sla_data sla ON 'ptr' = sla.businessservice
-       WHERE UPPER(ls.applicationstatus) IN ('REJECTED', 'APPROVED', 'DOCUMENTVERIFY')
+       FROM eg_wf_businessservice_v2 bs
+        WHERE bs.businessservice = 'ptr'
+       ),
+      assignee_details AS (
+        SELECT DISTINCT ON (wf.businessid)
+          wf.businessid, e.code AS employee_code, u.name AS employee_name
+         FROM eg_wf_processinstance_v2 wf
+         JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+         JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+         JOIN eg_user u ON e.uuid = u.uuid  
+         WHERE wf.tenantid = $tenantid
+         AND wf.businessservice = 'ptr'
+        ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+          )
+       SELECT
+         split_part(ptr.tenantid, '.', 2) AS tenantid, ptr.applicationnumber AS applicationnumber, ls.applicationstatus,
+         TO_CHAR(TO_TIMESTAMP(st.docverify_time / 1000), 'DD-MM-YYYY') AS documentverify_on,
+         TO_CHAR(TO_TIMESTAMP(st.final_time / 1000), 'DD-MM-YYYY') AS finalstatus_on,
+         CASE 
+            WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL
+              THEN FLOOR((st.final_time - st.docverify_time) / 86400000)
+            WHEN st.docverify_time IS NOT NULL
+              THEN FLOOR((EXTRACT(EPOCH FROM NOW()) * 1000 - st.docverify_time) / 86400000)
+          ELSE NULL
+         END AS sla_days,
+         CASE
+            WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL THEN
+               CASE
+                WHEN (st.final_time - st.docverify_time) > sla.businessservicesla THEN 'BREACHED'
+                ELSE 'MEET'
+            END
+             WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
+              THEN 'IN-PROGRESS'
+             ELSE 'AWAITING DOCVERIFY'
+         END AS sla_status,
+          ae.employee_name AS assigned_employee_name, ae.employee_code AS assigned_employee_code
+         FROM eg_ptr_registration ptr
+         LEFT JOIN status_times st ON ptr.applicationnumber = st.uuid
+         LEFT JOIN latest_status ls ON ptr.applicationnumber = ls.uuid
+         JOIN sla_data sla ON 'ptr' = sla.businessservice
+         LEFT JOIN assignee_details ae ON ptr.applicationnumber = ae.businessid
+         WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY', 'INITIATED', 'PENDINGPAYMENT')
   orderby: ORDER BY ptr.createdtime DESC, tenantid, ls.applicationstatus;
