@@ -1,6 +1,6 @@
 {
-  "key": "chbservice-receipt",
-  "documentType": "CHBSERVICE_RECEIPT",
+  "key": "challangeneration-receipt",
+  "documentType": "CHALLANGENERATION_RECEIPT",
   "DataConfigs": {
     "moduleName": "rainmaker-common",
     "version": "1.0.0",
@@ -71,80 +71,6 @@
                 "variable": "totalAmount",
                 "value": {
                   "path": "$.totalAmountPaid"
-                }
-              },
-              {
-                "variable": "chb_sgst",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_SGST"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbSgst",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[0].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "chb_service_charge",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_CHB_SERVICE_CHARGE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbServiceCharge",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[1].adjustedAmount"
-                }
-              },
-              {
-                "variable": "chb_booking_fees",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_BOOKING_FEES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbBookingFees",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[2].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "chb_cgst",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_CGST"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbCgst",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[3].adjustedAmount"
                 }
               },
 
@@ -238,6 +164,43 @@
                 "variable": "payment_receipt",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAYMENT_RECEIPT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+
+              {
+                "variable": "challan_term_1",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_TERM_1"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "challan_term_2",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_TERM_2"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "challan_term_3",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_TERM_3"
                 },
                 "type": "label",
                 "localisation": {
