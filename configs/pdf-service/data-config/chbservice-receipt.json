@@ -88,7 +88,7 @@
               {
                 "variable": "chbSgst",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[0].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SGST')].adjustedAmount"
                 }
               },
 
@@ -107,7 +107,25 @@
               {
                 "variable": "chbServiceCharge",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[1].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_SERVICE_CHARGE')].adjustedAmount"
+                }
+              },
+              {
+                "variable": "chb_discount",
+                "value": {
+                  "path": "CHB_DISCOUNT_AMOUNT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "chbDiscount",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_DISCOUNT')].adjustedAmount"
                 }
               },
               {
@@ -125,7 +143,7 @@
               {
                 "variable": "chbBookingFees",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[2].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BOOKING_FEES')].adjustedAmount"
                 }
               },
 
@@ -144,7 +162,7 @@
               {
                 "variable": "chbCgst",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[3].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CGST')].adjustedAmount"
                 }
               },
 
@@ -581,6 +599,10 @@
               {
                 "variable": "excessAmountPaid",
                 "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
+              },
+              {
+                "variable": "chbDiscountPositive",
+                "formula": "{{chbDiscount}} < 0 ? -{{chbDiscount}} : {{chbDiscount}}"
               }
             ]
           },
