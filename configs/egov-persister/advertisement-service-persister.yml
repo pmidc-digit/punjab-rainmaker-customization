@@ -139,13 +139,25 @@ serviceMaps:
             - jsonPath: $.bookingApplication.bookingId
             
 
-        - query: UPDATE public.eg_adv_cart_detail SET status = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE cart_id = ?;
+        - query: INSERT INTO public.eg_adv_cart_detail(cart_id, booking_id, add_type, location, face_area, night_light, booking_date, booking_from_time, booking_to_time, status, createdby, createdtime, lastmodifiedby, lastmodifiedtime, advertisementid) VALUES (?, ?, ?, ?, ?, ?, ?::DATE, ?::TIME, ?::TIME, ?, ?, ?, ?, ?, ?) ON CONFLICT (cart_id) DO UPDATE SET booking_id = EXCLUDED.booking_id, add_type = EXCLUDED.add_type, location = EXCLUDED.location, face_area = EXCLUDED.face_area, night_light = EXCLUDED.night_light, booking_date = EXCLUDED.booking_date, booking_from_time = EXCLUDED.booking_from_time, booking_to_time = EXCLUDED.booking_to_time, status = EXCLUDED.status, lastmodifiedby = EXCLUDED.lastmodifiedby, lastmodifiedtime = EXCLUDED.lastmodifiedtime, advertisementid = EXCLUDED.advertisementid;
           basePath: bookingApplication.cartDetails.*
           jsonMaps:
+            - jsonPath: $.bookingApplication.cartDetails.*.cartId
+            - jsonPath: $.bookingApplication.cartDetails.*.bookingId
+            - jsonPath: $.bookingApplication.cartDetails.*.addType
+            - jsonPath: $.bookingApplication.cartDetails.*.location
+            - jsonPath: $.bookingApplication.cartDetails.*.faceArea
+            - jsonPath: $.bookingApplication.cartDetails.*.nightLight
+            - jsonPath: $.bookingApplication.cartDetails.*.bookingDate
+            - jsonPath: $.bookingApplication.cartDetails.*.bookingFromTime
+            - jsonPath: $.bookingApplication.cartDetails.*.bookingToTime
             - jsonPath: $.bookingApplication.cartDetails.*.status
+            - jsonPath: $.bookingApplication.auditDetails.createdBy
+            - jsonPath: $.bookingApplication.auditDetails.createdTime
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedBy
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedTime
-            - jsonPath: $.bookingApplication.cartDetails.*.cartId
+            - jsonPath: $.bookingApplication.cartDetails.*.advertisementId
+
 
 
         - query: INSERT INTO public.eg_adv_document_detail(document_detail_id, booking_id, document_type, filestore_id, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
