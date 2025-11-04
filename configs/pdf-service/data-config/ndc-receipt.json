@@ -176,10 +176,15 @@
                 "type": "date"
               },
               {
+                "variable": "epoch", 
+                "value": {
+                  "path": "$.transactionDate"
+                }
+              },
+              {
                 "variable": "payment_date_time", 
                 "value": {
-                  "path": "$.transactionDate",
-                 "preProcess": "new Date(value).toLocaleString('en-GB', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false}).replace(',', '')"
+                  "path": "$.transactionDate"
                 },
                  "type": "date"
               },
@@ -560,7 +565,13 @@
              {
               "variable": "excessAmountPaid",
               "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
-           }
+           },
+           {
+              "variable": "epochIST",
+              "type": "date",
+              "formula": "({{epoch}} + 19800) * 1000",
+              "format": "HH:mm"
+            }
             ]
          },
           {
