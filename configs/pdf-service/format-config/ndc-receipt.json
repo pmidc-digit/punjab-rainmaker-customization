@@ -173,38 +173,15 @@
                 "border": [false, true, false, false],
                 "style": "receipt-table"
               },
-              {
-                "text": "Validity date",
+               {
+                "text": "Total Fee Collected",
                 "border": [false, true, false, false],
                 "style": "receipt-table-value"
               },
               {
-                "text": "{{fromPeriod}} {{to}} {{toPeriod}}",
+                "text": "₹ {{dueAmount}}",
                 "border": [false, true, true, false],
                 "style": "receipt-table"
-              }
-            ],
-            [
-              {
-                "text": "Total Fee Collected",
-                "border": [true, false, false, false],
-                "style": "receipt-table-value"
-              },
-              {
-                "text": "₹ {{dueAmount}}",
-                "border": [false, false, false, false],
-                "style": "receipt-table"
-              },
-              {
-                "text": "Fee Detail",
-                "border": [false, false, false, false],
-                "style": "receipt-table-value"
-              },
-              {
-                "text": "{{billNumber}}",
-                "border": [false, false, true, false],
-                "style": "receipt-table",
-                "font": "Roboto"
               }
             ],
             [
@@ -316,24 +293,27 @@
               }
             ],
             "alignment": "left"
-          },
-          {
-            "text": [
-              {
-                "text": "Mobile No: ",
-                "bold": true
-              },
-              {
-                "text": "{{generated_mobileNumber}}",
-                "bold": true
-              }
-            ],
-            "alignment": "right",
-            "margin": [0, 0, -10, 1]
           }
         ]
       },
-
+      {
+        "style": "pt-disclaimer",
+        "stack": [
+          { "text": "Disclaimer", "bold": true, "style": "pt-disclaimer-header" },
+          
+           {
+          "ol": [
+             " The Payment received by cheque/DD shall be subject to realization.",
+              " The authenticity of this document can be verified by using application number at the weblink “https://mseva.lgpunjab.gov.in/digit-ui/citizen/ndc-home”.",
+              " The responsibility of verification of this document before accepting the same for any legal purpose would rest with the institution/organization or any entity where the document is produced.",
+              " In case of discrepancy please inform the issuing authority.",
+              " You can search your application with this ID."
+          ],
+          "alignment": "justify",
+          "margin": [20, 0, 0, 10]
+        }
+        ]
+      },
       {
         "style": "receipt-approver",
         "columns": [
@@ -413,17 +393,17 @@
       "receipt-approver": {
         "fontSize": 12,
         "bold": true,
-        "margin": [-27, 50, -10, 0],
+        "margin": [-27, 8, -10, 0],
         "color": "#484848"
       },
       "no-signature": {
         "fontSize": 12,
-        "margin": [-27, 35, -10, 0],
+        "margin": [-27, 4, -10, 0],
         "color": "#484848"
       },
       "pt-disclaimer": {
         "fontSize": 12,
-        "margin": [-27, 30, -10, 0],
+        "margin": [-27, 0, -10, 0],
         "color": "#484848"
       },
       "pt-disclaimer-value": {
