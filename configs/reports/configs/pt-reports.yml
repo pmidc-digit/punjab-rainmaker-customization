@@ -9627,6 +9627,110 @@ ReportDefinitions:
       inner join report_properties rp on ro.propertyid=rp.propertyid
       where 1=1 
       
+- reportName: USERNAME_PT_ULB_Wise
+  decryptionPathId: ULBPTDataDumpReport_V2
+  summary: USERNAME PT ULB Wise
+  version: 1.0.0
+  moduleName: rainmaker-pt
+  additionalConfig:
+    print:
+      pdfPageSize: "Legal"
+  sourceColumns:
+  - name: tenantid
+    label: ULB
+    type: string
+    source: pt
+    total: false
+  - name: propertyid
+    label: Property Id
+    type: string
+    source: pt
+    total: false
+  - name: ownername
+    label: Owner Name
+    type: string
+    source: pt
+    total: false
+  - name: guardianname
+    label: Guardian Name
+    type: string
+    source: pt
+    total: false
+  - name: mobileno
+    label: Mobile Number
+    type: string
+    source: pt
+    total: false
+  - name: localitycode
+    label: Locality Code
+    type: string
+    source: pt
+    total: false
+  - name: propertyusagetype
+    label: Property Usagetype
+    type: string
+    source: pt
+    total: false
+  - name: createdtime
+    label: Created Time
+    type: string
+    source: pt
+    total: false
+  - name: propertystatus
+    label: Property Status
+    type: string
+    source: pt
+    total: false
+  searchParams:
+  - name: localityArray
+    label: Zone List
+    type: boundarylist
+    source: pt
+    wrapper: true
+    isMandatory: false
+    searchClause: AND rp.localitycode IN ($localityArray)
+  - name: usageType
+    label: usage Type
+    type: singlevaluelist
+    pattern: 'list://RESIDENTIAL:Residential,NONRESIDENTIAL:NonResidential,MIXED:Mixed'
+    source: pt
+    isMandatory: false
+    searchClause: AND split_part(rp.propertyusagetype,'.',1) = $usageType
+  - name: fromDate
+    label: FromDate
+    type: epoch 
+    source: pt
+    isMandatory: false
+    searchClause: AND rp.createdtime >= $fromDate 
+  - name: toDate
+    label: ToDate
+    type: epoch 
+    source: pt
+    isMandatory: false
+    searchClause: AND rp.createdtime <= $toDate 
+  - name: pstatus
+    label: Status
+    type: singlevaluelist
+    pattern: 'list://ACTIVE:ACTIVE,PENDINGWS:PENDINGWS,INWORKFLOW:INWORKFLOW'
+    source: pt
+    isMandatory: false
+    searchClause: AND rp.propertystatus=$pstatus
+  query: |
+      -- Use CTE to force query plan, compute & use CTE later
+          SELECT 
+          rp.tenantid as tenantid,
+          rp.propertyid as propertyid,
+          ownername as ownername,
+          guardianname as guardianname,       
+          mobilenumber as  mobileno,
+          rp.localitycode as localitycode,
+          rp.propertyusagetype as propertyusagetype,
+          rp.createdtime as createdtime,
+          rp.propertystatus as propertystatus
+      from  report_owners ro
+      inner join report_properties rp on ro.propertyid=rp.propertyid
+      where rp.tenantid = $ulb      
+      
 - reportName: PropertyListReport
   decryptionPathId: ULBPTDataDumpReport_V2
   summary: PT Report for GIS Mapping
