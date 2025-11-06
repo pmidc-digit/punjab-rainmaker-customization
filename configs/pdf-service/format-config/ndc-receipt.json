@@ -4,8 +4,32 @@
     "defaultStyle": {
       "font": "Cambay"
     },
+    "pageSize": "A4",
+"pageMargins": [36, 36, 36, 36],
+"background": {
+  "canvas": [
+    {
+      "type": "rect",
+      "x": 8,
+      "y": 8,
+      "w": 579.28,
+      "h": 825.89,
+      "r": 0,
+      "lineWidth": 0.6,
+      "lineColor": "#000000"
+    }
+  ]
+},
+    
     "content": [
       {
+        "table": {
+          "widths": ["*"],
+          "body": [
+            [
+              {
+                "stack": [
+                  {
         "style": "noc-head",
         "table": {
           "widths": [90, "*", 90],
@@ -72,7 +96,8 @@
                 "text": "{{receiptNo}}",
                 "border": [false, true, false, false],
                 "style": "receipt-table",
-                "font": "Roboto"
+                "font": "Roboto",
+                "fontSize": 10
               },
               {
                 "text": "Application Number",
@@ -83,7 +108,8 @@
                 "text": "{{consumerID}}",
                 "border": [false, true, true, false],
                 "style": "receipt-table",
-                "font": "Roboto"
+                "font": "Roboto",
+                "fontSize": 10
               }
             ],
             [
@@ -118,7 +144,8 @@
               {
                 "text": "{{propertyID}}",
                 "border": [false, false, false, false],
-                "style": "receipt-table"
+                "style": "receipt-table",
+                "font": "Roboto"
               },
               {
                 "text": "Father's Name",
@@ -226,7 +253,8 @@
                 "text": "{{transactionID}}",
                 "border": [false, false, true, false],
                 "style": "receipt-table",
-                "font": "Roboto"
+                "font": "Roboto",
+                "fontSize": 9
               }
             ],
             [
@@ -304,13 +332,11 @@
            {
           "ol": [
              " The Payment received by cheque/DD shall be subject to realization.",
-              " The authenticity of this document can be verified by using application number at the weblink “https://mseva.lgpunjab.gov.in/digit-ui/citizen/ndc-home”.",
               " The responsibility of verification of this document before accepting the same for any legal purpose would rest with the institution/organization or any entity where the document is produced.",
-              " In case of discrepancy please inform the issuing authority.",
-              " You can search your application with this ID."
+              " In case of discrepancy please inform the issuing authority."
           ],
           "alignment": "justify",
-          "margin": [20, 0, 0, 10]
+          "margin": [10, 0, 0, 0]
         }
         ]
       },
@@ -327,90 +353,101 @@
                 "text": "{{note_section}}",
                 "bold": false
               }
-            ],
-            "alignment": "center"
-          }
+            ]          }
         ]
       },
       {
         "style": "no-signature",
-        "text": "{{no_signature}}",
-        "alignment": "center"
+        "text": "{{no_signature}}"      }
+
+
+
+                ]
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
       }
     ],
-    "styles": {
-      "noc-head": {
-        "margin": [-30, -30, 0, 1]
-      },
-      "receipt-logo-header": {
-        "color": "#000000",
-        "fontSize": 14,
-        "bold": true,
-        "letterSpacing": 0.74,
-        "margin": [0, 0, 0, 5]
-      },
-      "receipt-logo-sub-header": {
-        "color": "#000000",
-        "fontSize": 12,
-        "letterSpacing": 0.6
-      },
-      "noc-table": {
-        "fontSize": 12,
-        "color": "#000000",
-        "margin": [-25, 10, -22, -8]
-      },
-      "receipt-table-value-total-Qr": {
-        "alignment": "right",
-        "margin": [0, 3, 10, 0]
-      },
-      "receipt-table-value-down": {
-        "color": "#000000",
-        "bold": false,
-        "fontSize": 12,
-        "fontWeight": 400,
-        "alignment": "left",
-        "margin": [3, 5, 0, 5]
-      },
-      "next-noc-table": {
-        "fontSize": 12,
-        "color": "#000000",
-        "margin": [-25, 28, -22, -8]
-      },
-      "receipt-table-value": {
-        "color": "#000000",
-        "bold": true,
-        "fontSize": 12,
-        "fontWeight": 500,
-        "margin": [-2, 2, 0, 2]
-      },
-      "receipt-table": {
-        "color": "#000000",
-        "bold": false,
-        "fontSize": 12,
-        "fontWeight": 400,
-        "margin": [-30, 2, 0, 2]
-      },
-      "receipt-approver": {
-        "fontSize": 12,
-        "bold": true,
-        "margin": [-27, 8, -10, 0],
-        "color": "#484848"
-      },
-      "no-signature": {
-        "fontSize": 12,
-        "margin": [-27, 4, -10, 0],
-        "color": "#484848"
-      },
-      "pt-disclaimer": {
-        "fontSize": 12,
-        "margin": [-27, 0, -10, 0],
-        "color": "#484848"
-      },
-      "pt-disclaimer-value": {
-        "fontSize": 12,
-        "margin": [2, 3, 0, 0],
-        "color": "#484848"
-      }
-    }
+
+
+
+
+   "styles": {
+  "noc-head": {
+    "margin": [0, 0, 0, 1]
+  },
+  "receipt-logo-header": {
+    "color": "#000000",
+    "fontSize": 14,
+    "bold": true,
+    "letterSpacing": 0.74,
+    "margin": [0, 0, 0, 5]
+  },
+  "receipt-logo-sub-header": {
+    "color": "#000000",
+    "fontSize": 12,
+    "letterSpacing": 0.6
+  },
+  "noc-table": {
+    "fontSize": 12,
+    "color": "#000000",
+    "margin": [0, 10, 0, 8]
+  },
+  "receipt-table-value-total-Qr": {
+    "alignment": "right",
+    "margin": [0, 3, 10, 0]
+  },
+  "receipt-table-value-down": {
+    "color": "#000000",
+    "bold": false,
+    "fontSize": 12,
+    "fontWeight": 400,
+    "alignment": "left",
+    "margin": [3, 5, 0, 5]
+  },
+  "next-noc-table": {
+    "fontSize": 12,
+    "color": "#000000",
+    "margin": [0, 18, 0, 8]
+  },
+  "receipt-table-value": {
+    "color": "#000000",
+    "bold": true,
+    "fontSize": 12,
+    "fontWeight": 500,
+    "margin": [2, 2, 0, 2]
+  },
+  "receipt-table": {
+    "color": "#000000",
+    "bold": false,
+    "fontSize": 12,
+    "fontWeight": 400,
+    "margin": [0, 2, 0, 2]
+  },
+  "receipt-approver": {
+    "fontSize": 12,
+    "bold": true,
+    "margin": [0, 12, 0, 0],
+    "color": "#484848"
+  },
+  "no-signature": {
+    "fontSize": 12,
+    "margin": [0, 6, 0, 0],
+    "color": "#484848"
+  },
+  "pt-disclaimer": {
+    "fontSize": 12,
+    "margin": [0, 6, 0, 0],
+    "color": "#484848"
+  },
+  "pt-disclaimer-value": {
+    "fontSize": 12,
+    "margin": [2, 3, 0, 0],
+    "color": "#484848"
+  }
+}
+
   }
 }

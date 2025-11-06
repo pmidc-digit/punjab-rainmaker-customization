@@ -17,7 +17,12 @@
                     "fontSize": 13
                   },
                   {
-                    "text": "Municipal Corporation Amritsar, C Block, Ranjit Avenue, Amritsar, Punjab",
+                    "text": "Municipal Corporation Amritsar",
+                    "bold": true,
+                    "fontSize": 13
+                  },
+                  {
+                    "text": "C Block, Ranjit Avenue, Amritsar, Punjab",
                     "bold": true,
                     "fontSize": 13
                   },
@@ -42,7 +47,7 @@
           "body": [
             [
               {
-                "text": "{{receipt_no}}",
+                "text": "{{receipt_no}} :",
                 "border": [true, true, false, false],
                 "style": "receipt-table-value"
               },
@@ -54,7 +59,7 @@
                 "fontSize": 10
               },
               {
-                "text": "File No:",
+                "text": "File No :",
                 "border": [false, true, false, false],
                 "style": "receipt-table-value"
               },
@@ -68,7 +73,7 @@
             ],
             [
               {
-                "text": "{{payment_date}}",
+                "text": "{{payment_date}} :",
                 "border": [true, false, false, false],
                 "style": "receipt-table-value"
               },
@@ -78,7 +83,7 @@
                 "style": "receipt-table"
               },
               {
-                "text": "Applicant Name:",
+                "text": "Applicant Name :",
                 "border": [false, false, false, false],
                 "style": "receipt-table-value"
               },
@@ -90,9 +95,10 @@
             ],
             [
               {
-                "text": "Applicant Contact:",
+                "text": "Applicant Contact No. :",
                 "border": [true, false, false, true],
-                "style": "receipt-table-value"
+                "style": "receipt-table-value",
+                "fontSize" :10
               },
               {
                 "text": "{{payerContact}}",
@@ -100,12 +106,12 @@
                 "style": "receipt-table"
               },
               {
-                "text": "Type of Fees:",
+                "text": " ",
                 "border": [false, false, false, true],
                 "style": "receipt-table-value"
               },
               {
-                "text": "{{paymentType}}",
+                "text": " ",
                 "border": [false, false, true, true],
                 "style": "receipt-table",
                 "font": "Roboto"
@@ -116,13 +122,61 @@
       },
 
       {
+        "style": "noc-mock-table",
+        "table": {
+          "widths": ["20%", "12%", "16%", "16%","16%","16%"],
+          "body": [
+            [
+              {
+                "text": "Type of Fees :",
+                "border": [true, true, false, false],
+                "style": "receipt-mock-table-value"
+              },
+              {
+                "text": "{{paymentType}}",
+                "border": [false, true, false, false],
+                "style": "receipt-mock-table",
+                "font": "Roboto",
+                "fontSize": 10
+              },
+              {
+                "text": "Module :",
+                "border": [false, true, false, false],
+                "style": "receipt-mock-table-value"
+              },
+              {
+                "text": "NA",
+                "border": [false, true, true, false],
+                "style": "receipt-mock-table",
+                "font": "Roboto",
+                "fontSize": 10
+              },
+              {
+                "text": "Category :",
+                "border": [false, true, false, false],
+                "style": "receipt-mock-table-value"
+              },
+              {
+                "text": "NA",
+                "border": [false, true, true, false],
+                "style": "receipt-mock-table",
+                "font": "Roboto",
+                "fontSize": 10
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+
+      {
         "style": "next-noc-table",
         "table": {
           "widths": ["30%", "20%", "25%", "25%"],
           "body": [
             [
               {
-                "text": "{{service_type}}",
+                "text": "{{service_type}} :",
                 "border": [true, true, false, false],
                 "style": "receipt-table-value"
               },
@@ -132,7 +186,7 @@
                 "style": "receipt-table"
               },
               {
-                "text": "{{paid_amount}}",
+                "text": "{{paid_amount}} :",
                 "border": [false, true, false, false],
                 "style": "receipt-table-value"
               },
@@ -144,7 +198,7 @@
             ],
             [
               {
-                "text": "Txn ID / UTR:",
+                "text": "Txn ID / UTR :",
                 "border": [true, false, false, true],
                 "style": "receipt-table-value"
               },
@@ -164,13 +218,30 @@
       },
 
       {
+        "style": "noc-mock-table",
+        "table": {
+          "widths": ["100%"],
+          "body": [
+            [
+              {
+                "text": "Detail of Payment",
+                "border": [true, true, false, false],
+                "style": "receipt-mock-table-value"
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+
+      {
         "style": "fee-summary-table",
         "table": {
           "widths": ["45%", "55%"],
           "body": [
             [
               {
-                "text": "Building Application Fees",
+                "text": "Building Application Fees :",
                 "style": "receipt-fee-label",
                 "border": [true, true, false, false]
               },
@@ -182,7 +253,7 @@
             ],
             [
               {
-                "text": "Boundary Wall Fees",
+                "text": "Boundary Wall Fees :",
                 "style": "receipt-fee-label",
                 "border": [true, false, false, false]
               },
@@ -194,7 +265,7 @@
             ],
             [
               {
-                "text": "{{total_amount}}",
+                "text": "{{total_amount}} :",
                 "style": "receipt-total-label",
                 "border": [true, false, false, true],
                 "fillColor": "#f2f2f2"
@@ -211,26 +282,30 @@
       },
 
       {
-        "style": "receipt-approver",
-        "columns": [
-          {
-            "text": [
-              { "text": "{{generated_by}}: ", "bold": true },
-              { "text": "{{user-name}} ," },
-              { "text": "    {{generator_mobileno}}" }
-            ],
-            "alignment": "left"
-          },
-          {
-            "text": [
-              { "text": "Municipal Corporation, Amritsar", "bold": true }
-            ],
-            "alignment": "right",
-            "margin": [0, 0, -10, 0]
-          }
-        ]
-      },
-
+  "style": "receipt-approver",
+  "columns": [
+    {
+      "text": [
+        { "text": "{{generated_by}}: ", "bold": true }
+      ],
+      "alignment": "left"
+    },
+    {
+      "ul": [
+        { "text": "{{user-name}}","listType": "none", "margin": [ -90, 0, 0, 0 ] },
+        { "text": "{{generator_mobileno}}" ,"listType": "none","margin": [ -90, 0, 0, 0 ]}
+      ],
+      "alignment": "left"
+    },
+    {
+      "text": [
+        { "text": "Municipal Corporation, Amritsar", "bold": true }
+      ],
+      "alignment": "right",
+      "margin": [0, 0, -10, 0]
+    }
+  ]
+},
       {
         "style": "pt-disclaimer",
         "stack": [
@@ -264,7 +339,13 @@
       "noc-table": {
         "fontSize": 12,
         "color": "#000000",
-        "margin": [0, 10, 0, 5]
+        "margin": [0, 0, 0, 5]
+      },
+
+      "noc-mock-table": {
+        "fontSize": 12,
+        "color": "#000000",
+        "margin": [0, 2, 0, 0]
       },
       "next-noc-table": {
         "fontSize": 12,
@@ -277,17 +358,29 @@
         "fontSize": 12,
         "margin": [2, 4, 0, 4]
       },
+      "receipt-mock-table-value": {
+        "color": "#000000",
+        "bold": true,
+        "fontSize": 12,
+        "margin": [2, 0, 0, 0]
+      },
       "receipt-table": {
         "color": "#000000",
         "bold": false,
         "fontSize": 12,
         "margin": [2, 4, 0, 4]
       },
+      "receipt-mock-table": {
+        "color": "#000000",
+        "bold": false,
+        "fontSize": 12,
+        "margin": [2, 0, 0, 0]
+      },
       "receipt-fee-label": {
         "fontSize": 12,
         "color": "#000000",
         "bold": true,
-        "margin": [4, 6, 0, 6]
+        "margin": [4, 0, 0, 6]
       },
       "receipt-fee-value": {
         "fontSize": 12,
@@ -311,18 +404,18 @@
       "receipt-approver": {
         "fontSize": 12,
         "bold": true,
-        "margin": [0, 40, 0, 10],
+        "margin": [0, 5, 0, 2],
         "color": "#484848"
       },
       "no-signature": {
         "fontSize": 12,
-        "margin": [0, 25, 0, 5],
+        "margin": [0, 5, 0, 5],
         "color": "#484848",
         "alignment": "center"
       },
       "pt-disclaimer": {
         "fontSize": 11,
-        "margin": [0, 20, 0, 0],
+        "margin": [0, 5, 0, 0],
         "color": "#484848"
       },
       "pt-disclaimer-header": {
