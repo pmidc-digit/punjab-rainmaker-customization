@@ -1,0 +1,127 @@
+ServiceMaps:
+  serviceName: egov-clu-services
+  version: 1.0.0
+  mappings:
+    - topic: save-clu-application
+      configKey: INDEX
+      indexes:
+        - name: clu-application-index
+          type: general
+          id: $.Clu.id, $.Clu.tenantId
+          isBulk: false
+          timeStampField: $.Clu.auditDetails.createdTime
+          jsonPath: $
+          customJsonMapping:
+            indexMapping:
+              Data:
+                id: id
+                tenantId: tenantId
+                applicationNo: applicationNo
+                status: status
+                cluNo: cluNo
+                applicationType: applicationType
+                cluType: cluType
+                accountId: accountId
+                applicationStatus: applicationStatus
+                createdBy: createdBy
+                lastModifiedBy: lastModifiedBy
+                createdTime: createdTime
+                lastModifiedTime: lastModifiedTime
+                documents: documents
+                cluDetails: cluDetails
+                owners: owners
+            fieldMapping:
+              - inJsonPath: $.Clu.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.Clu.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.Clu.applicationNo
+                outJsonPath: $.Data.applicationNo
+              - inJsonPath: $.Clu.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.Clu.cluNo
+                outJsonPath: $.Data.cluNo
+              - inJsonPath: $.Clu.applicationType
+                outJsonPath: $.Data.applicationType
+              - inJsonPath: $.Clu.cluType
+                outJsonPath: $.Data.cluType
+              - inJsonPath: $.Clu.accountId
+                outJsonPath: $.Data.accountId
+              - inJsonPath: $.Clu.applicationStatus
+                outJsonPath: $.Data.applicationStatus
+              - inJsonPath: $.Clu.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+              - inJsonPath: $.Clu.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.Clu.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
+              - inJsonPath: $.Clu.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+              - inJsonPath: $.Clu.documents
+                outJsonPath: $.Data.documents
+              - inJsonPath: $.Clu.cluDetails
+                outJsonPath: $.Data.cluDetails
+              - inJsonPath: $.Clu.owners
+                outJsonPath: $.Data.owners
+
+    - topic: update-clu-application
+      configKey: INDEX
+      indexes:
+        - name: update-clu-application-index
+          type: general
+          id: $.Clu.id, $.Clu.tenantId
+          isBulk: false
+          timeStampField: $.Clu.auditDetails.lastModifiedTime
+          jsonPath: $
+          customJsonMapping:
+            indexMapping:
+              Data:
+                id: id
+                tenantId: tenantId
+                applicationNo: applicationNo
+                status: status
+                cluNo: cluNo
+                applicationType: applicationType
+                cluType: cluType
+                accountId: accountId
+                applicationStatus: applicationStatus
+                createdBy: createdBy
+                lastModifiedBy: lastModifiedBy
+                createdTime: createdTime
+                lastModifiedTime: lastModifiedTime
+                documents: []
+                cluDetails: {}
+                owners: owners
+            fieldMapping:
+              - inJsonPath: $.Clu.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.Clu.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.Clu.applicationNo
+                outJsonPath: $.Data.applicationNo
+              - inJsonPath: $.Clu.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.Clu.cluNo
+                outJsonPath: $.Data.cluNo
+              - inJsonPath: $.Clu.applicationType
+                outJsonPath: $.Data.applicationType
+              - inJsonPath: $.Clu.cluType
+                outJsonPath: $.Data.cluType
+              - inJsonPath: $.Clu.accountId
+                outJsonPath: $.Data.accountId
+              - inJsonPath: $.Clu.applicationStatus
+                outJsonPath: $.Data.applicationStatus
+              - inJsonPath: $.Clu.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+              - inJsonPath: $.Clu.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.Clu.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
+              - inJsonPath: $.Clu.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+              - inJsonPath: $.Clu.documents
+                outJsonPath: $.Data.documents
+              - inJsonPath: $.Clu.cluDetails
+                outJsonPath: $.Data.cluDetails
+              - inJsonPath: $.Clu.owners
+                outJsonPath: $.Data.owners
