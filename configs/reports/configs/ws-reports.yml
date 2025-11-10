@@ -3849,11 +3849,17 @@ ReportDefinitions:
       isMandatory: false
       searchClause: AND connectiontype=$connectiontype      
     - name: minAmtarrear
-      label: Enter Amount
+      label: From Amount
       type: string 
       source: ws
       isMandatory: false
-      searchClause: AND amtarrear::numeric > $minAmtarrear::numeric           
+      searchClause: AND amtarrear::numeric >= $minAmtarrear::numeric
+    - name: maxAmtarrear
+      label: To Amount
+      type: string 
+      source: ws
+      isMandatory: false
+      searchClause: AND amtarrear::numeric <= $maxAmtarrear::numeric          
     - name: usagecategory
       label: usagecategory
       type: singlevaluelist
@@ -3975,11 +3981,17 @@ ReportDefinitions:
       isMandatory: false
       searchClause: AND connectiontype=$connectiontype      
     - name: minAmtarrear
-      label: Enter Amount
+      label: From Amount
       type: string 
       source: ws
       isMandatory: false
-      searchClause: AND amtarrear::numeric > $minAmtarrear::numeric     
+      searchClause: AND amtarrear::numeric >= $minAmtarrear::numeric
+    - name: maxAmtarrear
+      label: To Amount
+      type: string 
+      source: ws
+      isMandatory: false
+      searchClause: AND amtarrear::numeric <= $maxAmtarrear::numeric     
     - name: usagecategory
       label: usagecategory
       type: singlevaluelist
