@@ -3860,7 +3860,14 @@ ReportDefinitions:
       pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
       source: ws
       isMandatory: false
-      searchClause: AND usagecategory=$usagecategory        
+      searchClause: AND usagecategory=$usagecategory
+    - name: localityArray
+      label: zoneList
+      type: boundarylist
+      source: pt
+      wrapper: true
+      isMandatory: false
+      searchClause: AND pt.locality IN ($localityArray)  
   query: |
       select consumercode as consumercode,usagecategory as usagecategory,amtarrear as amtarrear,
       bill_status as bill_status,connectiontype as connectiontype,
@@ -3979,7 +3986,15 @@ ReportDefinitions:
       pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
       source: ws
       isMandatory: false
-      searchClause: AND usagecategory=$usagecategory           
+      searchClause: AND usagecategory=$usagecategory    
+    - name: localityArray
+      label: zoneList
+      type: boundarylist
+      source: pt
+      wrapper: true
+      isMandatory: false
+      searchClause: AND pt.locality IN ($localityArray)  
+      
   query: |
       select consumercode as consumercode,usagecategory as usagecategory,amtarrear as amtarrear,
       bill_status as bill_status,connectiontype as connectiontype,
