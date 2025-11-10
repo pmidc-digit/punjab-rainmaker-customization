@@ -18,7 +18,7 @@ ServiceMaps:
                 "applicantName":"applicantName","fatherName":"fatherName","mobileNumber":"mobileNumber",
                 "emailId":"emailId","applicationType":"applicationType","validityDate":"validityDate",
                 "status":"status","expireFlag":"expireFlag","petToken":"petToken","previousApplicationNumber":"previousApplicationNumber",
-                "propertyId":"propertyId","createdby":"createdby","lastmodifiedby":"lastmodifiedby",
+                "petRegistrationNumber":"petRegistrationNumber","propertyId":"propertyId","createdby":"createdby","lastmodifiedby":"lastmodifiedby",
                 "createdtime":"createdtime","lastmodifiedtime":"lastmodifiedtime","addressId":"addressId","addressLine1":"addressLine1","addressLine2":"addressLine2",
                 "city":"city","pincode":"pincode","petName":"petName","petType":"petType","breedType":"breedType",
                 "petAge":"petAge","petGender":"petGender","vaccinationNumber":"vaccinationNumber","petColor":"petColor","owner":"owner"
@@ -51,6 +51,8 @@ ServiceMaps:
                 outJsonPath: $.Data.petToken
               - inJsonPath: $.previousApplicationNumber
                 outJsonPath: $.Data.previousApplicationNumber
+              - inJsonPath: $.petRegistrationNumber
+                outJsonPath: $.Data.petRegistrationNumber
               - inJsonPath: $.propertyId
                 outJsonPath: $.Data.propertyId
               - inJsonPath: $.auditDetails.createdBy
@@ -89,7 +91,6 @@ ServiceMaps:
                 outJsonPath: $.Data.buildingName
               - inJsonPath: $.address.street
                 outJsonPath: $.Data.street
-              # locality mapping removed; locality is null in payload
               - inJsonPath: $.petDetails.id
                 outJsonPath: $.Data.petDetailsId
               - inJsonPath: $.petDetails.petName
@@ -126,7 +127,7 @@ ServiceMaps:
     - topic: update-ptr-application
       configKey: INDEX
       indexes:
-        - name: ptr-application-update-index
+        - name: ptr-application-index
           type: general
           id: $.id, $.tenantId
           isBulk: true
@@ -138,7 +139,7 @@ ServiceMaps:
               "applicantName":"applicantName","fatherName":"fatherName","mobileNumber":"mobileNumber",
               "emailId":"emailId","applicationType":"applicationType","validityDate":"validityDate",
               "status":"status","expireFlag":"expireFlag","petToken":"petToken","previousApplicationNumber":"previousApplicationNumber",
-              "propertyId":"propertyId","lastmodifiedby":"lastmodifiedby","lastmodifiedtime":"lastmodifiedtime",
+              "petRegistrationNumber":"petRegistrationNumber","propertyId":"propertyId","lastmodifiedby":"lastmodifiedby","lastmodifiedtime":"lastmodifiedtime",
               "addressId":"addressId","addressLine1":"addressLine1","addressLine2":"addressLine2","city":"city","pincode":"pincode",
               "petName":"petName","petType":"petType","breedType":"breedType","petAge":"petAge","petGender":"petGender",
               "vaccinationNumber":"vaccinationNumber","petColor":"petColor"}}
@@ -169,6 +170,8 @@ ServiceMaps:
                 outJsonPath: $.Data.petToken
               - inJsonPath: $.previousApplicationNumber
                 outJsonPath: $.Data.previousApplicationNumber
+              - inJsonPath: $.petRegistrationNumber
+                outJsonPath: $.Data.petRegistrationNumber
               - inJsonPath: $.propertyId
                 outJsonPath: $.Data.propertyId
               - inJsonPath: $.auditDetails.lastModifiedBy
@@ -203,7 +206,7 @@ ServiceMaps:
     - topic: expire-ptr-application
       configKey: INDEX
       indexes:
-        - name: ptr-application-expire-index
+        - name: ptr-application-index
           type: general
           id: $.id, $.tenantId
           isBulk: false
@@ -228,7 +231,7 @@ ServiceMaps:
     - topic: renew-ptr-application
       configKey: INDEX
       indexes:
-        - name: ptr-application-renew-index
+        - name: ptr-application-index
           type: general
           id: $.id
           isBulk: true
@@ -239,7 +242,7 @@ ServiceMaps:
               "id":"id","tenantId":"tenantId","applicationNumber":"applicationNumber","applicantName":"applicantName",
               "fatherName":"fatherName","mobileNumber":"mobileNumber","emailId":"emailId","applicationType":"applicationType",
               "validityDate":"validityDate","status":"status","expireFlag":"expireFlag","petToken":"petToken",
-              "previousApplicationNumber":"previousApplicationNumber","propertyId":"propertyId","createdby":"createdby",
+              "previousApplicationNumber":"previousApplicationNumber","petRegistrationNumber":"petRegistrationNumber","propertyId":"propertyId","createdby":"createdby",
               "lastmodifiedby":"lastmodifiedby","createdtime":"createdtime","lastmodifiedtime":"lastmodifiedtime",
               "addressId":"addressId","addressLine1":"addressLine1","addressLine2":"addressLine2","city":"city",
               "pincode":"pincode","petName":"petName","petType":"petType","breedType":"breedType","petAge":"petAge",
@@ -271,6 +274,8 @@ ServiceMaps:
                 outJsonPath: $.Data.petToken
               - inJsonPath: $.previousApplicationNumber
                 outJsonPath: $.Data.previousApplicationNumber
+              - inJsonPath: $.petRegistrationNumber
+                outJsonPath: $.Data.petRegistrationNumber
               - inJsonPath: $.propertyId
                 outJsonPath: $.Data.propertyId
               - inJsonPath: $.auditDetails.createdBy
