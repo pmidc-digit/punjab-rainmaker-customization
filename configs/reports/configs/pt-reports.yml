@@ -7986,7 +7986,7 @@ ReportDefinitions:
       
 - reportName: DEFAULTER_REPORT_WITH_LOCALITY
   decryptionPathId: ULBDEFAULTERPTREPORT_V2
-  summary: Occupancy Type Report
+  summary: DEFAULTER REPORT WITH LOCALITY
   version: 1.0.0
   moduleName: rainmaker-pt
   additionalConfig:
@@ -8066,18 +8066,13 @@ ReportDefinitions:
     source: pt
     isMandatory: true
     searchClause: and assessments.fy not like concat('%',$fy,'%')
-  - name: blockname
-    label: reports.pt.blockname
-    type: string
+  - name: localityArray
+    label: zoneList
+    type: boundarylist
     source: pt
+    wrapper: true
     isMandatory: false
-    searchClause: AND upper(blockname) LIKE CONCAT('%',upper($blockname),'%')
-  - name: localityname
-    label: reports.pt.localityname
-    type: string
-    source: pt
-    isMandatory: false
-    searchClause: AND upper(localityname) LIKE CONCAT('%',upper($localityname),'%')
+    searchClause: AND pt.locality IN ($localityArray)        
   query: |
       -- Use CTE to force query plan, compute & use CTE later
       with assessments as
@@ -8123,7 +8118,7 @@ ReportDefinitions:
 
 - reportName: DEFAULTER_REPORT_WITH_LOCALITY_UNPAID_DEMAND
   decryptionPathId: ULBDEFAULTERPTREPORT_V2
-  summary: Occupancy Type Report
+  summary: DEFAULTERS UNPAID DEMAND
   version: 1.0.0
   moduleName: rainmaker-pt
   additionalConfig:
@@ -8215,18 +8210,13 @@ ReportDefinitions:
     source: pt
     isMandatory: true
     searchClause: and 1=1
-  - name: blockname
-    label: reports.pt.blockname
-    type: string
+  - name: localityArray
+    label: zoneList
+    type: boundarylist
     source: pt
+    wrapper: true
     isMandatory: false
-    searchClause: AND upper(blockname) LIKE CONCAT('%',upper($blockname),'%')
-  - name: localityname
-    label: reports.pt.localityname
-    type: string
-    source: pt
-    isMandatory: false
-    searchClause: AND upper(localityname) LIKE CONCAT('%',upper($localityname),'%')
+    searchClause: AND pt.locality IN ($localityArray)        
   query: |
       -- Use CTE to force query plan, compute & use CTE later
       with properties as
