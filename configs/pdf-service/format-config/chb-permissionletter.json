@@ -1,968 +1,408 @@
 {
   "key": "chb-permissionletter",
-  "documentType": "CHB_PERMISSIONLETTER",
-  "DataConfigs": {
-    "moduleName": "rainmaker-common",
-    "version": "1.0.0",
-    "baseKeyPath": "$.Payments.*",
-    "entityIdPath": "$.id",
-    "isCommonTableBorderRequired": true,
-    "mappings": [
+  "config": {
+    "defaultStyle": {
+      "font": "Cambay"
+    },
+    "content": [
       {
-        "topic": "common-pdf-generation-3",
-        "mappings": [
-          {
-            "direct": [
+        "style": "noc-head",
+        "table": {
+          "widths": [60, "*", 120],
+          "body": [
+            [
               {
-                "variable": "payerName",
-                "value": {
-                  "path": "$.payerName"
-                }
+                "image": "{{logoImage}}",
+                "width": 50,
+                "height": 61.25
               },
               {
-                "variable": "designation",
-                "value": {
-                  "path": "$.additionalDetails.designation"
-                }
-              },
-              {
-                "variable": "user-name",
-                "value": {
-                  "path": "$.userInfo.name"
-                },
-                "type": "selectFromRequestInfo"
-              },
-              {
-                "variable": "payerContact",
-                "value": {
-                  "path": "$.mobileNumber"
-                }
-              },
-              {
-                "variable": "payerAddress",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].address.addressLine1"
-                }
-              },
-              {
-                "variable": "hallCode",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].bookingSlotDetails[0].hallCode"
-                }
-              },
-              {
-                "variable": "communityHallName",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].communityHallName"
-                }
-              },
-              {
-                "variable": "bookingDate",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].bookingSlotDetails[0].bookingDate"
-                }
-              },
-              {
-                "variable": "bookingEndDate",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].bookingSlotDetails[0].bookingEndDate"
-                }
-              },
-
-              {
-                "variable": "var_bookingSlots",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].bookingSlotDetails[*]"
-                },
-                "type": "array",
-                "format": {
-                  "type": "string",
-                  "scema": [
-                    { "variable": "bookingDate", "value": "bookingDate" },
-                    { "variable": "bookingEndDate", "value": "bookingEndDate" }
-                  ]
-                }
-              },
-              {
-                "variable": "purpose",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].purpose.purpose",
-                  "localisation": {
-                    "required": true,
-                    "prefix": null,
-                    "module": "rainmaker-common"
+                "stack": [
+                  {
+                    "text": "{{Municipal_Corporation}} {{logo-header}}",
+                    "style": "receipt-logo-header"
+                  },
+                  {
+                    "text": "{{serviceType}} Permission Letter",
+                    "style": "receipt-logo-sub-header"
                   }
-                }
+                ],
+                "alignment": "left",
+                "margin": [0, 10, 0, 0]
               },
               {
-                "variable": "accountNumber",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].applicantDetail.accountNumber"
-                }
-              },
-              {
-                "variable": "ifscCode",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].applicantDetail.ifscCode"
-                }
-              },
-              {
-                "variable": "bankName",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].applicantDetail.bankName"
-                }
-              },
-              {
-                "variable": "paymentStatus",
-                "value": {
-                  "path": "$.paymentStatus"
-                },
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "receiptNo",
-                "value": {
-                  "path": "$.paymentDetails[0].receiptNumber"
-                }
-              },
-              {
-                "variable": "total_amount",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_TOTAL_AMOUNT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "totalAmount",
-                "value": {
-                  "path": "$.totalAmountPaid"
-                }
-              },
-              {
-                "variable": "chb_sgst",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_SGST"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbSgst",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SGST')].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "chb_service_charge",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_CHB_SERVICE_CHARGE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbServiceCharge",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_SERVICE_CHARGE')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "chb_discount",
-                "value": {
-                  "path": "CHB_DISCOUNT_AMOUNT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbDiscount",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_DISCOUNT')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "chb_booking_fees",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_BOOKING_FEES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbBookingFees",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BOOKING_FEES')].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "chb_cgst",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_CGST"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbCgst",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CGST')].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "term_1",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_1"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "term_2",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_2"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "term_3",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_3"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "term_4",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_4"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "term_5",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_5"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "term_6",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_6"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "term_7",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_7"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "term_8",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_8"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "term_9",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_9"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "term_10",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_10"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "term_11",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_11"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "term_12",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_12"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "term_13",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_13"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "term_14",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_14"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "term_15",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_15"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "term_16",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_16"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "term_17",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_CONSOLIDATED_ACKNOWLEDGMENT_TERM_17"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-
-              {
-                "variable": "tenantid",
-                "value": {
-                  "path": "$.tenantId"
-                }
-              },
-              {
-                "variable": "serviceType",
-                "value": {
-                  "path": "$.paymentDetails[0].businessService"
-                },
-                "localisation": {
-                  "required": true,
-                  "prefix": "MODULE",
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "paidAmount",
-                "value": {
-                  "path": "$.paymentDetails[0].totalAmountPaid"
-                }
-              },
-              {
-                "variable": "fromPeriod",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].fromPeriod"
-                },
-                "type": "date"
-              },
-              {
-                "variable": "toPeriod",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].toPeriod"
-                },
-                "type": "date"
-              },
-              {
-                "variable": "paymentMode",
-                "value": {
-                  "path": "$.paymentMode"
-                },
-                "localisation": {
-                  "required": true,
-                  "prefix": "COMMON_MASTERS_PAYMENTMODE",
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "G8ReceiptNo",
-                "value": {
-                  "path": "$.paymentDetails[0].manualReceiptNumber"
-                }
-              },
-              {
-                "variable": "G8ReceiptDate",
-                "value": {
-                  "path": "$.paymentDetails[0].manualReceiptDate"
-                },
-                "type": "date"
-              },
-              {
-                "variable": "paymentDate",
-                "value": {
-                  "path": "$.transactionDate"
-                },
-                "type": "date"
-              },
-              {
-                "variable": "consumerID",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.consumerCode"
-                }
-              },
-              {
-                "variable": "transactionID",
-                "value": {
-                  "path": "$.transactionNumber"
-                }
-              },
-              {
-                "variable": "dueAmount",
-                "value": {
-                  "path": "$.paymentDetails[0].totalDue"
-                }
-              },
-              {
-                "variable": "payment_receipt",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAYMENT_RECEIPT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "receipt_no",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_RECEIPT_NO"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "consumer_id",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CONSUMER_ID"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-bpa"
-                }
-              },
-              {
-                "variable": "payment_date",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAYMENT_DATE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "payer_name",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAYER_NAME"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "payer_contact",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAYER_CONTACT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "payment_status",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAYMENT_STATUS"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "service_type",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_SERVICE_TYPE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "billing_period",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_BILLING_PERIOD"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "paid_amount",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAID_AMOUNT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "pending_amount",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PENDING_AMOUNT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "excess_amount_paid",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_EXCESS_AMOUNT_PAID"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "payment_mode",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAYMENT_MODE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "transaction_id",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_TRANSACTION_ID"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "g8_receipt_no",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_G8_RECEIPT_NO"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "g8_receipt_date",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_G8_RECEIPT_DATE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "generated_by",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_GENERATED_BY"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "commissioner/eo",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_COMMISSIONER_EO"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "no_signature",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_NO_SIGNATURE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "disclamer",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "disclamer_1",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_FIRST_LINE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "disclamer_2",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_SECOND_LINE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "disclamer_3",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_THIRD_LINE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "disclamer_4",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_4"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "disclamer_5",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_FIFTH_LINE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "to",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_TO"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "Municipal_Corporation",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_MDMS_MUNICIPAL_CORPORATION"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "total_bill_amount",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_TOTAL_BILL_AMOUNT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              }
-            ]
-          },
-          {
-            "derived": [
-              {
-                "variable": "pendingAmount",
-                "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"
-              },
-              {
-                "variable": "excessAmountPaid",
-                "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
-              },
-              {
-                "variable": "chbDiscountPositive",
-                "formula": "{{chbDiscount}} < 0 ? -{{chbDiscount}} : {{chbDiscount}}"
-              }
-            ]
-          },
-          {
-            "externalAPI": [
-              {
-                "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
-                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}')%5D",
-                "apiRequest": null,
-                "responseMapping": [
+                "stack": [
                   {
-                    "variable": "address",
-                    "value": "$.MdmsRes.tenant.tenants[0].address"
+                    "text": "{{address}}"
                   },
                   {
-                    "variable": "phoneNumber",
-                    "value": "$.MdmsRes.tenant.tenants[0].contactNumber"
+                    "text": "{{phoneNumber}}"
                   },
                   {
-                    "variable": "website",
-                    "value": "$.MdmsRes.tenant.tenants[0].domainUrl"
+                    "text": "{{website}}"
                   },
                   {
-                    "variable": "email",
-                    "value": "$.MdmsRes.tenant.tenants[0].emailId"
-                  },
-                  {
-                    "variable": "logoImage",
-                    "value": "$.MdmsRes.tenant.tenants[0].logoId",
-                    "type": "image"
-                  },
-                  {
-                    "variable": "logo-header",
-                    "value": "$.MdmsRes.tenant.tenants[0].code",
-                    "localisation": {
-                      "required": true,
-                      "prefix": "TENANT_TENANTS",
-                      "module": "rainmaker-common"
-                    }
+                    "text": "{{email}}"
                   }
-                ]
+                ],
+                "alignment": "right",
+                "color": "#484848",
+                "margin": [-100, 0, -25, 0]
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+      {
+        "style": "noc-table",
+        "table": {
+          "widths": ["55%", "45%"],
+          "body": [
+            [
+              {
+                "text": "",
+                "border": [false, false, false, false]
               },
               {
-                "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
-                "queryParam": "moduleName=tenant&masterName=footer&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}' %26%26 @.service=='{$.paymentDetails[0].businessService}')%5D",
-                "apiRequest": null,
-                "responseMapping": [
-                  {
-                    "variable": "variable11",
-                    "value": "$.MdmsRes.tenant.footer[0].receiptFooterContent.*",
-                    "type": "array",
-                    "format": {
-                      "type": "string",
-                      "scema": [
-                        {
-                          "variable": "disclaimerContent",
-                          "value": "disclaimer",
-                          "type": "string",
-                          "localisation": {
-                            "required": true,
-                            "prefix": null,
-                            "module": "rainmaker-common"
-                          }
-                        }
-                      ]
-                    }
-                  }
-                ]
+                "text": "Booking No: {{consumerID}}",
+                "style": "receipt-table-value",
+                "alignment": "right",
+                "border": [false, false, false, false],
+                "margin": [0, 5, 10, 5]
               }
-            ]
-          },
-          {
-            "qrcodeConfig": [
+            ],
+            [
               {
-                "variable": "qrcodeimage",
-                "value": "/digit-ui/citizen/payment/verification?tenantId={{tenantid}}&receiptNumber={{receiptNo}}"
+                "stack": [
+                  { "text": "To,", "margin": [0, 0, 0, 2] },
+                  { "text": "{{payerName}}", "margin": [20, 0, 0, 2] },
+                  { "text": "{{payerAddress}}", "margin": [20, 0, 0, 2] }
+                ],
+                "style": "receipt-table",
+                "alignment": "left",
+                "border": [false, false, false, false],
+                "margin": [10, 0, 0, 0]
+              },
+              {
+                "image": "{{qrcodeimage}}",
+                "width": 72,
+                "height": 72,
+                "alignment": "right",
+                "margin": [0, 0, 10, 0],
+                "border": [false, false, false, false]
               }
             ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+      {
+        "style": "noc-table",
+        "table": {
+          "widths": ["100%"],
+          "body": [
+            [
+              {
+                "stack": [
+                  {
+                    "text": "Subject: Permission to use the Community Hall {{communityHallName}} {{hallCode}} Holding for {{purpose}} purpose",
+                    "style": "receipt-table",
+                    "alignment": "left",
+                    "margin": [0, 0, 0, 5],
+                    "bold": true
+                  },
+                  {
+                    "text": "Dear {{payerName}},",
+                    "style": "receipt-table",
+                    "alignment": "left",
+                    "margin": [0, 0, 0, 10]
+                  },
+                  {
+                    "text": "Permission is hereby accorded to use the following holding for the {{purpose}} purpose:",
+                    "style": "receipt-table",
+                    "alignment": "left",
+                    "margin": [0, 0, 0, 10]
+                  }
+                ],
+                "border": [false, false, false, false],
+                "margin": [0, 5, 0, 5]
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+
+      {
+        "style": "next-noc-table",
+        "table": {
+          "widths": ["40%", "60%"],
+          "body": [
+            [
+              {
+                "text": "Area / Accommodation Booked :",
+                "style": "receipt-table-value",
+                "bold": true,
+                "alignment": "left",
+                "border": [false, false, false, false],
+                "margin": [8, 4, 0, 4]
+              },
+              {
+                "text": "{{communityHallName}} - {{hallCode}}",
+                "style": "receipt-table-value-down",
+                "alignment": "left",
+                "border": [false, false, false, false],
+                "margin": [8, 4, 0, 4]
+              }
+            ],
+            [
+              {
+                "text": "Date of Booking :",
+                "style": "receipt-table-value",
+                "bold": true,
+                "alignment": "left",
+                "border": [false, false, false, false],
+                "margin": [8, 4, 0, 4]
+              },
+              {
+                "text": "{{bookingDate}}",
+                "style": "receipt-table-value-down",
+                "alignment": "left",
+                "border": [false, false, false, false],
+                "margin": [8, 4, 0, 4]
+              }
+            ],
+            "[{\"text\":\"Period of Booking :\",\"style\":\"receipt-table-value\",\"bold\":true,\"alignment\":\"left\",\"border\":[false,false,false,false],\"margin\":[8,4,0,4]},{\"text\":\"{{#var_bookingSlots}}{{bookingDate}}, {{/var_bookingSlots}}\",\"style\":\"receipt-table-value-down\",\"alignment\":\"left\",\"border\":[false,false,false,false],\"margin\":[8,4,0,4]}]"
+          ]
+        },
+        "layout": {}
+      },
+      {
+        "style": "next-noc-table",
+        "table": {
+          "widths": ["60%", "40%"],
+          "body": [
+            [
+              {
+                "text": "{{chb_booking_fees}}",
+                "border": [true, true, false, false],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": "{{chbBookingFees}}",
+                "border": [false, true, true, false],
+                "style": "receipt-table-value-down"
+              }
+            ],
+            [
+              {
+                "text": "{{chb_sgst}}",
+                "border": [true, false, false, false],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": "{{chbSgst}}",
+                "border": [false, false, true, false],
+                "style": "receipt-table-value-down"
+              }
+            ],
+            [
+              {
+                "text": "{{chb_cgst}}",
+                "border": [true, false, false, false],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": "{{chbCgst}}",
+                "border": [false, false, true, false],
+                "style": "receipt-table-value-down"
+              }
+            ],
+            [
+              {
+                "text": "{{chb_service_charge}}",
+                "border": [true, false, false, false],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": "{{chbServiceCharge}}",
+                "border": [false, false, true, false],
+                "style": "receipt-table-value-down"
+              }
+            ],
+            [
+              {
+                "text": "{{chb_discount}}",
+                "border": [true, false, false, false],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": "{{chbDiscountPositive}}",
+                "border": [false, false, true, false],
+                "style": "receipt-table-value-down"
+              }
+            ],
+            [
+              {
+                "text": "{{total_amount}}",
+                "border": [true, false, false, true],
+                "bold": true,
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": "{{totalAmount}}",
+                "border": [false, false, true, true],
+                "bold": true,
+                "style": "receipt-table-value-down"
+              }
+            ]
+          ]
+        },
+        "layout": {}
+      },
+      {
+        "style": "next-noc-table",
+        "table": {
+          "widths": ["100%"],
+          "body": [
+            [
+              {
+                "text": "TERMS AND CONDITIONS",
+                "bold": true,
+                "style": "receipt-table-value-down",
+                "alignment": "left",
+                "border": [false, false, false, false],
+                "margin": [0, 6, 0, 6]
+              }
+            ],
+            [
+              {
+                "stack": [
+                  { "text": "{{term_1}}", "margin": [0, 2, 0, 2] },
+                  { "text": "{{term_2}}", "margin": [0, 2, 0, 2] },
+                  { "text": "{{term_3}}", "margin": [0, 2, 0, 2] },
+                  { "text": "{{term_4}}", "margin": [0, 2, 0, 2] },
+                  { "text": "{{term_5}}", "margin": [0, 2, 0, 2] },
+                  { "text": "{{term_6}}", "margin": [0, 2, 0, 2] },
+                  { "text": "{{term_7}}", "margin": [0, 2, 0, 2] },
+                  { "text": "{{term_8}}", "margin": [0, 2, 0, 2] },
+                  { "text": "{{term_9}}", "margin": [0, 2, 0, 2] },
+                  { "text": "{{term_10}}", "margin": [0, 2, 0, 2] },
+                  { "text": "{{term_11}}", "margin": [0, 2, 0, 2] },
+                  { "text": "{{term_12}}", "margin": [0, 2, 0, 2] },
+                  { "text": "{{term_13}}", "margin": [0, 2, 0, 2] },
+                  { "text": "{{term_14}}", "margin": [0, 2, 0, 2] },
+                  { "text": "{{term_15}}", "margin": [0, 2, 0, 2] },
+                  { "text": "{{term_16}}", "margin": [0, 2, 0, 2] },
+                  { "text": "{{term_17}}", "margin": [0, 2, 0, 2] }
+                ],
+                "style": "receipt-table",
+                "alignment": "left",
+                "border": [false, false, false, false],
+                "margin": [10, 6, 10, 6]
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+      {
+        "style": "receipt-approver",
+        "columns": [
+          {
+            "text": [
+              {
+                "text": "{{generated_by}}: ",
+                "bold": true
+              },
+              {
+                "text": "{{user-name}}",
+                "bold": false
+              }
+            ],
+            "alignment": "left"
           }
         ]
+      },
+      {
+        "style": "no-signature",
+        "text": "{{no_signature}}"
       }
-    ]
+    ],
+    "styles": {
+      "noc-head": {
+        "margin": [-30, -30, 0, 1]
+      },
+      "receipt-logo-header": {
+        "color": "#000000",
+        "fontSize": 14,
+        "bold": true,
+        "letterSpacing": 0.74,
+        "margin": [0, 0, 0, 5]
+      },
+      "receipt-logo-sub-header": {
+        "color": "#000000",
+        "fontSize": 12,
+        "letterSpacing": 0.6
+      },
+      "noc-table": {
+        "fontSize": 12,
+        "color": "#000000",
+        "margin": [-25, 10, -22, -8]
+      },
+      "receipt-table-value-total-Qr": {
+        "alignment": "right",
+        "margin": [0, 3, 10, 0]
+      },
+      "receipt-table-value-down": {
+        "color": "#000000",
+        "bold": false,
+        "fontSize": 12,
+        "fontWeight": 400,
+        "alignment": "left",
+        "margin": [3, 5, 0, 5]
+      },
+      "next-noc-table": {
+        "fontSize": 12,
+        "color": "#000000",
+        "margin": [-25, 28, -22, -8]
+      },
+      "receipt-table-value": {
+        "color": "#000000",
+        "bold": true,
+        "fontSize": 12,
+        "fontWeight": 500,
+        "margin": [-2, 2, 0, 2]
+      },
+      "receipt-table": {
+        "color": "#000000",
+        "bold": false,
+        "fontSize": 12,
+        "fontWeight": 400,
+        "margin": [-30, 2, 0, 2]
+      },
+      "receipt-approver": {
+        "fontSize": 12,
+        "bold": true,
+        "margin": [-27, 50, -10, 0],
+        "color": "#484848"
+      },
+      "no-signature": {
+        "fontSize": 12,
+        "margin": [-27, 35, -10, 0],
+        "color": "#484848"
+      },
+      "pt-disclaimer": {
+        "fontSize": 12,
+        "margin": [-27, 30, -10, 0],
+        "color": "#484848"
+      },
+      "pt-disclaimer-value": {
+        "fontSize": 12,
+        "margin": [2, 3, 0, 0],
+        "color": "#484848"
+      }
+    }
   }
 }
