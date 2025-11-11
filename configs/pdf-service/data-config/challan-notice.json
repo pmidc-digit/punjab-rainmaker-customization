@@ -1,11 +1,11 @@
 {
-  "key": "challangeneration-receipt",
-  "documentType": "CHALLANGENERATION_RECEIPT",
+  "key": "challan-notice",
+  "documentType": "CHALLAN_NOTICE",
   "DataConfigs": {
     "moduleName": "rainmaker-common",
     "version": "1.0.0",
-    "baseKeyPath": "$.Payments.*",
-    "entityIdPath": "$.id",
+    "baseKeyPath": "$.challan",
+    "entityIdPath": "$.challans[0].id",
     "isCommonTableBorderRequired": true,
     "mappings": [
       {
@@ -16,7 +16,38 @@
               {
                 "variable": "payerName",
                 "value": {
-                  "path": "$.payerName"
+                  "path": "$.challans[0].citizen.name"
+                }
+              },
+              {
+                "variable": "payerFatherName",
+                "value": {
+                  "path": "$.challans[0].citizen.fatherOrHusbandName"
+                }
+              },
+              {
+                "variable": "payerAddress",
+                "value": {
+                  "path": "$.challans[0].address.addressLine1"
+                }
+              },
+              {
+                "variable": "ownerEmail",
+                "value": {
+                  "path": "$.userInfo.emailId"
+                },
+                "type": "selectFromRequestInfo"
+              },
+              {
+                "variable": "violationTime",
+                "value": {
+                  "path": "$.challans[0].documents.auditDetails.lastModifiedTime"
+                }
+              },
+              {
+                "variable": "epoch",
+                "value": {
+                  "path": "$.challans[0].auditDetails.lastModifiedTime"
                 }
               },
               {
@@ -129,6 +160,12 @@
                 }
               },
               {
+                "variable": "location",
+                "value": {
+                  "path": "$.challans[0].address.locality.name"
+                }
+              },
+              {
                 "variable": "G8ReceiptDate",
                 "value": {
                   "path": "$.paymentDetails[0].manualReceiptDate"
@@ -138,14 +175,90 @@
               {
                 "variable": "paymentDate",
                 "value": {
-                  "path": "$.transactionDate"
+                  "path": "$.challans[0].taxPeriodFrom"
                 },
                 "type": "date"
               },
               {
+                "variable": "dueDate",
+                "value": {
+                  "path": "$.challans[0].taxPeriodTo"
+                },
+                "type": "date"
+              },
+              {
+                "variable": "officerName",
+                "value": {
+                  "path": "$.officer.code"
+                }
+              },
+              {
+                "variable": "officerID",
+                "value": {
+                  "path": "$.officer.id"
+                }
+              },
+              {
+                "variable": "officerdept",
+                "value": {
+                  "path": "$.officer.department"
+                }
+              },
+              {
+                "variable": "violationDate",
+                "value": {
+                  "path": "$.challans[0].documents[0].auditDetails.lastModifiedTime"
+                },
+                "type": "date"
+              },
+              {
+                "variable": "offenceTypeName",
+                "value": {
+                  "path": "$.challans[0].offenceTypeName"
+                }
+              },
+              {
+                "variable": "offenceDescription",
+                "value": {
+                  "path": "$.challans[0].description"
+                }
+              },
+              {
+                "variable": "offenceCategoryName",
+                "value": {
+                  "path": "$.challans[0].offenceCategoryName"
+                }
+              },
+              {
+                "variable": "offenceSubCategoryName",
+                "value": {
+                  "path": "$.challans[0].offenceSubCategoryName"
+                }
+              },
+              {
+                "variable": "challanAmount",
+                "value": {
+                  "path": "$.challans[0].challanAmount"
+                }
+              },
+
+              {
+                "variable": "totalAmountCollected",
+                "value": {
+                  "path": "$.totalAmountCollected"
+                }
+              },
+              {
+                "variable": "challanFine",
+                "value": {
+                  "path": "$.challans[0].additionalDetail.amount[?(@.taxHeadCode == 'CH.CHALLAN_FINE')].amount"
+                }
+              },
+
+              {
                 "variable": "consumerID",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.consumerCode"
+                  "path": "$.challans[0].challanNo"
                 }
               },
               {
@@ -474,12 +587,6 @@
                 }
               },
               {
-                "variable": "epoch",
-                "value": {
-                  "path": "$.transactionDate"
-                }
-              },
-              {
                 "variable": "disclamer_4",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_4"
@@ -501,30 +608,6 @@
                   "required": true,
                   "prefix": null,
                   "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "offenceTypeName",
-                "value": {
-                  "path": "$.challan.challans[0].offenceTypeName"
-                }
-              },
-              {
-                "variable": "offenceDescription",
-                "value": {
-                  "path": "$.challan.challans[0].description"
-                }
-              },
-              {
-                "variable": "offenceCategoryName",
-                "value": {
-                  "path": "$.challan.challans[0].offenceCategoryName"
-                }
-              },
-              {
-                "variable": "offenceSubCategoryName",
-                "value": {
-                  "path": "$.challan.challans[0].offenceSubCategoryName"
                 }
               },
               {
@@ -568,18 +651,24 @@
           {
             "derived": [
               {
-                "variable": "epochIST",
-                "type": "date",
-                "formula": "({{epoch}} + 19800) * 1000",
-                "format": "HH:mm"
-              },
-              {
                 "variable": "pendingAmount",
                 "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"
               },
               {
                 "variable": "excessAmountPaid",
                 "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
+              },
+              {
+                "variable": "epochIST",
+                "type": "date",
+                "formula": "({{epoch}} + 19800) * 1000",
+                "format": "HH:mm"
+              },
+              {
+                "variable": "violationTimeIST",
+                "type": "date",
+                "formula": "({{violationTime}} + 19800) * 1000",
+                "format": "HH:mm"
               }
             ]
           },
@@ -587,7 +676,7 @@
             "externalAPI": [
               {
                 "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
-                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}')%5D",
+                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.challans[0].tenantId}')%5D",
                 "apiRequest": null,
                 "responseMapping": [
                   {
