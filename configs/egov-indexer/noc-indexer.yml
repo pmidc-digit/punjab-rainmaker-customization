@@ -2,126 +2,119 @@ ServiceMaps:
   serviceName: egov-noc-services
   version: 1.0.0
   mappings:
-    - topic: save-noc-application
-      configKey: INDEX
-      indexes:
-        - name: noc-application-index
-          type: general
-          id: $.Noc.id, $.Noc.tenantId
-          isBulk: false
-          timeStampField: $.Noc.auditDetails.createdTime
-          jsonPath: $
-          customJsonMapping:
-            indexMapping:
-              Data:
-                id: id
-                tenantId: tenantId
-                applicationNo: applicationNo
-                status: status
-                nocNo: nocNo
-                applicationType: applicationType
-                nocType: nocType
-                accountId: accountId
-                applicationStatus: applicationStatus
-                createdBy: createdBy
-                lastModifiedBy: lastModifiedBy
-                createdTime: createdTime
-                lastModifiedTime: lastModifiedTime
-                documents: documents
-                nocDetails: nocDetails
-                owners: owners
-            fieldMapping:
-              - inJsonPath: $.Noc.id
-                outJsonPath: $.Data.id
-              - inJsonPath: $.Noc.tenantId
-                outJsonPath: $.Data.tenantId
-              - inJsonPath: $.Noc.applicationNo
-                outJsonPath: $.Data.applicationNo
-              - inJsonPath: $.Noc.status
-                outJsonPath: $.Data.status
-              - inJsonPath: $.Noc.nocNo
-                outJsonPath: $.Data.nocNo
-              - inJsonPath: $.Noc.applicationType
-                outJsonPath: $.Data.applicationType
-              - inJsonPath: $.Noc.nocType
-                outJsonPath: $.Data.nocType
-              - inJsonPath: $.Noc.accountId
-                outJsonPath: $.Data.accountId
-              - inJsonPath: $.Noc.applicationStatus
-                outJsonPath: $.Data.applicationStatus
-              - inJsonPath: $.Noc.auditDetails.createdBy
-                outJsonPath: $.Data.createdBy
-              - inJsonPath: $.Noc.auditDetails.lastModifiedBy
-                outJsonPath: $.Data.lastModifiedBy
-              - inJsonPath: $.Noc.auditDetails.createdTime
-                outJsonPath: $.Data.createdTime
-              - inJsonPath: $.Noc.auditDetails.lastModifiedTime
-                outJsonPath: $.Data.lastModifiedTime
-              - inJsonPath: $.Noc.documents
-                outJsonPath: $.Data.documents
-              - inJsonPath: $.Noc.nocDetails
-                outJsonPath: $.Data.nocDetails
-              - inJsonPath: $.Noc.owners
-                outJsonPath: $.Data.owners
-
-    - topic: update-noc-application
-      configKey: INDEX
-      indexes:
-        - name: update-noc-application-index
-          type: general
-          id: $.Noc.id, $.Noc.tenantId
-          isBulk: false
-          timeStampField: $.Noc.auditDetails.lastModifiedTime
-          jsonPath: $
-          customJsonMapping:
-            indexMapping:
-              Data:
-                id: id
-                tenantId: tenantId
-                applicationNo: applicationNo
-                status: status
-                nocNo: nocNo
-                applicationType: applicationType
-                nocType: nocType
-                accountId: accountId
-                applicationStatus: applicationStatus
-                createdBy: createdBy
-                lastModifiedBy: lastModifiedBy
-                createdTime: createdTime
-                lastModifiedTime: lastModifiedTime
-                documents: []
-                nocDetails: {}
-                owners: owners
-            fieldMapping:
-              - inJsonPath: $.Noc.id
-                outJsonPath: $.Data.id
-              - inJsonPath: $.Noc.tenantId
-                outJsonPath: $.Data.tenantId
-              - inJsonPath: $.Noc.applicationNo
-                outJsonPath: $.Data.applicationNo
-              - inJsonPath: $.Noc.status
-                outJsonPath: $.Data.status
-              - inJsonPath: $.Noc.nocNo
-                outJsonPath: $.Data.nocNo
-              - inJsonPath: $.Noc.applicationType
-                outJsonPath: $.Data.applicationType
-              - inJsonPath: $.Noc.nocType
-                outJsonPath: $.Data.nocType
-              - inJsonPath: $.Noc.accountId
-                outJsonPath: $.Data.accountId
-              - inJsonPath: $.Noc.applicationStatus
-                outJsonPath: $.Data.applicationStatus
-              - inJsonPath: $.Noc.auditDetails.createdBy
-                outJsonPath: $.Data.createdBy
-              - inJsonPath: $.Noc.auditDetails.lastModifiedBy
-                outJsonPath: $.Data.lastModifiedBy
-              - inJsonPath: $.Noc.auditDetails.createdTime
-                outJsonPath: $.Data.createdTime
-              - inJsonPath: $.Noc.auditDetails.lastModifiedTime
-                outJsonPath: $.Data.lastModifiedTime
-              - inJsonPath: $.Noc.documents
-                outJsonPath: $.Data.documents
-              - inJsonPath: $.Noc.nocDetails
-                outJsonPath: $.Data.nocDetails
-              - inJsonPath: $.Noc.owners
-                outJsonPath: $.Data.owners
+  - topic: save-noc-application
+    configKey: INDEX
+    indexes:
+    - name: noc-application-index
+      type: general
+      id: $.Noc.id, $.Noc.tenantId
+      isBulk: true
+      timeStampField: $.Noc.auditDetails.createdTime
+      jsonPath: $
+      customJsonMapping:
+        indexMapping:
+          Data:
+            id: id
+            tenantId: tenantId
+            applicationNo: applicationNo
+            status: status
+            nocNo: nocNo
+            applicationType: applicationType
+            nocType: nocType
+            accountId: accountId
+            applicationStatus: applicationStatus
+            createdBy: createdBy
+            lastModifiedBy: lastModifiedBy
+            createdTime: createdTime
+            lastModifiedTime: lastModifiedTime
+            documents: []
+            nocDetails: {}
+        fieldMapping:
+        - inJsonPath: $.Noc.*.id
+          outJsonPath: $.Data.id
+        - inJsonPath: $.Noc.*.tenantId
+          outJsonPath: $.Data.tenantId
+        - inJsonPath: $.Noc.*.applicationNo
+          outJsonPath: $.Data.applicationNo
+        - inJsonPath: $.Noc.*.status
+          outJsonPath: $.Data.status
+        - inJsonPath: $.Noc.*.nocNo
+          outJsonPath: $.Data.nocNo
+        - inJsonPath: $.Noc.*.applicationType
+          outJsonPath: $.Data.applicationType
+        - inJsonPath: $.Noc.*.nocType
+          outJsonPath: $.Data.nocType
+        - inJsonPath: $.Noc.*.accountId
+          outJsonPath: $.Data.accountId
+        - inJsonPath: $.Noc.*.applicationStatus
+          outJsonPath: $.Data.applicationStatus
+        - inJsonPath: $.Noc.*.auditDetails.createdBy
+          outJsonPath: $.Data.createdBy
+        - inJsonPath: $.Noc.*.auditDetails.lastModifiedBy
+          outJsonPath: $.Data.lastModifiedBy
+        - inJsonPath: $.Noc.*.auditDetails.createdTime
+          outJsonPath: $.Data.createdTime
+        - inJsonPath: $.Noc.*.auditDetails.lastModifiedTime
+          outJsonPath: $.Data.lastModifiedTime
+        - inJsonPath: $.Noc.*.documents
+          outJsonPath: $.Data.documents
+        - inJsonPath: $.Noc.*.nocDetails
+          outJsonPath: $.Data.nocDetails
+  - topic: update-noc-application
+    configKey: INDEX
+    indexes:
+    - name: noc-application-update-index
+      type: general
+      id: $.Noc.id, $.Noc.tenantId
+      isBulk: true
+      timeStampField: $.Noc.auditDetails.lastModifiedTime
+      jsonPath: $
+      customJsonMapping:
+        indexMapping:
+          Data:
+            id: id
+            tenantId: tenantId
+            applicationNo: applicationNo
+            status: status
+            nocNo: nocNo
+            applicationType: applicationType
+            nocType: nocType
+            accountId: accountId
+            applicationStatus: applicationStatus
+            createdBy: createdBy
+            lastModifiedBy: lastModifiedBy
+            createdTime: createdTime
+            lastModifiedTime: lastModifiedTime
+            documents: []
+            nocDetails: {}
+        fieldMapping:
+        - inJsonPath: $.Noc.*.id
+          outJsonPath: $.Data.id
+        - inJsonPath: $.Noc.*.tenantId
+          outJsonPath: $.Data.tenantId
+        - inJsonPath: $.Noc.*.applicationNo
+          outJsonPath: $.Data.applicationNo
+        - inJsonPath: $.Noc.*.status
+          outJsonPath: $.Data.status
+        - inJsonPath: $.Noc.*.nocNo
+          outJsonPath: $.Data.nocNo
+        - inJsonPath: $.Noc.*.applicationType
+          outJsonPath: $.Data.applicationType
+        - inJsonPath: $.Noc.*.nocType
+          outJsonPath: $.Data.nocType
+        - inJsonPath: $.Noc.*.accountId
+          outJsonPath: $.Data.accountId
+        - inJsonPath: $.Noc.*.applicationStatus
+          outJsonPath: $.Data.applicationStatus
+        - inJsonPath: $.Noc.*.auditDetails.createdBy
+          outJsonPath: $.Data.createdBy
+        - inJsonPath: $.Noc.*.auditDetails.lastModifiedBy
+          outJsonPath: $.Data.lastModifiedBy
+        - inJsonPath: $.Noc.*.auditDetails.createdTime
+          outJsonPath: $.Data.createdTime
+        - inJsonPath: $.Noc.*.auditDetails.lastModifiedTime
+          outJsonPath: $.Data.lastModifiedTime
+        - inJsonPath: $.Noc.*.documents
+          outJsonPath: $.Data.documents
+        - inJsonPath: $.Noc.*.nocDetails
+          outJsonPath: $.Data.nocDetails

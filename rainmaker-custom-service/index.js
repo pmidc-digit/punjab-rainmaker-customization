@@ -385,13 +385,10 @@ router.post('/protected/bndlogin', asyncMiddleware(async function (req, res) {
 async function findDemandForConsumerCode(consumerCode, tenantId, service, RequestInfo) {
 
     log("Got Request to Find Demand for Comsumer code: "+consumerCode+" tenantid : "+tenantId+" Service : "+service);
-      let fromDate = 1364774400000
-      let toDate = 1396310399000
-      let status = "ACTIVE"
+
     let demandSearchResponse = await request.post({
         url: url.resolve(PT_DEMAND_HOST, "/billing-service/demand/_search?tenantId=" + tenantId +
-            "&consumerCode=" + consumerCode + "&businessService=" + service + "&periodFrom=" + fromDate + 
-            "&periodTo=" + toDate + "&status=" + status),
+            "&consumerCode=" + consumerCode + "&businessService=" + service),
         body: {
             RequestInfo
         },
@@ -485,13 +482,8 @@ async function _estimateIntegrationTaxProcessor(req1, res1) {
 
 function _estimateZeroTaxProcessor(request, response) {
     let index = 0;
-    console.log("Request:",request, "Response:", response );
-
-    console.log("request[CalculationCriteria]:", request["CalculationCriteria"])
 
     for (let calc of response["Calculation"]) {
-        console.log("Response Calculation:", calc );
-
         let assessmentYear = request["CalculationCriteria"][index]["assessmentYear"]
         let tenantId = request["CalculationCriteria"][index]["tenantId"]
         let newTotal = 0;
@@ -647,29 +639,16 @@ function _estimateZeroTaxProcessor(request, response) {
 // }
 
 async function _createAndUpdateZeroTaxProcessor(request, response) {
-    console.log("Entered in to _createAndUpdateZeroTaxProcessor======");
-    console.log("Request:", request);
-    console.log("Response:", response);
     let index = 0
+    for (reqProperty of request["Properties"]) {
 
-    for (reqProperty of response["Assessments"]) {
-
-        let resProperty = response["Assessments"][index]
+        let resProperty = response["Properties"][index]
         let propertyId = resProperty["propertyId"]
-        let assessmentNumber = resProperty["assessmentNumber"]
 
-        let assessmentYear = resProperty["financialYear"]
+        let assessmentNumber = resProperty["propertyDetails"][0]["assessmentNumber"]
+
+        let assessmentYear = resProperty["propertyDetails"][0]["financialYear"]
         let tenantId = reqProperty["tenantId"]
-
-    // for (reqProperty of request["Properties"]) {
-
-    //     let resProperty = response["Properties"][index]
-    //     let propertyId = resProperty["propertyId"]
-
-    //     let assessmentNumber = resProperty["propertyDetails"][0]["assessmentNumber"]
-
-    //     let assessmentYear = resProperty["propertyDetails"][0]["financialYear"]
-    //     let tenantId = reqProperty["tenantId"]
 
         if (isCitizen(request) && assessmentYear === PT_ZERO_ASSESSMENTYEAR) {
             data =  
@@ -692,9 +671,9 @@ async function _createAndUpdateZeroTaxProcessor(request, response) {
 
         request_info = request["RequestInfo"] || request["requestInfo"]
 
-        let consumerCode = propertyId
+        let consumerCode = propertyId + ":" + assessmentNumber
         let service = "PT"
-       // let calc = response["Properties"][index]["propertyDetails"][0]["calculation"]
+        let calc = response["Properties"][index]["propertyDetails"][0]["calculation"]
 
         let newTotal = 0;
 
@@ -710,20 +689,20 @@ async function _createAndUpdateZeroTaxProcessor(request, response) {
             }
         }
 
-        /*let taxHeads = calc["taxHeadEstimates"];
+        let taxHeads = calc["taxHeadEstimates"];
 
         for (taxHead of taxHeads) {
             if (taxHead.taxHeadCode != "PT_ADHOC_PENALTY" && taxHead.taxHeadCode == 'PT_ADVANCE_CARRYFORWARD') {
                 taxHead.estimateAmount = 0
             }
-        }*/
+        }
         let demandUpdateResponse = await updateDemand(demandSearchResponse["Demands"], request["RequestInfo"])
 
-      /*  calc["taxAmount"] = 0;
+        calc["taxAmount"] = 0;
         calc["exemption"] = 0;
         calc["totalAmount"] = newTotal;
         calc["rebate"] = 0
-        calc["penanlty"] = newTotal*/
+        calc["penanlty"] = newTotal
         index++
     }
 
@@ -1021,37 +1000,12 @@ router.post('/open/punjab-pt/payu/confirm', asyncMiddleware((async function (req
     res.redirect(redirect_url);
 })))
 
-router.post('/open/punjab-pt/ccavanue/confirm', asyncMiddleware((async function (req, res) {
-  let return_data = req.body;
-     console.log('Request Body :', return_data);
-    let orderNo = return_data.orderNo;
-
-    original_callback = req.query.original_callback;
-         console.log('Request Query  :',  req.query);
-         console.log('Request original callback  :',  original_callback);
-
-    delete req.query['original_callback'];
-    let txnid = req.query.eg_pg_txnid
-    delete req.query['eg_pg_txnid'];
-
-    new_query_params = Object.assign({}, return_data, req.query);
-    redirect_url = url.format(
-        {
-            pathname: original_callback,
-            query: new_query_params
-        }
-    )
-    //ensuring the first query param is eg_pg_txnid
-    redirect_url = redirect_url.replace('?', '?'+ 'eg_pg_txnid=' + orderNo +'&')
-    res.redirect(redirect_url);
-})))
-
 router.post('/protected/punjab-pt/pre-hook/pg-service/transaction/v1/_create', asyncMiddleware((async function (req, res) {
     let {
         request
     } = getRequestResponse(req)
 
-    if (request['Transaction']['tenantId'] == 'pb.jalandhar' ) {
+    if (request['Transaction']['tenantId'] == 'pb.jalandhar' || request['Transaction']['tenantId'] == 'pb.testing') {
         let original_callback = request['Transaction']['callbackUrl'];
         request['Transaction']['gateway'] = 'PAYU'
         url_callback = url.parse(original_callback)
@@ -1065,30 +1019,7 @@ router.post('/protected/punjab-pt/pre-hook/pg-service/transaction/v1/_create', a
 
         request['Transaction']['callbackUrl'] = url.format(url_callback);
     }
-    //    else  if (request['Transaction']['tenantId'] == 'pb.amritsar' && (request['Transaction']['module'] == 'WS' || request['Transaction']['module'] == 'SW' || request['Transaction']['module'] == 'WS.ONE_TIME_FEE' || request['Transaction']['module'] == 'SW.ONE_TIME_FEE' )) {
-    //     let original_callback = request['Transaction']['callbackUrl'];
-    //     request['Transaction']['gateway'] = 'CCAVANUE'
-    //     url_callback = url.parse(original_callback)
 
-    //     url_callback.query = url_callback.query || {};
-
-    //     url_callback.query['original_callback'] = url_callback.path;
-
-    //      url_callback.path = '/customization/open/punjab-pt/ccavanue/confirm';
-    //      url_callback.pathname = '/customization/open/punjab-pt/ccavanue/confirm';
-
-    //     request['Transaction']['callbackUrl'] = url.format(url_callback);
-    // }
-     // else if (request['Transaction']['tenantId'] == 'pb.amritsar' || request['Transaction']['tenantId'] == 'pb.mohali' || request['Transaction']['tenantId'] == 'pb.hoshiarpur' || request['Transaction']['tenantId'] == 'pb.kapurthala' || request['Transaction']['tenantId'] == 'pb.khanna' || request['Transaction']['tenantId'] == 'pb.moga' || request['Transaction']['tenantId'] == 'pb.mandigobindgarh'|| request['Transaction']['tenantId'] == 'pb.handiaya') {
-    else {
-    let original_callback = request['Transaction']['callbackUrl'];
-      request['Transaction']['gateway'] = 'RAZORPAY'
-      url_callback = url.parse(original_callback)
-      url_callback.query = url_callback.query || {};
-      url_callback.query['original_callback'] = url_callback.path;
-      request['Transaction']['callbackUrl'] = url.format(url_callback);
-      
-    }
     res.json(request);
 })));
 
@@ -1112,13 +1043,12 @@ router.post('/protected/punjab-pt/pt-calculator-v2/_estimate', asyncMiddleware(a
 
 
     let oldRequestbody = await getOldRequestBody(request); 
-    console.log("Old Request Body:", oldRequestbody);
     oldRequestbody["CalculationCriteria"][0]["assessmentYear"] =  assessmentYear;
     // assessmentYear field was there in old request body but not present in new request body Without this field we will get null pointer exception.
 
 
     if (assessmentYear == PT_ZERO_ASSESSMENTYEAR && PT_ZERO_TENANTS.indexOf(tenantId) >= 0){
-        response = _estimateZeroTaxProcessor(oldRequestbody, response)
+        response = _estimateZeroTaxProcessor(request, response)
     }
     else if (assessmentYear == PT_INTEGRATION_ASSESSMENTYEAR){
             

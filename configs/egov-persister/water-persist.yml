@@ -7,7 +7,7 @@ serviceMaps:
    fromTopic: save-ws-connection
    isTransaction: true
    queryMaps: 
-    - query: INSERT INTO eg_ws_connection (id, tenantid, property_id, applicationno, applicationstatus, status, connectionno, oldconnectionno,roadcuttingarea,action,roadtype, createdby, lastmodifiedby, createdtime, lastmodifiedtime, applicationtype, dateEffectiveFrom, locality, isoldapplication,additionaldetails, channel,isDisconnectionTemporary, disconnectionReason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?);
+    - query: INSERT INTO eg_ws_connection (id, tenantid, property_id, applicationno, applicationstatus, status, connectionno, oldconnectionno,roadcuttingarea,action,roadtype, createdby, lastmodifiedby, createdtime, lastmodifiedtime, applicationtype, dateEffectiveFrom, locality, isoldapplication,additionaldetails, channel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?);
       basePath: $.WaterConnection
       jsonMaps:
        - jsonPath: $.WaterConnection.id 
@@ -53,12 +53,8 @@ serviceMaps:
          dbType: JSONB
        - jsonPath: $.WaterConnection.channel
 
-       - jsonPath: $.WaterConnection.isDisconnectionTemporary
-
-       - jsonPath: $.WaterConnection.disconnectionReason
-
        
-    - query: INSERT INTO eg_ws_service(connection_id,connectionCategory,connectionType,waterSource,meterId,meterInstallationDate,pipeSize,noOfTaps,connectionexecutiondate,proposedPipeSize,proposedTaps, appCreatedDate, createdby, lastmodifiedby, createdtime, lastmodifiedtime,disconnectionExecutionDate) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+    - query: INSERT INTO eg_ws_service(connection_id,connectionCategory,connectionType,waterSource,meterId,meterInstallationDate,pipeSize,noOfTaps,connectionexecutiondate,proposedPipeSize,proposedTaps, appCreatedDate, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
       basePath: $.WaterConnection
       jsonMaps:
 
@@ -92,8 +88,6 @@ serviceMaps:
        - jsonPath: $.WaterConnection.auditDetails.createdTime
 
        - jsonPath: $.WaterConnection.auditDetails.lastModifiedTime
-
-       - jsonPath: $.WaterConnection.disconnectionExecutionDate
        
    
     - query: INSERT INTO eg_ws_connectionholder(tenantid, connectionid, userid, status, isprimaryholder, connectionholdertype, holdershippercentage, relationship, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -170,7 +164,7 @@ serviceMaps:
       jsonMaps:
       - jsonPath: $.WaterConnection.id
       
-    - query: UPDATE eg_ws_connection SET applicationstatus=?, status=?, connectionno=?, oldconnectionno=?, action=?, roadCuttingArea=?, roadType=?, adhocpenalty=?, adhocrebate=?, adhocpenaltyreason=?, adhocpenaltycomment=?, adhocrebatereason=?, adhocrebatecomment=?, lastModifiedBy=?, lastModifiedTime=?, dateEffectiveFrom=?, locality=?, isoldapplication=?, property_id=?, additionaldetails=?,isDisconnectionTemporary=?, disconnectionReason=? WHERE id=?;
+    - query: UPDATE eg_ws_connection SET applicationstatus=?, status=?, connectionno=?, oldconnectionno=?, action=?, roadCuttingArea=?, roadType=?, adhocpenalty=?, adhocrebate=?, adhocpenaltyreason=?, adhocpenaltycomment=?, adhocrebatereason=?, adhocrebatecomment=?, lastModifiedBy=?, lastModifiedTime=?, dateEffectiveFrom=?, locality=?, isoldapplication=?, property_id=?, additionaldetails=? WHERE id=?;
       basePath: $.WaterConnection
       jsonMaps:
 
@@ -215,10 +209,6 @@ serviceMaps:
        - jsonPath: $.WaterConnection.additionalDetails
          type: JSON
          dbType: JSONB
-
-       - jsonPath: $.WaterConnection.isDisconnectionTemporary
-
-       - jsonPath: $.WaterConnection.disconnectionReason  
      
        - jsonPath: $.WaterConnection.id 
        
@@ -227,7 +217,7 @@ serviceMaps:
       jsonMaps:
       - jsonPath: $.WaterConnection.id
 
-    - query: UPDATE eg_ws_service SET connectionCategory=?,connectionType=?,waterSource=?,meterId=?,meterInstallationDate=?,pipeSize=?,noOfTaps=?,proposedPipeSize=?,proposedTaps=?, initialmeterreading = ?, connectionexecutiondate = ?, detailsprovidedby = ?, estimationfileStoreId = ?, sanctionfileStoreId = ?, estimationLetterDate = ?, lastModifiedBy=?, lastModifiedTime=?,disconnectionExecutionDate=? WHERE connection_id=?;
+    - query: UPDATE eg_ws_service SET connectionCategory=?,connectionType=?,waterSource=?,meterId=?,meterInstallationDate=?,pipeSize=?,noOfTaps=?,proposedPipeSize=?,proposedTaps=?, initialmeterreading = ?, connectionexecutiondate = ?, detailsprovidedby = ?, estimationfileStoreId = ?, sanctionfileStoreId = ?, estimationLetterDate = ?, lastModifiedBy=?, lastModifiedTime=? WHERE connection_id=?;
       basePath: $.WaterConnection
       jsonMaps:
        
@@ -264,8 +254,6 @@ serviceMaps:
        - jsonPath: $.WaterConnection.auditDetails.lastModifiedBy
 
        - jsonPath: $.WaterConnection.auditDetails.lastModifiedTime
-
-       - jsonPath: $.WaterConnection.disconnectionExecutionDate
 
        - jsonPath: $.WaterConnection.id
 
@@ -475,7 +463,7 @@ serviceMaps:
       jsonMaps:
       - jsonPath: $.WaterConnection.id
       
-    - query: UPDATE eg_ws_service SET estimationfileStoreId = ?, sanctionfileStoreId = ?,estimationLetterDate = ?, appCreatedDate = ? WHERE connection_id=?;
+    - query: UPDATE eg_ws_service SET estimationfileStoreId = ?, sanctionfileStoreId = ? WHERE connection_id=?;
       basePath: $.WaterConnection
       jsonMaps:
 
@@ -483,34 +471,4 @@ serviceMaps:
 
       - jsonPath: $.WaterConnection.additionalDetails.sanctionFileStoreId
 
-      - jsonPath: $.WaterConnection.additionalDetails.estimationLetterDate
-
-      - jsonPath: $.WaterConnection.additionalDetails.appCreatedDate 
-
       - jsonPath: $.WaterConnection.id
-
- - version: 1.0
-
-   description: Updates ws status for auto escalate
-
-   fromTopic: ws-auto-escalation
-
-   isTransaction: true
-
-   queryMaps:
-    - query: UPDATE eg_ws_connection SET applicationstatus=?, lastmodifiedby=?, lastmodifiedtime=? WHERE applicationno=? AND tenantId=?;
-
-      basePath: ProcessInstances.*
-
-      jsonMaps:
-
-      - jsonPath: $.ProcessInstances.*.state.applicationStatus
-
-      - jsonPath: $.ProcessInstances.*.auditDetails.lastModifiedBy
-
-      - jsonPath: $.ProcessInstances.*.auditDetails.lastModifiedTime
-
-      - jsonPath: $.ProcessInstances.*.businessId
-
-      - jsonPath: $.ProcessInstances.*.tenantId
-

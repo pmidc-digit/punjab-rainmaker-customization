@@ -9,48 +9,53 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: id
-        label: swachId
+      - name: District
+        label: District
         type: string
         source: rainmaker-swach
-        total: false
-      - name: Tenantid
-        label: tenantid
-        type: string
-        source: rainmaker-swach
-        total: false
-      - name: latitude
-        label: latitude
-        type: string
-        source: rainmaker-swach
-        total: false
-      - name: longitude
-        label: longitude
-        type: string
-        source: rainmaker-swach
-        total: false
-      - name: locality
-        label: locality
-        type: string
-        source: rainmaker-swach
-        total: false
-      - name: imagerurl
-        label: imagerurl
-        type: string
-        source: rainmaker-swach
-        total: false
-      - name: createdtime
-        label: createdtime
+        total: false    
+      - name: ULB
+        label: ULB
         type: string
         source: rainmaker-swach
         total: false
       - name: ownername
-        label: username
+        label: Name
         type: string
         source: rainmaker-swach
         total: false
       - name: mobileno
-        label: mobilenumber
+        label: Mob.No.
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: createdtime
+        label: Time
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: latitude
+        label: Latitude
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: longitude
+        label: Longitude
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: locality
+        label: Locality
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: id
+        label: Photo
+        type: string
+        source: rainmaker-swach
+        total: false        
+      - name: imagerurl
+        label: URL Image
         type: string
         source: rainmaker-swach
         total: false
@@ -69,11 +74,12 @@ ReportDefinitions:
         searchClause: AND swach.created_time <= $toDate
         
     query: |
-        SELECT swach.id, swach.tenant_id as tenantid, swach.uuid, swach.latitude, swach.longitude, swach.locality, 
+        SELECT swach.id,ulb.district as District, initcap(split_part(swach.tenant_id, '.', 2)) as ULB, swach.uuid, swach.latitude, swach.longitude, swach.locality, 
         swach.imagerurl, TO_CHAR((TO_TIMESTAMP(swach.created_time/1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY HH24:MI:SS') as createdtime,
         swach.created_by as createdby, TO_CHAR((TO_TIMESTAMP(swach.last_updated_time/1000) AT TIME ZONE 'Asia/Kolkata'), 'DD-MM-YYYY HH24:MI:SS') as lastupdatedtime, 
         swach.last_updated_by as lastupdatedby, us.name as ownername,us.mobilenumber as mobileno
         FROM public.egov_swach_imagedata  swach
+        INNER JOIN ulb_data ulb on swach.tenant_id = ulb.ulb_code
         INNER JOIN public.eg_user us ON us.uuid = swach.uuid
 
   - reportName: ULBwiseComplaintCountReport
@@ -81,33 +87,18 @@ ReportDefinitions:
     version: 1.0.0
     moduleName: rainmaker-swach
     sourceColumns:
-    - name: Tenantid
-      label: Tenantid
+    - name: District
+      label: District
+      type: string
+      source: rainmaker-swach
+      total: false    
+    - name: ULB
+      label: ULB
       type: string
       source: rainmaker-swach
       total: false
-    - name: ULBType
-      label: ULBType
-      type: string
-      source: rainmaker-swach
-      total: false
-    - name: Pending at LME
-      label: PENDING AT LME
-      type: string
-      source: rainmaker-swach
-      total: true
-    - name: PENDING %
-      label: PENDING %
-      type: string
-      source: rainmaker-swach
-      total: false
-    - name: PENDING FOR ASSIGNMENT
-      label: PENDING FOR ASSIGNMENT
-      type: string
-      source: rainmaker-swach
-      total: true
-    - name: PENDING FOR REASSIGNMENT
-      label: PENDING FOR REASSIGNMENT
+    - name: Total
+      label: Total
       type: string
       source: rainmaker-swach
       total: true
@@ -121,11 +112,33 @@ ReportDefinitions:
       type: string
       source: rainmaker-swach
       total: true
-    - name: Total
-      label: Total
+    - name: Total Pending
+      label: Total Pending
       type: string
       source: rainmaker-swach
       total: true
+    - name: Pending %
+      label: Pending %
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: PENDING FOR ASSIGNMENT
+      label: PENDING FOR ASSIGNMENT
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: Pending at LME
+      label: PENDING AT LME
+      type: string
+      source: rainmaker-swach
+      total: true
+    - name: PENDING FOR REASSIGNMENT
+      label: PENDING FOR REASSIGNMENT
+      type: string
+      source: rainmaker-swach
+      total: true
+
+
     searchParams:
     - name: ulb
       label: ULB
@@ -149,17 +162,20 @@ ReportDefinitions:
       searchClause: AND createdtime <= $toDate
     query: |
       select 
-      initcap(split_part(sc.tenantid, '.', 2)) as Tenantid,
-      ulb.type as ULBType,
+      CASE
+      WHEN initcap(split_part(sc.tenantid, '.', 2)) IN ('Abohar', 'Amritsar', 'Batala', 'Bathinda', 'Mohali', 'Moga',
+      'Pathankot', 'Phagwara', 'Patiala', 'Jalandhar', 'Kapurthala', 'Hoshiarpur', 'Ludhiana')
+      THEN 'MC ' || initcap(split_part(sc.tenantid, '.', 2))
+      ELSE initcap(split_part(sc.tenantid, '.', 2))
+      END AS "ULB",
+      ulb.district as District,
       SUM(CASE WHEN sc.applicationstatus ='PENDINGATLME' THEN 1 ELSE 0 END) as "Pending at LME",
+      SUM(CASE WHEN sc.applicationstatus in ('PENDINGATLME','PENDINGFORASSIGNMENT','PENDINGFORREASSIGNMENT') THEN 1 ELSE 0 END) as "Total Pending",
       SUM(CASE WHEN sc.applicationstatus ='PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END) as "PENDING FOR ASSIGNMENT",
       SUM(CASE WHEN sc.applicationstatus ='PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END) as "PENDING FOR REASSIGNMENT",
       SUM(CASE WHEN sc.applicationstatus ='REJECTED' THEN 1 ELSE 0 END) as "Rejected",
       SUM(CASE WHEN sc.applicationstatus ='RESOLVED' THEN 1 ELSE 0 END) as "Resolved",
       count(sc.applicationstatus) as "Total" ,
-      CASE 
-       WHEN COUNT(sc.applicationstatus) = 0 THEN '0.00'
-       ELSE 
       ROUND(
         (
           (SUM(CASE 
@@ -172,16 +188,21 @@ ReportDefinitions:
       from eg_swach_service_v2 sc
       inner join ulb_data ulb on ulb.ulb_code = sc.tenantid
       WHERE sc.tenantid != 'pb.testing'
-    groupby: GROUP BY Tenantid,ULBType
-    orderby: ORDER BY Tenantid
+    groupby: GROUP BY initcap(split_part(sc.tenantid, '.', 2)), ulb.district
+
         
   - reportName: SwachComplaintTypesReport_v2
     summary: Fetches complaint stats based on complaint types for a ULB
     version: 1.0.0
     moduleName: rainmaker-swach
     sourceColumns:
+    - name: District
+      label: District
+      type: string
+      source: rainmaker-swach
+      total: false    
     - name: Tenantid
-      label: Tenantid
+      label: ULB
       type: string
       source: rainmaker-swach
       total: false
@@ -190,18 +211,8 @@ ReportDefinitions:
       type: string
       source: rainmaker-swach
       total: false
-    - name: Pending at LME
-      label: Pending at LME
-      type: string
-      source: rainmaker-swach
-      total: true
-    - name: PENDING FOR ASSIGNMENT
-      label: Pending For Assignment
-      type: string
-      source: rainmaker-swach
-      total: true
-    - name: PENDINGFORREASSIGNMENT
-      label: Pending For Reassignment
+    - name: Total
+      label: Total
       type: string
       source: rainmaker-swach
       total: true
@@ -215,11 +226,26 @@ ReportDefinitions:
       type: string
       source: rainmaker-swach
       total: true
-    - name: Total
-      label: Total
+    - name: Total Pending
+      label: Total Pending
+      type: string
+      source: rainmaker-swach
+      total: true      
+    - name: PENDING FOR ASSIGNMENT
+      label: Pending for Assignment
+      type: string
+      source: rainmaker-swach
+      total: true       
+    - name: Pending at LME
+      label: Pending at LME
       type: string
       source: rainmaker-swach
       total: true
+    - name: PENDINGFORREASSIGNMENT
+      label: Pending For Reassignment
+      type: string
+      source: rainmaker-swach
+      total: true           
     searchParams:
     - name: ulb
       label: ULB
@@ -243,17 +269,20 @@ ReportDefinitions:
       searchClause: AND createdtime <= $toDate
     query: |
       select 
-      initcap(split_part(tenantid, '.', 2)) as tenantid,
-      regexp_replace(servicecode, '([a-z])([A-Z])', '\1 \2','g') as "Complaint Type",
-      SUM(CASE WHEN applicationstatus ='PENDINGATLME' THEN 1 ELSE 0 END) as "Pending at LME",
-      SUM(CASE WHEN applicationstatus ='PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END) as "PENDING FOR ASSIGNMENT",
-      SUM(CASE WHEN applicationstatus ='PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END) as "PENDINGFORREASSIGNMENT",
-      SUM(CASE WHEN applicationstatus ='REJECTED' THEN 1 ELSE 0 END) as Rejected,
-      SUM(CASE WHEN applicationstatus ='RESOLVED' THEN 1 ELSE 0 END) as Resolved,
-      count(applicationstatus) as Total
-      from eg_swach_service_v2
-      WHERE tenantid != 'pb.testing'
-    groupby: GROUP BY tenantid,servicecode
+      ulb.district as District,
+      initcap(split_part(sc.tenantid, '.', 2)) as tenantid,
+      regexp_replace(sc.servicecode, '([a-z])([A-Z])', '\1 \2','g') as "Complaint Type",
+      SUM(CASE WHEN sc.applicationstatus in ('PENDINGATLME','PENDINGFORASSIGNMENT','PENDINGFORREASSIGNMENT') THEN 1 ELSE 0 END) as "Total Pending",
+      SUM(CASE WHEN sc.applicationstatus ='PENDINGATLME' THEN 1 ELSE 0 END) as "Pending at LME",
+      SUM(CASE WHEN sc.applicationstatus ='PENDINGFORASSIGNMENT' THEN 1 ELSE 0 END) as "PENDING FOR ASSIGNMENT",
+      SUM(CASE WHEN sc.applicationstatus ='PENDINGFORREASSIGNMENT' THEN 1 ELSE 0 END) as "PENDINGFORREASSIGNMENT",
+      SUM(CASE WHEN sc.applicationstatus ='REJECTED' THEN 1 ELSE 0 END) as Rejected,
+      SUM(CASE WHEN sc.applicationstatus ='RESOLVED' THEN 1 ELSE 0 END) as Resolved,
+      count(sc.applicationstatus) as Total
+      from eg_swach_service_v2 sc
+      inner join ulb_data ulb on ulb.ulb_code = sc.tenantid
+      WHERE sc.tenantid != 'pb.testing'
+    groupby: GROUP BY tenantid,servicecode,District
     orderby: ORDER BY tenantid,servicecode
 
   - reportName: SwachStateSourceReport_v2
@@ -261,36 +290,46 @@ ReportDefinitions:
     version: 1.0.0
     moduleName: rainmaker-swach
     sourceColumns:
+    - name: District
+      label: District
+      type: string 
+      source: rainmaker-swach
+      total: false    
     - name: tenantid
-      label: Tenantid
+      label: ULB
       type: string
       source: rainmaker-swach
       total: false
     - name: whatsapp
-      label: whatsapp
-      type: string
-      source: rainmaker-swach
-      total: true
-    - name: ivr
-      label: ivr
+      label: WhatsApp
       type: string
       source: rainmaker-swach
       total: true
     - name: mobileapp
-      label: mobileapp
+      label: MobileApp
       type: string
       source: rainmaker-swach
-      total: true
+      total: true      
     - name: web
-      label: web
+      label: Web
+      type: string
+      source: rainmaker-swach
+      total: true      
+    - name: ivr
+      label: IVR
       type: string
       source: rainmaker-swach
       total: true
     - name: unknown
-      label: unknown
+      label: Unknown
       type: string
       source: rainmaker-swach
       total: true
+    - name: Total
+      label: Total
+      type: string
+      source: rainmaker-swach
+      total: true      
     searchParams:
     - name: fromDate
       label: From Date
@@ -305,17 +344,19 @@ ReportDefinitions:
       isMandatory: false
       searchClause: AND createdtime <= $toDate
     query: |
-      select initcap(split_part(tenantid, '.', 2)) as tenantid,
-      SUM(CASE WHEN source ='whatsapp' THEN 1 ELSE 0 END) as whatsapp,
-      SUM(CASE WHEN source ='ivr' THEN 1 ELSE 0 END) as ivr,
-      SUM(CASE WHEN source ='mobile' THEN 1 ELSE 0 END) as mobileapp,
-      SUM(CASE WHEN source ='web' THEN 1 ELSE 0 END) as web,
-      SUM(CASE WHEN source NOT IN ('web', 'ivr', 'mobile','whatsapp')  OR source is NULL THEN 1 ELSE 0 END) as unknown
-      from eg_swach_service_v2
-      WHERE tenantid != 'pb.testing'
-    groupby: GROUP BY tenantid
+      select initcap(split_part(sc.tenantid, '.', 2)) as tenantid,
+      ulb.district as "District",
+      SUM(CASE WHEN sc.source ='whatsapp' THEN 1 ELSE 0 END) as whatsapp,
+      SUM(CASE WHEN sc.source ='ivr' THEN 1 ELSE 0 END) as ivr,
+      SUM(CASE WHEN sc.source ='mobile' THEN 1 ELSE 0 END) as mobileapp,
+      SUM(CASE WHEN sc.source ='web' THEN 1 ELSE 0 END) as web,
+      SUM(CASE WHEN sc.source NOT IN ('web', 'ivr', 'mobile','whatsapp')  OR sc.source is NULL THEN 1 ELSE 0 END) as unknown,
+      COUNT(sc.source) as "Total"
+      from eg_swach_service_v2 sc
+      inner join ulb_data ulb on ulb.ulb_code = sc.tenantid
+      WHERE sc.tenantid != 'pb.testing'
+    groupby: GROUP BY tenantid,ulb.district
     orderby: ORDER BY tenantid
-
   - reportName: SwachStateDescriptionReport_v2
     decryptionPathId: DescriptionReport_v2
     summary: Fetches state description wise reports 
@@ -332,72 +373,72 @@ ReportDefinitions:
       tableName: tbl_def_dept
     sourceColumns:
     - name: department
-      label: department
+      label: Department
       type: string
       source: rainmaker-swach
       total: false
     - name: servicecode
-      label: servicecode
+      label: Servicecode
       type: string
       source: rainmaker-swach
       total: false
     - name: complaintNo
-      label: complaintNo
+      label: Complaint No.
       type: string
       source: rainmaker-swach
       total: false
     - name: date
-      label: date
+      label: Date
       type: string
       source: rainmaker-swach
       total: false
     - name: name
-      label: name
+      label: Name
       type: string
       source: rainmaker-swach
       total: false
     - name: mobileno
-      label: mobileno
+      label: Mob.No.
       type: string
       source: rainmaker-swach
       total: false
     - name: address
-      label: address
+      label: Address
       type: string
       source: rainmaker-swach
       total: false
     - name: landmark
-      label: landmark
+      label: Landmark
       type: string
       source: rainmaker-swach
       total: false
     - name: description
-      label: description
+      label: Description
       type: string
       source: rainmaker-swach
       total: false
     - name: lastassignedto
-      label: lastassignedto
+      label: Last Assigned To
       type: string
       source: rainmaker-swach
       total: false
     - name: status
-      label: status
+      label: Status
       type: string
       source: rainmaker-swach
       total: false
     - name: actiondate
-      label: actiondate
+      label: Action Date
       type: string
       source: rainmaker-swach
       total: false
     - name: source
-      label: source
+      label: Source of Complaint
       type: string
       source: rainmaker-swach
       total: false
-    - name: tenantid
-      label: tenantid
+    - name: ULB
+      label: ULB
       type: string
       source: rainmaker-swach
       total: false
@@ -425,14 +466,15 @@ ReportDefinitions:
     - name: appstatus
       label: reports.rainmaker-swach.status
       type: singlevaluelist
-      pattern: 'list://assigned:assigned,closed:closed,open:open,reassignrequested:reassignrequested,rejected:rejected,resolved:resolved'
+      pattern: 'list://PENDINGATLME:PENDINGATLME,PENDINGFORASSIGNMENT:PENDINGFORASSIGNMENT,PENDINGFORREASSIGNMENT:PENDINGFORREASSIGNMENT,REJECTED:REJECTED,RESOLVED:RESOLVED'
       source: rainmaker-swach
       isMandatory: false
-      searchClause: AND ess.status=$appstatus
+      searchClause: AND ess.applicationstatus=$appstatus
     query: |
       SELECT 
       DISTINCT ON (servicerequestid)
       (case when ua.name is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else ua.name end) as lastassignedto,
+      initcap(split_part(ess.tenantid, '.', 2)) as "ULB",
       (SELECT deptmap_def.name FROM (VALUES tbl_def_dept) AS deptmap_def(name,code) INNER JOIN (VALUES tbl_dept) AS deptmap(serviceCode, department, slaHours) on deptmap.serviceCode = ess.servicecode and deptmap_def.code = deptmap.department) AS department, 
       regexp_replace(servicecode, '([a-z])([A-Z])', '\1 \2','g') AS servicecode,
       servicerequestid AS complaintNo, 
@@ -450,12 +492,15 @@ ReportDefinitions:
       left outer join eg_swach_address_v2 esa on ess.id = esa.parentid
       left outer join eg_user on eg_user.uuid::text = ess.createdby
       left outer join eg_pgr_action as epa on epa.businesskey = ess.servicerequestid and epa.action in ('assign','reassign','resolve')
-      left outer join eg_user as ua on (ua.id = epa.assignee::int or ua.id = split_part(epa.by,':',1)::INTEGER)
+      left outer join eg_user as ua on (ua.id = epa.assignee::int 
+      -- or ua.id = split_part(epa.by,':',1)::INTEGER
+      )
       WHERE 
       ess.tenantid !='pb.testing'
       --AND ess.status IN ('open','assigned','reassigrequested','rejected','closed','resolved')
    
     orderby: ORDER BY servicerequestid, ess.createdtime desc
+
 
   - reportName: Detailed_Attendance_report_swach
     decryptionPathId: ULBPTDataDumpReport_V2 
@@ -467,12 +512,12 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
       - name: ownername
-        label: username
+        label: Name
         type: string
         source: rainmaker-swach
         total: false
       - name: mobileno
-        label: mobilenumber
+        label: Mob.No.
         type: string
         source: rainmaker-swach
         total: false
@@ -507,7 +552,7 @@ ReportDefinitions:
         source: rainmaker-swach
         total: false
       - name: attendance_status
-        label: attendance_status
+        label: Attendance
         type: string
         source: rainmaker-swach
         total: false
