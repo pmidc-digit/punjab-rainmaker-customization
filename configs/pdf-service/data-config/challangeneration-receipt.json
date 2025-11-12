@@ -474,6 +474,12 @@
                 }
               },
               {
+                "variable": "epoch",
+                "value": {
+                  "path": "$.transactionDate"
+                }
+              },
+              {
                 "variable": "disclamer_4",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_4"
@@ -495,6 +501,30 @@
                   "required": true,
                   "prefix": null,
                   "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "offenceTypeName",
+                "value": {
+                  "path": "$.challan.challans[0].offenceTypeName"
+                }
+              },
+              {
+                "variable": "offenceDescription",
+                "value": {
+                  "path": "$.challan.challans[0].description"
+                }
+              },
+              {
+                "variable": "offenceCategoryName",
+                "value": {
+                  "path": "$.challan.challans[0].offenceCategoryName"
+                }
+              },
+              {
+                "variable": "offenceSubCategoryName",
+                "value": {
+                  "path": "$.challan.challans[0].offenceSubCategoryName"
                 }
               },
               {
@@ -537,6 +567,12 @@
           },
           {
             "derived": [
+              {
+                "variable": "epochIST",
+                "type": "date",
+                "formula": "({{epoch}} + 19800) * 1000",
+                "format": "HH:mm"
+              },
               {
                 "variable": "pendingAmount",
                 "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"

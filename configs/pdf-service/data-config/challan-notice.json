@@ -1,11 +1,11 @@
 {
-  "key": "adv-bill",
-  "documentType": "ADV_BILL",
+  "key": "challan-notice",
+  "documentType": "CHALLAN_NOTICE",
   "DataConfigs": {
     "moduleName": "rainmaker-common",
     "version": "1.0.0",
-    "baseKeyPath": "$.Payments.*",
-    "entityIdPath": "$.id",
+    "baseKeyPath": "$.challan",
+    "entityIdPath": "$.challans[0].id",
     "isCommonTableBorderRequired": true,
     "mappings": [
       {
@@ -16,7 +16,38 @@
               {
                 "variable": "payerName",
                 "value": {
-                  "path": "$.payerName"
+                  "path": "$.challans[0].citizen.name"
+                }
+              },
+              {
+                "variable": "payerFatherName",
+                "value": {
+                  "path": "$.challans[0].citizen.fatherOrHusbandName"
+                }
+              },
+              {
+                "variable": "payerAddress",
+                "value": {
+                  "path": "$.challans[0].address.addressLine1"
+                }
+              },
+              {
+                "variable": "ownerEmail",
+                "value": {
+                  "path": "$.userInfo.emailId"
+                },
+                "type": "selectFromRequestInfo"
+              },
+              {
+                "variable": "violationTime",
+                "value": {
+                  "path": "$.challans[0].documents.auditDetails.lastModifiedTime"
+                }
+              },
+              {
+                "variable": "epoch",
+                "value": {
+                  "path": "$.challans[0].auditDetails.lastModifiedTime"
                 }
               },
               {
@@ -71,98 +102,6 @@
                 "variable": "totalAmount",
                 "value": {
                   "path": "$.totalAmountPaid"
-                }
-              },
-              {
-                "variable": "adv_service_charge",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_SERVICE_CHARGE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "advServiceCharge",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[0].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "adv_booking_fees",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_BOOKING_FEES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "advBookingFees",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[1].adjustedAmount"
-                }
-              },
-              {
-                "variable": "adv_sgst",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_SGST"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "advSgst",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[2].adjustedAmount"
-                }
-              },
-              {
-                "variable": "adv_cgst",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_CGST"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "advCgst",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[3].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "adv_security_deposit",
-                "value": {
-                  "path": "ADV_SECURITY_DEPOSIT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "advSecurityDeposit",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[4].adjustedAmount"
                 }
               },
 
@@ -221,6 +160,12 @@
                 }
               },
               {
+                "variable": "location",
+                "value": {
+                  "path": "$.challans[0].address.locality.name"
+                }
+              },
+              {
                 "variable": "G8ReceiptDate",
                 "value": {
                   "path": "$.paymentDetails[0].manualReceiptDate"
@@ -230,28 +175,90 @@
               {
                 "variable": "paymentDate",
                 "value": {
-                  "path": "$.transactionDate"
+                  "path": "$.challans[0].taxPeriodFrom"
                 },
                 "type": "date"
               },
               {
-                "variable": "currentDate",
+                "variable": "dueDate",
                 "value": {
-                  "path": "$.bookingData[0].currentTime"
+                  "path": "$.challans[0].taxPeriodTo"
                 },
                 "type": "date"
               },
               {
-                "variable": "currentTime",
+                "variable": "officerName",
                 "value": {
-                  "path": "$.bookingData[0].currentTime"
-                },
-                "type": "time"
+                  "path": "$.officer.code"
+                }
               },
+              {
+                "variable": "officerID",
+                "value": {
+                  "path": "$.officer.id"
+                }
+              },
+              {
+                "variable": "officerdept",
+                "value": {
+                  "path": "$.officer.department"
+                }
+              },
+              {
+                "variable": "violationDate",
+                "value": {
+                  "path": "$.challans[0].documents[0].auditDetails.lastModifiedTime"
+                },
+                "type": "date"
+              },
+              {
+                "variable": "offenceTypeName",
+                "value": {
+                  "path": "$.challans[0].offenceTypeName"
+                }
+              },
+              {
+                "variable": "offenceDescription",
+                "value": {
+                  "path": "$.challans[0].description"
+                }
+              },
+              {
+                "variable": "offenceCategoryName",
+                "value": {
+                  "path": "$.challans[0].offenceCategoryName"
+                }
+              },
+              {
+                "variable": "offenceSubCategoryName",
+                "value": {
+                  "path": "$.challans[0].offenceSubCategoryName"
+                }
+              },
+              {
+                "variable": "challanAmount",
+                "value": {
+                  "path": "$.challans[0].challanAmount"
+                }
+              },
+
+              {
+                "variable": "totalAmountCollected",
+                "value": {
+                  "path": "$.totalAmountCollected"
+                }
+              },
+              {
+                "variable": "challanFine",
+                "value": {
+                  "path": "$.challans[0].additionalDetail.amount[?(@.taxHeadCode == 'CH.CHALLAN_FINE')].amount"
+                }
+              },
+
               {
                 "variable": "consumerID",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.consumerCode"
+                  "path": "$.challans[0].challanNo"
                 }
               },
               {
@@ -269,7 +276,44 @@
               {
                 "variable": "payment_receipt",
                 "value": {
-                  "path": "PAYMENT_HEADER_CITIZEN"
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAYMENT_RECEIPT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+
+              {
+                "variable": "challan_term_1",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_TERM_1"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "challan_term_2",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_TERM_2"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "challan_term_3",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_TERM_3"
                 },
                 "type": "label",
                 "localisation": {
@@ -306,18 +350,6 @@
                 "variable": "payment_date",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAYMENT_DATE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "current_date",
-                "value": {
-                  "path": "ADS_DATE"
                 },
                 "type": "label",
                 "localisation": {
@@ -387,18 +419,6 @@
                 }
               },
               {
-                "variable": "booking_no",
-                "value": {
-                  "path": "ADS_BOOKING_NO"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
                 "variable": "paid_amount",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAID_AMOUNT"
@@ -410,96 +430,6 @@
                   "module": "rainmaker-common"
                 }
               },
-              {
-                "variable": "var_cartdetails",
-                "value": {
-                  "path": "$.bookingData[0].bookingApplication[0].cartDetails[*]"
-                },
-                "type": "array",
-                "format": {
-                  "type": "string",
-                  "scema": [
-                    {
-                      "variable": "location",
-                      "value": "location",
-                      "localisation": {
-                        "required": true,
-                        "prefix": null,
-                        "module": "rainmaker-common"
-                      }
-                    },
-                    {
-                      "variable": "advertisementId",
-                      "value": "advertisementId"
-                    },
-                    {
-                      "variable": "advertisementName",
-                      "value": "advertisementName"
-                    },
-                    {
-                      "variable": "poleNo",
-                      "value": "poleNo"
-                    },
-                    {
-                      "variable": "startDate",
-                      "value": "startDate"
-                    },
-                    {
-                      "variable": "endDate",
-                      "value": "endDate"
-                    },
-                    {
-                      "variable": "numberOfDays",
-                      "value": "numberOfDays"
-                    },
-                    {
-                      "variable": "addType",
-                      "value": "addType",
-                      "localisation": {
-                        "required": true,
-                        "prefix": null,
-                        "module": "rainmaker-common"
-                      }
-                    },
-                    {
-                      "variable": "faceArea",
-                      "value": "faceArea",
-                      "localisation": {
-                        "required": true,
-                        "prefix": null,
-                        "module": "rainmaker-common"
-                      }
-                    },
-                    {
-                      "variable": "nightLight",
-                      "value": "nightLight"
-                    },
-                    {
-                      "variable": "status",
-                      "value": "status",
-                      "localisation": {
-                        "required": true,
-                        "prefix": null,
-                        "module": "rainmaker-common"
-                      }
-                    },
-                    {
-                      "variable": "amount",
-                      "value": "amount"
-                    },
-
-                    {
-                      "variable": "amountForDaysChosen",
-                      "value": "amountForDaysChosen"
-                    },
-                    {
-                      "variable": "dateRangesFlat",
-                      "value": "dateRangesFlat"
-                    }
-                  ]
-                }
-              },
-
               {
                 "variable": "pending_amount",
                 "value": {
@@ -573,9 +503,9 @@
                 }
               },
               {
-                "variable": "generated_on",
+                "variable": "generated_by",
                 "value": {
-                  "path": "GENERATED_ON_DATE"
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_GENERATED_BY"
                 },
                 "type": "label",
                 "localisation": {
@@ -704,70 +634,6 @@
                   "module": "rainmaker-common"
                 }
               },
-
-              {
-                "variable": "Site_Id",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_SITE_ID"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-
-              {
-                "variable": "Site",
-                "value": {
-                  "path": "CS_ADDCOMPLAINT_LOCATION"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-
-              {
-                "variable": "Booked_Dates",
-                "value": {
-                  "path": "PERIOD_BOOKING"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-
-              {
-                "variable": "Price/Day",
-                "value": {
-                  "path": "ONE_DAY_ADV_PRICE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "Cost",
-                "value": {
-                  "path": "ADS_COST"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
               {
                 "variable": "total_bill_amount",
                 "value": {
@@ -791,6 +657,18 @@
               {
                 "variable": "excessAmountPaid",
                 "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
+              },
+              {
+                "variable": "epochIST",
+                "type": "date",
+                "formula": "({{epoch}} + 19800) * 1000",
+                "format": "HH:mm"
+              },
+              {
+                "variable": "violationTimeIST",
+                "type": "date",
+                "formula": "({{violationTime}} + 19800) * 1000",
+                "format": "HH:mm"
               }
             ]
           },
@@ -798,7 +676,7 @@
             "externalAPI": [
               {
                 "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
-                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}')%5D",
+                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.challans[0].tenantId}')%5D",
                 "apiRequest": null,
                 "responseMapping": [
                   {

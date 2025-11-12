@@ -1,0 +1,250 @@
+SearchDefinitions:
+  moduleName: clu-services
+  summary: CLU Services Inbox API
+  version: 1.0.0
+  definitions:
+    - name: inboxclusearch
+      query:
+        baseQuery: |
+          Select row_to_json(result) from (
+            select DISTINCT(clu.applicationno), 
+                   pi.createdtime, 
+                   pi.status as status_id, 
+                   ws.state as status_name, 
+                   ws.applicationStatus as workflow_application_status,
+                   clu.id,
+                   clu.tenantid,
+                   clu.status,
+                   clu.cluno,
+                   clu.applicationType,
+                   clu.clutype,
+                   clu.accountid,
+                   clu.applicationstatus,
+                   details.additionaldetails,
+                   owner.ownertype,
+                   owner.isprimaryowner,
+                   owner.relationship,
+                   owner.ownershippercentage
+            from eg_clu as clu
+            LEFT JOIN eg_clu_details details ON details.cluid = clu.id
+            LEFT JOIN eg_clu_owner owner ON owner.cluid = clu.id AND owner.isprimaryowner = true
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = clu.applicationno
+            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
+            LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            $where 
+            AND pi.createdtime IN (
+              select max(createdtime) 
+              from eg_wf_processinstance_v2 wf 
+              where wf.businessid = clu.applicationno 
+              GROUP BY wf.businessid
+            )
+            order by pi.createdtime asc
+            $pagination
+          ) result
+        groupBy:
+        orderBy:
+      searchParams:
+        condition: AND
+        params:
+          - name: clu.tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+          - name: clu.id
+            isMandatory: false
+            jsonPath: $.searchCriteria.id
+          - name: pi.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.status
+            operator: IN
+          - name: clu.applicationno
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationNumber
+          - name: clu.cluno
+            isMandatory: false
+            jsonPath: $.searchCriteria.cluNumber
+          - name: pi.businessservice
+            isMandatory: false
+            jsonPath: $.searchCriteria.businessservice
+          - name: assg.assignee
+            isMandatory: false
+            jsonPath: $.searchCriteria.assignee
+          - name: clu.applicationstatus
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationStatus
+          - name: clu.applicationType
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationType
+          - name: clu.clutype
+            isMandatory: false
+            jsonPath: $.searchCriteria.cluType
+          - name: clu.accountid
+            isMandatory: false
+            jsonPath: $.searchCriteria.accountId
+          - name: owner.ownertype
+            isMandatory: false
+            jsonPath: $.searchCriteria.ownerType
+        pagination:
+          noOfRecords: $.searchCriteria.noOfRecords
+          offset: $.searchCriteria.offset
+      output:
+        jsonFormat: {"ResponseInfo": {},"cluApplication": []}
+        outJsonPath: $.cluApplication
+        responseInfoPath: $.ResponseInfo
+
+    - name: inboxclusearchcount
+      query:
+        baseQuery: |
+          Select row_to_json(result) from (
+            select COUNT(DISTINCT(clu.applicationno)) as totalCount
+            from eg_clu as clu
+            LEFT JOIN eg_clu_details details ON details.cluid = clu.id
+            LEFT JOIN eg_clu_owner owner ON owner.cluid = clu.id AND owner.isprimaryowner = true
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = clu.applicationno
+            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
+            LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            $where
+            AND pi.createdtime IN (
+              select max(createdtime) 
+              from eg_wf_processinstance_v2 wf 
+              where wf.businessid = clu.applicationno 
+              GROUP BY wf.businessid
+            )
+            $pagination
+          ) result
+        groupBy:
+        orderBy:
+      searchParams:
+        condition: AND
+        params:
+          - name: clu.tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+          - name: clu.id
+            isMandatory: false
+            jsonPath: $.searchCriteria.id
+          - name: pi.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.status
+            operator: IN
+          - name: clu.applicationno
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationNumber
+          - name: clu.cluno
+            isMandatory: false
+            jsonPath: $.searchCriteria.cluNumber
+          - name: pi.businessservice
+            isMandatory: false
+            jsonPath: $.searchCriteria.businessservice
+          - name: assg.assignee
+            isMandatory: false
+            jsonPath: $.searchCriteria.assignee
+          - name: clu.applicationstatus
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationStatus
+          - name: clu.applicationType
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationType
+          - name: clu.clutype
+            isMandatory: false
+            jsonPath: $.searchCriteria.cluType
+          - name: clu.accountid
+            isMandatory: false
+            jsonPath: $.searchCriteria.accountId
+          - name: owner.ownertype
+            isMandatory: false
+            jsonPath: $.searchCriteria.ownerType
+        pagination:
+          noOfRecords: $.searchCriteria.noOfRecords
+          offset: $.searchCriteria.offset
+      output:
+        jsonFormat: {"ResponseInfo": {},"totalCount": []}
+        outJsonPath: $.totalCount
+        responseInfoPath: $.ResponseInfo
+
+    - name: inboxclusearchdesc
+      query:
+        baseQuery: |
+          Select row_to_json(result) from (
+            select DISTINCT(clu.applicationno), 
+                   pi.createdtime, 
+                   pi.status as status_id,
+                   ws.state as status_name,
+                   ws.applicationStatus as workflow_application_status,
+                   clu.id,
+                   clu.tenantid,
+                   clu.status,
+                   clu.cluno,
+                   clu.applicationType,
+                   clu.clutype,
+                   clu.accountid,
+                   clu.applicationstatus,
+                   details.additionaldetails,
+                   owner.ownertype,
+                   owner.isprimaryowner,
+                   owner.relationship,
+                   owner.ownershippercentage
+            from eg_clu as clu
+            LEFT JOIN eg_clu_details details ON details.cluid = clu.id
+            LEFT JOIN eg_clu_owner owner ON owner.cluid = clu.id AND owner.isprimaryowner = true
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = clu.applicationno
+            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
+            LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            $where
+            AND pi.createdtime IN (
+              select max(createdtime) 
+              from eg_wf_processinstance_v2 wf 
+              where wf.businessid = clu.applicationno 
+              GROUP BY wf.businessid
+            )
+            order by pi.createdtime desc
+            $pagination
+          ) result
+        groupBy:
+        orderBy:
+      searchParams:
+        condition: AND
+        params:
+          - name: clu.tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+          - name: clu.id
+            isMandatory: false
+            jsonPath: $.searchCriteria.id
+          - name: pi.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.status
+            operator: IN
+          - name: clu.applicationno
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationNumber
+          - name: clu.cluno
+            isMandatory: false
+            jsonPath: $.searchCriteria.cluNumber
+          - name: pi.businessservice
+            isMandatory: false
+            jsonPath: $.searchCriteria.businessservice
+          - name: assg.assignee
+            isMandatory: false
+            jsonPath: $.searchCriteria.assignee
+          - name: clu.applicationstatus
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationStatus
+          - name: clu.applicationType
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationType
+          - name: clu.clutype
+            isMandatory: false
+            jsonPath: $.searchCriteria.cluType
+          - name: clu.accountid
+            isMandatory: false
+            jsonPath: $.searchCriteria.accountId
+          - name: owner.ownertype
+            isMandatory: false
+            jsonPath: $.searchCriteria.ownerType
+        pagination:
+          noOfRecords: $.searchCriteria.noOfRecords
+          offset: $.searchCriteria.offset
+      output:
+        jsonFormat: {"ResponseInfo": {},"cluApplication": []}
+        outJsonPath: $.cluApplication
+        responseInfoPath: $.ResponseInfo
