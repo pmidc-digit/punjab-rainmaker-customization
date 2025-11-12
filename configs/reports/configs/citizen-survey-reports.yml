@@ -1,0 +1,32 @@
+---
+ReportDefinitions:
+  - reportName: Survey_Question_Weightage
+    summary: Question Weightage Tenant Wise
+    version: 1.0.0
+    moduleName: rainmaker-survey
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: rainmaker-survey
+        total: false
+      - name: questionuuid
+        label: questionuuid
+        type: string
+        source: rainmaker-survey
+        total: false
+      - name: totalweightage
+        label: totalweightage
+        type: string
+        source: rainmaker-survey
+        total: false
+    query: |
+        SELECT res.tenantid,qw.questionuuid,sum(qw.weightage) as totalweightage 
+        FROM eg_ss_survey_response res
+        JOIN eg_ss_survey_section sec on res.surveyuuid=sec.surveyuuid
+        JOIN eg_ss_question_weightage qw ON sec.uuid = qw.sectionuuid
+        WHERE res.tenantid = $tenantid
+    groupby: GROUP BY res.tenantid,qw.questionuuid

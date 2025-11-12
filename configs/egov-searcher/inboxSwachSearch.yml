@@ -210,3 +210,74 @@ SearchDefinitions:
     outJsonPath: $.Services
     responseInfoPath: $.ResponseInfo
 
+
+ - name: inboxswachsearchall
+   query:
+     baseQuery: >
+      SELECT row_to_json(result) FROM (
+        SELECT DISTINCT ser.id AS id,
+          ser.tenantid AS tenantid,
+          ser.servicerequestid AS servicerequestid,
+          ser.servicecode AS servicecode,
+          ser.applicationstatus AS applicationstatus,
+          ser.accountid AS accountid,
+          ser.createdtime AS createdtime,
+          ser.lastmodifiedtime AS lastmodifiedtime,
+          ads.locality AS locality,
+          pi.businessservice AS businessservice,
+          pi.action AS action,
+          pi.assigner AS assigner,
+          pi.createdby AS createdby,
+          pi.lastmodifiedby AS lastmodifiedby,
+          assg.assignee AS assignee
+        FROM eg_swach_service_v2 ser
+        INNER JOIN eg_swach_address_v2 ads ON ads.parentid = ser.id
+        INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = ser.servicerequestid
+        LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+        $where
+        AND pi.createdtime = (
+          SELECT MAX(wf.createdtime)
+          FROM eg_wf_processinstance_v2 wf
+          WHERE wf.businessid = ser.servicerequestid
+        )
+        ORDER BY ser.createdtime DESC
+      ) result
+
+   searchParams:
+    condition: AND
+    params:
+      - name: ser.tenantid
+        isMandatory: true
+        jsonPath: $.searchCriteria.tenantId
+      - name: pi.status
+        isMandatory: false
+        jsonPath: $.searchCriteria.status
+      - name: ser.servicerequestid
+        isMandatory: false
+        jsonPath: $.searchCriteria.serviceRequestId
+      - name: ser.servicecode
+        isMandatory: false
+        jsonPath: $.searchCriteria.serviceCode
+      - name: assg.assignee
+        isMandatory: false
+        jsonPath: $.searchCriteria.assignee
+      - name: ads.locality
+        isMandatory: false
+        jsonPath: $.searchCriteria.locality
+      - name: ser.accountid
+        isMandatory: false
+        jsonPath: $.searchCriteria.userid
+      - name: pi.businessservice
+        isMandatory: false
+        jsonPath: $.searchCriteria.businessservice
+      - name: ser.createdtime
+        isMandatory: false
+        jsonPath: $.searchCriteria.fromDate
+      - name: ser.createdtime
+        isMandatory: false
+        jsonPath: $.searchCriteria.toDate
+
+   output:
+    jsonFormat: {"ResponseInfo": {},"Services": []}
+    outJsonPath: $.Services
+    responseInfoPath: $.ResponseInfo

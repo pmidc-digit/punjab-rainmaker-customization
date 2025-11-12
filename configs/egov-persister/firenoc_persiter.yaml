@@ -92,7 +92,7 @@ serviceMaps:
 
           - jsonPath: $.FireNOCs.*.fireNOCDetails.applicantDetails.owners.*.isActive
 
-          - jsonPath: $.FireNOCs.*.fireNOCDetails.applicantDetails.owners.*.isPrimaryOwner
+          - jsonPath: $.FireNOCs.*.fireNOCDetails.applicantDetails.owners.*.isPrimaryowner
 
           - jsonPath: $.FireNOCs[*][?({id} in @.fireNOCDetails.applicantDetails.owners[*].id)].fireNOCDetails.applicantDetails.ownerShipType
 
@@ -469,7 +469,7 @@ serviceMaps:
           - jsonPath: $.FireNOCs[*][?({id} in @.fireNOCDetails.buildings.*.uoms[*].id)].auditDetails.lastModifiedTime
 
 
-       - query: INSERT INTO eg_fn_owner(uuid, tenantid, firenocdetailsuuid, isactive, isprimaryowner, ownertype, ownershippercentage, relationship, active, institutionid, createdby, createdtime, lastmodifiedby, lastmodifiedtime,useruuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?) ON CONFLICT ON CONSTRAINT pk_eg_fn_owner DO UPDATE SET active = ?, isprimaryowner = ?, ownertype = ?, ownershippercentage = ?, relationship = ?,useruuid=?, lastmodifiedby = ?,  lastmodifiedtime = ?;
+       - query: INSERT INTO eg_fn_owner(uuid, tenantid, firenocdetailsuuid, isactive, isprimaryowner, ownertype, ownershippercentage, relationship, active, institutionid, createdby, createdtime, lastmodifiedby, lastmodifiedtime,useruuid, applicationAssignee) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?) ON CONFLICT ON CONSTRAINT pk_eg_fn_owner DO UPDATE SET active = ?, isprimaryowner = ?, ownertype = ?, ownershippercentage = ?, relationship = ?,useruuid=?, lastmodifiedby = ?,  lastmodifiedtime = ?, applicationAssignee = ?;
          basePath: FireNOCs.*.fireNOCDetails.applicantDetails.owners.*
          jsonMaps:
           - jsonPath: $.FireNOCs.*.fireNOCDetails.applicantDetails.owners.*.ownerUUID
@@ -480,7 +480,7 @@ serviceMaps:
 
           - jsonPath: $.FireNOCs.*.fireNOCDetails.applicantDetails.owners.*.userActive
 
-          - jsonPath: $.FireNOCs.*.fireNOCDetails.applicantDetails.owners.*.isPrimaryOwner
+          - jsonPath: $.FireNOCs.*.fireNOCDetails.applicantDetails.owners.*.isPrimaryowner
 
           - jsonPath: $.FireNOCs[*][?({id} in @.fireNOCDetails.applicantDetails.owners[*].id)].fireNOCDetails.applicantDetails.ownerShipType
 
@@ -501,10 +501,12 @@ serviceMaps:
           - jsonPath: $.FireNOCs[*][?({id} in @.fireNOCDetails.applicantDetails.owners[*].id)].auditDetails.lastModifiedTime
 
           - jsonPath: $.FireNOCs.*.fireNOCDetails.applicantDetails.owners.*.uuid
+          
+          - jsonPath: $.FireNOCs.*.fireNOCDetails.applicantDetails.owners.*.applicationAssignee
 
           - jsonPath: $.FireNOCs.*.fireNOCDetails.applicantDetails.owners.*.userActive
 
-          - jsonPath: $.FireNOCs.*.fireNOCDetails.applicantDetails.owners.*.isPrimaryOwner
+          - jsonPath: $.FireNOCs.*.fireNOCDetails.applicantDetails.owners.*.isPrimaryowner
 
           - jsonPath: $.FireNOCs[*][?({id} in @.fireNOCDetails.applicantDetails.owners[*].id)].fireNOCDetails.applicantDetails.ownerShipType
 
@@ -517,6 +519,8 @@ serviceMaps:
           - jsonPath: $.FireNOCs[*][?({id} in @.fireNOCDetails.applicantDetails.owners[*].id)].auditDetails.lastModifiedBy
 
           - jsonPath: $.FireNOCs[*][?({id} in @.fireNOCDetails.applicantDetails.owners[*].id)].auditDetails.lastModifiedTime
+          
+          - jsonPath: $.FireNOCs.*.fireNOCDetails.applicantDetails.owners.*.applicationAssignee
 
        - query: UPDATE eg_fn_address SET doorno =?,street = ?,buildingName = ?, latitude =?, longitude =?, addressid =?, addressnumber =?,locality =?, type =?, addressline1 =?, addressline2 =?, landmark =?, city =?, pincode =?, detail =?,lastmodifiedby =?, lastmodifiedtime =?, areatype=?, subdistrict=? WHERE uuid =?;
          basePath: FireNOCs.*.fireNOCDetails.propertyDetails.address

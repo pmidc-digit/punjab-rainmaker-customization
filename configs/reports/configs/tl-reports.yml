@@ -1325,16 +1325,16 @@ ReportDefinitions:
     type: epoch
     source: tl
     isMandatory: false
-    searchClause: AND egcl_paymentdetail.receiptdate  <= $toDate
+    searchClause: AND egcl_paymentdetail.receiptdate  <= $toDate 
   - name: collectorname
     label: reports.uc.collectorname
     type: singlevaluelist
     pattern: http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=TL_CEMP|$.Employees[*].user.id|$.Employees[*].user.name
-    source: tl
+    source: pt
     wrapper: true
     isMandatory: false
     searchClause: AND eg_user.id = $collectorname::INTEGER
-  query: |  
+  query: |
     SELECT 
       licensenumber,
       to_char((To_timestamp(issueddate / 1000) at time Zone 'Asia/Kolkata'), 'DD/MM/YYYY') as formattedIssuedDate,
@@ -1372,8 +1372,8 @@ ReportDefinitions:
       SELECT tradelicensedetailid,array_to_string(array_agg(message.message),',') AS acc FROM eg_tl_accessory
       LEFT OUTER JOIN message ON code=CONCAT('TRADELICENSE_ACCESSORIESCATEGORY_', REGEXP_REPLACE(accessorycategory, '[^A-Za-z0-9]','_', 'g')) AND message.locale = 'en_IN' GROUP BY 1 ) tlacc ON tlacc.tradelicensedetailid = tld.id
     Join eg_user ON eg_user.id = egcl_paymentdetail.createdby::INTEGER
-    WHERE  tl.tenantid = $tenantid and payment.paymentstatus!='CANCELLED'
-  orderby: ORDER BY egcl_paymentdetail.receiptnumber DESC;
+    WHERE  tl.tenantId = $tenantid and payment.paymentstatus!='CANCELLED'
+
 
 - reportName: StateTradeLicenseCancelledRegistryReport_v2
   decryptionPathId: TradeLicenseCancelledRegistryReport_v2
@@ -2302,11 +2302,6 @@ ReportDefinitions:
     type: string
     source: tl
     total: false
-  - name: applicationdate
-    label: report.tl.receipt.applicationdate
-    type: string
-    source: tl
-    total: false   
   searchParams:
   - name: fromDate
     label: reports.tl.fromDate
@@ -2329,13 +2324,12 @@ ReportDefinitions:
   query: |
       SELECT 
         tl.applicationnumber as applicationnumber,
-        to_char((To_timestamp(tl.applicationdate / 1000) at time Zone 'Asia/Kolkata'), 'DD/MM/YYYY') as applicationdate,
         locality_tlb.locality as locality,
         eg_bndry_mohalla.blockcode as ward_block,
         eg_bndry_mohalla.zonecode as zone,
         propertyid,
         financialyear,
-        (case when oldlicensenumber is null then 'NEW' else 'RENEWAL' end) AS licensetype,
+        (case when oldlicensenumber is null then 'New' else 'Renewal' end) AS licensetype,
         oldlicensenumber,
         licensenumber,
         to_char((To_timestamp(issueddate / 1000) at time Zone 'Asia/Kolkata'), 'DD/MM/YYYY') as formattedIssuedDate,
@@ -2365,7 +2359,7 @@ ReportDefinitions:
       (
         SELECT tradelicensedetailid,array_to_string(array_agg(message.message),',') AS acc FROM eg_tl_accessory
         LEFT OUTER JOIN message ON code=CONCAT('TRADELICENSE_ACCESSORIESCATEGORY_', REGEXP_REPLACE(accessorycategory, '[^A-Za-z0-9]','_', 'g')) AND message.locale = 'en_IN' GROUP BY 1 ) tlacc ON tlacc.tradelicensedetailid = tld.id
-      WHERE tl.tenantid=$tenantid
+      WHERE tl.tenantid=$tenantid 
 
 
 - reportName: StateDefaulterReport_v2
@@ -2414,19 +2408,6 @@ ReportDefinitions:
     type: string
     source: tl
     total: false
-  searchParams:
-  - name: fromDate
-    label: reports.tl.fromDate
-    type: epoch
-    source: tl
-    isMandatory: false
-    searchClause: AND applicationdate >= $fromDate
-  - name: toDate
-    label: reports.tl.toDate
-    type: epoch
-    source: tl
-    isMandatory: false
-    searchClause: AND applicationdate <= $toDate     
   query: |
     select 
       split_part(tenantid,'.',2) as ulb,
@@ -2446,7 +2427,7 @@ ReportDefinitions:
       group by tradelicensedetailid
     ) tlown ON tlown.tradelicensedetailid = tld.id
     where validto < extract (epoch from NOW())*1000 and licensenumber is not null and licensenumber not in (select oldlicensenumber from eg_tl_tradelicense where oldlicensenumber is not null)
-    and tenantid! ='pb.testing'
+    and tenantid!='pb.testing'
   orderby: order by tenantid
 
 
@@ -2491,16 +2472,6 @@ ReportDefinitions:
     type: string
     source: tl
     total: false
-  - name: zonename
-    label: report.tl.zonename
-    type: string
-    source: tl
-    total: false
-  - name: blockname
-    label: report.tl.blockname
-    type: string
-    source: tl
-    total: false
   - name: mobilenumber
     label: report.tl.mobilenumber
     type: string
@@ -2508,21 +2479,16 @@ ReportDefinitions:
     total: false
   query: |
     select 
-      distinct on (tl.applicationnumber)
-       applicationnumber,
-      split_part(tl.tenantid,'.',2) as ulb,
+      split_part(tenantid,'.',2) as ulb,
       licensenumber,
+      applicationnumber,
       oldlicensenumber,
       financialyear,
       tradename,
-      zonename,
-      blockname,
       split_part(name,',',1) as ownername,
       split_part(mobilenumber,',',1) as mobilenumber
     from eg_tl_tradelicense tl
     INNER JOIN eg_tl_tradelicensedetail tld ON tld.tradelicenseid = tl.id 
-    inner join eg_tl_address as tla on tla.tradelicensedetailid = tld.id
-    inner join eg_bndry_mohalla on eg_bndry_mohalla.localitycode=tla.locality
     INNER JOIN (
       SELECT tradelicensedetailid, array_to_string(array_agg(name),', ') as name, array_to_string(array_agg(mobilenumber),', ') as mobilenumber 
       FROM eg_tl_owner tlowner 
@@ -2530,9 +2496,7 @@ ReportDefinitions:
       group by tradelicensedetailid
     ) tlown ON tlown.tradelicensedetailid = tld.id
     where validto < extract (epoch from NOW())*1000 and licensenumber is not null and licensenumber not in (select oldlicensenumber from eg_tl_tradelicense where oldlicensenumber is not null)
-    and tl.tenantid = $tenantid
-  
-    
+    and tenantid = $tenantid
     
 - reportName: StateTradeLicenseDetailsReport_v2
   decryptionPathId: TradeLicenseDetailsReport_v2                   
@@ -2625,48 +2589,48 @@ ReportDefinitions:
     type: string
     source: tl
     total: false
-  - name: applicationdate
-    label: report.tl.receipt.applicationdate
-    type: string
-    source: tl
-    total: false    
   searchParams:
   - name: fromDate
     label: reports.tl.fromDate
     type: epoch
     source: tl
     isMandatory: false
-    searchClause: AND tl.applicationdate >= $fromDate
+    searchClause: AND applicationdate >= $fromDate
   - name: toDate
     label: reports.tl.toDate
     type: epoch
     source: tl
     isMandatory: false
-    searchClause: AND tl.applicationdate <= $toDate 
+    searchClause: AND applicationdate <= $toDate 
+  - name: localityArray
+    label: reports.tl.zoneList
+    type: boundarylist
+    source: tl
+    isMandatory: false
+    searchClause: AND localitycode IN ($localityArray)
   query: |
-    SELECT
-      tl.applicationnumber as applicationnumber,
-      to_char((To_timestamp(tl.applicationdate / 1000) at time Zone 'Asia/Kolkata'), 'DD/MM/YYYY') as applicationdate,
-       propertyid,
-       financialyear,
+      SELECT 
+        tl.applicationnumber as applicationnumber,
+        propertyid,
+        financialyear,
         (case when oldlicensenumber is null then 'New' else 'Renewal' end) AS licensetype,
         oldlicensenumber,
-        string_agg(tl.licensenumber, ', ') as "licensenumber",
-         to_char((To_timestamp(issueddate / 1000) at time Zone 'Asia/Kolkata'), 'DD/MM/YYYY') as formattedIssuedDate,
-         string_agg(tl.tradeName, ', ') as "tradeName",
-         string_agg(tl.tenantid, ', ') as "tenantid",
-         tradeTypeName,
-         acc,
-         name,
-         (case when emailid is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else emailid end)  as emailid,
-         string_agg(distinct REGEXP_REPLACE(REGEXP_REPLACE(CONCAT(tla.doorno, ',', tla.buildingname, ',',tla.street,',',tla.localityname,',', tla.pincode), ',+', ','), '^,|,$', ''),',') as "address",
-         mobilenumber,
-         paydetail.amountpaid as totalamount,
-         tl.status as status
+        licensenumber,
+        to_char((To_timestamp(issueddate / 1000) at time Zone 'Asia/Kolkata'), 'DD/MM/YYYY') as formattedIssuedDate,
+        tl.tradeName,
+        tl.tenantid,
+        tradeTypeName,   
+        acc, 
+        name,
+        mobilenumber,
+        emailid,
+        paydetail.amountpaid as totalamount,
+        string_agg(distinct REGEXP_REPLACE(REGEXP_REPLACE(CONCAT(tla.doorno, ',', tla.buildingname, ',',tla.street,',',tla.localityname,',', tla.pincode), ',+', ','), '^,|,$', ''),',') as "address",
+        tl.status as status
       FROM eg_tl_tradelicense tl 
-        INNER JOIN eg_tl_tradelicensedetail tld ON tld.tradelicenseid = tl.id 
-        inner join (SELECT tradelicensedetailid , locality,doorno,street,buildingname,pincode,localityname, max(createdtime) 
-                 from eg_tl_address inner join eg_bndry_mohalla on eg_bndry_mohalla.localitycode=eg_tl_address.locality where eg_tl_address.tenantid=eg_bndry_mohalla.tenantid
+      INNER JOIN eg_tl_tradelicensedetail tld ON tld.tradelicenseid = tl.id 
+      inner join (SELECT tradelicensedetailid , locality,doorno,street,buildingname,pincode,localityname, max(createdtime) 
+                 from eg_tl_address inner join eg_bndry_mohalla on eg_bndry_mohalla.localitycode=locality where eg_tl_address.tenantid=$tenantid
                  group by tradelicensedetailid, locality, doorno,street,buildingname,pincode,localityname) tla ON tld.id=tla.tradelicensedetailid
       INNER JOIN eg_tl_owner tlowner ON tlowner.tradelicensedetailid = tld.id 
       INNER JOIN (
@@ -2681,7 +2645,6 @@ ReportDefinitions:
         SELECT tradelicensedetailid,array_to_string(array_agg(message.message),',') AS acc FROM eg_tl_accessory
         LEFT OUTER JOIN message ON code=CONCAT('TRADELICENSE_ACCESSORIESCATEGORY_', REGEXP_REPLACE(accessorycategory, '[^A-Za-z0-9]','_', 'g')) AND message.locale = 'en_IN' GROUP BY 1 ) tlacc ON tlacc.tradelicensedetailid = tld.id
       WHERE tl.tenantid!='pb.testing'
-  groupby: group by tl.applicationnumber, tl.propertyid, tl.financialyear, tl.oldlicensenumber, tl.issueddate, tlunit.tradetypename, tlacc.acc,tluser.name,tluser.emailid, tluser.mobilenumber,paydetail.amountpaid, tl.status,tl.tenantid,tl.applicationdate
   orderby: order by tl.tenantid     
    
 - reportName: TradeLicensePendencyReport_v2
@@ -2842,174 +2805,4 @@ ReportDefinitions:
         WHERE payment.tenantid=$tenantid AND businessservice in ('TL') and payment.paymentstatus != 'CANCELLED'
   groupby: GROUP BY collectorname , paymentmode
         
-- reportName: TLReceiptRegister_7to10Sept2020
-  decryptionPathId: TradeLicenseRegistryReport_v2
-  summary: TLReceiptRegister_7to10Sept2020
-  version: 1.0.0
-  moduleName: rainmaker-tl
-  additionalConfig:
-    print:
-      pdfPageSize: "A3"
-  sourceColumns:
-  - name: tenantid
-    label: reports.tl.tenantid
-    type: string
-    source: tl
-    total: false
-  - name: receiptnumber
-    label: reports.tl.receiptnumber
-    type: string
-    source: tl
-    total: false
-  - name: receiptissuedate
-    label: reports.tl.receiptissuedate
-    type: string
-    source: tl
-    total: false
-  - name: g8issuedate
-    label: reports.tl.g8issuedate
-    type: string
-    source: tl
-    total: false
-  - name: g8receiptno
-    label: reports.tl.g8receiptno
-    type: string
-    source: tl
-    total: false
-  - name: name
-    label: reports.tl.name
-    type: string
-    source: tl
-    total: false
-  - name: formattedissueddate
-    label: reports.tl.formattedissueddate
-    type: string
-    source: tl
-    total: false
-  - name: licensenumber
-    label: reports.tl.licensenumber
-    type: string
-    source: tl
-    total: false
-  - name: acc
-    label: reports.tl.acc
-    type: string
-    source: tl
-    total: false
-  - name: tradename
-    label: reports.tl.tradename
-    type: string
-    source: tl
-    total: true
-  - name: status
-    label: reports.tl.status
-    type: string
-    source: tl
-    total: false
-  - name: tradetypename
-    label: reports.tl.tradetypename
-    type: string
-    source: tl
-    total: true
-  - name: totalamount
-    label: reports.tl.totalamount
-    type: string
-    source: tl
-    total: true
-  - name: transactionnumber
-    label: reports.tl.transactionnumber
-    type: string
-    source: tl
-    total: false
-  - name: instrumenttype
-    label: reports.tl.instrumenttype
-    type: string
-    source: tl
-    total: false
-  - name: mobilenumber
-    label: reports.tl.mobilenumber
-    type: string
-    source: tl
-    total: false 
-  - name: collectorname
-    label: reports.tl.collectorname
-    type: string
-    source: tl
-    total: false
-  
-  query: |
-      -- Use CTE to force query plan, compute & use CTE later
-      SELECT
-         licensenumber, formattedissueddate, tradename, status, receiptissuedate, receiptnumber, tradetypename, acc, 
-         name, mobilenumber,transactionnumber, instrumenttype, totalamount, g8issuedate, g8receiptno, collectorname,tenantid from tl_7to10sept2020_receipts
-         where tenantid=$tenantid 
-  orderby: ORDER BY receiptissuedate DESC
-
-
-- reportName: StateTradesubtype_v2
-  decryptionPathId: TradeLicenseDetailsReport_v2                   
-  summary: State Trade Subtype Collection Report
-  version: 1.0.0
-  moduleName: rainmaker-tl
-  sourceColumns:
-  - name:  tradetype
-    label: report.tl.tradetype
-    type: string
-    source: tl
-    total: false
-  - name: count
-    label: report.tl.count
-    type: string
-    source: tl
-    total: false
-  - name: collectionamount
-    label: report.tl.collectionamount
-    type: string
-    source: tl
-    total: false
-  - name: tradesubtype
-    label: report.tl.tradesubtype
-    type: string
-    source: tl
-    total: false
-  - name: workflowcode
-    label: report.tl.workflowcode
-    type: string
-    source: tl
-    total: false
-  - name: category
-    label: report.tl.category
-    type: string
-    source: tl
-    total: false       
-  searchParams:
-  - name: fromDate
-    label: reports.tl.fromDate
-    type: epoch
-    source: tl
-    isMandatory: false
-    searchClause: AND tl.applicationdate >= $fromDate
-  - name: toDate
-    label: reports.tl.toDate
-    type: epoch
-    source: tl
-    isMandatory: false
-    searchClause: AND tl.applicationdate <= $toDate 
-  query: |
-     SELECT
-        tradetype,count(*) as count,sum(pd.amountpaid) as collectionamount,message as tradesubtype,workflowcode,
-        (case when tl.workflowcode!='NEWTL.HAZ' then 'Non Hazardeous' else 'Hazardeous' end) as category
-        from eg_tl_tradelicense tl
-        inner join eg_tl_tradelicensedetail td on td.tradelicenseid=tl.id
-        inner join eg_tl_tradeunit tu on tu.tradelicensedetailid=td.id
-        inner join egbs_billdetail_v1 bd on bd.consumercode=tl.applicationnumber
-        inner join message on message.code=replace(concat('TRADELICENSE_TRADETYPE_',replace(tradetype,'.','_')),'-','_')
-        inner join egcl_paymentdetail pd on pd.billid=bd.billid
-        where  status='APPROVED' and tl.tenantid!='pb.testing'       
-  groupby: GROUP BY tradetype,message,workflowcode;
-
-
-
-
-
-  
+    

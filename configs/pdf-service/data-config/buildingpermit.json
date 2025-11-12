@@ -6,16 +6,11 @@
     "baseKeyPath": "$.Bpa.*",
     "entityIdPath": "$.applicationNo",
     "isCommonTableBorderRequired": true,
-    "mappings": [
+    "mappings": [ 
       {
         "mappings": [
           {
-            "direct": [
-              {
-                "variable": "logoImage",
-                "url": "https://raw.githubusercontent.com/egovernments/egov-web-app/master/web/rainmaker/dev-packages/egov-ui-kit-dev/src/assets/images/pblogo.png",
-                "type": "image"
-              },
+            "direct": [              
               {
                 "variable": "applicationNo",
                 "value": {
@@ -25,7 +20,7 @@
               {
                 "variable": "planPermissionNo",
                 "value": {
-                  "path": "$.permitOrderNo"
+                  "path": "$.approvalNo"
                 }
               },
               {
@@ -44,21 +39,71 @@
               {
                 "variable": "favourOf",
                 "value": {
-                  "path": "$.owners.*.name"
+                  "path": "$.landInfo.owners.*.name"
+                }
+              },
+              {
+                "variable": "street",
+                "value": {
+                  "path": "$.landInfo.address.street"
+                }
+              },
+              {
+                "variable": "city",
+                "value": {
+                  "path": "$.landInfo.address.city"
+                }
+              },
+              {
+                "variable": "locality",
+                "value": {
+                  "path": "$.landInfo.address.locality.name"
+                }
+              },
+              {
+                "variable": "doorNo",
+                "value": {
+                  "path": "$.landInfo.address.doorNo"
                 }
               },
               {
                 "variable": "holdingNo",
                 "value": {
-                  "path": "$.holdingNo"
+                  "path": "$.additionalDetails.holdingNo"
+                }
+              },
+              {
+                "variable": "ownerName",
+                "value": {
+                  "path": "$.landInfo.owners[0].name"
                 }
               },
               {
                 "variable": "validityDate",
                 "value": {
-                  "path": "$.validityDate"
+                  "path": "$.additionalDetails.validityDate"
                 },
                 "type": "date"
+              },
+
+              {
+                "variable": "COLONY_TEXT",
+                "value": {
+                  "path": "$.additionalDetails.permitData"
+                }
+              },
+              {
+                "variable": "submissionDate",
+                "value": {
+                  "path": "$.additionalDetails.runDate"
+                },
+                "type": "date"
+              },
+              {
+                "variable": "formattedSubmissionDate",
+                "value": {
+                  "path": "$.additionalDetails.formattedSubmissionDate"
+                }
               },
               {
                 "variable": "conditions",
@@ -70,7 +115,8 @@
                   "scema": [
                     {
                       "key": "pendingapproval",
-                      "type" : "array-orderedlist"
+                      "type" : "array-orderedlist",
+                      "value": "pendingapproval"
                     }
                   ]
                 }
@@ -88,6 +134,64 @@
                 }
               },
               {
+                "variable": "profession",
+                "value": {
+                  "path": "$.additionalDetails.typeOfArchitect"
+                }
+              },
+              {
+                "variable": "stakeholderName",
+                "value": {
+                  "path": "$.additionalDetails.stakeholderName"
+                  
+                }
+              },
+              {
+                "variable": "ulbName",
+                "value": {
+                  "path": "$.additionalDetails.UlbName"
+                  
+                }
+              },
+              {
+                "variable": "ulbType",
+                "value": {
+                  "path": "$.additionalDetails.Ulblisttype" 
+                }
+              },
+              {
+                "variable": "ownersWithAddress",
+                "value": {
+                  "path": "$.landInfo.owners[0].name"  
+                }
+              },
+              {
+                "variable": "ownersWithName",
+                "value": {
+                  "path": "$.landInfo.owners[0].permanentAddress"  
+                }
+              },
+              {
+                "variable": "nocNumber",
+                "value": {
+                  "path": "$.additionalDetails.nocNumber"
+                  
+                }
+              },
+              {
+                "variable": "stakeholderAddress",
+                "value": {
+                  "path": "$.additionalDetails.stakeholderAddress"
+                }
+              },
+              {
+                "variable": "stakeholderRegistrationNumber",
+                "value": {
+                  "path": "$.additionalDetails.stakeholderRegistrationNumber"
+                }
+              },
+              
+              {
                 "variable": "proposedLandUse",
                 "value": {
                   "path": "$.additionalDetails.proposedLandUse"
@@ -97,6 +201,19 @@
                 "variable": "WRT_TXT",
                 "value": {
                   "path": "BOA_PDF_WRT_TXT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              
+              {
+                "variable": "REGISTRATION_NUMBER",
+                "value": {
+                  "path": "BPA_PDF_REGISTRATION_NUMBER"
                 },
                 "type": "label",
                 "localisation": {
@@ -129,11 +246,645 @@
                 }
               },
               {
+                "variable": "ADDRESS",
+                "value": {
+                  "path": "BPA_PDF_ADDRESS"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "SELF_CERTIFIED_BY",
+                "value": {
+                  "path": "BPA_PDF_SELF_CERTIFIED_BY"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "COMPUTER_GENERATED_STATEMENT",
+                "value": {
+                  "path": "BPA_PDF_COMPUTER_GENERATED_STATEMENT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "BPA_UNDER_SELF_CERTIFICATION_SCHEME",
+                "value": {
+                  "path": "BPA_PDF_BPA_UNDER_SELF_CERTIFICATION_SCHEME"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "BPA_BUILDING_PERMIT",
+                "value": {
+                  "path": "BPA_PDF_BPA_BUILDING_PERMIT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "BPA_AUTO_APPROVED",
+                "value": {
+                  "path": "BPA_PDF_BPA_AUTO_APPROVED"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "FILE_BPA_NO",
+                "value": {
+                  "path": "BPA_PDF_FILE_BPA_NO"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "THE_PLOT_REGULARISED_UNDER",
+                "value": {
+                  "path": "BPA_PDF_THE_PLOT_REGULARISED_UNDER"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "REGISTERED_NAME_OF",
+                "value": {
+                  "path": "BPA_PDF_REGISTERED_NAME_OF"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "REGULATION_FALLS_UNDER",
+                "value": {
+                  "path": "BPA_PDF_REGULATION_FALLS_UNDER"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "MISREPRESENTATION",
+                "value": {
+                  "path": "BPA_PDF_MISREPRESENTATION"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "Name Of ",
+                "value": {
+                  "path": "BPA_PDF_NAME_OF_STAKEHOLFDER_CONTENT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "DATED",
+                "value": {
+                  "path": "BPA_PDF_DATED_CAPITAL"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "TO",
+                "value": {
+                  "path": "BPA_PDF_TO"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "SUBJECT",
+                "value": {
+                  "path": "BPA_PDF_SUBJECT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+             {
+                "variable": "SUBJECT_CONTENT",
+                "value": {
+                  "path": "$.additionalDetails.Ulblisttype"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": "BPA_PDF_SUBJECT_CONTENT_",
+                  "module": "rainmaker-bpa"
+                }
+              },
+
+              {
+                "variable": "SUBJECT_CONTENT2",
+                "value": {
+                  "path": "BPA_PDF_SUBJECT_CONTENT2"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "DEAR_SIR_MADAM",
+                "value": {
+                  "path": "BPA_PDF_DEAR_SIR_MADAM"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "REFERNCE_TEXT",
+                "value": {
+                  "path": "BPA_PDF_REFERNCE_TEXT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "GRANT_OF_SANCTION_TEXT",
+                "value": {
+                  "path": "BPA_PDF_GRANT_OF_SANCTION_TEXT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+               {
+                "variable": "RESIDENTIAL_PLOTTED",
+                "value": {
+                  "path": "$.additionalDetails.usage"
+                  
+                }
+              },
+             
+              {
+                "variable": "BUILDING_HAVING",
+                "value": {
+                  "path": "BPA_PDF_BUILDING_HAVING"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "PLOT_SIZE",
+                "value": {
+                  "path": "$.edcrDetail.planDetail.planInformation[0].plotArea"
+                }
+               
+              
+              },
+              {
+                "variable": "SELF_CERTIFIED_UNDER",
+                "value": {
+                  "path": "BPA_PDF_SELF_CERTIFIED_UNDER"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "VALID_UPTO",
+                "value": {
+                  "path": "BPA_PDF_VALID_UPTO"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "RESPONSIBILITY_TXT",
+                "value": {
+                  "path": "BPA_PDF_RESPONSIBILITY_TXT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "YOUR_PROFESSIONAL",
+                "value": {
+                  "path": "BPA_PDF_YOUR_PROFESSIONAL"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "RESTS_UPTO_YOU",
+                "value": {
+                  "path": "BPA_PDF_RESTS_UPTO_YOU"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "REGARDING_TXT",
+                "value": {
+                  "path": "BPA_PDF_REGARDING_TXT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "THE",
+                "value": {
+                  "path": "BPA_PDF_THE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "CORRECTNESS_OWNERSHIP",
+                "value": {
+                  "path": "BPA_PDF_CORRECTNESS_OWNERSHIP"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "FURNISHED_FOUND_INCORRECT",
+                "value": {
+                  "path": "BPA_PDF_FURNISHED_FOUND_INCORRECT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "BPA_TERMS",
+                "value": {
+                  "path": "BPA_PDF_TERMS"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "BPA_TERMS2",
+                "value": {
+                  "path": "BPA_PDF_TERMS2"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "BPA_TERMS3",
+                "value": {
+                  "path": "BPA_PDF_TERMS3"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "BPA_TERMS4",
+                "value": {
+                  "path": "BPA_PDF_TERMS4"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "BPA_TERMS5",
+                "value": {
+                  "path": "BPA_PDF_TERMS5"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "BPA_TERMS6",
+                "value": {
+                  "path": "BPA_PDF_TERMS6"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "BPA_TERMS7",
+                "value": {
+                  "path": "BPA_PDF_TERMS7"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "BPA_TERMS8",
+                "value": {
+                  "path": "BPA_PDF_TERMS8"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "BPA_TERMS9",
+                "value": {
+                  "path": "BPA_PDF_TERMS9"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "BPA_TERMS10",
+                "value": {
+                  "path": "BPA_PDF_TERMS10"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "BPA_TERMS11",
+                "value": {
+                  "path": "BPA_PDF_TERMS11"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "BPA_TERMS12",
+                "value": {
+                  "path": "BPA_PDF_TERMS11"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "PLAN_SANCTION",
+                "value": {
+                  "path": "BPA_PDF_PLAN_SANCTION"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "FURTHERMORE_THE",
+                "value": {
+                  "path": "BPA_PDF_FURTHERMORE_THE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "RESERVES_RIGHT",
+                "value": {
+                  "path": "BPA_PDF_RESERVES_RIGHT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "SHORTFALL_P2",
+                "value": {
+                  "path": "BPA_PDF_SHORTFALL_P2"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "IS_LIABLE",
+                "value": {
+                  "path": "BPA_PDF_IS_LIABLE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "SET_OF_SANCTIONED_PLAN",
+                "value": {
+                  "path": "BPA_PDF_SET_OF_SANCTIONED_PLAN"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "DIGITALLY_SIGNED_BY",
+                "value": {
+                  "path": "BPA_PDF_DIGITALLY_SIGNED_BY"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "PROFESSION",
+                "value": {
+                  "path": "BPA_PDF_PROFESSION"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "DATE_AND_TIME",
+                "value": {
+                  "path": "BPA_PDF_DATE_AND_TIME"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
                 "variable": "orderGeneratedOn",
                 "value": {
-                  "path": "$.orderGeneratedDate"
+                  "path": "$.approvalDate"
                 },
                 "type": "date"
+                
+                  
+                  
+               
+                
               },
               {
                 "variable": "Muncipal_Council",
@@ -280,40 +1031,18 @@
                 }
               },
               {
-                "variable": "CS_PLOT",
+                "variable": "KHATA_NO",
                 "value": {
-                  "path": "BPA_PDF_CS_PLOT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-bpa"
+                  "path": "BPA_PDF_KHATANO_TXT"
                 }
-              },
-              {
-                "variable": "MSP_PLOT",
-                "value": {
-                  "path": "BPA_PDF_MSP_PLOT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-bpa"
-                }
+               
               },
               {
                 "variable": "KHATA_NO",
                 "value": {
                   "path": "BPA_PDF_KHATANO_TXT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-bpa"
                 }
+               
               },
               {
                 "variable": "HOLDING_NO",
@@ -508,6 +1237,18 @@
                 }
               },
               {
+                "variable": "situatedin",
+                "value": {
+                  "path": "BPA_PDF_SITUATED_IN"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
                 "variable": "SUMMARY2",
                 "value": {
                   "path": "BPA_PDF_SUMMARY2"
@@ -552,7 +1293,7 @@
               {
                 "variable": "applicationDate",
                 "value": {
-                  "path": "$.edcrDetail[0].planDetail.applicationDate"
+                  "path": "$.applicationDate"
                 },
                 "type": "date"
               },
@@ -563,9 +1304,40 @@
                 }
               },
               {
+                "variable": "plotArea",
+                "value": {
+                  "path": "$.edcrDetail[0].planDetail.planInformation.plotArea"
+                }
+              },
+              {
                 "variable": "khataNo",
                 "value": {
-                  "path": "$.edcrDetail[0].planDetail.planInformation.khataNo"
+                  "path": "$.additionalDetails.wardnumber"
+                }
+              },
+              {
+                "variable": "wardNo",
+                "value": {
+                  "path": "$.edcrDetail[0].planDetail.planInfoProperties.KHATA_NO"
+                }
+              },
+              {
+                "variable": "reportrunDate",
+                "value": {
+                  "path": "$.additionalDetails.runDate"
+                },
+                "type":"date"
+              },
+              {
+                "variable": "REPORT_RUNDATE",
+                "value": {
+                  "path": "BPA_PDF_REPORT_RUNDATE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
                 }
               }
             ]
@@ -573,7 +1345,7 @@
           {
             "externalAPI": [
               {
-                "path": "http://collection-services:8080/collection-services/payments/_search",
+                "path": "http://collection-services:8080/collection-services/payments/BPA.NC_SAN_FEE/_search",
                 "queryParam": "tenantId=$.tenantId,consumerCodes=$.applicationNo",
                 "apiRequest": null,
                 "responseMapping": [
@@ -589,10 +1361,17 @@
                   {
                     "variable": "sanFee",
                     "value": "$.Payments[0].paymentDetails[0].bill.billDetails[0].billAccountDetails[0].amount"
-                  },
+                  }
+                ]
+              },
+              {
+                "path": "http://collection-services:8080/collection-services/payments/BPA.NC_APP_FEE/_search",
+                "queryParam": "tenantId=$.tenantId,consumerCodes=$.applicationNo",
+                "apiRequest": null,
+                "responseMapping": [
                   {
                     "variable": "appHeadCode",
-                    "value": "$.Payments[1].paymentDetails[0].bill.billDetails[0].billAccountDetails[0].taxHeadCode",
+                    "value": "$.Payments[0].paymentDetails[0].bill.billDetails[0].billAccountDetails[0].taxHeadCode",
                     "localisation": {
                       "required": true,
                       "prefix": "BPA",
@@ -601,7 +1380,7 @@
                   },
                   {
                     "variable": "appFee",
-                    "value": "$.Payments[1].paymentDetails[0].bill.billDetails[0].billAccountDetails[0].amount"
+                    "value": "$.Payments[0].paymentDetails[0].bill.billDetails[0].billAccountDetails[0].amount"
                   }
                 ]
               },
@@ -614,6 +1393,27 @@
                     "variable": "approvedBy",
                     "value": "$.ProcessInstances[?(@.action=='APPROVE')].assigner.name",
                     "isUpperCaseRequired": true
+                  }
+                ]
+              },
+              {
+                "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
+                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pg&filter=%5B?(@.code=='{$.tenantId}')%5D",
+                "apiRequest": null,
+                "responseMapping": [
+                  {
+                    "variable": "logoImage",
+                    "value": "$.MdmsRes.tenant.tenants[0].logoId",
+                    "type": "image"
+                  },
+                  {
+                    "variable": "logo_header",
+                    "value": "$.MdmsRes.tenant.tenants[0].code",
+                    "localisation": {
+                      "required": true,
+                      "prefix": "TENANT_TENANTS",
+                      "module": "rainmaker-common"
+                    }
                   }
                 ]
               }

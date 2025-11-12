@@ -1,0 +1,24 @@
+serviceMaps:
+  serviceName: Cancel Demand Service
+  mappings:
+    - version: 1.0
+      name: w/s cancel demand 
+      description: Updates demand status and bill status for cancelled demands in the water and sewerage system.
+      fromTopic: cancelDetails
+      isTransaction: true
+      queryMaps:
+        - query: "UPDATE egbs_demand_v1 SET status='CANCELLED' WHERE id in (?) AND status='ACTIVE' AND tenantId=? AND businessservice=?;"
+          basePath: $
+          jsonMaps:
+            - jsonPath: $.demandid  
+            - jsonPath: $.tenantId   
+            - jsonPath: $.businessservice  
+
+
+            
+
+        - query: "UPDATE egbs_bill_v1 bill SET status = 'EXPIRED' FROM egbs_billdetail_v1 bd WHERE bd.billid = bill.id AND bill.status = 'ACTIVE' AND bd.businessservice = ? AND bd.consumercode in (?);"
+          basePath: $
+          jsonMaps:
+            - jsonPath: $.businessservice
+            - jsonPath: $.consumercode
