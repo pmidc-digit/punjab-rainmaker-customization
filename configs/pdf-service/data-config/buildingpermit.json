@@ -67,6 +67,12 @@
                 }
               },
               {
+                "variable": "pincode",
+                "value": {
+                  "path": "$.landInfo.address.pincode"
+                }
+              },
+              {
                 "variable": "holdingNo",
                 "value": {
                   "path": "$.additionalDetails.holdingNo"
@@ -98,6 +104,12 @@
                   "path": "$.additionalDetails.runDate"
                 },
                 "type": "date"
+              },
+              {
+                "variable": "epoch",
+                "value": {
+                  "path": "$.additionalDetails.runDate"
+                }
               },
               {
                 "variable": "formattedSubmissionDate",
@@ -425,16 +437,17 @@
                   "module": "rainmaker-bpa"
                 }
               },
+
              {
                 "variable": "SUBJECT_CONTENT",
                 "value": {
-                  "path": "$.additionalDetails.Ulblisttype"
+                  "path": "BPA_PDF_SUBJECT_CONTENT"
                 },
                 "type": "label",
                 "localisation": {
                   "required": true,
-                  "prefix": "BPA_PDF_SUBJECT_CONTENT_",
-                  "module": "rainmaker-bpa"
+                  "prefix": null,
+                  "module": "rainmaker-common"
                 }
               },
 
@@ -1310,13 +1323,13 @@
                 }
               },
               {
-                "variable": "khataNo",
+                "variable": "wardNo",
                 "value": {
                   "path": "$.additionalDetails.wardnumber"
                 }
               },
               {
-                "variable": "wardNo",
+                "variable": "khataNo",
                 "value": {
                   "path": "$.edcrDetail[0].planDetail.planInfoProperties.KHATA_NO"
                 }
@@ -1424,6 +1437,12 @@
               {
                 "variable": "totalDue",
                 "formula": "{{sanFee}}+{{appFee}}"
+              },
+              {
+                "variable": "epochIST",
+                "type": "date",
+                "formula": "({{epoch}} + 19800) * 1000",
+                "format": "HH:mm"
               }
             ]
           },
