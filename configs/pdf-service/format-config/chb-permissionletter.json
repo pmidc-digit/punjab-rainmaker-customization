@@ -2,7 +2,8 @@
   "key": "chb-permissionletter",
   "config": {
     "defaultStyle": {
-      "font": "Cambay"
+      "font": "Roboto",
+      "fontSize": 10
     },
     "content": [
       {
@@ -13,8 +14,8 @@
             [
               {
                 "image": "{{logoImage}}",
-                "width": 50,
-                "height": 61.25
+                "width": 60,
+                "height": 60
               },
               {
                 "stack": [
@@ -23,7 +24,7 @@
                     "style": "receipt-logo-header"
                   },
                   {
-                    "text": "{{serviceType}} Permission Letter",
+                    "text": "{{chb_service}} Permission Letter",
                     "style": "receipt-logo-sub-header"
                   }
                 ],
@@ -33,16 +34,20 @@
               {
                 "stack": [
                   {
-                    "text": "{{address}}"
+                    "text": "{{address}}",
+                    "alignment": "center"
                   },
                   {
-                    "text": "{{phoneNumber}}"
+                    "text": "{{website}}",
+                    "alignment": "center"
                   },
                   {
-                    "text": "{{website}}"
+                    "text": "{{email}}",
+                    "alignment": "center"
                   },
                   {
-                    "text": "{{email}}"
+                    "text": "{{phoneNumber}}",
+                    "alignment": "center"
                   }
                 ],
                 "alignment": "right",
@@ -69,16 +74,16 @@
                 "style": "receipt-table-value",
                 "alignment": "right",
                 "border": [false, false, false, false],
-                "margin": [0, 5, 10, 5],
-                "font":"Roboto"
+                "margin": [0, 0, 10, 0],
+                "font": "Roboto"
               }
             ],
             [
               {
                 "stack": [
-                  { "text": "To,", "margin": [0, 0, 0, 2] },
-                  { "text": "{{payerName}}", "margin": [20, 0, 0, 2] },
-                  { "text": "{{payerAddress}}", "margin": [20, 0, 0, 2] }
+                  { "text": "To,", "margin": [0, 0, 0, 0] },
+                  { "text": "{{payerName}}", "margin": [20, 0, 0, 0] },
+                  { "text": "{{payerAddress}}", "margin": [20, 0, 0, 0] }
                 ],
                 "style": "receipt-table",
                 "alignment": "left",
@@ -87,8 +92,8 @@
               },
               {
                 "image": "{{qrcodeimage}}",
-                "width": 72,
-                "height": 72,
+                "width": 50,
+                "height": 50,
                 "alignment": "right",
                 "margin": [0, 0, 10, 0],
                 "border": [false, false, false, false]
@@ -107,27 +112,27 @@
               {
                 "stack": [
                   {
-                    "text": "Subject: Permission to use the Community Hall {{communityHallName}} {{hallCode}} Holding for {{purpose}} purpose",
+                    "text": "Subject: Permission to use the Community Hall {{communityHallName}} Holding for {{purpose}} purpose",
                     "style": "receipt-table",
                     "alignment": "left",
-                    "margin": [0, 0, 0, 5],
+                    "margin": [0, 0, 0, 0],
                     "bold": true
                   },
                   {
                     "text": "Dear {{payerName}},",
                     "style": "receipt-table",
                     "alignment": "left",
-                    "margin": [0, 0, 0, 10]
+                    "margin": [0, 0, 0, 0]
                   },
                   {
                     "text": "Permission is hereby accorded to use the following holding for the {{purpose}} purpose:",
                     "style": "receipt-table",
                     "alignment": "left",
-                    "margin": [0, 0, 0, 10]
+                    "margin": [0, 0, 0, 0]
                   }
                 ],
                 "border": [false, false, false, false],
-                "margin": [0, 5, 0, 5]
+                "margin": [0, 0, 0, 0]
               }
             ]
           ]
@@ -147,14 +152,14 @@
                 "bold": true,
                 "alignment": "left",
                 "border": [false, false, false, false],
-                "margin": [8, 4, 0, 4]
+                "margin": [8, 0, 0, 0]
               },
               {
                 "text": "{{communityHallName}} - {{hallCode}}",
                 "style": "receipt-table-value-down",
                 "alignment": "left",
                 "border": [false, false, false, false],
-                "margin": [8, 4, 0, 4]
+                "margin": [8, 0, 0, 0]
               }
             ],
             [
@@ -164,14 +169,14 @@
                 "bold": true,
                 "alignment": "left",
                 "border": [false, false, false, false],
-                "margin": [8, 4, 0, 4]
+                "margin": [8, 0, 0, 0]
               },
               {
                 "text": "{{bookingDate}}",
                 "style": "receipt-table-value-down",
                 "alignment": "left",
                 "border": [false, false, false, false],
-                "margin": [8, 4, 0, 4]
+                "margin": [8, 0, 0, 0]
               }
             ],
             "[{\"text\":\"Period of Booking :\",\"style\":\"receipt-table-value\",\"bold\":true,\"alignment\":\"left\",\"border\":[false,false,false,false],\"margin\":[8,4,0,4]},{\"text\":\"{{#var_bookingSlots}}{{bookingDate}}, {{/var_bookingSlots}}\",\"style\":\"receipt-table-value-down\",\"alignment\":\"left\",\"border\":[false,false,false,false],\"margin\":[8,4,0,4]}]"
@@ -198,7 +203,7 @@
             ],
             [
               {
-                "text": "{{chb_sgst}}",
+                "text": "{{chb_sgst}} (9%)",
                 "border": [true, false, false, false],
                 "style": "receipt-table-value-down"
               },
@@ -210,7 +215,7 @@
             ],
             [
               {
-                "text": "{{chb_cgst}}",
+                "text": "{{chb_cgst}} (9%)",
                 "border": [true, false, false, false],
                 "style": "receipt-table-value-down"
               },
@@ -246,7 +251,7 @@
             ],
             [
               {
-                "text": "{{total_amount}}",
+                "text": "{{total_amount}} (Rs)",
                 "border": [true, false, false, true],
                 "bold": true,
                 "style": "receipt-table-value-down"
@@ -274,34 +279,102 @@
                 "style": "receipt-table-value-down",
                 "alignment": "left",
                 "border": [false, false, false, false],
-                "margin": [0, 6, 0, 6]
+                "margin": [0, 2, 0, 2]
               }
             ],
             [
               {
                 "stack": [
-                  { "text": "{{term_1}}", "margin": [0, 2, 0, 2] },
-                  { "text": "{{term_2}}", "margin": [0, 2, 0, 2] },
-                  { "text": "{{term_3}}", "margin": [0, 2, 0, 2] },
-                  { "text": "{{term_4}}", "margin": [0, 2, 0, 2] },
-                  { "text": "{{term_5}}", "margin": [0, 2, 0, 2] },
-                  { "text": "{{term_6}}", "margin": [0, 2, 0, 2] },
-                  { "text": "{{term_7}}", "margin": [0, 2, 0, 2] },
-                  { "text": "{{term_8}}", "margin": [0, 2, 0, 2] },
-                  { "text": "{{term_9}}", "margin": [0, 2, 0, 2] },
-                  { "text": "{{term_10}}", "margin": [0, 2, 0, 2] },
-                  { "text": "{{term_11}}", "margin": [0, 2, 0, 2] },
-                  { "text": "{{term_12}}", "margin": [0, 2, 0, 2] },
-                  { "text": "{{term_13}}", "margin": [0, 2, 0, 2] },
-                  { "text": "{{term_14}}", "margin": [0, 2, 0, 2] },
-                  { "text": "{{term_15}}", "margin": [0, 2, 0, 2] },
-                  { "text": "{{term_16}}", "margin": [0, 2, 0, 2] },
-                  { "text": "{{term_17}}", "margin": [0, 2, 0, 2] }
+                  {
+                    "text": "{{term_1}}",
+                    "margin": [0, 2, 0, 2],
+                    "fontSize": 9
+                  },
+                  {
+                    "text": "{{term_2}}",
+                    "margin": [0, 2, 0, 2],
+                    "fontSize": 9
+                  },
+                  {
+                    "text": "{{term_3}}",
+                    "margin": [0, 2, 0, 2],
+                    "fontSize": 9
+                  },
+                  {
+                    "text": "{{term_4}}",
+                    "margin": [0, 2, 0, 2],
+                    "fontSize": 9
+                  },
+                  {
+                    "text": "{{term_5}}",
+                    "margin": [0, 2, 0, 2],
+                    "fontSize": 9
+                  },
+                  {
+                    "text": "{{term_6}}",
+                    "margin": [0, 2, 0, 2],
+                    "fontSize": 9
+                  },
+                  {
+                    "text": "{{term_7}}",
+                    "margin": [0, 2, 0, 2],
+                    "fontSize": 9
+                  },
+                  {
+                    "text": "{{term_8}}",
+                    "margin": [0, 2, 0, 2],
+                    "fontSize": 9
+                  },
+                  {
+                    "text": "{{term_9}}",
+                    "margin": [0, 2, 0, 2],
+                    "fontSize": 9
+                  },
+                  {
+                    "text": "{{term_10}}",
+                    "margin": [0, 2, 0, 2],
+                    "fontSize": 9
+                  },
+                  {
+                    "text": "{{term_11}}",
+                    "margin": [0, 2, 0, 2],
+                    "fontSize": 9
+                  },
+                  {
+                    "text": "{{term_12}}",
+                    "margin": [0, 2, 0, 2],
+                    "fontSize": 9
+                  },
+                  {
+                    "text": "{{term_13}}",
+                    "margin": [0, 2, 0, 2],
+                    "fontSize": 9
+                  },
+                  {
+                    "text": "{{term_14}}",
+                    "margin": [0, 2, 0, 2],
+                    "fontSize": 9
+                  },
+                  {
+                    "text": "{{term_15}}",
+                    "margin": [0, 2, 0, 2],
+                    "fontSize": 9
+                  },
+                  {
+                    "text": "{{term_16}}",
+                    "margin": [0, 2, 0, 2],
+                    "fontSize": 9
+                  },
+                  {
+                    "text": "{{term_17}}",
+                    "margin": [0, 2, 0, 2],
+                    "fontSize": 9
+                  }
                 ],
                 "style": "receipt-table",
                 "alignment": "left",
                 "border": [false, false, false, false],
-                "margin": [10, 6, 10, 6]
+                "margin": [10, 2, 10, 2]
               }
             ]
           ]
@@ -328,7 +401,8 @@
       },
       {
         "style": "no-signature",
-        "text": "{{no_signature}}"
+        "text": "{{no_signature}}",
+        "alignment": "center"
       }
     ],
     "styles": {
@@ -337,20 +411,20 @@
       },
       "receipt-logo-header": {
         "color": "#000000",
-        "fontSize": 14,
+        "fontSize": 12,
         "bold": true,
         "letterSpacing": 0.74,
         "margin": [0, 0, 0, 5]
       },
       "receipt-logo-sub-header": {
         "color": "#000000",
-        "fontSize": 12,
+        "fontSize": 11,
         "letterSpacing": 0.6
       },
       "noc-table": {
-        "fontSize": 12,
+        "fontSize": 11,
         "color": "#000000",
-        "margin": [-25, 10, -22, -8]
+        "margin": [-25, 2, -22, 0]
       },
       "receipt-table-value-total-Qr": {
         "alignment": "right",
@@ -359,49 +433,49 @@
       "receipt-table-value-down": {
         "color": "#000000",
         "bold": false,
-        "fontSize": 12,
+        "fontSize": 9,
         "fontWeight": 400,
         "alignment": "left",
-        "margin": [3, 5, 0, 5]
+        "margin": [3, 0, 0, 0]
       },
       "next-noc-table": {
-        "fontSize": 12,
+        "fontSize": 10,
         "color": "#000000",
-        "margin": [-25, 28, -22, -8]
+        "margin": [-25, 4, -22, 2]
       },
       "receipt-table-value": {
         "color": "#000000",
         "bold": true,
-        "fontSize": 12,
+        "fontSize": 9,
         "fontWeight": 500,
         "margin": [-2, 2, 0, 2]
       },
       "receipt-table": {
         "color": "#000000",
         "bold": false,
-        "fontSize": 12,
+        "fontSize": 9,
         "fontWeight": 400,
         "margin": [-30, 2, 0, 2]
       },
       "receipt-approver": {
-        "fontSize": 12,
+        "fontSize": 9,
         "bold": true,
-        "margin": [-27, 50, -10, 0],
+        "margin": [-27, 2, -10, 0],
         "color": "#484848"
       },
       "no-signature": {
-        "fontSize": 12,
-        "margin": [-27, 35, -10, 0],
+        "fontSize": 9,
+        "margin": [-27, 2, -10, 0],
         "color": "#484848"
       },
       "pt-disclaimer": {
-        "fontSize": 12,
-        "margin": [-27, 30, -10, 0],
+        "fontSize": 10,
+        "margin": [-27, 0, -10, 0],
         "color": "#484848"
       },
       "pt-disclaimer-value": {
-        "fontSize": 12,
-        "margin": [2, 3, 0, 0],
+        "fontSize": 9,
+        "margin": [2, 0, 0, 0],
         "color": "#484848"
       }
     }

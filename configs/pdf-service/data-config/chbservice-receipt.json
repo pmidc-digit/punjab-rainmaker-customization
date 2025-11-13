@@ -95,7 +95,7 @@
               {
                 "variable": "chb_service_charge",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_CHB_SERVICE_CHARGE"
+                  "path": "MODULE_CSS_COW_CESS"
                 },
                 "type": "label",
                 "localisation": {
@@ -160,6 +160,18 @@
                 }
               },
               {
+                "variable": "chb_service",
+                "value": {
+                  "path": "ACTION_TEST_CHB"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
                 "variable": "chbCgst",
                 "value": {
                   "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CGST')].adjustedAmount"
@@ -187,6 +199,13 @@
                 "variable": "paidAmount",
                 "value": {
                   "path": "$.paymentDetails[0].totalAmountPaid"
+                }
+              },
+
+              {
+                "variable": "hallName",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].communityHallName"
                 }
               },
               {
