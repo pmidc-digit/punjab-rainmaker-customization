@@ -105,7 +105,7 @@ ReportDefinitions:
     type: epoch
     source: chb
     isMandatory: true
-    searchClause: to_timestamp($toDate / 1000);
+    searchClause:   AND s.booking_date <= to_timestamp($toDate / 1000);
   - name: tenantid
     label: tenantid
     type: singlevaluelist
