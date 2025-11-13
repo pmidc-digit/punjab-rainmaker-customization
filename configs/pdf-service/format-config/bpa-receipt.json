@@ -26,7 +26,15 @@
                     "bold": true,
                     "fontSize": 13
                   },
-                  { "text": "Website : {{website}}" , "alignment": "right", "margin": [0, 2, 0, 0]}
+                  {
+                    "text": [
+                      { "text": "Website: ", "bold": true },
+                      { "text": "{{website}}" }
+                    ],
+                    "fontSize": 11,
+                    "alignment": "right",
+                    "margin": [0, 2, 0, 0]
+                  }
                 ],
                 "alignment": "center",
                 "color": "#484848",
@@ -45,7 +53,7 @@
           "body": [
             [
               {
-                "text": "{{receipt_no}} :",
+                "text": "{{receipt_no}} ",
                 "style": "receipt-table-value"
               },
               {
@@ -54,7 +62,7 @@
                 "fontSize": 10
               },
               {
-                "text": "File No :",
+                "text": "File No ",
                 "style": "receipt-table-value"
               },
               {
@@ -65,7 +73,7 @@
             ],
             [
               {
-                "text": "{{payment_date}} :",
+                "text": "{{payment_date}} ",
                 "style": "receipt-table-value"
               },
               {
@@ -73,7 +81,7 @@
                 "style": "receipt-table"
               },
               {
-                "text": "Applicant Name :",
+                "text": "Applicant Name ",
                 "style": "receipt-table-value"
               },
               {
@@ -83,21 +91,22 @@
             ],
             [
               {
-                "text": "Applicant Contact No. :",
+                "text": "Applicant Contact No. ",
                 "style": "receipt-table-value",
-                "fontSize" :10
+                "fontSize": 10
               },
               {
                 "text": "{{payerContact}}",
-                "style": "receipt-table"
+                "style": "receipt-table",
+                "border": [true, true, false, true]
               },
               {
                 "text": " ",
-                "style": "receipt-table-value"
+                "border": [false, true, false, true]
               },
               {
                 "text": " ",
-                "style": "receipt-table"
+                "border": [false, true, true, true]
               }
             ]
           ]
@@ -107,11 +116,11 @@
       {
         "style": "noc-mock-table",
         "table": {
-          "widths": ["24%", "28%", "15%", "10%","13%","10%"],
+          "widths": ["24%", "28%", "9%", "13%", "11%", "15%"],
           "body": [
             [
               {
-                "text": "Type of Fees :",
+                "text": "Type of Fees ",
                 "style": "receipt-mock-table-value"
               },
               {
@@ -120,7 +129,7 @@
                 "fontSize": 10
               },
               {
-                "text": "Module :",
+                "text": "Module ",
                 "style": "receipt-mock-table-value"
               },
               {
@@ -129,7 +138,7 @@
                 "fontSize": 10
               },
               {
-                "text": "Category :",
+                "text": "Category ",
                 "style": "receipt-mock-table-value"
               },
               {
@@ -146,11 +155,11 @@
       {
         "style": "next-noc-table",
         "table": {
-          "widths": ["30%", "20%", "25%", "25%"],
+          "widths": ["23%", "27%", "23%", "27%"],
           "body": [
             [
               {
-                "text": "{{service_type}} :",
+                "text": "{{service_type}} ",
                 "style": "receipt-table-value"
               },
               {
@@ -158,7 +167,7 @@
                 "style": "receipt-table"
               },
               {
-                "text": "{{paid_amount}} :",
+                "text": "{{paid_amount}} ",
                 "style": "receipt-table-value"
               },
               {
@@ -168,7 +177,7 @@
             ],
             [
               {
-                "text": "Txn ID / UTR :",
+                "text": "Txn ID / UTR ",
                 "style": "receipt-table-value"
               },
               {
@@ -193,7 +202,7 @@
               {
                 "text": "Detail of Payment",
                 "style": "receipt-mock-table-value",
-                "border": [true,true,true,false],
+                "border": [true, true, true, false],
                 "fontSize": 12
               }
             ]
@@ -205,42 +214,48 @@
       {
         "style": "fee-summary-table",
         "table": {
-          "widths": ["45%", "55%"],
+          "widths": ["22%", "78%"],
           "body": [
             [
               {
                 "text": "Charges",
-                "style": "receipt-fee-label"              },
+                "style": "receipt-fee-label"
+              },
               {
-                "text": "Amount",
-                "style": "receipt-fee-label"    ,
-              "alignment":"right"          ,
-            "margin":[0,0,35,0]}
+                "text": "Amount (In ₹)",
+                "style": "receipt-fee-label",
+                "alignment": "right",
+                "margin": [0, 0, 35, 0]
+              }
             ],
             [
               {
-                "text": "Building Application Fees :",
-                "style": "receipt-fee-label"              },
+                "text": "Building Application Fees ",
+                "style": "receipt-fee-label"
+              },
               {
-                "text": "₹ {{buildingApplicationFees}}",
-                "style": "receipt-fee-value"              }
+                "text": " {{buildingApplicationFees}}",
+                "style": "receipt-fee-value"
+              }
             ],
             [
               {
-                "text": "Boundary Wall Fees :",
-                "style": "receipt-fee-label"              },
+                "text": "Boundary Wall Fees ",
+                "style": "receipt-fee-label"
+              },
               {
-                "text": "₹ {{boundaryWallFee}}",
-                "style": "receipt-fee-value"              }
+                "text": " {{boundaryWallFee}}",
+                "style": "receipt-fee-value"
+              }
             ],
             [
               {
-                "text": "{{total_amount}} :",
+                "text": " {{total_amount}} ",
                 "style": "receipt-total-label",
                 "fillColor": "#f2f2f2"
               },
               {
-                "text": "₹ {{totalAmount}}",
+                "text": " {{totalAmount}}",
                 "style": "receipt-total-value",
                 "fillColor": "#f2f2f2"
               }
@@ -251,30 +266,36 @@
       },
 
       {
-  "style": "receipt-approver",
-  "columns": [
-    {
-      "text": [
-        { "text": "{{generated_by}}: ", "bold": true }
-      ],
-      "alignment": "left"
-    },
-    {
-      "ul": [
-        { "text": "{{user-name}}","listType": "none", "margin": [ -90, 0, 0, 0 ] },
-        { "text": "{{generator_mobileno}}" ,"listType": "none","margin": [ -90, 0, 0, 0 ]}
-      ],
-      "alignment": "left"
-    },
-    {
-      "text": [
-        { "text": "Municipal Corporation, Amritsar", "bold": true }
-      ],
-      "alignment": "right",
-      "margin": [0, 0, -10, 0]
-    }
-  ]
-},
+        "style": "receipt-approver",
+        "columns": [
+          {
+            "text": [{ "text": "{{generated_by}}: ", "bold": true }],
+            "alignment": "left"
+          },
+          {
+            "ul": [
+              {
+                "text": "{{user-name}}",
+                "listType": "none",
+                "margin": [-90, 0, 0, 0]
+              },
+              {
+                "text": "{{generator_mobileno}}",
+                "listType": "none",
+                "margin": [-90, 0, 0, 0]
+              }
+            ],
+            "alignment": "left"
+          },
+          {
+            "text": [
+              { "text": "Municipal Corporation, Amritsar", "bold": true }
+            ],
+            "alignment": "right",
+            "margin": [0, 0, -10, 0]
+          }
+        ]
+      },
       {
         "style": "pt-disclaimer",
         "stack": [
@@ -300,8 +321,7 @@
       {
         "style": "no-signature",
         "text": "This is a system-generated receipt and does not require a physical signature.",
-                "margin":[0,4,0,0]
-
+        "margin": [0, 4, 0, 0]
       }
     ],
 
