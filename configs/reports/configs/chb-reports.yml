@@ -96,16 +96,16 @@ ReportDefinitions:
   searchParams:
   - name: fromDate
     label: fromDate
-    type: string
+    type: epoch
     source: chb
     isMandatory: true
-    searchClause: AND s.booking_date >= $fromDate
+    searchClause: AND s.booking_date >= to_timestamp($formDate / 1000)
   - name: toDate
     label: toDate
     type: epoch
     source: chb
     isMandatory: true
-    searchClause: AND s.booking_date <= $toDate
+    searchClause: to_timestamp($toDate / 1000);
   - name: tenantid
     label: tenantid
     type: singlevaluelist
@@ -126,7 +126,7 @@ ReportDefinitions:
           INNER JOIN eg_chb_applicant_detail a on a.booking_id=b.booking_id
           INNER JOIN eg_chb_address_detail ad on ad.applicant_detail_id=a.applicant_detail_id
           INNER JOIN eg_chb_slot_detail s on s.booking_id=b.booking_id
-          where b.tenant_id = $tenantid and s.booking_date >='2025-11-01' and s.booking_date <='2025-11-30'      
+          where b.tenant_id = $tenantid  
 - reportName: CollectionsReport
   summary: Collections
   version: 1.0.0
