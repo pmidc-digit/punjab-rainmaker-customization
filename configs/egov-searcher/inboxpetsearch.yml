@@ -11,18 +11,11 @@ SearchDefinitions:
           (
             select DISTINCT(pet.applicationNumber), pi.createdtime, pi.status as status_id, ws.state as status_name, ws.applicationStatus
             from eg_ptr_registration as pet
-            INNER JOIN eg_ptr_address ptadd ON ptadd.registrationId = pet.id
             INNER JOIN eg_ptr_petdetails ptdet ON ptdet.petdetailsid = pet.id
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber  AND pi.latest = TRUE
             LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = pet.applicationNumber 
-              GROUP BY wf.businessid
-            )
             order by pi.createdtime asc $pagination
           ) result
         groupBy:
@@ -79,18 +72,10 @@ SearchDefinitions:
           (
             select COUNT(DISTINCT(pet.applicationNumber)) as totalCount
             from eg_ptr_registration as pet
-            INNER JOIN eg_ptr_address ptadd ON ptadd.registrationId = pet.id
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber
-            INNER JOIN eg_ptr_petdetails ptdet ON ptdet.petdetailsid = pet.id
-            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber  AND pi.latest = TRUE
+            INNER JOIN eg_ptr_petdetails ptdet ON ptdet.petdetailsid = pet.id 
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = pet.applicationNumber 
-              GROUP BY wf.businessid
-            )
           ) result
         groupBy:
         orderBy:
@@ -148,15 +133,9 @@ SearchDefinitions:
             select DISTINCT(pet.applicationNumber), pi.createdtime, pi.status 
             from eg_ptr_registration as pet
             INNER JOIN eg_ptr_address ptadd ON ptadd.registrationId = pet.id
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber  AND pi.latest = TRUE
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = pet.applicationNumber 
-              GROUP BY wf.businessid
-            )
             order by pi.createdtime desc $pagination
           ) result
         groupBy:
