@@ -9284,12 +9284,6 @@ ReportDefinitions:
     source: pt
     total: false
   searchParams:
-  - name: nameofbusiness
-    label: nameofbusinness
-    type: string
-    source: pt
-    isMandatory: false
-    searchClause: AND upper(pt.firmbusinessname) LIKE CONCAT('%',upper($nameofbusiness),'%')
   - name: fy
     label: Financial Year
     type: singlevaluelist
@@ -9304,24 +9298,6 @@ ReportDefinitions:
     source: pt
     isMandatory: false
     searchClause: and pt.propertyusagetype like concat($usageCat,'%') 
-  - name: usageSubCat
-    label: Usage Sub Category
-    type: string
-    source: pt
-    isMandatory: false
-    searchClause: u.unitusage like concat('%',upper($usageSubCat),'%') 
-  - name: blockname
-    label: blockname
-    type: string
-    source: pt
-    isMandatory: false
-    searchClause: AND upper(blockname) LIKE CONCAT('%',upper($blockname),'%')
-  - name: localityname
-    label: localityname
-    type: string
-    source: pt
-    isMandatory: false
-    searchClause: AND upper(localityname) LIKE CONCAT('%',upper($localityname),'%')
   query: |
     --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property    Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id    Address
     WITH owners AS (
