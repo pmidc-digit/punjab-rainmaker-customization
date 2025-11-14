@@ -1,240 +1,283 @@
 SearchDefinitions:
-  moduleName: swach-reform
-  summary: Swach Services Inbox API
-  version: 1.0.0
-  definitions:
+ moduleName: swach-reform
+ summary: Swach Services Inbox API
+ version: 1.0.0
+ definitions:
+ - name: inboxswachsearch
+   query:
+    baseQuery: >
+      SELECT row_to_json(result) FROM (
+        SELECT DISTINCT ser.id AS id,
+          ser.tenantid AS tenantid,
+          ser.servicerequestid AS servicerequestid,
+          ser.servicecode AS servicecode,
+          ser.applicationstatus AS applicationstatus,
+          ser.accountid AS accountid,
+          ser.createdtime AS createdtime,
+          ser.lastmodifiedtime AS lastmodifiedtime,
+          ads.locality AS locality,
+          pi.businessservice AS businessservice,
+          pi.action AS action,
+          pi.assigner AS assigner,
+          pi.createdby AS createdby,
+          pi.lastmodifiedby AS lastmodifiedby,
+          assg.assignee AS assignee
+        FROM eg_swach_service_v2 ser
+        INNER JOIN eg_swach_address_v2 ads ON ads.parentid = ser.id
+        INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = ser.servicerequestid
+        LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+        $where
+        AND pi.createdtime = (
+          SELECT MAX(wf.createdtime)
+          FROM eg_wf_processinstance_v2 wf
+          WHERE wf.businessid = ser.servicerequestid
+        )
+        ORDER BY ser.createdtime DESC
+        $pagination
+      ) result
+    groupBy:
+    orderBy:
+   searchParams:
+    condition: AND
+    params:
+    - name: ser.tenantid
+      isMandatory: true
+      jsonPath: $.searchCriteria.tenantId
+    - name: pi.status
+      isMandatory: false
+      jsonPath: $.searchCriteria.status
+    - name: ser.servicerequestid
+      isMandatory: false
+      jsonPath: $.searchCriteria.serviceRequestId
+    - name: ser.servicecode
+      isMandatory: false
+      jsonPath: $.searchCriteria.serviceCode
+    - name: assg.assignee
+      isMandatory: false
+      jsonPath: $.searchCriteria.assignee
+    - name: ads.locality
+      isMandatory: false
+      jsonPath: $.searchCriteria.locality
+    - name: ser.accountid
+      isMandatory: false
+      jsonPath: $.searchCriteria.userid
+    - name: pi.businessservice
+      isMandatory: false
+      jsonPath: $.searchCriteria.businessservice
+    - name: ser.createdtime
+      isMandatory: false
+      jsonPath: $.searchCriteria.fromDate
+    - name: ser.createdtime
+      isMandatory: false
+      jsonPath: $.searchCriteria.toDate
+    
+    pagination:
+      noOfRecords: $.searchCriteria.noOfRecords
+      offset: $.searchCriteria.offset
+   
+   output:
+    jsonFormat: {"ResponseInfo": {},"Services": []}
+    outJsonPath: $.Services
+    responseInfoPath: $.ResponseInfo
 
-    # ============================================================
-    # 1. inboxswachsearch (ASC)
-    # ============================================================
-    - name: inboxswachsearch
-      query:
-        baseQuery: |
-          SELECT row_to_json(result) FROM (
-            SELECT DISTINCT(ser.servicerequestid),
-                   ser.id,
-                   ser.tenantid,
-                   ser.servicecode,
-                   ser.applicationstatus,
-                   ser.accountid,
-                   ser.createdtime,
-                   ser.lastmodifiedtime,
-                   ads.locality,
-                   pi.businessservice,
-                   pi.status,
-                   pi.action,
-                   pi.assigner,
-                   pi.createdby,
-                   pi.lastmodifiedby,
-                   assg.assignee
-            FROM eg_swach_service_v2 ser
-            INNER JOIN eg_swach_address_v2 ads 
-                ON ads.parentid = ser.id
-            INNER JOIN eg_wf_processinstance_v2 pi 
-                ON pi.businessid = ser.servicerequestid 
-                AND pi.latest = TRUE
-            LEFT JOIN eg_wf_assignee_v2 assg 
-                ON pi.id = assg.processinstanceid
-            $where
-            ORDER BY ser.createdtime ASC
-            $pagination
-          ) result
-        groupBy:
-        orderBy:
+ - name: inboxswachsearchcount
+   query:
+    baseQuery: >
+      SELECT COUNT(DISTINCT ser.id) AS "TotalCount"
+      FROM eg_swach_service_v2 ser
+      INNER JOIN eg_swach_address_v2 ads ON ads.parentid = ser.id
+      INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = ser.servicerequestid
+      LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+      $where
+      AND pi.createdtime = (
+        SELECT MAX(wf.createdtime)
+        FROM eg_wf_processinstance_v2 wf
+        WHERE wf.businessid = ser.servicerequestid
+      )
+      --AND ser.createdtime >= $fromDate
+      --AND ser.createdtime <= $toDate
+    groupBy:
+    orderBy:
+   searchParams:
+    condition: AND
+    params:
+    - name: ser.tenantid
+      isMandatory: true
+      jsonPath: $.searchCriteria.tenantId
+    - name: pi.status
+      isMandatory: false
+      jsonPath: $.searchCriteria.status
+    - name: ser.servicerequestid
+      isMandatory: false
+      jsonPath: $.searchCriteria.serviceRequestId
+    - name: ser.servicecode
+      isMandatory: false
+      jsonPath: $.searchCriteria.serviceCode
+    - name: assg.assignee
+      isMandatory: false
+      jsonPath: $.searchCriteria.assignee
+    - name: ads.locality
+      isMandatory: false
+      jsonPath: $.searchCriteria.locality
+    - name: ser.accountid
+      isMandatory: false
+      jsonPath: $.searchCriteria.userid
+    - name: pi.businessservice
+      isMandatory: false
+      jsonPath: $.searchCriteria.businessservice
+    - name: ser.createdtime
+      isMandatory: false
+      jsonPath: $.searchCriteria.fromDate
+    - name: ser.createdtime
+      isMandatory: false
+      jsonPath: $.searchCriteria.toDate
 
-      searchParams:
-        condition: AND
-        params:
-          - name: ser.tenantid
-            isMandatory: true
-            jsonPath: $.searchCriteria.tenantId
-          - name: pi.status
-            isMandatory: false
-            jsonPath: $.searchCriteria.status
-            operator: IN
-          - name: ser.servicerequestid
-            isMandatory: false
-            jsonPath: $.searchCriteria.serviceRequestId
-          - name: ser.servicecode
-            isMandatory: false
-            jsonPath: $.searchCriteria.serviceCode
-          - name: assg.assignee
-            isMandatory: false
-            jsonPath: $.searchCriteria.assignee
-          - name: ads.locality
-            isMandatory: false
-            jsonPath: $.searchCriteria.locality
-          - name: ser.accountid
-            isMandatory: false
-            jsonPath: $.searchCriteria.userid
-          - name: pi.businessservice
-            isMandatory: false
-            jsonPath: $.searchCriteria.businessservice
-          - name: ser.createdtime
-            isMandatory: false
-            jsonPath: $.searchCriteria.fromDate
-            operator: ">="
-          - name: ser.createdtime
-            isMandatory: false
-            jsonPath: $.searchCriteria.toDate
-            operator: "<="
+   output:
+    jsonFormat: {"ResponseInfo": {},"TotalCount": {}}
+    outJsonPath: $.TotalCount
+    responseInfoPath: $.ResponseInfo
 
-        pagination:
-          noOfRecords: $.searchCriteria.noOfRecords
-          offset: $.searchCriteria.offset
+ - name: inboxswachsearchdesc
+   query:
+    baseQuery: >
+      SELECT row_to_json(result) 
+      FROM (
+        SELECT DISTINCT ser.id AS id, ser.tenantid AS tenantid, ser.servicerequestid AS servicerequestid,
+            ser.servicecode AS servicecode, ser.applicationstatus AS applicationstatus,
+            ser.accountid AS accountid, ser.createdtime AS createdtime, ser.lastmodifiedtime AS lastmodifiedtime,
+            ads.locality AS locality, pi.businessservice AS businessservice,
+            pi.state AS state, pi.action AS action, pi.assigner AS assigner,
+            pi.createdby AS createdby, pi.lastmodifiedby AS lastmodifiedby,
+            assg.assignee AS assignee
+        FROM eg_swach_service_v2 ser
+        INNER JOIN eg_swach_address_v2 ads ON ads.parentid = ser.id
+        INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = ser.servicerequestid
+        LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+        $where
+        AND pi.createdtime = (
+          SELECT MAX(wf.createdtime)
+          FROM eg_wf_processinstance_v2 wf
+          WHERE wf.businessid = ser.servicerequestid
+        )
+        --AND ser.createdtime >= $fromDate  
+        --AND ser.createdtime <= $toDate  
+        ORDER BY ser.createdtime DESC
+        OFFSET $offset
+        LIMIT $limit
+      ) result
+    groupBy:
+    orderBy:
+   searchParams:
+    condition: AND
+    params:
+    - name: ser.tenantid
+      isMandatory: true
+      jsonPath: $.searchCriteria.tenantId
+    - name: pi.status
+      isMandatory: false
+      jsonPath: $.searchCriteria.status
+    - name: ser.servicerequestid
+      isMandatory: false
+      jsonPath: $.searchCriteria.serviceRequestId
+    - name: ser.servicecode
+      isMandatory: false
+      jsonPath: $.searchCriteria.serviceCode
+    - name: assg.assignee
+      isMandatory: false
+      jsonPath: $.searchCriteria.assignee
+    - name: ads.locality
+      isMandatory: false
+      jsonPath: $.searchCriteria.locality
+    - name: ser.accountid
+      isMandatory: false
+      jsonPath: $.searchCriteria.userid
+    - name: pi.businessservice
+      isMandatory: false
+      jsonPath: $.searchCriteria.businessservice
+    - name: ser.createdtime
+      isMandatory: false
+      jsonPath: $.searchCriteria.fromDate
+    - name: ser.createdtime
+      isMandatory: false
+      jsonPath: $.searchCriteria.toDate
+    
+    pagination:
+      noOfRecords: $.searchCriteria.noOfRecords
+      offset: $.searchCriteria.offset
+   
+   output:
+    jsonFormat: {"ResponseInfo": {},"Services": []}
+    outJsonPath: $.Services
+    responseInfoPath: $.ResponseInfo
 
-      output:
-        jsonFormat: {"ResponseInfo": {},"Services": []}
-        outJsonPath: $.Services
-        responseInfoPath: $.ResponseInfo
 
-    # ============================================================
-    # 2. inboxswachsearchcount (NO pagination)
-    # ============================================================
-    - name: inboxswachsearchcount
-      query:
-        baseQuery: |
-          SELECT row_to_json(result) FROM (
-            SELECT COUNT(DISTINCT ser.servicerequestid) AS "TotalCount"
-            FROM eg_swach_service_v2 ser
-            INNER JOIN eg_swach_address_v2 ads 
-                ON ads.parentid = ser.id
-            INNER JOIN eg_wf_processinstance_v2 pi 
-                ON pi.businessid = ser.servicerequestid 
-                AND pi.latest = TRUE
-            LEFT JOIN eg_wf_assignee_v2 assg 
-                ON pi.id = assg.processinstanceid
-            $where
-          ) result
-        groupBy:
-        orderBy:
+ - name: inboxswachsearchall
+   query:
+     baseQuery: >
+      SELECT row_to_json(result) FROM (
+        SELECT DISTINCT ser.id AS id,
+          ser.tenantid AS tenantid,
+          ser.servicerequestid AS servicerequestid,
+          ser.servicecode AS servicecode,
+          ser.applicationstatus AS applicationstatus,
+          ser.accountid AS accountid,
+          ser.createdtime AS createdtime,
+          ser.lastmodifiedtime AS lastmodifiedtime,
+          ads.locality AS locality,
+          pi.businessservice AS businessservice,
+          pi.action AS action,
+          pi.assigner AS assigner,
+          pi.createdby AS createdby,
+          pi.lastmodifiedby AS lastmodifiedby,
+          assg.assignee AS assignee
+        FROM eg_swach_service_v2 ser
+        INNER JOIN eg_swach_address_v2 ads ON ads.parentid = ser.id
+        INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = ser.servicerequestid
+        LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+        $where
+        AND pi.createdtime = (
+          SELECT MAX(wf.createdtime)
+          FROM eg_wf_processinstance_v2 wf
+          WHERE wf.businessid = ser.servicerequestid
+        )
+        ORDER BY ser.createdtime DESC
+      ) result
 
-      searchParams:
-        condition: AND
-        params:
-          - name: ser.tenantid
-            isMandatory: true
-            jsonPath: $.searchCriteria.tenantId
-          - name: pi.status
-            isMandatory: false
-            jsonPath: $.searchCriteria.status
-            operator: IN
-          - name: ser.servicerequestid
-            isMandatory: false
-            jsonPath: $.searchCriteria.serviceRequestId
-          - name: ser.servicecode
-            isMandatory: false
-            jsonPath: $.searchCriteria.serviceCode
-          - name: assg.assignee
-            isMandatory: false
-            jsonPath: $.searchCriteria.assignee
-          - name: ads.locality
-            isMandatory: false
-            jsonPath: $.searchCriteria.locality
-          - name: ser.accountid
-            isMandatory: false
-            jsonPath: $.searchCriteria.userid
-          - name: pi.businessservice
-            isMandatory: false
-            jsonPath: $.searchCriteria.businessservice
-          - name: ser.createdtime
-            isMandatory: false
-            jsonPath: $.searchCriteria.fromDate
-            operator: ">="
-          - name: ser.createdtime
-            isMandatory: false
-            jsonPath: $.searchCriteria.toDate
-            operator: "<="
+   searchParams:
+    condition: AND
+    params:
+      - name: ser.tenantid
+        isMandatory: true
+        jsonPath: $.searchCriteria.tenantId
+      - name: pi.status
+        isMandatory: false
+        jsonPath: $.searchCriteria.status
+      - name: ser.servicerequestid
+        isMandatory: false
+        jsonPath: $.searchCriteria.serviceRequestId
+      - name: ser.servicecode
+        isMandatory: false
+        jsonPath: $.searchCriteria.serviceCode
+      - name: assg.assignee
+        isMandatory: false
+        jsonPath: $.searchCriteria.assignee
+      - name: ads.locality
+        isMandatory: false
+        jsonPath: $.searchCriteria.locality
+      - name: ser.accountid
+        isMandatory: false
+        jsonPath: $.searchCriteria.userid
+      - name: pi.businessservice
+        isMandatory: false
+        jsonPath: $.searchCriteria.businessservice
+      - name: ser.createdtime
+        isMandatory: false
+        jsonPath: $.searchCriteria.fromDate
+      - name: ser.createdtime
+        isMandatory: false
+        jsonPath: $.searchCriteria.toDate
 
-        pagination:
-          noOfRecords: $.searchCriteria.noOfRecords
-          offset: $.searchCriteria.offset
-
-      output:
-        jsonFormat: {"ResponseInfo": {},"TotalCount": {}}
-        outJsonPath: $.TotalCount
-        responseInfoPath: $.ResponseInfo
-
-    # ============================================================
-    # 3. inboxswachsearchdesc (DESC)
-    # ============================================================
-    - name: inboxswachsearchdesc
-      query:
-        baseQuery: |
-          SELECT row_to_json(result) FROM (
-            SELECT DISTINCT(ser.servicerequestid),
-                   ser.id,
-                   ser.tenantid,
-                   ser.servicecode,
-                   ser.applicationstatus,
-                   ser.accountid,
-                   ser.createdtime,
-                   ser.lastmodifiedtime,
-                   ads.locality,
-                   pi.businessservice,
-                   pi.status,
-                   pi.action,
-                   pi.assigner,
-                   pi.createdby,
-                   pi.lastmodifiedby,
-                   assg.assignee
-            FROM eg_swach_service_v2 ser
-            INNER JOIN eg_swach_address_v2 ads 
-                ON ads.parentid = ser.id
-            INNER JOIN eg_wf_processinstance_v2 pi 
-                ON pi.businessid = ser.servicerequestid 
-                AND pi.latest = TRUE
-            LEFT JOIN eg_wf_assignee_v2 assg 
-                ON pi.id = assg.processinstanceid
-            $where
-            ORDER BY ser.createdtime DESC
-            $pagination
-          ) result
-        groupBy:
-        orderBy:
-
-      searchParams:
-        condition: AND
-        params:
-          - name: ser.tenantid
-            isMandatory: true
-            jsonPath: $.searchCriteria.tenantId
-          - name: pi.status
-            isMandatory: false
-            jsonPath: $.searchCriteria.status
-            operator: IN
-          - name: ser.servicerequestid
-            isMandatory: false
-            jsonPath: $.searchCriteria.serviceRequestId
-          - name: ser.servicecode
-            isMandatory: false
-            jsonPath: $.searchCriteria.serviceCode
-          - name: assg.assignee
-            isMandatory: false
-            jsonPath: $.searchCriteria.assignee
-          - name: ads.locality
-            isMandatory: false
-            jsonPath: $.searchCriteria.locality
-          - name: ser.accountid
-            isMandatory: false
-            jsonPath: $.searchCriteria.userid
-          - name: pi.businessservice
-            isMandatory: false
-            jsonPath: $.searchCriteria.businessservice
-          - name: ser.createdtime
-            isMandatory: false
-            jsonPath: $.searchCriteria.fromDate
-            operator: ">="
-          - name: ser.createdtime
-            isMandatory: false
-            jsonPath: $.searchCriteria.toDate
-            operator: "<="
-
-        pagination:
-          noOfRecords: $.searchCriteria.noOfRecords
-          offset: $.searchCriteria.offset
-
-      output:
-        jsonFormat: {"ResponseInfo": {},"Services": []}
-        outJsonPath: $.Services
-        responseInfoPath: $.ResponseInfo
+   output:
+    jsonFormat: {"ResponseInfo": {},"Services": []}
+    outJsonPath: $.Services
+    responseInfoPath: $.ResponseInfo
