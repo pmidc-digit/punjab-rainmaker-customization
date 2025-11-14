@@ -1,0 +1,220 @@
+---
+ReportDefinitions:
+- reportName: TimelyBookingReport
+  decryptionPathId: CHBREPORTS
+  summary: Details of booking slots in chb service
+  version: 1.0.0
+  moduleName: rainmaker-chb
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: booking_no
+    label: Booking Number
+    type: string
+    source: chb
+    total: false
+  - name: applicant_name
+    label: applicant_name
+    type: string
+    source: chb
+    total: false
+  - name: applicant_email_id
+    label: applicant_email_id
+    type: string
+    source: chb
+    total: false
+  - name: applicant_mobile_no
+    label: applicant_mobile_no
+    type: string
+    source: chb
+    total: false
+  - name: tenant_id
+    label: Tenantid
+    type: string
+    source: chb
+    total: false
+  - name: address_line_1
+    label: Address
+    type: string
+    source: chb
+    total: false
+  - name: locality
+    label: Locality
+    type: string
+    source: chb
+    total: false
+  - name: booking_status
+    label: Booking Status
+    type: string
+    source: chb
+    total: false
+  - name: purpose
+    label: Purpose
+    type: string
+    source: chb
+    total: false
+  - name: receipt_no
+    label: Receipt No
+    type: string
+    source: chb
+    total: false
+  - name: community_hall_name
+    label: Community Hall Name
+    type: string
+    source: chb
+    total: false
+  - name: hall_code
+    label: Hall Code
+    type: string
+    source: chb
+    total: false
+  - name: capacity
+    label: Capacity
+    type: string
+    source: chb
+    total: false
+  - name: booking_date
+    label: Booking From Date
+    type: string
+    source: chb
+    total: false
+  - name: booking_end_date
+    label: Booking To Date
+    type: string
+    source: chb
+    total: false
+  - name: booking_from_time
+    label: Booking From Time
+    type: string
+    source: chb
+    total: false
+  - name: booking_to_time
+    label: Booking To Time
+    type: string
+    source: chb
+    total: false
+  searchParams:
+  - name: fromDate
+    label: fromDate
+    type: epoch
+    source: chb
+    isMandatory: true
+    searchClause: AND s.booking_date >= to_timestamp($fromDate / 1000)
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: chb
+    isMandatory: true
+    searchClause:   AND s.booking_date <= to_timestamp($toDate / 1000);
+  - name: tenantid
+    label: tenantid
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: chb
+    wrapper: true
+    isMandatory: false
+    searchClause: AND b.tenant_id = $tenantid
+  query: |
+      -- Use CTE to force query plan, compute & use CTE later
+       SELECT 
+         a.applicant_name , a.applicant_email_id, a.applicant_mobile_no,b.tenant_id,
+         ad.address_line_1 , ad.locality ,
+         b.booking_status , b.purpose , b.receipt_no , b.community_hall_name,b.booking_no,
+         s.hall_code , s.capacity , s.booking_date ,s.booking_end_date , s.booking_from_time , s.booking_to_time 
+        FROM
+          eg_chb_booking_detail b
+          INNER JOIN eg_chb_applicant_detail a on a.booking_id=b.booking_id
+          INNER JOIN eg_chb_address_detail ad on ad.applicant_detail_id=a.applicant_detail_id
+          INNER JOIN eg_chb_slot_detail s on s.booking_id=b.booking_id
+          where b.tenant_id = $tenantid  
+- reportName: CollectionsReport
+  summary: Collections
+  version: 1.0.0
+  moduleName: rainmaker-chb
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: collector_code
+    label: collector_code
+    type: string
+    source: chb
+    total: false
+  - name: payment_mode
+    label: payment_mode
+    type: string
+    source: chb
+    total: false
+  - name: total_amount
+    label: total_amount
+    type: string
+    source: chb
+    total: true
+  - name: total_count
+    label: total_count
+    type: string
+    source: chb
+    total: false
+  searchParams:
+  - name: tenantid
+    label: tenantid
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: chb
+    wrapper: true
+    isMandatory: false
+    searchClause: AND tenantid = $tenantid
+  - name: collector_code
+    label: collector_code
+    type: string
+    source: chb
+    isMandatory: false
+    searchClause: AND collector_code = $collector_code
+  - name: fromDate
+    label: fromDate
+    type: epoch
+    source: chb
+    isMandatory: true
+    searchClause: AND createdtime >= $fromDate
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: chb
+    isMandatory: true
+    searchClause: AND createdtime <= $toDate
+  query: |
+      -- Use CTE to force query plan, compute & use CTE later
+      WITH unique_transactions AS (
+         SELECT
+              p.id AS transaction_id, p.createdtime, p.totalamountpaid,
+            CASE
+              WHEN p.paymentmode IN ('POSTAL_ORDER','POTAL_ORDER') THEN 'POSTAL_ORDER'
+              WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN 'OFFLINE_RTGS'
+              WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN 'OFFLINE_NEFT'
+              WHEN p.paymentmode IN ('CASH','OFFLINE_CASH') THEN 'CASH'
+              WHEN p.paymentmode IN ('CARD','DEBIT_CARD','CREDIT_CARD','OFFLINE_CARD') THEN 'CARD'
+              WHEN p.paymentmode IN ('ONLINE') THEN 'ONLINE'
+             ELSE p.paymentmode
+            END AS mode_norm,
+              emp.code AS collector_code, pd.businessservice, p.tenantid
+          FROM egcl_paymentdetail pd
+            INNER JOIN egcl_payment p ON pd.paymentid = p.id
+            INNER JOIN egcl_bill bill ON bill.id = pd.billid
+            INNER JOIN eg_chb_booking_detail chb ON chb.booking_no = bill.consumercode
+            LEFT JOIN eg_user u ON u.id::text = p.createdby::text
+            LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
+           WHERE p.paymentstatus != 'CANCELLED'
+                 AND bill.businessservice = 'chb-services'
+                 AND p.tenantid = $tenantid
+               --AND p.createdtime BETWEEN $fromDate AND $toDate
+              )
+           SELECT
+              COALESCE(collector_code, 'SELF') AS collector_code,
+              mode_norm AS payment_mode,
+              SUM(totalamountpaid) AS total_amount,
+              COUNT(transaction_id) AS total_count
+            FROM unique_transactions
+              WHERE 1=1 
+  groupby: GROUP BY collector_code, mode_norm
+  orderby: ORDER BY collector_code, mode_norm;
