@@ -9,50 +9,49 @@
       {
         "style": "noc-head",
         "table": {
-          "widths": [60, "*", 120],
+          "widths": [90, "*", 90],
           "body": [
             [
               {
                 "image": "{{logoImage}}",
                 "width": 60,
-                "height": 60
+                "height": 60,
+                "alignment": "left"
               },
               {
                 "stack": [
                   {
                     "text": "{{ulbType}} {{logo-header}}",
-                    "style": "receipt-logo-header"
+                    "style": "receipt-logo-header",
+                    "alignment": "center",
+                    "margin": [20, 5, 0, 2]
                   },
                   {
-                    "text": "{{chb_service}} Permission Letter",
-                    "style": "receipt-logo-sub-header"
+                    "stack": [
+                      { "text": "{{address}}" },
+                      { "text": "{{website}}" },
+                      { "text": "{{email}}" },
+                      { "text": "{{phoneNumber}}" }
+                    ],
+                    "alignment": "center",
+                    "color": "#484848",
+                    "margin": [20, 0, 0, 0]
+                  },
+                  {
+                    "text": "{{chb_service}} {{payment_receipt}}",
+                    "style": "receipt-logo-sub-header",
+                    "alignment": "center",
+                    "margin": [20, 2, 0, 0]
                   }
                 ],
-                "alignment": "left",
-                "margin": [0, 10, 0, 0]
+                "alignment": "center"
               },
               {
-                "stack": [
-                  {
-                    "text": "{{address}}",
-                    "alignment": "center"
-                  },
-                  {
-                    "text": "{{website}}",
-                    "alignment": "center"
-                  },
-                  {
-                    "text": "{{email}}",
-                    "alignment": "center"
-                  },
-                  {
-                    "text": "{{phoneNumber}}",
-                    "alignment": "center"
-                  }
-                ],
+                "image": "{{qrcodeimage}}",
+                "width": 60,
+                "height": 60,
                 "alignment": "right",
-                "color": "#484848",
-                "margin": [-100, 0, -25, 0]
+                "margin": [10, 0, -10, 0]
               }
             ]
           ]
@@ -66,8 +65,15 @@
           "body": [
             [
               {
-                "text": "",
-                "border": [false, false, false, false]
+                "stack": [
+                  { "text": "To,", "margin": [0, 0, 0, 0] },
+                  { "text": "{{payerName}}", "margin": [10, 0, 0, 0] },
+                  { "text": "{{payerAddress}}", "margin": [10, 0, 0, 0] }
+                ],
+                "style": "receipt-table",
+                "alignment": "left",
+                "border": [false, false, false, false],
+                "margin": [0, 0, 0, 0]
               },
               {
                 "text": "Booking No: {{consumerID}}",
@@ -76,27 +82,6 @@
                 "border": [false, false, false, false],
                 "margin": [0, 0, 10, 0],
                 "font": "Roboto"
-              }
-            ],
-            [
-              {
-                "stack": [
-                  { "text": "To,", "margin": [0, 0, 0, 0] },
-                  { "text": "{{payerName}}", "margin": [20, 0, 0, 0] },
-                  { "text": "{{payerAddress}}", "margin": [20, 0, 0, 0] }
-                ],
-                "style": "receipt-table",
-                "alignment": "left",
-                "border": [false, false, false, false],
-                "margin": [10, 0, 0, 0]
-              },
-              {
-                "image": "{{qrcodeimage}}",
-                "width": 50,
-                "height": 50,
-                "alignment": "right",
-                "margin": [0, 0, 10, 0],
-                "border": [false, false, false, false]
               }
             ]
           ]
@@ -143,23 +128,38 @@
       {
         "style": "next-noc-table",
         "table": {
-          "widths": ["40%", "60%"],
+          "widths": ["auto", "auto"],
           "body": [
+            [
+              {
+                "text": "Booking Details:",
+                "style": "receipt-table-value",
+                "bold": true,
+                "border": [false, false, false, false],
+                "alignment": "left",
+                "margin": [-4, 0, 0, 0]
+              },
+              {
+                "text": "",
+                "style": "receipt-table-value-down",
+                "alignment": "left",
+                "border": [false, false, false, false],
+                "margin": [0, 0, 0, 0]
+              }
+            ],
             [
               {
                 "text": "Area / Accommodation Booked :",
                 "style": "receipt-table-value",
                 "bold": true,
                 "alignment": "left",
-                "border": [false, false, false, false],
-                "margin": [8, 0, 0, 0]
+                "margin": [0, 0, 0, 0]
               },
               {
                 "text": "{{communityHallName}} - {{hallCode}}",
                 "style": "receipt-table-value-down",
                 "alignment": "left",
-                "border": [false, false, false, false],
-                "margin": [8, 0, 0, 0]
+                "margin": [0, 0, 0, 0]
               }
             ],
             [
@@ -168,18 +168,16 @@
                 "style": "receipt-table-value",
                 "bold": true,
                 "alignment": "left",
-                "border": [false, false, false, false],
-                "margin": [8, 0, 0, 0]
+                "margin": [0, 0, 0, 0]
               },
               {
                 "text": "{{bookingDate}}",
                 "style": "receipt-table-value-down",
                 "alignment": "left",
-                "border": [false, false, false, false],
-                "margin": [8, 0, 0, 0]
+                "margin": [0, 0, 0, 0]
               }
             ],
-            "[{\"text\":\"Period of Booking :\",\"style\":\"receipt-table-value\",\"bold\":true,\"alignment\":\"left\",\"border\":[false,false,false,false],\"margin\":[8,4,0,4]},{\"text\":\"{{#var_bookingSlots}}{{bookingDate}}, {{/var_bookingSlots}}\",\"style\":\"receipt-table-value-down\",\"alignment\":\"left\",\"border\":[false,false,false,false],\"margin\":[8,4,0,4]}]"
+            "[{\"text\":\"Period of Booking :\",\"style\":\"receipt-table-value\",\"bold\":true,\"alignment\":\"left\",\"border\":[true,true,true,true],\"margin\":[0,0,0,0]},{\"text\":\"{{#var_bookingSlots}}{{bookingDate}}, {{/var_bookingSlots}}\",\"style\":\"receipt-table-value-down\",\"alignment\":\"left\",\"border\":[true,true,true,true],\"margin\":[0,0,0,0]}]"
           ]
         },
         "layout": {}
@@ -187,91 +185,93 @@
       {
         "style": "next-noc-table",
         "table": {
-          "widths": ["60%", "40%"],
+          "widths": ["24.1%", "auto"],
           "body": [
             [
               {
+                "text": "Payment Details:",
+                "bold": true,
+                "style": "receipt-table-value",
+                "border": [false, false, false, false],
+                "margin": [-4, 0, 0, 0]
+              },
+              {
+                "text": "",
+                "style": "receipt-table-value-down",
+                "border": [false, false, false, false]
+              }
+            ],
+            [
+              {
                 "text": "{{chb_booking_fees}}",
-                "border": [true, true, false, false],
                 "style": "receipt-table-value-down"
               },
               {
-                "text": "{{chbBookingFees}}",
-                "border": [false, true, true, false],
+                "text": "₹{{chbBookingFees}}",
                 "style": "receipt-table-value-down"
               }
             ],
             [
               {
                 "text": "{{chb_sgst}} (9%)",
-                "border": [true, false, false, false],
                 "style": "receipt-table-value-down"
               },
               {
-                "text": "{{chbSgst}}",
-                "border": [false, false, true, false],
+                "text": "₹{{chbSgst}}",
                 "style": "receipt-table-value-down"
               }
             ],
             [
               {
                 "text": "{{chb_cgst}} (9%)",
-                "border": [true, false, false, false],
                 "style": "receipt-table-value-down"
               },
               {
-                "text": "{{chbCgst}}",
-                "border": [false, false, true, false],
+                "text": "₹{{chbCgst}}",
                 "style": "receipt-table-value-down"
               }
             ],
             [
               {
                 "text": "{{chb_cow_cess}}",
-                "border": [true, false, false, false],
                 "style": "receipt-table-value-down"
               },
               {
-                "text": "{{chbCowCessCharge}}",
-                "border": [false, false, true, false],
+                "text": "₹{{chbCowCessCharge}}",
                 "style": "receipt-table-value-down"
               }
             ],
             [
               {
                 "text": "{{chb_service_charge}}",
-                "border": [true, false, false, false],
                 "style": "receipt-table-value-down"
               },
               {
-                "text": "{{chbServiceCharge}}",
-                "border": [false, false, true, false],
+                "text": "₹{{chbServiceCharge}}",
                 "style": "receipt-table-value-down"
               }
             ],
             [
               {
                 "text": "{{chb_discount}}",
-                "border": [true, false, false, false],
                 "style": "receipt-table-value-down"
               },
               {
-                "text": "{{chbDiscountPositive}}",
-                "border": [false, false, true, false],
+                "text": "₹{{chbDiscountPositive}}",
                 "style": "receipt-table-value-down"
               }
             ],
             [
               {
                 "text": "{{total_amount}} (Rs)",
-                "border": [true, false, false, true],
                 "bold": true,
+                "fillColor": "#f2f2f2",
                 "style": "receipt-table-value-down"
               },
               {
                 "text": "{{totalAmount}}",
-                "border": [false, false, true, true],
                 "bold": true,
+                "fillColor": "#f2f2f2",
                 "style": "receipt-table-value-down"
               }
             ]
@@ -300,86 +300,103 @@
                   {
                     "text": "{{term_1}}",
                     "margin": [0, 2, 0, 2],
+                    "alignment": "justify",
                     "fontSize": 9
                   },
                   {
                     "text": "{{term_2}}",
                     "margin": [0, 2, 0, 2],
+                    "alignment": "justify",
                     "fontSize": 9
                   },
                   {
                     "text": "{{term_3}}",
                     "margin": [0, 2, 0, 2],
+                    "alignment": "justify",
                     "fontSize": 9
                   },
                   {
                     "text": "{{term_4}}",
                     "margin": [0, 2, 0, 2],
+                    "alignment": "justify",
                     "fontSize": 9
                   },
                   {
                     "text": "{{term_5}}",
                     "margin": [0, 2, 0, 2],
+                    "alignment": "justify",
                     "fontSize": 9
                   },
                   {
                     "text": "{{term_6}}",
                     "margin": [0, 2, 0, 2],
+                    "alignment": "justify",
                     "fontSize": 9
                   },
                   {
                     "text": "{{term_7}}",
                     "margin": [0, 2, 0, 2],
+                    "alignment": "justify",
                     "fontSize": 9
                   },
                   {
-                    "text": "{{term_8}}",
+                    "text": "{{term_8}}.",
                     "margin": [0, 2, 0, 2],
+                    "alignment": "justify",
                     "fontSize": 9
                   },
                   {
                     "text": "{{term_9}}",
                     "margin": [0, 2, 0, 2],
+                    "alignment": "justify",
                     "fontSize": 9
                   },
                   {
                     "text": "{{term_10}}",
                     "margin": [0, 2, 0, 2],
+                    "alignment": "justify",
                     "fontSize": 9
                   },
                   {
                     "text": "{{term_11}}",
                     "margin": [0, 2, 0, 2],
+                    "alignment": "justify",
                     "fontSize": 9
                   },
                   {
                     "text": "{{term_12}}",
                     "margin": [0, 2, 0, 2],
+                    "alignment": "justify",
                     "fontSize": 9
                   },
                   {
                     "text": "{{term_13}}",
                     "margin": [0, 2, 0, 2],
+                    "alignment": "justify",
                     "fontSize": 9
                   },
                   {
                     "text": "{{term_14}}",
                     "margin": [0, 2, 0, 2],
+                    "alignment": "justify",
                     "fontSize": 9
                   },
                   {
                     "text": "{{term_15}}",
                     "margin": [0, 2, 0, 2],
+                    "alignment": "justify",
                     "fontSize": 9
                   },
                   {
                     "text": "{{term_16}}",
                     "margin": [0, 2, 0, 2],
+                    "alignment": "justify",
                     "fontSize": 9
                   },
                   {
                     "text": "{{term_17}}",
                     "margin": [0, 2, 0, 2],
+                    "alignment": "justify",
                     "fontSize": 9
                   }
                 ],
@@ -453,7 +470,7 @@
       "next-noc-table": {
         "fontSize": 10,
         "color": "#000000",
-        "margin": [-25, 4, -22, 2]
+        "margin": [-25, 0, -22, 2]
       },
       "receipt-table-value": {
         "color": "#000000",
@@ -478,7 +495,7 @@
       "no-signature": {
         "fontSize": 9,
         "margin": [-27, 0, -10, 0],
-        "color": "#484848"
+        "color": "#000000"
       },
       "pt-disclaimer": {
         "fontSize": 10,
