@@ -25,12 +25,7 @@ SearchDefinitions:
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
-            AND pi.createdtime = (
-              SELECT MAX(wf.createdtime)
-              FROM eg_wf_processinstance_v2 wf
-              WHERE wf.businessid = a.applicationno
-              GROUP BY wf.businessid
-            )
+            AND latest = true 
             ORDER BY a.createdtime DESC
             $pagination
           ) result
@@ -84,12 +79,7 @@ SearchDefinitions:
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.applicationno
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
           $where
-          AND pi.createdtime = (
-            SELECT MAX(wf.createdtime)
-            FROM eg_wf_processinstance_v2 wf
-            WHERE wf.businessid = a.applicationno
-            GROUP BY wf.businessid
-          ) )t
+          AND latest = true )t
       searchParams:
        condition: AND
        params:
@@ -152,12 +142,7 @@ SearchDefinitions:
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
-            AND pi.createdtime = (
-              SELECT MAX(wf.createdtime)
-              FROM eg_wf_processinstance_v2 wf
-              WHERE wf.businessid = a.applicationno
-              GROUP BY wf.businessid
-            )
+            AND latest = true 
             ORDER BY a.createdtime DESC
             OFFSET $offset
             LIMIT $limit
