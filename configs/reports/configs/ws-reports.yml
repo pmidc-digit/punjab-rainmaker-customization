@@ -4029,6 +4029,12 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+
+  - name: oldconnectionno
+    label: Old ConnectionNo
+    type: string
+    source: ws
+    total: false    
     
   - name: billingperiod
     label: Billing Period
@@ -4059,6 +4065,18 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+
+  - name: name
+    label: Name
+    type: string
+    source: ws
+    total: false
+
+  - name: guardian
+    label: Guardian
+    type: string
+    source: ws
+    total: false    
 
   - name: address
     label: Address
@@ -4106,20 +4124,23 @@ ReportDefinitions:
   query: |
     SELECT 
     conn.connectionno, 
+    conn.oldconnectionno,
     MAX(mt.billingperiod) AS billingperiod,  
     MAX(pt.propertyid) AS propertyid,
     MAX(mt.currentreading) AS currentReading,
     MAX(mt.lastreading) AS lastReading,
     MAX(mt.meterstatus) AS meterstatus,
+    MAX(usr.name) AS name,
+    MAX(usr.guardian) AS guardian,
     MAX(pt.address) AS address, 
-    MAX(pt.blockname) AS blockname,  
+    MAX(pt.blockname) AS blockname,
     MAX(pt.zonename) AS zonename, 
     MAX(pt.zonecode) AS zonecode, 
     MAX(pt.propertyusagetype) AS propertyusagetype, 
     MAX(pt.propertytype) AS propertytype    FROM  eg_ws_meterreading AS mt
     INNER JOIN 
         eg_ws_connection AS conn ON mt.connectionno = conn.connectionno
-    INNER JOIN 
+    INNER JOIN  eg_user as usr on usr.uuid=conn.createdby inner join
         report_properties AS pt ON pt.propertyid = conn.property_id
     WHERE 
         conn.tenantid = $tenantid
@@ -4129,7 +4150,7 @@ ReportDefinitions:
             FROM eg_ws_meterreading
             WHERE connectionno = mt.connectionno
         )
-  groupby: GROUP BY   conn.connectionno
+  groupby: GROUP BY  conn.connectionno, conn.oldconnectionno
   
 - reportName: DeadMeterReport
   decryptionPathId: ULBPTDataDumpReport_V2  
