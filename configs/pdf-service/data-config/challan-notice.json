@@ -208,6 +208,11 @@
                 "variable": "officerdept",
                 "value": {
                   "path": "$.officer.department"
+                },
+                "localisation": {
+                  "required": true,
+                  "prefix": "COMMON_MASTERS_DEPARTMENT",
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -659,6 +664,10 @@
               {
                 "variable": "pendingAmount",
                 "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"
+              },
+              {
+                "variable": "TotalChallanAmount",
+                "formula": "{{challanFine}}>=0?{{challanFine}}+{{challanAmount}}:0"
               },
               {
                 "variable": "excessAmountPaid",
