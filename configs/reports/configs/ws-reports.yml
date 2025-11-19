@@ -4114,6 +4114,13 @@ ReportDefinitions:
     source: pt
     total: false
   searchParams:
+  - name: usagecategory
+    label: Category
+    type: singlevaluelist
+    pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIOL,NRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+    source: ws
+    isMandatory: false
+    searchClause: AND pt.propertyusagetype = $usagecategory  
   - name: localityArray
     label: zoneList
     type: boundarylist
