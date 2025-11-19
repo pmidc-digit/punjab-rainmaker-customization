@@ -89,10 +89,10 @@
                   "path": "$.hallsBookingApplication[0].purpose.purpose"
                 },
                 "localisation": {
-                    "required": true,
-                    "prefix": null,
-                    "module": "rainmaker-common"
-                  }
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
               },
               {
                 "variable": "accountNumber",
@@ -167,9 +167,21 @@
               },
 
               {
+                "variable": "chb_cow_cess",
+                "value": {
+                  "path": "MODULE_CSS_COW_CESS"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
                 "variable": "chb_service_charge",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_CHB_SERVICE_CHARGE"
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_SERVICE_CHARGE"
                 },
                 "type": "label",
                 "localisation": {
@@ -182,6 +194,13 @@
                 "variable": "chbServiceCharge",
                 "value": {
                   "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_SERVICE_CHARGE')].adjustedAmount"
+                }
+              },
+
+              {
+                "variable": "chbCowCessCharge",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_COW_CESS')].adjustedAmount"
                 }
               },
               {
@@ -787,6 +806,18 @@
                 "variable": "disclamer_2",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_SECOND_LINE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "chb_service",
+                "value": {
+                  "path": "ACTION_TEST_CHB"
                 },
                 "type": "label",
                 "localisation": {

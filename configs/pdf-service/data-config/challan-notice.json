@@ -189,6 +189,12 @@
               {
                 "variable": "officerName",
                 "value": {
+                  "path": "$.officer.name"
+                }
+              },
+              {
+                "variable": "officerCode",
+                "value": {
                   "path": "$.officer.code"
                 }
               },
@@ -202,6 +208,11 @@
                 "variable": "officerdept",
                 "value": {
                   "path": "$.officer.department"
+                },
+                "localisation": {
+                  "required": true,
+                  "prefix": "COMMON_MASTERS_DEPARTMENT",
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -655,13 +666,18 @@
                 "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"
               },
               {
+                "variable": "TotalChallanAmount",
+                "formula": "{{challanFine}}>=0?{{challanFine}}+{{challanAmount}}:0"
+              },
+              {
                 "variable": "excessAmountPaid",
                 "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
               },
               {
                 "variable": "epochIST",
                 "type": "date",
-                "formula": "({{epoch}} + 19800) * 1000",
+                "formula": "{{epoch}}",
+                "timezone": "Asia/Kolkata",
                 "format": "HH:mm"
               },
               {

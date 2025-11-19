@@ -92,6 +92,18 @@
                 }
               },
               {
+                "variable": "challanFee",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode=='CH.CHALLAN_FINE')].adjustedAmount"
+                }
+              },
+              {
+                "variable": "challanAmount",
+                "value": {
+                  "path": "$.challan.challans[0].challanAmount"
+                }
+              },
+              {
                 "variable": "paidAmount",
                 "value": {
                   "path": "$.paymentDetails[0].totalAmountPaid"
@@ -570,12 +582,13 @@
               {
                 "variable": "epochIST",
                 "type": "date",
-                "formula": "({{epoch}} + 19800) * 1000",
+                "formula": "{{epoch}}",
+                "timezone": "Asia/Kolkata",
                 "format": "HH:mm"
               },
               {
-                "variable": "pendingAmount",
-                "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"
+                "variable": "TotalChallanAmount",
+                "formula": "{{challanFee}}>=0?{{challanFee}}+{{challanAmount}}:0"
               },
               {
                 "variable": "excessAmountPaid",

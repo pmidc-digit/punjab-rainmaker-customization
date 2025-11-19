@@ -6,11 +6,11 @@
     "baseKeyPath": "$.Bpa.*",
     "entityIdPath": "$.applicationNo",
     "isCommonTableBorderRequired": true,
-    "mappings": [ 
+    "mappings": [
       {
         "mappings": [
           {
-            "direct": [              
+            "direct": [
               {
                 "variable": "applicationNo",
                 "value": {
@@ -127,7 +127,7 @@
                   "scema": [
                     {
                       "key": "pendingapproval",
-                      "type" : "array-orderedlist",
+                      "type": "array-orderedlist",
                       "value": "pendingapproval"
                     }
                   ]
@@ -155,39 +155,36 @@
                 "variable": "stakeholderName",
                 "value": {
                   "path": "$.additionalDetails.stakeholderName"
-                  
                 }
               },
               {
                 "variable": "ulbName",
                 "value": {
                   "path": "$.additionalDetails.UlbName"
-                  
                 }
               },
               {
                 "variable": "ulbType",
                 "value": {
-                  "path": "$.additionalDetails.Ulblisttype" 
+                  "path": "$.additionalDetails.Ulblisttype"
                 }
               },
               {
                 "variable": "ownersWithAddress",
                 "value": {
-                  "path": "$.landInfo.owners[0].name"  
+                  "path": "$.landInfo.owners[0].name"
                 }
               },
               {
                 "variable": "ownersWithName",
                 "value": {
-                  "path": "$.landInfo.owners[0].permanentAddress"  
+                  "path": "$.landInfo.owners[0].permanentAddress"
                 }
               },
               {
                 "variable": "nocNumber",
                 "value": {
                   "path": "$.additionalDetails.nocNumber"
-                  
                 }
               },
               {
@@ -202,7 +199,7 @@
                   "path": "$.additionalDetails.stakeholderRegistrationNumber"
                 }
               },
-              
+
               {
                 "variable": "proposedLandUse",
                 "value": {
@@ -221,7 +218,7 @@
                   "module": "rainmaker-bpa"
                 }
               },
-              
+
               {
                 "variable": "REGISTRATION_NUMBER",
                 "value": {
@@ -438,7 +435,7 @@
                 }
               },
 
-             {
+              {
                 "variable": "SUBJECT_CONTENT",
                 "value": {
                   "path": "BPA_PDF_SUBJECT_CONTENT"
@@ -499,14 +496,13 @@
                   "module": "rainmaker-bpa"
                 }
               },
-               {
+              {
                 "variable": "RESIDENTIAL_PLOTTED",
                 "value": {
                   "path": "$.additionalDetails.usage"
-                  
                 }
               },
-             
+
               {
                 "variable": "BUILDING_HAVING",
                 "value": {
@@ -524,8 +520,6 @@
                 "value": {
                   "path": "$.edcrDetail.planDetail.planInformation[0].plotArea"
                 }
-               
-              
               },
               {
                 "variable": "SELF_CERTIFIED_UNDER",
@@ -893,11 +887,6 @@
                   "path": "$.approvalDate"
                 },
                 "type": "date"
-                
-                  
-                  
-               
-                
               },
               {
                 "variable": "Muncipal_Council",
@@ -1048,14 +1037,12 @@
                 "value": {
                   "path": "BPA_PDF_KHATANO_TXT"
                 }
-               
               },
               {
                 "variable": "KHATA_NO",
                 "value": {
                   "path": "BPA_PDF_KHATANO_TXT"
                 }
-               
               },
               {
                 "variable": "HOLDING_NO",
@@ -1339,7 +1326,7 @@
                 "value": {
                   "path": "$.additionalDetails.runDate"
                 },
-                "type":"date"
+                "type": "date"
               },
               {
                 "variable": "REPORT_RUNDATE",
@@ -1441,7 +1428,8 @@
               {
                 "variable": "epochIST",
                 "type": "date",
-                "formula": "({{epoch}} + 19800) * 1000",
+                "formula": "{{epoch}}",
+                "timezone": "Asia/Kolkata",
                 "format": "HH:mm"
               }
             ]

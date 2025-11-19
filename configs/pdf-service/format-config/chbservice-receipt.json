@@ -2,7 +2,7 @@
   "key": "chbservice-receipt",
   "config": {
     "defaultStyle": {
-      "font": "Cambay"
+      "font": "Roboto"
     },
     "content": [
       {
@@ -28,16 +28,16 @@
                   {
                     "stack": [
                       { "text": "{{address}}" },
-                      { "text": "{{phoneNumber}}" },
                       { "text": "{{website}}" },
-                      { "text": "{{email}}" }
+                      { "text": "{{email}}" },
+                      { "text": "{{phoneNumber}}" }
                     ],
                     "alignment": "center",
                     "color": "#484848",
                     "margin": [0, 2, 0, 2]
                   },
                   {
-                    "text": "{{serviceType}} {{payment_receipt}}",
+                    "text": "{{chb_service}} {{payment_receipt}}",
                     "style": "receipt-logo-sub-header",
                     "alignment": "center",
                     "margin": [0, 5, 0, 0]
@@ -233,6 +233,27 @@
         },
         "layout": {}
       },
+
+      {
+        "style": "noc-mock-table",
+        "table": {
+          "widths": ["24%", "80%"],
+          "body": [
+            [
+              {
+                "text": "Hall Name: ",
+                "style": "receipt-mock-table-value"
+              },
+              {
+                "text": "{{hallName}}",
+                "style": "receipt-mock-table",
+                "fontSize": 10
+              }
+            ]
+          ]
+        },
+        "layout": {}
+      },
       {
         "style": "next-noc-table",
         "table": {
@@ -252,7 +273,7 @@
             ],
             [
               {
-                "text": "{{chb_sgst}}",
+                "text": "{{chb_sgst}} (9%)",
                 "border": [true, false, false, false],
                 "style": "receipt-table-value-down"
               },
@@ -264,12 +285,24 @@
             ],
             [
               {
-                "text": "{{chb_cgst}}",
+                "text": "{{chb_cgst}} (9%)",
                 "border": [true, false, false, false],
                 "style": "receipt-table-value-down"
               },
               {
                 "text": "{{chbCgst}}",
+                "border": [false, false, true, false],
+                "style": "receipt-table-value-down"
+              }
+            ],
+            [
+              {
+                "text": "{{chb_cow_cess}}",
+                "border": [true, false, false, false],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": "{{chbCowCessCharge}}",
                 "border": [false, false, true, false],
                 "style": "receipt-table-value-down"
               }
@@ -318,6 +351,26 @@
         "layout": {}
       },
       {
+        "style": "pt-disclaimer",
+        "stack": [
+          {
+            "text": "Disclaimer",
+            "bold": true,
+            "style": "pt-disclaimer-header"
+          },
+
+          {
+            "ol": [
+              " The Payment received by cheque/DD shall be subject to realization.",
+              " The responsibility of verification of this document before accepting the same for any legal purpose would rest with the institution/ organization or any entity where the document is produced.",
+              " In case of discrepancy please inform the issuing authority."
+            ],
+            "alignment": "justify",
+            "margin": [10, 0, 0, 0]
+          }
+        ]
+      },
+      {
         "style": "receipt-approver",
         "columns": [
           {
@@ -360,7 +413,7 @@
       "noc-table": {
         "fontSize": 12,
         "color": "#000000",
-        "margin": [-25, 10, -22, -8]
+        "margin": [-25, 4, -22, 4]
       },
       "receipt-table-value-total-Qr": {
         "alignment": "right",
@@ -372,12 +425,29 @@
         "fontSize": 12,
         "fontWeight": 400,
         "alignment": "left",
-        "margin": [3, 5, 0, 5]
+        "margin": [3, 0, 0, 0]
+      },
+      "noc-mock-table": {
+        "fontSize": 12,
+        "color": "#000000",
+        "margin": [-25, 7, 0, 0]
+      },
+      "receipt-mock-table-value": {
+        "color": "#000000",
+        "bold": true,
+        "fontSize": 10,
+        "margin": [2, 0, 0, 0]
+      },
+      "receipt-mock-table": {
+        "color": "#000000",
+        "bold": false,
+        "fontSize": 10,
+        "margin": [2, 0, 0, 0]
       },
       "next-noc-table": {
         "fontSize": 12,
         "color": "#000000",
-        "margin": [-25, 28, -22, -8]
+        "margin": [-25, 4, -22, 2]
       },
       "receipt-table-value": {
         "color": "#000000",
@@ -396,17 +466,17 @@
       "receipt-approver": {
         "fontSize": 12,
         "bold": true,
-        "margin": [-27, 50, -10, 0],
+        "margin": [-27, 6, -10, 0],
         "color": "#484848"
       },
       "no-signature": {
         "fontSize": 12,
-        "margin": [-27, 35, -10, 0],
+        "margin": [-27, 7, -10, 0],
         "color": "#484848"
       },
       "pt-disclaimer": {
         "fontSize": 12,
-        "margin": [-27, 30, -10, 0],
+        "margin": [-27, 5, -10, 0],
         "color": "#484848"
       },
       "pt-disclaimer-value": {
