@@ -4145,10 +4145,12 @@ ReportDefinitions:
     MAX(pt.zonecode) AS zonecode, 
     MAX(pt.propertyusagetype) AS propertyusagetype, 
     MAX(pt.propertytype) AS propertytype    FROM  eg_ws_meterreading AS mt
-    INNER JOIN 
-        eg_ws_connection AS conn ON mt.connectionno = conn.connectionno
-    INNER JOIN  eg_user as usr on usr.uuid=conn.createdby inner join
-        report_properties AS pt ON pt.propertyid = conn.property_id
+    INNER JOIN eg_ws_connection AS conn ON mt.connectionno = conn.connectionno
+    INNER JOIN  
+        report_properties AS pt ON pt.propertyid = conn.property_id  
+        inner join eg_pt_property pro on pro.propertyid = pt.propertyid
+        inner join eg_pt_owner ow on ow.propertyid = pro.id 
+        inner join eg_user usr on usr.uuid = ow.userid 
     WHERE 
         conn.tenantid = $tenantid
     AND 
