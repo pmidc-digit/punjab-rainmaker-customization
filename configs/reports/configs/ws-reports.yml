@@ -4016,7 +4016,7 @@ ReportDefinitions:
       WHERE tenantid = $tenantid
   
 - reportName: MeterReadingReport
-  decryptionPathId: MiscReceiptULB_v2
+  decryptionPathId: ULBPTDataDumpReport_V2
   summary: Meter Reading Report
   version: 1.0.0
   moduleName: rainmaker-ws
@@ -4066,14 +4066,14 @@ ReportDefinitions:
     source: ws
     total: false
 
-  - name: name
+  - name: ownername
     label: Name
     type: string
     source: ws
     total: false
 
-  - name: guardian
-    label: Guardian
+  - name: guardianname
+    label: Guardian Name
     type: string
     source: ws
     total: false    
@@ -4130,8 +4130,8 @@ ReportDefinitions:
     MAX(mt.currentreading) AS currentReading,
     MAX(mt.lastreading) AS lastReading,
     MAX(mt.meterstatus) AS meterstatus,
-    MAX(usr.name) AS name,
-    MAX(usr.guardian) AS guardian,
+    MAX(usr.name) AS ownername,
+    MAX(usr.guardian) AS guardianname,
     MAX(pt.address) AS address, 
     MAX(pt.blockname) AS blockname,
     MAX(pt.zonename) AS zonename, 
