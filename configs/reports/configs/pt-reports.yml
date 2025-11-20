@@ -9299,47 +9299,76 @@ ReportDefinitions:
     isMandatory: false
     searchClause: and pt.propertyusagetype like concat($usageCat,'%') 
   query: |
-    --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property    Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id    Address
     WITH owners AS (
-    SELECT propertyid,
-    SPLIT_PART(STRING_AGG(ownername, ','), ',', 1) AS ownername,
-    SPLIT_PART(STRING_AGG(mobilenumber, ','), ',', 1) AS mobilenumber
-    FROM report_owners
-    WHERE tenantid = $tenantid
-    AND status = 'ACTIVE'
-    GROUP BY propertyid ),
-    units AS (
-    SELECT
-    propertyid,
-    STRING_AGG(usagecategory, ',') AS unitusage
-    FROM report_units
-    WHERE tenantid = $tenantid
-    AND active = TRUE
-    GROUP BY propertyid )
-    SELECT 
-    d.propertyid AS propertyid, 
-    pt.oldpropertyid AS oldpropertyid,
-    pt.surveyid AS surveyid,
-    d.demand AS tentativedemand, 
-    d.fy AS assessmentyear,
-    pt.address AS address,
-    pt.blockname AS blockname,
-    pt.propertyusagetype AS propertycategory,
-    pt.propertytype AS propertytype,
-    pt.ownershipcategory AS ownership,
-    pt.plotsize AS plotsize,
-    pt.firmbusinessname AS businessname,
-    pt.localityname AS localityname,
-    COALESCE(o.ownername, 'N/A') AS ownername,
-    COALESCE(o.mobilenumber, 'N/A') AS mobileno
-    FROM report_unpaid_demand d
-    LEFT JOIN report_properties pt ON pt.propertyid = d.propertyid
-    AND pt.propertystatus != 'INACTIVE'
-    LEFT JOIN units u ON u.propertyid = d.propertyid
-    LEFT JOIN owners o ON o.propertyid = d.propertyid
-    WHERE d.tenantid = $tenantid
-    AND d.demand > 0
+        SELECT 
+            propertyid,
+            SPLIT_PART(STRING_AGG(ownername, ','), ',', 1) AS ownername,
+            SPLIT_PART(STRING_AGG(mobilenumber, ','), ',', 1) AS mobilenumber
+        FROM report_owners
+        WHERE tenantid = $tenantid
+          AND status = 'ACTIVE'
+        GROUP BY propertyid
+    ),
     
+    units AS (
+        SELECT 
+            propertyid,
+            STRING_AGG(usagecategory, ',') AS unitusage
+        FROM report_units
+        WHERE tenantid = $tenantid
+          AND active = TRUE
+        GROUP BY propertyid
+    ),
+    
+    report_unpaid_demand AS (
+        SELECT 
+            d.tenantid,
+            d.consumercode AS propertyid,
+            SUM(dd.taxamount) AS demand,
+            STRING_AGG(
+                DISTINCT TO_CHAR(
+                    (TO_TIMESTAMP(d.taxperiodfrom / 1000) AT TIME ZONE 'Asia/Kolkata'),
+                    'YYYY'
+                ),
+                ', '
+            ) AS fy
+        FROM egbs_demand_v1 d
+        INNER JOIN egbs_demanddetail_v1 dd 
+            ON dd.demandid = d.id
+        WHERE d.businessservice = 'PT'
+          AND d.status != 'CANCELLED'
+          AND d.ispaymentcompleted = FALSE
+          AND dd.taxamount != dd.collectionamount
+          AND dd.tenantid = 'pb.phagwara'
+        GROUP BY d.consumercode, d.tenantid
+    )
+    
+    SELECT 
+        d.propertyid,
+        pt.oldpropertyid,
+        pt.surveyid,
+        d.demand AS tentativedemand,
+        d.fy AS assessmentyear,
+        pt.address,
+        pt.blockname,
+        pt.propertyusagetype AS propertycategory,
+        pt.propertytype,
+        pt.ownershipcategory AS ownership,
+        pt.plotsize,
+        pt.firmbusinessname AS businessname,
+        pt.localityname,
+        COALESCE(o.ownername, 'N/A') AS ownername,
+        COALESCE(o.mobilenumber, 'N/A') AS mobileno
+    FROM report_unpaid_demand d
+    LEFT JOIN report_properties pt 
+           ON pt.propertyid = d.propertyid
+          AND pt.propertystatus != 'INACTIVE'
+    LEFT JOIN units u 
+           ON u.propertyid = d.propertyid
+    LEFT JOIN owners o 
+           ON o.propertyid = d.propertyid
+    WHERE d.tenantid = $tenantid
+      AND d.demand > 0
     
 - reportName: STATEDEFAULTER_REPORT_WITH_LOCALITY_UNPAID_DEMAND_NEW
   decryptionPathId: ULBDEFAULTERPTREPORT_V2
