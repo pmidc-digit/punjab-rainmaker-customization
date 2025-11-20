@@ -9338,7 +9338,7 @@ ReportDefinitions:
           AND d.status != 'CANCELLED'
           AND d.ispaymentcompleted = FALSE
           AND dd.taxamount != dd.collectionamount
-          AND dd.tenantid = 'pb.phagwara'
+          AND dd.tenantid = $tenantid
         GROUP BY d.consumercode, d.tenantid
     )
     
