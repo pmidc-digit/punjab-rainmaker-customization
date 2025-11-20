@@ -5997,7 +5997,7 @@ ReportDefinitions:
 
 - reportName: PT_DEFAULTER_REPORT_V2
   decryptionPathId: ULBDEFAULTERPTREPORT_V2
-  summary: ULB_PT_DEFAULTER
+  summary: Latest FY year Payed - ULB_PT_DEFAULTER
   version: 1.0.0
   moduleName: rainmaker-pt
   sourceColumns:
@@ -6051,6 +6051,11 @@ ReportDefinitions:
     type: string
     source: pt
     total: false
+  - name: localityname
+    label: reports.pt.localityname
+    type: string
+    source: pt
+    total: false    
   - name: block
     label: reports.pt.block
     type: string
@@ -6120,6 +6125,7 @@ ReportDefinitions:
         props.propertytype as propertytype,
         propertyusagetype as propertyusagetype,
         concat(address,' ',localityname) as address,
+        localityname as localityname,
         blockcode as block,
         owners.ownername as ownername,
         owners.mobileNumber as mobileno
