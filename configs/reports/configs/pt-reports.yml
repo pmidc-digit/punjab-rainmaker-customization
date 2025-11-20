@@ -8065,14 +8065,7 @@ ReportDefinitions:
     pattern: 'list://1427846400000:2015-16,1459468800000:2016-17,1491004800000:2017-18,1522521000000:2018-19,1522540800000:2019-20,1554076800000:2020-21,1617215400000:2021-22,1648751400000:2022-23,1680287400000:2023-24,1711909800000:2024-25'
     source: pt
     isMandatory: true
-    searchClause: and assessments.fy not like concat('%',$fy,'%')
-  - name: localityArray
-    label: zoneList
-    type: boundarylist
-    source: pt
-    wrapper: true
-    isMandatory: false
-    searchClause: AND pt.locality IN ($localityArray)        
+    searchClause: and assessments.fy not like concat('%',$fy,'%')       
   query: |
       -- Use CTE to force query plan, compute & use CTE later
       with assessments as
