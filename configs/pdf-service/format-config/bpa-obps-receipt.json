@@ -1,5 +1,5 @@
 {
-  "key": "bpa-receipt",
+  "key": "bpa-obps-receipt",
   "config": {
     "defaultStyle": { "font": "Roboto" },
     "content": [
@@ -124,7 +124,7 @@
                 "style": "receipt-mock-table-value"
               },
               {
-                "text": "Registration Fees",
+                "text": "{{paymentType}}",
                 "style": "receipt-mock-table",
                 "fontSize": 10
               },
@@ -133,7 +133,7 @@
                 "style": "receipt-mock-table-value"
               },
               {
-                "text": "Professional Registration",
+                "text": "Building Plan Approval",
                 "style": "receipt-mock-table",
                 "fontSize": 10
               },
@@ -230,7 +230,30 @@
             ],
             [
               {
-                "text": " Registration Fees ",
+                "text": "Building Application Fees ",
+                "style": "receipt-fee-label"
+              },
+              {
+                "text": " {{buildingApplicationFees}}",
+                "style": "receipt-fee-value"
+              }
+            ],
+            [
+              {
+                "text": "Boundary Wall Fees ",
+                "style": "receipt-total-label",
+                "fillColor": "#f2f2f2"
+              },
+              {
+                "text": " {{boundaryWallFee}}",
+                "style": "receipt-total-value",
+                "fillColor": "#f2f2f2"
+              }
+            ],
+
+            [
+              {
+                "text": "{{total_amount}}",
                 "style": "receipt-total-label",
                 "fillColor": "#f2f2f2"
               },
@@ -281,7 +304,7 @@
           },
           {
             "text": [
-              { "text": "{{ulbType}} , {{logo-header}}", "bold": true }
+              { "text": "{{ulbType}} {{logo-header}}", "bold": true }
             ],
             "alignment": "right",
             "margin": [0, 0, -10, 0]
