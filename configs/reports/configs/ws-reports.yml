@@ -4059,12 +4059,18 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
-
+    
   - name: meterstatus
     label: Meter status
     type: string
     source: ws
     total: false
+
+  - name: connectiontype
+    label: Connection Type
+    type: string
+    source: ws
+    total: false    
 
   - name: ownername
     label: Name
@@ -4137,6 +4143,7 @@ ReportDefinitions:
     MAX(mt.currentreading) AS currentReading,
     MAX(mt.lastreading) AS lastReading,
     MAX(mt.meterstatus) AS meterstatus,
+    MAX(ser.connectiontype) AS connectiontype,
     MAX(usr.name) AS ownername,
     MAX(usr.guardian) AS guardianname,
     MAX(pt.address) AS address, 
@@ -4145,14 +4152,14 @@ ReportDefinitions:
     MAX(pt.zonecode) AS zonecode, 
     MAX(pt.propertyusagetype) AS propertyusagetype, 
     MAX(pt.propertytype) AS propertytype    FROM  eg_ws_meterreading AS mt
-    INNER JOIN eg_ws_connection AS conn ON mt.connectionno = conn.connectionno
-    INNER JOIN  
-        report_properties AS pt ON pt.propertyid = conn.property_id  
-        inner join eg_pt_property pro on pro.propertyid = pt.propertyid
-        inner join eg_pt_owner ow on ow.propertyid = pro.id 
-        inner join eg_user usr on usr.uuid = ow.userid 
+    INNER JOIN eg_ws_connection AS conn ON mt.connectionno = conn.connectionno 
+    inner join  eg_ws_service ser on conn.id = ser.connection_id
+    INNER JOIN report_properties AS pt ON pt.propertyid = conn.property_id  
+    inner join eg_pt_property pro on pro.propertyid = pt.propertyid
+    inner join eg_pt_owner ow on ow.propertyid = pro.id 
+    inner join eg_user usr on usr.uuid = ow.userid 
     WHERE 
-        conn.tenantid = $tenantid
+        conn.tenantid = $tenantid and ser.connectiontype = 'Metered'
     AND 
         mt.currentreadingdate = (
             SELECT MAX(currentreadingdate)
