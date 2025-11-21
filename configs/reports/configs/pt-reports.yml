@@ -9304,7 +9304,7 @@ ReportDefinitions:
             SPLIT_PART(STRING_AGG(ownername, ','), ',', 1) AS ownername,
             SPLIT_PART(STRING_AGG(mobilenumber, ','), ',', 1) AS mobilenumber
         FROM report_owners
-        WHERE tenantid = $tenantid
+        WHERE tenantid = $ulb
           AND status = 'ACTIVE'
         GROUP BY propertyid
     ),
@@ -9314,7 +9314,7 @@ ReportDefinitions:
             propertyid,
             STRING_AGG(usagecategory, ',') AS unitusage
         FROM report_units
-        WHERE tenantid = $tenantid
+        WHERE tenantid = $ulb
           AND active = TRUE
         GROUP BY propertyid
     ),
@@ -9338,7 +9338,7 @@ ReportDefinitions:
           AND d.status != 'CANCELLED'
           AND d.ispaymentcompleted = FALSE
           AND dd.taxamount != dd.collectionamount
-          AND dd.tenantid = $tenantid
+          AND dd.tenantid = $ulb
         GROUP BY d.consumercode, d.tenantid
     )
     
@@ -9366,7 +9366,7 @@ ReportDefinitions:
            ON u.propertyid = d.propertyid
     LEFT JOIN owners o 
            ON o.propertyid = d.propertyid
-    WHERE d.tenantid = $tenantid
+    WHERE d.tenantid = $ulb
       AND d.demand > 0
     
 - reportName: STATEDEFAULTER_REPORT_WITH_LOCALITY_UNPAID_DEMAND_NEW
@@ -9468,7 +9468,7 @@ ReportDefinitions:
     source: pt
     wrapper: true
     isMandatory: true
-    searchClause: AND props.tenantid = $tenantid
+    searchClause: AND props.tenantid = $ulb
   query: |
     with assessments as
     (
@@ -9479,7 +9479,7 @@ ReportDefinitions:
             max(totalamount) as maxtotal,
             max(propertytax) as max_pt_tax
         from report_assessments 
-        where tenantid=$tenantid and propertyid not in (select propertyid from report_assessments where tenantid=$tenantid and assessmentyears =$finYear)
+        where tenantid=$ulb and propertyid not in (select propertyid from report_assessments where tenantid=$ulb and assessmentyears =$finYear)
             group by propertyid
     ),
     owners as 
@@ -9488,7 +9488,7 @@ ReportDefinitions:
         split_part(string_agg(ownername,','),',',1) as ownername,
         split_part(string_agg(mobileNumber,','),',',1) as mobileNumber,
         propertyid
-        from report_owners where tenantid=$tenantid and status='ACTIVE'
+        from report_owners where tenantid=$ulb and status='ACTIVE'
         group by propertyid
     )
     select 
@@ -9508,7 +9508,7 @@ ReportDefinitions:
     from report_properties props
     inner join assessments on assessments.propertyid=props.propertyid
     inner join owners on owners.propertyid=props.propertyid 
-    where tenantid=$tenantid     
+    where tenantid=$ulb     
  
 - reportName: USERNAME_PT
   decryptionPathId: ULBPTDataDumpReport_V2
