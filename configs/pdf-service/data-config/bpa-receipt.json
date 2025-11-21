@@ -96,6 +96,12 @@
                 }
               },
               {
+                "variable": "ulbType",
+                "value": {
+                  "path": "$.ulbType"
+                }
+              },
+              {
                 "variable": "tenantid",
                 "value": {
                   "path": "$.tenantId"
@@ -543,6 +549,7 @@
                 "variable": "pendingAmount",
                 "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"
               },
+              
               {
                 "variable": "excessAmountPaid",
                 "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
@@ -563,10 +570,6 @@
                   {
                     "variable": "phoneNumber",
                     "value": "$.MdmsRes.tenant.tenants[0].contactNumber"
-                  },
-                  {
-                    "variable": "ulbType",
-                    "value": "$.MdmsRes.tenant.tenants[0].city.ulbType"
                   },
                   {
                     "variable": "website",

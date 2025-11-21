@@ -84,7 +84,7 @@
               {
                 "variable": "ServiceCharge",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[0].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SERVICE_CHARGE')].adjustedAmount"
                 }
               },
               {
@@ -102,7 +102,7 @@
               {
                 "variable": "PetRegistrationFee",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[1].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PET_REGISTRATION_FEE')].adjustedAmount"
                 }
               },
               {
@@ -120,7 +120,7 @@
               {
                 "variable": "PenaltyFee",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[2].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PENALTY_FEE')].adjustedAmount"
                 }
               },
               {
@@ -138,7 +138,7 @@
               {
                 "variable": "InterestAmount",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[3].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'INTEREST_AMOUNT')].adjustedAmount"
                 }
               },
 
