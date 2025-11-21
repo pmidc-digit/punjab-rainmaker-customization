@@ -20,6 +20,7 @@ SearchDefinitions:
             from eg_ptr_registration as pet
             INNER JOIN eg_ptr_petdetails ptdet ON ptdet.petdetailsid = pet.id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber AND pi.latest = TRUE
+            INNER JOIN eg_ptr_owner ownerinfo ON ownerinfo.ptrregistrationid = pet.id
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
             order by pi.createdtime asc $pagination
@@ -63,6 +64,9 @@ SearchDefinitions:
           - name: assg.assignee
             isMandatory: false
             jsonPath: $.searchCriteria.assignee
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -147,6 +151,7 @@ SearchDefinitions:
                    assg.assignee as wf_assignee
             from eg_ptr_registration as pet
             INNER JOIN eg_ptr_petdetails ptdet ON ptdet.petdetailsid = pet.id
+            INNER JOIN eg_ptr_owner ownerinfo ON ownerinfo.ptrregistrationid = pet.id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber AND pi.latest = TRUE
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
@@ -191,6 +196,9 @@ SearchDefinitions:
           - name: assg.assignee
             isMandatory: false
             jsonPath: $.searchCriteria.assignee
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset

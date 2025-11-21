@@ -17,6 +17,7 @@ SearchDefinitions:
                    booking.payment_date
             from eg_adv_booking_detail as booking
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = booking.booking_no AND pi.latest = TRUE
+            INNER JOIN eg_adv_owner ownerinfo ON ownerinfo.booking_id = booking.booking_id
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where 
             order by pi.createdtime asc
@@ -53,6 +54,9 @@ SearchDefinitions:
           - name: applicant.applicant_mobile_no
             isMandatory: false
             jsonPath: $.searchCriteria.mobileNumber
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -124,6 +128,7 @@ SearchDefinitions:
                    booking.payment_date
             from eg_adv_booking_detail as booking
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = booking.booking_no AND pi.latest = TRUE
+            INNER JOIN eg_adv_owner ownerinfo ON ownerinfo.booking_id = booking.booking_id
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
             order by pi.createdtime desc
@@ -160,6 +165,9 @@ SearchDefinitions:
           - name: applicant.applicant_mobile_no
             isMandatory: false
             jsonPath: $.searchCriteria.mobileNumber
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset

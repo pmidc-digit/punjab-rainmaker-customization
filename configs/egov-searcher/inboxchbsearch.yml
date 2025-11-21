@@ -28,11 +28,10 @@ SearchDefinitions:
             INNER JOIN eg_wf_processinstance_v2 pi 
                 ON pi.businessid = booking.booking_no 
                 AND pi.latest = TRUE
+            INNER JOIN eg_chb_owner ownerinfo ON ownerinfo.booking_id = booking.booking_id
             LEFT JOIN eg_wf_assignee_v2 assg 
               ON pi.id = assg.processinstanceid
-
             $where
-
             ORDER BY pi.createdtime ASC
             $pagination
           ) result
@@ -82,6 +81,10 @@ SearchDefinitions:
           - name: booking.purpose
             isMandatory: false
             jsonPath: $.searchCriteria.purpose
+
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
 
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
@@ -189,6 +192,7 @@ SearchDefinitions:
             INNER JOIN eg_wf_processinstance_v2 pi 
                 ON pi.businessid = booking.booking_no 
                 AND pi.latest = TRUE
+            INNER JOIN eg_chb_owner ownerinfo ON ownerinfo.booking_id = booking.booking_id
             LEFT JOIN eg_wf_assignee_v2 assg 
               ON pi.id = assg.processinstanceid
 
@@ -244,7 +248,9 @@ SearchDefinitions:
             isMandatory: false
             jsonPath: $.searchCriteria.purpose
 
-
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
 
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords

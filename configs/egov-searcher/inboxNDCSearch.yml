@@ -23,6 +23,7 @@ SearchDefinitions:
                assg.assignee AS wf_assignee
              FROM eg_ndc_application a
              INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.applicationno AND pi.latest = TRUE
+             INNER JOIN eg_ndc_owner ownerinfo ON ownerinfo.ndcapplicationuuid = a.uuid
              LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
              $where
              ORDER BY a.createdtime DESC
@@ -61,6 +62,10 @@ SearchDefinitions:
           - name: a.createdtime
             isMandatory: false
             jsonPath: $.searchCriteria.toDate
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
+
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -139,6 +144,7 @@ SearchDefinitions:
                assg.assignee AS wf_assignee
              FROM eg_ndc_application a
              INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = a.applicationno AND pi.latest = TRUE
+             INNER JOIN eg_ndc_owner ownerinfo ON ownerinfo.ndcapplicationuuid = a.uuid
              LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
              $where
              ORDER BY a.createdtime DESC
@@ -178,6 +184,9 @@ SearchDefinitions:
           - name: a.createdtime
             isMandatory: false
             jsonPath: $.searchCriteria.toDate
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
