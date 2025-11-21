@@ -54,7 +54,7 @@ serviceMaps:
        - jsonPath: $.WaterConnection.channel
 
        
-    - query: INSERT INTO eg_ws_service(connection_id,connectionCategory,connectionType,waterSource,meterId,meterInstallationDate,pipeSize,noOfTaps,connectionexecutiondate,proposedPipeSize,proposedTaps, appCreatedDate, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+    - query: INSERT INTO eg_ws_service(connection_id,connectionCategory,connectionType,waterSource,meterId,meterInstallationDate,pipeSize,noOfTaps,connectionexecutiondate,proposedPipeSize,proposedTaps,initialMeterReading, appCreatedDate, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
       basePath: $.WaterConnection
       jsonMaps:
 
@@ -78,6 +78,8 @@ serviceMaps:
        - jsonPath: $.WaterConnection.proposedPipeSize
        
        - jsonPath: $.WaterConnection.proposedTaps
+
+       - jsonPath: $.WaterConnection.additionalDetails.initialMeterReading
        
        - jsonPath: $.WaterConnection.additionalDetails.appCreatedDate
        
