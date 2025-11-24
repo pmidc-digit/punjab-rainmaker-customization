@@ -19,26 +19,6 @@ ReportDefinitions:
     type: string
     source: ndc
     total: false
-  - name: emailid
-    label: emailid
-    type: string
-    source: ndc
-    total: false
-  - name: tenantid
-    label: tenantid
-    type: string
-    source: ndc
-    total: false
-  - name: action
-    label: action
-    type: string
-    source: ndc
-    total: false
-  - name: consumercode
-    label: consumercode
-    type: string
-    source: ndc
-    total: false
   - name: applicationstatus
     label: applicationstatus
     type: string
@@ -54,13 +34,13 @@ ReportDefinitions:
     type: string
     source: ndc
     total: false
-  - name: isduepending
-    label: isduepending
+  - name: employee_name
+    label: employee_name
     type: string
     source: ndc
     total: false
-  - name: status
-    label: status
+  - name: employee_code
+    label: employee_code
     type: string
     source: ndc
     total: false
@@ -77,26 +57,45 @@ ReportDefinitions:
     source: ndc
     isMandatory: true
     searchClause: AND a.createdtime <= $toDate
-  - name: tenantid
-    label: tenantid
+  - name: applicationstatus
+    label: Application status
     type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    pattern: list://INITIATED:INITIATED,PENDINGPAYMENT:PENDINGPAYMENT,DOCUMENTVERIFY:DOCUMENTVERIFY,APPROVED:APPROVED, REJECTED:REJECTED,TL-VERIFICATION:TL-VERIFICATION,WS-SW-VERIFICATION:WS-SW-VERIFICATION ,CITIZENACTIONREQUIRED-DV:CITIZENACTIONREQUIRED-DV,BPA-VERIFICATION:BPA-VERIFICATION,PENDINGAPPROVAL:PENDINGAPPROVAL,CANCELLED:CANCELLED,PT-VERIFICATION:PT-VERIFICATION,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
     source: ndc
-    wrapper: true
     isMandatory: false
-    searchClause: AND a.tenantid = $tenantid
+    searchClause: AND LOWER(a.applicationstatus) = LOWER($applicationstatus)
   query: |
       -- Use CTE to force query plan, compute & use CTE later
-      SELECT 
-        u.name, u.mobilenumber , u.emailid ,a.tenantid,
-        a.action, d.consumercode, a.applicationstatus, d.businessservice, 
-        a.applicationno, d.isduepending, d.status
-      FROM  eg_user  u
-      JOIN eg_ndc_owner AS o ON u.uuid = o.uuid
-      JOIN eg_ndc_details AS d ON o.ndcapplicationuuid = d.applicationid
-      JOIN eg_ndc_application AS a ON a.uuid = o.ndcapplicationuuid
-      LEFT JOIN eg_user_address AS ua ON ua.userid = u.id
-      WHERE 1=1
+      WITH current_holder AS (
+         SELECT DISTINCT ON (wf.businessid)
+            wf.businessid AS applicationno,
+            u.name AS assignee_name,
+            e.code AS assignee_code,
+            UPPER(st.applicationstatus) AS current_stage
+           FROM eg_wf_processinstance_v2 wf
+           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+           LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+           LEFT JOIN eg_user u ON u.uuid = wa.assignee
+           LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+           WHERE wf.tenantid = $tenantid
+           AND wf.businessservice = 'ndc-services'
+           ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+           )
+       SELECT 
+         u.name ,
+         u.mobilenumber ,
+         a.applicationstatus ,
+         d.businessservice ,
+         a.applicationno,        
+         COALESCE(ch.assignee_name, 'Unassigned') AS "employee_name",
+         COALESCE(ch.assignee_code, '') AS "employee_code"
+        FROM eg_ndc_application a
+        JOIN eg_ndc_owner o   ON a.uuid = o.ndcapplicationuuid
+        JOIN eg_user u ON u.uuid = o.uuid
+        JOIN eg_ndc_details d ON d.applicationid = o.ndcapplicationuuid
+        LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno
+        WHERE a.tenantid = $tenantid
+
 - reportName: CollectionsReport
   summary: Collections
   version: 1.0.0
@@ -264,14 +263,6 @@ ReportDefinitions:
     source: ndc
     isMandatory: true
     searchClause: AND n.createdtime <= $toDate
-  - name: tenantid
-    label: Tenant ID
-    type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-    source: ndc
-    wrapper: true
-    isMandatory: false
-    searchClause: AND n.tenantid = $tenantid
   query: |
       -- Use CTE to force query plan, compute & use CTE later     
        WITH wf_detailed AS (
