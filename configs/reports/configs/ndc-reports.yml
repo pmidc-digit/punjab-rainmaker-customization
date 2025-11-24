@@ -87,8 +87,8 @@ ReportDefinitions:
          a.applicationstatus ,
          d.businessservice ,
          a.applicationno,        
-         COALESCE(ch.assignee_name, 'Unassigned') AS "employee_name",
-         COALESCE(ch.assignee_code, '') AS "employee_code"
+         ch.assignee_name AS employee_name,
+         ch.assignee_code AS employee_code
         FROM eg_ndc_application a
         JOIN eg_ndc_owner o   ON a.uuid = o.ndcapplicationuuid
         JOIN eg_user u ON u.uuid = o.uuid
