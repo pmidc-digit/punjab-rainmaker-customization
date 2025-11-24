@@ -252,11 +252,11 @@ ReportDefinitions:
              LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno
              WHERE pd.businessservice = 'NDC'
              AND p.paymentstatus != 'CANCELLED'
-             AND p.tenantid = 'pb.testing'
+             AND p.tenantid = $tenantid
                  )
          SELECT
               applicationno, name, mobilenumber, businessservice, applicationstatus,
-              collector_code,  employee_employee,  assignee_code, cash_amount, cheque_amount,
+              collector_code,  assignee_employee,  assignee_code, cash_amount, cheque_amount,
               card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
               to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS "PaymentDate"
              FROM unique_transactions
