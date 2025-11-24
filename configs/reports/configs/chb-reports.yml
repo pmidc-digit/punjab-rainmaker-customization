@@ -74,12 +74,12 @@ ReportDefinitions:
     type: string
     source: chb
     total: false
-  - name: booking_date
+  - name: booking_start_date
     label: Booking From Date
     type: string
     source: chb
     total: false
-  - name: booking_end_date
+  - name: booking_last_date
     label: Booking To Date
     type: string
     source: chb
@@ -121,7 +121,8 @@ ReportDefinitions:
          a.applicant_name , a.applicant_email_id, a.applicant_mobile_no,b.tenant_id,
          ad.address_line_1 , ad.locality ,
          b.booking_status , b.purpose , b.receipt_no , b.community_hall_name,b.booking_no,
-         s.hall_code , s.capacity , s.booking_date ,s.booking_end_date , s.booking_from_time , s.booking_to_time 
+         s.hall_code , s.capacity ,TO_CHAR(TO_TIMESTAMP(s.booking_date/1000), 'DD-MM-YYYY') AS booking_start_date,
+         TO_CHAR(TO_TIMESTAMP(s.booking_end_date/1000), 'DD-MM-YYYY') AS booking_last_date , s.booking_from_time , s.booking_to_time 
         FROM
           eg_chb_booking_detail b
           INNER JOIN eg_chb_applicant_detail a on a.booking_id=b.booking_id
