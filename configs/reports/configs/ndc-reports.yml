@@ -263,14 +263,6 @@ ReportDefinitions:
     source: ndc
     isMandatory: true
     searchClause: AND n.createdtime <= $toDate
-  - name: tenantid
-    label: Tenant ID
-    type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-    source: ndc
-    wrapper: true
-    isMandatory: false
-    searchClause: AND n.tenantid = $tenantid
   query: |
       -- Use CTE to force query plan, compute & use CTE later     
        WITH wf_detailed AS (
