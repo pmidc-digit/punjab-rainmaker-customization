@@ -26,7 +26,7 @@ SearchDefinitions:
              INNER JOIN eg_ndc_owner ownerinfo ON ownerinfo.ndcapplicationuuid = a.uuid
              LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
              $where
-             ORDER BY a.createdtime DESC
+             ORDER BY a.createdtime ASC
              $pagination
            ) result
       searchParams:
@@ -148,8 +148,7 @@ SearchDefinitions:
              LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
              $where
              ORDER BY a.createdtime DESC
-             OFFSET $offset
-             LIMIT $limit
+             $pagination
            ) result
       searchParams:
         condition: AND

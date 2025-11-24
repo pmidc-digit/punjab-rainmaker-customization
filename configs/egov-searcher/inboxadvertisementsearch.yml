@@ -8,7 +8,7 @@ SearchDefinitions:
         baseQuery: |
           Select row_to_json(result) from (
             select DISTINCT(booking.booking_no), 
-                   pi.createdtime, 
+                   booking.createdtime, 
                    pi.status as status_id,
                    booking.booking_id,
                    booking.tenant_id,
@@ -20,7 +20,7 @@ SearchDefinitions:
             INNER JOIN eg_adv_owner ownerinfo ON ownerinfo.booking_id = booking.booking_id
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where 
-            order by pi.createdtime asc
+            order by booking.createdtime asc
             $pagination
           ) result
         groupBy:
@@ -119,7 +119,7 @@ SearchDefinitions:
         baseQuery: |
           Select row_to_json(result) from (
             select DISTINCT(booking.booking_no), 
-                   pi.createdtime, 
+                   booking.createdtime, 
                    pi.status as status_id,
                    booking.booking_id,
                    booking.tenant_id,
@@ -131,7 +131,7 @@ SearchDefinitions:
             INNER JOIN eg_adv_owner ownerinfo ON ownerinfo.booking_id = booking.booking_id
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
-            order by pi.createdtime desc
+            order by booking.createdtime desc
             $pagination
           ) result
         groupBy:
