@@ -62,7 +62,7 @@ ReportDefinitions:
     type: singlevaluelist
     pattern: list://INITIATED:INITIATED,PENDINGPAYMENT:PENDINGPAYMENT,DOCUMENTVERIFY:DOCUMENTVERIFY,APPROVED:APPROVED, REJECTED:REJECTED,TL-VERIFICATION:TL-VERIFICATION,WS-SW-VERIFICATION:WS-SW-VERIFICATION ,CITIZENACTIONREQUIRED-DV:CITIZENACTIONREQUIRED-DV,BPA-VERIFICATION:BPA-VERIFICATION,PENDINGAPPROVAL:PENDINGAPPROVAL,CANCELLED:CANCELLED,PT-VERIFICATION:PT-VERIFICATION,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
     source: ndc
-    isMandatory: false
+    isMandatory: true
     searchClause: AND LOWER(a.applicationstatus) = LOWER($applicationstatus)
   query: |
       -- Use CTE to force query plan, compute & use CTE later
@@ -109,13 +109,13 @@ ReportDefinitions:
     type: string
     source: ndc
     total: false
-  - name: applicant_name
-    label: applicant_name
+  - name: name
+    label: name
     type: string
     source: ndc
     total: false
-  - name: mobile_no
-    label: mobile_no
+  - name: mobilenumber
+    label: mobilenumber
     type: string
     source: ndc
     total: false
@@ -207,7 +207,7 @@ ReportDefinitions:
       WITH current_holder AS (
          SELECT DISTINCT ON (wf.businessid)
            wf.businessid AS applicationno,
-           u.name AS assignee_name,
+           u.name AS employee_name,
            e.code AS assignee_code,
            UPPER(st.applicationstatus) AS current_stage
          FROM eg_wf_processinstance_v2 wf
@@ -236,9 +236,9 @@ ReportDefinitions:
               a.applicationno,
               a.applicationstatus,
               d.businessservice,
-              u_applicant.name AS applicant_name,
-              u_applicant.mobilenumber AS mobile_no,
-              ch.assignee_name AS assignee_employee,
+              u_applicant.name ,
+              u_applicant.mobilenumber ,
+              ch.employee_name AS assignee_employee,
               ch.assignee_code AS assignee_code
              FROM egcl_paymentdetail pd
              JOIN egcl_payment p ON pd.paymentid = p.id
@@ -255,8 +255,8 @@ ReportDefinitions:
              AND p.tenantid = 'pb.testing'
                  )
          SELECT
-              applicationno, applicant_name, mobile_no, businessservice, applicationstatus,
-              collector_code,  assignee_employee,  assignee_code, cash_amount, cheque_amount,
+              applicationno, name, mobilenumber, businessservice, applicationstatus,
+              collector_code,  employee_employee,  assignee_code, cash_amount, cheque_amount,
               card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
               to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS "PaymentDate"
              FROM unique_transactions
