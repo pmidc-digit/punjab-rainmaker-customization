@@ -24,11 +24,6 @@ ReportDefinitions:
         type: string
         source: ptr
         total: false
-      - name: tenant
-        label: tenantid
-        type: string
-        source: ptr
-        total: false
       - name: petname
         label: petname
         type: string
@@ -84,6 +79,16 @@ ReportDefinitions:
         type: string
         source: ptr
         total: false
+      - name: assignee_employee
+        label: assignee_employee
+        type: string
+        source: ptr
+        total: false
+      - name: assignee_code
+        label: assignee_code
+        type: string
+        source: ptr
+        total: false
     searchParams:
       - name: applicationtype
         label: applicationtype
@@ -92,6 +97,13 @@ ReportDefinitions:
         source: ptr
         isMandatory: true
         searchClause: AND r.applicationtype = $applicationtype
+      - name: status
+        label: status
+        type: singlevaluelist
+        pattern: list://INITIATED:INITIATED,DOCUMENTVERIFY:DOCUMENTVERIFY,PENDINGAPPROVAL:PENDINGAPPROVAL,PENDINGPAYMENT:PENDINGPAYMENT,APPROVED:APPROVED,REJECTED:REJECTED,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
+        source: ptr
+        isMandatory: false
+        searchClause: AND r.status = $status
       - name: fromDate
         label: fromDate
         type: epoch
@@ -106,21 +118,32 @@ ReportDefinitions:
         searchClause: AND r.createdtime<=$toDate
     query: |
       -- Use CTE to force query plan, compute & use CTE later
-       SELECT
-          r.applicationnumber, r.applicationtype, r.status,
-          split_part(r.tenantid, '.', 2) AS tenant,
-          pd.petname, pd.pettype, pd.breedtype, pd.petage,
-          pd.petgender, pd.petcolor, pd.identificationmark,
-          pd.vaccinationnumber, pd.doctorname, pd.clinicname,
-          u.mobilenumber , u.name ,
-          pay.totalamount,  pay.createdtime AS paymentcreatedtime
-        FROM eg_ptr_registration AS r
-        LEFT JOIN eg_ptr_owner AS o ON o.ptrregistrationid = r.id
-        LEFT JOIN eg_ptr_petdetails AS pd ON r.id = pd.petdetailsid
-        LEFT JOIN eg_user AS u ON u.uuid = o.uuid
-        LEFT JOIN egcl_bill AS pay ON pay.consumercode = r.applicationnumber
-        WHERE r.status = 'APPROVED'
-        AND r.tenantid = $tenantid
+       WITH current_holder AS (
+            SELECT DISTINCT ON (wf.businessid)
+                wf.businessid AS applicationnumber,
+                u.name AS assignee_employee,
+                e.code AS assignee_code
+              FROM eg_wf_processinstance_v2 wf
+              JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+              LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+              LEFT JOIN eg_user u ON u.uuid = wa.assignee
+              LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+              WHERE wf.tenantid = $tenantid
+              AND wf.businessservice = 'ptr'
+               ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+              )
+         SELECT
+           r.applicationnumber, r.applicationtype, r.status, pd.petname, pd.pettype,
+           pd.breedtype, pd.petage, pd.petgender, pd.petcolor, pd.identificationmark,
+           pd.vaccinationnumber, pd.doctorname, pd.clinicname, u.mobilenumber, u.name,
+           ch.assignee_employee, ch.assignee_code
+          FROM eg_ptr_registration AS r
+           LEFT JOIN eg_ptr_owner AS o ON o.ptrregistrationid = r.id
+           LEFT JOIN eg_ptr_petdetails AS pd ON r.id = pd.petdetailsid
+           LEFT JOIN eg_user AS u ON u.uuid = o.uuid
+           LEFT JOIN current_holder ch ON ch.applicationnumber = r.applicationnumber
+            WHERE  r.tenantid = $tenantid
+            
   - reportName: CollectionsReport
     decryptionPathId: PETREPORTS
     summary: Collections
