@@ -8,11 +8,8 @@ SearchDefinitions:
         baseQuery: |
           Select row_to_json(result) from (
             select DISTINCT(clu.applicationno), 
-                   pi.createdtime, 
-                   pi.status as status_id, 
-                   ws.state as status_name, 
-                   ws.applicationStatus as workflow_application_status,
-                   clu.id,
+                   clu.createdtime, 
+                   pi.status as status_id,
                    clu.tenantid,
                    clu.status,
                    clu.cluno,
@@ -20,25 +17,17 @@ SearchDefinitions:
                    clu.clutype,
                    clu.accountid,
                    clu.applicationstatus,
-                   details.additionaldetails,
                    owner.ownertype,
                    owner.isprimaryowner,
                    owner.relationship,
                    owner.ownershippercentage
             from eg_clu as clu
-            LEFT JOIN eg_clu_details details ON details.cluid = clu.id
-            LEFT JOIN eg_clu_owner owner ON owner.cluid = clu.id AND owner.isprimaryowner = true
+            LEFT JOIN eg_clu_owner owner ON owner.cluid = clu.id 
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = clu.applicationno
-            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where 
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = clu.applicationno 
-              GROUP BY wf.businessid
-            )
-            order by pi.createdtime asc
+            AND pi.latest = TRUE
+            order by clu.createdtime asc
             $pagination
           ) result
         groupBy:
@@ -83,6 +72,9 @@ SearchDefinitions:
           - name: owner.ownertype
             isMandatory: false
             jsonPath: $.searchCriteria.ownerType
+          - name: owner.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -166,10 +158,8 @@ SearchDefinitions:
         baseQuery: |
           Select row_to_json(result) from (
             select DISTINCT(clu.applicationno), 
-                   pi.createdtime, 
+                   clu.createdtime, 
                    pi.status as status_id,
-                   ws.state as status_name,
-                   ws.applicationStatus as workflow_application_status,
                    clu.id,
                    clu.tenantid,
                    clu.status,
@@ -178,25 +168,17 @@ SearchDefinitions:
                    clu.clutype,
                    clu.accountid,
                    clu.applicationstatus,
-                   details.additionaldetails,
                    owner.ownertype,
                    owner.isprimaryowner,
                    owner.relationship,
                    owner.ownershippercentage
             from eg_clu as clu
-            LEFT JOIN eg_clu_details details ON details.cluid = clu.id
-            LEFT JOIN eg_clu_owner owner ON owner.cluid = clu.id AND owner.isprimaryowner = true
+            LEFT JOIN eg_clu_owner owner ON owner.cluid = clu.id 
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = clu.applicationno
-            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = clu.applicationno 
-              GROUP BY wf.businessid
-            )
-            order by pi.createdtime desc
+            AND pi.latest = TRUE
+            order by clu.createdtime desc
             $pagination
           ) result
         groupBy:
@@ -241,6 +223,9 @@ SearchDefinitions:
           - name: owner.ownertype
             isMandatory: false
             jsonPath: $.searchCriteria.ownerType
+          - name: owner.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
