@@ -1327,6 +1327,13 @@
                   "path": "$.additionalDetails.wardnumber"
                 }
               },
+
+              {
+                "variable": "khasraNumber",
+                "value": {
+                  "path": "$.additionalDetails.khasraNumber"
+                }
+              },
               {
                 "variable": "khataNo",
                 "value": {
@@ -1420,6 +1427,27 @@
                   },
                   {
                     "variable": "logo_header",
+                    "value": "$.MdmsRes.tenant.tenants[0].code",
+                    "localisation": {
+                      "required": true,
+                      "prefix": "TENANT_TENANTS",
+                      "module": "rainmaker-common"
+                    }
+                  }
+                ]
+              },
+              {
+                "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
+                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}')%5D",
+                "apiRequest": null,
+                "responseMapping": [
+                  {
+                    "variable": "newlogoImage",
+                    "value": "$.MdmsRes.tenant.tenants[0].logoId",
+                    "type": "image"
+                  },
+                  {
+                    "variable": "logo-header",
                     "value": "$.MdmsRes.tenant.tenants[0].code",
                     "localisation": {
                       "required": true,
