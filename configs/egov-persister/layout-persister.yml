@@ -93,8 +93,8 @@ serviceMaps:
             INSERT INTO eg_layout_owner (
               id, tenantid, layoutId, status, isprimaryowner,
               ownertype, ownershippercentage, institutionid, relationship,
-              createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails
-            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+              createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails,uuid
+            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?);
           basePath: $.Layout.owners.*
 
           jsonMaps:
@@ -114,6 +114,7 @@ serviceMaps:
             - jsonPath: $.Layout.owners.*.additionalDetails
               type: JSON
               dbType: JSONB
+            - jsonPath: $.Layout.owners.*.uuid
 
 
 
