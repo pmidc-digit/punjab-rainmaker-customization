@@ -9,7 +9,7 @@ SearchDefinitions:
           Select row_to_json(result) from
           (
             select DISTINCT(pet.applicationNumber), 
-                   pi.createdtime, 
+                   pet.createdtime, 
                    pi.status as status_id,
                    ptdet.pettype,
                    ptdet.petname,
@@ -23,7 +23,7 @@ SearchDefinitions:
             INNER JOIN eg_ptr_owner ownerinfo ON ownerinfo.ptrregistrationid = pet.id
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
-            order by pi.createdtime asc $pagination
+            order by pet.createdtime asc $pagination
           ) result
         groupBy:
         orderBy:
@@ -141,7 +141,7 @@ SearchDefinitions:
           Select row_to_json(result) from
           (
             select DISTINCT(pet.applicationNumber), 
-                   pi.createdtime, 
+                   pet.createdtime, 
                    pi.status as status_id,
                    ptdet.pettype,
                    ptdet.petname,
@@ -155,7 +155,7 @@ SearchDefinitions:
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber AND pi.latest = TRUE
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
-            order by pi.createdtime DESC $pagination
+            order by pet.createdtime DESC $pagination
           ) result
         groupBy:
         orderBy:

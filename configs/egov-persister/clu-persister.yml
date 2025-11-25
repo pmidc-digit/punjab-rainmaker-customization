@@ -93,8 +93,8 @@ serviceMaps:
             INSERT INTO eg_clu_owner (
               id, tenantid, cluId, status, isprimaryowner,
               ownertype, ownershippercentage, institutionid, relationship,
-              createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails
-            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+              createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails,uuid
+            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?);
           basePath: $.Clu.owners.*
 
           jsonMaps:
@@ -114,6 +114,7 @@ serviceMaps:
             - jsonPath: $.Clu.owners.*.additionalDetails
               type: JSON
               dbType: JSONB
+            - jsonPath: $.Clu.owners.*.uuid
 
 
 

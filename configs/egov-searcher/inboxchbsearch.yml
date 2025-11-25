@@ -12,10 +12,10 @@ SearchDefinitions:
         baseQuery: |
           SELECT row_to_json(result) FROM (
             SELECT DISTINCT(booking.booking_no),
-                   pi.createdtime,
                    pi.status AS status_id,
                    booking.booking_id,
                    booking.tenant_id,
+                   booking.createdtime,
                    booking.booking_status,
                    booking.application_date,
                    booking.payment_date,
@@ -27,12 +27,12 @@ SearchDefinitions:
             FROM eg_chb_booking_detail booking
             INNER JOIN eg_wf_processinstance_v2 pi 
                 ON pi.businessid = booking.booking_no 
-                AND pi.latest = TRUE
             INNER JOIN eg_chb_owner ownerinfo ON ownerinfo.booking_id = booking.booking_id
             LEFT JOIN eg_wf_assignee_v2 assg 
               ON pi.id = assg.processinstanceid
             $where
-            ORDER BY pi.createdtime ASC
+            AND pi.latest = TRUE
+            ORDER BY booking.createdtime ASC
             $pagination
           ) result
         groupBy:
@@ -176,9 +176,9 @@ SearchDefinitions:
         baseQuery: |
           SELECT row_to_json(result) FROM (
             SELECT DISTINCT(booking.booking_no),
-                   pi.createdtime,
                    pi.status AS status_id,
                    booking.booking_id,
+                   booking.createdtime,
                    booking.tenant_id,
                    booking.booking_status,
                    booking.application_date,
@@ -191,14 +191,13 @@ SearchDefinitions:
             FROM eg_chb_booking_detail booking
             INNER JOIN eg_wf_processinstance_v2 pi 
                 ON pi.businessid = booking.booking_no 
-                AND pi.latest = TRUE
             INNER JOIN eg_chb_owner ownerinfo ON ownerinfo.booking_id = booking.booking_id
             LEFT JOIN eg_wf_assignee_v2 assg 
               ON pi.id = assg.processinstanceid
 
             $where
-
-            ORDER BY pi.createdtime DESC
+            AND pi.latest = TRUE
+            ORDER BY booking.createdtime DESC
             $pagination
           ) result
         groupBy:
