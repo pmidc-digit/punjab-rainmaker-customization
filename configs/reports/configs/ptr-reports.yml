@@ -24,11 +24,6 @@ ReportDefinitions:
         type: string
         source: ptr
         total: false
-      - name: tenant
-        label: tenantid
-        type: string
-        source: ptr
-        total: false
       - name: petname
         label: petname
         type: string
@@ -102,6 +97,13 @@ ReportDefinitions:
         source: ptr
         isMandatory: true
         searchClause: AND r.applicationtype = $applicationtype
+      - name: status
+        label: status
+        type: singlevaluelist
+        pattern: list://INITIATED:INITIATED,DOCUMENTVERIFY:DOCUMENTVERIFY,PENDINGAPPROVAL:PENDINGAPPROVAL,PENDINGPAYMENT:PENDINGPAYMENT,APPROVED:APPROVED,REJECTED:REJECTED,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
+        source: ptr
+        isMandatory: false
+        searchClause: AND r.status = $status
       - name: fromDate
         label: fromDate
         type: epoch
