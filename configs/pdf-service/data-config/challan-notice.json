@@ -218,7 +218,7 @@
               {
                 "variable": "violationDate",
                 "value": {
-                  "path": "$.challans[0].documents[0].auditDetails.lastModifiedTime"
+                  "path": "$.challans[0].auditDetails.lastModifiedTime"
                 },
                 "type": "date"
               },
@@ -238,6 +238,17 @@
                 "variable": "offenceCategoryName",
                 "value": {
                   "path": "$.challans[0].offenceCategoryName"
+                }
+              },
+              {
+                "variable": "longitude",
+                "value": {
+                  "path": "$.challans[0].additionalDetail.longitude"
+                }
+              },{
+                "variable": "latitude",
+                "value": {
+                  "path": "$.challans[0].additionalDetail.latitude"
                 }
               },
               {
@@ -262,7 +273,7 @@
               {
                 "variable": "challanFine",
                 "value": {
-                  "path": "$.challans[0].additionalDetail.amount[?(@.taxHeadCode == 'CH.CHALLAN_FINE')].amount"
+                  "path": "$.challans[0].additionalDetail.calculation.taxHeadEstimates[?(@.taxHeadCode == 'CH.CHALLAN_FINE')].estimateAmount"
                 }
               },
 
@@ -550,6 +561,42 @@
                 }
               },
               {
+                "variable": "challan_notice_1",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_NOTICE_1"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "challan_notice_2",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_NOTICE_2"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "challan_notice_3",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_NOTICE_3"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
                 "variable": "disclamer",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER"
@@ -667,7 +714,7 @@
               },
               {
                 "variable": "TotalChallanAmount",
-                "formula": "{{challanFine}}>=0?{{challanFine}}+{{challanAmount}}:0"
+                "formula": "{{challanFine}}>{{challanAmount}}?{{challanFine}}:{{challanAmount}}"
               },
               {
                 "variable": "excessAmountPaid",

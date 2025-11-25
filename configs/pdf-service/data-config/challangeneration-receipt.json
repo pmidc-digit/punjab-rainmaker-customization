@@ -94,7 +94,7 @@
               {
                 "variable": "challanFee",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode=='CH.CHALLAN_FINE')].adjustedAmount"
+                  "path": "$.challan.challans[0].additionalDetail.calculation.taxHeadEstimates[?(@.taxHeadCode=='CH.CHALLAN_FINE')].estimateAmount"
                 }
               },
               {
@@ -588,7 +588,7 @@
               },
               {
                 "variable": "TotalChallanAmount",
-                "formula": "{{challanFee}}>=0?{{challanFee}}+{{challanAmount}}:0"
+                "formula": "{{challanFee}}>{{challanAmount}}?{{challanFee}}:{{challanAmount}}"
               },
               {
                 "variable": "excessAmountPaid",
