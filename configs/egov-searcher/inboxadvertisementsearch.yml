@@ -22,6 +22,7 @@ SearchDefinitions:
                    applicant.applicant_email_id
             from eg_adv_booking_detail as booking
             INNER JOIN eg_adv_applicant_detail applicant ON applicant.booking_id = booking.booking_id
+            INNER JOIN eg_adv_owner ownerinfo ON ownerinfo.booking_id = booking.booking_id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = booking.booking_no
             LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
@@ -65,6 +66,9 @@ SearchDefinitions:
           - name: applicant.applicant_mobile_no
             isMandatory: false
             jsonPath: $.searchCriteria.mobileNumber
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -149,6 +153,7 @@ SearchDefinitions:
             from eg_adv_booking_detail as booking
             INNER JOIN eg_adv_applicant_detail applicant ON applicant.booking_id = booking.booking_id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = booking.booking_no
+            INNER JOIN eg_adv_owner ownerinfo ON ownerinfo.booking_id = booking.booking_id
             LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
@@ -191,6 +196,9 @@ SearchDefinitions:
           - name: applicant.applicant_mobile_no
             isMandatory: false
             jsonPath: $.searchCriteria.mobileNumber
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset

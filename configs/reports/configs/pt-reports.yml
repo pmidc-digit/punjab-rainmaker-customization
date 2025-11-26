@@ -5997,7 +5997,7 @@ ReportDefinitions:
 
 - reportName: PT_DEFAULTER_REPORT_V2
   decryptionPathId: ULBDEFAULTERPTREPORT_V2
-  summary: ULB_PT_DEFAULTER
+  summary: Latest FY year Payed - ULB_PT_DEFAULTER
   version: 1.0.0
   moduleName: rainmaker-pt
   sourceColumns:
@@ -6051,6 +6051,11 @@ ReportDefinitions:
     type: string
     source: pt
     total: false
+  - name: localityname
+    label: reports.pt.localityname
+    type: string
+    source: pt
+    total: false    
   - name: block
     label: reports.pt.block
     type: string
@@ -6120,6 +6125,7 @@ ReportDefinitions:
         props.propertytype as propertytype,
         propertyusagetype as propertyusagetype,
         concat(address,' ',localityname) as address,
+        localityname as localityname,
         blockcode as block,
         owners.ownername as ownername,
         owners.mobileNumber as mobileno
@@ -8065,14 +8071,7 @@ ReportDefinitions:
     pattern: 'list://1427846400000:2015-16,1459468800000:2016-17,1491004800000:2017-18,1522521000000:2018-19,1522540800000:2019-20,1554076800000:2020-21,1617215400000:2021-22,1648751400000:2022-23,1680287400000:2023-24,1711909800000:2024-25'
     source: pt
     isMandatory: true
-    searchClause: and assessments.fy not like concat('%',$fy,'%')
-  - name: localityArray
-    label: zoneList
-    type: boundarylist
-    source: pt
-    wrapper: true
-    isMandatory: false
-    searchClause: AND pt.locality IN ($localityArray)        
+    searchClause: and assessments.fy not like concat('%',$fy,'%')       
   query: |
       -- Use CTE to force query plan, compute & use CTE later
       with assessments as
@@ -9204,7 +9203,7 @@ ReportDefinitions:
     
 - reportName: DEFAULTER_REPORT_WITH_LOCALITY_UNPAID_DEMAND_NEW
   decryptionPathId: ULBPTDataDumpReport_V2
-  summary: ULB level report
+  summary: Defaulters With Penidng Dues - ULB level report
   version: 1.0.0
   moduleName: rainmaker-pt
   sourceColumns:
@@ -9284,12 +9283,6 @@ ReportDefinitions:
     source: pt
     total: false
   searchParams:
-  - name: nameofbusiness
-    label: nameofbusinness
-    type: string
-    source: pt
-    isMandatory: false
-    searchClause: AND upper(pt.firmbusinessname) LIKE CONCAT('%',upper($nameofbusiness),'%')
   - name: fy
     label: Financial Year
     type: singlevaluelist
@@ -9304,66 +9297,77 @@ ReportDefinitions:
     source: pt
     isMandatory: false
     searchClause: and pt.propertyusagetype like concat($usageCat,'%') 
-  - name: usageSubCat
-    label: Usage Sub Category
-    type: string
-    source: pt
-    isMandatory: false
-    searchClause: u.unitusage like concat('%',upper($usageSubCat),'%') 
-  - name: blockname
-    label: blockname
-    type: string
-    source: pt
-    isMandatory: false
-    searchClause: AND upper(blockname) LIKE CONCAT('%',upper($blockname),'%')
-  - name: localityname
-    label: localityname
-    type: string
-    source: pt
-    isMandatory: false
-    searchClause: AND upper(localityname) LIKE CONCAT('%',upper($localityname),'%')
   query: |
-    --S.no    Service Name    ULB    Property Tax Unique ID    Date Of Transcation    Receipt Number    Existing Property ID    Owner Name    Guardian Name    Total Area (SQ.YARD)    Covered  Area/Built Area (SQ.FEET)    Floors    Occupancy (Rented,Self /Unoccupied)    Type Of Property    Mobile Number    Transcation Mode of Payment    Payment Amount    Payment Date    Email Id    Address
     WITH owners AS (
-    SELECT propertyid,
-    SPLIT_PART(STRING_AGG(ownername, ','), ',', 1) AS ownername,
-    SPLIT_PART(STRING_AGG(mobilenumber, ','), ',', 1) AS mobilenumber
-    FROM report_owners
-    WHERE tenantid = $tenantid
-    AND status = 'ACTIVE'
-    GROUP BY propertyid ),
-    units AS (
-    SELECT
-    propertyid,
-    STRING_AGG(usagecategory, ',') AS unitusage
-    FROM report_units
-    WHERE tenantid = $tenantid
-    AND active = TRUE
-    GROUP BY propertyid )
-    SELECT 
-    d.propertyid AS propertyid, 
-    pt.oldpropertyid AS oldpropertyid,
-    pt.surveyid AS surveyid,
-    d.demand AS tentativedemand, 
-    d.fy AS assessmentyear,
-    pt.address AS address,
-    pt.blockname AS blockname,
-    pt.propertyusagetype AS propertycategory,
-    pt.propertytype AS propertytype,
-    pt.ownershipcategory AS ownership,
-    pt.plotsize AS plotsize,
-    pt.firmbusinessname AS businessname,
-    pt.localityname AS localityname,
-    COALESCE(o.ownername, 'N/A') AS ownername,
-    COALESCE(o.mobilenumber, 'N/A') AS mobileno
-    FROM report_unpaid_demand d
-    LEFT JOIN report_properties pt ON pt.propertyid = d.propertyid
-    AND pt.propertystatus != 'INACTIVE'
-    LEFT JOIN units u ON u.propertyid = d.propertyid
-    LEFT JOIN owners o ON o.propertyid = d.propertyid
-    WHERE d.tenantid = $tenantid
-    AND d.demand > 0
+        SELECT 
+            propertyid,
+            SPLIT_PART(STRING_AGG(ownername, ','), ',', 1) AS ownername,
+            SPLIT_PART(STRING_AGG(mobilenumber, ','), ',', 1) AS mobilenumber
+        FROM report_owners
+        WHERE tenantid = $ulb
+          AND status = 'ACTIVE'
+        GROUP BY propertyid
+    ),
     
+    units AS (
+        SELECT 
+            propertyid,
+            STRING_AGG(usagecategory, ',') AS unitusage
+        FROM report_units
+        WHERE tenantid = $ulb
+          AND active = TRUE
+        GROUP BY propertyid
+    ),
+    
+    report_unpaid_demand AS (
+        SELECT 
+            d.tenantid,
+            d.consumercode AS propertyid,
+            SUM(dd.taxamount) AS demand,
+            STRING_AGG(
+                DISTINCT TO_CHAR(
+                    (TO_TIMESTAMP(d.taxperiodfrom / 1000) AT TIME ZONE 'Asia/Kolkata'),
+                    'YYYY'
+                ),
+                ', '
+            ) AS fy
+        FROM egbs_demand_v1 d
+        INNER JOIN egbs_demanddetail_v1 dd 
+            ON dd.demandid = d.id
+        WHERE d.businessservice = 'PT'
+          AND d.status != 'CANCELLED'
+          AND d.ispaymentcompleted = FALSE
+          AND dd.taxamount != dd.collectionamount
+          AND dd.tenantid = $ulb
+        GROUP BY d.consumercode, d.tenantid
+    )
+    
+    SELECT 
+        d.propertyid,
+        pt.oldpropertyid,
+        pt.surveyid,
+        d.demand AS tentativedemand,
+        d.fy AS assessmentyear,
+        pt.address,
+        pt.blockname,
+        pt.propertyusagetype AS propertycategory,
+        pt.propertytype,
+        pt.ownershipcategory AS ownership,
+        pt.plotsize,
+        pt.firmbusinessname AS businessname,
+        pt.localityname,
+        COALESCE(o.ownername, 'N/A') AS ownername,
+        COALESCE(o.mobilenumber, 'N/A') AS mobileno
+    FROM report_unpaid_demand d
+    LEFT JOIN report_properties pt 
+           ON pt.propertyid = d.propertyid
+          AND pt.propertystatus != 'INACTIVE'
+    LEFT JOIN units u 
+           ON u.propertyid = d.propertyid
+    LEFT JOIN owners o 
+           ON o.propertyid = d.propertyid
+    WHERE d.tenantid = $ulb
+      AND d.demand > 0
     
 - reportName: STATEDEFAULTER_REPORT_WITH_LOCALITY_UNPAID_DEMAND_NEW
   decryptionPathId: ULBDEFAULTERPTREPORT_V2
@@ -9464,7 +9468,7 @@ ReportDefinitions:
     source: pt
     wrapper: true
     isMandatory: true
-    searchClause: AND props.tenantid = $tenantid
+    searchClause: AND props.tenantid = $ulb
   query: |
     with assessments as
     (
@@ -9475,7 +9479,7 @@ ReportDefinitions:
             max(totalamount) as maxtotal,
             max(propertytax) as max_pt_tax
         from report_assessments 
-        where tenantid=$tenantid and propertyid not in (select propertyid from report_assessments where tenantid=$tenantid and assessmentyears =$finYear)
+        where tenantid=$ulb and propertyid not in (select propertyid from report_assessments where tenantid=$ulb and assessmentyears =$finYear)
             group by propertyid
     ),
     owners as 
@@ -9484,7 +9488,7 @@ ReportDefinitions:
         split_part(string_agg(ownername,','),',',1) as ownername,
         split_part(string_agg(mobileNumber,','),',',1) as mobileNumber,
         propertyid
-        from report_owners where tenantid=$tenantid and status='ACTIVE'
+        from report_owners where tenantid=$ulb and status='ACTIVE'
         group by propertyid
     )
     select 
@@ -9504,7 +9508,7 @@ ReportDefinitions:
     from report_properties props
     inner join assessments on assessments.propertyid=props.propertyid
     inner join owners on owners.propertyid=props.propertyid 
-    where tenantid=$tenantid     
+    where tenantid=$ulb     
  
 - reportName: USERNAME_PT
   decryptionPathId: ULBPTDataDumpReport_V2

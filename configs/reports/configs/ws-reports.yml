@@ -3873,7 +3873,7 @@ ReportDefinitions:
       source: pt
       wrapper: true
       isMandatory: false
-      searchClause: AND pt.locality IN ($localityArray)  
+      searchClause: AND locality IN ($localityArray)  
   query: |
       select consumercode as consumercode,usagecategory as usagecategory,amtarrear as amtarrear,
       bill_status as bill_status,connectiontype as connectiontype,
@@ -4005,7 +4005,7 @@ ReportDefinitions:
       source: pt
       wrapper: true
       isMandatory: false
-      searchClause: AND pt.locality IN ($localityArray)  
+      searchClause: AND locality IN ($localityArray)  
       
   query: |
       select consumercode as consumercode,usagecategory as usagecategory,amtarrear as amtarrear,
@@ -4029,6 +4029,12 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
+
+  - name: oldconnectionno
+    label: Old ConnectionNo
+    type: string
+    source: ws
+    total: false    
     
   - name: billingperiod
     label: Billing Period
@@ -4053,12 +4059,30 @@ ReportDefinitions:
     type: string
     source: ws
     total: false
-
+    
   - name: meterstatus
     label: Meter status
     type: string
     source: ws
     total: false
+
+  - name: connectiontype
+    label: Connection Type
+    type: string
+    source: ws
+    total: false    
+
+  - name: ownername
+    label: Name
+    type: string
+    source: ws
+    total: false
+
+  - name: guardianname
+    label: Guardian Name
+    type: string
+    source: ws
+    total: false    
 
   - name: address
     label: Address
@@ -4096,6 +4120,13 @@ ReportDefinitions:
     source: pt
     total: false
   searchParams:
+  - name: usagecategory
+    label: Category
+    type: singlevaluelist
+    pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIOL,NRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+    source: ws
+    isMandatory: false
+    searchClause: AND pt.propertyusagetype = $usagecategory  
   - name: localityArray
     label: zoneList
     type: boundarylist
@@ -4106,30 +4137,36 @@ ReportDefinitions:
   query: |
     SELECT 
     conn.connectionno, 
+    conn.oldconnectionno,
     MAX(mt.billingperiod) AS billingperiod,  
     MAX(pt.propertyid) AS propertyid,
     MAX(mt.currentreading) AS currentReading,
     MAX(mt.lastreading) AS lastReading,
     MAX(mt.meterstatus) AS meterstatus,
+    MAX(ser.connectiontype) AS connectiontype,
+    MAX(usr.name) AS ownername,
+    MAX(usr.guardian) AS guardianname,
     MAX(pt.address) AS address, 
-    MAX(pt.blockname) AS blockname,  
+    MAX(pt.blockname) AS blockname,
     MAX(pt.zonename) AS zonename, 
     MAX(pt.zonecode) AS zonecode, 
     MAX(pt.propertyusagetype) AS propertyusagetype, 
     MAX(pt.propertytype) AS propertytype    FROM  eg_ws_meterreading AS mt
-    INNER JOIN 
-        eg_ws_connection AS conn ON mt.connectionno = conn.connectionno
-    INNER JOIN 
-        report_properties AS pt ON pt.propertyid = conn.property_id
+    INNER JOIN eg_ws_connection AS conn ON mt.connectionno = conn.connectionno 
+    inner join  eg_ws_service ser on conn.id = ser.connection_id
+    INNER JOIN report_properties AS pt ON pt.propertyid = conn.property_id  
+    inner join eg_pt_property pro on pro.propertyid = pt.propertyid
+    inner join eg_pt_owner ow on ow.propertyid = pro.id 
+    inner join eg_user usr on usr.uuid = ow.userid 
     WHERE 
-        conn.tenantid = $tenantid
+        conn.tenantid = $tenantid and ser.connectiontype = 'Metered'
     AND 
         mt.currentreadingdate = (
             SELECT MAX(currentreadingdate)
             FROM eg_ws_meterreading
             WHERE connectionno = mt.connectionno
         )
-  groupby: GROUP BY   conn.connectionno
+  groupby: GROUP BY  conn.connectionno, conn.oldconnectionno
   
 - reportName: DeadMeterReport
   decryptionPathId: ULBPTDataDumpReport_V2  
@@ -4265,53 +4302,53 @@ ReportDefinitions:
       pdfPageSize: A1
   sourceColumns:
   - name: blockname
-    label: reports.ws.blockname
+    label: blockname
     type: string
     source: ws
     total: false
   - name: localityname
-    label: reports.ws.localityname
+    label: localityname
     type: string
     source: ws
     total: false
   - name: locality
-    label: reports.ws.locality
+    label: locality
     type: string
     source: ws
     total: false
   - name: status
-    label: reports.ws.status
+    label: status
     type: string
     source: ws
     total: false
   - name: service_type
-    label: reports.ws.service_type
+    label: service_type
     type: string
     source: ws
     total: false
   - name: fromDate
-    label: reports.ws.fromDate
+    label: fromDate
     type: string
     source: ws
     total: false
   - name: end_date
-    label: reports.ws.end_date
+    label: end_date
     type: string
     source: ws
     total: false
   - name: createddate
-    label: reports.ws.createddate
+    label: createddate
     type: string
     source: ws
     total: false
   - name: connection_count
-    label: reports.ws.connection_count
+    label: connection_count
     type: string
     source: ws
     total: false
   searchParams:
   - name: fromDate
-    label: reports.pt.fromDate
+    label: fromDate
     type: epoch
     source: pt
     isMandatory: true
@@ -4387,52 +4424,47 @@ ReportDefinitions:
       pdfPageSize: A1
   sourceColumns:
   - name: connectionno
-    label: reports.ws.connectionno
+    label: connectionno
     type: string
     source: ws
     total: false
   - name: finyear
-    label: reports.ws.finyear
+    label: finyear
     type: string
     source: ws
     total: false
   - name: status
-    label: reports.ws.status
+    label: status
     type: string
     source: ws
     total: false
   - name: demandupdateddate
-    label: reports.ws.demandupdateddate
+    label: demandupdateddate
     type: string
     source: ws
     total: false
   - name: taxhead
-    label: reports.ws.taxhead
+    label: taxhead
     type: string
     source: ws
     total: false
   - name: taxamt
-    label: reports.ws.taxamt
-    type: string
-    source: ws
-    total: false
-  - name: taxamt
-    label: reports.ws.taxamt
+    label: taxamt
     type: string
     source: ws
     total: false
   - name: taxcoll
-    label: reports.ws.taxcoll
+    label: taxcoll
     type: string
     source: ws
     total: false
   - name: balance
-    label: reports.ws.balance
+    label: balance
     type: string
     source: ws
     total: false
   - name: ispaymentcompleted
-    label: reports.ws.ispaymentcompleted
+    label: ispaymentcompleted
     type: string
     source: ws
     total: false
@@ -4729,123 +4761,123 @@ ReportDefinitions:
       pdfPageSize: A1
   sourceColumns:
   - name: tenantid
-    label: reports.ws.tenantid
+    label: tenantid
     type: string
     source: ws
     total: false
   - name: applicationno
-    label: reports.ws.applicationno
+    label: applicationno
     type: string
     source: ws
     total: false
   - name: connectionno
-    label: reports.ws.connectionno
+    label: connectionno
     type: string
     source: ws
     total: false
   - name: receiptdate
-    label: reports.ws.receiptdate
+    label: receiptdate
     type: string
     source: ws
     total: false
   - name: receiptnumber
-    label: reports.ws.receiptnumber
+    label: receiptnumber
     type: string
     source: ws
     total: false
   - name: amount
-    label: reports.ws.amount
+    label: amount
     type: string
     source: ws
     total: false
   - name: instrumenttype
-    label: reports.ws.instrumenttype
+    label: instrumenttype
     type: string
     source: ws
     total: false
   - name: transactionnumber
-    label: reports.ws.transactionnumber
+    label: transactionnumber
     type: string
     source: ws
     total: false
   - name: securityfee
-    label: reports.ws.securityfee
+    label: securityfee
     type: string
     source: ws
     total: false
   - name: connectionfee
-    label: reports.ws.connectionfee
+    label: connectionfee
     type: string
     source: ws
     total: false
   - name: othefee
-    label: reports.ws.othefee
+    label: othefee
     type: string
     source: ws
     total: false
   - name: roadcutting
-    label: reports.ws.roadcutting
+    label: roadcutting
     type: string
     source: ws
     total: false
   - name: usagetype
-    label: reports.ws.usagetype
+    label: usagetype
     type: string
     source: ws
     total: false
   - name: ledgerid
-    label: reports.ws.ledgerid
+    label: ledgerid
     type: string
     source: ws
     total: false
   - name: ownername
-    label: reports.ws.ownername
+    label: ownername
     type: string
     source: ws
     total: false
   - name: connectioncategory
-    label: reports.ws.connectioncategory
+    label: connectioncategory
     type: string
     source: ws
     total: false
   - name: propertyid
-    label: reports.ws.propertyid
+    label: propertyid
     type: string
     source: ws
     total: false
   - name: plotsize
-    label: reports.ws.plotsize
+    label: plotsize
     type: string
     source: ws
     total: false
   - name: address
-    label: reports.ws.address
+    label: address
     type: string
     source: ws
     total: false
   - name: g8issuedate
-    label: reports.ws.g8issuedate
+    label: g8issuedate
     type: string
     source: ws
     total: false
   - name: g8receiptno
-    label: reports.ws.g8receiptno
+    label: g8receiptno
     type: string
     source: ws
     total: false
   - name: collectorname
-    label: reports.ws.approvedby
+    label: approvedby
     type: string
     source: ws
     total: false
   - name: approvaldate
-    label: reports.ws.approvaldate
+    label: approvaldate
     type: string
     source: ws
     total: false
   searchParams:
   - name: fromDate
-    label: reports.pt.fromDate
+    label: fromDate
     type: epoch
     source: pt
     isMandatory: true
@@ -4921,129 +4953,129 @@ ReportDefinitions:
       pdfPageSize: A1
   sourceColumns:
   - name: tenantid
-    label: reports.ws.tenantid
+    label: tenantid
     type: string
     source: ws
     total: false
   - name: applicationno
-    label: reports.ws.applicationno
+    label: applicationno
     type: string
     source: ws
     total: false
   - name: connectionno
-    label: reports.ws.connectionno
+    label: connectionno
     type: string
     source: ws
     total: false
   - name: receiptdate
-    label: reports.ws.receiptdate
+    label: receiptdate
     type: string
     source: ws
     total: false
   - name: receiptnumber
-    label: reports.ws.receiptnumber
+    label: receiptnumber
     type: string
     source: ws
     total: false
   - name: amount
-    label: reports.ws.amount
+    label: amount
     type: string
     source: ws
     total: false
   - name: instrumenttype
-    label: reports.ws.instrumenttype
+    label: instrumenttype
     type: string
     source: ws
     total: false
   - name: transactionnumber
-    label: reports.ws.transactionnumber
+    label: transactionnumber
     type: string
     source: ws
     total: false
   - name: securityfee
-    label: reports.ws.securityfee
+    label: securityfee
     type: string
     source: ws
     total: false
   - name: connectionfee
-    label: reports.ws.connectionfee
+    label: connectionfee
     type: string
     source: ws
     total: false
   - name: othefee
-    label: reports.ws.othefee
+    label: othefee
     type: string
     source: ws
     total: false
   - name: roadcutting
-    label: reports.ws.roadcutting
+    label: roadcutting
     type: string
     source: ws
     total: false
   - name: usagetype
-    label: reports.ws.usagetype
+    label: usagetype
     type: string
     source: ws
     total: false
   - name: ledgerid
-    label: reports.ws.ledgerid
+    label: ledgerid
     type: string
     source: ws
     total: false
   - name: ownername
-    label: reports.ws.ownername
+    label: ownername
     type: string
     source: ws
     total: false
   - name: connectioncategory
-    label: reports.ws.connectioncategory
+    label: connectioncategory
     type: string
     source: ws
     total: false
   - name: propertyid
-    label: reports.ws.propertyid
+    label: propertyid
     type: string
     source: ws
     total: false
   - name: plotsize
-    label: reports.ws.plotsize
+    label: plotsize
     type: string
     source: ws
     total: false
   - name: address
-    label: reports.ws.address
+    label: address
     type: string
     source: ws
     total: false
   - name: g8issuedate
-    label: reports.ws.g8issuedate
+    label: g8issuedate
     type: string
     source: ws
     total: false
   - name: g8receiptno
-    label: reports.ws.g8receiptno
+    label: g8receiptno
     type: string
     source: ws
     total: false 
   - name: collectorname
-    label: reports.ws.approvedby
+    label: approvedby
     type: string
     source: ws
     total: false
   - name: approvaldate
-    label: reports.ws.approvaldate
+    label: approvaldate
     type: string
     source: ws
     total: false
   searchParams:
   - name: fromDate
-    label: reports.pt.fromDate
+    label: fromDate
     type: epoch
     source: pt
     isMandatory: true
     searchClause: AND pd.receiptdate >= $fromDate
   - name: toDate
-    label: reports.pt.toDate
+    label: toDate
     type: epoch
     source: pt
     isMandatory: true
@@ -5337,68 +5369,68 @@ ReportDefinitions:
       pdfPageSize: "A1"
   sourceColumns:
   - name: receiptnumber
-    label: reports.ws.receiptNo
+    label: receiptNo
     type: string
     source: ws
     total: false
   - name: receiptdate
-    label: reports.ws.receiptDate
+    label: receiptDate
     type: string
     source: ws
     total: false
   - name: g8issuedate
-    label: reports.ws.g8issuedate
+    label: g8issuedate
     type: string
     source: ws
     total: false
   - name: g8receiptno
-    label: reports.ws.g8receiptno
+    label: g8receiptno
     type: string
     source: ws
     total: false  
   - name: amount
-    label: reports.ws.amount
+    label: amount
     type: string
     source: ws
     total: true
   - name: consumercode
-    label: reports.ws.consumercode
+    label: consumercode
     type: string
     source: ws
     total: false
   - name: instrumenttype
-    label: reports.ws.paymentMode
+    label: paymentMode
     type: string
     source: ws
     total: false
   - name: transactionnumber
-    label: reports.ws.ddChequeTransactionNo
+    label: ddChequeTransactionNo
     type: string
     source: ws
     total: false
   - name: transactiondate
-    label: reports.ws.ddChequeTransactionDate
+    label: ddChequeTransactionDate
     type: string
     source: ws
     total: false
   - name: bankname
-    label: reports.ws.bankName
+    label: bankName
     type: string
     source: ws
     total: false
   - name: collectorname
-    label: reports.ws.collectorname
+    label: collectorname
     type: string
     source: ws
     total: false
   - name: status
-    label: reports.ws.status
+    label: status
     type: string
     source: ws
     total: false
   searchParams:
   - name: fromDate
-    label: reports.pt.fromDate
+    label: fromDate
     type: epoch
     source: pt
     isMandatory: false
