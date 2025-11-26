@@ -212,7 +212,7 @@ ReportDefinitions:
       WITH unique_transactions AS (
              SELECT
                   p.id AS transaction_id,
-                  p.createdtime,
+                  p.createdtime as createdtime,
                   p.totalamountpaid AS amountpaid,
                   CASE WHEN p.paymentmode IN ('CASH','OFFLINE_CASH') THEN p.totalamountpaid ELSE 0 END AS cash_amount,
                   CASE WHEN p.paymentmode = 'CHEQUE' THEN p.totalamountpaid ELSE 0 END AS cheque_amount,
