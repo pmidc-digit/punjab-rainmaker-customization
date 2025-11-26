@@ -210,43 +210,44 @@ ReportDefinitions:
     query: >
       -- Use CTE to force query plan, compute & use CTE later
       WITH unique_transactions AS (
-             SELECT
-                  p.id AS transaction_id,
-                  p.createdtime as createdtime,
-                  p.totalamountpaid AS amountpaid,
-                  CASE WHEN p.paymentmode IN ('CASH','OFFLINE_CASH') THEN p.totalamountpaid ELSE 0 END AS cash_amount,
-                  CASE WHEN p.paymentmode = 'CHEQUE' THEN p.totalamountpaid ELSE 0 END AS cheque_amount,
-                  CASE WHEN p.paymentmode IN ('CARD','DEBIT_CARD','CREDIT_CARD','OFFLINE_CARD') THEN p.totalamountpaid ELSE 0 END AS card_amount,
-                  CASE WHEN p.paymentmode = 'DD' THEN p.totalamountpaid ELSE 0 END AS dd_amount,
-                  CASE WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN p.totalamountpaid ELSE 0 END AS neft_amount,
-                  CASE WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN p.totalamountpaid ELSE 0 END AS rtgs_amount,
-                  CASE WHEN p.paymentmode = 'ONLINE' THEN p.totalamountpaid ELSE 0 END AS online_amount,
-                  b.booking_no AS applicationno,
-                  b.booking_status AS status,
-                  'chb-services' AS businessservice,
-                  u_applic.name AS name,
-                  u_applic.mobilenumber AS mobilenumber
-                FROM egcl_paymentdetail pd
-                JOIN egcl_payment p ON pd.paymentid = p.id
-                JOIN egcl_bill bill ON bill.id = pd.billid
-                JOIN eg_chb_booking_detail b ON b.booking_no = bill.consumercode
-                LEFT JOIN eg_chb_applicant_detail a ON a.booking_id = b.booking_id
-                LEFT JOIN eg_chb_owner o ON o.booking_id=a.booking_id
-                LEFT JOIN eg_user u_applic ON u_applic.uuid = o.uuid
-                LEFT JOIN eg_user u ON u.id::text = p.createdby::text
-                LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
-                WHERE p.paymentstatus != 'CANCELLED'
-                AND pd.businessservice = 'chb-services'
-                AND p.tenantid = $tenantid
+        SELECT
+          p.id AS transaction_id,
+          p.createdtime AS createdtime,
+          p.totalamountpaid AS amountpaid,
+          CASE WHEN p.paymentmode IN ('CASH','OFFLINE_CASH') THEN p.totalamountpaid ELSE 0 END AS cash_amount,
+          CASE WHEN p.paymentmode = 'CHEQUE' THEN p.totalamountpaid ELSE 0 END AS cheque_amount,
+          CASE WHEN p.paymentmode IN ('CARD','DEBIT_CARD','CREDIT_CARD','OFFLINE_CARD') THEN p.totalamountpaid ELSE 0 END AS card_amount,
+          CASE WHEN p.paymentmode = 'DD' THEN p.totalamountpaid ELSE 0 END AS dd_amount,
+          CASE WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN p.totalamountpaid ELSE 0 END AS neft_amount,
+          CASE WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN p.totalamountpaid ELSE 0 END AS rtgs_amount,
+          CASE WHEN p.paymentmode = 'ONLINE' THEN p.totalamountpaid ELSE 0 END AS online_amount,
+          b.booking_no AS applicationno,
+          b.booking_status AS status,
+          'chb-services' AS businessservice,
+          u_applic.name AS name,
+          u_applic.mobilenumber AS mobilenumber
+         FROM egcl_paymentdetail pd
+         JOIN egcl_payment p ON pd.paymentid = p.id
+         JOIN egcl_bill bill ON bill.id = pd.billid
+         JOIN eg_chb_booking_detail b ON b.booking_no = bill.consumercode
+         LEFT JOIN eg_chb_applicant_detail a ON a.booking_id = b.booking_id
+         LEFT JOIN eg_chb_owner o ON o.booking_id = a.booking_id
+         LEFT JOIN eg_user u_applic ON u_applic.uuid = o.uuid
+         LEFT JOIN eg_user u ON u.id::text = p.createdby::text
+         LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
+         WHERE p.paymentstatus != 'CANCELLED'
+          AND pd.businessservice = 'chb-services'
+          AND p.tenantid = $tenantid
       )
-     
-      SELECT 
-        applicationno,name,mobilenumber, businessservice, status, cash_amount,
-        cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
-        TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate
-        FROM unique_transactions
-        WHERE 1=1
+      SELECT
+       applicationno, name, mobilenumber, businessservice, status,
+       cash_amount, cheque_amount, card_amount, dd_amount, neft_amount,
+       rtgs_amount, online_amount, amountpaid,
+       TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate
+       FROM unique_transactions
+       WHERE 1=1
     orderby: ORDER BY createdtime  DESC
+    
   - reportName: ReceiptRegisterCHB
     decryptionPathId: CHBREPORTS
     summary: Details of collector register in CHB service
