@@ -241,7 +241,7 @@ ReportDefinitions:
        SELECT 
         applicationno,name,mobilenumber, businessservice, status, cash_amount,
         cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
-        TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS "PaymentDate"
+        TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate
         FROM unique_transactions
         WHERE 1=1
     orderby: ORDER BY createdtime  DESC
