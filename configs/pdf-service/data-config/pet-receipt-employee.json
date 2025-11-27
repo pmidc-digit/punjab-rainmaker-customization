@@ -186,7 +186,7 @@
               {
                 "variable": "payerAddress", 
                 "value": {
-                   "path": "$.paymentDetails[0].bill.billDetails[0].additionalDetails.address"
+                   "path": "$.payerAddress"
                 }
               },
               {
@@ -591,7 +591,15 @@
                {
                   "variable": "pendingAmount",
                   "formula": "{{dueAmount}}-{{paidAmount}}"
-               }
+               },
+               {
+                "variable": "ServiceCharge",
+                "formula": "{{ServiceCharge}}>0?{{ServiceCharge}}:0"
+              },
+              {
+                "variable": "InterestAmount",
+                "formula": "{{InterestAmount}}>0?{{InterestAmount}}:0"
+              }
             ]
          },
           {
