@@ -85,7 +85,7 @@ ReportDefinitions:
          u.name ,
          u.mobilenumber ,
          a.applicationstatus ,
-         d.businessservice ,
+         'NDC' AS businessservice ,
          a.applicationno,        
          ch.assignee_name AS employee_name,
          ch.assignee_code AS employee_code
@@ -130,18 +130,8 @@ ReportDefinitions:
     type: string
     source: ndc
     total: false
-  - name: assignee_employee
-    label: assignee_employee
-    type: string
-    source: ndc
-    total: false
   - name: collector_code
     label: collector_code
-    type: string
-    source: ndc
-    total: false
-  - name: assignee_code
-    label: assignee_code
     type: string
     source: ndc
     total: false
@@ -236,7 +226,6 @@ ReportDefinitions:
               a.uuid AS ndc_id,
               a.applicationno,
               a.applicationstatus,
-              d.businessservice,
               u_applicant.name ,
               u_applicant.mobilenumber ,
               ch.employee_name AS assignee_employee,
@@ -256,10 +245,10 @@ ReportDefinitions:
              AND p.tenantid = $tenantid
                  )
          SELECT
-              applicationno, name, mobilenumber, businessservice, applicationstatus,
-              collector_code,  assignee_employee,  assignee_code, cash_amount, cheque_amount,
+              applicationno, name, mobilenumber, 'NDC' AS businessservice, applicationstatus,
+              collector_code, cash_amount, cheque_amount,
               card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
-              to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS "PaymentDate"
+              to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate
              FROM unique_transactions
              WHERE 1=1 
   orderby: ORDER BY createdtime DESC
@@ -556,13 +545,6 @@ ReportDefinitions:
     source: ndc
     isMandatory: false
     searchClause: AND pd.receiptnumber like $receiptNumber
-  - name: paymentStatus
-    label: paymentStatus
-    type: singlevaluelist
-    pattern: 'list://NEW:NEW,DEPOSITED:DEPOSITED'
-    source: ndc
-    isMandatory: false
-    searchClause: AND payment.paymentstatus like $paymentStatus
   - name: paymentMode
     label: paymentMode
     type: singlevaluelist
