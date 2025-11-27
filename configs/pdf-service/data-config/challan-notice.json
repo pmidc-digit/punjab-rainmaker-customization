@@ -20,6 +20,12 @@
                 }
               },
               {
+                "variable": "feeWaiver",
+                "value": {
+                  "path": "$.challans[0].feeWaiver"
+                }
+              },
+              {
                 "variable": "payerFatherName",
                 "value": {
                   "path": "$.challans[0].citizen.fatherOrHusbandName"
@@ -714,7 +720,7 @@
               },
               {
                 "variable": "TotalChallanAmount",
-                "formula": "{{challanFine}}>{{challanAmount}}?{{challanFine}}:{{challanAmount}}"
+                "formula": "{{challanFine}}>{{challanAmount}}?{{challanFine}}-{{feeWaiver}}:{{challanAmount}}-{{feeWaiver}}"
               },
               {
                 "variable": "excessAmountPaid",
