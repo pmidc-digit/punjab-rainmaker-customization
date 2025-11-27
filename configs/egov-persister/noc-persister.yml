@@ -94,7 +94,8 @@ serviceMaps:
               id, tenantid, nocid, status, isprimaryowner,
               ownertype, ownershippercentage, institutionid, relationship,
               createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails
-            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            ,uuid
+            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?);
           basePath: $.Noc.owners.*
 
           jsonMaps:
@@ -114,6 +115,7 @@ serviceMaps:
             - jsonPath: $.Noc.owners.*.additionalDetails
               type: JSON
               dbType: JSONB
+            - jsonPath: $.Noc.owners.*.uuid
 
 
 
