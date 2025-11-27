@@ -178,18 +178,8 @@ ReportDefinitions:
         type: string
         source: ptr
         total: false
-      - name: assignee_employee
-        label: assignee_employee
-        type: string
-        source: ptr
-        total: false
       - name: collector_code
         label: collector_code
-        type: string
-        source: ptr
-        total: false
-      - name: assignee_code
-        label: assignee_code
         type: string
         source: ptr
         total: false
@@ -563,13 +553,6 @@ ReportDefinitions:
       source: ptr
       isMandatory: false
       searchClause: AND pd.receiptnumber like $receiptNumber
-    - name: paymentStatus
-      label: paymentStatus
-      type: singlevaluelist
-      pattern: 'list://NEW:NEW,DEPOSITED:DEPOSITED'
-      source: ptr
-      isMandatory: false
-      searchClause: AND payment.paymentstatus like $paymentStatus
     - name: paymentMode
       label: paymentMode
       type: singlevaluelist
