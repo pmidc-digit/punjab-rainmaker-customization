@@ -19,6 +19,7 @@
                   "path": "$.payerName"
                 }
               },
+
               {
                 "variable": "designation",
                 "value": {
@@ -33,18 +34,43 @@
                 "type": "selectFromRequestInfo"
               },
               {
+                "variable": "generator_mobileno",
+                "value": {
+                  "path": "$.userInfo.mobileNumber"
+                },
+                "type": "selectFromRequestInfo"
+              },
+              {
                 "variable": "payerContact",
                 "value": {
                   "path": "$.mobileNumber"
                 }
               },
               {
-                "variable": "payerAddress",
+                "variable": "Category",
                 "value": {
-                  "path": "$.payerAddress"
+                  "path": "$.usage"
                 }
               },
 
+              {
+                "variable": "Amountinwords",
+                "value": {
+                  "path": "$.amountinwords"
+                }
+              },
+              {
+                "variable": "paymentType",
+                "value": {
+                  "path": "BPA_PAYMENT_TYPE1"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
               {
                 "variable": "receiptNo",
                 "value": {
@@ -67,6 +93,31 @@
                 "variable": "totalAmount",
                 "value": {
                   "path": "$.totalAmountPaid"
+                }
+              },
+              {
+                "variable": "tenantid",
+                "value": {
+                  "path": "$.tenantId"
+                }
+              },
+              {
+                "variable": "serviceType",
+                "value": {
+                  "path": "ACTION_TEST_LAYOUT_HOME"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+
+              {
+                "variable": "paidAmount",
+                "value": {
+                  "path": "$.paymentDetails[0].totalAmountPaid"
                 }
               },
               {
@@ -143,33 +194,9 @@
               },
 
               {
-                "variable": "tenantid",
-                "value": {
-                  "path": "$.tenantId"
-                }
-              },
-              {
-                "variable": "serviceType",
-                "value": {
-                  "path": "ACTION_TEST_LAYOUT_HOME"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "paidAmount",
-                "value": {
-                  "path": "$.paymentDetails[0].totalAmountPaid"
-                }
-              },
-              {
                 "variable": "fromPeriod",
                 "value": {
-                  "path": "$.transactionDate"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].fromPeriod"
                 },
                 "type": "date"
               },
@@ -179,6 +206,12 @@
                   "path": "$.paymentDetails[0].bill.billDetails[0].toPeriod"
                 },
                 "type": "date"
+              },
+              {
+                "variable": "stakeholderType",
+                "value": {
+                  "path": "$.paymentDetails[0].additionalDetails.stakeholderType"
+                }
               },
               {
                 "variable": "paymentMode",
@@ -599,12 +632,12 @@
                     "value": "$.MdmsRes.tenant.tenants[0].domainUrl"
                   },
                   {
-                    "variable": "ulbType",
-                    "value": "$.MdmsRes.tenant.tenants[0].city.ulbType"
-                  },
-                  {
                     "variable": "email",
                     "value": "$.MdmsRes.tenant.tenants[0].emailId"
+                  },
+                  {
+                    "variable": "ulbType",
+                    "value": "$.MdmsRes.tenant.tenants[0].city.ulbType"
                   },
                   {
                     "variable": "logoImage",

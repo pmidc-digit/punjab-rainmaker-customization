@@ -124,177 +124,173 @@
         },
         "layout": "noBorders"
       },
-
       {
-        "style": "next-noc-table",
-        "table": {
-          "widths": ["auto", "auto"],
-          "body": [
-            [
-              {
-                "text": "Booking Details",
-                "style": "receipt-table-value",
-                "bold": true,
-                "border": [false, false, false, false],
-                "alignment": "left",
-                "margin": [-4, 0, 0, 0]
-              },
-              {
-                "text": "",
-                "style": "receipt-table-value-down",
-                "alignment": "left",
-                "border": [false, false, false, false],
-                "margin": [0, 0, 0, 0]
-              }
-            ],
-            [
-              {
-                "text": "Area",
-                "style": "receipt-table-value",
-                "bold": true,
-                "alignment": "left",
-                "margin": [0, 0, 0, 0]
-              },
-              {
-                "text": "{{communityHallName}}",
-                "style": "receipt-table-value-down",
-                "alignment": "left",
-                "margin": [0, 0, 0, 0]
-              }
-            ],
+        "columns": [
+          {
+            "style": "next-noc-table",
+            "table": {
+              "widths": ["auto", "40%"],
+              "body": [
+                [
+                  {
+                    "text": "Payment Details:",
+                    "bold": true,
+                    "style": "receipt-table-value",
+                    "border": [false, false, false, false],
+                    "margin": [-26, 0, 0, 0]
+                  },
+                  {
+                    "text": "",
+                    "style": "receipt-table-value-down",
+                    "border": [false, false, false, false]
+                  }
+                ],
+                [
+                  {
+                    "text": "{{chb_booking_fees}}",
+                    "style": "receipt-table-value-down",
+                    "bold": true
+                  },
+                  {
+                    "text": "₹{{chbBookingFees}}",
+                    "style": "receipt-table-value-down"
+                  }
+                ],
+                [
+                  {
+                    "text": "{{chb_sgst}} (9%)",
+                    "style": "receipt-table-value-down",
+                    "bold": true
+                  },
+                  {
+                    "text": "₹{{chbSgst}}",
+                    "style": "receipt-table-value-down"
+                  }
+                ],
+                [
+                  {
+                    "text": "{{chb_cgst}} (9%)",
+                    "bold": true,
+                    "style": "receipt-table-value-down"
+                  },
+                  {
+                    "text": "₹{{chbCgst}}",
+                    "style": "receipt-table-value-down"
+                  }
+                ],
+                [
+                  {
+                    "text": "{{chb_cow_cess}}",
+                    "bold": true,
+                    "style": "receipt-table-value-down"
+                  },
+                  {
+                    "text": "₹{{chbCowCessCharge}}",
+                    "style": "receipt-table-value-down"
+                  }
+                ],
+                [
+                  {
+                    "text": "{{chb_service_charge}}",
+                    "bold": true,
+                    "style": "receipt-table-value-down"
+                  },
+                  {
+                    "text": "₹{{chbServiceCharge}}",
+                    "style": "receipt-table-value-down"
+                  }
+                ],
+                [
+                  {
+                    "text": "{{chb_discount}}",
+                    "bold": true,
+                    "style": "receipt-table-value-down"
+                  },
+                  {
+                    "text": "₹{{chbDiscountPositive}}",
+                    "style": "receipt-table-value-down"
+                  }
+                ],
+                [
+                  {
+                    "text": "{{total_amount}} (Rs)",
+                    "bold": true,
+                    "fillColor": "#f2f2f2",
+                    "style": "receipt-table-value-down"
+                  },
+                  {
+                    "text": "₹{{totalAmount}}",
+                    "bold": true,
+                    "fillColor": "#f2f2f2",
+                    "style": "receipt-table-value-down"
+                  }
+                ]
+              ]
+            },
+            "layout": {}
+          },
+          {
+            "style": "next-noc-table",
+            "table": {
+              "widths": ["auto", "40%"],
+              "body": [
+                [
+                  {
+                    "text": "Booking Details",
+                    "style": "receipt-table-value",
+                    "bold": true,
+                    "border": [false, false, false, false],
+                    "alignment": "left",
+                    "margin": [-4, 0, 0, 0]
+                  },
+                  {
+                    "text": "",
+                    "style": "receipt-table-value-down",
+                    "alignment": "left",
+                    "border": [false, false, false, false],
+                    "margin": [0, 0, 0, 0]
+                  }
+                ],
+                [
+                  {
+                    "text": "Area",
+                    "style": "receipt-table-value",
+                    "bold": true,
+                    "alignment": "left",
+                    "margin": [0, 0, 0, 0]
+                  },
+                  {
+                    "text": "{{communityHallName}}",
+                    "style": "receipt-table-value-down",
+                    "alignment": "left",
+                    "margin": [0, 0, 0, 0]
+                  }
+                ],
+                [
+                  {
+                    "text": "Date of Booking ",
+                    "style": "receipt-table-value",
+                    "bold": true,
+                    "alignment": "left",
+                    "margin": [0, 0, 0, 0]
+                  },
+                  {
+                    "text": "{{dateNow}}",
+                    "style": "receipt-table-value-down",
+                    "alignment": "left",
+                    "margin": [0, 0, 0, 0]
+                  }
+                ],
+                "[{\"text\":\"Period of Booking \",\"style\":\"receipt-table-value\",\"bold\":true,\"alignment\":\"left\",\"border\":[true,true,true,true],\"margin\":[0,0,0,0]},{\"text\":\"{{#var_bookingSlots}}{{bookingDate}}  {{/var_bookingSlots}}\",\"style\":\"receipt-table-value-down\",\"alignment\":\"left\",\"border\":[true,true,true,true],\"margin\":[0,0,0,0]}]"
+              ]
+            },
+            "layout": {}
+          }
+          
+        ] ,
+        "margin": [20, 0, 20, 0]
+      },
 
-            [
-              {
-                "text": "Accommodation Booked",
-                "style": "receipt-table-value",
-                "bold": true,
-                "alignment": "left",
-                "margin": [0, 0, 0, 0]
-              },
-              {
-                "text": "{{hallCode}}",
-                "style": "receipt-table-value-down",
-                "alignment": "left",
-                "margin": [0, 0, 0, 0]
-              }
-            ],
-            [
-              {
-                "text": "Date of Booking ",
-                "style": "receipt-table-value",
-                "bold": true,
-                "alignment": "left",
-                "margin": [0, 0, 0, 0]
-              },
-              {
-                "text": "{{bookingDate}}",
-                "style": "receipt-table-value-down",
-                "alignment": "left",
-                "margin": [0, 0, 0, 0]
-              }
-            ],
-            "[{\"text\":\"Period of Booking \",\"style\":\"receipt-table-value\",\"bold\":true,\"alignment\":\"left\",\"border\":[true,true,true,true],\"margin\":[0,0,0,0]},{\"text\":\"{{#var_bookingSlots}}{{bookingDate}}  {{/var_bookingSlots}}\",\"style\":\"receipt-table-value-down\",\"alignment\":\"left\",\"border\":[true,true,true,true],\"margin\":[0,0,0,0]}]"
-          ]
-        },
-        "layout": {}
-      },
-      {
-        "style": "next-noc-table",
-        "table": {
-          "widths": ["18.5%", "10.1%"],
-          "body": [
-            [
-              {
-                "text": "Payment Details:",
-                "bold": true,
-                "style": "receipt-table-value",
-                "border": [false, false, false, false],
-                "margin": [-4, 0, 0, 0]
-              },
-              {
-                "text": "",
-                "style": "receipt-table-value-down",
-                "border": [false, false, false, false]
-              }
-            ],
-            [
-              {
-                "text": "{{chb_booking_fees}}",
-                "style": "receipt-table-value-down"
-              },
-              {
-                "text": "₹{{chbBookingFees}}",
-                "style": "receipt-table-value-down"
-              }
-            ],
-            [
-              {
-                "text": "{{chb_sgst}} (9%)",
-                "style": "receipt-table-value-down"
-              },
-              {
-                "text": "₹{{chbSgst}}",
-                "style": "receipt-table-value-down"
-              }
-            ],
-            [
-              {
-                "text": "{{chb_cgst}} (9%)",
-                "style": "receipt-table-value-down"
-              },
-              {
-                "text": "₹{{chbCgst}}",
-                "style": "receipt-table-value-down"
-              }
-            ],
-            [
-              {
-                "text": "{{chb_cow_cess}}",
-                "style": "receipt-table-value-down"
-              },
-              {
-                "text": "₹{{chbCowCessCharge}}",
-                "style": "receipt-table-value-down"
-              }
-            ],
-            [
-              {
-                "text": "{{chb_service_charge}}",
-                "style": "receipt-table-value-down"
-              },
-              {
-                "text": "₹{{chbServiceCharge}}",
-                "style": "receipt-table-value-down"
-              }
-            ],
-            [
-              {
-                "text": "{{chb_discount}}",
-                "style": "receipt-table-value-down"
-              },
-              {
-                "text": "₹{{chbDiscountPositive}}",
-                "style": "receipt-table-value-down"
-              }
-            ],
-            [
-              {
-                "text": "{{total_amount}} (Rs)",
-                "bold": true,
-                "fillColor": "#f2f2f2",
-                "style": "receipt-table-value-down"
-              },
-              {
-                "text": "{{totalAmount}}",
-                "bold": true,
-                "fillColor": "#f2f2f2",
-                "style": "receipt-table-value-down"
-              }
-            ]
-          ]
-        },
-        "layout": {}
-      },
       {
         "style": "next-noc-table",
         "table": {
@@ -307,7 +303,7 @@
                 "style": "receipt-table-value-down",
                 "alignment": "left",
                 "border": [false, false, false, false],
-                "margin": [0, 2, 0, 2]
+                "margin": [0, 20, 0, 2]
               }
             ],
             [
@@ -399,12 +395,6 @@
                   },
                   {
                     "text": "{{term_15}}",
-                    "margin": [0, 2, 0, 2],
-                    "alignment": "justify",
-                    "fontSize": 9
-                  },
-                  {
-                    "text": "{{term_16}}",
                     "margin": [0, 2, 0, 2],
                     "alignment": "justify",
                     "fontSize": 9
@@ -510,7 +500,7 @@
       },
       "no-signature": {
         "fontSize": 9,
-        "margin": [-27, -4, -10, 0],
+        "margin": [-27, 30, -10, 0],
         "color": "#000000"
       },
       "pt-disclaimer": {

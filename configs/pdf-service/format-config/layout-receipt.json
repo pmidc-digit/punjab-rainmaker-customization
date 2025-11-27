@@ -1,409 +1,459 @@
 {
   "key": "layout-receipt",
   "config": {
-    "defaultStyle": {
-      "font": "Cambay"
-    },
+    "defaultStyle": { "font": "Roboto" },
     "content": [
       {
         "style": "noc-head",
         "table": {
-          "widths": [90, "*", 90],
+          "widths": ["*"],
           "body": [
             [
               {
-                "image": "{{logoImage}}",
-                "width": 70,
-                "height": 70,
-                "alignment": "left"
-              },
-              {
                 "stack": [
                   {
+                    "text": "Department of Local Government, Punjab",
+                    "bold": true,
+                    "fontSize": 13
+                  },
+                  {
                     "text": "{{ulbType}} {{logo-header}}",
-                    "style": "receipt-logo-header",
-                    "alignment": "center",
-                    "margin": [0, 5, 0, 5]
+                    "bold": true,
+                    "fontSize": 13
                   },
                   {
-                    "stack": [
-                      { "text": "{{address}}" },
-                      { "text": "{{phoneNumber}}" },
-                      { "text": "{{website}}" },
-                      { "text": "{{email}}" }
+                    "text": "{{address}}",
+                    "bold": true,
+                    "fontSize": 11
+                  },
+                  {
+                    "text": [
+                      { "text": "Website: ", "bold": true },
+                      { "text": "{{website}}" }
                     ],
+                    "fontSize": 11,
                     "alignment": "center",
-                    "color": "#484848",
-                    "margin": [0, 2, 0, 2]
-                  },
-                  {
-                    "text": "{{serviceType}} {{payment_receipt}}",
-                    "style": "receipt-logo-sub-header",
-                    "alignment": "center",
-                    "margin": [0, 5, 0, 0]
+                    "margin": [0, 2, 0, 0]
                   }
                 ],
-                "alignment": "center"
-              },
-              {
-                "image": "{{qrcodeimage}}",
-                "width": 72,
-                "height": 72,
-                "alignment": "right",
-                "margin": [0, 0, 0, 0]
+                "alignment": "center",
+                "color": "#484848",
+                "margin": [0, -10, 0, 10]
               }
             ]
           ]
         },
         "layout": "noBorders"
       },
+
       {
         "style": "noc-table",
         "table": {
-          "widths": ["26%", "21%", "27%", "26%"],
+          "widths": ["23%", "27%", "23%", "27%"],
           "body": [
             [
               {
-                "text": "{{receipt_no}}.",
-                "border": [true, true, false, false],
+                "text": "{{receipt_no}} ",
                 "style": "receipt-table-value"
               },
               {
                 "text": "{{receiptNo}}",
-                "border": [false, true, false, false],
                 "style": "receipt-table",
-                "font": "Roboto",
-                "fontSize" :10
+                "fontSize": 10
               },
               {
-                "text": "Application Number",
-                "border": [false, true, false, false],
+                "text": "File No ",
                 "style": "receipt-table-value"
               },
               {
                 "text": "{{consumerID}}",
-                "border": [false, true, true, false],
                 "style": "receipt-table",
-                "font": "Roboto",
-                "fontSize" :10
+                "fontSize": 10
               }
             ],
             [
               {
-                "text": "{{payment_date}}",
-                "border": [true, false, false, false],
+                "text": "{{payment_date}} ",
                 "style": "receipt-table-value"
               },
               {
                 "text": "{{paymentDate}}",
-                "border": [false, false, false, false],
                 "style": "receipt-table"
               },
               {
-                "text": "Applicant Name",
-                "border": [false, false, false, false],
+                "text": "Applicant Name ",
                 "style": "receipt-table-value"
               },
               {
                 "text": "{{payerName}}",
-                "border": [false, false, true, false],
                 "style": "receipt-table"
               }
             ],
             [
               {
-                "text": "Applicant Contact",
-                "border": [true, false, false, true],
-                "style": "receipt-table-value"
+                "text": "Applicant Contact No. ",
+                "style": "receipt-table-value",
+                "fontSize": 10
               },
               {
                 "text": "{{payerContact}}",
-                "border": [false, false, false, true],
-                "style": "receipt-table"
+                "style": "receipt-table",
+                "border": [true, true, false, true]
               },
               {
                 "text": " ",
-                "border": [false, false, false, true],
-                "style": "receipt-table-value"
+                "border": [false, true, false, true]
               },
               {
                 "text": " ",
-                "border": [false, false, true, true],
-                "style": "receipt-table"
+                "border": [false, true, true, true]
+              }
+            ]
+          ]
+        }
+      },
+
+      {
+        "style": "noc-mock-table",
+        "table": {
+          "widths": ["24%", "28%", "9%", "13%", "11%", "15%"],
+          "body": [
+            [
+              {
+                "text": "Type of Fees ",
+                "style": "receipt-mock-table-value"
+              },
+              {
+                "text": "{{paymentType}}",
+                "style": "receipt-mock-table",
+                "fontSize": 10
+              },
+              {
+                "text": "Module ",
+                "style": "receipt-mock-table-value"
+              },
+              {
+                "text": "{{serviceType}}",
+                "style": "receipt-mock-table",
+                "fontSize": 10
+              },
+              {
+                "text": "Category ",
+                "style": "receipt-mock-table-value"
+              },
+              {
+                "text": "{{Category}}",
+                "style": "receipt-mock-table",
+                "fontSize": 10
               }
             ]
           ]
         },
         "layout": {}
       },
+
       {
         "style": "next-noc-table",
         "table": {
-          "widths": ["27%", "23%", "25%", "25%"],
+          "widths": ["23%", "27%", "23%", "27%"],
           "body": [
             [
               {
-                "text": "{{service_type}}",
-                "border": [true, true, false, false],
+                "text": "{{service_type}} ",
                 "style": "receipt-table-value"
               },
               {
                 "text": "{{serviceType}}",
-                "border": [false, true, false, false],
                 "style": "receipt-table"
               },
               {
-                "text": "Validity date",
-                "border": [false, true, false, false],
-                "style": "receipt-table-value"
-              },
-              {
-                "text": "{{fromPeriod}} {{to}} {{toPeriod}}",
-                "border": [false, true, true, false],
-                "style": "receipt-table"
-              }
-            ],
-            [
-              {
-                "text": "Registration Amount",
-                "border": [true, false, false, false],
-                "style": "receipt-table-value"
-              },
-              {
-                "text": "₹ {{dueAmount}}",
-                "border": [false, false, false, false],
-                "style": "receipt-table"
-              },
-              {
-                "text": "{{paid_amount}}",
-                "border": [false, false, false, false],
+                "text": "{{paid_amount}} ",
                 "style": "receipt-table-value"
               },
               {
                 "text": "₹ {{paidAmount}}",
-                "border": [false, false, true, false],
                 "style": "receipt-table"
               }
             ],
             [
               {
-                "text": "{{payment_mode}}",
-                "border": [true, false, false, false],
-                "style": "receipt-table-value"
-              },
-              {
-                "text": "{{paymentMode}}",
-                "border": [false, false, false, false],
-                "style": "receipt-table"
-              },
-              {
-                "text": "{{transaction_id}}",
-                "border": [false, false, false, false],
+                "text": "Txn ID / UTR ",
                 "style": "receipt-table-value"
               },
               {
                 "text": "{{transactionID}}",
-                "border": [false, false, true, false],
                 "style": "receipt-table",
-                "font": "Roboto",
-                "fontSize" :10
-              }
-            ],
+                "fontSize": 10,
+                "colSpan": 3
+              },
+              {},
+              {}
+            ]
+          ]
+        }
+      },
 
+      {
+        "style": "noc-mock-table",
+        "table": {
+          "widths": ["100%"],
+          "body": [
             [
               {
-                "text": "{{g8_receipt_no}}.",
-                "border": [true, false, false, true],
-                "style": "receipt-table-value"
-              },
-              {
-                "text": "{{G8ReceiptNo}}",
-                "border": [false, false, false, true],
-                "style": "receipt-table"
-              },
-              {
-                "text": "{{g8_receipt_date}}",
-                "border": [false, false, false, true],
-                "style": "receipt-table-value"
-              },
-              {
-                "text": "{{G8ReceiptDate}}",
-                "border": [false, false, true, true],
-                "style": "receipt-table"
+                "text": "Detail of Payment",
+                "style": "receipt-mock-table-value",
+                "border": [true, true, true, false],
+                "fontSize": 12
               }
             ]
           ]
         },
         "layout": {}
       },
+
       {
-        "style": "next-noc-table",
+        "style": "fee-summary-table",
         "table": {
-          "widths": ["70%", "30%"],
+          "widths": ["22%", "78%"],
           "body": [
             [
               {
-                "text": "{{layout_clu_charge}}",
-                "border": [true, true, false, false],
-                "style": "receipt-table-value-down"
+                "text": "Charges",
+                "style": "receipt-fee-label"
               },
               {
-                "text": "{{LayoutCluCharge}}",
-                "border": [false, true, true, false],
-                "style": "receipt-table-value-down"
+                "text": "Amount (In ₹)",
+                "style": "receipt-fee-label",
+                "alignment": "right",
+                "margin": [0, 0, 4, 0]
+              }
+            ],
+            [
+              {
+                "text": "{{layout_clu_charge}}",
+                "style": "receipt-fee-label"
+              },
+              {
+                "text": " {{LayoutCluCharge}}",
+                "style": "receipt-fee-value"
               }
             ],
             [
               {
                 "text": "{{layout_processing_fee}}",
-                "border": [true, false, false, false],
-                "style": "receipt-table-value-down"
+                "style": "receipt-total-label"
               },
               {
-                "text": "{{LayoutProcessingFee}}",
-                "border": [false, false, true, false],
-                "style": "receipt-table-value-down"
+                "text": " {{LayoutProcessingFee}}",
+                "style": "receipt-total-value"
               }
             ],
+
             [
               {
                 "text": "{{layout_external_development_charges}}",
-                "border": [true, false, false, false],
-                "style": "receipt-table-value-down"
+                "style": "receipt-fee-label"
               },
               {
-                "text": "{{LayoutExternalDevelopmentCharges}}",
-                "border": [false, false, true, false],
-                "style": "receipt-table-value-down"
+                "text": " {{LayoutExternalDevelopmentCharges}}",
+                "style": "receipt-fee-value"
               }
             ],
             [
               {
                 "text": "{{layout_urban_development_cess}}",
-                "border": [true, false, false, false],
-                "style": "receipt-table-value-down"
+                "style": "receipt-total-label"
               },
               {
-                "text": "{{LayoutUrbanDevelopmentCess}}",
-                "border": [false, false, true, false],
-                "style": "receipt-table-value-down"
+                "text": " {{LayoutUrbanDevelopmentCess}}",
+                "style": "receipt-total-value"
               }
             ],
 
             [
               {
                 "text": "{{total_amount}}",
-                "border": [true, false, false, true],
-                "bold": true,
-                "style": "receipt-table-value-down"
+                "style": "receipt-total-label",
+                "fillColor": "#f2f2f2"
               },
               {
-                "text": "{{totalAmount}}",
-                "border": [false, false, true, true],
-                "bold": true,
-                "style": "receipt-table-value-down"
+                "text": " {{totalAmount}}",
+                "style": "receipt-total-value",
+                "fillColor": "#f2f2f2"
+              }
+            ],
+            [
+              {
+                "text": " Amount in Words ",
+                "style": "receipt-total-label",
+                "fillColor": "#f2f2f2"
+              },
+              {
+                "text": " {{Amountinwords}} only.",
+                "style": "receipt-total-value",
+                "fillColor": "#f2f2f2"
               }
             ]
           ]
         },
         "layout": {}
       },
+
       {
         "style": "receipt-approver",
         "columns": [
           {
-            "text": [
-              {
-                "text": "{{generated_by}}: ",
-                "bold": true
-              },
+            "text": [{ "text": "{{generated_by}}: ", "bold": true }],
+            "alignment": "left"
+          },
+          {
+            "ul": [
               {
                 "text": "{{user-name}}",
-                "bold": false
+                "listType": "none",
+                "margin": [-90, 0, 0, 0]
+              },
+              {
+                "text": "{{generator_mobileno}}",
+                "listType": "none",
+                "margin": [-90, 0, 0, 0]
               }
             ],
             "alignment": "left"
+          },
+          {
+            "ul": [
+              { "text": "{{ulbType}}", "bold": true,"listType": "none" },
+              { "text": "{{logo-header}}", "bold": true,"listType": "none" }
+            ],
+            "alignment": "right",
+            "margin": [0, 0, -2, 0]
+          }
+        ]
+      },
+      {
+        "style": "pt-disclaimer",
+        "stack": [
+          {
+            "text": "Disclaimer",
+            "bold": true,
+            "style": "pt-disclaimer-header"
+          },
+
+          {
+            "ol": [
+              " This receipt is generated electronically by the Building Plan Approval System of the {{ulbType}} {{logo-header}}.",
+              " In case of any discrepancies, kindly contact the concerned municipal office with a copy of this receipt.",
+              " The ULB shall not be responsible for delays caused due to banking network or technical issues.",
+              " Retain this receipt for future reference."
+            ],
+            "alignment": "justify",
+            "margin": [20, 0, 0, 10]
           }
         ]
       },
       {
         "style": "no-signature",
-        "text": "{{no_signature}}",
-        "alignment": "center"
+        "text": "This is a system-generated receipt and does not require a physical signature.",
+        "margin": [0, 4, 0, 0]
       }
     ],
+
     "styles": {
-      "noc-head": {
-        "margin": [-30, -30, 0, 1]
-      },
-      "receipt-logo-header": {
-        "color": "#000000",
-        "fontSize": 14,
-        "bold": true,
-        "letterSpacing": 0.74,
-        "margin": [0, 0, 0, 5]
-      },
-      "receipt-logo-sub-header": {
-        "color": "#000000",
-        "fontSize": 12,
-        "letterSpacing": 0.6
-      },
+      "noc-head": { "margin": [0, -20, 0, 10] },
       "noc-table": {
         "fontSize": 12,
         "color": "#000000",
-        "margin": [-25, 10, -22, -8]
+        "margin": [0, 0, 0, 5]
       },
-      "receipt-table-value-total-Qr": {
-        "alignment": "right",
-        "margin": [0, 3, 10, 0]
-      },
-      "receipt-table-value-down": {
-        "color": "#000000",
-        "bold": false,
+
+      "noc-mock-table": {
         "fontSize": 12,
-        "fontWeight": 400,
-        "alignment": "left",
-        "margin": [3, 5, 0, 5]
+        "color": "#000000",
+        "margin": [0, 2, 0, 0]
       },
       "next-noc-table": {
         "fontSize": 12,
         "color": "#000000",
-        "margin": [-25, 28, -22, -8]
+        "margin": [0, 15, 0, 10]
       },
       "receipt-table-value": {
         "color": "#000000",
         "bold": true,
-        "fontSize": 12,
-        "fontWeight": 500,
-        "margin": [-2, 2, 0, 2]
+        "fontSize": 10,
+        "margin": [2, 4, 0, 4]
+      },
+      "receipt-mock-table-value": {
+        "color": "#000000",
+        "bold": true,
+        "fontSize": 10,
+        "margin": [2, 0, 0, 0]
       },
       "receipt-table": {
         "color": "#000000",
         "bold": false,
-        "fontSize": 12,
-        "fontWeight": 400,
-        "margin": [-30, 2, 0, 2]
+        "fontSize": 10,
+        "margin": [2, 4, 0, 4]
+      },
+      "receipt-mock-table": {
+        "color": "#000000",
+        "bold": false,
+        "fontSize": 10,
+        "margin": [2, 0, 0, 0]
+      },
+      "receipt-fee-label": {
+        "fontSize": 10,
+        "color": "#000000",
+        "bold": true,
+        "margin": [4, 0, 0, 6]
+      },
+      "receipt-fee-value": {
+        "fontSize": 10,
+        "color": "#000000",
+        "alignment": "right",
+        "margin": [0, 6, 4, 6]
+      },
+      "receipt-total-label": {
+        "fontSize": 10,
+        "color": "#000000",
+        "bold": true,
+        "margin": [4, 6, 0, 6]
+      },
+      "receipt-total-value": {
+        "fontSize": 10,
+        "color": "#000000",
+        "bold": true,
+        "alignment": "right",
+        "margin": [0, 6, 4, 6]
       },
       "receipt-approver": {
-        "fontSize": 12,
+        "fontSize": 10,
         "bold": true,
-        "margin": [-27, 50, -10, 0],
+        "margin": [0, 5, 0, 2],
         "color": "#484848"
       },
       "no-signature": {
-        "fontSize": 12,
-        "margin": [-27, 35, -10, 0],
-        "color": "#484848"
+        "fontSize": 10,
+        "margin": [0, 5, 0, 5],
+        "color": "#484848",
+        "alignment": "center"
       },
       "pt-disclaimer": {
-        "fontSize": 12,
-        "margin": [-27, 30, -10, 0],
+        "fontSize": 10,
+        "margin": [0, 5, 0, 0],
         "color": "#484848"
       },
+      "pt-disclaimer-header": {
+        "fontSize": 11,
+        "bold": true,
+        "margin": [0, 0, 0, 4],
+        "color": "#000000"
+      },
       "pt-disclaimer-value": {
-        "fontSize": 12,
+        "fontSize": 10,
         "margin": [2, 3, 0, 0],
-        "color": "#484848"
+        "color": "#484848",
+        "alignment": "justify"
       }
     }
   }

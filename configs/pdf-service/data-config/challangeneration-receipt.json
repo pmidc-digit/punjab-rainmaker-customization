@@ -20,6 +20,12 @@
                 }
               },
               {
+                "variable": "feeWaiver",
+                "value": {
+                  "path": "$.challan.challans[0].feeWaiver"
+                }
+              },
+              {
                 "variable": "designation",
                 "value": {
                   "path": "$.additionalDetails.designation"
@@ -588,7 +594,7 @@
               },
               {
                 "variable": "TotalChallanAmount",
-                "formula": "{{challanFee}}>{{challanAmount}}?{{challanFee}}:{{challanAmount}}"
+                "formula": "{{challanFee}}>{{challanAmount}}?{{challanFee}}-{{feeWaiver}}:{{challanAmount}}-{{feeWaiver}}"
               },
               {
                 "variable": "excessAmountPaid",
