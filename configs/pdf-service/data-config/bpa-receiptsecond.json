@@ -23,91 +23,97 @@
               {
                 "variable": "bpaLabourCess",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[0].amount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BPA_LABOUR_CESS')].adjustedAmount"
                 }
               },
               {
                 "variable": "bpaGaushalaChargesCess",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[1].amount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BPA_GAUSHALA_CHARGES_CESS')].adjustedAmount"
                 }
               },
               {
                 "variable": "bpaMiningCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[2].amount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BPA_MINING_CHARGES')].adjustedAmount"
+                }
+              },
+              {
+                "variable": "bpaPurchasableFarCharges",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BPA_PURCHASABLE_FAR_CHARGES')].adjustedAmount"
                 }
               },
               {
                 "variable": "bpaSubDivisionCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[3].amount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BPA_SUB-DIVISION_CHARGES')].adjustedAmount"
                 }
               },
               {
                 "variable": "bpaDevelopmentCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[4].amount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BPA_DEVELOPMENT_CHARGES')].adjustedAmount"
                 }
               },
               {
                 "variable": "bpaOtherCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[5].amount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BPA_OTHER_CHARGES')].adjustedAmount"
                 }
               },
               {
                 "variable": "bpaClubbingCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[6].amount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BPA_CLUBBING_CHARGES')].adjustedAmount"
                 }
               },
               {
                 "variable": "bpaMalbaCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[7].amount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BPA_MALBA_CHARGES')].adjustedAmount"
                 }
               },
               {
                 "variable": "bpaLessAdjustmentPlot",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[8].amount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BPA_LESS_ADJUSTMENT_PLOT')].adjustedAmount"
                 }
               },
               {
                 "variable": "bpaRainWaterHarvestingCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[9].amount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BPA_RAIN_WATER_HARVESTING_CHARGES')].adjustedAmount"
                 }
               },
               {
                 "variable": "bpaExternalDevelopmentCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[10].amount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BPA_EXTERNAL_DEVELOPMENT_CHARGES')].adjustedAmount"
                 }
               },
               {
                 "variable": "bpaCluCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[11].amount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BPA_CLU_CHARGES')].adjustedAmount"
                 }
               },
               {
                 "variable": "bpaWaterCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[12].amount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BPA_WATER_CHARGES')].adjustedAmount"
                 }
               },
               {
                 "variable": "bpaProcessingFees",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[13].amount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BPA_PROCESSING_FEES')].adjustedAmount"
                 }
               },
               {
                 "variable": "bpaUrbanDevelopmentCess",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[14].amount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BPA_URBAN_DEVELOPMENT_CESS')].adjustedAmount"
                 }
               },
 
@@ -642,6 +648,74 @@
               {
                 "variable": "excessAmountPaid",
                 "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
+              },
+              {
+                "variable": "bpaLabourCess",
+                "formula": "{{bpaLabourCess}}>0?{{bpaLabourCess}}:0"
+              },
+              {
+                "variable": "bpaGaushalaChargesCess",
+                "formula": "{{bpaGaushalaChargesCess}}>0?{{bpaGaushalaChargesCess}}:0"
+              },
+
+              {
+                "variable": "bpaMiningCharges",
+                "formula": "{{bpaMiningCharges}}>0?{{bpaMiningCharges}}:0"
+              },
+
+              {
+                "variable": "bpaSubDivisionCharges",
+                "formula": "{{bpaSubDivisionCharges}}>0?{{bpaSubDivisionCharges}}:0"
+              },
+
+              {
+                "variable": "bpaDevelopmentCharges",
+                "formula": "{{bpaDevelopmentCharges}}>0?{{bpaDevelopmentCharges}}:0"
+              },
+              {
+                "variable": "bpaOtherCharges",
+                "formula": "{{bpaOtherCharges}}>0?{{bpaOtherCharges}}:0"
+              },
+              {
+                "variable": "bpaClubbingCharges",
+                "formula": "{{bpaClubbingCharges}}>0?{{bpaClubbingCharges}}:0"
+              },
+              {
+                "variable": "bpaMalbaCharges",
+                "formula": "{{bpaMalbaCharges}}>0?{{bpaMalbaCharges}}:0"
+              },
+              {
+                "variable": "bpaPurchasableFarCharges",
+                "formula": "{{bpaPurchasableFarCharges}}>0?{{bpaPurchasableFarCharges}}:0"
+              },
+              {
+                "variable": "bpaLessAdjustmentPlot",
+                "formula": "{{bpaLessAdjustmentPlot}}>0?{{bpaLessAdjustmentPlot}}:0"
+              },
+              {
+                "variable": "bpaRainWaterHarvestingCharges",
+                "formula": "{{bpaRainWaterHarvestingCharges}}>0?{{bpaRainWaterHarvestingCharges}}:0"
+              },
+
+              {
+                "variable": "bpaExternalDevelopmentCharges",
+                "formula": "{{bpaExternalDevelopmentCharges}}>0?{{bpaExternalDevelopmentCharges}}:0"
+              },
+              {
+                "variable": "bpaCluCharges",
+                "formula": "{{bpaCluCharges}}>0?{{bpaCluCharges}}:0"
+              },
+              {
+                "variable": "bpaWaterCharges",
+                "formula": "{{bpaWaterCharges}}>0?{{bpaWaterCharges}}:0"
+              },
+              {
+                "variable": "bpaProcessingFees",
+                "formula": "{{bpaProcessingFees}}>0?{{bpaProcessingFees}}:0"
+              },
+              {
+                "variable": "bpaUrbanDevelopmentCess",
+                "formula": "{{bpaUrbanDevelopmentCess}}>0?{{bpaUrbanDevelopmentCess}}:0"
               }
             ]
           },
