@@ -1,11 +1,11 @@
 {
-  "key": "chbservice-receipt",
-  "documentType": "CHBSERVICE_RECEIPT",
+  "key": "challan-notice",
+  "documentType": "CHALLAN_NOTICE",
   "DataConfigs": {
     "moduleName": "rainmaker-common",
     "version": "1.0.0",
-    "baseKeyPath": "$.Payments.*",
-    "entityIdPath": "$.id",
+    "baseKeyPath": "$.challan",
+    "entityIdPath": "$.challans[0].id",
     "isCommonTableBorderRequired": true,
     "mappings": [
       {
@@ -16,7 +16,44 @@
               {
                 "variable": "payerName",
                 "value": {
-                  "path": "$.payerName"
+                  "path": "$.challans[0].citizen.name"
+                }
+              },
+              {
+                "variable": "feeWaiver",
+                "value": {
+                  "path": "$.challans[0].feeWaiver"
+                }
+              },
+              {
+                "variable": "payerFatherName",
+                "value": {
+                  "path": "$.challans[0].citizen.fatherOrHusbandName"
+                }
+              },
+              {
+                "variable": "payerAddress",
+                "value": {
+                  "path": "$.challans[0].address.addressLine1"
+                }
+              },
+              {
+                "variable": "ownerEmail",
+                "value": {
+                  "path": "$.userInfo.emailId"
+                },
+                "type": "selectFromRequestInfo"
+              },
+              {
+                "variable": "violationTime",
+                "value": {
+                  "path": "$.challans[0].documents.auditDetails.lastModifiedTime"
+                }
+              },
+              {
+                "variable": "epoch",
+                "value": {
+                  "path": "$.challans[0].auditDetails.lastModifiedTime"
                 }
               },
               {
@@ -35,7 +72,7 @@
               {
                 "variable": "payerContact",
                 "value": {
-                  "path": "$.mobileNumber"
+                  "path": "$.challans[0].citizen.mobileNumber"
                 }
               },
               {
@@ -73,129 +110,6 @@
                   "path": "$.totalAmountPaid"
                 }
               },
-              {
-                "variable": "chb_sgst",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_SGST"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbSgst",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SGST')].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "chb_cow_cess",
-                "value": {
-                  "path": "MODULE_CSS_COW_CESS"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chb_service_charge",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_SERVICE_CHARGE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbServiceCharge",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_SERVICE_CHARGE')].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "chbCowCessCharge",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_COW_CESS')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "chb_discount",
-                "value": {
-                  "path": "CHB_DISCOUNT_AMOUNT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbDiscount",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_DISCOUNT')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "chb_booking_fees",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_BOOKING_FEES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbBookingFees",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BOOKING_FEES')].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "chb_cgst",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_CGST"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chb_service",
-                "value": {
-                  "path": "ACTION_TEST_CHB"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbCgst",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CGST')].adjustedAmount"
-                }
-              },
 
               {
                 "variable": "tenantid",
@@ -218,25 +132,6 @@
                 "variable": "paidAmount",
                 "value": {
                   "path": "$.paymentDetails[0].totalAmountPaid"
-                }
-              },
-
-              {
-                "variable": "hallName",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].communityHallName"
-                }
-              },
-              {
-                "variable": "applicantName",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].applicantDetail.applicantName"
-                }
-              },
-              {
-                "variable": "applicantMobileNo",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].applicantDetail.applicantMobileNo"
                 }
               },
               {
@@ -271,6 +166,12 @@
                 }
               },
               {
+                "variable": "location",
+                "value": {
+                  "path": "$.location"
+                }
+              },
+              {
                 "variable": "G8ReceiptDate",
                 "value": {
                   "path": "$.paymentDetails[0].manualReceiptDate"
@@ -280,14 +181,112 @@
               {
                 "variable": "paymentDate",
                 "value": {
-                  "path": "$.transactionDate"
+                  "path": "$.challans[0].taxPeriodFrom"
                 },
                 "type": "date"
               },
               {
+                "variable": "dueDate",
+                "value": {
+                  "path": "$.challans[0].taxPeriodTo"
+                },
+                "type": "date"
+              },
+              {
+                "variable": "officerName",
+                "value": {
+                  "path": "$.officer.name"
+                }
+              },
+              {
+                "variable": "officerCode",
+                "value": {
+                  "path": "$.officer.code"
+                }
+              },
+              {
+                "variable": "officerID",
+                "value": {
+                  "path": "$.officer.id"
+                }
+              },
+              {
+                "variable": "officerdept",
+                "value": {
+                  "path": "$.officer.department"
+                },
+                "localisation": {
+                  "required": true,
+                  "prefix": "COMMON_MASTERS_DEPARTMENT",
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "violationDate",
+                "value": {
+                  "path": "$.challans[0].auditDetails.lastModifiedTime"
+                },
+                "type": "date"
+              },
+              {
+                "variable": "offenceTypeName",
+                "value": {
+                  "path": "$.challans[0].offenceTypeName"
+                }
+              },
+              {
+                "variable": "offenceDescription",
+                "value": {
+                  "path": "$.challans[0].description"
+                }
+              },
+              {
+                "variable": "offenceCategoryName",
+                "value": {
+                  "path": "$.challans[0].offenceCategoryName"
+                }
+              },
+              {
+                "variable": "longitude",
+                "value": {
+                  "path": "$.challans[0].additionalDetail.longitude"
+                }
+              },{
+                "variable": "latitude",
+                "value": {
+                  "path": "$.challans[0].additionalDetail.latitude"
+                }
+              },
+              {
+                "variable": "offenceSubCategoryName",
+                "value": {
+                  "path": "$.challans[0].offenceSubCategoryName"
+                }
+              },
+              {
+                "variable": "challanAmount",
+                "value": {
+                  "path": "$.challans[0].challanAmount"
+                }
+              },
+
+              {
+                "variable": "totalAmountCollected",
+                "value": {
+                  "path": "$.totalAmountCollected"
+                }
+              },
+              {
+                "variable": "challanFine",
+                "value": {
+                  "path": "$.challans[0].additionalDetail.calculation.taxHeadEstimates[?(@.taxHeadCode == 'CH.CHALLAN_FINE')].estimateAmount"
+                }
+              },
+
+              {
                 "variable": "consumerID",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.consumerCode"
+                  "path": "$.challans[0].challanNo"
                 }
               },
               {
@@ -305,7 +304,44 @@
               {
                 "variable": "payment_receipt",
                 "value": {
-                  "path": "PAYMENT_HEADER_CITIZEN"
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAYMENT_RECEIPT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+
+              {
+                "variable": "challan_term_1",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_TERM_1"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "challan_term_2",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_TERM_2"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "challan_term_3",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_TERM_3"
                 },
                 "type": "label",
                 "localisation": {
@@ -531,6 +567,42 @@
                 }
               },
               {
+                "variable": "challan_notice_1",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_NOTICE_1"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "challan_notice_2",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_NOTICE_2"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "challan_notice_3",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_NOTICE_3"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
                 "variable": "disclamer",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER"
@@ -647,16 +719,33 @@
                 "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"
               },
               {
-                "variable": "chbServiceCharge",
-                "formula": "{{chbServiceCharge}}>0?{{chbServiceCharge}}:0"
+                "variable": "newLatitude",
+                "formula": "{{latitude}}!==0?{{latitude}}:0"
+              },
+              {
+                "variable": "newLongitude",
+                "formula": "{{longitude}}!==0?{{longitude}}:0"
+              },
+              {
+                "variable": "TotalChallanAmount",
+                "formula": "{{challanFine}}>{{challanAmount}}?{{challanFine}}-{{feeWaiver}}:{{challanAmount}}-{{feeWaiver}}"
               },
               {
                 "variable": "excessAmountPaid",
                 "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
               },
               {
-                "variable": "chbDiscountPositive",
-                "formula": "{{chbDiscount}} < 0 ? -{{chbDiscount}} : {{chbDiscount}}"
+                "variable": "epochIST",
+                "type": "date",
+                "formula": "{{epoch}}",
+                "timezone": "Asia/Kolkata",
+                "format": "HH:mm"
+              },
+              {
+                "variable": "violationTimeIST",
+                "type": "date",
+                "formula": "({{violationTime}} + 19800) * 1000",
+                "format": "HH:mm"
               }
             ]
           },
@@ -664,7 +753,7 @@
             "externalAPI": [
               {
                 "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
-                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}')%5D",
+                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.challans[0].tenantId}')%5D",
                 "apiRequest": null,
                 "responseMapping": [
                   {

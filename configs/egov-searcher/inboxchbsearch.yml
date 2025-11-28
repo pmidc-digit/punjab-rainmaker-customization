@@ -3,17 +3,19 @@ SearchDefinitions:
   summary: Community Hall Booking Services Inbox API
   version: 1.0.0
   definitions:
+
+    # ============================================================
+    # 1. inboxchbsearch (ASC)
+    # ============================================================
     - name: inboxchbsearch
       query:
         baseQuery: |
-          Select row_to_json(result) from (
-            select DISTINCT(booking.booking_no), 
-                   pi.createdtime, 
-                   pi.status as status_id, 
-                   ws.state as status_name, 
-                   ws.applicationStatus,
+          SELECT row_to_json(result) FROM (
+            SELECT DISTINCT(booking.booking_no),
+                   pi.status AS status_id,
                    booking.booking_id,
                    booking.tenant_id,
+                   booking.createdtime,
                    booking.booking_status,
                    booking.application_date,
                    booking.payment_date,
@@ -21,157 +23,162 @@ SearchDefinitions:
                    booking.special_category,
                    booking.purpose,
                    booking.purpose_description,
-                   applicant.applicant_name,
-                   applicant.applicant_mobile_no,
-                   applicant.applicant_email_id,
-                   owner.ownertype,
-                   owner.isprimaryowner
-            from eg_chb_booking_detail as booking
-            INNER JOIN eg_chb_applicant_detail applicant ON applicant.booking_id = booking.booking_id
-            LEFT JOIN eg_chb_owner owner ON owner.booking_id = booking.booking_id AND owner.isprimaryowner = true
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = booking.booking_no
-            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
-            LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
-            $where 
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = booking.booking_no 
-              GROUP BY wf.businessid
-            )
-            order by pi.createdtime asc
+                   assg.assignee AS wf_assignee
+            FROM eg_chb_booking_detail booking
+            INNER JOIN eg_wf_processinstance_v2 pi 
+                ON pi.businessid = booking.booking_no 
+            INNER JOIN eg_chb_owner ownerinfo ON ownerinfo.booking_id = booking.booking_id
+            LEFT JOIN eg_wf_assignee_v2 assg 
+              ON pi.id = assg.processinstanceid
+            $where
+            AND pi.latest = TRUE
+            ORDER BY booking.createdtime ASC
             $pagination
           ) result
         groupBy:
         orderBy:
+
       searchParams:
         condition: AND
         params:
           - name: booking.tenant_id
             isMandatory: true
             jsonPath: $.searchCriteria.tenantId
+
           - name: booking.booking_id
             isMandatory: false
             jsonPath: $.searchCriteria.id
+
           - name: pi.status
             isMandatory: false
             jsonPath: $.searchCriteria.status
             operator: IN
+
           - name: booking.booking_no
             isMandatory: false
             jsonPath: $.searchCriteria.applicationNumber
+
           - name: pi.businessservice
             isMandatory: false
             jsonPath: $.searchCriteria.businessservice
+
           - name: assg.assignee
             isMandatory: false
             jsonPath: $.searchCriteria.assignee
+
           - name: booking.booking_status
             isMandatory: false
             jsonPath: $.searchCriteria.bookingStatus
-          - name: applicant.applicant_mobile_no
-            isMandatory: false
-            jsonPath: $.searchCriteria.mobileNumber
+
           - name: booking.community_hall_code
             isMandatory: false
             jsonPath: $.searchCriteria.communityHallCode
+
           - name: booking.special_category
             isMandatory: false
             jsonPath: $.searchCriteria.specialCategory
+
           - name: booking.purpose
             isMandatory: false
             jsonPath: $.searchCriteria.purpose
-          - name: owner.ownertype
+
+          - name: ownerinfo.uuid
             isMandatory: false
-            jsonPath: $.searchCriteria.ownerType
+            jsonPath: $.searchCriteria.userid
+
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
+
       output:
-        jsonFormat: {"ResponseInfo": {},"bookingApplication": []}
+        jsonFormat: {"ResponseInfo": {}, "bookingApplication": []}
         outJsonPath: $.bookingApplication
         responseInfoPath: $.ResponseInfo
 
+    # ============================================================
+    # 2. inboxchbsearchcount (NO pagination)
+    # ============================================================
     - name: inboxchbsearchcount
       query:
         baseQuery: |
-          Select row_to_json(result) from (
-            select COUNT(DISTINCT(booking.booking_no)) as totalCount
-            from eg_chb_booking_detail as booking
-            INNER JOIN eg_chb_applicant_detail applicant ON applicant.booking_id = booking.booking_id
-            LEFT JOIN eg_chb_owner owner ON owner.booking_id = booking.booking_id AND owner.isprimaryowner = true
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = booking.booking_no
-            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
-            LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+          SELECT row_to_json(result) FROM (
+            SELECT COUNT(DISTINCT booking.booking_no) AS totalCount
+            FROM eg_chb_booking_detail booking
+            INNER JOIN eg_wf_processinstance_v2 pi 
+                ON pi.businessid = booking.booking_no 
+                AND pi.latest = TRUE
+            LEFT JOIN eg_wf_assignee_v2 assg 
+              ON pi.id = assg.processinstanceid
+
             $where
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = booking.booking_no 
-              GROUP BY wf.businessid
-            )
-            $pagination
           ) result
         groupBy:
         orderBy:
+
       searchParams:
         condition: AND
         params:
           - name: booking.tenant_id
             isMandatory: true
             jsonPath: $.searchCriteria.tenantId
+
           - name: booking.booking_id
             isMandatory: false
             jsonPath: $.searchCriteria.id
+
           - name: pi.status
             isMandatory: false
             jsonPath: $.searchCriteria.status
             operator: IN
+
           - name: booking.booking_no
             isMandatory: false
             jsonPath: $.searchCriteria.applicationNumber
+
           - name: pi.businessservice
             isMandatory: false
             jsonPath: $.searchCriteria.businessservice
+
           - name: assg.assignee
             isMandatory: false
             jsonPath: $.searchCriteria.assignee
+
           - name: booking.booking_status
             isMandatory: false
             jsonPath: $.searchCriteria.bookingStatus
-          - name: applicant.applicant_mobile_no
-            isMandatory: false
-            jsonPath: $.searchCriteria.mobileNumber
+
           - name: booking.community_hall_code
             isMandatory: false
             jsonPath: $.searchCriteria.communityHallCode
+
           - name: booking.special_category
             isMandatory: false
             jsonPath: $.searchCriteria.specialCategory
+
           - name: booking.purpose
             isMandatory: false
             jsonPath: $.searchCriteria.purpose
-          - name: owner.ownertype
-            isMandatory: false
-            jsonPath: $.searchCriteria.ownerType
+
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
+
       output:
-        jsonFormat: {"ResponseInfo": {},"totalCount": []}
+        jsonFormat: {"ResponseInfo": {}, "totalCount": []}
         outJsonPath: $.totalCount
         responseInfoPath: $.ResponseInfo
 
+    # ============================================================
+    # 3. inboxchbsearchdesc (DESC)
+    # ============================================================
     - name: inboxchbsearchdesc
       query:
         baseQuery: |
-          Select row_to_json(result) from (
-            select DISTINCT(booking.booking_no), 
-                   pi.createdtime, 
-                   pi.status as status_id,
-                   ws.state as status_name,
-                   ws.applicationStatus,
+          SELECT row_to_json(result) FROM (
+            SELECT DISTINCT(booking.booking_no),
+                   pi.status AS status_id,
                    booking.booking_id,
+                   booking.createdtime,
                    booking.tenant_id,
                    booking.booking_status,
                    booking.application_date,
@@ -180,73 +187,75 @@ SearchDefinitions:
                    booking.special_category,
                    booking.purpose,
                    booking.purpose_description,
-                   applicant.applicant_name,
-                   applicant.applicant_mobile_no,
-                   applicant.applicant_email_id,
-                   owner.ownertype,
-                   owner.isprimaryowner
-            from eg_chb_booking_detail as booking
-            INNER JOIN eg_chb_applicant_detail applicant ON applicant.booking_id = booking.booking_id
-            LEFT JOIN eg_chb_owner owner ON owner.booking_id = booking.booking_id AND owner.isprimaryowner = true
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = booking.booking_no
-            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
-            LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+                   assg.assignee AS wf_assignee
+            FROM eg_chb_booking_detail booking
+            INNER JOIN eg_wf_processinstance_v2 pi 
+                ON pi.businessid = booking.booking_no 
+            INNER JOIN eg_chb_owner ownerinfo ON ownerinfo.booking_id = booking.booking_id
+            LEFT JOIN eg_wf_assignee_v2 assg 
+              ON pi.id = assg.processinstanceid
+
             $where
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = booking.booking_no 
-              GROUP BY wf.businessid
-            )
-            order by pi.createdtime desc
+            AND pi.latest = TRUE
+            ORDER BY booking.createdtime DESC
             $pagination
           ) result
         groupBy:
         orderBy:
+
       searchParams:
         condition: AND
         params:
           - name: booking.tenant_id
             isMandatory: true
             jsonPath: $.searchCriteria.tenantId
+
           - name: booking.booking_id
             isMandatory: false
             jsonPath: $.searchCriteria.id
+
           - name: pi.status
             isMandatory: false
             jsonPath: $.searchCriteria.status
             operator: IN
+
           - name: booking.booking_no
             isMandatory: false
             jsonPath: $.searchCriteria.applicationNumber
+
           - name: pi.businessservice
             isMandatory: false
             jsonPath: $.searchCriteria.businessservice
+
           - name: assg.assignee
             isMandatory: false
             jsonPath: $.searchCriteria.assignee
+
           - name: booking.booking_status
             isMandatory: false
             jsonPath: $.searchCriteria.bookingStatus
-          - name: applicant.applicant_mobile_no
-            isMandatory: false
-            jsonPath: $.searchCriteria.mobileNumber
+
           - name: booking.community_hall_code
             isMandatory: false
             jsonPath: $.searchCriteria.communityHallCode
+
           - name: booking.special_category
             isMandatory: false
             jsonPath: $.searchCriteria.specialCategory
+
           - name: booking.purpose
             isMandatory: false
             jsonPath: $.searchCriteria.purpose
-          - name: owner.ownertype
+
+          - name: ownerinfo.uuid
             isMandatory: false
-            jsonPath: $.searchCriteria.ownerType
+            jsonPath: $.searchCriteria.userid
+
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
+
       output:
-        jsonFormat: {"ResponseInfo": {},"bookingApplication": []}
+        jsonFormat: {"ResponseInfo": {}, "bookingApplication": []}
         outJsonPath: $.bookingApplication
         responseInfoPath: $.ResponseInfo

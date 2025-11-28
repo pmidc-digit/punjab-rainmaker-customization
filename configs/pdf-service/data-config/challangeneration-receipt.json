@@ -20,6 +20,12 @@
                 }
               },
               {
+                "variable": "feeWaiver",
+                "value": {
+                  "path": "$.challan.challans[0].feeWaiver"
+                }
+              },
+              {
                 "variable": "designation",
                 "value": {
                   "path": "$.additionalDetails.designation"
@@ -89,6 +95,18 @@
                   "required": true,
                   "prefix": "MODULE",
                   "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "challanFee",
+                "value": {
+                  "path": "$.challan.challans[0].additionalDetail.calculation.taxHeadEstimates[?(@.taxHeadCode=='CH.CHALLAN_FINE')].estimateAmount"
+                }
+              },
+              {
+                "variable": "challanAmount",
+                "value": {
+                  "path": "$.challan.challans[0].challanAmount"
                 }
               },
               {
@@ -474,6 +492,12 @@
                 }
               },
               {
+                "variable": "epoch",
+                "value": {
+                  "path": "$.transactionDate"
+                }
+              },
+              {
                 "variable": "disclamer_4",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_4"
@@ -495,6 +519,30 @@
                   "required": true,
                   "prefix": null,
                   "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "offenceTypeName",
+                "value": {
+                  "path": "$.challan.challans[0].offenceTypeName"
+                }
+              },
+              {
+                "variable": "offenceDescription",
+                "value": {
+                  "path": "$.challan.challans[0].description"
+                }
+              },
+              {
+                "variable": "offenceCategoryName",
+                "value": {
+                  "path": "$.challan.challans[0].offenceCategoryName"
+                }
+              },
+              {
+                "variable": "offenceSubCategoryName",
+                "value": {
+                  "path": "$.challan.challans[0].offenceSubCategoryName"
                 }
               },
               {
@@ -538,8 +586,15 @@
           {
             "derived": [
               {
-                "variable": "pendingAmount",
-                "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"
+                "variable": "epochIST",
+                "type": "date",
+                "formula": "{{epoch}}",
+                "timezone": "Asia/Kolkata",
+                "format": "HH:mm"
+              },
+              {
+                "variable": "TotalChallanAmount",
+                "formula": "{{challanFee}}>{{challanAmount}}?{{challanFee}}-{{feeWaiver}}:{{challanAmount}}-{{feeWaiver}}"
               },
               {
                 "variable": "excessAmountPaid",
@@ -565,6 +620,10 @@
                   {
                     "variable": "website",
                     "value": "$.MdmsRes.tenant.tenants[0].domainUrl"
+                  },
+                  {
+                    "variable": "ulbType",
+                    "value": "$.MdmsRes.tenant.tenants[0].city.ulbType"
                   },
                   {
                     "variable": "email",

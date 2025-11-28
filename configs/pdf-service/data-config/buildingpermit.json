@@ -6,15 +6,21 @@
     "baseKeyPath": "$.Bpa.*",
     "entityIdPath": "$.applicationNo",
     "isCommonTableBorderRequired": true,
-    "mappings": [ 
+    "mappings": [
       {
         "mappings": [
           {
-            "direct": [              
+            "direct": [
               {
                 "variable": "applicationNo",
                 "value": {
                   "path": "$.applicationNo"
+                }
+              },
+              {
+                "variable": "fileNo",
+                "value": {
+                  "path": "$.fileno"
                 }
               },
               {
@@ -57,13 +63,19 @@
               {
                 "variable": "locality",
                 "value": {
-                  "path": "$.landInfo.address.locality.name"
+                  "path": "$.additionalDetails.registrationDetails"
                 }
               },
               {
                 "variable": "doorNo",
                 "value": {
                   "path": "$.landInfo.address.doorNo"
+                }
+              },
+              {
+                "variable": "pincode",
+                "value": {
+                  "path": "$.landInfo.address.pincode"
                 }
               },
               {
@@ -100,6 +112,12 @@
                 "type": "date"
               },
               {
+                "variable": "epoch",
+                "value": {
+                  "path": "$.additionalDetails.runDate"
+                }
+              },
+              {
                 "variable": "formattedSubmissionDate",
                 "value": {
                   "path": "$.additionalDetails.formattedSubmissionDate"
@@ -115,7 +133,7 @@
                   "scema": [
                     {
                       "key": "pendingapproval",
-                      "type" : "array-orderedlist",
+                      "type": "array-orderedlist",
                       "value": "pendingapproval"
                     }
                   ]
@@ -143,39 +161,42 @@
                 "variable": "stakeholderName",
                 "value": {
                   "path": "$.additionalDetails.stakeholderName"
-                  
                 }
               },
               {
                 "variable": "ulbName",
                 "value": {
                   "path": "$.additionalDetails.UlbName"
-                  
                 }
               },
               {
                 "variable": "ulbType",
                 "value": {
-                  "path": "$.additionalDetails.Ulblisttype" 
+                  "path": "$.additionalDetails.Ulblisttype"
+                }
+              },
+              {
+                "variable": "subjectLine",
+                "value": {
+                  "path": "$.subjectLine"
                 }
               },
               {
                 "variable": "ownersWithAddress",
                 "value": {
-                  "path": "$.landInfo.owners[0].name"  
+                  "path": "$.landInfo.owners[0].name"
                 }
               },
               {
                 "variable": "ownersWithName",
                 "value": {
-                  "path": "$.landInfo.owners[0].permanentAddress"  
+                  "path": "$.landInfo.owners[0].permanentAddress"
                 }
               },
               {
                 "variable": "nocNumber",
                 "value": {
                   "path": "$.additionalDetails.nocNumber"
-                  
                 }
               },
               {
@@ -187,10 +208,10 @@
               {
                 "variable": "stakeholderRegistrationNumber",
                 "value": {
-                  "path": "$.additionalDetails.stakeholderRegistrationNumber"
+                  "path": "$.additionalDetails.architectid"
                 }
               },
-              
+
               {
                 "variable": "proposedLandUse",
                 "value": {
@@ -209,7 +230,7 @@
                   "module": "rainmaker-bpa"
                 }
               },
-              
+
               {
                 "variable": "REGISTRATION_NUMBER",
                 "value": {
@@ -425,16 +446,17 @@
                   "module": "rainmaker-bpa"
                 }
               },
-             {
+
+              {
                 "variable": "SUBJECT_CONTENT",
                 "value": {
-                  "path": "$.additionalDetails.Ulblisttype"
+                  "path": "BPA_PDF_SUBJECT_CONTENT"
                 },
                 "type": "label",
                 "localisation": {
                   "required": true,
-                  "prefix": "BPA_PDF_SUBJECT_CONTENT_",
-                  "module": "rainmaker-bpa"
+                  "prefix": null,
+                  "module": "rainmaker-common"
                 }
               },
 
@@ -486,14 +508,13 @@
                   "module": "rainmaker-bpa"
                 }
               },
-               {
+              {
                 "variable": "RESIDENTIAL_PLOTTED",
                 "value": {
                   "path": "$.additionalDetails.usage"
-                  
                 }
               },
-             
+
               {
                 "variable": "BUILDING_HAVING",
                 "value": {
@@ -511,8 +532,6 @@
                 "value": {
                   "path": "$.edcrDetail.planDetail.planInformation[0].plotArea"
                 }
-               
-              
               },
               {
                 "variable": "SELF_CERTIFIED_UNDER",
@@ -880,11 +899,6 @@
                   "path": "$.approvalDate"
                 },
                 "type": "date"
-                
-                  
-                  
-               
-                
               },
               {
                 "variable": "Muncipal_Council",
@@ -1035,14 +1049,12 @@
                 "value": {
                   "path": "BPA_PDF_KHATANO_TXT"
                 }
-               
               },
               {
                 "variable": "KHATA_NO",
                 "value": {
                   "path": "BPA_PDF_KHATANO_TXT"
                 }
-               
               },
               {
                 "variable": "HOLDING_NO",
@@ -1310,15 +1322,22 @@
                 }
               },
               {
-                "variable": "khataNo",
+                "variable": "wardNo",
                 "value": {
                   "path": "$.additionalDetails.wardnumber"
                 }
               },
+
               {
-                "variable": "wardNo",
+                "variable": "khasraNumber",
                 "value": {
-                  "path": "$.edcrDetail[0].planDetail.planInfoProperties.KHATA_NO"
+                  "path": "$.additionalDetails.khasraNumber"
+                }
+              },
+              {
+                "variable": "khataNo",
+                "value": {
+                  "path": "$.edcrDetail[0].planDetail.planInfoProperties['KHATA _NO']"
                 }
               },
               {
@@ -1326,7 +1345,7 @@
                 "value": {
                   "path": "$.additionalDetails.runDate"
                 },
-                "type":"date"
+                "type": "date"
               },
               {
                 "variable": "REPORT_RUNDATE",
@@ -1416,6 +1435,27 @@
                     }
                   }
                 ]
+              },
+              {
+                "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
+                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}')%5D",
+                "apiRequest": null,
+                "responseMapping": [
+                  {
+                    "variable": "newlogoImage",
+                    "value": "$.MdmsRes.tenant.tenants[0].logoId",
+                    "type": "image"
+                  },
+                  {
+                    "variable": "logo-header",
+                    "value": "$.MdmsRes.tenant.tenants[0].code",
+                    "localisation": {
+                      "required": true,
+                      "prefix": "TENANT_TENANTS",
+                      "module": "rainmaker-common"
+                    }
+                  }
+                ]
               }
             ]
           },
@@ -1424,6 +1464,13 @@
               {
                 "variable": "totalDue",
                 "formula": "{{sanFee}}+{{appFee}}"
+              },
+              {
+                "variable": "epochIST",
+                "type": "date",
+                "formula": "{{epoch}}",
+                "timezone": "Asia/Kolkata",
+                "format": "HH:mm"
               }
             ]
           },

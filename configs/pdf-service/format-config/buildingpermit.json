@@ -9,9 +9,10 @@
       {
         "columns": [
           {
-            "image": "{{logoImage}}",
-            "width": 50,
-            "height": 61.25
+            "image": "{{newlogoImage}}",
+            "width": 60,
+            "height": 60,
+            "margin":[0,-8,0,0]
           },
           {
             "stack": [
@@ -63,8 +64,9 @@
                 "bold": true
               },
               {
-                "text": " {{applicationNo}}",
-                "bold": false 
+                "text": " {{fileNo}}",
+                "bold": false,
+                "font":"Roboto" 
               }
             ] 
           },
@@ -138,11 +140,12 @@
             "width":"auto"
           },
           {
-            "text": "{{SUBJECT_CONTENT}}",
+            "text": "{{subjectLine}} {{ulbType}} and as per the provisions of clause 3.14.1 (b) of PMBBL",
             "decoration":"underline",
             "width":"auto",
             "bold": true,
-            "margin":[5,0,0,0]
+            "margin":[5,0,0,0],
+            "font":"Roboto"
           }
         ],
         "margin":[0,5,0,0],
@@ -174,7 +177,7 @@
                   "text":"This is with reference to your application dated " 
                 },
                 {
-                  "text": "{{submissionDate}} ",
+                  "text": "{{submissionDate}} at time {{epochIST}} ",
                   "bold":true
                 },
                 {
@@ -193,7 +196,7 @@
                   
                 },
                 {
-                  "text":" {{plotArea}}, ",
+                  "text":" {{plotArea}} sq.meters, ",
                   "bold":true
                 },
                 {
@@ -202,14 +205,15 @@
                 },
                 {
                   "text":" {{plotNo}}, ",
+                  "bold":true,
+                  "font": "Roboto"
+                },
+                {
+                  "text":" Khasra No :",
                   "bold":true
                 },
                 {
-                  "text":" Khata No :",
-                  "bold":true
-                },
-                {
-                  "text":" {{khataNo}}, ",
+                  "text":" {{khasraNumber}}, ",
                   "bold":true
                 },
                  {
@@ -224,8 +228,9 @@
                   "text":" situated in/at"
                 },
                 {
-                  "text":" {{doorNo}}, {{street}}, {{city}}, {{locality}}.",
-                  "bold":true
+                  "text":" {{locality}} , {{pincode}}. ",
+                  "bold":true,
+                  "font" :"Roboto"
                 },
                 {
                   "text":"This Building plan has been self-certified under self-certification on"
@@ -258,7 +263,7 @@
               "text": " The plans are valid up to."
             },
             {
-              "text": "{{VALID_UPTO}}",
+              "text": "{{validityDate}}",
               "bold":true
             }
           
@@ -749,7 +754,7 @@
                 "text":"Furthermore, the"
               },
               {
-                "text":" {{Muncipal_Council}} {{tenantName}} ",
+                "text":" {{ulbType}} {{tenantName}} ",
                 "bold":true
               },
               {
@@ -817,7 +822,7 @@
                       "text":"Date and Time:"
                     },
                     {
-                      "text":" {{formattedSubmissionDate}}"
+                      "text":" {{submissionDate}} , {{epochIST}}"
                     }
                   ] 
                 }
@@ -852,8 +857,8 @@
                     "text":" Registration Number:"
                   },
                   {
-                    "text": " {{stakeholderRegistrationNumber}}"
-                   
+                    "text": " {{stakeholderRegistrationNumber}}",
+                   "font":"Roboto"
                   }
                 ]
                 
@@ -875,7 +880,7 @@
                     "text":"Date"
                   },
                   {
-                    "text":" {{formattedSubmissionDate}}"
+                    "text":" {{submissionDate}}"
                   }
                 ]
               }

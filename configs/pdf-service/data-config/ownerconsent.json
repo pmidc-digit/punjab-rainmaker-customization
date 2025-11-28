@@ -153,7 +153,20 @@
                     "path": "$.applicationData.TimeStamp"
                   }
                 },
-                
+
+                {
+                  "variable": "otpverifieddate",
+                  "value": {
+                    "path": "$.applicationData.auditDetails.lastModifiedTime"
+                  },
+                  "type" : "date"
+                },
+                {
+                "variable": "epoch",
+                "value": {
+                  "path": "$.applicationData.auditDetails.lastModifiedTime"
+                }
+              },
                 {
                   "variable": "architecttype",
                   "value": {
@@ -733,6 +746,13 @@
               {
                 "variable": "totalDue",
                 "formula": "{{sanFee}}+{{appFee}}"
+              },
+              {
+                "variable": "epochIST",
+                "type": "date",
+                "formula": "{{epoch}}",
+                "timezone": "Asia/Kolkata",
+                "format": "HH:mm"
               }
             ]
           },

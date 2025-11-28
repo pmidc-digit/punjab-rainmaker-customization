@@ -1,7 +1,7 @@
 {
-  "key": "bpa-receiptsecond",
+  "key": "clu-receipt",
   "config": {
-    "defaultStyle": { "font": "Roboto", "fontSize": 11 },
+    "defaultStyle": { "font": "Roboto" },
     "content": [
       {
         "style": "noc-head",
@@ -14,31 +14,31 @@
                   {
                     "text": "Department of Local Government, Punjab",
                     "bold": true,
-                    "fontSize": 11
+                    "fontSize": 13
                   },
                   {
                     "text": "{{ulbType}} {{logo-header}}",
                     "bold": true,
-                    "fontSize": 11
+                    "fontSize": 13
                   },
                   {
                     "text": "{{address}}",
                     "bold": true,
-                    "fontSize": 9
+                    "fontSize": 11
                   },
                   {
                     "text": [
                       { "text": "Website: ", "bold": true },
                       { "text": "{{website}}" }
                     ],
-                    "fontSize": 9,
+                    "fontSize": 11,
                     "alignment": "center",
                     "margin": [0, 2, 0, 0]
                   }
                 ],
                 "alignment": "center",
                 "color": "#484848",
-                "margin": [0, -10, 0, 0]
+                "margin": [0, -10, 0, 10]
               }
             ]
           ]
@@ -59,7 +59,6 @@
               {
                 "text": "{{receiptNo}}",
                 "style": "receipt-table",
-                "font": "Roboto",
                 "fontSize": 10
               },
               {
@@ -67,9 +66,8 @@
                 "style": "receipt-table-value"
               },
               {
-                "text": "{{fileNo}}",
+                "text": "{{consumerID}}",
                 "style": "receipt-table",
-                "font": "Roboto",
                 "fontSize": 10
               }
             ],
@@ -114,6 +112,7 @@
           ]
         }
       },
+
       {
         "style": "noc-mock-table",
         "table": {
@@ -127,7 +126,6 @@
               {
                 "text": "{{paymentType}}",
                 "style": "receipt-mock-table",
-                "font": "Roboto",
                 "fontSize": 10
               },
               {
@@ -135,9 +133,8 @@
                 "style": "receipt-mock-table-value"
               },
               {
-                "text": "Building Plan Approval",
+                "text": "{{serviceType}}",
                 "style": "receipt-mock-table",
-                "font": "Roboto",
                 "fontSize": 10
               },
               {
@@ -147,15 +144,14 @@
               {
                 "text": "{{Category}}",
                 "style": "receipt-mock-table",
-                "font": "Roboto",
                 "fontSize": 10
               }
             ]
           ]
         },
-        "margin": [0, 6, 0, 0],
         "layout": {}
       },
+
       {
         "style": "next-noc-table",
         "table": {
@@ -164,13 +160,11 @@
             [
               {
                 "text": "{{service_type}} ",
-                "style": "receipt-table-value",
-                "border": [true, true, true, true]
+                "style": "receipt-table-value"
               },
               {
                 "text": "{{serviceType}}",
-                "style": "receipt-table",
-                "border": [true, true, false, true]
+                "style": "receipt-table"
               },
               {
                 "text": "{{paid_amount}} ",
@@ -189,7 +183,6 @@
               {
                 "text": "{{transactionID}}",
                 "style": "receipt-table",
-                "font": "Roboto",
                 "fontSize": 10,
                 "colSpan": 3
               },
@@ -197,10 +190,9 @@
               {}
             ]
           ]
-        },
-        "layout": {},
-        "margin": [0, 6, 0, 4]
+        }
       },
+
       {
         "style": "noc-mock-table",
         "table": {
@@ -209,8 +201,8 @@
             [
               {
                 "text": "Detail of Payment",
-                "border": [true, true, true, false],
                 "style": "receipt-mock-table-value",
+                "border": [true, true, true, false],
                 "fontSize": 12
               }
             ]
@@ -218,164 +210,68 @@
         },
         "layout": {}
       },
+
       {
         "style": "fee-summary-table",
         "table": {
-          "widths": ["10%", "39%", "51%"],
+          "widths": ["22%", "78%"],
           "body": [
             [
-              { "text": "S. No", "style": "receipt-header", "bold": true },
-              { "text": "Charges", "style": "receipt-header", "bold": true },
+              {
+                "text": "Charges",
+                "style": "receipt-fee-label"
+              },
               {
                 "text": "Amount (In ₹)",
-                "style": "receipt-header",
+                "style": "receipt-fee-label",
                 "alignment": "right",
-                "margin": [0, 0, 4, 0],
-                "bold": true
+                "margin": [0, 0, 4, 0]
               }
             ],
             [
-              { "text": "1", "style": "receipt-fee-label" },
-              { "text": " Labour Cess ", "style": "receipt-fee-label" },
-              { "text": "{{bpaLabourCess}}", "style": "receipt-fee-value" }
-            ],
-            [
-              { "text": "2", "style": "receipt-fee-label" },
               {
-                "text": " Gaushala Charges Cess ",
+                "text": "{{clu_charge}}",
                 "style": "receipt-fee-label"
               },
               {
-                "text": "{{bpaGaushalaChargesCess}}",
+                "text": " {{CluCharge}}",
                 "style": "receipt-fee-value"
               }
             ],
             [
-              { "text": "3", "style": "receipt-fee-label" },
-              { "text": " Mining Charges ", "style": "receipt-fee-label" },
-              { "text": " {{bpaMiningCharges}}", "style": "receipt-fee-value" }
-            ],
-            [
-              { "text": "4", "style": "receipt-fee-label" },
               {
-                "text": " Sub-Division Charges ",
-                "style": "receipt-fee-label"
+                "text": "{{clu_processing_fee}}",
+                "style": "receipt-total-label"
               },
               {
-                "text": " {{bpaSubDivisionCharges}}",
-                "style": "receipt-fee-value"
+                "text": " {{CluProcessingFee}}",
+                "style": "receipt-total-value"
               }
             ],
             [
-              { "text": "5", "style": "receipt-fee-label" },
               {
-                "text": " Development Charges ",
-                "style": "receipt-fee-label"
+                "text": "{{clu_external_development_charges}}",
+                "style": "receipt-total-label"
               },
               {
-                "text": " {{bpaDevelopmentCharges}}",
-                "style": "receipt-fee-value"
+                "text": " {{CluExternalDevelopmentCharges}}",
+                "style": "receipt-total-value"
               }
             ],
             [
-              { "text": "6", "style": "receipt-fee-label" },
-              { "text": " Other Charges ", "style": "receipt-fee-label" },
-              { "text": " {{bpaOtherCharges}}", "style": "receipt-fee-value" }
-            ],
-            [
-              { "text": "7", "style": "receipt-fee-label" },
-              { "text": " Clubbing Charges ", "style": "receipt-fee-label" },
               {
-                "text": " {{bpaClubbingCharges}}",
-                "style": "receipt-fee-value"
-              }
-            ],
-            [
-              { "text": "8", "style": "receipt-fee-label" },
-              { "text": " Malba Charges ", "style": "receipt-fee-label" },
-              { "text": " {{bpaMalbaCharges}}", "style": "receipt-fee-value" }
-            ],
-            [
-              { "text": "9", "style": "receipt-fee-label" },
-              {
-                "text": " Less Adjustment Plot ",
-                "style": "receipt-fee-label"
+                "text": "{{clu_urban_development_cess}}",
+                "style": "receipt-total-label"
               },
               {
-                "text": " {{bpaLessAdjustmentPlot}}",
-                "style": "receipt-fee-value"
+                "text": " {{CluUrbanDevelopmentCess}}",
+                "style": "receipt-total-value"
               }
             ],
-            [
-              { "text": "10", "style": "receipt-fee-label" },
-              {
-                "text": " Rain Water Harvesting Charges ",
-                "style": "receipt-fee-label"
-              },
-              {
-                "text": " {{bpaRainWaterHarvestingCharges}}",
-                "style": "receipt-fee-value"
-              }
-            ],
-            [
-              { "text": "11", "style": "receipt-fee-label" },
-              {
-                "text": " External Development Charges ",
-                "style": "receipt-fee-label"
-              },
-              {
-                "text": " {{bpaExternalDevelopmentCharges}}",
-                "style": "receipt-fee-value"
-              }
-            ],
-            [
-              { "text": "12", "style": "receipt-fee-label" },
-              { "text": " CLU Charges ", "style": "receipt-fee-label" },
-              { "text": " {{bpaCluCharges}}", "style": "receipt-fee-value" }
-            ],
-            [
-              { "text": "13", "style": "receipt-fee-label" },
-              { "text": " Water Charges ", "style": "receipt-fee-label" },
-              { "text": " {{bpaWaterCharges}}", "style": "receipt-fee-value" }
-            ],
-            [
-              { "text": "14", "style": "receipt-fee-label" },
-              { "text": " Processing Fees ", "style": "receipt-fee-label" },
-              {
-                "text": " {{bpaProcessingFees}}",
-                "style": "receipt-fee-value"
-              }
-            ],
-            [
-              { "text": "15", "style": "receipt-fee-label" },
-              {
-                "text": " Urban Development Cess ",
-                "style": "receipt-fee-label"
-              },
-              {
-                "text": " {{bpaUrbanDevelopmentCess}}",
-                "style": "receipt-fee-value"
-              }
-            ],
-            [
-              { "text": "16", "style": "receipt-fee-label" },
-              {
-                "text": " Purchasable FAR Charges ",
-                "style": "receipt-fee-label"
-              },
-              {
-                "text": " {{bpaPurchasableFarCharges}}",
-                "style": "receipt-fee-value"
-              }
-            ],
+
             [
               {
-                "text": " ",
-                "style": "receipt-total-label",
-                "fillColor": "#f2f2f2"
-              },
-              {
-                "text": "{{total_amount}} ",
+                "text": "{{total_amount}}",
                 "style": "receipt-total-label",
                 "fillColor": "#f2f2f2"
               },
@@ -386,11 +282,6 @@
               }
             ],
             [
-              {
-                "text": " ",
-                "style": "receipt-total-label",
-                "fillColor": "#f2f2f2"
-              },
               {
                 "text": " Amount in Words ",
                 "style": "receipt-total-label",
@@ -439,7 +330,6 @@
           }
         ]
       },
-
       {
         "style": "pt-disclaimer",
         "stack": [
@@ -454,38 +344,45 @@
               " This receipt is generated electronically by the Building Plan Approval System of the {{ulbType}} {{logo-header}}.",
               " In case of any discrepancies, kindly contact the concerned municipal office with a copy of this receipt.",
               " The ULB shall not be responsible for delays caused due to banking network or technical issues.",
-              " Retain this receipt for future reference"
+              " Retain this receipt for future reference."
             ],
             "alignment": "justify",
-            "margin": [20, 5, 0, 5]
+            "margin": [20, 0, 0, 10]
           }
         ]
       },
       {
         "style": "no-signature",
         "text": "This is a system-generated receipt and does not require a physical signature.",
-        "margin": [0, 10, 0, 0]
+        "margin": [0, 4, 0, 0]
       }
     ],
 
     "styles": {
-      "noc-head": { "margin": [0, -20, 0, 0] },
+      "noc-head": { "margin": [0, -20, 0, 10] },
+      "noc-table": {
+        "fontSize": 12,
+        "color": "#000000",
+        "margin": [0, 0, 0, 5]
+      },
+
       "noc-mock-table": {
-        "fontSize": 11,
+        "fontSize": 12,
         "color": "#000000",
         "margin": [0, 2, 0, 0]
       },
-      "noc-table": {
-        "fontSize": 11,
-        "color": "#000000",
-        "margin": [0, 0, 0, 0]
-      },
       "next-noc-table": {
-        "fontSize": 11,
+        "fontSize": 12,
         "color": "#000000",
-        "margin": [0, 0, 0, 0]
+        "margin": [0, 15, 0, 10]
       },
       "receipt-table-value": {
+        "color": "#000000",
+        "bold": true,
+        "fontSize": 10,
+        "margin": [2, 4, 0, 4]
+      },
+      "receipt-mock-table-value": {
         "color": "#000000",
         "bold": true,
         "fontSize": 10,
@@ -495,11 +392,11 @@
         "color": "#000000",
         "bold": false,
         "fontSize": 10,
-        "margin": [2, 0, 0, 0]
+        "margin": [2, 4, 0, 4]
       },
-      "receipt-mock-table-value": {
+      "receipt-mock-table": {
         "color": "#000000",
-        "bold": true,
+        "bold": false,
         "fontSize": 10,
         "margin": [2, 0, 0, 0]
       },
@@ -507,31 +404,31 @@
         "fontSize": 10,
         "color": "#000000",
         "bold": true,
-        "margin": [4, 0, 0, 0]
+        "margin": [4, 0, 0, 6]
       },
       "receipt-fee-value": {
         "fontSize": 10,
         "color": "#000000",
         "alignment": "right",
-        "margin": [0, 0, 4, 0]
+        "margin": [0, 6, 4, 6]
       },
       "receipt-total-label": {
         "fontSize": 10,
         "color": "#000000",
         "bold": true,
-        "margin": [4, 0, 4, 0]
+        "margin": [4, 6, 0, 6]
       },
       "receipt-total-value": {
         "fontSize": 10,
         "color": "#000000",
         "bold": true,
         "alignment": "right",
-        "margin": [0, 2, 4, 2]
+        "margin": [0, 6, 4, 6]
       },
       "receipt-approver": {
         "fontSize": 10,
         "bold": true,
-        "margin": [0, 7, 0, 2],
+        "margin": [0, 5, 0, 2],
         "color": "#484848"
       },
       "no-signature": {
@@ -546,13 +443,13 @@
         "color": "#484848"
       },
       "pt-disclaimer-header": {
-        "fontSize": 10,
+        "fontSize": 11,
         "bold": true,
         "margin": [0, 0, 0, 4],
         "color": "#000000"
       },
       "pt-disclaimer-value": {
-        "fontSize": 9,
+        "fontSize": 10,
         "margin": [2, 3, 0, 0],
         "color": "#484848",
         "alignment": "justify"

@@ -1,4 +1,3 @@
-
 SearchDefinitions:
   moduleName: pet-services
   summary: Pet Services Inbox API
@@ -9,21 +8,22 @@ SearchDefinitions:
         baseQuery: |
           Select row_to_json(result) from
           (
-            select DISTINCT(pet.applicationNumber), pi.createdtime, pi.status as status_id, ws.state as status_name, ws.applicationStatus
+            select DISTINCT(pet.applicationNumber), 
+                   pet.createdtime, 
+                   pi.status as status_id,
+                   ptdet.pettype,
+                   ptdet.petname,
+                   ptdet.breedtype,
+                   ptdet.petgender,
+                   ptdet.petcolor,
+                   assg.assignee as wf_assignee
             from eg_ptr_registration as pet
-            INNER JOIN eg_ptr_address ptadd ON ptadd.registrationId = pet.id
             INNER JOIN eg_ptr_petdetails ptdet ON ptdet.petdetailsid = pet.id
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber
-            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber AND pi.latest = TRUE
+            INNER JOIN eg_ptr_owner ownerinfo ON ownerinfo.ptrregistrationid = pet.id
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = pet.applicationNumber 
-              GROUP BY wf.businessid
-            )
-            order by pi.createdtime asc $pagination
+            order by pet.createdtime asc $pagination
           ) result
         groupBy:
         orderBy:
@@ -64,6 +64,9 @@ SearchDefinitions:
           - name: assg.assignee
             isMandatory: false
             jsonPath: $.searchCriteria.assignee
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -79,18 +82,10 @@ SearchDefinitions:
           (
             select COUNT(DISTINCT(pet.applicationNumber)) as totalCount
             from eg_ptr_registration as pet
-            INNER JOIN eg_ptr_address ptadd ON ptadd.registrationId = pet.id
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber
             INNER JOIN eg_ptr_petdetails ptdet ON ptdet.petdetailsid = pet.id
-            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber AND pi.latest = TRUE
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = pet.applicationNumber 
-              GROUP BY wf.businessid
-            )
           ) result
         groupBy:
         orderBy:
@@ -145,19 +140,22 @@ SearchDefinitions:
         baseQuery: |
           Select row_to_json(result) from
           (
-            select DISTINCT(pet.applicationNumber), pi.createdtime, pi.status 
+            select DISTINCT(pet.applicationNumber), 
+                   pet.createdtime, 
+                   pi.status as status_id,
+                   ptdet.pettype,
+                   ptdet.petname,
+                   ptdet.breedtype,
+                   ptdet.petgender,
+                   ptdet.petcolor,
+                   assg.assignee as wf_assignee
             from eg_ptr_registration as pet
-            INNER JOIN eg_ptr_address ptadd ON ptadd.registrationId = pet.id
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber
+            INNER JOIN eg_ptr_petdetails ptdet ON ptdet.petdetailsid = pet.id
+            INNER JOIN eg_ptr_owner ownerinfo ON ownerinfo.ptrregistrationid = pet.id
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = pet.applicationNumber AND pi.latest = TRUE
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = pet.applicationNumber 
-              GROUP BY wf.businessid
-            )
-            order by pi.createdtime desc $pagination
+            order by pet.createdtime DESC $pagination
           ) result
         groupBy:
         orderBy:
@@ -180,6 +178,27 @@ SearchDefinitions:
           - name: pi.businessservice
             isMandatory: false
             jsonPath: $.searchCriteria.businessservice
+          - name: ptdet.pettype
+            isMandatory: false
+            jsonPath: $.searchCriteria.petType
+          - name: ptdet.petname
+            isMandatory: false
+            jsonPath: $.searchCriteria.petName
+          - name: ptdet.breedtype
+            isMandatory: false
+            jsonPath: $.searchCriteria.breedType
+          - name: ptdet.petgender
+            isMandatory: false
+            jsonPath: $.searchCriteria.petGender
+          - name: ptdet.petcolor
+            isMandatory: false
+            jsonPath: $.searchCriteria.petColor
+          - name: assg.assignee
+            isMandatory: false
+            jsonPath: $.searchCriteria.assignee
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset

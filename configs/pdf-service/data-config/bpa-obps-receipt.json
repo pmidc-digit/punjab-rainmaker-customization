@@ -1,6 +1,6 @@
 {
-  "key": "chbservice-receipt",
-  "documentType": "CHBSERVICE_RECEIPT",
+  "key": "bpa-obps-receipt",
+  "documentType": "BPA_OBPS_RECEIPT",
   "DataConfigs": {
     "moduleName": "rainmaker-common",
     "version": "1.0.0",
@@ -19,6 +19,7 @@
                   "path": "$.payerName"
                 }
               },
+
               {
                 "variable": "designation",
                 "value": {
@@ -33,16 +34,37 @@
                 "type": "selectFromRequestInfo"
               },
               {
+                "variable": "generator_mobileno",
+                "value": {
+                  "path": "$.userInfo.mobileNumber"
+                },
+                "type": "selectFromRequestInfo"
+              },
+              {
                 "variable": "payerContact",
                 "value": {
                   "path": "$.mobileNumber"
                 }
               },
               {
-                "variable": "paymentStatus",
+                "variable": "Category",
                 "value": {
-                  "path": "$.paymentStatus"
+                  "path": "$.usage"
+                }
+              },
+
+              {
+                "variable": "Amountinwords",
+                "value": {
+                  "path": "$.amountinwords"
+                }
+              },
+              {
+                "variable": "paymentType",
+                "value": {
+                  "path": "BPA_PAYMENT_TYPE1"
                 },
+                "type": "label",
                 "localisation": {
                   "required": true,
                   "prefix": null,
@@ -74,130 +96,6 @@
                 }
               },
               {
-                "variable": "chb_sgst",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_SGST"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbSgst",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SGST')].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "chb_cow_cess",
-                "value": {
-                  "path": "MODULE_CSS_COW_CESS"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chb_service_charge",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_SERVICE_CHARGE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbServiceCharge",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_SERVICE_CHARGE')].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "chbCowCessCharge",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_COW_CESS')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "chb_discount",
-                "value": {
-                  "path": "CHB_DISCOUNT_AMOUNT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbDiscount",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_DISCOUNT')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "chb_booking_fees",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_BOOKING_FEES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbBookingFees",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BOOKING_FEES')].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "chb_cgst",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_CGST"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chb_service",
-                "value": {
-                  "path": "ACTION_TEST_CHB"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbCgst",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CGST')].adjustedAmount"
-                }
-              },
-
-              {
                 "variable": "tenantid",
                 "value": {
                   "path": "$.tenantId"
@@ -220,23 +118,16 @@
                   "path": "$.paymentDetails[0].totalAmountPaid"
                 }
               },
-
               {
-                "variable": "hallName",
+                "variable": "buildingApplicationFees",
                 "value": {
-                  "path": "$.hallsBookingApplication[0].communityHallName"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[0].amount"
                 }
               },
               {
-                "variable": "applicantName",
+                "variable": "boundaryWallFee",
                 "value": {
-                  "path": "$.hallsBookingApplication[0].applicantDetail.applicantName"
-                }
-              },
-              {
-                "variable": "applicantMobileNo",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].applicantDetail.applicantMobileNo"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[1].amount"
                 }
               },
               {
@@ -252,6 +143,12 @@
                   "path": "$.paymentDetails[0].bill.billDetails[0].toPeriod"
                 },
                 "type": "date"
+              },
+              {
+                "variable": "stakeholderType",
+                "value": {
+                  "path": "$.paymentDetails[0].additionalDetails.stakeholderType"
+                }
               },
               {
                 "variable": "paymentMode",
@@ -647,16 +544,8 @@
                 "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"
               },
               {
-                "variable": "chbServiceCharge",
-                "formula": "{{chbServiceCharge}}>0?{{chbServiceCharge}}:0"
-              },
-              {
                 "variable": "excessAmountPaid",
                 "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
-              },
-              {
-                "variable": "chbDiscountPositive",
-                "formula": "{{chbDiscount}} < 0 ? -{{chbDiscount}} : {{chbDiscount}}"
               }
             ]
           },

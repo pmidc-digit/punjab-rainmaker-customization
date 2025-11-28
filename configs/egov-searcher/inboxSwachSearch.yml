@@ -27,11 +27,7 @@ SearchDefinitions:
         INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = ser.servicerequestid
         LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
         $where
-        AND pi.createdtime = (
-          SELECT MAX(wf.createdtime)
-          FROM eg_wf_processinstance_v2 wf
-          WHERE wf.businessid = ser.servicerequestid
-        )
+        AND latest = true
         ORDER BY ser.createdtime DESC
         $pagination
       ) result
@@ -70,6 +66,9 @@ SearchDefinitions:
     - name: ser.createdtime
       isMandatory: false
       jsonPath: $.searchCriteria.toDate
+    - name: ser.applicationstatus
+      isMandatory: false
+      jsonPath: $.searchCriteria.applicationstatus
     
     pagination:
       noOfRecords: $.searchCriteria.noOfRecords
@@ -89,11 +88,7 @@ SearchDefinitions:
       INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = ser.servicerequestid
       LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
       $where
-      AND pi.createdtime = (
-        SELECT MAX(wf.createdtime)
-        FROM eg_wf_processinstance_v2 wf
-        WHERE wf.businessid = ser.servicerequestid
-      )
+      AND latest = true
       --AND ser.createdtime >= $fromDate
       --AND ser.createdtime <= $toDate
     groupBy:
@@ -154,11 +149,7 @@ SearchDefinitions:
         INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = ser.servicerequestid
         LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
         $where
-        AND pi.createdtime = (
-          SELECT MAX(wf.createdtime)
-          FROM eg_wf_processinstance_v2 wf
-          WHERE wf.businessid = ser.servicerequestid
-        )
+        AND latest = true
         --AND ser.createdtime >= $fromDate  
         --AND ser.createdtime <= $toDate  
         ORDER BY ser.createdtime DESC
@@ -276,6 +267,9 @@ SearchDefinitions:
       - name: ser.createdtime
         isMandatory: false
         jsonPath: $.searchCriteria.toDate
+      - name: ser.applicationstatus
+        isMandatory: false
+        jsonPath: $.searchCriteria.applicationstatus
 
    output:
     jsonFormat: {"ResponseInfo": {},"Services": []}

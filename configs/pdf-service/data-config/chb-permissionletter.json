@@ -20,6 +20,18 @@
                 }
               },
               {
+                "variable": "applicantName",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].applicantDetail.applicantName"
+                }
+              },
+              {
+                "variable": "applicantMobileNo",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].applicantDetail.applicantMobileNo"
+                }
+              },
+              {
                 "variable": "designation",
                 "value": {
                   "path": "$.additionalDetails.designation"
@@ -86,12 +98,12 @@
               {
                 "variable": "purpose",
                 "value": {
-                  "path": "$.hallsBookingApplication[0].purpose.purpose",
-                  "localisation": {
-                    "required": true,
-                    "prefix": null,
-                    "module": "rainmaker-common"
-                  }
+                  "path": "$.hallsBookingApplication[0].purpose.purpose"
+                },
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -167,9 +179,21 @@
               },
 
               {
+                "variable": "chb_cow_cess",
+                "value": {
+                  "path": "MODULE_CSS_COW_CESS"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
                 "variable": "chb_service_charge",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_CHB_SERVICE_CHARGE"
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_SERVICE_CHARGE"
                 },
                 "type": "label",
                 "localisation": {
@@ -182,6 +206,13 @@
                 "variable": "chbServiceCharge",
                 "value": {
                   "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_SERVICE_CHARGE')].adjustedAmount"
+                }
+              },
+
+              {
+                "variable": "chbCowCessCharge",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_COW_CESS')].adjustedAmount"
                 }
               },
               {
@@ -475,6 +506,13 @@
                 },
                 "type": "date"
               },
+              {
+                  "variable": "dateNow",
+                  "value": {
+                    "path": "$.auditDetails.lastModifiedTime"
+                  },
+                  "type" : "date"
+                },
               {
                 "variable": "toPeriod",
                 "value": {
@@ -796,6 +834,18 @@
                 }
               },
               {
+                "variable": "chb_service",
+                "value": {
+                  "path": "ACTION_TEST_CHB"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
                 "variable": "disclamer_3",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_THIRD_LINE"
@@ -880,6 +930,10 @@
                 "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
               },
               {
+                "variable": "chbServiceCharge",
+                "formula": "{{chbServiceCharge}}>0?{{chbServiceCharge}}:0"
+              },
+              {
                 "variable": "chbDiscountPositive",
                 "formula": "{{chbDiscount}} < 0 ? -{{chbDiscount}} : {{chbDiscount}}"
               }
@@ -895,6 +949,10 @@
                   {
                     "variable": "address",
                     "value": "$.MdmsRes.tenant.tenants[0].address"
+                  },
+                  {
+                    "variable": "ulbType",
+                    "value": "$.MdmsRes.tenant.tenants[0].city.ulbType"
                   },
                   {
                     "variable": "phoneNumber",

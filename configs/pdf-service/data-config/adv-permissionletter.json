@@ -88,7 +88,7 @@
               {
                 "variable": "advServiceCharge",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[0].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'ADV_SERVICE_CHARGE')].adjustedAmount"
                 }
               },
               {
@@ -113,7 +113,7 @@
               {
                 "variable": "advBookingFees",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[1].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'ADV_BOOKING_FEES')].adjustedAmount"
                 }
               },
               {
@@ -131,7 +131,7 @@
               {
                 "variable": "advSgst",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[2].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'ADV_SGST')].adjustedAmount"
                 }
               },
               {
@@ -149,7 +149,7 @@
               {
                 "variable": "advCgst",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[3].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'ADV_CGST')].adjustedAmount"
                 }
               },
 
@@ -168,7 +168,7 @@
               {
                 "variable": "advSecurityDeposit",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[4].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'ADV_SECURITY_DEPOSIT')].adjustedAmount"
                 }
               },
 
@@ -275,7 +275,7 @@
               {
                 "variable": "payment_receipt",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAYMENT_RECEIPT"
+                  "path": "PAYMENT_HEADER_CITIZEN"
                 },
                 "type": "label",
                 "localisation": {
@@ -903,6 +903,10 @@
                   {
                     "variable": "address",
                     "value": "$.MdmsRes.tenant.tenants[0].address"
+                  },
+                  {
+                    "variable": "ulbType",
+                    "value": "$.MdmsRes.tenant.tenants[0].city.ulbType"
                   },
                   {
                     "variable": "phoneNumber",

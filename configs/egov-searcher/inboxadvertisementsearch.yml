@@ -8,31 +8,19 @@ SearchDefinitions:
         baseQuery: |
           Select row_to_json(result) from (
             select DISTINCT(booking.booking_no), 
-                   pi.createdtime, 
-                   pi.status as status_id, 
-                   ws.state as status_name, 
-                   ws.applicationStatus,
+                   booking.createdtime, 
+                   pi.status as status_id,
                    booking.booking_id,
                    booking.tenant_id,
                    booking.booking_status,
                    booking.application_date,
-                   booking.payment_date,
-                   applicant.applicant_name,
-                   applicant.applicant_mobile_no,
-                   applicant.applicant_email_id
+                   booking.payment_date
             from eg_adv_booking_detail as booking
-            INNER JOIN eg_adv_applicant_detail applicant ON applicant.booking_id = booking.booking_id
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = booking.booking_no
-            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = booking.booking_no AND pi.latest = TRUE
+            INNER JOIN eg_adv_owner ownerinfo ON ownerinfo.booking_id = booking.booking_id
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where 
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = booking.booking_no 
-              GROUP BY wf.businessid
-            )
-            order by pi.createdtime asc
+            order by booking.createdtime asc
             $pagination
           ) result
         groupBy:
@@ -61,10 +49,14 @@ SearchDefinitions:
             jsonPath: $.searchCriteria.assignee
           - name: booking.booking_status
             isMandatory: false
+            operator: IN
             jsonPath: $.searchCriteria.bookingStatus
           - name: applicant.applicant_mobile_no
             isMandatory: false
             jsonPath: $.searchCriteria.mobileNumber
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -79,17 +71,9 @@ SearchDefinitions:
           Select row_to_json(result) from (
             select COUNT(DISTINCT(booking.booking_no)) as totalCount
             from eg_adv_booking_detail as booking
-            INNER JOIN eg_adv_applicant_detail applicant ON applicant.booking_id = booking.booking_id
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = booking.booking_no
-            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = booking.booking_no AND pi.latest = TRUE
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = booking.booking_no 
-              GROUP BY wf.businessid
-            )
           ) result
         groupBy:
         orderBy:
@@ -117,6 +101,7 @@ SearchDefinitions:
             jsonPath: $.searchCriteria.assignee
           - name: booking.booking_status
             isMandatory: false
+            operator: IN
             jsonPath: $.searchCriteria.bookingStatus
           - name: applicant.applicant_mobile_no
             isMandatory: false
@@ -134,31 +119,19 @@ SearchDefinitions:
         baseQuery: |
           Select row_to_json(result) from (
             select DISTINCT(booking.booking_no), 
-                   pi.createdtime, 
+                   booking.createdtime, 
                    pi.status as status_id,
-                   ws.state as status_name,
-                   ws.applicationStatus,
                    booking.booking_id,
                    booking.tenant_id,
                    booking.booking_status,
                    booking.application_date,
-                   booking.payment_date,
-                   applicant.applicant_name,
-                   applicant.applicant_mobile_no,
-                   applicant.applicant_email_id
+                   booking.payment_date
             from eg_adv_booking_detail as booking
-            INNER JOIN eg_adv_applicant_detail applicant ON applicant.booking_id = booking.booking_id
-            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = booking.booking_no
-            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = booking.booking_no AND pi.latest = TRUE
+            INNER JOIN eg_adv_owner ownerinfo ON ownerinfo.booking_id = booking.booking_id
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = booking.booking_no 
-              GROUP BY wf.businessid
-            )
-            order by pi.createdtime desc
+            order by booking.createdtime desc
             $pagination
           ) result
         groupBy:
@@ -187,10 +160,14 @@ SearchDefinitions:
             jsonPath: $.searchCriteria.assignee
           - name: booking.booking_status
             isMandatory: false
+            operator: IN
             jsonPath: $.searchCriteria.bookingStatus
           - name: applicant.applicant_mobile_no
             isMandatory: false
             jsonPath: $.searchCriteria.mobileNumber
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
