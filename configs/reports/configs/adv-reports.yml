@@ -112,14 +112,6 @@ ReportDefinitions:
     source: adv
     isMandatory: true
     searchClause:   AND c.booking_date <= to_timestamp($toDate / 1000)
-  - name: tenantid
-    label: tenantid
-    type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-    source: adv
-    wrapper: true
-    isMandatory: false
-    searchClause: AND b.tenant_id = $tenantid
   query: |
       -- Use CTE to force query plan, compute & use CTE later
        SELECT 
@@ -343,14 +335,6 @@ ReportDefinitions:
     source: adv
     isMandatory: true
     searchClause:   AND c.booking_date <= to_timestamp($toDate / 1000)
-  - name: tenantid
-    label: tenantid
-    type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-    source: adv
-    wrapper: true
-    isMandatory: false
-    searchClause: AND b.tenant_id = $tenantid
   query: |
       -- Use CTE to force query plan, compute & use CTE later
        SELECT 
