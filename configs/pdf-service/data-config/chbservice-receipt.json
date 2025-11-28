@@ -93,9 +93,21 @@
               },
 
               {
+                "variable": "chb_cow_cess",
+                "value": {
+                  "path": "MODULE_CSS_COW_CESS"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
                 "variable": "chb_service_charge",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_CHB_SERVICE_CHARGE"
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_SERVICE_CHARGE"
                 },
                 "type": "label",
                 "localisation": {
@@ -108,6 +120,13 @@
                 "variable": "chbServiceCharge",
                 "value": {
                   "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_SERVICE_CHARGE')].adjustedAmount"
+                }
+              },
+
+              {
+                "variable": "chbCowCessCharge",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_COW_CESS')].adjustedAmount"
                 }
               },
               {
@@ -160,6 +179,18 @@
                 }
               },
               {
+                "variable": "chb_service",
+                "value": {
+                  "path": "ACTION_TEST_CHB"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
                 "variable": "chbCgst",
                 "value": {
                   "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CGST')].adjustedAmount"
@@ -187,6 +218,25 @@
                 "variable": "paidAmount",
                 "value": {
                   "path": "$.paymentDetails[0].totalAmountPaid"
+                }
+              },
+
+              {
+                "variable": "hallName",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].communityHallName"
+                }
+              },
+              {
+                "variable": "applicantName",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].applicantDetail.applicantName"
+                }
+              },
+              {
+                "variable": "applicantMobileNo",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].applicantDetail.applicantMobileNo"
                 }
               },
               {
@@ -595,6 +645,10 @@
               {
                 "variable": "pendingAmount",
                 "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"
+              },
+              {
+                "variable": "chbServiceCharge",
+                "formula": "{{chbServiceCharge}}>0?{{chbServiceCharge}}:0"
               },
               {
                 "variable": "excessAmountPaid",
