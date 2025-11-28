@@ -1,0 +1,182 @@
+serviceMaps:
+  serviceName: rl-service
+  mappings:
+  - version: 1.0
+    description: Persists Allotment and Applicant Details
+    fromTopic: save-rl-allotment
+    isTransaction: true
+    queryMaps:
+    - query: INSERT INTO eg_rl_allotment (
+              id, property_id, tenant_id, is_auto_renewal, application_status, status,
+              application_number, previous_application_number, application_type,
+              start_date, end_date, term_and_condition, penalty_type,
+              created_time, created_by, lastmodified_time, lastmodified_by,witness_details,additional_details)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: AllotmentDetails
+      jsonMaps:
+      - jsonPath: $.AllotmentDetails.id
+      - jsonPath: $.AllotmentDetails.property_id
+      - jsonPath: $.AllotmentDetails.tenant_id
+      - jsonPath: $.AllotmentDetails.is_auto_renewal
+      - jsonPath: $.AllotmentDetails.application_status
+      - jsonPath: $.AllotmentDetails.status
+      - jsonPath: $.AllotmentDetails.application_number
+      - jsonPath: $.AllotmentDetails.previous_application_number
+      - jsonPath: $.AllotmentDetails.application_type
+      - jsonPath: $.AllotmentDetails.start_date
+      - jsonPath: $.AllotmentDetails.end_date
+      - jsonPath: $.AllotmentDetails.term_and_condition
+      - jsonPath: $.AllotmentDetails.penalty_type
+      - jsonPath: $.AllotmentDetails.audit_details.createdTime
+      - jsonPath: $.AllotmentDetails.audit_details.createdBy
+      - jsonPath: $.AllotmentDetails.audit_details.lastModifiedTime
+      - jsonPath: $.AllotmentDetails.audit_details.lastModifiedBy
+      - jsonPath: $.AllotmentDetails.witness_details
+      - jsonPath: $.AllotmentDetails.additional_details
+        type: JSON
+        dbType: JSONB
+
+    - query: UPDATE eg_rl_allotment SET expireflag=true WHERE application_number=?;
+      basePath: AllotmentDetails
+      jsonMaps:
+      - jsonPath: $.AllotmentDetails.previous_application_number
+      
+    - query: INSERT INTO eg_rl_owner_info(id, allotment_id, user_uuid, is_primary_owner, owner_type, ownership_percentage, relationship, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: AllotmentDetails.OwnerInfo.*
+      jsonMaps:
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.owner_id
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.allotment_id
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.user_uuid
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.is_primary_owner
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.owner_type
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.ownership_percentage
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.relationship
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.status
+
+    - query: INSERT INTO eg_rl_document(id, allotment_id, documenttype, filestoreid,status, createdby, createdtime) VALUES (?, ?, ?, ?,'Active', ?, ?);
+      basePath: AllotmentDetails.Document.*
+      jsonMaps:
+      - jsonPath: $.AllotmentDetails.Document.*.doc_id
+      - jsonPath: $.AllotmentDetails.Document.*.allotment_id
+      - jsonPath: $.AllotmentDetails.Document.*.documentType
+      - jsonPath: $.AllotmentDetails.Document.*.fileStoreId
+      - jsonPath: $.AllotmentDetails.Document.*.audit_details.createdBy
+      - jsonPath: $.AllotmentDetails.Document.*.audit_details.createdTime
+      
+  - version: 1.0
+    description: Update Allotment and Applicant Details
+    fromTopic: update-rl-allotment
+    isTransaction: true
+    queryMaps:
+    - query: UPDATE eg_rl_allotment SET is_auto_renewal=?, application_status=?, status=?,application_type=?, previous_application_number=?, application_number=?,start_date=?, end_date=?, term_and_condition=?, penalty_type=?, lastmodified_time=?, lastmodified_by=?,witness_details=? WHERE id=?;
+      basePath: AllotmentDetails
+      jsonMaps:
+      - jsonPath: $.AllotmentDetails.is_auto_renewal
+      - jsonPath: $.AllotmentDetails.application_status
+      - jsonPath: $.AllotmentDetails.status
+      - jsonPath: $.AllotmentDetails.application_type
+      - jsonPath: $.AllotmentDetails.previous_application_number
+      - jsonPath: $.AllotmentDetails.application_number
+      - jsonPath: $.AllotmentDetails.start_date
+      - jsonPath: $.AllotmentDetails.end_date
+      - jsonPath: $.AllotmentDetails.term_and_condition
+      - jsonPath: $.AllotmentDetails.penalty_type
+      - jsonPath: $.AllotmentDetails.audit_details.lastModifiedTime
+      - jsonPath: $.AllotmentDetails.audit_details.lastModifiedBy
+      - jsonPath: $.AllotmentDetails.witness_details
+      - jsonPath: $.AllotmentDetails.id
+    
+    - query: INSERT INTO eg_rl_owner_info(id, allotment_id, user_uuid, is_primary_owner, owner_type, ownership_percentage, relationship, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+             ON CONFLICT (id) DO UPDATE SET
+        is_primary_owner = EXCLUDED.is_primary_owner,
+        owner_type = EXCLUDED.owner_type,
+        ownership_percentage = EXCLUDED.ownership_percentage,
+        relationship = EXCLUDED.relationship,
+        status = EXCLUDED.status;
+      basePath: AllotmentDetails.OwnerInfo.*
+      jsonMaps:
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.owner_id
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.allotment_id
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.user_uuid
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.is_primary_owner
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.owner_type
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.ownership_percentage
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.relationship
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.status
+    
+    - query: INSERT INTO eg_rl_document(id, allotment_id, documenttype, filestoreid,status, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?,'Active', ?, ?, ?, ?)
+            ON CONFLICT (id) DO UPDATE SET
+        documentType = EXCLUDED.documentType,
+        fileStoreId = EXCLUDED.fileStoreId,
+        lastmodifiedby = EXCLUDED.lastmodifiedby,
+        lastmodifiedtime = EXCLUDED.lastmodifiedtime;       
+      basePath: AllotmentDetails.Document.*
+      jsonMaps:
+      - jsonPath: $.AllotmentDetails.Document.*.doc_id
+      - jsonPath: $.AllotmentDetails.Document.*.allotment_id
+      - jsonPath: $.AllotmentDetails.Document.*.documentType
+      - jsonPath: $.AllotmentDetails.Document.*.fileStoreId
+      - jsonPath: $.AllotmentDetails.Document.*.audit_details.createdBy
+      - jsonPath: $.AllotmentDetails.Document.*.audit_details.createdTime
+      - jsonPath: $.AllotmentDetails.Document.*.audit_details.lastModifiedBy
+      - jsonPath: $.AllotmentDetails.Document.*.audit_details.lastModifiedTime
+
+  - version: 1.0
+    description: Persists clsure Details
+    fromTopic: save-rl-clsure
+    isTransaction: true
+    queryMaps:
+    - query: INSERT INTO eg_rl_allotment_clsure(id, allotment_id, status, reason_for_clsure,
+              amount_to_be_refund, amount_to_be_deducted, refund_amount,
+              notes_comments, upload_proof, audit_details
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: AllotmentClsure
+      jsonMaps:
+      - jsonPath: $.AllotmentClsure.id
+      - jsonPath: $.AllotmentClsure.allotment_id
+      - jsonPath: $.AllotmentClsure.status
+      - jsonPath: $.AllotmentClsure.reason_for_clsure
+      - jsonPath: $.AllotmentClsure.amount_to_be_refund
+      - jsonPath: $.AllotmentClsure.amount_to_be_deducted
+      - jsonPath: $.AllotmentClsure.refund_amount
+      - jsonPath: $.AllotmentClsure.notes_comments
+      - jsonPath: $.AllotmentClsure.upload_proof
+      - jsonPath: $.AllotmentClsure.audit_details
+        type: JSON
+        dbType: JSONB
+    - query: UPDATE eg_rl_allotment SET status=? WHERE id=?;
+      basePath: AllotmentClsure
+      jsonMaps:
+      - jsonPath: $.AllotmentClsure.status
+      - jsonPath: $.AllotmentClsure.allotment_id
+
+        # UPDATE Query
+  - version: 1.0
+    description: Persists clsure Details
+    fromTopic: update-rl-clsure
+    isTransaction: true
+    queryMaps:
+    - query: >
+            UPDATE eg_rl_allotment_clsure SET
+              status = ?, reason_for_clsure = ?, amount_to_be_refund = ?,
+              amount_to_be_deducted = ?, refund_amount = ?, notes_comments = ?,
+              upload_proof = ?, audit_details = ?
+            WHERE id = ?;
+      basePath: AllotmentClsure
+      jsonMaps:
+      - jsonPath: $.AllotmentClsure.status
+      - jsonPath: $.AllotmentClsure.reason_for_clsure
+      - jsonPath: $.AllotmentClsure.amount_to_be_refund
+      - jsonPath: $.AllotmentClsure.amount_to_be_deducted
+      - jsonPath: $.AllotmentClsure.refund_amount
+      - jsonPath: $.AllotmentClsure.notes_comments
+      - jsonPath: $.AllotmentClsure.upload_proof
+      - jsonPath: $.AllotmentClsure.audit_details
+        type: JSON
+        dbType: JSONB
+      - jsonPath: $.AllotmentClsure.id
+    - query: UPDATE eg_rl_allotment SET status=? WHERE id=?;
+      basePath: AllotmentClsure
+      jsonMaps:
+      - jsonPath: $.AllotmentClsure.status
+      - jsonPath: $.AllotmentClsure.allotment_id
