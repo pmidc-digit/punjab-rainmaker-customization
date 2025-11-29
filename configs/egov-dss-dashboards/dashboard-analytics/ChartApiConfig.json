@@ -315,7 +315,7 @@
       {
         "module": "PT",
         "indexName": "property-services",
-        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"term\":{\"Data.tenantId.keyword\":\"pb.testing\"}}]}},\"aggs\":{\"Total Application\":{\"value_count\":{\"field\":\"Data.propertyId.keyword\"}}}}}}",
+        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must\":[{\"term\":{\"Data.status.keyword\":\"ACTIVE\"}}],\"must_not\":[{\"term\":{\"Data.tenantId.keyword\":\"pb.testing\"}}]}},\"aggs\":{\"Total Application\":{\"value_count\":{\"field\":\"Data.propertyId.keyword\"}}}}}}",
         "requestQueryMap": "{\"wardId\" : \"Data.ward.name.keyword\", \r\n  \"district\" : \"Data.tenantData.city.districtCode\", \r\n\"tenantId\" : \"Data.tenantId\" \r\n}",
         "dateRefField": "Data.@timestamp"
       },
@@ -523,7 +523,7 @@
         "requestQueryMap": "{\"wardId\" : \"Data.ward.name.keyword\", \"module\" : \"businessService.keyword\",\"tenantId\" : \"Data.tenantId\" ,  \"district\" : \"Data.tenantData.city.districtCode\"}",
         "dateRefField": "Data.@timestamp",
         "indexName": "property-services",
-        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"term\":{\"Data.tenantId.keyword\":\"pb.testing\"}}]}},\"aggs\":{\"Closed Application\":{\"filter\":{\"exists\":{\"field\":\"Data.propertyId.keyword\"}},\"aggs\":{\"count\":{\"terms\":{\"field\":\"Data.tenantId.keyword\"},\"aggs\":{\"tenant_count\":{\"value_count\":{\"field\":\"Data.tenantId.keyword\"}}}}}},\"Total Application\":{\"terms\":{\"field\":\"Data.tenantId.keyword\"},\"aggs\":{\"tenant_count\":{\"value_count\":{\"field\":\"Data.tenantId.keyword\"}}}}}}}}"
+        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must\":[{\"term\":{\"Data.status.keyword\":\"ACTIVE\"}}],\"must_not\":[{\"term\":{\"Data.tenantId.keyword\":\"pb.testing\"}}]}},\"aggs\":{\"Closed Application\":{\"filter\":{\"exists\":{\"field\":\"Data.propertyId.keyword\"}},\"aggs\":{\"count\":{\"terms\":{\"field\":\"Data.tenantId.keyword\"},\"aggs\":{\"tenant_count\":{\"value_count\":{\"field\":\"Data.tenantId.keyword\"}}}}}},\"Total Application\":{\"terms\":{\"field\":\"Data.tenantId.keyword\"},\"aggs\":{\"tenant_count\":{\"value_count\":{\"field\":\"Data.tenantId.keyword\"}}}}}}}}"
       },
       {
         "module": "TL",
@@ -564,7 +564,7 @@
         "requestQueryMap": "{\"wardId\" : \"Data.ward.name.keyword\", \"module\" : \"businessService.keyword\",\"tenantId\" : \"Data.tenantId\" ,\"district\" : \"Data.tenantData.city.districtCode\"}",
         "dateRefField": "Data.@timestamp",
         "indexName": "property-services",
-        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"term\":{\"Data.tenantId.keyword\":\"pb.testing\"}}]}},\"aggs\":{\"Closed Application\":{\"filter\":{\"exists\":{\"field\":\"Data.propertyId.keyword\"}},\"aggs\":{\"count\":{\"terms\":{\"field\":\"Data.tenantId.keyword\"},\"aggs\":{\"tenant_count\":{\"value_count\":{\"field\":\"Data.tenantId.keyword\"}}}}}},\"Total Application\":{\"terms\":{\"field\":\"Data.tenantId.keyword\"},\"aggs\":{\"tenant_count\":{\"value_count\":{\"field\":\"Data.tenantId.keyword\"}}}}}}}}"
+        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must\":[{\"term\":{\"Data.status.keyword\":\"ACTIVE\"}}],\"must_not\":[{\"term\":{\"Data.tenantId.keyword\":\"pb.testing\"}}]}},\"aggs\":{\"Closed Application\":{\"filter\":{\"exists\":{\"field\":\"Data.propertyId.keyword\"}},\"aggs\":{\"count\":{\"terms\":{\"field\":\"Data.tenantId.keyword\"},\"aggs\":{\"tenant_count\":{\"value_count\":{\"field\":\"Data.tenantId.keyword\"}}}}}},\"Total Application\":{\"terms\":{\"field\":\"Data.tenantId.keyword\"},\"aggs\":{\"tenant_count\":{\"value_count\":{\"field\":\"Data.tenantId.keyword\"}}}}}}}}"
       },
       {
         "module": "TL",
@@ -695,7 +695,7 @@
       {
         "module": "PT",
         "indexName": "property-services",
-        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"term\":{\"Data.tenantId.keyword\":\"pb.testing\"}}]}},\"aggs\":{\"Total Application\":{\"value_count\":{\"field\":\"Data.propertyId.keyword\"}}}}}}",
+        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must\":[{\"term\":{\"Data.status.keyword\":\"ACTIVE\"}}],\"must_not\":[{\"term\":{\"Data.tenantId.keyword\":\"pb.testing\"}}]}},\"aggs\":{\"Total Application\":{\"value_count\":{\"field\":\"Data.propertyId.keyword\"}}}}}}",
         "requestQueryMap": "{\"wardId\" : \"Data.ward.name.keyword\", \r\n  \"district\" : \"Data.tenantData.city.districtCode\", \r\n\"tenantId\" : \"Data.tenantId\" \r\n}",
         "dateRefField": ""
       }
@@ -710,13 +710,34 @@
     ],
     "_comment": " totol properties count"
   },
+  "totalPropertiesApplication": {
+    "chartName": "DSS_PT_TOTAL_PROPERTIES_APPLICATION",
+    "queries": [
+      {
+        "module": "PT",
+        "indexName": "property-services",
+        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must\":[{\"terms\":{\"Data.creationReason.keyword\":[\"CREATE\",\"MUTATION\",\"UPDATE\"]}},{\"terms\":{\"Data.status.keyword\":[\"ACTIVE\",\"INWORKFLOW\"]}}],\"must_not\":[{\"term\":{\"Data.tenantId.keyword\":\"pb.testing\"}}]}},\"aggs\":{\"Total Property Application\":{\"value_count\":{\"field\":\"Data.propertyId.keyword\"}}}}}}",
+        "requestQueryMap": "{\"wardId\" : \"Data.ward.name.keyword\", \r\n  \"district\" : \"Data.tenantData.city.districtCode\", \r\n\"tenantId\" : \"Data.tenantId\" \r\n}",
+        "dateRefField": ""
+      }
+    ],
+    "chartType": "metric",
+    "valueType": "number",
+    "action": "",
+    "documentType": "_doc",
+    "drillChart": "none",
+    "aggregationPaths": [
+      "Total Property Application"
+    ],
+    "_comment": " totol property properties count"
+  },
   "propertiesAssessed": {
     "chartName": "DSS_PT_TOTAL_PROPERTIES_ASSESSED",
     "queries": [
       {
         "module": "PT",
-        "indexName": "property-services",	
-        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"term\":{\"Data.tenantId.keyword\":\"pb.testing\"}}]}},\"aggs\":{\"Total Application\":{\"value_count\":{\"field\":\"Data.propertyId.keyword\"}}}}}}",	
+        "indexName": "property-assessments",
+        "aggrQuery": "{\"size\":0,\"query\":{\"bool\":{\"must_not\":[{\"term\":{\"Data.tenantId.keyword\":\"pb.testing\"}}]}},\"aggs\":{\"Total Properties Assessed\":{\"cardinality\":{\"field\":\"Data.propertyId.keyword\"}}}}",
         "requestQueryMap": "{\"wardId\" : \"Data.ward.name.keyword\", \r\n  \"district\" : \"Data.tenantData.city.districtCode\", \r\n\"tenantId\" : \"Data.tenantId\" \r\n}",
         "dateRefField": "Data.@timestamp"
       }
@@ -727,7 +748,7 @@
     "documentType": "_doc",
     "drillChart": "none",
     "aggregationPaths": [
-      "Total Application"	
+      "Total Properties Assessed"
     ],
     "insight": {
       "chartResponseMap" : "propertiesAssessed",
