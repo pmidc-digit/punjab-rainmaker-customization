@@ -2,7 +2,8 @@
   "key": "adv-bill",
   "config": {
     "defaultStyle": {
-      "font": "Cambay"
+      "font": "Roboto",
+      "fontSize" :12
     },
     "content": [
       {
@@ -13,8 +14,8 @@
             [
               {
                 "image": "{{logoImage}}",
-                "width": 60,
-                "height": 60,
+                "width": 70,
+                "height": 70,
                 "alignment": "left"
               },
               {
@@ -40,7 +41,7 @@
                     "text": "{{serviceType}} {{payment_receipt}}",
                     "style": "receipt-logo-sub-header",
                     "alignment": "center",
-                    "margin": [0, 5, 0, 0]
+                    "margin": [0, 4, 0, 4]
                   }
                 ],
                 "alignment": "center"
@@ -60,12 +61,12 @@
       {
         "style": "noc-table",
         "table": {
-          "widths": ["20%", "26%", "5%", "22%", "26%"],
+          "widths": ["20%", "30%", "5%", "18%", "28%"],
           "body": [
             [
               {
                 "text": "Receipt No",
-                "border": [false, true, false, false],
+                "border": [true, true, false, false],
                 "style": "receipt-table-value"
               },
               {
@@ -86,7 +87,7 @@
               },
               {
                 "text": "{{currentDate}}",
-                "border": [false, true, false, false],
+                "border": [false, true, true, false],
                 "style": "receipt-table",
                 "font": "Roboto"
               }
@@ -94,7 +95,7 @@
             [
               {
                 "text": "{{booking_no}}",
-                "border": [false, false, false, false],
+                "border": [true, false, false, false],
                 "style": "receipt-table-value"
               },
               {
@@ -115,7 +116,7 @@
               },
               {
                 "text": "{{paymentMode}}",
-                "border": [false, false, false, false],
+                "border": [false, false, true, false],
                 "style": "receipt-table",
                 "font": "Roboto"
               }
@@ -123,7 +124,7 @@
             [
               {
                 "text": "Trans ID",
-                "border": [false, false, false, false],
+                "border": [true, false, false, false],
                 "style": "receipt-table-value"
               },
               {
@@ -144,14 +145,14 @@
               },
               {
                 "text": "",
-                "border": [false, false, false, false],
+                "border": [false, false, true, false],
                 "style": "receipt-table"
               }
             ],
             [
               {
                 "text": "Name",
-                "border": [false, false, false, true],
+                "border": [true, false, false, true],
                 "style": "receipt-table-value"
               },
               {
@@ -172,7 +173,7 @@
               },
               {
                 "text": "",
-                "border": [false, false, false, true],
+                "border": [false, false, true, true],
                 "style": "receipt-table"
               }
             ]
@@ -183,46 +184,46 @@
       {
         "style": "next-noc-table",
         "table": {
-          "widths": ["8%", "22%", "35%", "15%", "20%"],
+          "widths": ["8%", "35%", "28%", "12%", "18%"],
           "body": [
             [
               {
                 "text": "{{Site_Id}}",
                 "style": "receipt-table-value",
-                "border": [false, false, false, false],
+                "border": [true, true, false, false],
                 "alignment": "left",
-                "margin": [10, 0, 0, 0]
+                "margin": [7, 0, 0, 0]
               },
               {
                 "text": "{{Site}}",
                 "style": "receipt-table-value",
-                "border": [false, false, false, false],
+                "border": [false, true, false, false],
                 "alignment": "left",
                 "margin": [8, 0, 0, 0]
               },
               {
                 "text": "{{Booked_Dates}}",
                 "style": "receipt-table-value",
-                "border": [false, false, false, false],
+                "border": [false, true, false, false],
                 "alignment": "left",
                 "margin": [8, 0, 0, 0]
               },
               {
                 "text": "{{Price/Day}}",
                 "style": "receipt-table-value",
-                "border": [false, false, false, false],
+                "border": [false, true, false, false],
                 "alignment": "left",
                 "margin": [10, 0, 0, 0]
               },
               {
                 "text": "{{Cost}}",
                 "style": "receipt-table-value",
-                "border": [false, false, false, false],
+                "border": [false, true, true, false],
                 "alignment": "left",
                 "margin": [10, 0, 0, 0]
               }
             ],
-            "{{#var_cartdetails}}[{\"text\":\"{{advertisementId}}\",\"style\":\"receipt-tableee\",\"alignment\":\"left\",\"border\":[false,false,false,false]},{\"stack\":[{\"text\":\"{{faceArea}}\",\"alignment\":\"left\",\"border\":[false,false,false,false]},{\"text\":\"{{location}}\",\"alignment\":\"left\",\"margin\":[0,2,0,0],\"border\":[false,false,false,false]},{\"text\":\"{{advertisementName}}\",\"alignment\":\"left\",\"margin\":[0,2,0,0],\"border\":[false,false,false,false]},{\"text\":\"Pole No. {{poleNo}}\",\"alignment\":\"left\",\"margin\":[0,2,0,0],\"border\":[false,false,false,false]}],\"style\":\"receipt-tableee\",\"border\":[false,false,false,false]},{\"stack\":[{\"text\":\"{{dateRangesFlat}}\",\"alignment\":\"left\",\"border\":[false,false,false,false]},{\"text\":\"({{numberOfDays}} Days)\",\"alignment\":\"left\",\"margin\":[0,2,0,0],\"border\":[false,false,false,false]}],\"style\":\"receipt-tableee\",\"border\":[false,false,false,false]},{\"text\":\"₹ {{amount}}\",\"style\":\"receipt-tableee\",\"alignment\":\"left\",\"border\":[false,false,false,false]},{\"text\":\"₹ {{amountForDaysChosen}}\",\"style\":\"receipt-tableee\",\"alignment\":\"left\",\"border\":[false,false,false,false]}]{{/var_cartdetails}}"
+            "{{#var_cartdetails}}[{\"text\":\"{{advertisementId}}\",\"style\":\"receipt-tableee\",\"alignment\":\"left\",\"border\":[true,false,false,true]},{\"stack\":[{\"text\":\"{{faceArea}}\",\"alignment\":\"left\",\"border\":[false,false,false,true]},{\"text\":\"{{location}}\",\"alignment\":\"left\",\"margin\":[0,0,0,0],\"border\":[false,false,false,true]},{\"text\":\"{{advertisementName}}\",\"alignment\":\"left\",\"margin\":[0,0,0,0],\"border\":[false,false,false,true]},{\"text\":\"Pole No. {{poleNo}}\",\"alignment\":\"left\",\"margin\":[0,0,0,0],\"border\":[false,false,false,true]}],\"style\":\"receipt-tableee\",\"border\":[false,false,false,true]},{\"stack\":[{\"text\":\"{{dateRangesFlat}}\",\"alignment\":\"left\",\"border\":[false,false,false,true]},{\"text\":\"({{numberOfDays}} Days)\",\"alignment\":\"left\",\"margin\":[0,0,0,0],\"border\":[false,false,false,true]}],\"style\":\"receipt-tableee\",\"border\":[false,false,false,true]},{\"text\":\"₹ {{amount}}\",\"style\":\"receipt-tableee\",\"alignment\":\"left\",\"border\":[false,false,false,true]},{\"text\":\"₹ {{amountForDaysChosen}}\",\"style\":\"receipt-tableee\",\"alignment\":\"left\",\"border\":[false,false,true,true]}]{{/var_cartdetails}}"
           ]
         },
         "layout": {}
@@ -230,45 +231,82 @@
       {
         "style": "next-noc-table",
         "table": {
-          "widths": ["100%"],
+          "widths": ["70%", "31%"],
           "body": [
             [
               {
-                "stack": [
-                  {
-                    "text": "{{adv_booking_fees}} : {{advBookingFees}}",
-                    "alignment": "right",
-                    "style": "receipt-table-value-down"
-                  },
-                  {
-                    "text": "{{adv_service_charge}} : {{advServiceCharge}}",
-                    "alignment": "right",
-                    "style": "receipt-table-value-down"
-                  },
-                  {
-                    "text": "{{adv_sgst}} : {{advSgst}}",
-                    "alignment": "right",
-                    "style": "receipt-table-value-down"
-                  },
-                  {
-                    "text": "{{adv_cgst}} : {{advCgst}}",
-                    "alignment": "right",
-                    "style": "receipt-table-value-down"
-                  },
-                  {
-                    "text": "{{adv_security_deposit}} : {{advSecurityDeposit}}",
-                    "alignment": "right",
-                    "style": "receipt-table-value-down"
-                  },
-                  {
-                    "text": "{{total_amount}} : {{totalAmount}}",
-                    "alignment": "right",
-                    "style": "receipt-table-value-down",
-                    "bold": true
-                  }
-                ],
-                "border": [false, false, false, false],
-                "margin": [0, 0, 20, 0]
+                "text": "{{adv_booking_fees}}",
+                "border": [true, true, false, false],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": "₹ {{advBookingFees}}",
+                "border": [false, true, true, false],
+                "style": "receipt-table-value-down"
+              }
+            ],
+            [
+              {
+                "text": "{{adv_cgst}} (9%)",
+                "border": [true, false, false, false],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": "₹ {{advCgst}}",
+                "border": [false, false, true, false],
+                "style": "receipt-table-value-down"
+              }
+            ],
+            [
+              {
+                "text": "{{adv_sgst}} (9%)",
+                "border": [true, false, false, false],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": "₹ {{advSgst}}",
+                "border": [false, false, true, false],
+                "style": "receipt-table-value-down"
+              }
+            ],
+            [
+              {
+                "text": "{{adv_security_deposit}}",
+                "border": [true, false, false, false],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": "₹ {{advSecurityDeposit}}",
+                "border": [false, false, true, false],
+                "style": "receipt-table-value-down"
+              }
+            ],
+            [
+              {
+                "text": "{{adv_service_charge}}",
+                "border": [true, false, false, false],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": "₹ {{advServiceCharge}}",
+                "border": [false, false, true, false],
+                "style": "receipt-table-value-down"
+              }
+            ],
+            
+
+            [
+              {
+                "text": "{{total_amount}} (in Rs)",
+                "border": [true, false, false, true],
+                "bold": true,
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": "₹{{totalAmount}}",
+                "border": [false, false, true, true],
+                "bold": true,
+                "style": "receipt-table-value-down"
               }
             ]
           ]
@@ -318,7 +356,7 @@
       "noc-table": {
         "fontSize": 10,
         "color": "#000000",
-        "margin": [-25, 10, -22, -4]
+        "margin": [-25, 5, 0, 0]
       },
       "receipt-table-value-total-Qr": {
         "alignment": "right",
@@ -330,26 +368,26 @@
         "fontSize": 10,
         "fontWeight": 400,
         "alignment": "left",
-        "margin": [3, 5, 0, 5]
+        "margin": [7, 5, 0, 5]
       },
       "next-noc-table": {
         "fontSize": 10,
         "color": "#000000",
-        "margin": [-25, 28, -22, -8]
+        "margin": [-25, 15, 0, 0]
       },
       "receipt-table-value": {
         "color": "#000000",
         "bold": true,
         "fontSize": 10,
         "fontWeight": 500,
-        "margin": [-2, 2, 0, 1]
+        "margin": [8, 5, 0, 5]
       },
       "receipt-table": {
         "color": "#000000",
         "bold": false,
         "fontSize": 10,
         "fontWeight": 400,
-        "margin": [-30, 2, 0, 1]
+        "margin": [8, 5, 0, 5]
       },
 
       "receipt-tableee": {
@@ -357,7 +395,7 @@
         "bold": false,
         "fontSize": 10,
         "fontWeight": 400,
-        "margin": [8, 0, 0, 0]
+        "margin": [8, 5, 0, 5]
       },
       "receipt-approver": {
         "fontSize": 10,
@@ -367,7 +405,7 @@
       },
       "no-signature": {
         "fontSize": 12,
-        "margin": [-27, 35, -10, 0],
+        "margin": [-27, 200, -10, 0],
         "color": "#484848"
       },
       "pt-disclaimer": {
