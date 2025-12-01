@@ -1,351 +1,512 @@
 ---
 ReportDefinitions:
-- reportName: ActiveHoardingSummary
-  decryptionPathId: ADVREPORTS
-  summary: Details of active hoarding booking slots in adv service
-  version: 1.0.0
-  moduleName: rainmaker-adv
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: tenantId
-    label: tenantId
-    type: string
-    source: adv
-    total: false
-  - name: booking_no
-    label: Booking No
-    type: string
-    source: adv
-    total: false
-  - name: receipt_no
-    label: Receipt No
-    type: string
-    source: adv
-    total: false
-  - name: applicant_name
-    label: applicant_name
-    type: string
-    source: adv
-    total: false
-  - name: applicant_email_id
-    label: applicant_email_id
-    type: string
-    source: adv
-    total: false
-  - name: applicant_mobile_no
-    label: applicant_mobile_no
-    type: string
-    source: adv
-    total: false
-  - name: city
-    label: City
-    type: string
-    source: adv
-    total: false
-  - name: address_line_1
-    label: Address
-    type: string
-    source: adv
-    total: false
-  - name: locality
-    label: Locality
-    type: string
-    source: adv
-    total: false
-  - name: pincode
-    label: Pincode
-    type: string
-    source: adv
-    total: false
-  - name: add_type
-    label: Add Type
-    type: string
-    source: adv
-    total: false
-  - name: location
-    label: Location
-    type: string
-    source: adv
-    total: false
-  - name: face_area
-    label: Face Area
-    type: string
-    source: adv
-    total: false
-  - name: booking_date
-    label: Booking Date
-    type: string
-    source: adv
-    total: false
-  - name: booking_from_time
-    label: Booking From Time
-    type: string
-    source: adv
-    total: false
-  - name: booking_to_time
-    label: Booking To Time
-    type: string
-    source: adv
-    total: false
-  - name: night_light
-    label: night_light
-    type: string
-    source: adv
-    total: false
-  - name: status
-    label: Status
-    type: string
-    source: adv
-    total: false
-  searchParams:
-  - name: fromDate
-    label: fromDate
-    type: epoch
-    source: adv
-    isMandatory: true
-    searchClause: AND c.booking_date >= to_timestamp($fromDate / 1000)
-  - name: toDate
-    label: toDate
-    type: epoch
-    source: adv
-    isMandatory: true
-    searchClause:   AND c.booking_date <= to_timestamp($toDate / 1000)
-  query: |
+  - reportName: ActiveHoardingSummary
+    decryptionPathId: ADVREPORTS
+    summary: Details of active hoarding booking slots in adv service
+    version: 1.0.0
+    moduleName: rainmaker-adv
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenantId
+        label: tenantId
+        type: string
+        source: adv
+        total: false
+      - name: booking_no
+        label: Booking No
+        type: string
+        source: adv
+        total: false
+      - name: receipt_no
+        label: Receipt No
+        type: string
+        source: adv
+        total: false
+      - name: applicant_name
+        label: applicant_name
+        type: string
+        source: adv
+        total: false
+      - name: applicant_mobile_no
+        label: applicant_mobile_no
+        type: string
+        source: adv
+        total: false
+      - name: address_line_1
+        label: Address
+        type: string
+        source: adv
+        total: false
+      - name: pincode
+        label: Pincode
+        type: string
+        source: adv
+        total: false
+      - name: add_type
+        label: Add Type
+        type: string
+        source: adv
+        total: false
+      - name: location
+        label: Location
+        type: string
+        source: adv
+        total: false
+      - name: face_area
+        label: Face Area
+        type: string
+        source: adv
+        total: false
+      - name: booking_date
+        label: Booking Date
+        type: string
+        source: adv
+        total: false
+      - name: booking_from_time
+        label: Booking From Time
+        type: string
+        source: adv
+        total: false
+      - name: booking_to_time
+        label: Booking To Time
+        type: string
+        source: adv
+        total: false
+      - name: status
+        label: Status
+        type: string
+        source: adv
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: adv
+        isMandatory: true
+        searchClause: AND c.booking_date >= to_timestamp($fromDate / 1000)
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: adv
+        isMandatory: true
+        searchClause: AND c.booking_date <= to_timestamp($toDate / 1000)
+    query: >
       -- Use CTE to force query plan, compute & use CTE later
        SELECT 
            split_part(b.tenant_id, '.', 2) AS tenantId ,b.booking_no, b.receipt_no , 
-           a.applicant_name , a.applicant_email_id , a.applicant_mobile_no,
-           ad.address_line_1 ,ad.city , ad.locality , ad.pincode ,
+           a.applicant_name , a.applicant_mobile_no,
+           ad.address_line_1 , ad.pincode ,
            c.add_type , c.location , c.face_area , c.booking_date , c.booking_from_time , 
-           c.booking_to_time , c.night_light ,c.status
+           c.booking_to_time,c.status
          FROM eg_adv_booking_detail b
           INNER JOIN eg_adv_applicant_detail a on a.booking_id=b.booking_id
           INNER JOIN eg_adv_address_detail ad on ad.applicant_detail_id = a.applicant_detail_id
           INNER JOIN eg_adv_cart_detail c on c.booking_id=b.booking_id
           WHERE  c.status='BOOKED' 
             AND b.tenant_id= $tenantid
-  orderby: ORDER BY c.booking_date  
-  
-- reportName: CollectionsReport
-  summary: Collections
-  version: 1.0.0
-  moduleName: rainmaker-adv
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: collector_code
-    label: collector_code
-    type: string
-    source: adv
-    total: false
-  - name: payment_mode
-    label: payment_mode
-    type: string
-    source: adv
-    total: false
-  - name: total_amount
-    label: total_amount
-    type: string
-    source: adv
-    total: true
-  - name: total_count
-    label: total_count
-    type: string
-    source: adv
-    total: false
-  searchParams:
-  - name: tenantid
-    label: tenantid
-    type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-    source: adv
-    wrapper: true
-    isMandatory: false
-    searchClause: AND tenantid = $tenantid
-  - name: collector_code
-    label: collector_code
-    type: string
-    source: adv
-    isMandatory: false
-    searchClause: AND collector_code = $collector_code
-  - name: fromDate
-    label: fromDate
-    type: epoch
-    source: adv
-    isMandatory: true
-    searchClause: AND createdtime >= $fromDate
-  - name: toDate
-    label: toDate
-    type: epoch
-    source: adv
-    isMandatory: true
-    searchClause: AND createdtime <= $toDate
-  query: |
+    orderby: ORDER BY c.booking_date
+  - reportName: CollectionsReport
+    summary: Collections
+    version: 1.0.0
+    moduleName: rainmaker-adv
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: applicationno
+        label: applicationno
+        type: string
+        source: adv
+        total: false
+      - name: name
+        label: name
+        type: string
+        source: adv
+        total: false
+      - name: mobilenumber
+        label: mobilenumber
+        type: string
+        source: adv
+        total: false
+      - name: businessservice
+        label: businessservice
+        type: string
+        source: adv
+        total: false
+      - name: status
+        label: status
+        type: string
+        source: adv
+        total: false
+      - name: cash_amount
+        label: cash_amount
+        type: string
+        source: adv
+        total: true
+      - name: cheque_amount
+        label: cheque_amount
+        type: string
+        source: adv
+        total: true
+      - name: card_amount
+        label: card_amount
+        type: string
+        source: adv
+        total: true
+      - name: dd_amount
+        label: dd_amount
+        type: string
+        source: adv
+        total: true
+      - name: neft_amount
+        label: neft_amount
+        type: string
+        source: adv
+        total: true
+      - name: rtgs_amount
+        label: rtgs_amount
+        type: string
+        source: adv
+        total: true
+      - name: online_amount
+        label: online_amount
+        type: string
+        source: adv
+        total: true
+      - name: amountpaid
+        label: amountpaid
+        type: string
+        source: adv
+        total: true
+      - name: PaymentDate
+        label: PaymentDate
+        type: string
+        source: adv
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: adv
+        isMandatory: true
+        searchClause: AND createdtime >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: adv
+        isMandatory: true
+        searchClause: AND createdtime <= $toDate
+    query: >
       -- Use CTE to force query plan, compute & use CTE later
-      WITH unique_transactions AS (
-          SELECT
-               p.id AS transaction_id,
-               p.createdtime,
-               p.totalamountpaid,
-            CASE
-            WHEN p.paymentmode IN ('POSTAL_ORDER','POTAL_ORDER') THEN 'POSTAL_ORDER'
-            WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN 'OFFLINE_RTGS'
-            WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN 'OFFLINE_NEFT'
-            WHEN p.paymentmode IN ('CASH','OFFLINE_CASH') THEN 'CASH'
-            WHEN p.paymentmode IN ('CARD','DEBIT_CARD','CREDIT_CARD','OFFLINE_CARD') THEN 'CARD'
-            WHEN p.paymentmode IN ('ONLINE') THEN 'ONLINE'
-            ELSE p.paymentmode
-            END AS mode_norm,
-               emp.code AS collector_code,
-               pd.businessservice,
-               p.tenantid
-             FROM egcl_paymentdetail pd
-             INNER JOIN egcl_payment p ON pd.paymentid = p.id
-             INNER JOIN egcl_bill bill  ON bill.id = pd.billid
-             INNER JOIN eg_adv_booking_detail adv ON adv.booking_no = bill.consumercode
-             LEFT JOIN eg_user u ON u.id::text = p.createdby::text
-             LEFT JOIN eg_hrms_employee emp  ON emp.uuid::text = u.uuid::text
-             WHERE p.paymentstatus != 'CANCELLED'
-                   AND bill.businessservice = 'adv-services'
-                   AND p.tenantid = $tenantid
-                   AND p.createdtime BETWEEN $fromDate AND $toDate
-                     )
-           SELECT
-             COALESCE(collector_code, 'SELF') AS collector_code,
-             mode_norm AS payment_mode,
-             SUM(totalamountpaid) AS total_amount,
-             COUNT(transaction_id) AS total_count
-           FROM unique_transactions
-           WHERE 1=1
-  groupby: GROUP BY collector_code, mode_norm
-  orderby: ORDER BY collector_code, mode_norm;
-  
-- reportName: TimelyHoardingSummary
-  decryptionPathId: ADVREPORTS
-  summary: Details of booking slots in adv service
-  version: 1.0.0
-  moduleName: rainmaker-adv
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: tenantId
-    label: tenantId
-    type: string
-    source: adv
-    total: false
-  - name: booking_no
-    label: Booking No
-    type: string
-    source: adv
-    total: false
-  - name: receipt_no
-    label: Receipt No
-    type: string
-    source: adv
-    total: false
-  - name: applicant_name
-    label: applicant_name
-    type: string
-    source: adv
-    total: false
-  - name: applicant_email_id
-    label: applicant_email_id
-    type: string
-    source: adv
-    total: false
-  - name: applicant_mobile_no
-    label: applicant_mobile_no
-    type: string
-    source: adv
-    total: false
-  - name: city
-    label: City
-    type: string
-    source: adv
-    total: false
-  - name: address_line_1
-    label: Address
-    type: string
-    source: adv
-    total: false
-  - name: locality
-    label: Locality
-    type: string
-    source: adv
-    total: false
-  - name: pincode
-    label: Pincode
-    type: string
-    source: adv
-    total: false
-  - name: add_type
-    label: Add Type
-    type: string
-    source: adv
-    total: false
-  - name: location
-    label: Location
-    type: string
-    source: adv
-    total: false
-  - name: face_area
-    label: Face Area
-    type: string
-    source: adv
-    total: false
-  - name: booking_date
-    label: Booking Date
-    type: string
-    source: adv
-    total: false
-  - name: booking_from_time
-    label: Booking From Time
-    type: string
-    source: adv
-    total: false
-  - name: booking_to_time
-    label: Booking To Time
-    type: string
-    source: adv
-    total: false
-  - name: night_light
-    label: night_light
-    type: string
-    source: adv
-    total: false
-  - name: status
-    label: Status
-    type: string
-    source: adv
-    total: false
-  searchParams:
-  - name: fromDate
-    label: fromDate
-    type: epoch
-    source: adv
-    isMandatory: true
-    searchClause: AND c.booking_date >= to_timestamp($fromDate / 1000)
-  - name: toDate
-    label: toDate
-    type: epoch
-    source: adv
-    isMandatory: true
-    searchClause:   AND c.booking_date <= to_timestamp($toDate / 1000)
-  query: |
+
+      WITH current_holder AS (
+        SELECT DISTINCT ON (wf.businessid)
+          wf.businessid AS applicationno,
+          u.name AS employee_name,
+          e.code AS assignee_code,
+          UPPER(st.applicationstatus) AS current_stage
+         FROM eg_wf_processinstance_v2 wf
+         JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+         LEFT JOIN eg_user u ON u.uuid = wa.assignee
+         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+         WHERE wf.tenantid = $tenantid
+         AND wf.businessservice = 'adv-services'
+         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+        ),
+       unique_transactions AS (
+         SELECT
+          p.id AS transaction_id,
+          p.createdtime,
+          pd.amountpaid,
+          CASE WHEN p.paymentmode IN ('CASH','OFFLINE_CASH') THEN pd.amountpaid ELSE 0 END AS cash_amount,
+          CASE WHEN p.paymentmode = 'CHEQUE' THEN pd.amountpaid ELSE 0 END AS cheque_amount,
+          CASE WHEN p.paymentmode IN ('CARD','DEBIT_CARD','CREDIT_CARD','OFFLINE_CARD') THEN pd.amountpaid ELSE 0 END AS card_amount,
+          CASE WHEN p.paymentmode = 'DD' THEN pd.amountpaid ELSE 0 END AS dd_amount,
+          CASE WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN pd.amountpaid ELSE 0 END AS neft_amount,
+          CASE WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN pd.amountpaid ELSE 0 END AS rtgs_amount,
+          CASE WHEN p.paymentmode = 'ONLINE' THEN pd.amountpaid ELSE 0 END AS online_amount,
+          COALESCE(emp.code, 'SELF') AS collector_code,
+          adv.booking_no AS applicationno,
+          a.applicant_name AS name,
+          a.applicant_mobile_no AS mobilenumber,
+          ch.employee_name AS assignee_employee,
+          ch.assignee_code AS assignee_code
+          FROM egcl_paymentdetail pd
+          JOIN egcl_payment p ON pd.paymentid = p.id
+          JOIN egcl_bill bill ON bill.id = pd.billid
+          JOIN eg_adv_booking_detail adv ON bill.consumercode = adv.booking_no
+          JOIN eg_adv_applicant_detail a ON a.booking_id = adv.booking_id
+          LEFT JOIN eg_user u ON u.id::text = p.createdby::text
+          LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
+          LEFT JOIN current_holder ch ON ch.applicationno = adv.booking_no
+          WHERE pd.businessservice = 'adv-services'
+          AND p.paymentstatus != 'CANCELLED'
+          AND p.tenantid = $tenantid
+          ) 
+      SELECT
+        applicationno,
+        name,
+        mobilenumber,
+        'ADV' AS businessservice,
+        collector_code,
+        cash_amount,
+        cheque_amount,
+        card_amount,
+        dd_amount,
+        neft_amount,
+        rtgs_amount,
+        online_amount,
+        amountpaid,
+        to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS paymentdate
+        FROM unique_transactions
+        WHERE 1=1
+    orderby: ORDER BY createdtime DESC
+  - reportName: TimelyHoardingSummary
+    decryptionPathId: ADVREPORTS
+    summary: Details of booking slots in adv service
+    version: 1.0.0
+    moduleName: rainmaker-adv
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenantId
+        label: tenantId
+        type: string
+        source: adv
+        total: false
+      - name: booking_no
+        label: Booking No
+        type: string
+        source: adv
+        total: false
+      - name: receipt_no
+        label: Receipt No
+        type: string
+        source: adv
+        total: false
+      - name: applicant_name
+        label: applicant_name
+        type: string
+        source: adv
+        total: false
+      - name: applicant_mobile_no
+        label: applicant_mobile_no
+        type: string
+        source: adv
+        total: false
+      - name: address_line_1
+        label: Address
+        type: string
+        source: adv
+        total: false
+      - name: pincode
+        label: Pincode
+        type: string
+        source: adv
+        total: false
+      - name: add_type
+        label: Add Type
+        type: string
+        source: adv
+        total: false
+      - name: location
+        label: Location
+        type: string
+        source: adv
+        total: false
+      - name: face_area
+        label: Face Area
+        type: string
+        source: adv
+        total: false
+      - name: booking_date
+        label: Booking Date
+        type: string
+        source: adv
+        total: false
+      - name: booking_from_time
+        label: Booking From Time
+        type: string
+        source: adv
+        total: false
+      - name: booking_to_time
+        label: Booking To Time
+        type: string
+        source: adv
+        total: false
+      - name: status
+        label: Status
+        type: string
+        source: adv
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: adv
+        isMandatory: true
+        searchClause: AND c.booking_date >= to_timestamp($fromDate / 1000)
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: adv
+        isMandatory: true
+        searchClause: AND c.booking_date <= to_timestamp($toDate / 1000)
+    query: >
       -- Use CTE to force query plan, compute & use CTE later
        SELECT 
            split_part(b.tenant_id, '.', 2) AS tenantId ,b.booking_no, b.receipt_no , 
-           a.applicant_name , a.applicant_email_id , a.applicant_mobile_no,
-           ad.address_line_1 ,ad.city , ad.locality , ad.pincode ,
+           a.applicant_name  , a.applicant_mobile_no,
+           ad.address_line_1, ad.pincode ,
            c.add_type , c.location , c.face_area , c.booking_date , c.booking_from_time , 
-           c.booking_to_time , c.night_light ,c.status
+           c.booking_to_time  ,c.status
          FROM eg_adv_booking_detail b
           INNER JOIN eg_adv_applicant_detail a on a.booking_id=b.booking_id
           INNER JOIN eg_adv_address_detail ad on ad.applicant_detail_id = a.applicant_detail_id
           INNER JOIN eg_adv_cart_detail c on c.booking_id=b.booking_id
           WHERE  b.tenant_id= $tenantid
-  orderby: ORDER BY c.booking_date 
+    orderby: ORDER BY c.booking_date
+  - reportName: ReceiptRegisterADV
+    decryptionPathId: ADVREPORTS
+    summary: Details of collector register in ADV service
+    version: 1.0.0
+    moduleName: rainmaker-adv
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: receiptno
+        label: receiptno
+        type: string
+        source: adv
+        total: false
+      - name: connectionno
+        label: connectionno
+        type: string
+        source: adv
+        total: false
+      - name: receiptdate1
+        label: receiptdate1
+        type: string
+        source: adv
+        total: false
+      - name: service
+        label: service
+        type: string
+        source: adv
+        total: false
+      - name: collectorname
+        label: collectorname
+        type: string
+        source: adv
+        total: false
+      - name: transactiondate
+        label: transactiondate
+        type: string
+        source: adv
+        total: false
+      - name: instrumentnumber
+        label: instrumentnumber
+        type: string
+        source: adv
+        total: false
+      - name: payername
+        label: payername
+        type: string
+        source: adv
+        total: false
+      - name: amountpaid
+        label: amountpaid
+        type: string
+        source: adv
+        total: false
+      - name: paymentmode
+        label: paymentmode
+        type: string
+        source: adv
+        total: false
+      - name: paymentstatus
+        label: paymentstatus
+        type: string
+        source: adv
+        total: false
+      - name: ownername1
+        label: ownername1
+        type: string
+        source: adv
+        total: false
+      - name: user
+        label: user
+        type: string
+        source: adv
+        total: false
+      - name: manualreceiptnumber
+        label: manualreceiptnumber
+        type: string
+        source: adv
+        total: false
+      - name: manualreceiptdate
+        label: manualreceiptdate
+        type: string
+        source: adv
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: adv
+        isMandatory: true
+        searchClause: AND pd.receiptdate >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: adv
+        isMandatory: true
+        searchClause: AND pd.receiptdate <= $toDate
+      - name: receiptno
+        label: receiptno
+        type: string
+        source: adv
+        isMandatory: false
+        searchClause: AND pd.receiptnumber like $receiptno
+      - name: paymentMode
+        label: paymentMode
+        type: singlevaluelist
+        pattern: list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE
+          NEFT
+        source: adv
+        isMandatory: false
+        searchClause: AND payment.paymentmode like $paymentMode
+    query: >
+      -- Use CTE to force query plan, compute & use CTE later
+       SELECT
+        pd.receiptnumber AS receiptno,
+        bill.consumercode AS connectionno,
+        TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate,
+        'ADVERTISEMENT' AS service,
+        usr.name AS collectorname,
+        TO_CHAR(TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS transactiondate,
+        payment.instrumentnumber AS instrumentnumber,
+        a.applicant_name AS payername,
+        usr.id AS user,
+        usr.name  AS ownername1,
+        pd.amountpaid AS amountpaid,
+        payment.paymentmode AS paymentmode,
+        payment.paymentstatus AS paymentstatus,
+        pd.manualreceiptnumber,
+        pd.manualreceiptdate
+       FROM eg_adv_booking_detail b
+       INNER JOIN eg_adv_applicant_detail a ON a.booking_id = b.booking_id
+       INNER JOIN eg_adv_address_detail ad ON ad.applicant_detail_id = a.applicant_detail_id
+       INNER JOIN eg_adv_cart_detail c ON c.booking_id = b.booking_id
+       JOIN egcl_bill bill ON bill.consumercode = b.booking_no AND bill.tenantid = b.tenant_id
+       JOIN egcl_paymentdetail pd ON pd.billid = bill.id 
+       JOIN egcl_payment payment ON payment.id = pd.paymentid
+       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
+       WHERE b.tenant_id = $tenantid
+       AND payment.paymentstatus != 'CANCELLED'
+    orderby: ORDER BY pd.receiptdate DESC;
