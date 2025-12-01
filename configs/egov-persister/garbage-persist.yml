@@ -7,7 +7,7 @@ serviceMaps:
    fromTopic: save-gc-connection
    isTransaction: true
    queryMaps:
-    - query: INSERT INTO eg_gc_connection (id, tenantid, property_id, applicationno, applicationstatus, status, connectionno, oldconnectionno,action, createdby, lastmodifiedby, createdtime, lastmodifiedtime, applicationtype, dateEffectiveFrom, locality, isoldapplication,additionaldetails, channel,isDisconnectionTemporary, disconnectionReason,property_type,plot_size,location,frequency_of_garbage_collection,type_of_waste) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+    - query: INSERT INTO eg_gc_connection (id, tenantid, property_id, applicationno, applicationstatus, status, connectionno, oldconnectionno,action, createdby, lastmodifiedby, createdtime, lastmodifiedtime, applicationtype, dateEffectiveFrom, isoldapplication,additionaldetails, channel,isDisconnectionTemporary, disconnectionReason,property_type,plot_size,location,frequency_of_garbage_collection,type_of_waste) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?);
       basePath: $.GarbageConnection
       jsonMaps:
        - jsonPath: $.GarbageConnection.id
@@ -44,7 +44,7 @@ serviceMaps:
 
        - jsonPath: $.GarbageConnection.dateEffectiveFrom
 
-       - jsonPath: $.GarbageConnection.additionalDetails.locality
+#       - jsonPath: $.GarbageConnection.additionalDetails.locality
 
        - jsonPath: $.GarbageConnection.oldApplication
 
@@ -131,7 +131,8 @@ serviceMaps:
       jsonMaps:
       - jsonPath: $.GarbageConnection.id
 
-    - query: UPDATE eg_gc_connection SET applicationstatus=?, status=?, connectionno=?, oldconnectionno=?, action=?, adhocpenalty=?, adhocrebate=?, adhocpenaltyreason=?, adhocpenaltycomment=?, adhocrebatereason=?, adhocrebatecomment=?, lastModifiedBy=?, lastModifiedTime=?, dateEffectiveFrom=?, locality=?, isoldapplication=?, property_id=?, additionaldetails=?,isDisconnectionTemporary=?, disconnectionReason=? ,property_type=?,plot_size=?,location=?,frequency_of_garbage_collection=?,type_of_waste=? WHERE id=?;
+    - query: UPDATE eg_gc_connection SET applicationstatus=?, status=?, connectionno=?, oldconnectionno=?, action=?, adhocpenalty=?, adhocrebate=?, adhocpenaltyreason=?, adhocpenaltycomment=?, adhocrebatereason=?, adhocrebatecomment=?, lastModifiedBy=?, lastModifiedTime=?, dateEffectiveFrom=?, isoldapplication=?, property_id=?, additionaldetails=?,isDisconnectionTemporary=?, disconnectionReason=? ,property_type=?,plot_size=?,location=?,frequency_of_garbage_collection=?,type_of_waste=? WHERE id=?;
+
       basePath: $.GarbageConnection
       jsonMaps:
 
@@ -163,7 +164,7 @@ serviceMaps:
 
        - jsonPath: $.GarbageConnection.dateEffectiveFrom
 
-       - jsonPath: $.GarbageConnection.additionalDetails.locality
+#       - jsonPath: $.GarbageConnection.additionalDetails.locality
 
        - jsonPath: $.GarbageConnection.oldApplication
 
