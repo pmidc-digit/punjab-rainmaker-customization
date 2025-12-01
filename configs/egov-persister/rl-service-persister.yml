@@ -124,24 +124,25 @@ serviceMaps:
     fromTopic: save-rl-clsure
     isTransaction: true
     queryMaps:
-    - query: INSERT INTO eg_rl_allotment_clsure(id, allotment_id, status, reason_for_clsure,
+    - query: INSERT INTO eg_rl_allotment_clsure(id, allotment_id, status,closed_application_number, reason_for_clsure,
               amount_to_be_refund, amount_to_be_deducted, refund_amount,
-              notes_comments, upload_proof, audit_details
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+              notes_comments, upload_proof, created_time,created_by
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: AllotmentClsure
       jsonMaps:
       - jsonPath: $.AllotmentClsure.id
       - jsonPath: $.AllotmentClsure.allotment_id
       - jsonPath: $.AllotmentClsure.status
+      - jsonPath: $.AllotmentClsure.closed_application_number
       - jsonPath: $.AllotmentClsure.reason_for_clsure
       - jsonPath: $.AllotmentClsure.amount_to_be_refund
       - jsonPath: $.AllotmentClsure.amount_to_be_deducted
       - jsonPath: $.AllotmentClsure.refund_amount
       - jsonPath: $.AllotmentClsure.notes_comments
       - jsonPath: $.AllotmentClsure.upload_proof
-      - jsonPath: $.AllotmentClsure.audit_details
-        type: JSON
-        dbType: JSONB
+      - jsonPath: $.AllotmentClsure.audit_details.createdTime
+      - jsonPath: $.AllotmentClsure.audit_details.createdBy
+       
     - query: UPDATE eg_rl_allotment SET status=? WHERE id=?;
       basePath: AllotmentClsure
       jsonMaps:
@@ -158,7 +159,7 @@ serviceMaps:
             UPDATE eg_rl_allotment_clsure SET
               status = ?, reason_for_clsure = ?, amount_to_be_refund = ?,
               amount_to_be_deducted = ?, refund_amount = ?, notes_comments = ?,
-              upload_proof = ?, audit_details = ?
+              upload_proof = ?, lastmodified_by = ?, lastmodified_time = ?
             WHERE id = ?;
       basePath: AllotmentClsure
       jsonMaps:
@@ -169,10 +170,10 @@ serviceMaps:
       - jsonPath: $.AllotmentClsure.refund_amount
       - jsonPath: $.AllotmentClsure.notes_comments
       - jsonPath: $.AllotmentClsure.upload_proof
-      - jsonPath: $.AllotmentClsure.audit_details
-        type: JSON
-        dbType: JSONB
+      - jsonPath: $.AllotmentClsure.audit_details.lastModifiedBy
+      - jsonPath: $.AllotmentClsure.audit_details.lastModifiedTime
       - jsonPath: $.AllotmentClsure.id
+
     - query: UPDATE eg_rl_allotment SET status=? WHERE id=?;
       basePath: AllotmentClsure
       jsonMaps:
