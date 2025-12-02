@@ -104,7 +104,7 @@ ServiceMaps:
     - topic: update-advertisement-booking
       configKey: INDEX
       indexes:
-        - name: ads-booking-application-update-index
+        - name: ads-booking-application-index
           type: general
           id: $.bookingId
           isBulk: false
@@ -196,6 +196,105 @@ ServiceMaps:
                 outJsonPath: $.Data.advertisementId
 
 
+    - topic: advertisement-booking-legacyIndex
+      configKey: LEGACYINDEX
+      indexes:
+        - name: ads-booking-application-index
+          type: general
+          id: $.bookingId
+          isBulk: false
+          timeStampField: $.auditDetails.createdTime
+          jsonPath: $.bookingApplication
+          customJsonMapping:
+            indexMapping: { "Data": { "bookingId": "bookingId","tenantId": "tenantId","bookingNo": "bookingNo",
+                                      "applicationDate": "applicationDate","paymentDate": "paymentDate","draftId": "draftId",
+                                      "receiptNo": "receiptNo","permissionLetterFilestoreId": "permissionLetterFilestoreId","paymentReceiptFilestoreId": "paymentReceiptFilestoreId",
+                                      "bookingStatus": "bookingStatus","businessService": "businessService",
+                                      "applicantDetailId": "applicantDetailId","applicantName": "applicantName","applicantMobileNo": "applicantMobileNo",
+                                      "applicantAlternateMobileNo": "applicantAlternateMobileNo","applicantEmailId": "applicantEmailId",
+                                      "createdBy": "createdBy","lastModifiedBy": "lastModifiedBy",
+                                      "createdTime": "createdTime","lastModifiedTime": "lastModifiedTime",
+                                      "addressId": "addressId","doorNo": "doorNo","houseNo": "houseNo","streetName": "streetName",
+                                      "addressLine1": "addressLine1","addressLine2": "addressLine2","landmark": "landmark",
+                                      "city": "city","cityCode": "cityCode","locality": "locality","localityCode": "localityCode","pincode": "pincode",
+                                      "cartDetails": "cartDetails","documents": "documents","workflow": "workflow","owners": "owners","advertisementId": "advertisementId" } }
+            fieldMapping:
+              - inJsonPath: $.bookingId
+                outJsonPath: $.Data.bookingId
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.bookingNo
+                outJsonPath: $.Data.bookingNo
+              - inJsonPath: $.applicationDate
+                outJsonPath: $.Data.applicationDate
+              - inJsonPath: $.paymentDate
+                outJsonPath: $.Data.paymentDate
+              - inJsonPath: $.draftId
+                outJsonPath: $.Data.draftId
+              - inJsonPath: $.receiptNo
+                outJsonPath: $.Data.receiptNo
+              - inJsonPath: $.permissionLetterFilestoreId
+                outJsonPath: $.Data.permissionLetterFilestoreId
+              - inJsonPath: $.paymentReceiptFilestoreId
+                outJsonPath: $.Data.paymentReceiptFilestoreId
+              - inJsonPath: $.bookingStatus
+                outJsonPath: $.Data.bookingStatus
+              - inJsonPath: $.businessService
+                outJsonPath: $.Data.businessService
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+              - inJsonPath: $.applicantDetail.applicantDetailId
+                outJsonPath: $.Data.applicantDetailId
+              - inJsonPath: $.applicantDetail.applicantName
+                outJsonPath: $.Data.applicantName
+              - inJsonPath: $.applicantDetail.applicantMobileNo
+                outJsonPath: $.Data.applicantMobileNo
+              - inJsonPath: $.applicantDetail.applicantAlternateMobileNo
+                outJsonPath: $.Data.applicantAlternateMobileNo
+              - inJsonPath: $.applicantDetail.applicantEmailId
+                outJsonPath: $.Data.applicantEmailId
+              - inJsonPath: $.address.addressId
+                outJsonPath: $.Data.addressId
+              - inJsonPath: $.address.doorNo
+                outJsonPath: $.Data.doorNo
+              - inJsonPath: $.address.houseNo
+                outJsonPath: $.Data.houseNo
+              - inJsonPath: $.address.streetName
+                outJsonPath: $.Data.streetName
+              - inJsonPath: $.address.addressLine1
+                outJsonPath: $.Data.addressLine1
+              - inJsonPath: $.address.addressLine2
+                outJsonPath: $.Data.addressLine2
+              - inJsonPath: $.address.landmark
+                outJsonPath: $.Data.landmark
+              - inJsonPath: $.address.city
+                outJsonPath: $.Data.city
+              - inJsonPath: $.address.cityCode
+                outJsonPath: $.Data.cityCode
+              - inJsonPath: $.address.locality
+                outJsonPath: $.Data.locality
+              - inJsonPath: $.address.localityCode
+                outJsonPath: $.Data.localityCode
+              - inJsonPath: $.address.pincode
+                outJsonPath: $.Data.pincode
+              - inJsonPath: $.cartDetails
+                outJsonPath: $.Data.cartDetails
+              - inJsonPath: $.documents
+                outJsonPath: $.Data.documents
+              - inJsonPath: $.workflow
+                outJsonPath: $.Data.workflow
+              - inJsonPath: $.owners
+                outJsonPath: $.Data.owners
+              - inJsonPath: $.advertisementId
+                outJsonPath: $.Data.advertisementId
+
+
     - topic: create-draft-advertisement
       configKey: INDEX
       indexes:
@@ -231,7 +330,7 @@ ServiceMaps:
     - topic: update-draft-advertisement
       configKey: INDEX
       indexes:
-        - name: ads-draft-application-update-index
+        - name: ads-draft-application-index
           type: general
           id: $.draftId
           isBulk: false
@@ -252,5 +351,38 @@ ServiceMaps:
                 outJsonPath: $.Data.draftApplicationData
               - inJsonPath: $.auditDetails.lastModifiedBy
                 outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+
+
+    - topic: draft-advertisement-legacyindex
+      configKey: LEGACYINDEX
+      indexes:
+        - name: ads-draft-application-index
+          type: general
+          id: $.draftId
+          isBulk: false
+          timeStampField: $.auditDetails.createdTime
+          jsonPath: $.advertisementDraftDetail
+          customJsonMapping:
+            indexMapping: { "Data": { "draftId": "draftId","tenantId": "tenantId","userUuid": "userUuid",
+                                      "draftApplicationData": "draftApplicationData",
+                                      "createdBy": "createdBy","lastModifiedBy": "lastModifiedBy",
+                                      "createdTime": "createdTime","lastModifiedTime": "lastModifiedTime" } }
+            fieldMapping:
+              - inJsonPath: $.draftId
+                outJsonPath: $.Data.draftId
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.userUuid
+              - inJsonPath: $.draftApplicationData
+                outJsonPath: $.Data.draftApplicationData
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
               - inJsonPath: $.auditDetails.lastModifiedTime
                 outJsonPath: $.Data.lastModifiedTime
