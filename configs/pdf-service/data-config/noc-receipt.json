@@ -88,7 +88,7 @@
               {
                 "variable": "nocCluCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[0].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_CLU_CHARGES')].adjustedAmount"
                 }
               },
               {
@@ -106,7 +106,7 @@
               {
                 "variable": "nocMiningCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[1].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_MINING_CHARGES')].adjustedAmount"
                 }
               },
               {
@@ -124,7 +124,7 @@
               {
                 "variable": "nocGaushalaChargesCess",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[2].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_GAUSHALA_CHARGES_CESS')].adjustedAmount"
                 }
               },
               {
@@ -142,7 +142,7 @@
               {
                 "variable": "nocProcessingFees",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[3].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_PROCESSING_FEES')].adjustedAmount"
                 }
               },
               {
@@ -160,7 +160,7 @@
               {
                 "variable": "nocLabourCess",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[4].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_LABOUR_CESS')].adjustedAmount"
                 }
               },
               {
@@ -178,7 +178,7 @@
               {
                 "variable": "nocClubbingCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[5].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_CLUBBING_CHARGES')].adjustedAmount"
                 }
               },
               {
@@ -197,7 +197,7 @@
               {
                 "variable": "nocSubDivisionCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[6].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_SUB-DIVISION_CHARGES')].adjustedAmount"
                 }
               },
               {
@@ -215,7 +215,7 @@
               {
                 "variable": "nocUrbanDevelopmentCess",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[7].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_URBAN_DEVELOPMENT_CESS')].adjustedAmount"
                 }
               },
               {
@@ -233,7 +233,7 @@
               {
                 "variable": "nocWaterCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[8].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_WATER_CHARGES')].adjustedAmount"
                 }
               },
               {
@@ -249,9 +249,27 @@
                 }
               },
               {
+                "variable": "noc_compounding_fees",
+                "value": {
+                  "path": "NOC_COMPOUNDING_FEE_LABEL"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
                 "variable": "nocExternalDevelopmentCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[9].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_EXTERNAL_DEVELOPMENT_CHARGES')].adjustedAmount"
+                }
+              },
+              {
+                "variable": "nocCompoundingFees",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_COMPOUNDING_FEES')].adjustedAmount"
                 }
               },
               {
@@ -269,7 +287,7 @@
               {
                 "variable": "nocOtherCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[10].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_OTHER_CHARGES')].adjustedAmount"
                 }
               },
               {
@@ -287,7 +305,7 @@
               {
                 "variable": "nocMalbaCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[11].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_MALBA_CHARGES')].adjustedAmount"
                 }
               },
 
@@ -306,7 +324,7 @@
               {
                 "variable": "nocRainWaterHarvestingCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[12].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_RAIN_WATER_HARVESTING_CHARGES')].adjustedAmount"
                 }
               },
 
@@ -743,6 +761,62 @@
               {
                 "variable": "excessAmountPaid",
                 "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
+              },
+              {
+                "variable": "nocCluCharges",
+                "formula": "{{nocCluCharges}}>0?{{nocCluCharges}}:0"
+              },
+              {
+                "variable": "nocCompoundingFees",
+                "formula": "{{nocCompoundingFees}}>0?{{nocCompoundingFees}}:0"
+              },
+              {
+                "variable": "nocProcessingFees",
+                "formula": "{{nocProcessingFees}}>0?{{nocProcessingFees}}:0"
+              },
+              {
+                "variable": "nocUrbanDevelopmentCess",
+                "formula": "{{nocUrbanDevelopmentCess}}>0?{{nocUrbanDevelopmentCess}}:0"
+              },
+              {
+                "variable": "nocExternalDevelopmentCharges",
+                "formula": "{{nocExternalDevelopmentCharges}}>0?{{nocExternalDevelopmentCharges}}:0"
+              },
+              {
+                "variable": "nocMiningCharges",
+                "formula": "{{nocMiningCharges}}>0?{{nocMiningCharges}}:0"
+              },
+              {
+                "variable": "nocGaushalaChargesCess",
+                "formula": "{{nocGaushalaChargesCess}}>0?{{nocGaushalaChargesCess}}:0"
+              },
+              {
+                "variable": "nocLabourCess",
+                "formula": "{{nocLabourCess}}>0?{{nocLabourCess}}:0"
+              },
+              {
+                "variable": "nocClubbingCharges",
+                "formula": "{{nocClubbingCharges}}>0?{{nocClubbingCharges}}:0"
+              },
+              {
+                "variable": "nocSubDivisionCharges",
+                "formula": "{{nocSubDivisionCharges}}>0?{{nocSubDivisionCharges}}:0"
+              },
+              {
+                "variable": "nocWaterCharges",
+                "formula": "{{nocWaterCharges}}>0?{{nocWaterCharges}}:0"
+              },
+              {
+                "variable": "nocOtherCharges",
+                "formula": "{{nocOtherCharges}}>0?{{nocOtherCharges}}:0"
+              },
+              {
+                "variable": "nocMalbaCharges",
+                "formula": "{{nocMalbaCharges}}>0?{{nocMalbaCharges}}:0"
+              },
+               {
+                "variable": "nocRainWaterHarvestingCharges",
+                "formula": "{{nocRainWaterHarvestingCharges}}>0?{{nocRainWaterHarvestingCharges}}:0"
               }
             ]
           },
