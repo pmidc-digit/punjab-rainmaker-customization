@@ -133,7 +133,7 @@ ReportDefinitions:
                ORDER BY wf.businessid, wf.lastmodifiedtime DESC
               )
          SELECT
-           r.applicationnumber, r.applicationtype, r.status, pd.petname, pd.pettype,
+           r.applicationnumber, r.status, pd.petname, pd.pettype,
            pd.breedtype, pd.petage, pd.petgender, pd.petcolor, pd.identificationmark,
            pd.vaccinationnumber, pd.doctorname, pd.clinicname, u.mobilenumber, u.name,
            ch.assignee_employee, ch.assignee_code
@@ -300,7 +300,7 @@ ReportDefinitions:
               )
           SELECT 
              applicationno,name,mobilenumber,businessservice,status,collector_code,
-             assignee_employee,assignee_code,cash_amount,cheque_amount,card_amount,
+             assignee_code,cash_amount,cheque_amount,card_amount,
              dd_amount,neft_amount,rtgs_amount,online_amount,amountpaid,
              TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS "PaymentDate"
            FROM unique_transactions
@@ -591,3 +591,98 @@ ReportDefinitions:
               AND pd.businessservice = 'pet-services'
               AND payment.paymentstatus != 'CANCELLED'
     orderby: ORDER BY pd.receiptdate DESC;  
+
+  - reportName: DefaulterReport
+    decryptionPathId: PETREPORTS
+    summary: Details of Defaulter for renew of pet applications
+    version: 1.0.0
+    moduleName: rainmaker-ptr
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: applicationnumber
+        label: applicationnumber
+        type: string
+        source: ptr
+        total: false
+      - name: mobilenumber
+        label: mobilenumber
+        type: string
+        source: ptr
+        total: false
+      - name: status
+        label: status
+        type: string
+        source: ptr
+        total: false
+      - name: petname
+        label: petname
+        type: string
+        source: ptr
+        total: false
+      - name: pettype
+        label: pettype
+        type: string
+        source: ptr
+        total: false
+      - name: breedtype
+        label: breedtype
+        type: string
+        source: ptr
+        total: false 
+      - name: validitydate
+        label: validitydate
+        type: string
+        source: ptr
+        total: false
+      - name: vaccinationnumber
+        label: vaccinationnumber
+        type: string
+        source: ptr
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ptr
+        isMandatory: true
+        searchClause: AND r.createdtime >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ptr
+        isMandatory: true
+        searchClause: AND r.createdtime<=$toDate
+    query: |
+      -- Use CTE to force query plan, compute & use CTE later
+       WITH latest_holder AS (
+           SELECT DISTINCT ON (wf.businessid)
+                wf.businessid AS applicationnumber,
+                u.name AS assignee_employee,
+                e.code AS assignee_code
+               FROM eg_wf_processinstance_v2 wf
+               JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+               LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+               LEFT JOIN eg_user u ON u.uuid = wa.assignee
+               LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+               WHERE wf.businessservice = 'ptr'
+               ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+            )
+        SELECT 
+           r.applicationnumber AS applicationnumber,
+           u.mobilenumber AS mobilenumber,
+           -- COALESCE(o.address, o.permanentaddress, NULL) AS "Address",
+           r.status,
+           pd.petname,
+           pd.pettype,
+           pd.breedtype,
+           TO_TIMESTAMP(r.validitydate/1000) AS validitydate
+           FROM eg_ptr_registration r
+           LEFT JOIN eg_ptr_owner o ON o.ptrregistrationid = r.id
+           LEFT JOIN eg_ptr_petdetails pd ON pd.petdetailsid = r.id
+           LEFT JOIN eg_user u ON u.uuid = o.uuid
+           LEFT JOIN latest_holder ch ON ch.applicationnumber = r.applicationnumber
+           WHERE  (TO_TIMESTAMP(r.validitydate/1000)::date < CURRENT_DATE)   
+           AND r.status NOT IN ('RENEWED', 'APPROVED')
+           AND r.tenantid =$tenantid
