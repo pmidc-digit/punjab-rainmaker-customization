@@ -380,7 +380,7 @@ ReportDefinitions:
             split_part(n.tenantid,'.',2) AS tenantid,
              n.applicationno AS ndc_application_no,                 
              UPPER(ls.applicationstatus) AS final_status,
-            TO_CHAR(TO_TIMESTAMP(st.docverify_time/1000),'DD-MM-YYYY') AS documentverify_on,
+            TO_CHAR(TO_TIMESTAMP(st.docverify_time/1000),'DD-MM-YYYY') AS document_verify_on,
             TO_CHAR(TO_TIMESTAMP(st.final_time/1000),'DD-MM-YYYY') AS finalstatus_on,   
             CASE
               WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL
