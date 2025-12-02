@@ -1628,47 +1628,62 @@ ReportDefinitions:
     total: true
   searchParams:
   - name: fromDate
-    label: reports.rainmaker-pgr.datefrom
+    label: datefrom
     type: epoch
     source: eg_pgr_service
     isMandatory: false
     searchClause: AND pgr_data.createdtime >= $fromDate
   - name: toDate
-    label: reports.rainmaker-pgr.dateto
+    label: dateto
     type: epoch
     source: eg_pgr_service
     isMandatory: false
     searchClause: AND pgr_data.createdtime <= $toDate
   query: |
-    with pgr_data as (select  
-      (select assignee from eg_pgr_action as pa where 
-      pa.businesskey = ps.servicerequestid 
-      and pa."action" in ('assign', 'reassign')
-      order by "when" desc
-      fetch first 1 rows only
-      ) as assignee, 
-      servicerequestid, 
-      createdtime, 
-      status,
-      (select max("when") from eg_pgr_action where action='resolve' and businesskey = servicerequestid) as resolvedtime,
-      (select min("when") from eg_pgr_action where action='open' and businesskey = servicerequestid) as opentime
-    from eg_pgr_service as ps
-    where 
-    tenantid = $tenantid)
-    select 
-      coalesce((select name from eg_user where id::varchar = assignee),'30048|23/xn3x2FAxn8vYAN0IdplsOxaE=') as employee,  -- encrypted value for NULL
-      SUM (CASE WHEN status in ('rejected') THEN 1 ELSE 0 END) as rejected,
-      SUM (CASE WHEN status in ('closed', 'resolved') THEN 1 ELSE 0 END) as resolved,
-      SUM (CASE WHEN status in ('closed', 'resolved') and (resolvedtime - opentime) >= 14 * 86400 * 1000 THEN 1 ELSE 0 END) as resolvedoutsidesla,
-      SUM (CASE WHEN status in ('assigned', 'reassignrequested') THEN 1 ELSE 0 END) as assigned,
-      SUM (CASE WHEN status in ('open') THEN 1 ELSE 0 END) as open,
-      SUM (CASE WHEN status in ('assigned', 'reassignrequested', 'open') and (extract(epoch from now()) * 1000 - opentime) >= 14 * 86400 * 1000 THEN 1 ELSE 0 END) as outsidesla
-      from pgr_data
-      WHERE 1=1
-  groupby: GROUP BY assignee
-  orderby: ORDER BY assignee NULLS FIRST
-
-  
+    WITH latest_assign AS (
+        SELECT DISTINCT ON (businesskey)
+               businesskey,
+               assignee,
+               "when" AS assign_time
+        FROM eg_pgr_action
+        WHERE action IN ('assign','reassign')
+        ORDER BY businesskey, "when" DESC
+    ),
+    action_data AS (
+        SELECT
+            businesskey,
+            MAX(CASE WHEN action = 'resolve' THEN "when" END) AS resolvedtime,
+            MIN(CASE WHEN action = 'open' THEN "when" END) AS opentime
+        FROM eg_pgr_action
+        WHERE action IN ('resolve','open')
+        GROUP BY businesskey
+    ),
+    pgr_data AS (
+        SELECT
+            ps.servicerequestid,
+            ps.createdtime,
+            ps.status,
+            la.assignee AS latest_assignee,
+            ad.resolvedtime,
+            ad.opentime
+        FROM eg_pgr_service ps
+        LEFT JOIN latest_assign la ON la.businesskey = ps.servicerequestid
+        LEFT JOIN action_data ad ON ad.businesskey = ps.servicerequestid
+         WHERE ps.tenantid = $tenantid
+    )
+    SELECT
+        COALESCE(u.name, '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=') AS employee,
+        SUM(CASE WHEN status IN ('rejected') THEN 1 ELSE 0 END) AS rejected,
+        SUM(CASE WHEN status IN ('closed','resolved') THEN 1 ELSE 0 END) AS resolved,
+        SUM(CASE WHEN status IN ('closed','resolved') AND (resolvedtime - opentime) >= 14 * 86400 * 1000 THEN 1 ELSE 0 END) AS resolvedoutsidesla,
+        SUM(CASE WHEN status IN ('assigned','reassignrequested') THEN 1 ELSE 0 END) AS assigned,
+        SUM(CASE WHEN status IN ('open') THEN 1 ELSE 0 END) AS open,
+        SUM(CASE WHEN status IN ('assigned','reassignrequested','open') AND (extract(epoch FROM now()) * 1000 - opentime) >= 14 * 86400 * 1000 THEN 1 ELSE 0 END)     AS outsidesla
+    FROM pgr_data
+    LEFT JOIN eg_user u ON u.id::varchar = pgr_data.latest_assignee
+  groupby: GROUP BY u.name
+  orderby: ORDER BY u.name NULLS FIRST;
+    
 - reportName: UlbPgrSlaReport_v2
   summary: Fetches employee sla for state
   version: 1.0.0
