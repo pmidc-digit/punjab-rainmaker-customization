@@ -1,6 +1,6 @@
 {
-  "key": "noc-receipt",
-  "documentType": "NOC_RECEIPT",
+  "key": "noc-sanctionletter",
+  "documentType": "NOC_SANCTIONLETTER",
   "DataConfigs": {
     "moduleName": "rainmaker-common",
     "version": "1.0.0",
@@ -13,16 +13,25 @@
         "mappings": [
           {
             "direct": [
+              
               {
-                "variable": "payerName",
+                "variable": "applicantOwnerOrFirmName",
                 "value": {
-                  "path": "$.payerName"
+                  "path": "$.Noc[0].nocDetails.additionalDetails.applicationDetails.applicantOwnerOrFirmName"
                 }
               },
               {
-                "variable": "designation",
+                "variable": "currentDate",
                 "value": {
-                  "path": "$.additionalDetails.designation"
+                  "path": "$.Noc[0].currentDate"
+                }
+              },
+              
+              
+              {
+                "variable": "nocType",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.specificationNocType"
                 }
               },
               {
@@ -39,20 +48,129 @@
                 }
               },
               {
-                "variable": "paymentStatus",
+                "variable": "payerAddress",
                 "value": {
-                  "path": "$.paymentStatus"
+                  "path": "$.Noc[0].nocDetails.additionalDetails.applicationDetails.applicantAddress"
+                }
+              },
+              
+              
+
+              {
+                "variable": "var_floorArea",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.floorArea[*]"
                 },
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
+                "type": "array",
+                "format": {
+                  "type": "string",
+                  "scema": [
+                    { "variable": "floorNo", "value": "floorNo" },
+                    { "variable": "value", "value": "value" }
+
+                  ]
                 }
               },
               {
-                "variable": "receiptNo",
+                "variable": "var_sanctionTerms",
                 "value": {
-                  "path": "$.paymentDetails[0].receiptNumber"
+                  "path": "$.Noc[0].sanctionTerms[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "string",
+                  "scema": [
+                    { "variable": "number", "value": "number" },
+                    { "variable": "text", "value": "text" }
+
+                  ]
+                }
+              },
+              
+            
+              {
+                "variable": "ulbName",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.ulbName"
+                }
+              },
+              {
+                "variable": "nocUlbType",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.ulbType"
+                }
+              },
+              {
+                "variable": "basementArea",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.basementArea"
+                }
+              },
+              {
+                "variable": "totalFloorArea",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.totalFloorArea"
+                }
+              },
+              {
+                "variable": "revenueEstate",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.villageName"
+                }
+              },
+              {
+                "variable": "submittedOn",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.SubmittedOn"
+                }
+              },
+
+              {
+                "variable": "vasikaNo",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.vasikaNumber"
+                }
+              },
+              {
+                "variable": "netTotalArea",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.specificationPlotArea"
+                }
+              },
+              {
+                "variable": "hadbastNo",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.hadbastNo"
+                }
+              },
+              {
+                "variable": "BuildingCategory",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.specificationBuildingCategory"
+                }
+              },
+              {
+                "variable": "plotArea",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.specificationPlotArea"
+                }
+              },
+              {
+                "variable": "plotNo",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.plotNo"
+                }
+              },
+              {
+                "variable": "khewatAndKhatuniNo",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.khewatAndKhatuniNo"
+                }
+              },
+              {
+                "variable": "khasraNo",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.khasraNo"
                 }
               },
               {
@@ -73,261 +191,15 @@
                   "path": "$.totalAmountPaid"
                 }
               },
+              
               {
-                "variable": "noc_clu_charges",
+                "variable": "nocTermThree",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_CLU_CHARGES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
+                  "path": "$.Noc[0].nocTermThree"
                 }
               },
-              {
-                "variable": "nocCluCharges",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_CLU_CHARGES')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "noc_mining_charges",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_MINING_CHARGES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "nocMiningCharges",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_MINING_CHARGES')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "noc_gaushala_charges_cess",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_GAUSHALA_CHARGES_CESS"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "nocGaushalaChargesCess",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_GAUSHALA_CHARGES_CESS')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "noc_processing_fees",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_PROCESSING_FEES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "nocProcessingFees",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_PROCESSING_FEES')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "noc_labour_cess",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_LABOUR_CESS"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "nocLabourCess",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_LABOUR_CESS')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "noc_clubbing_charges",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_CLUBBING_CHARGES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "nocClubbingCharges",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_CLUBBING_CHARGES')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "noc_sub_division_charges",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_SUB_DIVISION_CHARGES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-
-              {
-                "variable": "nocSubDivisionCharges",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_SUB-DIVISION_CHARGES')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "noc_urban_development_cess",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_URBAN_DEVELOPMENT_CESS"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "nocUrbanDevelopmentCess",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_URBAN_DEVELOPMENT_CESS')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "noc_water_charges",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_WATER_CHARGES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "nocWaterCharges",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_WATER_CHARGES')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "noc_external_development_charges",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_EXTERNAL_DEVELOPMENT_CHARGES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "noc_compounding_fees",
-                "value": {
-                  "path": "NOC_COMPOUNDING_FEE_LABEL"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "nocExternalDevelopmentCharges",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_EXTERNAL_DEVELOPMENT_CHARGES')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "nocCompoundingFees",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_COMPOUNDING_FEES')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "noc_other_charges",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_OTHER_CHARGES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "nocOtherCharges",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_OTHER_CHARGES')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "noc_malba_charges",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_MALBA_CHARGES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "nocMalbaCharges",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_MALBA_CHARGES')].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "noc_rain_water_harvesting_charges",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_RAIN_WATER_HARVESTING_CHARGES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "nocRainWaterHarvestingCharges",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_RAIN_WATER_HARVESTING_CHARGES')].adjustedAmount"
-                }
-              },
-
+              
+              
               {
                 "variable": "tenantid",
                 "value": {
@@ -352,12 +224,31 @@
                 }
               },
               {
+                "variable": "officerName",
+                "value": {
+                  "path": "$.Noc[0].officer.name"
+                }
+              },
+              {
+                "variable": "officerDesignation",
+                "value": {
+                  "path": "$.Noc[0].officer.designation"
+                }
+              },
+              {
                 "variable": "fromPeriod",
                 "value": {
                   "path": "$.paymentDetails[0].bill.billDetails[0].fromPeriod"
                 },
                 "type": "date"
               },
+              {
+                  "variable": "dateNow",
+                  "value": {
+                    "path": "$.auditDetails.lastModifiedTime"
+                  },
+                  "type" : "date"
+                },
               {
                 "variable": "toPeriod",
                 "value": {
@@ -417,7 +308,7 @@
               {
                 "variable": "payment_receipt",
                 "value": {
-                  "path": "PAYMENT_HEADER_CITIZEN"
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAYMENT_RECEIPT"
                 },
                 "type": "label",
                 "localisation": {
@@ -430,6 +321,199 @@
                 "variable": "receipt_no",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_RECEIPT_NO"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+
+              {
+                "variable": "noc_no",
+                "value": {
+                  "path": "APPLICATIONNO"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "date_label",
+                "value": {
+                  "path": "AUDIT_DATE_LABEL"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "property_desc",
+                "value": {
+                  "path": "PROPERTY_DESC"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "revenue_estate",
+                "value": {
+                  "path": "REVENUE_ESTATE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "vasika_no",
+                "value": {
+                  "path": "NOC_SITE_VASIKA_NO_LABEL"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "net_total_area",
+                "value": {
+                  "path": "NOC_NET_TOTAL_AREA_LABEL"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "hadbast_no",
+                "value": {
+                  "path": "BPA_HADBAST_NO_LABEL"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "khewat_khatuni_no",
+                "value": {
+                  "path": "NOC_SITE_KHEWAT_AND_KHATUNI_NO_LABEL"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "khasra_no",
+                "value": {
+                  "path": "BPA_KHASRA_NO_LABEL"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "property_address",
+                "value": {
+                  "path": "PROPERTY_ADDRESS"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "noc_compounding",
+                "value": {
+                  "path": "NOC_COMPOUNDING"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "regularization_unauthorized",
+                "value": {
+                  "path": "REGULARIZATION_UNAUTHORIZED"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "built_up_area",
+                "value": {
+                  "path": "BPA_APPLICATION_TOTAL_BUILDUP_AREA"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "regularization_paid",
+                "value": {
+                  "path": "NOC_REGUALRIZATION_PAID"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "vide_no",
+                "value": {
+                  "path": "VIDE_NO"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "applicant_name",
+                "value": {
+                  "path": "REPORT_FSM_RESULT_APPLICANTNAME"
                 },
                 "type": "label",
                 "localisation": {
@@ -679,6 +763,18 @@
                 }
               },
               {
+                "variable": "chb_service",
+                "value": {
+                  "path": "ACTION_TEST_CHB"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
                 "variable": "disclamer_3",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_THIRD_LINE"
@@ -761,62 +857,6 @@
               {
                 "variable": "excessAmountPaid",
                 "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
-              },
-              {
-                "variable": "nocCluCharges",
-                "formula": "{{nocCluCharges}}>0?{{nocCluCharges}}:0"
-              },
-              {
-                "variable": "nocCompoundingFees",
-                "formula": "{{nocCompoundingFees}}>0?{{nocCompoundingFees}}:0"
-              },
-              {
-                "variable": "nocProcessingFees",
-                "formula": "{{nocProcessingFees}}>0?{{nocProcessingFees}}:0"
-              },
-              {
-                "variable": "nocUrbanDevelopmentCess",
-                "formula": "{{nocUrbanDevelopmentCess}}>0?{{nocUrbanDevelopmentCess}}:0"
-              },
-              {
-                "variable": "nocExternalDevelopmentCharges",
-                "formula": "{{nocExternalDevelopmentCharges}}>0?{{nocExternalDevelopmentCharges}}:0"
-              },
-              {
-                "variable": "nocMiningCharges",
-                "formula": "{{nocMiningCharges}}>0?{{nocMiningCharges}}:0"
-              },
-              {
-                "variable": "nocGaushalaChargesCess",
-                "formula": "{{nocGaushalaChargesCess}}>0?{{nocGaushalaChargesCess}}:0"
-              },
-              {
-                "variable": "nocLabourCess",
-                "formula": "{{nocLabourCess}}>0?{{nocLabourCess}}:0"
-              },
-              {
-                "variable": "nocClubbingCharges",
-                "formula": "{{nocClubbingCharges}}>0?{{nocClubbingCharges}}:0"
-              },
-              {
-                "variable": "nocSubDivisionCharges",
-                "formula": "{{nocSubDivisionCharges}}>0?{{nocSubDivisionCharges}}:0"
-              },
-              {
-                "variable": "nocWaterCharges",
-                "formula": "{{nocWaterCharges}}>0?{{nocWaterCharges}}:0"
-              },
-              {
-                "variable": "nocOtherCharges",
-                "formula": "{{nocOtherCharges}}>0?{{nocOtherCharges}}:0"
-              },
-              {
-                "variable": "nocMalbaCharges",
-                "formula": "{{nocMalbaCharges}}>0?{{nocMalbaCharges}}:0"
-              },
-               {
-                "variable": "nocRainWaterHarvestingCharges",
-                "formula": "{{nocRainWaterHarvestingCharges}}>0?{{nocRainWaterHarvestingCharges}}:0"
               }
             ]
           },
@@ -830,6 +870,10 @@
                   {
                     "variable": "address",
                     "value": "$.MdmsRes.tenant.tenants[0].address"
+                  },
+                  {
+                    "variable": "ulbType",
+                    "value": "$.MdmsRes.tenant.tenants[0].city.ulbType"
                   },
                   {
                     "variable": "phoneNumber",
@@ -847,10 +891,6 @@
                     "variable": "logoImage",
                     "value": "$.MdmsRes.tenant.tenants[0].logoId",
                     "type": "image"
-                  },
-                  {
-                    "variable": "ulbType",
-                    "value": "$.MdmsRes.tenant.tenants[0].city.ulbType"
                   },
                   {
                     "variable": "logo-header",
