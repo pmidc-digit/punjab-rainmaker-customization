@@ -9283,91 +9283,34 @@ ReportDefinitions:
     source: pt
     total: false
   searchParams:
+  - name: ulb
+    label: ULB
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: pt
+    wrapper: true
+    isMandatory: true
+    searchClause: AND tenantid = $ulb  
   - name: fy
     label: Financial Year
     type: singlevaluelist
     pattern: 'list://2015:2015-16,2016:2016-17,2017:2017-18,2018:2018-19,2019:2019-20,2020:2020-21,2021:2021-22,2022:2022-23,2023:2023-24,2024-25:2024-25,2025-26:2025-26'
     source: pt
     isMandatory: false
-    searchClause: and d.fy like concat('%',$fy,'%')
+    searchClause: and assessmentyear like concat('%',$fy,'%')
   - name: usageCat
     label: Usage Category
     type: singlevaluelist
     pattern: 'list://NONRESIDENTIAL:NONRESIDENTIAL,MIXED:MIXED,RESIDENTIAL:RESIDENTIAL'
     source: pt
     isMandatory: false
-    searchClause: and pt.propertyusagetype like concat($usageCat,'%') 
+    searchClause: and propertycategory like concat($usageCat,'%') 
   query: |
-    WITH owners AS (
-        SELECT 
-            propertyid,
-            SPLIT_PART(STRING_AGG(ownername, ','), ',', 1) AS ownername,
-            SPLIT_PART(STRING_AGG(mobilenumber, ','), ',', 1) AS mobilenumber
-        FROM report_owners
-        WHERE tenantid = $ulb
-          AND status = 'ACTIVE'
-        GROUP BY propertyid
-    ),
-    
-    units AS (
-        SELECT 
-            propertyid,
-            STRING_AGG(usagecategory, ',') AS unitusage
-        FROM report_units
-        WHERE tenantid = $ulb
-          AND active = TRUE
-        GROUP BY propertyid
-    ),
-    
-    report_unpaid_demand AS (
-        SELECT 
-            d.tenantid,
-            d.consumercode AS propertyid,
-            SUM(dd.taxamount) AS demand,
-            STRING_AGG(
-                DISTINCT TO_CHAR(
-                    (TO_TIMESTAMP(d.taxperiodfrom / 1000) AT TIME ZONE 'Asia/Kolkata'),
-                    'YYYY'
-                ),
-                ', '
-            ) AS fy
-        FROM egbs_demand_v1 d
-        INNER JOIN egbs_demanddetail_v1 dd 
-            ON dd.demandid = d.id
-        WHERE d.businessservice = 'PT'
-          AND d.status != 'CANCELLED'
-          AND d.ispaymentcompleted = FALSE
-          AND dd.taxamount != dd.collectionamount
-          AND dd.tenantid = $ulb
-        GROUP BY d.consumercode, d.tenantid
-    )
-    
-    SELECT 
-        d.propertyid,
-        pt.oldpropertyid,
-        pt.surveyid,
-        d.demand AS tentativedemand,
-        d.fy AS assessmentyear,
-        pt.address,
-        pt.blockname,
-        pt.propertyusagetype AS propertycategory,
-        pt.propertytype,
-        pt.ownershipcategory AS ownership,
-        pt.plotsize,
-        pt.firmbusinessname AS businessname,
-        pt.localityname,
-        COALESCE(o.ownername, 'N/A') AS ownername,
-        COALESCE(o.mobilenumber, 'N/A') AS mobileno
-    FROM report_unpaid_demand d
-    LEFT JOIN report_properties pt 
-           ON pt.propertyid = d.propertyid
-          AND pt.propertystatus != 'INACTIVE'
-    LEFT JOIN units u 
-           ON u.propertyid = d.propertyid
-    LEFT JOIN owners o 
-           ON o.propertyid = d.propertyid
-    WHERE d.tenantid = $ulb
-      AND d.demand > 0
+    select propertyid as propertyid,tenantid as tenantid,oldpropertyid as oldpropertyid,surveyid as surveyid,tentativedemand 
+    as tentativedemand,assessmentyear as assessmentyear,
+    propertytype as propertytype,ownership as ownership, propertycategory as propertycategory, businessname as businessname,
+    address as address, plotsize as plotsize, localityname as localityname, blockname as blockname, ownername as ownername, mobileno as mobileno
+    from public.defaulter_mv where 1=1 
     
 - reportName: STATEDEFAULTER_REPORT_WITH_LOCALITY_UNPAID_DEMAND_NEW
   decryptionPathId: ULBDEFAULTERPTREPORT_V2
