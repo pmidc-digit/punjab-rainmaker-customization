@@ -1,302 +1,381 @@
 ---
 ReportDefinitions:
-- reportName: PetDetailsReport
-  decryptionPathId: PETREPORTS
-  summary: Details of pets in pet service
-  version: 1.0.0
-  moduleName: rainmaker-ptr
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: applicationnumber
-    label: applicationnumber
-    type: string
-    source: ptr
-    total: false
-  - name: name
-    label: name
-    type: string
-    source: ptr
-    total: false
-  - name: mobilenumber
-    label: mobilenumber
-    type: string
-    source: ptr
-    total: false
-  - name: tenant
-    label: tenantid
-    type: string
-    source: ptr
-    total: false
-  - name: petname
-    label: petname
-    type: string
-    source: ptr
-    total: false
-  - name: pettype
-    label: pettype
-    type: string
-    source: ptr
-    total: false
-  - name: petgender
-    label: petgender
-    type: string
-    source: ptr
-    total: false
-  - name: petage
-    label: petage
-    type: string
-    source: ptr
-    total: false
-  - name: petcolor
-    label: petcolor
-    type: string
-    source: ptr
-    total: false
-  - name: breedtype
-    label: breedtype
-    type: string
-    source: ptr
-    total: false
-  - name: identificationmark
-    label: identificationmark
-    type: string
-    source: ptr
-    total: false
-  - name: vaccinationnumber
-    label: vaccinationnumber
-    type: string
-    source: ptr
-    total: false
-  - name: doctorname
-    label: doctorname
-    type: string
-    source: ptr
-    total: false
-  - name: clinicname
-    label: clinicname
-    type: string
-    source: ptr
-    total: false
-  - name: status
-    label: status
-    type: string
-    source: ptr
-    total: false
-  searchParams:
-  - name: applicationtype
-    label: applicationtype
-    type: singlevaluelist
-    pattern: list://NEWAPPLICATION:NEWAPPLICATION,RENEWAPPLICATION:RENEWAPPLICATION
-    source: ptr
-    isMandatory: true
-    searchClause: AND r.applicationtype = $applicationtype
-  - name: fromDate
-    label: fromDate
-    type: epoch
-    source: ptr
-    isMandatory: true
-    searchClause: AND r.createdtime >= $fromDate
-  - name: toDate
-    label: toDate
-    type: epoch
-    source: ptr
-    isMandatory: true
-    searchClause: AND r.createdtime<=$toDate
-  - name: tenantid
-    label: tenantid
-    type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-    source: ptr
-    wrapper: true
-    isMandatory: false
-    searchClause: AND r.tenantid = $tenantid
-  query: |
+  - reportName: PetDetailsReport
+    decryptionPathId: PETREPORTS
+    summary: Details of pets in pet service
+    version: 1.0.0
+    moduleName: rainmaker-ptr
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: applicationnumber
+        label: applicationnumber
+        type: string
+        source: ptr
+        total: false
+      - name: name
+        label: name
+        type: string
+        source: ptr
+        total: false
+      - name: mobilenumber
+        label: mobilenumber
+        type: string
+        source: ptr
+        total: false
+      - name: petname
+        label: petname
+        type: string
+        source: ptr
+        total: false
+      - name: pettype
+        label: pettype
+        type: string
+        source: ptr
+        total: false
+      - name: petgender
+        label: petgender
+        type: string
+        source: ptr
+        total: false
+      - name: petage
+        label: petage
+        type: string
+        source: ptr
+        total: false
+      - name: petcolor
+        label: petcolor
+        type: string
+        source: ptr
+        total: false
+      - name: breedtype
+        label: breedtype
+        type: string
+        source: ptr
+        total: false
+      - name: identificationmark
+        label: identificationmark
+        type: string
+        source: ptr
+        total: false
+      - name: vaccinationnumber
+        label: vaccinationnumber
+        type: string
+        source: ptr
+        total: false
+      - name: doctorname
+        label: doctorname
+        type: string
+        source: ptr
+        total: false
+      - name: clinicname
+        label: clinicname
+        type: string
+        source: ptr
+        total: false
+      - name: status
+        label: status
+        type: string
+        source: ptr
+        total: false
+      - name: assignee_employee
+        label: assignee_employee
+        type: string
+        source: ptr
+        total: false
+      - name: assignee_code
+        label: assignee_code
+        type: string
+        source: ptr
+        total: false
+    searchParams:
+      - name: applicationtype
+        label: applicationtype
+        type: singlevaluelist
+        pattern: list://NEWAPPLICATION:NEWAPPLICATION,RENEWAPPLICATION:RENEWAPPLICATION
+        source: ptr
+        isMandatory: true
+        searchClause: AND r.applicationtype = $applicationtype
+      - name: status
+        label: status
+        type: singlevaluelist
+        pattern: list://INITIATED:INITIATED,DOCUMENTVERIFY:DOCUMENTVERIFY,PENDINGAPPROVAL:PENDINGAPPROVAL,PENDINGPAYMENT:PENDINGPAYMENT,APPROVED:APPROVED,REJECTED:REJECTED,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
+        source: ptr
+        isMandatory: false
+        searchClause: AND r.status = $status
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ptr
+        isMandatory: true
+        searchClause: AND r.createdtime >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ptr
+        isMandatory: true
+        searchClause: AND r.createdtime<=$toDate
+    query: |
       -- Use CTE to force query plan, compute & use CTE later
-       SELECT
-          r.applicationnumber, r.applicationtype, r.status,
-          split_part(r.tenantid, '.', 2) AS tenant,
-          pd.petname, pd.pettype, pd.breedtype, pd.petage,
-          pd.petgender, pd.petcolor, pd.identificationmark,
-          pd.vaccinationnumber, pd.doctorname, pd.clinicname,
-          u.mobilenumber , u.name ,
-          pay.totalamount,  pay.createdtime AS paymentcreatedtime
-        FROM eg_ptr_registration AS r
-        LEFT JOIN eg_ptr_owner AS o ON o.ptrregistrationid = r.id
-        LEFT JOIN eg_ptr_petdetails AS pd ON r.id = pd.petdetailsid
-        LEFT JOIN eg_user AS u ON u.uuid = o.uuid
-        LEFT JOIN egcl_bill AS pay ON pay.consumercode = r.applicationnumber
-        WHERE r.status = 'APPROVED'
-        AND r.tenantid = $tenantid
-      
-- reportName: CollectionsReport
-  summary: Collections
-  version: 1.0.0
-  moduleName: rainmaker-ptr
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: collector_code
-    label: collector_code
-    type: string
-    source: ptr
-    total: false
-  - name: payment_mode
-    label: payment_mode
-    type: string
-    source: ptr
-    total: false
-  - name: total_amount
-    label: total_amount
-    type: string
-    source: ptr
-    total: true
-  - name: total_count
-    label: total_count
-    type: string
-    source: ptr
-    total: false
-  searchParams:
-  - name: tenantid
-    label: tenantid
-    type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-    source: ptr
-    wrapper: true
-    isMandatory: false
-    searchClause: AND tenantid = $tenantid
-  - name: collector_code
-    label: collector_code
-    type: string
-    source: ptr
-    isMandatory: false
-    searchClause: AND collector_code = $collector_code
-  - name: fromDate
-    label: fromDate
-    type: epoch
-    source: ptr
-    isMandatory: true
-    searchClause: AND createdtime >= $fromDate
-  - name: toDate
-    label: toDate
-    type: epoch
-    source: ptr
-    isMandatory: true
-    searchClause: AND createdtime <= $toDate
-  query: |
+       WITH current_holder AS (
+            SELECT DISTINCT ON (wf.businessid)
+                wf.businessid AS applicationnumber,
+                u.name AS assignee_employee,
+                e.code AS assignee_code
+              FROM eg_wf_processinstance_v2 wf
+              JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+              LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+              LEFT JOIN eg_user u ON u.uuid = wa.assignee
+              LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+              WHERE wf.tenantid = $tenantid
+              AND wf.businessservice = 'ptr'
+               ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+              )
+         SELECT
+           r.applicationnumber, r.status, pd.petname, pd.pettype,
+           pd.breedtype, pd.petage, pd.petgender, pd.petcolor, pd.identificationmark,
+           pd.vaccinationnumber, pd.doctorname, pd.clinicname, u.mobilenumber, u.name,
+           ch.assignee_employee, ch.assignee_code
+          FROM eg_ptr_registration AS r
+           LEFT JOIN eg_ptr_owner AS o ON o.ptrregistrationid = r.id
+           LEFT JOIN eg_ptr_petdetails AS pd ON r.id = pd.petdetailsid
+           LEFT JOIN eg_user AS u ON u.uuid = o.uuid
+           LEFT JOIN current_holder ch ON ch.applicationnumber = r.applicationnumber
+            WHERE  r.tenantid = $tenantid
+            
+  - reportName: CollectionsReport
+    decryptionPathId: PETREPORTS
+    summary: Collections
+    version: 1.0.0
+    moduleName: rainmaker-ptr
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: applicationno
+        label: applicationno
+        type: string
+        source: ptr
+        total: false
+      - name: name
+        label: name
+        type: string
+        source: ptr
+        total: false
+      - name: mobilenumber
+        label: mobilenumber
+        type: string
+        source: ptr
+        total: false
+      - name: businessservice
+        label: businessservice
+        type: string
+        source: ptr
+        total: false
+      - name: status
+        label: status
+        type: string
+        source: ptr
+        total: false
+      - name: collector_code
+        label: collector_code
+        type: string
+        source: ptr
+        total: false
+      - name: cash_amount
+        label: cash_amount
+        type: string
+        source: ptr
+        total: true
+      - name: cheque_amount
+        label: cheque_amount
+        type: string
+        source: ptr
+        total: true
+      - name: card_amount
+        label: card_amount
+        type: string
+        source: ptr
+        total: true
+      - name: dd_amount
+        label: dd_amount
+        type: string
+        source: ptr
+        total: true
+      - name: neft_amount
+        label: neft_amount
+        type: string
+        source: ptr
+        total: true
+      - name: rtgs_amount
+        label: rtgs_amount
+        type: string
+        source: ptr
+        total: true
+      - name: online_amount
+        label: online_amount
+        type: string
+        source: ptr
+        total: true
+      - name: amountpaid
+        label: amountpaid
+        type: string
+        source: ptr
+        total: true
+      - name: PaymentDate
+        label: PaymentDate
+        type: string
+        source: ptr
+        total: false
+    searchParams:
+      - name: collector_code
+        label: collector_code
+        type: string
+        source: ptr
+        isMandatory: false
+        searchClause: AND collector_code = $collector_code
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ptr
+        isMandatory: true
+        searchClause: AND createdtime >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ptr
+        isMandatory: true
+        searchClause: AND createdtime <= $toDate
+    query: >
       -- Use CTE to force query plan, compute & use CTE later
-      WITH unique_transactions AS (
-      SELECT
-        p.id AS transaction_id,p.createdtime,p.totalamountpaid,
-        CASE
-        WHEN p.paymentmode IN ('POSTAL_ORDER','POTAL_ORDER') THEN 'POSTAL_ORDER'
-        WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN 'OFFLINE_RTGS'
-        WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN 'OFFLINE_NEFT'
-        WHEN p.paymentmode IN ('CASH','OFFLINE_CASH') THEN 'CASH'
-        WHEN p.paymentmode IN ('CARD','DEBIT_CARD','CREDIT_CARD','OFFLINE_CARD') THEN 'CARD'
-        WHEN p.paymentmode IN ('ONLINE') THEN 'ONLINE'
-       ELSE p.paymentmode
-       END AS mode_norm,
-       emp.code AS collector_code, pd.businessservice,p.tenantid
-       FROM egcl_paymentdetail pd
-       JOIN egcl_payment p ON pd.paymentid = p.id
-       JOIN egcl_bill bill ON bill.id = pd.billid
-       JOIN eg_ptr_registration r ON r.applicationnumber = bill.consumercode
-       LEFT JOIN eg_user u ON u.id::text = p.createdby::text
-       LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
-       WHERE p.paymentstatus != 'CANCELLED'
-       AND bill.businessservice = 'pet-services'
-       AND p.tenantid = $tenantid
-       AND p.createdtime >= $fromDate
-       AND p.createdtime <= $toDate
-        )
-       SELECT
-        COALESCE(collector_code, 'SELF') AS collector_code,
-        mode_norm AS payment_mode,
-        SUM(totalamountpaid) AS total_amount, COUNT(transaction_id) AS total_count
-       FROM unique_transactions
-       WHERE 1=1
-  groupby: GROUP BY collector_code, mode_norm
-  orderby: ORDER BY collector_code, total_amount DESC;
-- reportName: SLAReport
-  decryptionPathId: PETREPORTS
-  summary: Sla report for ptr service
-  version: 1.0.0
-  moduleName: rainmaker-ptr
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: tenantid
-    label: tenantid
-    type: string
-    source: ptr
-    total: false
-  - name: applicationnumber
-    label: Application number
-    type: string
-    source: ptr
-    total: false
-  - name: applicationstatus
-    label: Application status
-    type: string
-    source: ptr
-    total: false
-  - name: documentverify_on
-    label: documentverify_on
-    type: string
-    source: ptr
-    total: false
-  - name: finalstatus_on
-    label: finalstatus_on
-    type: string
-    source: ptr
-    total: false
-  - name: sla_days
-    label: sla_days
-    type: string
-    source: ptr
-    total: false
-  - name: sla_status
-    label: sla_status
-    type: string
-    source: ptr
-    total: false
-  - name: assigned_employee_name
-    label: assigned_employee_name
-    type: string
-    source: ptr
-    total: false
-  - name: assigned_employee_code
-    label: assigned_employee_code
-    type: string
-    source: ptr
-    total: false
-  searchParams:
-  - name: fromDate
-    label: fromDate
-    type: epoch
-    source: ptr
-    isMandatory: true
-    searchClause: AND ptr.createdtime >= $fromDate
-  - name: toDate
-    label: toDate
-    type: epoch
-    source: ptr
-    isMandatory: true
-    searchClause: AND ptr.createdtime <= $toDate
-  - name: tenantid
-    label: tenantid
-    type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-    source: ptr
-    wrapper: true
-    isMandatory: false
-    searchClause: AND ptr.tenantid = $tenantid
-  query: |
+
+      WITH current_holder AS (
+            SELECT DISTINCT ON (wf.businessid)
+                 wf.businessid AS applicationno,
+                 u.name AS employee_name,
+                 e.code AS assignee_code,
+                 UPPER(st.applicationstatus) AS current_stage
+               FROM eg_wf_processinstance_v2 wf
+               JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+               LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+               LEFT JOIN eg_user u ON u.uuid = wa.assignee
+               LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+               WHERE wf.tenantid = $tenantid
+               AND wf.businessservice = 'pet-services'
+              ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+               ),
+        unique_transactions AS (
+            SELECT
+                 p.id AS transaction_id,
+                 p.createdtime,
+                 p.totalamountpaid AS amountpaid,
+                 CASE WHEN p.paymentmode IN ('CASH','OFFLINE_CASH') THEN p.totalamountpaid ELSE 0 END AS cash_amount,
+                 CASE WHEN p.paymentmode = 'CHEQUE' THEN p.totalamountpaid ELSE 0 END AS cheque_amount,
+                 CASE WHEN p.paymentmode IN ('CARD','DEBIT_CARD','CREDIT_CARD','OFFLINE_CARD') THEN p.totalamountpaid ELSE 0 END AS card_amount,
+                 CASE WHEN p.paymentmode = 'DD' THEN p.totalamountpaid ELSE 0 END AS dd_amount,
+                 CASE WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN p.totalamountpaid ELSE 0 END AS neft_amount,
+                 CASE WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN p.totalamountpaid ELSE 0 END AS rtgs_amount,
+                 CASE WHEN p.paymentmode = 'ONLINE' THEN p.totalamountpaid ELSE 0 END AS online_amount,
+                 COALESCE(emp.code, 'SELF') AS collector_code,
+                 r.applicationnumber AS applicationno,
+                 r.status,
+                'pet-services' AS businessservice,
+                 u_cust.name AS name,
+                 u_cust.mobilenumber AS mobilenumber,
+                 ch.employee_name AS assignee_employee,
+                 ch.assignee_code AS assignee_code
+             FROM egcl_paymentdetail pd
+            JOIN egcl_payment p ON pd.paymentid = p.id
+            JOIN egcl_bill bill ON bill.id = pd.billid
+            JOIN eg_ptr_registration r ON r.applicationnumber = bill.consumercode
+            LEFT JOIN eg_ptr_owner o ON o.ptrregistrationid= r.id
+            LEFT JOIN eg_user u_cust ON u_cust.uuid = o.uuid
+            LEFT JOIN eg_user u ON u.id::text = p.createdby::text
+            LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
+            LEFT JOIN current_holder ch ON ch.applicationno = r.applicationnumber
+             WHERE p.paymentstatus != 'CANCELLED'
+              AND pd.businessservice = 'pet-services'
+              AND p.tenantid = $tenantid
+              )
+          SELECT 
+             applicationno,name,mobilenumber,businessservice,status,collector_code,
+             assignee_code,cash_amount,cheque_amount,card_amount,
+             dd_amount,neft_amount,rtgs_amount,online_amount,amountpaid,
+             TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS "PaymentDate"
+           FROM unique_transactions
+           WHERE 1 = 1
+    orderby: ORDER BY createdtime DESC;
+  - reportName: SLAReport
+    decryptionPathId: PETREPORTS
+    summary: Sla report for ptr service
+    version: 1.0.0
+    moduleName: rainmaker-ptr
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: ptr
+        total: false
+      - name: applicationnumber
+        label: Application number
+        type: string
+        source: ptr
+        total: false
+      - name: applicationstatus
+        label: Application status
+        type: string
+        source: ptr
+        total: false
+      - name: documentverify_on
+        label: documentverify_on
+        type: string
+        source: ptr
+        total: false
+      - name: finalstatus_on
+        label: finalstatus_on
+        type: string
+        source: ptr
+        total: false
+      - name: sla_days
+        label: sla_days
+        type: string
+        source: ptr
+        total: false
+      - name: sla_status
+        label: sla_status
+        type: string
+        source: ptr
+        total: false
+      - name: assigned_employee_name
+        label: assigned_employee_name
+        type: string
+        source: ptr
+        total: false
+      - name: assigned_employee_code
+        label: assigned_employee_code
+        type: string
+        source: ptr
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ptr
+        isMandatory: true
+        searchClause: AND ptr.createdtime >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ptr
+        isMandatory: true
+        searchClause: AND ptr.createdtime <= $toDate
+    query: >
       -- Use CTE to force query plan, compute & use CTE later
+
       WITH wf_detailed AS (
        SELECT 
         wf.businessid AS uuid, UPPER(st.applicationstatus) AS applicationstatus, wf.createdtime,
@@ -314,6 +393,7 @@ ReportDefinitions:
        FROM wf_detailed
        GROUP BY uuid
       ),
+
       latest_status AS (
        SELECT uuid, applicationstatus
         FROM (
@@ -369,4 +449,240 @@ ReportDefinitions:
          JOIN sla_data sla ON 'ptr' = sla.businessservice
          LEFT JOIN assignee_details ae ON ptr.applicationnumber = ae.businessid
          WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY', 'INITIATED', 'PENDINGPAYMENT')
-  orderby: ORDER BY ptr.createdtime DESC, tenantid, ls.applicationstatus;
+    orderby: ORDER BY ptr.createdtime DESC, tenantid, ls.applicationstatus; 
+  - reportName: ReceiptRegisterPET
+    decryptionPathId: PETREPORTS
+    summary: Details of collector register in pet service
+    version: 1.0.0
+    moduleName: rainmaker-ptr
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+    - name: receiptno
+      label: receiptno
+      type: string
+      source: ptr
+      total: false
+    - name: connectionno
+      label: connectionno
+      type: string
+      source: ptr
+      total: false
+    - name: receiptdate1
+      label: receiptdate1
+      type: string
+      source: ptr
+      total: false
+    - name: service
+      label: service
+      type: string
+      source: ptr
+      total: false
+    - name: collectorname
+      label: collectorname
+      type: string
+      source: ptr
+      total: false
+    - name: transactiondate
+      label: transactiondate
+      type: string
+      source: ptr
+      total: false
+    - name: instrumentnumber
+      label: instrumentnumber
+      type: string
+      source: ptr
+      total: false
+    - name: payername
+      label: payername
+      type: string
+      source: ptr
+      total: false
+    - name: amountpaid
+      label: amountpaid
+      type: string
+      source: ptr
+      total: false
+    - name: paymentmode
+      label: paymentmode
+      type: string
+      source: ptr
+      total: false
+    - name: paymentstatus
+      label: paymentstatus
+      type: string
+      source: ptr
+      total: false
+    - name: ownername1
+      label: ownername1
+      type: string
+      source: ptr
+      total: false
+    - name: user
+      label: user
+      type: string
+      source: ptr
+      total: false
+    - name: manualreceiptnumber
+      label: manualreceiptnumber
+      type: string
+      source: ptr
+      total: false
+    - name: manualreceiptdate
+      label: manualreceiptdate
+      type: string
+      source: ptr
+      total: false
+    searchParams:
+    - name: fromDate
+      label: fromDate
+      type: epoch
+      source: ptr
+      isMandatory: true
+      searchClause: AND pd.receiptdate >= $fromDate
+    - name: toDate
+      label: toDate
+      type: epoch
+      source: ptr
+      isMandatory: true
+      searchClause: AND pd.receiptdate <= $toDate
+    - name: receiptno
+      label: receiptno
+      type: string
+      source: ptr
+      isMandatory: false
+      searchClause: AND pd.receiptnumber like $receiptno
+    - name: paymentMode
+      label: paymentMode
+      type: singlevaluelist
+      pattern: 'list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT'
+      source: ptr
+      isMandatory: false
+      searchClause: AND payment.paymentmode like $paymentMode
+    query: |
+      -- Use CTE to force query plan, compute & use CTE later
+      SELECT
+            pd.receiptnumber AS receiptno,
+            bill.consumercode AS connectionno,
+            TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate1,
+            'pet-services' AS service,              
+            usr.name AS collectorname,
+            TO_CHAR( TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS transactiondate,
+            payment.instrumentnumber,
+            u_owner.name AS payername,
+            pd.amountpaid,
+            payment.paymentmode,
+            payment.paymentstatus,
+            u_owner.name AS ownername1,
+            usr.id AS user,
+            pd.manualreceiptnumber,
+            pd.manualreceiptdate
+
+          FROM egcl_paymentdetail pd
+          INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = $tenantid
+          INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
+          LEFT JOIN eg_ptr_registration r ON r.applicationnumber = bill.consumercode
+          LEFT JOIN eg_ptr_owner o  ON o.ptrregistrationid = r.id
+          LEFT JOIN eg_user u_owner ON u_owner.uuid = o.uuid      
+          LEFT JOIN eg_user usr  ON usr.id = payment.createdby::integer  -- Collector
+          WHERE
+              bill.tenantid = $tenantid
+              AND pd.businessservice = 'pet-services'
+              AND payment.paymentstatus != 'CANCELLED'
+    orderby: ORDER BY pd.receiptdate DESC;  
+
+  - reportName: DefaulterReport
+    decryptionPathId: PETREPORTS
+    summary: Details of Defaulter for renew of pet applications
+    version: 1.0.0
+    moduleName: rainmaker-ptr
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: applicationnumber
+        label: applicationnumber
+        type: string
+        source: ptr
+        total: false
+      - name: mobilenumber
+        label: mobilenumber
+        type: string
+        source: ptr
+        total: false
+      - name: status
+        label: status
+        type: string
+        source: ptr
+        total: false
+      - name: petname
+        label: petname
+        type: string
+        source: ptr
+        total: false
+      - name: pettype
+        label: pettype
+        type: string
+        source: ptr
+        total: false
+      - name: breedtype
+        label: breedtype
+        type: string
+        source: ptr
+        total: false 
+      - name: validitydate
+        label: validitydate
+        type: string
+        source: ptr
+        total: false
+      - name: vaccinationnumber
+        label: vaccinationnumber
+        type: string
+        source: ptr
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ptr
+        isMandatory: true
+        searchClause: AND r.createdtime >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ptr
+        isMandatory: true
+        searchClause: AND r.createdtime<=$toDate
+    query: |
+      -- Use CTE to force query plan, compute & use CTE later
+       WITH latest_holder AS (
+           SELECT DISTINCT ON (wf.businessid)
+                wf.businessid AS applicationnumber,
+                u.name AS assignee_employee,
+                e.code AS assignee_code
+               FROM eg_wf_processinstance_v2 wf
+               JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+               LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+               LEFT JOIN eg_user u ON u.uuid = wa.assignee
+               LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+               WHERE wf.businessservice = 'ptr'
+               ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+            )
+        SELECT 
+           r.applicationnumber AS applicationnumber,
+           u.mobilenumber AS mobilenumber,
+           -- COALESCE(o.address, o.permanentaddress, NULL) AS "Address",
+           r.status,
+           pd.petname,
+           pd.pettype,
+           pd.breedtype,
+           TO_TIMESTAMP(r.validitydate/1000) AS validitydate
+           FROM eg_ptr_registration r
+           LEFT JOIN eg_ptr_owner o ON o.ptrregistrationid = r.id
+           LEFT JOIN eg_ptr_petdetails pd ON pd.petdetailsid = r.id
+           LEFT JOIN eg_user u ON u.uuid = o.uuid
+           LEFT JOIN latest_holder ch ON ch.applicationnumber = r.applicationnumber
+           WHERE  (TO_TIMESTAMP(r.validitydate/1000)::date < CURRENT_DATE)   
+           AND r.status NOT IN ('RENEWED', 'APPROVED')
+           AND r.tenantid =$tenantid
