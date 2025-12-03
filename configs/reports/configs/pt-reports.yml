@@ -158,7 +158,7 @@ ReportDefinitions:
     pattern: 'list://Cash:Cash,Online:Online,Card:Card,DD:DD,Cheque:Cheque'
     source: pt
     isMandatory: false
-    searchClause: AND instrumenttype = $paymentMo
+    searchClause: AND instrumenttype = $paymentMode
   - name: financialyear
     label: Financial Year
     type: singlevaluelist
@@ -2453,7 +2453,7 @@ ReportDefinitions:
     source: pt
     wrapper: true
     isMandatory: false
-    searchClause: AND financialyear =$financialyear
+    searchClause: AND financialyear = $financialyear
   - name: paymentMode
     label: Payment Mode
     type: singlevaluelist
@@ -9217,6 +9217,11 @@ ReportDefinitions:
     type: string
     source: pt
     total: false
+  - name: tenantid
+    label: tenantid
+    type: string
+    source: pt
+    total: false    
   - name: surveyid
     label: surveyid
     type: string
@@ -9289,7 +9294,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: pt
     wrapper: true
-    isMandatory: true
+    isMandatory: false
     searchClause: AND tenantid = $ulb  
   - name: fy
     label: Financial Year
