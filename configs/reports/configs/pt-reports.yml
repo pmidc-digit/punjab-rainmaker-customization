@@ -9283,6 +9283,14 @@ ReportDefinitions:
     source: pt
     total: false
   searchParams:
+  - name: ulb
+    label: ULB
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: pt
+    wrapper: true
+    isMandatory: true
+    searchClause: AND tenantid = $ulb  
   - name: fy
     label: Financial Year
     type: singlevaluelist
@@ -9298,7 +9306,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: and propertycategory like concat($usageCat,'%') 
   query: |
-    select propertyid as propertyid,oldpropertyid as oldpropertyid,surveyid as surveyid,tentativedemand 
+    select propertyid as propertyid,tenantid as tenantid,oldpropertyid as oldpropertyid,surveyid as surveyid,tentativedemand 
     as tentativedemand,assessmentyear as assessmentyear,
     propertytype as propertytype,ownership as ownership, propertycategory as propertycategory, businessname as businessname,
     address as address, plotsize as plotsize, localityname as localityname, blockname as blockname, ownername as ownername, mobileno as mobileno
