@@ -234,7 +234,7 @@ ReportDefinitions:
           a.applicant_name AS name,
           a.applicant_mobile_no AS mobilenumber,
           ch.employee_name AS assignee_employee,
-          ch.assignee_code AS assignee_code
+          ch.assignee_code AS assignee_code , ch.current_stage AS current_stage
           FROM egcl_paymentdetail pd
           JOIN egcl_payment p ON pd.paymentid = p.id
           JOIN egcl_bill bill ON bill.id = pd.billid
@@ -252,7 +252,7 @@ ReportDefinitions:
         name,
         mobilenumber,
         'ADV' AS businessservice,
-        current_stage
+        current_stage ,
         collector_code,
         cash_amount,
         cheque_amount,
