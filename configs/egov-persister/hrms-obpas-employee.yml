@@ -1,0 +1,41 @@
+serviceMaps:
+  serviceName: HRMS
+  mappings:
+    - version: 1.0
+      name: hrms
+      description: Persists employee details in the table
+      fromTopic: save-obpas-employee
+      isTransaction: true
+      queryMaps:
+        - query: >
+            INSERT INTO public.eg_hrms_obpass_employee
+            (tenantid, userid, category, subcategory, zone, assigned_tenantid,
+             createdby, createddate, lastmodifiedby, lastmodifieddate)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: Employees.*
+
+          jsonMaps:
+            - jsonPath: $.Employees.*.tenantId       # FIXED
+            - jsonPath: $.Employees.*.userUUID       # FIXED
+            - jsonPath: $.Employees.*.category
+            - jsonPath: $.Employees.*.subcategory
+            - jsonPath: $.Employees.*.zone
+            - jsonPath: $.Employees.*.assignedTenantId  # FIXED
+            - jsonPath: $.Employees.*.auditDetails.createdBy         # FIXED
+            - jsonPath: $.Employees.*.auditDetails.createdDate       # FIXED
+            - jsonPath: $.Employees.*.auditDetails.lastModifiedBy    # FIXED
+            - jsonPath: $.Employees.*.auditDetails.lastModifiedDate  # FIXED
+
+    - version: 1.0
+      name: hrms
+      description: Persists employee details in the table
+      fromTopic: delete-obpas-employee
+      isTransaction: true
+      queryMaps:
+        - query: >
+            DELETE FROM public.eg_hrms_obpass_employee
+            WHERE uuid = ?::uuid AND tenantid = ?;
+          basePath: Employees.*
+          jsonMaps:
+            - jsonPath: $.Employees.*.uuid       # FIXED
+            - jsonPath: $.Employees.*.tenantId       # FIXED
