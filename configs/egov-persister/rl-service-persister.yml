@@ -41,16 +41,16 @@ serviceMaps:
       - jsonPath: $.AllotmentDetails.previousApplicationNumber
       
     - query: INSERT INTO eg_rl_owner_info(id, allotment_id, user_uuid, is_primary_owner, owner_type, ownership_percentage, relationship, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: AllotmentDetails.ownerInfo.*
+      basePath: AllotmentDetails.OwnerInfo.*
       jsonMaps:
-      - jsonPath: $.AllotmentDetails.ownerInfo.*.ownerId
-      - jsonPath: $.AllotmentDetails.ownerInfo.*.allotmentId
-      - jsonPath: $.AllotmentDetails.ownerInfo.*.userUuid
-      - jsonPath: $.AllotmentDetails.ownerInfo.*.isPrimaryOwner
-      - jsonPath: $.AllotmentDetails.ownerInfo.*.ownerType
-      - jsonPath: $.AllotmentDetails.ownerInfo.*.ownershipPercentage
-      - jsonPath: $.AllotmentDetails.ownerInfo.*.relationship
-      - jsonPath: $.AllotmentDetails.ownerInfo.*.status
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.ownerId
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.allotmentId
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.userUuid
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.isPrimaryOwner
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.ownerType
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.ownershipPercentage
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.relationship
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.status
 
     - query: INSERT INTO eg_rl_document(id, allotment_id, documenttype, filestoreid,status, createdby, createdtime) VALUES (?, ?, ?, ?,'Active', ?, ?);
       basePath: AllotmentDetails.Document.*
@@ -91,16 +91,16 @@ serviceMaps:
         ownership_percentage = EXCLUDED.ownership_percentage,
         relationship = EXCLUDED.relationship,
         status = EXCLUDED.status;
-      basePath: AllotmentDetails.ownerInfo.*
+      basePath: AllotmentDetails.OwnerInfo.*
       jsonMaps:
-      - jsonPath: $.AllotmentDetails.ownerInfo.*.ownerId
-      - jsonPath: $.AllotmentDetails.ownerInfo.*.allotmentId
-      - jsonPath: $.AllotmentDetails.ownerInfo.*.userUuid
-      - jsonPath: $.AllotmentDetails.ownerInfo.*.isPrimaryOwner
-      - jsonPath: $.AllotmentDetails.ownerInfo.*.ownerType
-      - jsonPath: $.AllotmentDetails.ownerInfo.*.ownershipPercentage
-      - jsonPath: $.AllotmentDetails.ownerInfo.*.relationship
-      - jsonPath: $.AllotmentDetails.ownerInfo.*.status
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.ownerId
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.allotmentId
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.userUuid
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.isPrimaryOwner
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.ownerType
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.ownershipPercentage
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.relationship
+      - jsonPath: $.AllotmentDetails.OwnerInfo.*.status
     
     - query: INSERT INTO eg_rl_document(id, allotment_id, documenttype, filestoreid,status, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?,'Active', ?, ?, ?, ?)
             ON CONFLICT (id) DO UPDATE SET
