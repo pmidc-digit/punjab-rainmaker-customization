@@ -212,7 +212,7 @@ ServiceMaps:
     - topic: update-scorecard-survey-active
       configKey: INDEX
       indexes:
-        - name: csc-entity-index
+        - name: csc-survey
           type: general
           id: $.uuid, $.tenantId
           isBulk: true
@@ -241,9 +241,9 @@ ServiceMaps:
         - name: csc-survey
           type: general
           id: $.uuid, $.tenantId
-          isBulk: false
+          isBulk: true
           timeStampField: $.auditDetails.lastModifiedTime
-          jsonPath: $.SurveyEntity
+          jsonPath: $.Surveys.*
           customJsonMapping:
             indexMapping: { "Data": { "uuid": "uuid", "tenantId": "tenantId", "surveyTitle": "surveyTitle", "surveyCategory": "surveyCategory", "surveyDescription": "surveyDescription", "startDate": "startDate", "endDate": "endDate", "postedBy": "postedBy", "active": "active", "answersCount": "answersCount", "hasResponded": "hasResponded", "auditDetails": { }, "sections": [ ] } }
             fieldMapping:
@@ -318,10 +318,10 @@ ServiceMaps:
       indexes:
         - name: csc-answer
           type: general
-          id: $.uuid, $.citizenId, $.tenantId
-          isBulk: false
-          timeStampField: $.answers[0].auditDetails.createdTime
-          jsonPath: $.SurveyResponse
+          id: $.surveyUuid, $.citizenId, $.tenantId
+          isBulk: true
+          timeStampField: $.surveyResponses[*].sectionResponses[*].questionResponses[*].answerResponse.auditDetails.lastModifiedTime
+          jsonPath: $.SurveyResponses.*
           customJsonMapping:
             indexMapping: {
               "Data": {
@@ -334,8 +334,6 @@ ServiceMaps:
                 "status": "status",
                 "answers": [ ] } }
             fieldMapping:
-              - inJsonPath: $.uuid
-                outJsonPath: $.Data.surveyResponseUuid
               - inJsonPath: $.surveyUuid
                 outJsonPath: $.Data.surveyUuid
               - inJsonPath: $.tenantId
@@ -349,4 +347,4 @@ ServiceMaps:
               - inJsonPath: $.status
                 outJsonPath: $.Data.status
               - inJsonPath: $.answers[*]
-                outJsonPath: $.Data.answers
+                outJsonPath: $.Data.sectionResponses[*].questionResponses[*].answerResponse
