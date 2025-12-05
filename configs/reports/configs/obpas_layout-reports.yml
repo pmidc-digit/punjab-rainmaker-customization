@@ -333,88 +333,85 @@ ReportDefinitions:
     isMandatory: true
     searchClause: AND n.createdtime <= $toDate
   query: |
-      WITH wf_detailed AS (
-        SELECT 
-          wf.businessid AS uuid,
-          UPPER(st.applicationstatus) AS applicationstatus,
-          wf.createdtime,
-          wf.lastmodifiedtime,
-          wf.businessservicesla,
-          wf.tenantid,
-          wf.id AS processinstanceid
-        FROM eg_wf_processinstance_v2 wf
-        JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-        WHERE wf.tenantid = $tenantid
-          AND wf.businessservice in ('layout_mcl','layout_mco')
-      ),
-      
-      status_times AS (
-        SELECT
-          uuid,
-          MAX(CASE WHEN applicationstatus = 'DOCUMENTVERIFY' THEN createdtime END)                    AS docverify_time,
-          MAX(CASE WHEN applicationstatus IN ('APPROVED','REJECTED') THEN lastmodifiedtime END)     AS final_time
-        FROM wf_detailed
-        GROUP BY uuid
-      ),
-      
-      latest_status AS (
-        SELECT uuid, applicationstatus
-        FROM (
-          SELECT uuid, applicationstatus, lastmodifiedtime,
-                 ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY lastmodifiedtime DESC NULLS LAST) AS rn
-          FROM wf_detailed
-        ) x
-        WHERE rn = 1
-      ),
-      
-      sla_data AS (
-        SELECT businessservice, businessservicesla
-        FROM eg_wf_businessservice_v2
-        WHERE businessservice in ('layout_mcl','layout_mco')
-      ),
-      
-      assignee_details AS (
-        SELECT DISTINCT ON (wf.businessid)
-          wf.businessid,
-          e.code AS employee_code,
-          u.name AS employee_name
-        FROM eg_wf_processinstance_v2 wf
-        JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
-        LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        LEFT JOIN eg_user u ON u.uuid = wa.assignee
-        WHERE wf.tenantid = $tenantid
-          AND wf.businessservice in ('layout_mcl','layout_mco')
-        ORDER BY wf.businessid, wf.lastmodifiedtime DESC
-      )
-      
-      SELECT
-        split_part(a.tenantid, '.', 2) AS tenantid,
-        a.applicationno AS layout_application_no,
-        UPPER(ls.applicationstatus) AS final_status,
-        TO_CHAR(TO_TIMESTAMP(st.docverify_time/1000),'DD-MM-YYYY') AS document_verify_on,
-        TO_CHAR(TO_TIMESTAMP(st.final_time/1000),'DD-MM-YYYY')   AS finalstatus_on,
-        CASE
-          WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL
-            THEN FLOOR((st.final_time - st.docverify_time) / 86400000)
-          WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
-            THEN FLOOR((EXTRACT(EPOCH FROM NOW()) * 1000 - st.docverify_time) / 86400000)
-          ELSE NULL
-        END AS sla_days,
-        CASE
-          WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL THEN
-            CASE WHEN (st.final_time - st.docverify_time) > sla.businessservicesla THEN 'BREACHED' ELSE 'MET' END
-          WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL THEN 'IN-PROGRESS'
-          ELSE 'AWAITING DOCVERIFY'
-        END AS sla_status,
-        ad.employee_name AS employee_name,
-        ad.employee_code AS employee_code
-      FROM eg_layout a
-      LEFT JOIN status_times st     ON a.applicationno = st.uuid
-      LEFT JOIN latest_status ls    ON a.applicationno = ls.uuid
-      CROSS JOIN sla_data sla
-      LEFT JOIN assignee_details ad ON a.applicationno = ad.businessid
-      WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')
-  orderby: ORDER BY a.createdtime DESC, tenantid, final_status;
+      -- Use CTE to force query plan, compute & use CTE later     
+       WITH wf_detailed AS (
+         SELECT 
+           wf.businessid AS uuid,                                 
+           UPPER(st.applicationstatus) AS applicationstatus,
+           wf.createdtime,
+           wf.lastmodifiedtime,
+           wf.businessservicesla,
+           wf.tenantid,
+           wf.id AS processinstanceid
+          FROM eg_wf_processinstance_v2 wf
+          JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+          WHERE wf.tenantid = $tenantid
+         AND wf.businessservice in ('layout_mcl','layout_mco')                   
+          ),
+        status_times AS (
+             SELECT
+                uuid,
+                MAX(CASE WHEN applicationstatus = 'DOCUMENTVERIFY' THEN createdtime END) AS docverify_time,
+                MAX(CASE WHEN applicationstatus IN ('APPROVED','REJECTED') THEN lastmodifiedtime END) AS final_time
+              FROM wf_detailed
+              GROUP BY uuid
+             ),
+        latest_status AS (
+              SELECT uuid, applicationstatus
+                 FROM (
+                      SELECT uuid, applicationstatus, lastmodifiedtime,
+                         ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY lastmodifiedtime DESC NULLS LAST) AS rn
+                          FROM wf_detailed
+                        ) x WHERE rn = 1
+                     ),
+        sla_data AS (
+            SELECT businessservice,businessservicesla
+            FROM eg_wf_businessservice_v2
+            WHERE businessservice in ('layout_mcl','layout_mco')
+           ),
+        assignee_details AS (
+             SELECT DISTINCT ON (wf.businessid)
+                 wf.businessid,
+                 e.code AS employee_code,
+                 u.name AS employee_name
+              FROM eg_wf_processinstance_v2 wf
+              JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+              JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+              JOIN eg_user u ON e.uuid = u.uuid
+               WHERE wf.tenantid = $tenantid
+               AND wf.businessservice in ('layout_mcl','layout_mco')
+              ORDER BY wf.businessid,wf.lastmodifiedtime DESC
+               )
+         SELECT
+            split_part(n.tenantid,'.',2) AS tenantid,
+             n.applicationno AS layout_application_no,                 
+             UPPER(ls.applicationstatus) AS final_status,
+            TO_CHAR(TO_TIMESTAMP(st.docverify_time/1000),'DD-MM-YYYY') AS document_verify_on,
+            TO_CHAR(TO_TIMESTAMP(st.final_time/1000),'DD-MM-YYYY') AS finalstatus_on,   
+            CASE
+              WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL
+               THEN FLOOR((st.final_time-st.docverify_time)/86400000)
+              WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
+               THEN FLOOR((EXTRACT(EPOCH FROM NOW())*1000-st.docverify_time)/86400000)
+             ELSE NULL
+            END AS sla_days,
+            CASE
+               WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL THEN
+            CASE WHEN (st.final_time-st.docverify_time) > sla.businessservicesla THEN 'BREACHED'
+                 ELSE 'MET' END
+                WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
+                THEN 'IN-PROGRESS'
+               ELSE 'AWAITING DOCVERIFY'
+            END AS sla_status,
+            ad.employee_name AS employee_name,
+            ad.employee_code AS employee_code
+            FROM eg_layout n
+            LEFT JOIN status_times st ON n.applicationno = st.uuid
+            LEFT JOIN latest_status ls ON n.applicationno = ls.uuid
+            JOIN sla_data sla ON sla.businessservice in ('layout_mcl','layout_mco')
+            LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
+            WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')             
+  orderby:  ORDER BY n.createdtime DESC, tenantid, final_status
       
             
   
