@@ -346,7 +346,7 @@ ReportDefinitions:
           FROM eg_wf_processinstance_v2 wf
           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
           WHERE wf.tenantid = $tenantid
-         AND wf.businessservice in ('layout_mcl','layout_mco')                   
+         AND wf.businessservice in ('Layout_mcl_up','Layout_mcl_abv','Layout_mco_abv','Layout_mcUp')                
           ),
         status_times AS (
              SELECT
@@ -367,7 +367,7 @@ ReportDefinitions:
         sla_data AS (
             SELECT businessservice,businessservicesla
             FROM eg_wf_businessservice_v2
-            WHERE businessservice in ('layout_mcl','layout_mco')
+            WHERE businessservice in ('Layout_mcl_up','Layout_mcl_abv','Layout_mco_abv','Layout_mcUp')
            ),
         assignee_details AS (
              SELECT DISTINCT ON (wf.businessid)
@@ -379,7 +379,7 @@ ReportDefinitions:
               JOIN eg_hrms_employee e ON e.uuid = wa.assignee
               JOIN eg_user u ON e.uuid = u.uuid
                WHERE wf.tenantid = $tenantid
-               AND wf.businessservice in ('layout_mcl','layout_mco')
+               AND wf.businessservice in ('Layout_mcl_up','Layout_mcl_abv','Layout_mco_abv','Layout_mcUp')
               ORDER BY wf.businessid,wf.lastmodifiedtime DESC
                )
          SELECT
@@ -408,7 +408,7 @@ ReportDefinitions:
             FROM eg_layout n
             LEFT JOIN status_times st ON n.applicationno = st.uuid
             LEFT JOIN latest_status ls ON n.applicationno = ls.uuid
-            JOIN sla_data sla ON sla.businessservice in ('layout_mcl','layout_mco')
+            JOIN sla_data sla ON sla.businessservice in ('Layout_mcl_up','Layout_mcl_abv','Layout_mco_abv','Layout_mcUp')
             LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
             WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')             
   orderby:  ORDER BY n.createdtime DESC, tenantid, final_status
