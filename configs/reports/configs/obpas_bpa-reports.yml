@@ -435,7 +435,6 @@ ReportDefinitions:
   orderby:  ORDER BY n.createdtime DESC, tenantid, final_status
 
 - reportName: ReceiptRegisterbpa
-  decryptionPathId: OBPAS_BUILDING_PLANREPORTS
   summary: Details of collector register in building_plan service
   version: 1.0.0
   moduleName: rainmaker-obpas_bpa
@@ -583,4 +582,78 @@ ReportDefinitions:
           AND pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG')
           AND payment.paymentstatus != 'CANCELLED'
   orderby: ORDER BY pd.receiptdate DESC;
-      
+
+- reportName: Detailed_File_List
+  summary: Detailed File List
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: applicationno
+    label: applicationno
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: edcrnumber
+    label: edcrnumber
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: status
+    label: status
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: tenantid
+    label: ULB Name
+    type: string
+    source: obpas_bpa
+    total: false  
+  - name: businessservice
+    label: Module
+    type: string
+    source: obpas_bpa
+    total: false
+  searchParams:    
+  - name: createdtime
+    label: Report Date
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND createdtime =  $createdtime 
+  query: |
+       select applicationno,edcrnumber,status,tenantid,'Building_Plan' as
+       businessservice from eg_bpa_buildingplan where businessservice = 'BPA_LOW' and createdtime = $createdtime 
+
+- reportName: Pending_Files_Summary
+  summary: Beyond Time Line Pending Files Summary
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: ulb_name
+    label: ULB Name
+    type: string
+    source: obpas_bpa
+    total: false  
+  - name: Pending_Files
+    label: Pending Files
+    type: string
+    source: obpas_bpa
+    total: true 
+  query: |
+       SELECT 
+           INITCAP(REPLACE(tenantid, 'pb.', '')) AS ulb_name,
+           status,
+           COUNT(*) AS Pending_Files
+       FROM eg_bpa_buildingplan
+       WHERE businessservice = 'BPA_LOW' and status IN (
+           'VERIFICATION_INPROGRESS',
+           'FIELDINSPECTION_INPROGRESS',
+           'INSPECTION_REPORT_PENDING',
+           'DOC_VERIFICATION_INPROGRESS')
+  groupby: GROUP BY tenantid, status
