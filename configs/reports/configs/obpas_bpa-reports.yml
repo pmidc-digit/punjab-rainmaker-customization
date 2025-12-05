@@ -69,7 +69,7 @@ ReportDefinitions:
     pattern: list://BPA_LOW%:BPA_LOW,BPA_NP_HIGH_OTH%:BPA_NP_HIGH_OTH,BPA_MC%:BPA_MC,BPA_NP%:BPA_NP,BPA_MC_HIGH_OTH%:BPA_MC_HIGH_OTH,BPA_NP_HIGH%:BPA_NP_HIG,BPA_MC_HIGH%:BPA_MC_HIGH,
     source: pt
     isMandatory: true
-    searchClause: 1=1   
+    searchClause: AND 1=1   
   query: |
       WITH current_holder AS (
         SELECT DISTINCT ON (wf.businessid)
@@ -199,6 +199,13 @@ ReportDefinitions:
     source: obpas_bpa
     isMandatory: true
     searchClause: AND createdtime <= $toDate
+  - name: businessservice
+    label: Business Service
+    type: singlevaluelist
+    pattern: list://BPA_LOW%:BPA_LOW,BPA_NP_HIGH_OTH%:BPA_NP_HIGH_OTH,BPA_MC%:BPA_MC,BPA_NP%:BPA_NP,BPA_MC_HIGH_OTH%:BPA_MC_HIGH_OTH,BPA_NP_HIGH%:BPA_NP_HIG,BPA_MC_HIGH%:BPA_MC_HIGH,
+    source: pt
+    isMandatory: true
+    searchClause: AND 1=1      
   - name: collector_code
     label: collector_code
     type: string
@@ -339,6 +346,13 @@ ReportDefinitions:
     source: obpas_bpa
     isMandatory: true
     searchClause: AND n.createdtime <= $toDate
+  - name: businessservice
+    label: Business Service
+    type: singlevaluelist
+    pattern: list://BPA_LOW%:BPA_LOW,BPA_NP_HIGH_OTH%:BPA_NP_HIGH_OTH,BPA_MC%:BPA_MC,BPA_NP%:BPA_NP,BPA_MC_HIGH_OTH%:BPA_MC_HIGH_OTH,BPA_NP_HIGH%:BPA_NP_HIG,BPA_MC_HIGH%:BPA_MC_HIGH,
+    source: pt
+    isMandatory: true
+    searchClause: AND 1=1      
   query: |
        WITH wf_detailed AS (
          SELECT 
@@ -420,9 +434,6 @@ ReportDefinitions:
             WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')             
   orderby:  ORDER BY n.createdtime DESC, tenantid, final_status
 
-      
-            
-  
 - reportName: ReceiptRegisterbpa
   decryptionPathId: OBPAS_BUILDING_PLANREPORTS
   summary: Details of collector register in building_plan service
@@ -528,6 +539,13 @@ ReportDefinitions:
     source: obpas_bpa
     isMandatory: false
     searchClause: AND payment.paymentmode like $paymentMode
+  - name: businessservice
+    label: Business Service
+    type: singlevaluelist
+    pattern: list://BPA_LOW%:BPA_LOW,BPA_NP_HIGH_OTH%:BPA_NP_HIGH_OTH,BPA_MC%:BPA_MC,BPA_NP%:BPA_NP,BPA_MC_HIGH_OTH%:BPA_MC_HIGH_OTH,BPA_NP_HIGH%:BPA_NP_HIG,BPA_MC_HIGH%:BPA_MC_HIGH,
+    source: pt
+    isMandatory: true
+    searchClause: AND 1=1      
   query: |
       SELECT
           pd.receiptnumber AS receiptno,
