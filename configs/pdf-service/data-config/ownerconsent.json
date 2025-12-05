@@ -666,61 +666,12 @@
          
           {
             "externalAPI": [
-              {
-                "path": "http://collection-services:8080/collection-services/payments/BPA.NC_SAN_FEE/_search",
-                "queryParam": "tenantId=$.tenantId,consumerCodes=$.applicationNo",
-                "apiRequest": null,
-                "responseMapping": [
-                  {
-                    "variable": "sanHeadCode",
-                    "value": "$.Payments[0].paymentDetails[0].bill.billDetails[0].billAccountDetails[0].taxHeadCode",
-                    "localisation": {
-                      "required": true,
-                      "prefix": "BPA",
-                      "module": "rainmaker-bpa"
-                    }
-                  },
-                  {
-                    "variable": "sanFee",
-                    "value": "$.Payments[0].paymentDetails[0].bill.billDetails[0].billAccountDetails[0].amount"
-                  }
-                ]
-              },
-              {
-                "path": "http://collection-services:8080/collection-services/payments/BPA.NC_APP_FEE/_search",
-                "queryParam": "tenantId=$.tenantId,consumerCodes=$.applicationNo",
-                "apiRequest": null,
-                "responseMapping": [
-                  {
-                    "variable": "appHeadCode",
-                    "value": "$.Payments[0].paymentDetails[0].bill.billDetails[0].billAccountDetails[0].taxHeadCode",
-                    "localisation": {
-                      "required": true,
-                      "prefix": "BPA",
-                      "module": "rainmaker-bpa"
-                    }
-                  },
-                  {
-                    "variable": "appFee",
-                    "value": "$.Payments[0].paymentDetails[0].bill.billDetails[0].billAccountDetails[0].amount"
-                  }
-                ]
-              },
-              {
-                "path": "http://egov-workflow-v2.egov:8080/egov-workflow-v2/egov-wf/process/_search",
-                "queryParam": "tenantId=$.tenantId,businessIds=$.applicationNo,history=true",
-                "apiRequest": null,
-                "responseMapping": [
-                  {
-                    "variable": "approvedBy",
-                    "value": "$.ProcessInstances[?(@.action=='APPROVE')].assigner.name",
-                    "isUpperCaseRequired": true
-                  }
-                ]
-              },
+              
+              
+            
               {
                 "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
-                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pg&filter=%5B?(@.code=='{$.tenantId}')%5D",
+                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}')%5D",
                 "apiRequest": null,
                 "responseMapping": [
                   {
@@ -743,10 +694,7 @@
           },
           {
             "derived": [
-              {
-                "variable": "totalDue",
-                "formula": "{{sanFee}}+{{appFee}}"
-              },
+              
               {
                 "variable": "epochIST",
                 "type": "date",
