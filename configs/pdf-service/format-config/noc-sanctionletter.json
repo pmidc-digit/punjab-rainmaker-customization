@@ -1,0 +1,571 @@
+{
+  "key": "noc-sanctionletter",
+  "config": {
+    "defaultStyle": {
+      "font": "Roboto",
+      "fontSize": 10
+    },
+    "content": [
+      {
+        "style": "noc-head",
+        "table": {
+          "widths": [90, "*", 90],
+          "body": [
+            [
+              {
+                "image": "{{logoImage}}",
+                "width": 60,
+                "height": 60,
+                "alignment": "left"
+              },
+              {
+                "stack": [
+                  {
+                    "text": "{{nocUlbType}} {{ulbName}}",
+                    "style": "receipt-logo-header",
+                    "alignment": "center",
+                    "margin": [20, 5, 0, 2]
+                  },
+                  {
+                    "text": "({{nocType}} Regularization Certificate)",
+                    "style": "receipt-logo-sub-header",
+                    "alignment": "center",
+                    "margin": [20, 2, 0, 0]
+                  }
+                ],
+                "alignment": "center"
+              },
+              {
+                "image": "{{qrcodeimage}}",
+                "width": 60,
+                "height": 60,
+                "alignment": "right",
+                "margin": [10, 0, -10, 0]
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+      {
+        "style": "noc-table",
+        "table": {
+          "widths": ["55%", "45%"],
+          "body": [
+            [
+              {
+                "stack": [
+                  { "text": "NOC No: {{consumerID}}", "margin": [0, 0, 0, 0] }
+                ],
+                "style": "receipt-table",
+                "alignment": "left",
+                "border": [false, false, false, false],
+                "margin": [0, 0, 0, 0]
+              },
+              {
+                "text": "Dated: {{submittedOn}}",
+                "style": "receipt-table-value",
+                "alignment": "right",
+                "border": [false, false, false, false],
+                "margin": [0, 0, 10, 0],
+                "font": "Roboto"
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+      {
+        "style": "noc-table",
+        "table": {
+          "widths": ["100%"],
+          "body": [
+            [
+              {
+                "stack": [
+                  {
+                    "text": "1. Whereas Mr/Miss/Mrs {{applicantOwnerOrFirmName}} has applied to {{ulbName}} for getting No Objection Certificate regarding the regularization of Plot/Building under Policy No: 12/01/2017-5HG2/1806 dated 18th October 2018. The detail of his/ her / their plot / building is given below: -.",
+                    "style": "receipt-table",
+                    "alignment": "left",
+                    "margin": [0, 5, 0, 5],
+                    "bold": true
+                  }
+                ],
+                "border": [false, false, false, false],
+                "margin": [0, 0, 0, 0]
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+      {
+        "columns": [
+          {
+            "style": "next-noc-table",
+            "table": {
+              "widths": ["50%", "50%"],
+              "body": [
+                [
+                  {
+                    "text": "{{noc_no}} & {{date_label}}",
+                    "style": "receipt-table-value-down",
+                    "bold": true,
+                    "fillColor": "#f2f2f2"
+                  },
+                  {
+                    "text": "{{applicant_name}}",
+                    "style": "receipt-table-value",
+                    "fillColor": "#f2f2f2"
+                  }
+                ],
+                [
+                  {
+                    "text": "{{consumerID}} Dated {{submittedOn}}",
+                    "style": "receipt-table-value-down",
+                    "bold": true
+                  },
+                  {
+                    "text": "{{applicantOwnerOrFirmName}}",
+                    "style": "receipt-table-value-down"
+                  }
+                ]
+              ]
+            },
+            "layout": {}
+          }
+        ]
+      },
+      {
+        "style": "next-noc-table",
+        "table": {
+          "widths": ["20%", "20%","20%","20%","20%"],
+          "body": [
+            [
+              {
+                "text": "{{property_desc}}:",
+                "bold": true,
+                "style": "receipt-table-value",
+                "border": [false, false, false, false],
+                "margin": [0, 0, 0, 0]
+              },
+              {
+                "text": "",
+                "style": "receipt-table-value-down",
+                "border": [false, false, false, false]
+              },
+              {
+                "text": "",
+                "style": "receipt-table-value-down",
+                "border": [false, false, false, false]
+              },
+              {
+                "text": "",
+                "style": "receipt-table-value-down",
+                "border": [false, false, false, false]
+              },
+              {
+                "text": "",
+                "style": "receipt-table-value-down",
+                "border": [false, false, false, false]
+              }
+            ],
+            [
+              {
+                "text": "{{revenue_estate}}",
+                "border": [true, true, true, false],
+                "style": "receipt-table-value",
+                "fillColor": "#f2f2f2"
+              },
+              {
+                "text": "{{vasika_no}}",
+                "border": [false, true, true, false],
+                "style": "receipt-table-value",
+                "fillColor": "#f2f2f2"
+              },
+              {
+                "text": "{{net_total_area}}",
+                "border": [false, true, true, false],
+                "style": "receipt-table-value",
+                "fillColor": "#f2f2f2"
+              },
+              {
+                "text": "{{hadbast_no}}",
+                "border": [false, true, false, false],
+                "style": "receipt-table-value",
+                "fillColor": "#f2f2f2"
+              },
+              {
+                "text": "{{khewat_khatuni_no}}",
+                "border": [true, true, true, false],
+                "style": "receipt-table-value",
+                "fillColor": "#f2f2f2"
+              }
+            ],
+            [
+              {
+                "text": "{{revenueEstate}}",
+                "border": [true, true, true, false],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": "{{vasikaNo}}",
+                "border": [false, true, true, false],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": "{{netTotalArea}}",
+                "border": [false, true, true, false],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": "{{hadbastNo}}",
+                "border": [false, true, false, false],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": "{{khewatAndKhatuniNo}}",
+                "border": [true, true, true, false],
+                "style": "receipt-table-value-down"
+              }
+            ],
+            [
+              {
+                "text": "{{khasra_no}} :",
+                "border": [true, true, true, true],
+                "style": "receipt-table-value-down",
+                "fillColor": "#f2f2f2",
+                "bold":true
+              },
+              {
+                "text": "{{khasraNo}}",
+                "border": [false, true, false, true],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": " ",
+                "border": [false, true, false, true],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": " ",
+                "border": [false, true, false, true],
+                "style": "receipt-table-value-down"
+              },
+              {
+                "text": " ",
+                "border": [false, true, true, true],
+                "style": "receipt-table-value-down"
+              }
+            ]
+            
+          ]
+        },
+        "layout": {}
+      },
+      {
+        "style": "next-noc-table",
+        "table": {
+          "widths": ["100%"],
+          "body": [
+            [
+              {
+                "text": "2. Whereas, the area falls under the following categories: -",
+                "style": "receipt-table-value-down",
+                "alignment": "left",
+                "border": [false, false, false, false],
+                "margin": [0, 5, 0, 2]
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+      {
+        "style": "next-noc-table",
+        "table": {
+          "widths": ["10%","45%","45%"],
+          "body": [
+            [
+                {
+                "text": "Sr. No",
+                "border": [true, true, true, false],
+                "style": "receipt-table-value",
+                "fillColor": "#f2f2f2"
+              },
+              {
+                "text": "Details",
+                "border": [true, true, true, false],
+                "style": "receipt-table-value",
+                "fillColor": "#f2f2f2"
+              },
+              {
+                "text": "{{hadbast_no}}",
+                "border": [true, true, true, false],
+                "style": "receipt-table-value",
+                "fillColor": "#f2f2f2"
+              }
+            ],
+            [
+                {
+                "text": "1",
+                "border": [true, true, true, false],
+                "style": "receipt-table-value"
+              },
+              {
+                "text": "{{property_address}}",
+                "border": [true, true, true, false],
+                "style": "receipt-table-value"
+              },
+              {
+                "text": "{{plotNo}}, {{payerAddress}}",
+                "border": [true, true, true, false],
+                "style": "receipt-table-value-down"
+              }
+            ],
+            [
+                {
+                "text": "2",
+                "border": [true, true, true, false],
+                "style": "receipt-table-value"
+              },
+              {
+                "text": "{{noc_compounding}}",
+                "border": [true, true, true, false],
+                "style": "receipt-table-value"
+              },
+              {
+                "text": "{{BuildingCategory}} Plot measuring {{plotArea}} Sq. mts.",
+                "border": [false, true, true, false],
+                "style": "receipt-table-value-down"
+              }
+            ],
+            [
+                {
+                "text": "3 ",
+                "style": "receipt-table-value",
+                "alignment": "left",
+                "border": [true, true, true, true],
+                "margin": [0, 0, 0, 0]
+              },
+              {
+                "text": "{{regularization_unauthorized}}",
+                "style": "receipt-table-value",
+                "bold": true,
+                "alignment": "left",
+                "border": [true, true, true, true],
+                "margin": [0, 0, 0, 0]
+              },
+              {
+                "stack": [
+                  {
+                    "stack": [
+                        "{{#var_floorArea}}",
+                        {
+                        "text": "{{floorNo}}: {{value}} sq.mtrs",
+                        "style": "receipt-table-value-down",
+                        "alignment": "left",
+                        "margin": [0, 0, 0, 0]
+                        },
+                        "{{/var_floorArea}}"
+                    ]
+                  },
+                  {
+                    "text": "Basement: {{basementArea}} sq.mtrs",
+                    "style": "receipt-table-value-down",
+                    "alignment": "left",
+                    "margin": [0, 0, 0, 0]
+                  },
+                  {
+                    "text": "{{built_up_area}}: {{totalFloorArea}} sq.mtrs",
+                    "style": "receipt-table-value-down",
+                    "alignment": "left",
+                    "margin": [0, 0, 0, 0]
+                  }
+                ],
+                "border": [true, true, true, true]
+              }
+
+            ],
+            [
+                {
+                "text": "4",
+                "border": [true, true, true, true],
+                "style": "receipt-table-value"
+              },
+              {
+                "text": "{{regularization_paid}}",
+                "border": [true, true, true, true],
+                "style": "receipt-table-value"
+              },
+              {
+                "text": "{{vide_no}}: {{consumerID}} Rs. : {{totalAmount}}",
+                "border": [false, true, true, true],
+                "style": "receipt-table-value-down"
+              }
+            ]
+          ]
+        },
+        "layout": {}
+      },
+      {
+        "style": "next-noc-table",
+        "table": {
+          "widths": ["100%"],
+          "body": [
+            
+            [
+              {
+                "stack": [
+                  "{{#var_sanctionTerms}}",
+                  {
+                    "text": "{{number}}  {{text}}",
+                    "style": "receipt-table-value-down",
+                    "alignment": "justify",
+                    "margin": [0, 2, 0, 2]
+                  },
+                  "{{/var_sanctionTerms}}"
+                ],
+                "style": "receipt-table",
+                "alignment": "left",
+                "border": [false, false, false, false],
+                "margin": [0, 15, 10, 2]
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+      {
+        "style": "receipt-approver",
+        "stack": [
+          
+            
+              {
+                "text": "Competent Authority",
+                "bold": true,
+                "alignment": "right"
+              },
+              {
+                "text": "{{nocUlbType}} {{ulbName}}",
+                "alignment": "right",
+                "bold": false,
+                "margin" :[5,4,0,2]
+              },
+              {
+                "text": "Officer Name",
+                "bold": true,
+                "alignment": "right"
+              },
+              {
+                "text": "{{officerName}}",
+                "alignment": "right",
+                "bold": false,
+                "margin" :[5,4,0,2]
+              },
+              {
+                "text": "Designation",
+                "bold": true,
+                "alignment": "right"
+              },
+              {
+                "text": "{{officerDesignation}}",
+                "alignment": "right",
+                "margin" :[5,4,0,2],
+                "bold": false
+              },
+              {
+                "text": "{{currentDate}}",
+                "bold": true,
+                "alignment": "right",
+                "margin" :[5,7,0,0]
+              }
+              
+              
+            
+            
+          
+        ]
+      },
+      {
+        "style": "no-signature",
+        "text": "**This is a computer generated letter , no signature is required.**",
+        "alignment": "center"
+      }
+    ],
+    "styles": {
+      "noc-head": {
+        "margin": [-30, -30, 0, 5]
+      },
+      "receipt-logo-header": {
+        "color": "#000000",
+        "fontSize": 12,
+        "bold": true,
+        "letterSpacing": 0.74,
+        "margin": [0, 0, 0, 2]
+      },
+      "receipt-logo-sub-header": {
+        "color": "#000000",
+        "fontSize": 11,
+        "letterSpacing": 0.6
+      },
+      "noc-table": {
+        "fontSize": 11,
+        "color": "#000000",
+        "margin": [-25, 0, -22, 0]
+      },
+      "receipt-table-value-total-Qr": {
+        "alignment": "right",
+        "margin": [0, 3, 10, 0]
+      },
+      "receipt-table-value-down": {
+        "color": "#000000",
+        "bold": false,
+        "fontSize": 9,
+        "fontWeight": 400,
+        "alignment": "left",
+        "margin": [3, 2, 0, 2]
+      },
+      "next-noc-table": {
+        "fontSize": 10,
+        "color": "#000000",
+        "margin": [-30, 10, -22, 0]
+      },
+      "receipt-table-value": {
+        "color": "#000000",
+        "bold": true,
+        "fontSize": 9,
+        "fontWeight": 500,
+        "margin": [0, 0, 0, 0]
+      },
+      "receipt-table": {
+        "color": "#000000",
+        "bold": false,
+        "fontSize": 9,
+        "fontWeight": 400,
+        "margin": [0, 2, 0, 2]
+      },
+      "receipt-approver": {
+        "fontSize": 9,
+        "bold": true,
+        "margin": [-27, 0, -10, 0],
+        "color": "#484848"
+      },
+      "no-signature": {
+        "fontSize": 9,
+        "margin": [-27, 30, -10, 0],
+        "color": "#000000"
+      },
+      "pt-disclaimer": {
+        "fontSize": 10,
+        "margin": [-27, 0, -10, 0],
+        "color": "#484848"
+      },
+      "pt-disclaimer-value": {
+        "fontSize": 9,
+        "margin": [2, 0, 0, 0],
+        "color": "#484848"
+      }
+    }
+  }
+}
