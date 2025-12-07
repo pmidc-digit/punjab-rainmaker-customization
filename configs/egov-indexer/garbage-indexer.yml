@@ -1,0 +1,343 @@
+
+ServiceMaps:
+  serviceName: garbage-services
+  version: 1.0.0
+  mappings:
+    - topic: save-gc-connection
+      configKey: INDEX
+      indexes:
+        - name: gc-connection-index
+          type: general
+          id: $.GarbageConnection.id, $.GarbageConnection.tenantId
+          isBulk: false
+          timeStampField: $.GarbageConnection.auditDetails.createdTime
+          jsonPath: $
+          customJsonMapping:
+            indexMapping:
+              Data:
+                id: id
+                tenantId: tenantId
+                propertyId: propertyId
+                applicationNo: applicationNo
+                applicationStatus: applicationStatus
+                status: status
+                connectionNo: connectionNo
+                oldConnectionNo: oldConnectionNo
+                action: action
+                createdBy: createdBy
+                lastModifiedBy: lastModifiedBy
+                createdTime: createdTime
+                lastModifiedTime: lastModifiedTime
+                applicationType: applicationType
+                dateEffectiveFrom: dateEffectiveFrom
+                oldApplication: oldApplication
+                channel: channel
+                isDisconnectionTemporary: isDisconnectionTemporary
+                disconnectionReason: disconnectionReason
+                propertyType: propertyType
+                plotSize: plotSize
+                location: location
+                frequency: frequency
+                typeOfWaste: typeOfWaste
+                connectionCategory: connectionCategory
+                connectionType: connectionType
+                connectionExecutionDate: connectionExecutionDate
+                appCreatedDate: appCreatedDate
+                disconnectionExecutionDate: disconnectionExecutionDate
+                estimationFileStoreId: estimationFileStoreId
+                sanctionFileStoreId: sanctionFileStoreId
+                estimationLetterDate: estimationLetterDate
+                detailsProvidedBy: detailsProvidedBy
+                additionalDetails: additionalDetails
+                documents: []
+                connectionHolders: []
+            fieldMapping:
+              - inJsonPath: $.GarbageConnection.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.GarbageConnection.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.GarbageConnection.propertyId
+                outJsonPath: $.Data.propertyId
+              - inJsonPath: $.GarbageConnection.applicationNo
+                outJsonPath: $.Data.applicationNo
+              - inJsonPath: $.GarbageConnection.applicationStatus
+                outJsonPath: $.Data.applicationStatus
+              - inJsonPath: $.GarbageConnection.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.GarbageConnection.connectionNo
+                outJsonPath: $.Data.connectionNo
+              - inJsonPath: $.GarbageConnection.oldConnectionNo
+                outJsonPath: $.Data.oldConnectionNo
+              - inJsonPath: $.GarbageConnection.processInstance.action
+                outJsonPath: $.Data.action
+              - inJsonPath: $.GarbageConnection.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+              - inJsonPath: $.GarbageConnection.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.GarbageConnection.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
+              - inJsonPath: $.GarbageConnection.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+              - inJsonPath: $.GarbageConnection.applicationType
+                outJsonPath: $.Data.applicationType
+              - inJsonPath: $.GarbageConnection.dateEffectiveFrom
+                outJsonPath: $.Data.dateEffectiveFrom
+              - inJsonPath: $.GarbageConnection.oldApplication
+                outJsonPath: $.Data.oldApplication
+              - inJsonPath: $.GarbageConnection.channel
+                outJsonPath: $.Data.channel
+              - inJsonPath: $.GarbageConnection.isDisconnectionTemporary
+                outJsonPath: $.Data.isDisconnectionTemporary
+              - inJsonPath: $.GarbageConnection.disconnectionReason
+                outJsonPath: $.Data.disconnectionReason
+              - inJsonPath: $.GarbageConnection.propertyType
+                outJsonPath: $.Data.propertyType
+              - inJsonPath: $.GarbageConnection.plotSize
+                outJsonPath: $.Data.plotSize
+              - inJsonPath: $.GarbageConnection.location
+                outJsonPath: $.Data.location
+              - inJsonPath: $.GarbageConnection.frequency
+                outJsonPath: $.Data.frequency
+              - inJsonPath: $.GarbageConnection.typeOfWaste
+                outJsonPath: $.Data.typeOfWaste
+              - inJsonPath: $.GarbageConnection.additionalDetails.connectionCategory
+                outJsonPath: $.Data.additionalDetails.connectionCategory
+              - inJsonPath: $.GarbageConnection.connectionType
+                outJsonPath: $.Data.connectionType
+              - inJsonPath: $.GarbageConnection.connectionExecutionDate
+                outJsonPath: $.Data.connectionExecutionDate
+              - inJsonPath: $.GarbageConnection.additionalDetails.appCreatedDate
+                outJsonPath: $.Data.appCreatedDate
+              - inJsonPath: $.GarbageConnection.disconnectionExecutionDate
+                outJsonPath: $.Data.disconnectionExecutionDate
+              - inJsonPath: $.GarbageConnection.additionalDetails.estimationFileStoreId
+                outJsonPath: $.Data.estimationFileStoreId
+              - inJsonPath: $.GarbageConnection.additionalDetails.sanctionFileStoreId
+                outJsonPath: $.Data.sanctionFileStoreId
+              - inJsonPath: $.GarbageConnection.additionalDetails.estimationLetterDate
+                outJsonPath: $.Data.estimationLetterDate
+              - inJsonPath: $.GarbageConnection.additionalDetails.detailsProvidedBy
+                outJsonPath: $.Data.detailsProvidedBy
+              - inJsonPath: $.GarbageConnection.additionalDetails
+                outJsonPath: $.Data.additionalDetails
+              - inJsonPath: $.GarbageConnection.documents
+                outJsonPath: $.Data.documents
+              - inJsonPath: $.GarbageConnection.connectionHolders
+                outJsonPath: $.Data.connectionHolders
+
+    - topic: update-gc-connection
+      configKey: INDEX
+      indexes:
+        - name: gc-connection-update-index
+          type: general
+          id: $.GarbageConnection.id, $.GarbageConnection.tenantId
+          isBulk: false
+          timeStampField: $.GarbageConnection.auditDetails.lastModifiedTime
+          jsonPath: $
+          customJsonMapping:
+            indexMapping:
+              Data:
+                id: id
+                tenantId: tenantId
+                applicationStatus: applicationStatus
+                status: status
+                connectionNo: connectionNo
+                oldConnectionNo: oldConnectionNo
+                action: action
+                adhocPenalty: adhocPenalty
+                adhocRebate: adhocRebate
+                adhocPenaltyReason: adhocPenaltyReason
+                adhocPenaltyComment: adhocPenaltyComment
+                adhocRebateReason: adhocRebateReason
+                adhocRebateComment: adhocRebateComment
+                lastModifiedBy: lastModifiedBy
+                lastModifiedTime: lastModifiedTime
+                dateEffectiveFrom: dateEffectiveFrom
+                oldApplication: oldApplication
+                propertyId: propertyId
+
+                isDisconnectionTemporary: isDisconnectionTemporary
+                disconnectionReason: disconnectionReason
+                propertyType: propertyType
+                plotSize: plotSize
+                location: location
+                frequency: frequency
+                typeOfWaste: typeOfWaste
+                connectionCategory: connectionCategory
+                connectionType: connectionType
+                connectionExecutionDate: connectionExecutionDate
+                detailsProvidedBy: detailsProvidedBy
+                estimationFileStoreId: estimationFileStoreId
+                sanctionFileStoreId: sanctionFileStoreId
+                estimationLetterDate: estimationLetterDate
+                additionalDetails: additionalDetails
+                documents: []
+            fieldMapping:
+              - inJsonPath: $.GarbageConnection.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.GarbageConnection.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.GarbageConnection.applicationStatus
+                outJsonPath: $.Data.applicationStatus
+              - inJsonPath: $.GarbageConnection.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.GarbageConnection.connectionNo
+                outJsonPath: $.Data.connectionNo
+              - inJsonPath: $.GarbageConnection.oldConnectionNo
+                outJsonPath: $.Data.oldConnectionNo
+              - inJsonPath: $.GarbageConnection.processInstance.action
+                outJsonPath: $.Data.action
+              - inJsonPath: $.GarbageConnection.additionalDetails.adhocPenalty
+                outJsonPath: $.Data.adhocPenalty
+              - inJsonPath: $.GarbageConnection.additionalDetails.adhocRebate
+                outJsonPath: $.Data.adhocRebate
+              - inJsonPath: $.GarbageConnection.additionalDetails.adhocPenaltyReason
+                outJsonPath: $.Data.adhocPenaltyReason
+              - inJsonPath: $.GarbageConnection.additionalDetails.adhocPenaltyComment
+                outJsonPath: $.Data.adhocPenaltyComment
+              - inJsonPath: $.GarbageConnection.additionalDetails.adhocRebateReason
+                outJsonPath: $.Data.adhocRebateReason
+              - inJsonPath: $.GarbageConnection.additionalDetails.adhocRebateComment
+                outJsonPath: $.Data.adhocRebateComment
+              - inJsonPath: $.GarbageConnection.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.GarbageConnection.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+              - inJsonPath: $.GarbageConnection.dateEffectiveFrom
+                outJsonPath: $.Data.dateEffectiveFrom
+              - inJsonPath: $.GarbageConnection.oldApplication
+                outJsonPath: $.Data.oldApplication
+              - inJsonPath: $.GarbageConnection.propertyId
+                outJsonPath: $.Data.propertyId
+
+              - inJsonPath: $.GarbageConnection.isDisconnectionTemporary
+                outJsonPath: $.Data.isDisconnectionTemporary
+              - inJsonPath: $.GarbageConnection.disconnectionReason
+                outJsonPath: $.Data.disconnectionReason
+              - inJsonPath: $.GarbageConnection.propertyType
+                outJsonPath: $.Data.propertyType
+              - inJsonPath: $.GarbageConnection.plotSize
+                outJsonPath: $.Data.plotSize
+              - inJsonPath: $.GarbageConnection.location
+                outJsonPath: $.Data.location
+              - inJsonPath: $.GarbageConnection.frequency
+                outJsonPath: $.Data.frequency
+              - inJsonPath: $.GarbageConnection.typeOfWaste
+                outJsonPath: $.Data.typeOfWaste
+              - inJsonPath: $.GarbageConnection.additionalDetails.connectionCategory
+                outJsonPath: $.Data.additionalDetails.connectionCategory
+              - inJsonPath: $.GarbageConnection.connectionType
+                outJsonPath: $.Data.connectionType
+              - inJsonPath: $.GarbageConnection.connectionExecutionDate
+                outJsonPath: $.Data.connectionExecutionDate
+              - inJsonPath: $.GarbageConnection.additionalDetails.detailsProvidedBy
+                outJsonPath: $.Data.detailsProvidedBy
+              - inJsonPath: $.GarbageConnection.additionalDetails.estimationFileStoreId
+                outJsonPath: $.Data.estimationFileStoreId
+              - inJsonPath: $.GarbageConnection.additionalDetails.sanctionFileStoreId
+                outJsonPath: $.Data.sanctionFileStoreId
+              - inJsonPath: $.GarbageConnection.additionalDetails.estimationLetterDate
+                outJsonPath: $.Data.estimationLetterDate
+              - inJsonPath: $.GarbageConnection.additionalDetails
+                outJsonPath: $.Data.additionalDetails
+              - inJsonPath: $.GarbageConnection.documents
+                outJsonPath: $.Data.documents
+
+    - topic: update-gc-workflow
+      configKey: INDEX
+      indexes:
+        - name: gc-workflow-update-index
+          type: general
+          id: $.GarbageConnection.id, $.GarbageConnection.tenantId
+          isBulk: false
+          timeStampField: $.GarbageConnection.auditDetails.lastModifiedTime
+          jsonPath: $
+          customJsonMapping:
+            indexMapping:
+              Data:
+                id: id
+                tenantId: tenantId
+                applicationStatus: applicationStatus
+                status: status
+                connectionNo: connectionNo
+                action: action
+                lastModifiedBy: lastModifiedBy
+                lastModifiedTime: lastModifiedTime
+            fieldMapping:
+              - inJsonPath: $.GarbageConnection.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.GarbageConnection.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.GarbageConnection.applicationStatus
+                outJsonPath: $.Data.applicationStatus
+              - inJsonPath: $.GarbageConnection.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.GarbageConnection.connectionNo
+                outJsonPath: $.Data.connectionNo
+              - inJsonPath: $.GarbageConnection.processInstance.action
+                outJsonPath: $.Data.action
+              - inJsonPath: $.GarbageConnection.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.GarbageConnection.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+
+    - topic: save-gc-filestoreids
+      configKey: INDEX
+      indexes:
+        - name: gc-filestore-index
+          type: general
+          id: $.GarbageConnection.id, $.GarbageConnection.tenantId
+          isBulk: false
+          timeStampField: $.GarbageConnection.auditDetails.lastModifiedTime
+          jsonPath: $
+          customJsonMapping:
+            indexMapping:
+              Data:
+                id: id
+                tenantId: tenantId
+                estimationFileStoreId: estimationFileStoreId
+                sanctionFileStoreId: sanctionFileStoreId
+                estimationLetterDate: estimationLetterDate
+                appCreatedDate: appCreatedDate
+            fieldMapping:
+              - inJsonPath: $.GarbageConnection.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.GarbageConnection.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.GarbageConnection.additionalDetails.estimationFileStoreId
+                outJsonPath: $.Data.estimationFileStoreId
+              - inJsonPath: $.GarbageConnection.additionalDetails.sanctionFileStoreId
+                outJsonPath: $.Data.sanctionFileStoreId
+              - inJsonPath: $.GarbageConnection.additionalDetails.estimationLetterDate
+                outJsonPath: $.Data.estimationLetterDate
+              - inJsonPath: $.GarbageConnection.additionalDetails.appCreatedDate
+                outJsonPath: $.Data.appCreatedDate
+
+    - topic: gc-auto-escalation
+      configKey: INDEX
+      indexes:
+        - name: gc-auto-escalation-index
+          type: general
+          id: $.ProcessInstances.*.businessId, $.ProcessInstances.*.tenantId
+          isBulk: true
+          timeStampField: $.ProcessInstances.*.auditDetails.lastModifiedTime
+          jsonPath: $
+          customJsonMapping:
+            indexMapping:
+              Data:
+                businessId: businessId
+                tenantId: tenantId
+                applicationStatus: applicationStatus
+                lastModifiedBy: lastModifiedBy
+                lastModifiedTime: lastModifiedTime
+            fieldMapping:
+              - inJsonPath: $.ProcessInstances.*.businessId
+                outJsonPath: $.Data.businessId
+              - inJsonPath: $.ProcessInstances.*.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.ProcessInstances.*.state.applicationStatus
+                outJsonPath: $.Data.applicationStatus
+              - inJsonPath: $.ProcessInstances.*.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.ProcessInstances.*.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
