@@ -126,16 +126,18 @@ serviceMaps:
     fromTopic: save-rl-clsure
     isTransaction: true
     queryMaps:
-    - query: INSERT INTO eg_rl_allotment_clsure(id, allotment_id, status,closed_application_number, reason_for_clsure,
+    - query: INSERT INTO eg_rl_allotment_clsure(id, allotment_id, tenant_id, status,application_number, alloted_application_number, reason_for_clsure,
               amount_to_be_refund, amount_to_be_deducted, refund_amount,
               notes_comments, upload_proof, created_time,created_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: AllotmentClsure
       jsonMaps:
       - jsonPath: $.AllotmentClsure.id
       - jsonPath: $.AllotmentClsure.allotmentId
+      - jsonPath: $.AllotmentClsure.tenantId
       - jsonPath: $.AllotmentClsure.status
-      - jsonPath: $.AllotmentClsure.closedApplicationNumber
+      - jsonPath: $.AllotmentClsure.applicationNumber
+      - jsonPath: $.AllotmentClsure.allotedApplicationNumber
       - jsonPath: $.AllotmentClsure.reasonForClosure
       - jsonPath: $.AllotmentClsure.amountToBeRefund
       - jsonPath: $.AllotmentClsure.amountToBeDeducted
@@ -144,12 +146,6 @@ serviceMaps:
       - jsonPath: $.AllotmentClsure.uploadProof
       - jsonPath: $.AllotmentClsure.auditDetails.createdTime
       - jsonPath: $.AllotmentClsure.auditDetails.createdBy
-       
-    - query: UPDATE eg_rl_allotment SET status=? WHERE id=?;
-      basePath: AllotmentClsure
-      jsonMaps:
-      - jsonPath: $.AllotmentClsure.status
-      - jsonPath: $.AllotmentClsure.allotmentId
 
         # UPDATE Query
   - version: 1.0
@@ -175,9 +171,3 @@ serviceMaps:
       - jsonPath: $.AllotmentClsure.auditDetails.lastModifiedBy
       - jsonPath: $.AllotmentClsure.auditDetails.lastModifiedTime
       - jsonPath: $.AllotmentClsure.id
-
-    - query: UPDATE eg_rl_allotment SET status=? WHERE id=?;
-      basePath: AllotmentClsure
-      jsonMaps:
-      - jsonPath: $.AllotmentClsure.status
-      - jsonPath: $.AllotmentClsure.allotmentId
