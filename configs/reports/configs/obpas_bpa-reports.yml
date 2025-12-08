@@ -56,13 +56,6 @@ ReportDefinitions:
     source: obpas_bpa
     isMandatory: true
     searchClause: AND a.createdtime <= $toDate
-  - name: applicationstatus
-    label: Application status
-    type: singlevaluelist
-    pattern: list://INITIATED:INITIATED,PENDINGPAYMENT:PENDINGPAYMENT,DOCUMENTVERIFY:DOCUMENTVERIFY,APPROVED:APPROVED, REJECTED:REJECTED,TL-VERIFICATION:TL-VERIFICATION,WS-SW-VERIFICATION:WS-SW-VERIFICATION ,CITIZENACTIONREQUIRED-DV:CITIZENACTIONREQUIRED-DV,BPA-VERIFICATION:BPA-VERIFICATION,PENDINGAPPROVAL:PENDINGAPPROVAL,CANCELLED:CANCELLED,PT-VERIFICATION:PT-VERIFICATION,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
-    source: obpas_bpa
-    isMandatory: true
-    searchClause: AND LOWER(a.applicationstatus) = LOWER($applicationstatus)
   - name: businessservice
     label: Business Service
     type: singlevaluelist
