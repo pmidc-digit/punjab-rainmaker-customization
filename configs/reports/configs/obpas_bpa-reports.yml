@@ -91,7 +91,6 @@ ReportDefinitions:
       SELECT
         u.name,
         u.mobilenumber,
-        ch.businessservice,
         o.status,
         'BPA' as businessservice,
         o.applicationno,
@@ -617,15 +616,15 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   searchParams:    
-  - name: createdtime
-    label: Report Date
+  - name: fromDate
+    label: Date
     type: epoch
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND createdtime =  $createdtime 
+    searchClause: AND createdtime = $fromDate 
   query: |
        select applicationno,edcrnumber,status,tenantid,'Building_Plan' as
-       businessservice from eg_bpa_buildingplan where businessservice = 'BPA_LOW' and createdtime = $createdtime 
+       businessservice from eg_bpa_buildingplan where businessservice = 'BPA_LOW' 
 
 - reportName: Pending_Files_Summary
   summary: Beyond Time Line Pending Files Summary
@@ -708,7 +707,7 @@ ReportDefinitions:
          inner JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
          inner join designation d on a.designation = d.code
           WHERE wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
-          and wf.businessservice = $ businessservice
+          and wf.businessservice = $businessservice
          ORDER BY wf.businessid, wf.lastmodifiedtime DESC
        ),
        
@@ -719,7 +718,7 @@ ReportDefinitions:
            tenantid,
            status
          FROM eg_bpa_buildingplan
-         WHERE businessservice = 'BPA_LOW'
+         WHERE businessservice = $businessservice
            AND status IN (
              'VERIFICATION_INPROGRESS',
              'FIELDINSPECTION_INPROGRESS',
@@ -747,7 +746,7 @@ ReportDefinitions:
          ulb_name ,
          designation_code as Officer_Designation,
          pending_files 
-       FROM merged
+       FROM merged where 1=1
   orderby:  ORDER BY pending_files DESC limit 7
 
 - reportName: officers_wise_pendency
@@ -799,12 +798,12 @@ ReportDefinitions:
     source: obpas_bpa
     total: true                     
   searchParams:
-  - name: createdtime
-    label: Report Date
+  - name: fromDate
+    label: Date
     type: epoch
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND createdtime =  $createdtime       
+    searchClause: AND 1=1     
   - name: businessservice
     label: Business Service
     type: singlevaluelist
@@ -830,7 +829,7 @@ ReportDefinitions:
       base AS (
           SELECT 
               la.designation_code,
-              p.createdtime = $createdtime
+              p.createdtime = $fromDate 
           FROM latest_assignee la
           JOIN eg_bpa_buildingplan p
             ON p.id::text = la.businessid OR p.applicationno = la.businessid
@@ -872,7 +871,7 @@ ReportDefinitions:
           SUM(CASE WHEN action_date = to_char((SELECT mdate FROM max_date) - INTERVAL '4 day', 'YYYY-MM-DD') THEN cnt ELSE 0 END) AS "day4",
           SUM(CASE WHEN action_date = to_char((SELECT mdate FROM max_date) - INTERVAL '5 day', 'YYYY-MM-DD') THEN cnt ELSE 0 END) AS "day5",
           SUM(CASE WHEN action_date = to_char((SELECT mdate FROM max_date) - INTERVAL '6 day', 'YYYY-MM-DD') THEN cnt ELSE 0 END) AS "day6"
-      FROM daily_count
+      FROM daily_count where 1=1
   groupby: GROUP BY designation_code
   orderby: ORDER BY officer_designation  
   
