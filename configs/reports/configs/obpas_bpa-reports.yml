@@ -66,7 +66,7 @@ ReportDefinitions:
   - name: businessservice
     label: Business Service
     type: singlevaluelist
-    pattern: list://BPA_LOW%:BPA_LOW,BPA_NP_HIGH_OTH%:BPA_NP_HIGH_OTH,BPA_MC%:BPA_MC,BPA_NP%:BPA_NP,BPA_MC_HIGH_OTH%:BPA_MC_HIGH_OTH,BPA_NP_HIGH%:BPA_NP_HIG,BPA_MC_HIGH%:BPA_MC_HIGH,
+    pattern: list://BPA_LOW%:BPA_LOW,BPA_NP_HIGH_OTH%:BPA_NP_HIGH_OTH,BPA_MC%:BPA_MC,BPA_NP%:BPA_NP,BPA_MC_HIGH_OTH%:BPA_MC_HIGH_OTH,BPA_NP_HIGH%:BPA_NP_HIG,BPA_MC_HIGH%:BPA_MC_HIGH
     source: pt
     isMandatory: true
     searchClause: AND 1=1   
@@ -202,7 +202,7 @@ ReportDefinitions:
   - name: businessservice
     label: Business Service
     type: singlevaluelist
-    pattern: list://BPA_LOW%:BPA_LOW,BPA_NP_HIGH_OTH%:BPA_NP_HIGH_OTH,BPA_MC%:BPA_MC,BPA_NP%:BPA_NP,BPA_MC_HIGH_OTH%:BPA_MC_HIGH_OTH,BPA_NP_HIGH%:BPA_NP_HIG,BPA_MC_HIGH%:BPA_MC_HIGH,
+    pattern: list://BPA_LOW%:BPA_LOW,BPA_NP_HIGH_OTH%:BPA_NP_HIGH_OTH,BPA_MC%:BPA_MC,BPA_NP%:BPA_NP,BPA_MC_HIGH_OTH%:BPA_MC_HIGH_OTH,BPA_NP_HIGH%:BPA_NP_HIG,BPA_MC_HIGH%:BPA_MC_HIGH
     source: pt
     isMandatory: true
     searchClause: AND 1=1      
@@ -349,7 +349,7 @@ ReportDefinitions:
   - name: businessservice
     label: Business Service
     type: singlevaluelist
-    pattern: list://BPA_LOW%:BPA_LOW,BPA_NP_HIGH_OTH%:BPA_NP_HIGH_OTH,BPA_MC%:BPA_MC,BPA_NP%:BPA_NP,BPA_MC_HIGH_OTH%:BPA_MC_HIGH_OTH,BPA_NP_HIGH%:BPA_NP_HIG,BPA_MC_HIGH%:BPA_MC_HIGH,
+    pattern: list://BPA_LOW%:BPA_LOW,BPA_NP_HIGH_OTH%:BPA_NP_HIGH_OTH,BPA_MC%:BPA_MC,BPA_NP%:BPA_NP,BPA_MC_HIGH_OTH%:BPA_MC_HIGH_OTH,BPA_NP_HIGH%:BPA_NP_HIG,BPA_MC_HIGH%:BPA_MC_HIGH
     source: pt
     isMandatory: true
     searchClause: AND 1=1      
@@ -541,7 +541,7 @@ ReportDefinitions:
   - name: businessservice
     label: Business Service
     type: singlevaluelist
-    pattern: list://BPA_LOW%:BPA_LOW,BPA_NP_HIGH_OTH%:BPA_NP_HIGH_OTH,BPA_MC%:BPA_MC,BPA_NP%:BPA_NP,BPA_MC_HIGH_OTH%:BPA_MC_HIGH_OTH,BPA_NP_HIGH%:BPA_NP_HIG,BPA_MC_HIGH%:BPA_MC_HIGH,
+    pattern: list://BPA_LOW%:BPA_LOW,BPA_NP_HIGH_OTH%:BPA_NP_HIGH_OTH,BPA_MC%:BPA_MC,BPA_NP%:BPA_NP,BPA_MC_HIGH_OTH%:BPA_MC_HIGH_OTH,BPA_NP_HIGH%:BPA_NP_HIG,BPA_MC_HIGH%:BPA_MC_HIGH
     source: pt
     isMandatory: true
     searchClause: AND 1=1      
@@ -657,3 +657,97 @@ ReportDefinitions:
            'INSPECTION_REPORT_PENDING',
            'DOC_VERIFICATION_INPROGRESS')
   groupby: GROUP BY tenantid, status
+  
+- reportName: officers_with_highest_pendency
+  summary: Top 7 officers with Highest Pendency
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: serial_no
+    label: Serial No
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: ulb_name
+    label: ULB Name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: Officer_Designation
+    label: Officer Designation
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: pending_files
+    label: Pending Files
+    type: string
+    source: obpas_bpa
+    total: false  
+  searchParams:    
+  - name: businessservice
+    label: Business Service
+    type: singlevaluelist
+    pattern: list://BPA_LOW%:BPA_LOW,BPA_NP_HIGH_OTH%:BPA_NP_HIGH_OTH,BPA_MC%:BPA_MC,BPA_NP%:BPA_NP,BPA_MC_HIGH_OTH%:BPA_MC_HIGH_OTH,BPA_NP_HIGH%:BPA_NP_HIG,BPA_MC_HIGH%:BPA_MC_HIGH
+    source: pt
+    isMandatory: true
+    searchClause: AND 1=1 
+
+  query: |
+       WITH latest_assignee AS (
+         SELECT DISTINCT ON (wf.businessid)
+           wf.businessid,
+           wf.tenantid,
+           d.name AS designation_code
+         FROM eg_wf_processinstance_v2 wf
+         JOIN eg_wf_state_v2 st    ON wf.status = st.uuid
+         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+         inner JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
+         inner join designation d on a.designation = d.code
+          WHERE wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+          and wf.businessservice = $ businessservice
+         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+       ),
+       
+       pending_files AS (
+         SELECT
+           id::text AS bp_id,
+           applicationno,
+           tenantid,
+           status
+         FROM eg_bpa_buildingplan
+         WHERE businessservice = 'BPA_LOW'
+           AND status IN (
+             'VERIFICATION_INPROGRESS',
+             'FIELDINSPECTION_INPROGRESS',
+             'INSPECTION_REPORT_PENDING',
+             'DOC_VERIFICATION_INPROGRESS'
+           )
+       ),
+       
+       merged AS (
+         SELECT
+           INITCAP(REPLACE(la.tenantid, 'pb.', '')) AS ulb_name,
+           la.designation_code,
+           COUNT(DISTINCT p.bp_id) AS pending_files
+         FROM latest_assignee la
+         LEFT JOIN pending_files p
+           ON (
+                p.bp_id = la.businessid
+             OR p.applicationno = la.businessid
+           )
+         GROUP BY la.tenantid, INITCAP(REPLACE(la.tenantid, 'pb.', '')), la.designation_code
+       )
+       
+       SELECT
+         ROW_NUMBER() OVER (ORDER BY pending_files DESC) AS Serial_No,
+         ulb_name ,
+         designation_code as Officer_Designation,
+         pending_files 
+       FROM merged
+  orderby:  ORDER BY pending_files DESC limit 7  
+  
+  
