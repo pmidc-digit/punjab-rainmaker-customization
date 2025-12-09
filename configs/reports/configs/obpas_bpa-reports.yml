@@ -866,7 +866,7 @@ ReportDefinitions:
         COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 5 THEN cnt END),0) AS day5,
         COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 6 THEN cnt END),0) AS day6,
         COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 7 THEN cnt END),0) AS day7
-      FROM agg
+      FROM agg where 1=1
   groupby: GROUP BY designation_code
   orderby: ORDER BY officer_designation
       
