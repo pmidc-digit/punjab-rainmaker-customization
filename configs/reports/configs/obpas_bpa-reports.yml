@@ -798,7 +798,7 @@ ReportDefinitions:
     pattern: list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH
     source: pt
     isMandatory: false
-    searchClause: AND 1=1 
+    searchClause: AND businessservice = $businessservice
   query: |
       WITH params AS (
         SELECT
@@ -813,21 +813,22 @@ ReportDefinitions:
         FROM eg_wf_processinstance_v2 wf
         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        inner JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
-        inner JOIN designation d ON d.code = a.designation
-        WHERE wf.businessservice = $businessservice
+        INNER JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
+        INNER JOIN designation d ON d.code = a.designation
+        WHERE wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       ),
       
       wf_data AS (
-        -- createdtime stored as epoch-ms? If your createdtime is timestamptz, replace to_timestamp(p.createdtime/1000) with p.createdtime
+        -- createdtime stored as epoch-ms? If your createdtime is timestamptz, replace to_timestamp(p.createdtime/1000.0) with p.createdtime
         SELECT
           la.designation_code,
+          p.businessservice,
           (to_timestamp(p.createdtime/1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS created_date
         FROM latest_assignee la
         JOIN eg_bpa_buildingplan p
           ON p.id::text = la.businessid OR p.applicationno = la.businessid
-        WHERE p.businessservice = $businessservice
+        WHERE p.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
           AND p.status IN (
             'VERIFICATION_INPROGRESS',
             'FIELDINSPECTION_INPROGRESS',
@@ -845,10 +846,11 @@ ReportDefinitions:
         SELECT
           d.dt,
           w.designation_code,
+          w.businessservice,
           COUNT(w.created_date) AS cnt
         FROM date_list d
         LEFT JOIN wf_data w ON w.created_date = d.dt
-        GROUP BY d.dt, w.designation_code
+        GROUP BY d.dt, w.designation_code, w.businessservice
       )
       
       SELECT
@@ -860,8 +862,9 @@ ReportDefinitions:
         COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 4 THEN cnt END),0) AS day4,
         COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 5 THEN cnt END),0) AS day5,
         COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 6 THEN cnt END),0) AS day6,
-        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 7 THEN cnt END),0) AS day7
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 7 THEN cnt END),0) AS day7,
+        COALESCE(businessservice, 'UNKNOWN') AS businessservice
       FROM agg where 1=1
-  groupby: GROUP BY designation_code
-  orderby: ORDER BY officer_designation
+  groupby:  GROUP BY designation_code, businessservice
+  orderby:  ORDER BY officer_designation
       
