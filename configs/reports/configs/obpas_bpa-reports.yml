@@ -62,13 +62,14 @@ ReportDefinitions:
     pattern: "list://BPALOW:BPA_LOW"
     source: pt
     isMandatory: false
-    searchClause: AND  1=1  
+    searchClause: AND ch.businessservice = $businessservice 
   query: |
       WITH current_holder AS (
         SELECT DISTINCT ON (wf.businessid)
           wf.businessid AS applicationno,
           u.name AS assignee_name,
           e.code AS assignee_code,
+          wf.businessservice,
           UPPER(st.applicationstatus) AS current_stage
         FROM eg_wf_processinstance_v2 wf
         JOIN eg_wf_state_v2 st    ON wf.status = st.uuid
@@ -77,7 +78,6 @@ ReportDefinitions:
         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
         WHERE wf.tenantid = $tenantid
           AND wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
-          and wf.businessservice =  $businessservice    
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       )
       
@@ -197,7 +197,7 @@ ReportDefinitions:
     pattern: list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH
     source: pt
     isMandatory: false
-    searchClause: AND 1=1      
+    searchClause: AND businessservice = $businessservice    
   - name: collector_code
     label: collector_code
     type: string
@@ -210,6 +210,7 @@ ReportDefinitions:
           wf.businessid AS applicationno,
           u.name AS employee_name,
           e.code AS assignee_code,
+          wf.businessservice,
           UPPER(st.applicationstatus) AS current_stage
         FROM eg_wf_processinstance_v2 wf
         JOIN eg_wf_state_v2 st ON wf.status = st.uuid
@@ -217,8 +218,7 @@ ReportDefinitions:
         LEFT JOIN eg_user u ON u.uuid = wa.assignee
         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
         WHERE wf.tenantid = $tenantid
-          AND wf.businessservice in   ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') and 
-            wf.businessservice = $businessservice
+        AND wf.businessservice in   ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') 
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       ),
       
@@ -243,6 +243,7 @@ ReportDefinitions:
           ch.employee_name AS assignee_employee,
           ch.assignee_code   AS assignee_code,
           bill.consumercode  AS bill_consumercode,
+          ch.businessservice,
           CASE WHEN a.applicationno IS NULL THEN 'NO_MATCH_IN_EG_BPA' ELSE 'MATCHED' END AS match_status
         FROM egcl_paymentdetail pd
         JOIN egcl_payment p ON pd.paymentid = p.id
@@ -269,7 +270,7 @@ ReportDefinitions:
          status,
         collector_code,
         cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
-      FROM unique_transactions where 1=1 
+      FROM unique_transactions where 1=1
   orderby: ORDER BY createdtime DESC 
   
 - reportName: SLAReportbpa
@@ -344,7 +345,7 @@ ReportDefinitions:
     pattern: list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH
     source: pt
     isMandatory: false
-    searchClause: AND 1=1      
+    searchClause: AND sla.businessservice = $businessservice     
   query: |
        WITH wf_detailed AS (
          SELECT 
@@ -420,8 +421,8 @@ ReportDefinitions:
             FROM eg_bpa_buildingplan n
             LEFT JOIN status_times st ON n.applicationno = st.uuid
             LEFT JOIN latest_status ls ON n.applicationno = ls.uuid
-            JOIN sla_data sla ON sla.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') and 
-            sla.businessservice = $businessservice
+            JOIN sla_data sla ON sla.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+            
             LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
             WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')             
   orderby:  ORDER BY n.createdtime DESC, tenantid, final_status
@@ -529,14 +530,7 @@ ReportDefinitions:
     pattern: 'list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT'
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND payment.paymentmode like $paymentMode
-  - name: businessservice
-    label: Business Service
-    type: singlevaluelist
-    pattern: list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH
-    source: pt
-    isMandatory: false
-    searchClause: AND 1=1      
+    searchClause: AND payment.paymentmode like $paymentMode     
   query: |
       SELECT
           pd.receiptnumber AS receiptno,
@@ -682,16 +676,17 @@ ReportDefinitions:
   - name: businessservice
     label: Business Service
     type: singlevaluelist
-    pattern: list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH
+    pattern: 'list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH'
     source: pt
     isMandatory: false
-    searchClause: AND 1=1 
+    searchClause: AND businessservice = $businessservice
 
   query: |
        WITH latest_assignee AS (
          SELECT DISTINCT ON (wf.businessid)
            wf.businessid,
            wf.tenantid,
+           wf.businessservice,
            d.name AS designation_code
          FROM eg_wf_processinstance_v2 wf
          JOIN eg_wf_state_v2 st    ON wf.status = st.uuid
@@ -700,7 +695,6 @@ ReportDefinitions:
          inner JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
          inner join designation d on a.designation = d.code
           WHERE wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
-          and wf.businessservice = $businessservice
          ORDER BY wf.businessid, wf.lastmodifiedtime DESC
        ),
        
@@ -711,7 +705,7 @@ ReportDefinitions:
            tenantid,
            status
          FROM eg_bpa_buildingplan
-         WHERE businessservice = $businessservice
+         WHERE businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
            AND status IN (
              'VERIFICATION_INPROGRESS',
              'FIELDINSPECTION_INPROGRESS',
@@ -724,6 +718,7 @@ ReportDefinitions:
          SELECT
            INITCAP(REPLACE(la.tenantid, 'pb.', '')) AS ulb_name,
            la.designation_code,
+           la.businessservice,
            COUNT(DISTINCT p.bp_id) AS pending_files
          FROM latest_assignee la
          LEFT JOIN pending_files p
@@ -731,12 +726,12 @@ ReportDefinitions:
                 p.bp_id = la.businessid
              OR p.applicationno = la.businessid
            )
-         GROUP BY la.tenantid, INITCAP(REPLACE(la.tenantid, 'pb.', '')), la.designation_code
+         GROUP BY la.tenantid, INITCAP(REPLACE(la.tenantid, 'pb.', '')), la.designation_code, la.businessservice
        )
        
        SELECT
          ROW_NUMBER() OVER (ORDER BY pending_files DESC) AS Serial_No,
-         ulb_name ,
+         ulb_name ,businessservice,
          designation_code as Officer_Designation,
          pending_files 
        FROM merged where 1=1
