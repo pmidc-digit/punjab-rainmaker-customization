@@ -3226,6 +3226,29 @@
     },
     "_comment": "W&S total collections "
   },
+  "wstotalConnectionOverview": {
+    "chartName": "DSS_W&S_ACTIVE_CONNECTIONS",
+    "queries": [
+      {
+        "module": "W&S",
+        "indexName": "wsapplications",
+        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"term\":{\"applicationstatus.keyword\":\"Cancelled\"}}],\"must\":[{\"terms\":{\"servicetype.keyword\":[\"Water Charges\",\"Sewerage Charges\"]}},{\"terms\":{\"connectionstatus.keyword\":[\"ACTIVE\"]}}]}},\"aggs\":{\"Active Connection\":{\"value_count\":{\"field\":\"id.keyword\"}}}}}}",
+        "requestQueryMap": "{\"tenantId\" : \"cityname.keyword\", \"wardId\" : \"block.keyword\"}",
+        "dateRefField": "createddate"
+      }
+    ],
+    "translateTenantCode": true,
+    "chartType": "metric",
+    "valueType": "amount",
+    "action": "",
+    "drillChart": "none",
+    "aggregationPaths": [
+      "Active Connection"
+    ],
+    "insight": {
+    },
+    "_comment": "W&S Active connections"
+  },  
   "wstargetCollection": {
     "chartName": "DSS_W&S_TARGET_COLLECTION",
     "queries": [
