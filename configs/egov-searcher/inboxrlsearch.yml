@@ -1,0 +1,267 @@
+SearchDefinitions:
+  moduleName: rl-services
+  summary: Rental/Leasing Allotment Services Inbox API
+  version: 1.0.0
+  definitions:
+
+    # ============================================================
+    # 1. inboxrlsearch (ASC)
+    # ============================================================
+    - name: inboxrlsearch
+      query:
+        baseQuery: |
+          SELECT row_to_json(result) FROM (
+            SELECT DISTINCT(allotment.application_number),
+                   pi.status AS status_id,
+                   allotment.id AS allotment_id,
+                   allotment.tenant_id,
+                   allotment.property_id,
+                   allotment.created_time,
+                   allotment.status,
+                   allotment.application_type,
+                   allotment.start_date,
+                   allotment.end_date,
+                   allotment.expireflag,
+                   allotment.is_gst_applicable,
+                   allotment.is_cow_cess_applicable,
+                   allotment.is_refund_applicable_on_discontinuation,
+                   allotment.penalty_type,
+                   allotment.previous_application_number,
+                   assg.assignee AS wf_assignee
+            FROM eg_rl_allotment allotment
+            INNER JOIN eg_wf_processinstance_v2 pi 
+                ON pi.businessid = allotment.application_number 
+            INNER JOIN eg_rl_owner_info ownerinfo ON ownerinfo.allotment_id = allotment.id
+            LEFT JOIN eg_wf_assignee_v2 assg 
+              ON pi.id = assg.processinstanceid
+            $where
+            AND pi.latest = TRUE
+            ORDER BY allotment.created_time ASC
+            $pagination
+          ) result
+        groupBy:
+        orderBy:
+
+      searchParams:
+        condition: AND
+        params:
+          - name: allotment.tenant_id
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+
+          - name: allotment.id
+            isMandatory: false
+            jsonPath: $.searchCriteria.id
+
+          - name: pi.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.status
+            operator: IN
+
+          - name: allotment.application_number
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationNumber
+
+          - name: pi.businessservice
+            isMandatory: false
+            jsonPath: $.searchCriteria.businessservice
+
+          - name: assg.assignee
+            isMandatory: false
+            jsonPath: $.searchCriteria.assignee
+
+          - name: allotment.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.allotmentStatus
+
+          - name: allotment.property_id
+            isMandatory: false
+            jsonPath: $.searchCriteria.propertyId
+
+          - name: allotment.application_type
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationType
+
+          - name: allotment.expireflag
+            isMandatory: false
+            jsonPath: $.searchCriteria.expireFlag
+
+          - name: ownerinfo.user_uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
+
+        pagination:
+          noOfRecords: $.searchCriteria.noOfRecords
+          offset: $.searchCriteria.offset
+
+      output:
+        jsonFormat: {"ResponseInfo": {}, "allotmentApplication": []}
+        outJsonPath: $.allotmentApplication
+        responseInfoPath: $.ResponseInfo
+
+    # ============================================================
+    # 2. inboxrlsearchcount (NO pagination)
+    # ============================================================
+    - name: inboxrlsearchcount
+      query:
+        baseQuery: |
+          SELECT row_to_json(result) FROM (
+            SELECT COUNT(DISTINCT allotment.application_number) AS totalCount
+            FROM eg_rl_allotment allotment
+            INNER JOIN eg_wf_processinstance_v2 pi 
+                ON pi.businessid = allotment.application_number 
+                AND pi.latest = TRUE
+            LEFT JOIN eg_wf_assignee_v2 assg 
+              ON pi.id = assg.processinstanceid
+            $where
+          ) result
+        groupBy:
+        orderBy:
+
+      searchParams:
+        condition: AND
+        params:
+          - name: allotment.tenant_id
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+
+          - name: allotment.id
+            isMandatory: false
+            jsonPath: $.searchCriteria.id
+
+          - name: pi.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.status
+            operator: IN
+
+          - name: allotment.application_number
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationNumber
+
+          - name: pi.businessservice
+            isMandatory: false
+            jsonPath: $.searchCriteria.businessservice
+
+          - name: assg.assignee
+            isMandatory: false
+            jsonPath: $.searchCriteria.assignee
+
+          - name: allotment.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.allotmentStatus
+
+          - name: allotment.property_id
+            isMandatory: false
+            jsonPath: $.searchCriteria.propertyId
+
+          - name: allotment.application_type
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationType
+
+          - name: allotment.expireflag
+            isMandatory: false
+            jsonPath: $.searchCriteria.expireFlag
+
+        pagination:
+          noOfRecords: $.searchCriteria.noOfRecords
+          offset: $.searchCriteria.offset
+
+      output:
+        jsonFormat: {"ResponseInfo": {}, "totalCount": []}
+        outJsonPath: $.totalCount
+        responseInfoPath: $.ResponseInfo
+
+    # ============================================================
+    # 3. inboxrlsearchdesc (DESC)
+    # ============================================================
+    - name: inboxrlsearchdesc
+      query:
+        baseQuery: |
+          SELECT row_to_json(result) FROM (
+            SELECT DISTINCT(allotment.application_number),
+                   pi.status AS status_id,
+                   allotment.id AS allotment_id,
+                   allotment.tenant_id,
+                   allotment.property_id,
+                   allotment.created_time,
+                   allotment.status,
+                   allotment.application_type,
+                   allotment.start_date,
+                   allotment.end_date,
+                   allotment.expireflag,
+                   allotment.is_gst_applicable,
+                   allotment.is_cow_cess_applicable,
+                   allotment.is_refund_applicable_on_discontinuation,
+                   allotment.penalty_type,
+                   allotment.previous_application_number,
+                   assg.assignee AS wf_assignee
+            FROM eg_rl_allotment allotment
+            INNER JOIN eg_wf_processinstance_v2 pi 
+                ON pi.businessid = allotment.application_number 
+            INNER JOIN eg_rl_owner_info ownerinfo ON ownerinfo.allotment_id = allotment.id
+            LEFT JOIN eg_wf_assignee_v2 assg 
+              ON pi.id = assg.processinstanceid
+            $where
+            AND pi.latest = TRUE
+            ORDER BY allotment.created_time DESC
+            $pagination
+          ) result
+        groupBy:
+        orderBy:
+
+      searchParams:
+        condition: AND
+        params:
+          - name: allotment.tenant_id
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+
+          - name: allotment.id
+            isMandatory: false
+            jsonPath: $.searchCriteria.id
+
+          - name: pi.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.status
+            operator: IN
+
+          - name: allotment.application_number
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationNumber
+
+          - name: pi.businessservice
+            isMandatory: false
+            jsonPath: $.searchCriteria.businessservice
+
+          - name: assg.assignee
+            isMandatory: false
+            jsonPath: $.searchCriteria.assignee
+
+          - name: allotment.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.allotmentStatus
+
+          - name: allotment.property_id
+            isMandatory: false
+            jsonPath: $.searchCriteria.propertyId
+
+          - name: allotment.application_type
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationType
+
+          - name: allotment.expireflag
+            isMandatory: false
+            jsonPath: $.searchCriteria.expireFlag
+
+          - name: ownerinfo.user_uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
+
+        pagination:
+          noOfRecords: $.searchCriteria.noOfRecords
+          offset: $.searchCriteria.offset
+
+      output:
+        jsonFormat: {"ResponseInfo": {}, "allotmentApplication": []}
+        outJsonPath: $.allotmentApplication
+        responseInfoPath: $.ResponseInfo

@@ -1,0 +1,870 @@
+---
+ReportDefinitions:
+- reportName: ApplicationDetailReportBPA
+  summary: Details of applicant in building Plan service
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: name
+    label: name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: mobilenumber
+    label: mobilenumber
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: applicationstatus
+    label: applicationstatus
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: businessservice
+    label: businessservice
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: applicationno
+    label: applicationno
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: employee_name
+    label: employee_name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: employee_code
+    label: employee_code
+    type: string
+    source: obpas_bpa
+    total: false
+  searchParams:
+  - name: fromDate
+    label: fromDate
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND a.createdtime >= $fromDate
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND a.createdtime <= $toDate
+  - name: businessservice
+    label: Business Service
+    type: singlevaluelist
+    pattern: "list://BPALOW:BPA_LOW"
+    source: pt
+    isMandatory: false
+    searchClause: AND ch.businessservice = $businessservice 
+  query: |
+      WITH current_holder AS (
+        SELECT DISTINCT ON (wf.businessid)
+          wf.businessid AS applicationno,
+          u.name AS assignee_name,
+          e.code AS assignee_code,
+          wf.businessservice,
+          UPPER(st.applicationstatus) AS current_stage
+        FROM eg_wf_processinstance_v2 wf
+        JOIN eg_wf_state_v2 st    ON wf.status = st.uuid
+        LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+        LEFT JOIN eg_user u       ON u.uuid = wa.assignee
+        LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+        WHERE wf.tenantid = $tenantid
+          AND wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+        ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+      )
+      
+      SELECT
+        u.name,
+        u.mobilenumber,
+        o.status,
+        'BPA' as businessservice,
+        o.applicationno,
+        ch.assignee_name  AS employee_name,
+        ch.assignee_code  AS employee_code
+      FROM  eg_bpa_document  a
+      JOIN eg_bpa_buildingplan o   ON a.buildingplanid = o.id            
+      JOIN eg_user u        ON u.uuid = o.accountid           
+      LEFT JOIN current_holder ch ON ch.applicationno = o.applicationno
+      WHERE o.tenantid = $tenantid
+
+- reportName: CollectionsReportBPA
+  summary: Collections
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: applicationno
+    label: applicationno
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: name
+    label: name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: mobilenumber
+    label: mobilenumber
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: businessservice
+    label: businessservice
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: applicationstatus
+    label: applicationstatus
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: collector_code
+    label: collector_code
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: cash_amount
+    label: cash_amount
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: cheque_amount
+    label: cheque_amount
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: card_amount
+    label: card_amount
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: dd_amount
+    label: dd_amount
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: neft_amount
+    label: neft_amount
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: rtgs_amount
+    label: rtgs_amount
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: online_amount
+    label: online_amount
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: amountpaid
+    label: amountpaid
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: PaymentDate
+    label: PaymentDate
+    type: string
+    source: obpas_bpa
+    total: false
+  searchParams:
+  - name: fromDate
+    label: fromDate
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND createdtime >= $fromDate
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND createdtime <= $toDate
+  - name: businessservice
+    label: Business Service
+    type: singlevaluelist
+    pattern: list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH
+    source: pt
+    isMandatory: false
+    searchClause: AND businessservice = $businessservice    
+  - name: collector_code
+    label: collector_code
+    type: string
+    source: ptr
+    isMandatory: false
+    searchClause: AND collector_code = $collector_code
+  query: |
+      WITH current_holder AS (
+        SELECT DISTINCT ON (wf.businessid)
+          wf.businessid AS applicationno,
+          u.name AS employee_name,
+          e.code AS assignee_code,
+          wf.businessservice,
+          UPPER(st.applicationstatus) AS current_stage
+        FROM eg_wf_processinstance_v2 wf
+        JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+        LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+        LEFT JOIN eg_user u ON u.uuid = wa.assignee
+        LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+        WHERE wf.tenantid = $tenantid
+        AND wf.businessservice in   ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') 
+        ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+      ),
+      
+      unique_transactions AS (
+        SELECT
+          p.id AS transaction_id,
+          p.createdtime,
+          pd.amountpaid,
+          CASE WHEN upper(p.paymentmode) IN ('CASH','OFFLINE_CASH') THEN pd.amountpaid ELSE 0 END AS cash_amount,
+          CASE WHEN upper(p.paymentmode) = 'CHEQUE' THEN pd.amountpaid ELSE 0 END AS cheque_amount,
+          CASE WHEN upper(p.paymentmode) IN ('CARD','DEBIT_CARD','CREDIT_CARD','OFFLINE_CARD') THEN pd.amountpaid ELSE 0 END AS card_amount,
+          CASE WHEN upper(p.paymentmode) = 'DD' THEN pd.amountpaid ELSE 0 END AS dd_amount,
+          CASE WHEN upper(p.paymentmode) IN ('NEFT','OFFLINE_NEFT') THEN pd.amountpaid ELSE 0 END AS neft_amount,
+          CASE WHEN upper(p.paymentmode) IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN pd.amountpaid ELSE 0 END AS rtgs_amount,
+          CASE WHEN upper(p.paymentmode) = 'ONLINE' THEN pd.amountpaid ELSE 0 END AS online_amount,
+          COALESCE(emp.code, 'SELF') AS collector_code,
+          a.id AS bpa_id,
+          a.applicationno,
+          a.status,
+          u_applicant.name,
+          u_applicant.mobilenumber,
+          ch.employee_name AS assignee_employee,
+          ch.assignee_code   AS assignee_code,
+          bill.consumercode  AS bill_consumercode,
+          ch.businessservice,
+          CASE WHEN a.applicationno IS NULL THEN 'NO_MATCH_IN_EG_BPA' ELSE 'MATCHED' END AS match_status
+        FROM egcl_paymentdetail pd
+        JOIN egcl_payment p ON pd.paymentid = p.id
+        LEFT JOIN egcl_bill bill ON bill.id = pd.billid
+        -- tolerant matching: try matching consumercode to applicationno OR to id (stringified)
+        LEFT JOIN eg_bpa_buildingplan a ON trim(bill.consumercode) = trim(a.applicationno)
+                           OR trim(bill.consumercode) = trim(a.id::text)
+        LEFT JOIN eg_user u_applicant ON u_applicant.uuid = a.accountid
+        LEFT JOIN eg_user u ON u.id::text = p.createdby::text
+        LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
+        LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno OR ch.applicationno = a.id::text
+        WHERE pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG')
+          AND upper(p.paymentstatus) != 'CANCELLED'
+          AND p.tenantid = $tenantid
+      )
+      
+      SELECT
+        to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS payment_date,
+        applicationno,
+        bill_consumercode,
+        name,
+        mobilenumber,
+        'BPA' AS businessservice,
+         status,
+        collector_code,
+        cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
+      FROM unique_transactions where 1=1
+  orderby: ORDER BY createdtime DESC 
+  
+- reportName: SLAReportbpa
+  summary: SLA report for building_plan service
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: tenantid
+    label: tenantid
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: bpa_application_no
+    label: Application Number
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: document_verify_on
+    label: Document Verified On
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: finalstatus_on
+    label: Approval / Rejection On
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: final_status
+    label: Application status
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: sla_status
+    label: sla status
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: sla_days
+    label: SLA Days 
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: employee_name
+    label: employee_name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: employee_code
+    label: Employee Code / Current Holder Code
+    type: string
+    source: obpas_bpa
+    total: false
+  searchParams:
+  - name: fromDate
+    label: From Date
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND n.createdtime >= $fromDate
+  - name: toDate
+    label: To Date
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND n.createdtime <= $toDate
+  - name: businessservice
+    label: Business Service
+    type: singlevaluelist
+    pattern: list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH
+    source: pt
+    isMandatory: false
+    searchClause: AND sla.businessservice = $businessservice     
+  query: |
+       WITH wf_detailed AS (
+         SELECT 
+           wf.businessid AS uuid,                                 
+           UPPER(st.applicationstatus) AS applicationstatus,
+           wf.createdtime,
+           wf.lastmodifiedtime,
+           wf.businessservicesla,
+           wf.tenantid,
+           wf.id AS processinstanceid
+          FROM eg_wf_processinstance_v2 wf
+          JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+          WHERE wf.tenantid = $tenantid
+         AND wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')                
+          ),
+        status_times AS (
+             SELECT
+                uuid,
+                MAX(CASE WHEN applicationstatus = 'DOCUMENTVERIFY' THEN createdtime END) AS docverify_time,
+                MAX(CASE WHEN applicationstatus IN ('APPROVED','REJECTED') THEN lastmodifiedtime END) AS final_time
+              FROM wf_detailed
+              GROUP BY uuid
+             ),
+        latest_status AS (
+              SELECT uuid, applicationstatus
+                 FROM (
+                      SELECT uuid, applicationstatus, lastmodifiedtime,
+                         ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY lastmodifiedtime DESC NULLS LAST) AS rn
+                          FROM wf_detailed
+                        ) x WHERE rn = 1
+                     ),
+        sla_data AS (
+            SELECT businessservice,businessservicesla
+            FROM eg_wf_businessservice_v2
+            WHERE businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+           ),
+        assignee_details AS (
+             SELECT DISTINCT ON (wf.businessid)
+                 wf.businessid,
+                 e.code AS employee_code,
+                 u.name AS employee_name
+              FROM eg_wf_processinstance_v2 wf
+              JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+              JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+              JOIN eg_user u ON e.uuid = u.uuid
+               WHERE wf.tenantid = $tenantid
+               AND wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+              ORDER BY wf.businessid,wf.lastmodifiedtime DESC
+               )
+         SELECT
+            split_part(n.tenantid,'.',2) AS tenantid,
+             n.applicationno AS bpa_application_no,                 
+             UPPER(ls.applicationstatus) AS final_status,
+            TO_CHAR(TO_TIMESTAMP(st.docverify_time/1000),'DD-MM-YYYY') AS document_verify_on,
+            TO_CHAR(TO_TIMESTAMP(st.final_time/1000),'DD-MM-YYYY') AS finalstatus_on,   
+            CASE
+              WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL
+               THEN FLOOR((st.final_time-st.docverify_time)/86400000)
+              WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
+               THEN FLOOR((EXTRACT(EPOCH FROM NOW())*1000-st.docverify_time)/86400000)
+             ELSE NULL
+            END AS sla_days,
+            CASE
+               WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL THEN
+            CASE WHEN (st.final_time-st.docverify_time) > sla.businessservicesla THEN 'BREACHED'
+                 ELSE 'MET' END
+                WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
+                THEN 'IN-PROGRESS'
+               ELSE 'AWAITING DOCVERIFY'
+            END AS sla_status,
+            ad.employee_name AS employee_name,
+            ad.employee_code AS employee_code
+            FROM eg_bpa_buildingplan n
+            LEFT JOIN status_times st ON n.applicationno = st.uuid
+            LEFT JOIN latest_status ls ON n.applicationno = ls.uuid
+            JOIN sla_data sla ON sla.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+            
+            LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
+            WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')             
+  orderby:  ORDER BY n.createdtime DESC, tenantid, final_status
+
+- reportName: ReceiptRegisterbpa
+  summary: Details of collector register in building_plan service
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: receiptno
+    label: receiptno
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: connectionno
+    label: connectionno
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: receiptdate
+    label: receiptdate
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: service
+    label: service
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: collectorname
+    label: collectorname
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: transactiondate
+    label: transactiondate
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: instrumentnumber
+    label: instrumentnumber
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: ownername1
+    label: ownername1
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: amountpaid
+    label: amountpaid
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: paymentmode
+    label: paymentmode
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: paymentstatus
+    label: paymentstatus
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: user
+    label: user
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: manualreceiptnumber
+    label: manualreceiptnumber
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: manualreceiptdate
+    label: manualreceiptdate
+    type: string
+    source: obpas_bpa
+    total: false
+  searchParams:
+  - name: fromDate
+    label: fromDate
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND pd.receiptdate >= $fromDate
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND pd.receiptdate <= $toDate
+  - name: receiptNumber
+    label: receiptNumber
+    type: string
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND pd.receiptnumber like $receiptNumber
+  - name: paymentMode
+    label: paymentMode
+    type: singlevaluelist
+    pattern: 'list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT'
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND payment.paymentmode like $paymentMode     
+  query: |
+      SELECT
+          pd.receiptnumber AS receiptno,
+          bill.consumercode AS connectionno,
+          TO_CHAR(
+              TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata',
+              'DD-MM-YYYY'
+          ) AS receiptdate,
+          pd.businessservice AS service,
+          usr.name AS collectorname,
+          TO_CHAR(
+              TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata',
+              'DD-MM-YYYY'
+          ) AS transactiondate,
+          payment.instrumentnumber,
+          usr.name AS ownername1,
+          pd.amountpaid,
+          payment.paymentmode,
+          payment.paymentstatus,
+          usr.id AS user,
+          pd.manualreceiptnumber,
+          pd.manualreceiptdate
+      FROM egcl_paymentdetail pd
+      INNER JOIN egcl_bill bill 
+          ON bill.id = pd.billid 
+          AND pd.tenantid = $tenantid
+      INNER JOIN egcl_payment payment 
+          ON payment.id = pd.paymentid
+      LEFT JOIN eg_bpa_buildingplan a 
+          ON bill.consumercode = a.applicationno
+      LEFT JOIN eg_user usr 
+          ON usr.id = payment.createdby::integer
+      WHERE
+          bill.tenantid = $tenantid
+          AND pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG')
+          AND payment.paymentstatus != 'CANCELLED'
+  orderby: ORDER BY pd.receiptdate DESC;
+
+- reportName: Detailed_File_List
+  summary: Detailed File List
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: applicationno
+    label: applicationno
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: edcrnumber
+    label: edcrnumber
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: status
+    label: status
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: tenantid
+    label: ULB Name
+    type: string
+    source: obpas_bpa
+    total: false  
+  - name: businessservice
+    label: Module
+    type: string
+    source: obpas_bpa
+    total: false
+  searchParams:    
+  - name: fromDate
+    label: Date
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND createdtime = $fromDate 
+  query: |
+       select applicationno,edcrnumber,status,tenantid,'Building_Plan' as
+       businessservice from eg_bpa_buildingplan where businessservice = 'BPA_LOW' 
+
+- reportName: Pending_Files_Summary
+  summary: Beyond Time Line Pending Files Summary
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: ulb_name
+    label: ULB Name
+    type: string
+    source: obpas_bpa
+    total: false  
+  - name: Pending_Files
+    label: Pending Files
+    type: string
+    source: obpas_bpa
+    total: true 
+  query: |
+       SELECT 
+           INITCAP(REPLACE(tenantid, 'pb.', '')) AS ulb_name,
+           status,
+           COUNT(*) AS Pending_Files
+       FROM eg_bpa_buildingplan
+       WHERE businessservice = 'BPA_LOW' and status IN (
+           'VERIFICATION_INPROGRESS',
+           'FIELDINSPECTION_INPROGRESS',
+           'INSPECTION_REPORT_PENDING',
+           'DOC_VERIFICATION_INPROGRESS')
+  groupby: GROUP BY tenantid, status
+  
+- reportName: officers_with_highest_pendency
+  summary: Top 7 officers with Highest Pendency
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: serial_no
+    label: Serial No
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: ulb_name
+    label: ULB Name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: Officer_Designation
+    label: Officer Designation
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: pending_files
+    label: Pending Files
+    type: string
+    source: obpas_bpa
+    total: false  
+  searchParams:    
+  - name: businessservice
+    label: Business Service
+    type: singlevaluelist
+    pattern: 'list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH'
+    source: pt
+    isMandatory: false
+    searchClause: AND businessservice = $businessservice
+
+  query: |
+       WITH latest_assignee AS (
+         SELECT DISTINCT ON (wf.businessid)
+           wf.businessid,
+           wf.tenantid,
+           wf.businessservice,
+           d.name AS designation_code
+         FROM eg_wf_processinstance_v2 wf
+         JOIN eg_wf_state_v2 st    ON wf.status = st.uuid
+         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+         inner JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
+         inner join designation d on a.designation = d.code
+          WHERE wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+       ),
+       
+       pending_files AS (
+         SELECT
+           id::text AS bp_id,
+           applicationno,
+           tenantid,
+           status
+         FROM eg_bpa_buildingplan
+         WHERE businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+           AND status IN (
+             'VERIFICATION_INPROGRESS',
+             'FIELDINSPECTION_INPROGRESS',
+             'INSPECTION_REPORT_PENDING',
+             'DOC_VERIFICATION_INPROGRESS'
+           )
+       ),
+       
+       merged AS (
+         SELECT
+           INITCAP(REPLACE(la.tenantid, 'pb.', '')) AS ulb_name,
+           la.designation_code,
+           la.businessservice,
+           COUNT(DISTINCT p.bp_id) AS pending_files
+         FROM latest_assignee la
+         LEFT JOIN pending_files p
+           ON (
+                p.bp_id = la.businessid
+             OR p.applicationno = la.businessid
+           )
+         GROUP BY la.tenantid, INITCAP(REPLACE(la.tenantid, 'pb.', '')), la.designation_code, la.businessservice
+       )
+       
+       SELECT
+         ROW_NUMBER() OVER (ORDER BY pending_files DESC) AS Serial_No,
+         ulb_name ,businessservice,
+         designation_code as Officer_Designation,
+         pending_files 
+       FROM merged where 1=1
+  orderby:  ORDER BY pending_files DESC limit 7
+
+- reportName: officers_wise_pendency
+  summary: officers wise  Pendency Trend Analysis - Last 7 Days
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: Officer_Designation
+    label: Officer Designation
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: day0
+    label: day0
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: day1
+    label: day1
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: day2
+    label: day2
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: day3
+    label: day3
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: day4
+    label: day4
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: day5
+    label: day5
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: day6
+    label: day6
+    type: string
+    source: obpas_bpa
+    total: true                     
+  searchParams:
+  - name: fromDate
+    label: Date
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND 1=1     
+  - name: businessservice
+    label: Business Service
+    type: singlevaluelist
+    pattern: list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH
+    source: pt
+    isMandatory: false
+    searchClause: AND businessservice = $businessservice
+  query: |
+      WITH params AS (
+        SELECT
+          to_timestamp($fromDate / 1000.0) AT TIME ZONE 'Asia/Kolkata' AS base_ts,
+          (to_timestamp($fromDate / 1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS base_dt
+      ),
+      
+      latest_assignee AS (
+        SELECT DISTINCT ON (wf.businessid)
+          wf.businessid,
+          d.name AS designation_code
+        FROM eg_wf_processinstance_v2 wf
+        LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+        LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+        INNER JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
+        INNER JOIN designation d ON d.code = a.designation
+        WHERE wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+        ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+      ),
+      
+      wf_data AS (
+        -- createdtime stored as epoch-ms? If your createdtime is timestamptz, replace to_timestamp(p.createdtime/1000.0) with p.createdtime
+        SELECT
+          la.designation_code,
+          p.businessservice,
+          (to_timestamp(p.createdtime/1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS created_date
+        FROM latest_assignee la
+        JOIN eg_bpa_buildingplan p
+          ON p.id::text = la.businessid OR p.applicationno = la.businessid
+        WHERE p.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+          AND p.status IN (
+            'VERIFICATION_INPROGRESS',
+            'FIELDINSPECTION_INPROGRESS',
+            'INSPECTION_REPORT_PENDING',
+            'DOC_VERIFICATION_INPROGRESS'
+          )
+      ),
+      
+      date_list AS (
+        SELECT (base_dt - offs) AS dt
+        FROM params, generate_series(0,7) AS g(offs)   -- 0 = base date, 7 = base - 7 days
+      ),
+      
+      agg AS (
+        SELECT
+          d.dt,
+          w.designation_code,
+          w.businessservice,
+          COUNT(w.created_date) AS cnt
+        FROM date_list d
+        LEFT JOIN wf_data w ON w.created_date = d.dt
+        GROUP BY d.dt, w.designation_code, w.businessservice
+      )
+      
+      SELECT
+        COALESCE(designation_code, 'UNASSIGNED') AS officer_designation,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params)     THEN cnt END),0) AS day0,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 1 THEN cnt END),0) AS day1,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 2 THEN cnt END),0) AS day2,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 3 THEN cnt END),0) AS day3,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 4 THEN cnt END),0) AS day4,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 5 THEN cnt END),0) AS day5,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 6 THEN cnt END),0) AS day6,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 7 THEN cnt END),0) AS day7,
+        COALESCE(businessservice, 'UNKNOWN') AS businessservice
+      FROM agg where 1=1
+  groupby:  GROUP BY designation_code, businessservice
+  orderby:  ORDER BY officer_designation
+      

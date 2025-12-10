@@ -7,24 +7,25 @@ serviceMaps:
     isTransaction: true
     queryMaps:
     - query: INSERT INTO eg_rl_allotment (
-              id, property_id, tenant_id, is_auto_renewal, application_status, status,
+              id, property_id, tenant_id, status,
               application_number, previous_application_number, application_type,
-              start_date, end_date, term_and_condition, penalty_type,
+              start_date, end_date,is_gst_applicable, is_cow_cess_applicable, is_refund_applicable_on_discontinuation, term_and_condition, penalty_type,
               created_time, created_by, lastmodified_time, lastmodified_by,additional_details)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: AllotmentDetails
       jsonMaps:
       - jsonPath: $.AllotmentDetails.id
       - jsonPath: $.AllotmentDetails.propertyId
       - jsonPath: $.AllotmentDetails.tenantId
-      - jsonPath: $.AllotmentDetails.isAutoRenewal
-      - jsonPath: $.AllotmentDetails.applicationStatus
       - jsonPath: $.AllotmentDetails.status
       - jsonPath: $.AllotmentDetails.applicationNumber
       - jsonPath: $.AllotmentDetails.previousApplicationNumber
       - jsonPath: $.AllotmentDetails.applicationType
       - jsonPath: $.AllotmentDetails.startDate
       - jsonPath: $.AllotmentDetails.endDate
+      - jsonPath: $.AllotmentDetails.isGSTApplicable
+      - jsonPath: $.AllotmentDetails.isCowCessApplicable
+      - jsonPath: $.AllotmentDetails.isRefundApplicableOnDiscontinuation
       - jsonPath: $.AllotmentDetails.termAndCondition
       - jsonPath: $.AllotmentDetails.penaltyType
       - jsonPath: $.AllotmentDetails.auditDetails.createdTime
@@ -67,17 +68,18 @@ serviceMaps:
     fromTopic: update-rl-allotment
     isTransaction: true
     queryMaps:
-    - query: UPDATE eg_rl_allotment SET is_auto_renewal=?, application_status=?, status=?,application_type=?, previous_application_number=?, application_number=?,start_date=?, end_date=?, term_and_condition=?, penalty_type=?, lastmodified_time=?, lastmodified_by=? WHERE id=?;
+    - query: UPDATE eg_rl_allotment SET status=?,application_type=?, previous_application_number=?, application_number=?,start_date=?, end_date=?,is_gst_applicable=?, is_cow_cess_applicable=?, is_refund_applicable_on_discontinuation=?, term_and_condition=?, penalty_type=?, lastmodified_time=?, lastmodified_by=? WHERE id=?;
       basePath: AllotmentDetails
       jsonMaps:
-      - jsonPath: $.AllotmentDetails.isAutoRenewal
-      - jsonPath: $.AllotmentDetails.applicationStatus
       - jsonPath: $.AllotmentDetails.status
       - jsonPath: $.AllotmentDetails.applicationType
       - jsonPath: $.AllotmentDetails.previousApplicationNumber
       - jsonPath: $.AllotmentDetails.applicationNumber
       - jsonPath: $.AllotmentDetails.startDate
       - jsonPath: $.AllotmentDetails.endDate
+      - jsonPath: $.AllotmentDetails.isGSTApplicable
+      - jsonPath: $.AllotmentDetails.isCowCessApplicable
+      - jsonPath: $.AllotmentDetails.isRefundApplicableOnDiscontinuation
       - jsonPath: $.AllotmentDetails.termAndCondition
       - jsonPath: $.AllotmentDetails.penaltyType
       - jsonPath: $.AllotmentDetails.auditDetails.lastModifiedTime
@@ -124,16 +126,18 @@ serviceMaps:
     fromTopic: save-rl-clsure
     isTransaction: true
     queryMaps:
-    - query: INSERT INTO eg_rl_allotment_clsure(id, allotment_id, status,closed_application_number, reason_for_clsure,
+    - query: INSERT INTO eg_rl_allotment_clsure(id, allotment_id, tenant_id, status,application_number, alloted_application_number, reason_for_clsure,
               amount_to_be_refund, amount_to_be_deducted, refund_amount,
               notes_comments, upload_proof, created_time,created_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: AllotmentClsure
       jsonMaps:
       - jsonPath: $.AllotmentClsure.id
       - jsonPath: $.AllotmentClsure.allotmentId
+      - jsonPath: $.AllotmentClsure.tenantId
       - jsonPath: $.AllotmentClsure.status
-      - jsonPath: $.AllotmentClsure.closedApplicationNumber
+      - jsonPath: $.AllotmentClsure.applicationNumber
+      - jsonPath: $.AllotmentClsure.allotedApplicationNumber
       - jsonPath: $.AllotmentClsure.reasonForClosure
       - jsonPath: $.AllotmentClsure.amountToBeRefund
       - jsonPath: $.AllotmentClsure.amountToBeDeducted
@@ -142,12 +146,6 @@ serviceMaps:
       - jsonPath: $.AllotmentClsure.uploadProof
       - jsonPath: $.AllotmentClsure.auditDetails.createdTime
       - jsonPath: $.AllotmentClsure.auditDetails.createdBy
-       
-    - query: UPDATE eg_rl_allotment SET status=? WHERE id=?;
-      basePath: AllotmentClsure
-      jsonMaps:
-      - jsonPath: $.AllotmentClsure.status
-      - jsonPath: $.AllotmentClsure.allotmentId
 
         # UPDATE Query
   - version: 1.0
@@ -173,9 +171,3 @@ serviceMaps:
       - jsonPath: $.AllotmentClsure.auditDetails.lastModifiedBy
       - jsonPath: $.AllotmentClsure.auditDetails.lastModifiedTime
       - jsonPath: $.AllotmentClsure.id
-
-    - query: UPDATE eg_rl_allotment SET status=? WHERE id=?;
-      basePath: AllotmentClsure
-      jsonMaps:
-      - jsonPath: $.AllotmentClsure.status
-      - jsonPath: $.AllotmentClsure.allotmentId
