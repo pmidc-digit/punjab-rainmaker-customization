@@ -1,0 +1,85 @@
+SearchDefinitions:
+  moduleName: saski-property-search
+  summary: Search configs for saski-property-search
+  version: 1.0.0
+  definitions:
+    - name: saskipropertycount
+      isCustomerRowMapEnabled: true
+      rowMapperKey: propertysearch
+      query:
+        baseQuery: >-
+          select count(*)
+          from eg_pt_property
+          $where and (additionaldetails->>'vasikaNo' is not null or additionaldetails->>'vasikaNo'!='' or
+              additionaldetails->>'allotmentNo' is not null or additionaldetails->>'allotmentNo'!='' ) 
+              and status='ACTIVE'
+      searchParams:
+        condition: AND
+        params:
+          - name: tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+      output:
+        jsonFormat:
+          ResponseInfo: {}
+          Property: []
+        outJsonPath: $.Property
+        responseInfoPath: $.ResponseInfo
+    - name: saskitotalpercentagecount
+      isCustomerRowMapEnabled: true
+      rowMapperKey: propertysearch
+      query:
+        baseQuery: >-
+          SELECT
+          ROUND(
+            100.0 * SUM(
+              CASE
+                WHEN (
+                  additionaldetails->>'vasikaNo'      IS NOT NULL OR additionaldetails->>'vasikaNo'      != '' OR
+                  additionaldetails->>'allotmentNo'   IS NOT NULL OR additionaldetails->>'allotmentNo'   != ''
+                )
+                    THEN 1 ELSE 0
+                  END
+                ) / NULLIF(COUNT(*), 0)
+              , 2) AS percentage_matching
+            FROM eg_pt_property
+            $where and status = 'ACTIVE'
+      searchParams:
+        condition: AND
+        params:
+          - name: tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+      output:
+        jsonFormat:
+          ResponseInfo: {}
+          Property: []
+        outJsonPath: $.Property
+        responseInfoPath: $.ResponseInfo
+    - name: saskipropertysearch
+      isCustomerRowMapEnabled: true
+      rowMapperKey: propertysearch
+      query:
+        baseQuery: >-
+          select propertyid,tenantid,oldpropertyid,createdtime, additionaldetails->>'allotmentNo' as allotmentno,
+          additionaldetails->>'allotmentDate' as allotmentdate,
+          additionaldetails->>'vasikaNo' as vasikano,additionaldetails->>'vasikaDate' as vasikadate
+          from eg_pt_property
+          $where and (additionaldetails->>'vasikaNo' is not null or additionaldetails->>'vasikaNo'!='' or
+              additionaldetails->>'allotmentNo' is not null or additionaldetails->>'allotmentNo'!='' ) 
+              and status='ACTIVE' $pagination;
+      searchParams:
+        condition: AND
+        params:
+          - name: tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+        pagination:
+          noOfRecords: $.searchCriteria.limit
+          offset: $.searchCriteria.offset
+      output:
+        jsonFormat:
+          ResponseInfo: {}
+          Property: []
+        outJsonPath: $.Property
+        responseInfoPath: $.ResponseInfo
