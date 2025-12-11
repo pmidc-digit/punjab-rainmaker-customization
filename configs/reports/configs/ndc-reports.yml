@@ -657,7 +657,7 @@ ReportDefinitions:
         JOIN eg_ndc_details d ON d.applicationid = o.ndcapplicationuuid
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno
         WHERE a.tenantid = $ulb
-- reportName: CollectionsReport
+- reportName: StateCollectionsReport
   decryptionPathId: NDCAPPLICATION
   summary: Collections
   version: 1.0.0
@@ -827,7 +827,7 @@ ReportDefinitions:
              WHERE 1=1 
   orderby: ORDER BY createdtime DESC
   
-- reportName: SLAReport
+- reportName: StateSLAReport
   decryptionPathId: NDCAPPLICATION
   summary: SLA report for NDC service
   version: 1.0.0
