@@ -1,0 +1,373 @@
+{
+  "key": "clu-sanctionletter",
+  "DataConfigs": {
+    "moduleName": "rainmaker-common",
+    "version": "1.0.0",
+    "baseKeyPath": "$.Payments.*",
+    "entityIdPath": "$.id",
+    "isCommonTableBorderRequired": true,
+    "mappings": [
+      {
+        "mappings": [
+          {
+            "direct": [
+              {
+                "variable": "applicationNo",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.consumerCode"
+                }
+              },
+              {
+                "variable": "fileNo",
+                "value": {
+                  "path": "$.fileno"
+                }
+              },
+              {
+                "variable": "planPermissionNo",
+                "value": {
+                  "path": "$.approvalNo"
+                }
+              },
+              {
+                "variable": "totalAmountPaid",
+                "value": {
+                  "path": "$.totalAmountPaid"
+                }
+              },
+              {
+                "variable": "transactionNumber",
+                "value": {
+                  "path": "$.transactionNumber"
+                }
+              },
+              {
+                "variable": "edcrNo",
+                "value": {
+                  "path": "$.edcrNumber"
+                }
+              },
+              {
+                "variable": "createdDate",
+                "value": {
+                  "path": "$.auditDetails.createdTime"
+                },
+                "type": "date"
+              },
+              {
+                "variable": "favourOf",
+                "value": {
+                  "path": "$.landInfo.owners.*.name"
+                }
+              },
+              {
+                "variable": "street",
+                "value": {
+                  "path": "$.landInfo.address.street"
+                }
+              },
+              {
+                "variable": "city",
+                "value": {
+                  "path": "$.landInfo.address.city"
+                }
+              },
+              {
+                "variable": "locality",
+                "value": {
+                  "path": "$.additionalDetails.registrationDetails"
+                }
+              },
+              {
+                "variable": "doorNo",
+                "value": {
+                  "path": "$.landInfo.address.doorNo"
+                }
+              },
+              {
+                "variable": "pincode",
+                "value": {
+                  "path": "$.landInfo.address.pincode"
+                }
+              },
+              {
+                "variable": "holdingNo",
+                "value": {
+                  "path": "$.additionalDetails.holdingNo"
+                }
+              },
+              {
+                "variable": "ownerName",
+                "value": {
+                  "path": "$.landInfo.owners[0].name"
+                }
+              },
+              {
+                "variable": "validityDate",
+                "value": {
+                  "path": "$.additionalDetails.validityDate"
+                },
+                "type": "date"
+              },
+
+              {
+                "variable": "COLONY_TEXT",
+                "value": {
+                  "path": "$.additionalDetails.permitData"
+                }
+              },
+              {
+                "variable": "submissionDate",
+                "value": {
+                  "path": "$.Clu[0].cluDetails.additionalDetails.SubmittedOn"
+                },
+                "type": "date"
+              },
+              {
+                "variable": "paymentDate",
+                "value": {
+                  "path": "$.auditDetails.lastModifiedTime"
+                },
+                "type": "date"
+              },
+              {
+                "variable": "epoch",
+                "value": {
+                  "path": "$.auditDetails.lastModifiedTime"
+                }
+              },
+              {
+                "variable": "submissionEpoch",
+                "value": {
+                  "path": "$.Clu[0].cluDetails.additionalDetails.SubmittedOn"
+                }
+              },
+              {
+                "variable": "conditions",
+                "value": {
+                  "path": "$.additionalDetails"
+                },
+                "type": "array-column",
+                "format": {
+                  "scema": [
+                    {
+                      "key": "pendingapproval",
+                      "type": "array-orderedlist",
+                      "value": "pendingapproval"
+                    }
+                  ]
+                }
+              },
+              {
+                "variable": "reServeyPlotNo",
+                "value": {
+                  "path": "$.additionalDetails.reSurveyPlotNo"
+                }
+              },
+              {
+                "variable": "proposedSiteAddress",
+                "value": {
+                  "path": "$.Clu[0].cluDetails.additionalDetails.siteDetails.proposedSiteAddress"
+                }
+              },
+              {
+                "variable": "profession",
+                "value": {
+                  "path": "$.additionalDetails.typeOfArchitect"
+                }
+              },
+              {
+                "variable": "stakeholderName",
+                "value": {
+                  "path": "$.additionalDetails.stakeholderName"
+                }
+              },
+              {
+                "variable": "ulbName",
+                "value": {
+                  "path": "$.Clu[0].cluDetails.additionalDetails.siteDetails.ulbName.city.name"
+                }
+              },
+              {
+                "variable": "ulbType",
+                "value": {
+                  "path": "$.Clu[0].cluDetails.additionalDetails.siteDetails.ulbName.city.ulbType"
+                }
+              },
+              {
+                "variable": "subjectLine",
+                "value": {
+                  "path": "$.subjectLine"
+                }
+              },
+              {
+                "variable": "ownersWithAddress",
+                "value": {
+                  "path": "$.Clu[0].cluDetails.additionalDetails.applicationDetails.applicantAddress"
+                }
+              },
+              
+              {
+                "variable": "jamabandiArea",
+                "value": {
+                  "path": "$.Clu[0].cluDetails.additionalDetails.siteDetails.netTotalArea"
+                }
+              },
+              {
+                "variable": "stakeholderAddress",
+                "value": {
+                  "path": "$.additionalDetails.stakeholderAddress"
+                }
+              },
+              {
+                "variable": "stakeholderRegistrationNumber",
+                "value": {
+                  "path": "$.additionalDetails.architectid"
+                }
+              },
+
+              {
+                "variable": "plotArea",
+                "value": {
+                  "path": "$.Clu[0].cluDetails.additionalDetails.siteDetails.specificationPlotArea"
+                }
+              },
+
+              {
+                "variable": "areaUnderClu",
+                "value": {
+                  "path": "$.Clu[0].cluDetails.additionalDetails.siteDetails.netTotalArea"
+                }
+              },
+              {
+                "variable": "approverComment",
+                "value": {
+                  "path": "$.ApproverComment"
+                }
+              },
+              {
+                "variable": "ownershipInPct",
+                "value": {
+                  "path": "$.Clu[0].cluDetails.additionalDetails.siteDetails.ownershipInPct"
+                }
+              },
+              
+              {
+                "variable": "tenantName",
+                "value": {
+                  "path": "$.tenantId"
+                },
+                "localisation": {
+                  "required": true,
+                  "prefix": "TENANT_TENANTS",
+                  "module": "rainmaker-common"
+                }
+              },
+              
+              
+              {
+                "variable": "applicantName",
+                "value": {
+                  "path": "$.Clu[0].cluDetails.additionalDetails.applicationDetails.applicantOwnerOrFirmName"
+                }
+              },
+              {
+                "variable": "applicationDate",
+                "value": {
+                  "path": "$.applicationDate"
+                },
+                "type": "date"
+              },
+              {
+                "variable": "plotNo",
+                "value": {
+                  "path": "$.edcrDetail[0].planDetail.planInformation.plotNo"
+                }
+              },
+              
+              {
+                "variable": "wardNo",
+                "value": {
+                  "path": "$.additionalDetails.wardnumber"
+                }
+              },
+
+              {
+                "variable": "khasraNumber",
+                "value": {
+                  "path": "$.Clu[0].cluDetails.additionalDetails.siteDetails.khasraNo"
+                }
+              },
+              {
+                "variable": "khataNo",
+                "value": {
+                  "path": "$.edcrDetail[0].planDetail.planInfoProperties['KHATA _NO']"
+                }
+              }
+            ]
+          },
+          {
+            "externalAPI": [
+              
+              {
+                "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
+                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}')%5D",
+                "apiRequest": null,
+                "responseMapping": [
+                  {
+                    "variable": "newlogoImage",
+                    "value": "$.MdmsRes.tenant.tenants[0].logoId",
+                    "type": "image"
+                  },
+                  {
+                    "variable": "logo-header",
+                    "value": "$.MdmsRes.tenant.tenants[0].code",
+                    "localisation": {
+                      "required": true,
+                      "prefix": "TENANT_TENANTS",
+                      "module": "rainmaker-common"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "derived": [
+              
+              {
+                "variable": "epochIST",
+                "type": "date",
+                "formula": "{{epoch}}",
+                "timezone": "Asia/Kolkata",
+                "format": "HH:mm"
+              },
+              {
+                "variable": "submissionEpochIST",
+                "type": "date",
+                "formula": "{{submissionEpoch}}",
+                "timezone": "Asia/Kolkata",
+                "format": "HH:mm"
+              },
+              {
+                "variable": "submissionEpochDate",
+                "type": "date",
+                "formula": "{{submissionEpoch}}",
+                "timezone": "Asia/Kolkata",
+                "format": "DD/MM/YYYY"
+              }
+            ]
+          },
+          {
+            "qrcodeConfig": [
+              {
+                "variable": "qrCode",
+                "value": "Applicant Name: {{favourOf}}, Permit Order Number : {{planPermissionNo}}, Permit Order Date : {{orderGeneratedOn}}, eDCR Scrutiny Number: {{edcrNo}}, Approver Name : {{approvedBy}}"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
