@@ -74,6 +74,20 @@ SearchDefinitions:
           - name: tenantid
             isMandatory: true
             jsonPath: $.searchCriteria.tenantId
+
+          - name: additionaldetails->>'vasikaNo'
+            isMandatory: false
+            jsonPath: $.searchCriteria.vasikaNo
+
+          - name: additionaldetails->>'allotmentNo'
+            isMandatory: false
+            jsonPath: $.searchCriteria.allotmentNo
+            
+          - name: propertyid
+            isMandatory: false
+            jsonPath: $.searchCriteria.propertyId
+
+
         pagination:
           noOfRecords: $.searchCriteria.limit
           offset: $.searchCriteria.offset
