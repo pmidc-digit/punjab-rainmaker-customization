@@ -766,7 +766,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: ndc
     isMandatory: true
-    searchClause: AND a.tenantid = $ulb
+    searchClause: AND 1=1
   query: |
       -- Use CTE to force query plan, compute & use CTE later
       WITH current_holder AS (
@@ -900,7 +900,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: ndc
     isMandatory: true
-    searchClause: AND a.tenantid = $ulb
+    searchClause: AND 1=1
   query: |
       -- Use CTE to force query plan, compute & use CTE later     
        WITH wf_detailed AS (
