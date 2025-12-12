@@ -614,14 +614,14 @@ ReportDefinitions:
   - name: applicationstatus
     label: Application status
     type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    pattern: list://INITIATED:INITIATED,PENDINGPAYMENT:PENDINGPAYMENT,DOCUMENTVERIFY:DOCUMENTVERIFY,APPROVED:APPROVED, REJECTED:REJECTED,TL-VERIFICATION:TL-VERIFICATION,WS-SW-VERIFICATION:WS-SW-VERIFICATION ,CITIZENACTIONREQUIRED-DV:CITIZENACTIONREQUIRED-DV,BPA-VERIFICATION:BPA-VERIFICATION,PENDINGAPPROVAL:PENDINGAPPROVAL,CANCELLED:CANCELLED,PT-VERIFICATION:PT-VERIFICATION,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
     source: ndc
     isMandatory: true
     searchClause: AND LOWER(a.applicationstatus) = LOWER($applicationstatus)
   - name: ulb
     label: ulb
     type: singlevaluelist
-    pattern: list://INITIATED:INITIATED,PENDINGPAYMENT:PENDINGPAYMENT,DOCUMENTVERIFY:DOCUMENTVERIFY,APPROVED:APPROVED, REJECTED:REJECTED,TL-VERIFICATION:TL-VERIFICATION,WS-SW-VERIFICATION:WS-SW-VERIFICATION ,CITIZENACTIONREQUIRED-DV:CITIZENACTIONREQUIRED-DV,BPA-VERIFICATION:BPA-VERIFICATION,PENDINGAPPROVAL:PENDINGAPPROVAL,CANCELLED:CANCELLED,PT-VERIFICATION:PT-VERIFICATION,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: ndc
     isMandatory: true
     searchClause: AND a.tenantid = $ulb
