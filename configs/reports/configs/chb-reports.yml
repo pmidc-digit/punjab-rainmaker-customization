@@ -492,6 +492,13 @@ ReportDefinitions:
       source: chb
       isMandatory: false
       searchClause: AND b.booking_status = $booking_status
+     - name: ulb
+        label: ulb
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: adv
+        isMandatory: true
+        searchClause: AND b.tenant_id= $ulb
     query: >
       -- Use CTE to force query plan, compute & use CTE later
        SELECT 
@@ -502,7 +509,7 @@ ReportDefinitions:
           INNER JOIN eg_chb_applicant_detail a ON a.booking_id = b.booking_id
           INNER JOIN eg_chb_address_detail ad ON ad.applicant_detail_id = a.applicant_detail_id
           INNER JOIN eg_chb_slot_detail s ON s.booking_id = b.booking_id
-          WHERE b.tenant_id = $tenantid
+          WHERE b.tenant_id = $ulb
           
   - reportName: StateCollectionsReport
     decryptionPathId: CHBREPORTS
@@ -596,6 +603,13 @@ ReportDefinitions:
       source: chb
       isMandatory: true
       searchClause: AND createdtime <= $toDate
+     - name: ulb
+      label: ulb
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: adv
+      isMandatory: true
+      searchClause: AND 1=1
     query: |
       -- Use CTE to force query plan, compute & use CTE later
       WITH unique_transactions AS (
@@ -624,7 +638,7 @@ ReportDefinitions:
           LEFT JOIN eg_user u_applic ON u_applic.uuid = o.uuid
         WHERE p.paymentstatus != 'CANCELLED'
           AND pd.businessservice = 'chb-services'
-          AND p.tenantid = $tenantid
+          AND p.tenantid = $ulb
       )
       SELECT
         applicationno, name, mobilenumber, businessservice, status,
@@ -745,6 +759,13 @@ ReportDefinitions:
       source: chb
       isMandatory: false
       searchClause: AND payment.paymentmode like $paymentMode
+     - name: ulb
+      label: ulb
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: adv
+      isMandatory: true
+      searchClause: AND 1=1
     query: |
       -- Use CTE to force query plan, compute & use CTE later
       SELECT
@@ -771,7 +792,7 @@ ReportDefinitions:
         LEFT JOIN eg_chb_owner o ON o.booking_id=b.booking_id
         LEFT JOIN eg_user u_applicant ON u_applicant.uuid = o.uuid   
         LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer  
-        WHERE bill.tenantid = $tenantid
+        WHERE bill.tenantid = $ulb
         AND pd.businessservice = 'chb-services'
         AND payment.paymentstatus != 'CANCELLED'
     orderby: ORDER BY pd.receiptdate DESC;  
