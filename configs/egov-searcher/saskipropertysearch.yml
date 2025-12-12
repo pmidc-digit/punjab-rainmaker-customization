@@ -3,7 +3,7 @@ SearchDefinitions:
   summary: Search configs for saski-property-search
   version: 1.0.0
   definitions:
-    - name: saskipropertycount
+    - name: saskipropertyvasikacount
       isCustomerRowMapEnabled: true
       rowMapperKey: propertysearch
       query:
@@ -82,7 +82,7 @@ SearchDefinitions:
           - name: additionaldetails->>'allotmentNo'
             isMandatory: false
             jsonPath: $.searchCriteria.allotmentNo
-            
+
           - name: propertyid
             isMandatory: false
             jsonPath: $.searchCriteria.propertyId
@@ -91,6 +91,25 @@ SearchDefinitions:
         pagination:
           noOfRecords: $.searchCriteria.limit
           offset: $.searchCriteria.offset
+      output:
+        jsonFormat:
+          ResponseInfo: {}
+          Property: []
+        outJsonPath: $.Property
+        responseInfoPath: $.ResponseInfo
+    - name: saskipropertysearchcount
+      isCustomerRowMapEnabled: true
+      rowMapperKey: propertysearch
+      query:
+        baseQuery: >-
+          select count(*) from eg_pt_property 
+          $where and status='ACTIVE'
+      searchParams:
+        condition: AND
+        params:
+          - name: tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
       output:
         jsonFormat:
           ResponseInfo: {}
