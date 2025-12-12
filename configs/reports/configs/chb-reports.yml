@@ -115,6 +115,7 @@ ReportDefinitions:
           INNER JOIN eg_chb_address_detail ad ON ad.applicant_detail_id = a.applicant_detail_id
           INNER JOIN eg_chb_slot_detail s ON s.booking_id = b.booking_id
           WHERE b.tenant_id = $tenantid
+          
   - reportName: CollectionsReport
     decryptionPathId: CHBREPORTS
     summary: Collections
@@ -247,6 +248,394 @@ ReportDefinitions:
     orderby: ORDER BY createdtime DESC
     
   - reportName: ReceiptRegisterCHB
+    decryptionPathId: CHBREPORTS
+    summary: Details of collector register in CHB service
+    version: 1.0.0
+    moduleName: rainmaker-chb
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+    - name: receiptno
+      label: receiptno
+      type: string
+      source: chb
+      total: false
+    - name: connectionno
+      label: connectionno
+      type: string
+      source: chb
+      total: false
+    - name: receiptdate1
+      label: receiptdate1
+      type: string
+      source: chb
+      total: false
+    - name: service
+      label: service
+      type: string
+      source: chb
+      total: false
+    - name: collectorname
+      label: collectorname
+      type: string
+      source: chb
+      total: false
+    - name: transactiondate
+      label: transactiondate
+      type: string
+      source: chb
+      total: false
+    - name: instrumentnumber
+      label: instrumentnumber
+      type: string
+      source: chb
+      total: false
+    - name: payername
+      label: payername
+      type: string
+      source: chb
+      total: false
+    - name: amountpaid
+      label: amountpaid
+      type: string
+      source: chb
+      total: false
+    - name: paymentmode
+      label: paymentmode
+      type: string
+      source: chb
+      total: false
+    - name: paymentstatus
+      label: paymentstatus
+      type: string
+      source: chb
+      total: false
+    - name: ownername1
+      label: ownername1
+      type: string
+      source: chb
+      total: false
+    - name: user
+      label: user
+      type: string
+      source: chb
+      total: false
+    - name: manualreceiptnumber
+      label: manualreceiptnumber
+      type: string
+      source: chb
+      total: false
+    - name: manualreceiptdate
+      label: manualreceiptdate
+      type: string
+      source: chb
+      total: false
+    searchParams:
+    - name: fromDate
+      label: fromDate
+      type: epoch
+      source: chb
+      isMandatory: true
+      searchClause: AND pd.receiptdate >= $fromDate
+    - name: toDate
+      label: toDate
+      type: epoch
+      source: chb
+      isMandatory: true
+      searchClause: AND pd.receiptdate <= $toDate
+    - name: receiptno
+      label: receiptno
+      type: string
+      source: chb
+      isMandatory: false
+      searchClause: AND pd.receiptnumber like $receiptno
+    - name: paymentMode
+      label: paymentMode
+      type: singlevaluelist
+      pattern: 'list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT'
+      source: chb
+      isMandatory: false
+      searchClause: AND payment.paymentmode like $paymentMode
+    query: |
+      -- Use CTE to force query plan, compute & use CTE later
+      SELECT
+            pd.receiptnumber AS receiptno,
+            bill.consumercode AS connectionno,   
+            TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY' ) AS receiptdate1,
+            'chb-services' AS service,
+            usr.name AS collectorname,
+            TO_CHAR( TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS transactiondate,
+            payment.instrumentnumber,
+            u_applicant.name AS payername,
+            pd.amountpaid,
+            payment.paymentmode,
+            payment.paymentstatus,
+            u_applicant.name AS ownername1,
+            usr.id AS user,
+            pd.manualreceiptnumber,
+            pd.manualreceiptdate
+        FROM egcl_paymentdetail pd
+        INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = $tenantid
+        INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
+        LEFT JOIN eg_chb_booking_detail b ON b.booking_no = bill.consumercode
+        LEFT JOIN eg_chb_applicant_detail a ON a.booking_id = b.booking_id
+        LEFT JOIN eg_chb_owner o ON o.booking_id=b.booking_id
+        LEFT JOIN eg_user u_applicant ON u_applicant.uuid = o.uuid   
+        LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer  
+        WHERE bill.tenantid = $tenantid
+        AND pd.businessservice = 'chb-services'
+        AND payment.paymentstatus != 'CANCELLED'
+    orderby: ORDER BY pd.receiptdate DESC; 
+    
+  - reportName: StateTimelyBookingReport
+    decryptionPathId: CHBREPORTS
+    summary: Details of booking slots in chb service
+    version: 1.0.0
+    moduleName: rainmaker-chb
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+    - name: booking_no
+      label: Booking Number
+      type: string
+      source: chb
+      total: false
+    - name: applicant_name
+      label: applicant_name
+      type: string
+      source: chb
+      total: false
+    - name: applicant_mobile_no
+      label: applicant_mobile_no
+      type: string
+      source: chb
+      total: false
+    - name: address_line_1
+      label: Address
+      type: string
+      source: chb
+      total: false
+    - name: locality
+      label: Locality
+      type: string
+      source: chb
+      total: false
+    - name: booking_status
+      label: Booking Status
+      type: string
+      source: chb
+      total: false
+    - name: purpose
+      label: Purpose
+      type: string
+      source: chb
+      total: false
+    - name: receipt_no
+      label: Receipt No
+      type: string
+      source: chb
+      total: false
+    - name: community_hall_name
+      label: Community Hall Name
+      type: string
+      source: chb
+      total: false
+    - name: hall_code
+      label: Hall Code
+      type: string
+      source: chb
+      total: false
+    - name: capacity
+      label: Capacity
+      type: string
+      source: chb
+      total: false
+    - name: booking_date
+      label: Booking From Date
+      type: string
+      source: chb
+      total: false
+    - name: booking_end_date
+      label: Booking To Date
+      type: string
+      source: chb
+      total: false
+    - name: booking_from_time
+      label: Booking From Time
+      type: string
+      source: chb
+      total: false
+    - name: booking_to_time
+      label: Booking To Time
+      type: string
+      source: chb
+      total: false
+    searchParams:
+    - name: fromDate
+      label: fromDate
+      type: epoch
+      source: chb
+      isMandatory: true
+      searchClause: AND s.booking_date >= to_timestamp($fromDate / 1000)
+    - name: toDate
+      label: toDate
+      type: epoch
+      source: chb
+      isMandatory: true
+      searchClause: AND s.booking_date <= to_timestamp($toDate / 1000)
+    - name: booking_status
+      label: booking status
+      type: singlevaluelist
+      pattern: list://INITIATED:INITIATED,PENDING_PAYMENT:PENDING_PAYMENT,BOOKED:BOOKED,CANCELLED:CANCELLED
+      source: chb
+      isMandatory: false
+      searchClause: AND b.booking_status = $booking_status
+    query: >
+      -- Use CTE to force query plan, compute & use CTE later
+       SELECT 
+            a.applicant_name,a.applicant_mobile_no,ad.address_line_1,ad.locality,
+            b.booking_status, b.purpose, b.receipt_no, b.community_hall_name, b.booking_no,
+            s.hall_code, s.capacity, s.booking_date, s.booking_end_date, s.booking_from_time, s.booking_to_time
+          FROM eg_chb_booking_detail b
+          INNER JOIN eg_chb_applicant_detail a ON a.booking_id = b.booking_id
+          INNER JOIN eg_chb_address_detail ad ON ad.applicant_detail_id = a.applicant_detail_id
+          INNER JOIN eg_chb_slot_detail s ON s.booking_id = b.booking_id
+          WHERE b.tenant_id = $tenantid
+          
+  - reportName: StateCollectionsReport
+    decryptionPathId: CHBREPORTS
+    summary: Collections
+    version: 1.0.0
+    moduleName: rainmaker-chb
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+    - name: applicationno
+      label: applicationno
+      type: string
+      source: chb
+      total: false
+    - name: name
+      label: name
+      type: string
+      source: chb
+      total: false
+    - name: mobilenumber
+      label: mobilenumber
+      type: string
+      source: chb
+      total: false
+    - name: businessservice
+      label: businessservice
+      type: string
+      source: chb
+      total: false
+    - name: status
+      label: status
+      type: string
+      source: chb
+      total: false
+    - name: cash_amount
+      label: cash_amount
+      type: string
+      source: chb
+      total: true
+    - name: cheque_amount
+      label: cheque_amount
+      type: string
+      source: chb
+      total: true
+    - name: card_amount
+      label: card_amount
+      type: string
+      source: chb
+      total: true
+    - name: dd_amount
+      label: dd_amount
+      type: string
+      source: chb
+      total: true
+    - name: neft_amount
+      label: neft_amount
+      type: string
+      source: chb
+      total: true
+    - name: rtgs_amount
+      label: rtgs_amount
+      type: string
+      source: chb
+      total: true
+    - name: online_amount
+      label: online_amount
+      type: string
+      source: chb
+      total: true
+    - name: amountpaid
+      label: amountpaid
+      type: string
+      source: chb
+      total: true
+    - name: PaymentDate
+      label: PaymentDate
+      type: string
+      source: chb
+      total: false
+    searchParams:
+    - name: fromDate
+      label: fromDate
+      type: epoch
+      source: chb
+      isMandatory: true
+      searchClause: AND createdtime >= $fromDate
+    - name: toDate
+      label: toDate
+      type: epoch
+      source: chb
+      isMandatory: true
+      searchClause: AND createdtime <= $toDate
+    query: |
+      -- Use CTE to force query plan, compute & use CTE later
+      WITH unique_transactions AS (
+        SELECT
+          p.id AS transaction_id,
+          p.createdtime,
+          p.totalamountpaid AS amountpaid,
+          CASE WHEN p.paymentmode IN ('CASH','OFFLINE_CASH') THEN p.totalamountpaid ELSE 0 END AS cash_amount,
+          CASE WHEN p.paymentmode = 'CHEQUE' THEN p.totalamountpaid ELSE 0 END AS cheque_amount,
+          CASE WHEN p.paymentmode IN ('CARD','DEBIT_CARD','CREDIT_CARD','OFFLINE_CARD') THEN p.totalamountpaid ELSE 0 END AS card_amount,
+          CASE WHEN p.paymentmode = 'DD' THEN p.totalamountpaid ELSE 0 END AS dd_amount,
+          CASE WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN p.totalamountpaid ELSE 0 END AS neft_amount,
+          CASE WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN p.totalamountpaid ELSE 0 END AS rtgs_amount,
+          CASE WHEN p.paymentmode = 'ONLINE' THEN p.totalamountpaid ELSE 0 END AS online_amount,
+          b.booking_no AS applicationno,
+          b.booking_status AS status,
+          'chb-services' AS businessservice,
+          u_applic.name AS name,
+          u_applic.mobilenumber AS mobilenumber
+        FROM egcl_paymentdetail pd
+          JOIN egcl_payment p ON pd.paymentid = p.id
+          JOIN egcl_bill bill ON bill.id = pd.billid
+          JOIN eg_chb_booking_detail b ON b.booking_no = bill.consumercode
+          LEFT JOIN eg_chb_applicant_detail a ON a.booking_id = b.booking_id
+          LEFT JOIN eg_chb_owner o ON o.booking_id = a.booking_id
+          LEFT JOIN eg_user u_applic ON u_applic.uuid = o.uuid
+        WHERE p.paymentstatus != 'CANCELLED'
+          AND pd.businessservice = 'chb-services'
+          AND p.tenantid = $tenantid
+      )
+      SELECT
+        applicationno, name, mobilenumber, businessservice, status,
+        cash_amount, cheque_amount, card_amount, dd_amount,
+        neft_amount, rtgs_amount, online_amount, amountpaid,
+        TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate
+      FROM unique_transactions
+      WHERE 1=1
+    orderby: ORDER BY createdtime DESC
+    
+  - reportName: StateReceiptRegisterCHB
     decryptionPathId: CHBREPORTS
     summary: Details of collector register in CHB service
     version: 1.0.0
