@@ -68,9 +68,11 @@ serviceMaps:
     fromTopic: update-rl-allotment
     isTransaction: true
     queryMaps:
-    - query: UPDATE eg_rl_allotment SET status=?,application_type=?, previous_application_number=?, application_number=?,start_date=?, end_date=?,is_gst_applicable=?, is_cow_cess_applicable=?, is_refund_applicable_on_discontinuation=?, term_and_condition=?, penalty_type=?, lastmodified_time=?, lastmodified_by=? WHERE id=?;
+    - query: UPDATE eg_rl_allotment SET property_id =?, tenant_id=?, status=?,application_type=?, previous_application_number=?, application_number=?,start_date=?, end_date=?,is_gst_applicable=?, is_cow_cess_applicable=?, is_refund_applicable_on_discontinuation=?, term_and_condition=?, penalty_type=?, lastmodified_time=?, lastmodified_by=? WHERE id=?;
       basePath: AllotmentDetails
       jsonMaps:
+      - jsonPath: $.AllotmentDetails.propertyId
+      - jsonPath: $.AllotmentDetails.tenantId
       - jsonPath: $.AllotmentDetails.status
       - jsonPath: $.AllotmentDetails.applicationType
       - jsonPath: $.AllotmentDetails.previousApplicationNumber
