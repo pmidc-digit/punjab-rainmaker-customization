@@ -632,7 +632,7 @@ ReportDefinitions:
             wf.businessid AS applicationno,
             u.name AS assignee_name,
             e.code AS assignee_code,
-            wf.tenantid
+            wf.tenantid ,
             UPPER(st.applicationstatus) AS current_stage
            FROM eg_wf_processinstance_v2 wf
            JOIN eg_wf_state_v2 st ON wf.status = st.uuid
