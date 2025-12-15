@@ -735,6 +735,7 @@ ReportDefinitions:
         SELECT DISTINCT ON (wf.businessid)
           wf.businessid AS applicationno,
           wf.tenantid AS tenantid, 
+          u.name AS employee_name,
           e.code AS assignee_code,
           UPPER(st.applicationstatus) AS current_stage
          FROM eg_wf_processinstance_v2 wf
