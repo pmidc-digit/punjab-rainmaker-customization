@@ -63,6 +63,12 @@
                 }
               },
               {
+                "variable": "bookingStatus",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].bookingStatus"
+                }
+              },
+              {
                 "variable": "communityHallName",
                 "value": {
                   "path": "$.hallsBookingApplication[0].communityHallName"
@@ -510,8 +516,7 @@
                   "variable": "dateNow",
                   "value": {
                     "path": "$.auditDetails.lastModifiedTime"
-                  },
-                  "type" : "date"
+                  }
                 },
               {
                 "variable": "toPeriod",
@@ -936,6 +941,33 @@
               {
                 "variable": "chbDiscountPositive",
                 "formula": "{{chbDiscount}} < 0 ? -{{chbDiscount}} : {{chbDiscount}}"
+              },
+              {
+                "variable": "chbBookingFees",
+                "formula": "{{chbBookingFees}}>0?{{chbBookingFees}}:0"
+              },
+              {
+                "variable": "chbSgst",
+                "formula": "{{chbSgst}}>0?{{chbSgst}}:0"
+              },
+              {
+                "variable": "chbCgst",
+                "formula": "{{chbCgst}}>0?{{chbCgst}}:0"
+              },
+              {
+                "variable": "chbCowCessCharge",
+                "formula": "{{chbCowCessCharge}}>0?{{chbCowCessCharge}}:0"
+              },
+              {
+                "variable": "dateNowFormatted",
+                "type": "date",
+                "formula": "{{dateNow}}",
+                "timezone": "Asia/Kolkata",
+                "format": "YYYY-MM-DD"
+              },
+              {
+                "variable": "chbDiscountPositive",
+                "formula": "{{chbDiscountPositive}}>0?{{chbDiscountPositive}}:0"
               }
             ]
           },
