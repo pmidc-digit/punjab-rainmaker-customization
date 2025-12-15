@@ -727,15 +727,14 @@ ReportDefinitions:
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: adv
-        isMandatory: true
-        searchClause: AND 1=1
+        isMandatory: false
+        searchClause: AND tenantid = $ulb
     query: >
       -- Use CTE to force query plan, compute & use CTE later
-
       WITH current_holder AS (
         SELECT DISTINCT ON (wf.businessid)
           wf.businessid AS applicationno,
-          u.name AS employee_name,
+          wf.tenantid AS tenantid, 
           e.code AS assignee_code,
           UPPER(st.applicationstatus) AS current_stage
          FROM eg_wf_processinstance_v2 wf
@@ -743,14 +742,14 @@ ReportDefinitions:
          LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
          LEFT JOIN eg_user u ON u.uuid = wa.assignee
          LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-         WHERE wf.tenantid = $ulb
-         AND wf.businessservice = 'ADV'
+         WHERE wf.businessservice = 'ADV'
          ORDER BY wf.businessid, wf.lastmodifiedtime DESC
         ),
        unique_transactions AS (
          SELECT
           p.id AS transaction_id,
           p.createdtime,
+          p.tenantid AS tenantid,  
           pd.amountpaid,
           CASE WHEN p.paymentmode IN ('CASH','OFFLINE_CASH') THEN pd.amountpaid ELSE 0 END AS cash_amount,
           CASE WHEN p.paymentmode = 'CHEQUE' THEN pd.amountpaid ELSE 0 END AS cheque_amount,
@@ -775,7 +774,6 @@ ReportDefinitions:
           LEFT JOIN current_holder ch ON ch.applicationno = adv.booking_no
           WHERE pd.businessservice = 'adv-services'
           AND p.paymentstatus != 'CANCELLED'
-          AND p.tenantid = $ulb
           ) 
       SELECT
         applicationno,
@@ -894,7 +892,7 @@ ReportDefinitions:
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: adv
-        isMandatory: true
+        isMandatory: false
         searchClause: AND b.tenant_id= $ulb
     query: >
       -- Use CTE to force query plan, compute & use CTE later
@@ -1026,7 +1024,7 @@ ReportDefinitions:
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: adv
-        isMandatory: true
+        isMandatory: false
         searchClause: AND b.tenant_id= $ulb
     query: >
       -- Use CTE to force query plan, compute & use CTE later
