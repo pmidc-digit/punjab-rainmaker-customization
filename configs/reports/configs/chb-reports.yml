@@ -397,6 +397,11 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
+    - name: tenantid
+      label: tenantid
+      type: string
+      source: chb
+      total: false
     - name: booking_no
       label: Booking Number
       type: string
@@ -503,7 +508,7 @@ ReportDefinitions:
       -- Use CTE to force query plan, compute & use CTE later
        SELECT 
             a.applicant_name,a.applicant_mobile_no,ad.address_line_1,ad.locality,
-            b.booking_status, b.purpose, b.receipt_no, b.community_hall_name, b.booking_no,
+            b.booking_status, b.purpose, b.receipt_no, b.community_hall_name, b.booking_no,b.tenantid
             s.hall_code, s.capacity, s.booking_date, s.booking_end_date, s.booking_from_time, s.booking_to_time
           FROM eg_chb_booking_detail b
           INNER JOIN eg_chb_applicant_detail a ON a.booking_id = b.booking_id
@@ -785,7 +790,7 @@ ReportDefinitions:
             pd.manualreceiptnumber,
             pd.manualreceiptdate
         FROM egcl_paymentdetail pd
-        INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = $tenantid
+        INNER JOIN egcl_bill bill ON bill.id = pd.billid 
         INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
         LEFT JOIN eg_chb_booking_detail b ON b.booking_no = bill.consumercode
         LEFT JOIN eg_chb_applicant_detail a ON a.booking_id = b.booking_id
