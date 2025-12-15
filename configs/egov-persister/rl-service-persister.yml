@@ -68,7 +68,7 @@ serviceMaps:
     fromTopic: update-rl-allotment
     isTransaction: true
     queryMaps:
-    - query: UPDATE eg_rl_allotment SET property_id =?, tenant_id=?, status=?,application_type=?, previous_application_number=?, application_number=?,start_date=?, end_date=?,is_gst_applicable=?, is_cow_cess_applicable=?, is_refund_applicable_on_discontinuation=?, term_and_condition=?, penalty_type=?, lastmodified_time=?, lastmodified_by=? WHERE id=?;
+    - query: UPDATE eg_rl_allotment SET property_id =?, tenant_id=?, status=?,application_type=?, previous_application_number=?, application_number=?,start_date=?, end_date=?,is_gst_applicable=?, is_cow_cess_applicable=?, is_refund_applicable_on_discontinuation=?, term_and_condition=?, penalty_type=?, lastmodified_time=?, lastmodified_by=?, additional_details=? WHERE id=?;
       basePath: AllotmentDetails
       jsonMaps:
       - jsonPath: $.AllotmentDetails.propertyId
@@ -86,6 +86,9 @@ serviceMaps:
       - jsonPath: $.AllotmentDetails.penaltyType
       - jsonPath: $.AllotmentDetails.auditDetails.lastModifiedTime
       - jsonPath: $.AllotmentDetails.auditDetails.lastModifiedBy
+      - jsonPath: $.AllotmentDetails.additionalDetails
+        type: JSON
+        dbType: JSONB
       - jsonPath: $.AllotmentDetails.id
     
     - query: INSERT INTO eg_rl_owner_info(id, allotment_id, user_uuid, is_primary_owner, owner_type, ownership_percentage, relationship, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
