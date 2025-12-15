@@ -202,8 +202,7 @@ ReportDefinitions:
         searchClause: AND createdtime <= $toDate
     query: >
       -- Use CTE to force query plan, compute & use CTE later
-
-      WITH current_holder AS (
+       WITH current_holder AS (
         SELECT DISTINCT ON (wf.businessid)
           wf.businessid AS applicationno,
           u.name AS employee_name,
@@ -218,7 +217,7 @@ ReportDefinitions:
          AND wf.businessservice = 'ADV'
          ORDER BY wf.businessid, wf.lastmodifiedtime DESC
         ),
-       unique_transactions AS (
+        unique_transactions AS (
          SELECT
           p.id AS transaction_id,
           p.createdtime,
@@ -248,7 +247,7 @@ ReportDefinitions:
           AND p.paymentstatus != 'CANCELLED'
           AND p.tenantid = $tenantid
           ) 
-      SELECT
+       SELECT
         applicationno,
         name,
         mobilenumber,
@@ -731,7 +730,7 @@ ReportDefinitions:
         searchClause: AND tenantid = $ulb
     query: >
       -- Use CTE to force query plan, compute & use CTE later
-      WITH current_holder AS (
+       WITH current_holder AS (
         SELECT DISTINCT ON (wf.businessid)
           wf.businessid AS applicationno,
           wf.tenantid AS tenantid, 
@@ -746,7 +745,7 @@ ReportDefinitions:
          WHERE wf.businessservice = 'ADV'
          ORDER BY wf.businessid, wf.lastmodifiedtime DESC
         ),
-       unique_transactions AS (
+        unique_transactions AS (
          SELECT
           p.id AS transaction_id,
           p.createdtime,
@@ -775,8 +774,8 @@ ReportDefinitions:
           LEFT JOIN current_holder ch ON ch.applicationno = adv.booking_no
           WHERE pd.businessservice = 'adv-services'
           AND p.paymentstatus != 'CANCELLED'
-          ) 
-      SELECT
+        ) 
+       SELECT
         applicationno,
         name,
         mobilenumber,

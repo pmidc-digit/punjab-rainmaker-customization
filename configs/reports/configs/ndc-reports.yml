@@ -623,7 +623,7 @@ ReportDefinitions:
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: ndc
-    isMandatory: true
+    isMandatory: false
     searchClause: AND a.tenantid = $ulb
   query: |
       -- Use CTE to force query plan, compute & use CTE later
@@ -632,14 +632,14 @@ ReportDefinitions:
             wf.businessid AS applicationno,
             u.name AS assignee_name,
             e.code AS assignee_code,
+            wf.tenantid
             UPPER(st.applicationstatus) AS current_stage
            FROM eg_wf_processinstance_v2 wf
            JOIN eg_wf_state_v2 st ON wf.status = st.uuid
            LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
            LEFT JOIN eg_user u ON u.uuid = wa.assignee
            LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-           WHERE wf.tenantid = $ulb
-           AND wf.businessservice = 'ndc-services'
+           WHERE wf.businessservice = 'ndc-services'
            ORDER BY wf.businessid, wf.lastmodifiedtime DESC
            )
        SELECT 
@@ -656,7 +656,7 @@ ReportDefinitions:
         JOIN eg_user u ON u.uuid = o.uuid
         JOIN eg_ndc_details d ON d.applicationid = o.ndcapplicationuuid
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno
-        WHERE a.tenantid = $ulb
+        WHERE 1=1
 - reportName: StateCollectionsReport
   decryptionPathId: NDCAPPLICATION
   summary: Collections
@@ -765,8 +765,8 @@ ReportDefinitions:
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: ndc
-    isMandatory: true
-    searchClause: AND 1=1
+    isMandatory: false
+    searchClause: AND tenantid = $ulb
   query: |
       -- Use CTE to force query plan, compute & use CTE later
       WITH current_holder AS (
@@ -780,8 +780,7 @@ ReportDefinitions:
          LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
          LEFT JOIN eg_user u ON u.uuid = wa.assignee
          LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-         WHERE wf.tenantid = $ulb
-         AND wf.businessservice = 'ndc-services'
+         WHERE wf.businessservice = 'ndc-services'
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
             ),
         unique_transactions AS (
@@ -803,7 +802,8 @@ ReportDefinitions:
               u_applicant.name ,
               u_applicant.mobilenumber ,
               ch.employee_name AS assignee_employee,
-              ch.assignee_code AS assignee_code
+              ch.assignee_code AS assignee_code ,
+              p.tenantid
              FROM egcl_paymentdetail pd
              JOIN egcl_payment p ON pd.paymentid = p.id
              JOIN egcl_bill bill ON bill.id = pd.billid
@@ -816,7 +816,6 @@ ReportDefinitions:
              LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno
              WHERE pd.businessservice = 'NDC'
              AND p.paymentstatus != 'CANCELLED'
-             AND p.tenantid = $ulb
                  )
          SELECT
               applicationno, name, mobilenumber, 'NDC' AS businessservice, applicationstatus,
@@ -899,8 +898,8 @@ ReportDefinitions:
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: ndc
-    isMandatory: true
-    searchClause: AND 1=1
+    isMandatory: false
+    searchClause: AND n.tenantid = $ulb
   query: |
       -- Use CTE to force query plan, compute & use CTE later     
        WITH wf_detailed AS (
@@ -914,8 +913,7 @@ ReportDefinitions:
            wf.id AS processinstanceid
           FROM eg_wf_processinstance_v2 wf
           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-          WHERE wf.tenantid = $ulb
-         AND wf.businessservice = 'ndc-services'                    
+          WHERE wf.businessservice = 'ndc-services'                    
           ),
         status_times AS (
              SELECT
@@ -947,8 +945,7 @@ ReportDefinitions:
               JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
               JOIN eg_hrms_employee e ON e.uuid = wa.assignee
               JOIN eg_user u ON e.uuid = u.uuid
-               WHERE wf.tenantid = $ulb
-               AND wf.businessservice = 'ndc-services'
+               WHERE wf.businessservice = 'ndc-services'
               ORDER BY wf.businessid,wf.lastmodifiedtime DESC
                )
          SELECT
@@ -1097,8 +1094,8 @@ ReportDefinitions:
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: ndc
-    isMandatory: true
-    searchClause: AND a.tenantid = $ulb
+    isMandatory: false
+    searchClause: AND bill.tenantid = $ulb
   query: |
       -- Use CTE to force query plan, compute & use CTE later
       SELECT
@@ -1118,15 +1115,13 @@ ReportDefinitions:
        	 pd.manualreceiptnumber,
          pd.manualreceiptdate   
        FROM egcl_paymentdetail pd
-      INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = $tenantid
+      INNER JOIN egcl_bill bill ON bill.id = pd.billid 
       INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
       LEFT JOIN eg_ndc_application a ON bill.consumercode = a.applicationno
       LEFT JOIN eg_ndc_owner o  ON o.ndcapplicationuuid = a.uuid
       LEFT JOIN eg_user u_applicant ON u_applicant.uuid = o.uuid
       LEFT JOIN eg_ndc_details d ON d.applicationid = a.uuid
       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
-       WHERE
-         bill.tenantid = $ulb
-         AND pd.businessservice = 'NDC'
+       WHERE pd.businessservice = 'NDC'
          AND payment.paymentstatus != 'CANCELLED'
   orderby: ORDER BY pd.receiptdate DESC;
