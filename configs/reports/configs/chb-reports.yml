@@ -491,13 +491,13 @@ ReportDefinitions:
       source: chb
       isMandatory: false
       searchClause: AND b.booking_status = $booking_status
-     - name: ulb
-        label: ulb
-        type: singlevaluelist
-        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-        source: adv
-        isMandatory: true
-        searchClause: AND b.tenant_id= $ulb
+    - name: ulb
+      label: ulb
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: adv
+      isMandatory: true
+      searchClause: AND b.tenant_id= $ulb
     query: >
       -- Use CTE to force query plan, compute & use CTE later
        SELECT 
@@ -601,7 +601,7 @@ ReportDefinitions:
       source: chb
       isMandatory: true
       searchClause: AND createdtime <= $toDate
-     - name: ulb
+    - name: ulb
       label: ulb
       type: singlevaluelist
       pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
@@ -756,7 +756,7 @@ ReportDefinitions:
       source: chb
       isMandatory: false
       searchClause: AND payment.paymentmode like $paymentMode
-     - name: ulb
+    - name: ulb
       label: ulb
       type: singlevaluelist
       pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
