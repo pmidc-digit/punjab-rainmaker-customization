@@ -508,7 +508,7 @@ ReportDefinitions:
       -- Use CTE to force query plan, compute & use CTE later
        SELECT 
             a.applicant_name,a.applicant_mobile_no,ad.address_line_1,ad.locality,
-            b.booking_status, b.purpose, b.receipt_no, b.community_hall_name, b.booking_no,b.tenantid
+            b.booking_status, b.purpose, b.receipt_no, b.community_hall_name, b.booking_no,b.tenantid,
             s.hall_code, s.capacity, s.booking_date, s.booking_end_date, s.booking_from_time, s.booking_to_time
           FROM eg_chb_booking_detail b
           INNER JOIN eg_chb_applicant_detail a ON a.booking_id = b.booking_id
