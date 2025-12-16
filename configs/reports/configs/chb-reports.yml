@@ -386,7 +386,7 @@ ReportDefinitions:
         WHERE bill.tenantid = $tenantid
         AND pd.businessservice = 'chb-services'
         AND payment.paymentstatus != 'CANCELLED'
-    orderby: ORDER BY pd.receiptdate DESC
+    orderby: ORDER BY pd.receiptdate DESC; 
     
   - reportName: StateTimelyBookingReport
     decryptionPathId: CHBREPORTS
@@ -799,4 +799,4 @@ ReportDefinitions:
         LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer  
         WHERE pd.businessservice = 'chb-services'
         AND payment.paymentstatus != 'CANCELLED'
-    orderby: ORDER BY pd.receiptdate DESC
+    orderby: ORDER BY pd.receiptdate DESC 
