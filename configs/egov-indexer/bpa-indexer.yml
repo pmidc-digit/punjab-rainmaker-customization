@@ -1,275 +1,197 @@
-
 ServiceMaps:
   serviceName: bpa-services
   version: 1.0.0
   mappings:
+
+    # ===============================
+    # SAVE BPA BUILDING PLAN
+    # ===============================
     - topic: save-bpa-buildingplan
       configKey: INDEX
       indexes:
         - name: bpa-buildingplan-index
           type: general
-          id: $.BPA.id, $.BPA.tenantId
+          id: $.id, $.tenantId
           isBulk: false
-          timeStampField: $.BPA.auditDetails.createdTime
-          jsonPath: $
+          timeStampField: $.auditDetails.createdTime
+          jsonPath: $.BPA
           customJsonMapping:
             indexMapping:
-              Data:
-                id: id
-                tenantId: tenantId
-                applicationNo: applicationNo
-                approvalNo: approvalNo
-                applicationDate: applicationDate
-                edcrNumber: edcrNumber
-                landId: landId
-                accountId: accountId
-                businessService: businessService
-                status: status
-                approvalDate: approvalDate
-                additionalDetails: additionalDetails
-                createdBy: createdBy
-                lastModifiedBy: lastModifiedBy
-                createdTime: createdTime
-                lastModifiedTime: lastModifiedTime
-                documents: documents
-              fieldMapping:
-                - inJsonPath: $.BPA.id
-                  outJsonPath: $.Data.id
-                - inJsonPath: $.BPA.tenantId
-                  outJsonPath: $.Data.tenantId
-                - inJsonPath: $.BPA.applicationNo
-                  outJsonPath: $.Data.applicationNo
-                - inJsonPath: $.BPA.approvalNo
-                  outJsonPath: $.Data.approvalNo
-                - inJsonPath: $.BPA.applicationDate
-                  outJsonPath: $.Data.applicationDate
-                - inJsonPath: $.BPA.edcrNumber
-                  outJsonPath: $.Data.edcrNumber
-                - inJsonPath: $.BPA.landId
-                  outJsonPath: $.Data.landId
-                - inJsonPath: $.BPA.accountId
-                  outJsonPath: $.Data.accountId
-                - inJsonPath: $.BPA.businessService
-                  outJsonPath: $.Data.businessService
-                - inJsonPath: $.BPA.status
-                  outJsonPath: $.Data.status
-                - inJsonPath: $.BPA.approvalDate
-                  outJsonPath: $.Data.approvalDate
-                - inJsonPath: $.BPA.additionalDetails
-                  outJsonPath: $.Data.additionalDetails
-                - inJsonPath: $.BPA.auditDetails.createdBy
-                  outJsonPath: $.Data.createdBy
-                - inJsonPath: $.BPA.auditDetails.lastModifiedBy
-                  outJsonPath: $.Data.lastModifiedBy
-                - inJsonPath: $.BPA.auditDetails.createdTime
-                  outJsonPath: $.Data.createdTime
-                - inJsonPath: $.BPA.auditDetails.lastModifiedTime
-                  outJsonPath: $.Data.lastModifiedTime
-                - inJsonPath: $.BPA.documents
-                  outJsonPath: $.Data.documents
+              Data: {}
+            fieldMapping:
+              - inJsonPath: $.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.applicationNo
+                outJsonPath: $.Data.applicationNo
+              - inJsonPath: $.approvalNo
+                outJsonPath: $.Data.approvalNo
+              - inJsonPath: $.applicationDate
+                outJsonPath: $.Data.applicationDate
+              - inJsonPath: $.edcrNumber
+                outJsonPath: $.Data.edcrNumber
+              - inJsonPath: $.landId
+                outJsonPath: $.Data.landId
+              - inJsonPath: $.accountId
+                outJsonPath: $.Data.accountId
+              - inJsonPath: $.businessService
+                outJsonPath: $.Data.businessService
+              - inJsonPath: $.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.approvalDate
+                outJsonPath: $.Data.approvalDate
+              - inJsonPath: $.additionalDetails
+                outJsonPath: $.Data.additionalDetails
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+              - inJsonPath: $.documents
+                outJsonPath: $.Data.documents
 
+    # ===============================
+    # UPDATE BPA BUILDING PLAN
+    # ===============================
     - topic: update-bpa-buildingplan
       configKey: INDEX
       indexes:
-        - name: update-bpa-buildingplan-index
+        - name: bpa-buildingplan-index
           type: general
-          id: $.BPA.id, $.BPA.tenantId
+          id: $.id, $.tenantId
           isBulk: false
-          timeStampField: $.BPA.auditDetails.lastModifiedTime
-          jsonPath: $
+          timeStampField: $.auditDetails.lastModifiedTime
+          jsonPath: $.BPA
           customJsonMapping:
             indexMapping:
-              Data:
-                id: id
-                tenantId: tenantId
-                applicationNo: applicationNo
-                approvalNo: approvalNo
-                applicationDate: applicationDate
-                edcrNumber: edcrNumber
-                landId: landId
-                accountId: accountId
-                businessService: businessService
-                status: status
-                approvalDate: approvalDate
-                additionalDetails: additionalDetails
-                createdBy: createdBy
-                lastModifiedBy: lastModifiedBy
-                createdTime: createdTime
-                lastModifiedTime: lastModifiedTime
-                documents: []
-              fieldMapping:
-                - inJsonPath: $.BPA.id
-                  outJsonPath: $.Data.id
-                - inJsonPath: $.BPA.tenantId
-                  outJsonPath: $.Data.tenantId
-                - inJsonPath: $.BPA.applicationNo
-                  outJsonPath: $.Data.applicationNo
-                - inJsonPath: $.BPA.approvalNo
-                  outJsonPath: $.Data.approvalNo
-                - inJsonPath: $.BPA.applicationDate
-                  outJsonPath: $.Data.applicationDate
-                - inJsonPath: $.BPA.edcrNumber
-                  outJsonPath: $.Data.edcrNumber
-                - inJsonPath: $.BPA.landId
-                  outJsonPath: $.Data.landId
-                - inJsonPath: $.BPA.accountId
-                  outJsonPath: $.Data.accountId
-                - inJsonPath: $.BPA.businessService
-                  outJsonPath: $.Data.businessService
-                - inJsonPath: $.BPA.status
-                  outJsonPath: $.Data.status
-                - inJsonPath: $.BPA.approvalDate
-                  outJsonPath: $.Data.approvalDate
-                - inJsonPath: $.BPA.additionalDetails
-                  outJsonPath: $.Data.additionalDetails
-                - inJsonPath: $.BPA.auditDetails.createdBy
-                  outJsonPath: $.Data.createdBy
-                - inJsonPath: $.BPA.auditDetails.lastModifiedBy
-                  outJsonPath: $.Data.lastModifiedBy
-                - inJsonPath: $.BPA.auditDetails.createdTime
-                  outJsonPath: $.Data.createdTime
-                - inJsonPath: $.BPA.auditDetails.lastModifiedTime
-                  outJsonPath: $.Data.lastModifiedTime
+              Data: {}
+            fieldMapping:
+              - inJsonPath: $.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.applicationNo
+                outJsonPath: $.Data.applicationNo
+              - inJsonPath: $.approvalNo
+                outJsonPath: $.Data.approvalNo
+              - inJsonPath: $.applicationDate
+                outJsonPath: $.Data.applicationDate
+              - inJsonPath: $.edcrNumber
+                outJsonPath: $.Data.edcrNumber
+              - inJsonPath: $.landId
+                outJsonPath: $.Data.landId
+              - inJsonPath: $.accountId
+                outJsonPath: $.Data.accountId
+              - inJsonPath: $.businessService
+                outJsonPath: $.Data.businessService
+              - inJsonPath: $.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.approvalDate
+                outJsonPath: $.Data.approvalDate
+              - inJsonPath: $.additionalDetails
+                outJsonPath: $.Data.additionalDetails
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+              - inJsonPath: $.documents
+                outJsonPath: $.Data.documents
 
+    # ===============================
+    # WORKFLOW UPDATE
+    # ===============================
     - topic: update-bpa-workflow
       configKey: INDEX
       indexes:
-        - name: update-bpa-workflow-index
+        - name: bpa-buildingplan-index
           type: general
-          id: $.BPA.id, $.BPA.tenantId
+          id: $.id, $.tenantId
           isBulk: false
-          timeStampField: $.BPA.auditDetails.lastModifiedTime
-          jsonPath: $
+          timeStampField: $.auditDetails.lastModifiedTime
+          jsonPath: $.BPA
           customJsonMapping:
             indexMapping:
-              Data:
-                id: id
-                tenantId: tenantId
-                applicationNo: applicationNo
-                approvalNo: approvalNo
-                applicationDate: applicationDate
-                edcrNumber: edcrNumber
-                landId: landId
-                accountId: accountId
-                businessService: businessService
-                status: status
-                approvalDate: approvalDate
-                additionalDetails: additionalDetails
-                createdBy: createdBy
-                lastModifiedBy: lastModifiedBy
-                createdTime: createdTime
-                lastModifiedTime: lastModifiedTime
-                documents: []
-              fieldMapping:
-                - inJsonPath: $.BPA.id
-                  outJsonPath: $.Data.id
-                - inJsonPath: $.BPA.tenantId
-                  outJsonPath: $.Data.tenantId
-                - inJsonPath: $.BPA.applicationNo
-                  outJsonPath: $.Data.applicationNo
-                - inJsonPath: $.BPA.approvalNo
-                  outJsonPath: $.Data.approvalNo
-                - inJsonPath: $.BPA.applicationDate
-                  outJsonPath: $.Data.applicationDate
-                - inJsonPath: $.BPA.edcrNumber
-                  outJsonPath: $.Data.edcrNumber
-                - inJsonPath: $.BPA.landId
-                  outJsonPath: $.Data.landId
-                - inJsonPath: $.BPA.accountId
-                  outJsonPath: $.Data.accountId
-                - inJsonPath: $.BPA.businessService
-                  outJsonPath: $.Data.businessService
-                - inJsonPath: $.BPA.status
-                  outJsonPath: $.Data.status
-                - inJsonPath: $.BPA.approvalDate
-                  outJsonPath: $.Data.approvalDate
-                - inJsonPath: $.BPA.additionalDetails
-                  outJsonPath: $.Data.additionalDetails
-                - inJsonPath: $.BPA.auditDetails.createdBy
-                  outJsonPath: $.Data.createdBy
-                - inJsonPath: $.BPA.auditDetails.lastModifiedBy
-                  outJsonPath: $.Data.lastModifiedBy
-                - inJsonPath: $.BPA.auditDetails.createdTime
-                  outJsonPath: $.Data.createdTime
-                - inJsonPath: $.BPA.auditDetails.lastModifiedTime
-                  outJsonPath: $.Data.lastModifiedTime
+              Data: {}
+            fieldMapping:
+              - inJsonPath: $.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
 
+    # ===============================
+    # AUTO ESCALATION INDEX
+    # ===============================
     - topic: bpa-auto-escalation
       configKey: INDEX
       indexes:
         - name: bpa-auto-escalation-index
           type: general
-          id: $.BPA.applicationNo, $.BPA.tenantId
+          id: $.applicationNo, $.tenantId
           isBulk: false
-          timeStampField: $.BPA.auditDetails.lastModifiedTime
-          jsonPath: $
+          timeStampField: $.auditDetails.lastModifiedTime
+          jsonPath: $.BPA
           customJsonMapping:
             indexMapping:
-              Data:
-                applicationNo: applicationNo
-                tenantId: tenantId
-                status: status
-                additionalDetails: additionalDetails
-                lastModifiedBy: lastModifiedBy
-                lastModifiedTime: lastModifiedTime
-              fieldMapping:
-                - inJsonPath: $.BPA.applicationNo
-                  outJsonPath: $.Data.applicationNo
-                - inJsonPath: $.BPA.tenantId
-                  outJsonPath: $.Data.tenantId
-                - inJsonPath: $.BPA.status
-                  outJsonPath: $.Data.status
-                - inJsonPath: $.BPA.additionalDetails
-                  outJsonPath: $.Data.additionalDetails
-                - inJsonPath: $.BPA.auditDetails.lastModifiedBy
-                  outJsonPath: $.Data.lastModifiedBy
-                - inJsonPath: $.BPA.auditDetails.lastModifiedTime
-                  outJsonPath: $.Data.lastModifiedTime
+              Data: {}
+            fieldMapping:
+              - inJsonPath: $.applicationNo
+                outJsonPath: $.Data.applicationNo
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.additionalDetails
+                outJsonPath: $.Data.additionalDetails
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
 
-    # Optional: Index for individual BPA documents
+    # ===============================
+    # BPA DOCUMENT INDEX
+    # ===============================
     - topic: save-bpa-buildingplan
       configKey: INDEX
       indexes:
         - name: bpa-document-index
           type: general
-          id: $.BPA.documents.*.id, $.BPA.tenantId
+          id: $.id, $['$parent'].tenantId
           isBulk: true
-          timeStampField: $.BPA.auditDetails.createdTime
+          timeStampField: $['$parent'].auditDetails.createdTime
           jsonPath: $.BPA.documents.*
           customJsonMapping:
             indexMapping:
-              Document:
-                id: id
-                tenantId: tenantId
-                buildingPlanId: buildingPlanId
-                documentType: documentType
-                fileStoreId: fileStoreId
-                documentUid: documentUid
-                additionalDetails: additionalDetails
-                createdBy: createdBy
-                lastModifiedBy: lastModifiedBy
-                createdTime: createdTime
-                lastModifiedTime: lastModifiedTime
-              fieldMapping:
-                - inJsonPath: $.id
-                  outJsonPath: $.Document.id
-                - inJsonPath: $.documentType
-                  outJsonPath: $.Document.documentType
-                - inJsonPath: $.fileStoreId
-                  outJsonPath: $.Document.fileStoreId
-                - inJsonPath: $.documentUid
-                  outJsonPath: $.Document.documentUid
-                - inJsonPath: $.additionalDetails
-                  outJsonPath: $.Document.additionalDetails
-                - inJsonPath: $['$parent'].BPA.id
-                  outJsonPath: $.Document.buildingPlanId
-                - inJsonPath: $['$parent'].BPA.tenantId
-                  outJsonPath: $.Document.tenantId
-                - inJsonPath: $['$parent'].BPA.auditDetails.createdBy
-                  outJsonPath: $.Document.createdBy
-                - inJsonPath: $['$parent'].BPA.auditDetails.lastModifiedBy
-                  outJsonPath: $.Document.lastModifiedBy
-                - inJsonPath: $['$parent'].BPA.auditDetails.createdTime
-                  outJsonPath: $.Document.createdTime
-                - inJsonPath: $['$parent'].BPA.auditDetails.lastModifiedTime
-                  outJsonPath: $.Document.lastModifiedTime
+              Document: {}
+            fieldMapping:
+              - inJsonPath: $.id
+                outJsonPath: $.Document.id
+              - inJsonPath: $.documentType
+                outJsonPath: $.Document.documentType
+              - inJsonPath: $.fileStoreId
+                outJsonPath: $.Document.fileStoreId
+              - inJsonPath: $.documentUid
+                outJsonPath: $.Document.documentUid
+              - inJsonPath: $.additionalDetails
+                outJsonPath: $.Document.additionalDetails
+              - inJsonPath: $['$parent'].id
+                outJsonPath: $.Document.buildingPlanId
+              - inJsonPath: $['$parent'].tenantId
+                outJsonPath: $.Document.tenantId
+              - inJsonPath: $['$parent'].auditDetails.createdBy
+                outJsonPath: $.Document.createdBy
+              - inJsonPath: $['$parent'].auditDetails.lastModifiedBy
+                outJsonPath: $.Document.lastModifiedBy
+              - inJsonPath: $['$parent'].auditDetails.createdTime
+                outJsonPath: $.Document.createdTime
+              - inJsonPath: $['$parent'].auditDetails.lastModifiedTime
+                outJsonPath: $.Document.lastModifiedTime
