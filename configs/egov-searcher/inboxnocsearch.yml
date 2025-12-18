@@ -10,8 +10,6 @@ SearchDefinitions:
             select DISTINCT(noc.applicationno), 
                    pi.createdtime, 
                    pi.status as status_id, 
-                   ws.state as status_name, 
-                   ws.applicationStatus,
                    noc.id,
                    noc.tenantid,
                    noc.status,
@@ -23,16 +21,11 @@ SearchDefinitions:
                    noc.accountid
             from eg_noc as noc
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = noc.applicationno
-            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            INNER JOIN eg_noc_owner ownerinfo ON ownerinfo.nocid = noc.id
             $where 
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = noc.applicationno 
-              GROUP BY wf.businessid
-            )
-            order by pi.createdtime asc
+            AND pi.latest = TRUE
+            order by noc.createdtime asc
             $pagination
           ) result
         groupBy:
@@ -68,6 +61,9 @@ SearchDefinitions:
           - name: noc.accountid
             isMandatory: false
             jsonPath: $.searchCriteria.accountId
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -83,15 +79,10 @@ SearchDefinitions:
             select COUNT(DISTINCT(noc.applicationno)) as totalCount
             from eg_noc as noc
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = noc.applicationno
-            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            INNER JOIN eg_noc_owner ownerinfo ON ownerinfo.nocid = noc.id
             $where
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = noc.applicationno 
-              GROUP BY wf.businessid
-            )
+            AND pi.latest = TRUE
           ) result
         groupBy:
         orderBy:
@@ -126,6 +117,9 @@ SearchDefinitions:
           - name: noc.accountid
             isMandatory: false
             jsonPath: $.searchCriteria.accountId
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -141,8 +135,6 @@ SearchDefinitions:
             select DISTINCT(noc.applicationno), 
                    pi.createdtime, 
                    pi.status as status_id,
-                   ws.state as status_name,
-                   ws.applicationStatus,
                    noc.id,
                    noc.tenantid,
                    noc.status,
@@ -154,16 +146,11 @@ SearchDefinitions:
                    noc.accountid
             from eg_noc as noc
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = noc.applicationno
-            LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            INNER JOIN eg_noc_owner ownerinfo ON ownerinfo.nocid = noc.id
             $where
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = noc.applicationno 
-              GROUP BY wf.businessid
-            )
-            order by pi.createdtime desc
+            AND pi.latest = TRUE
+            order by noc.createdtime desc
             $pagination
           ) result
         groupBy:
@@ -199,6 +186,9 @@ SearchDefinitions:
           - name: noc.accountid
             isMandatory: false
             jsonPath: $.searchCriteria.accountId
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
