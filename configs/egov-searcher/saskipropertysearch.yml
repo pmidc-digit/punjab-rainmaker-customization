@@ -1,0 +1,113 @@
+SearchDefinitions:
+  moduleName: saski-property-search
+  summary: Search configs for saski-property-search
+  version: 1.0.0
+  definitions:
+    - name: saskipropertyvasikacount
+      isCustomerRowMapEnabled: true
+      rowMapperKey: propertysearch
+      query:
+        baseQuery: >-
+          select count(pt.*)from eg_pt_property pt left join obpas_applications ob on ob.propertyid = pt.propertyid
+           $where  and (pt.additionaldetails->>'vasikaNo' is not null or pt.additionaldetails->>'vasikaNo'!='' or pt.additionaldetails->>'allotmentNo' is not null or pt.additionaldetails->>'allotmentNo'!='' ) 
+           and pt.status='ACTIVE' AND pt.source!='WATER_CHARGES'
+      searchParams:
+        condition: AND
+        params:
+          - name: pt.tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+      output:
+        jsonFormat:
+          ResponseInfo: {}
+          Property: []
+        outJsonPath: $.Property
+        responseInfoPath: $.ResponseInfo
+    - name: saskitotalpercentagecount
+      isCustomerRowMapEnabled: true
+      rowMapperKey: propertysearch
+      query:
+        baseQuery: >-
+          SELECT
+          ROUND(
+            100.0 * SUM(
+              CASE
+                WHEN (
+                  additionaldetails->>'vasikaNo'      IS NOT NULL OR additionaldetails->>'vasikaNo'      != '' OR
+                  additionaldetails->>'allotmentNo'   IS NOT NULL OR additionaldetails->>'allotmentNo'   != ''
+                )
+                    THEN 1 ELSE 0
+                  END
+                ) / NULLIF(COUNT(*), 0)
+              , 2) AS percentage_matching
+            FROM eg_pt_property
+            $where and status = 'ACTIVE' AND  source!='WATER_CHARGES'
+      searchParams:
+        condition: AND
+        params:
+          - name: tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+      output:
+        jsonFormat:
+          ResponseInfo: {}
+          Property: []
+        outJsonPath: $.Property
+        responseInfoPath: $.ResponseInfo
+    - name: saskipropertysearch
+      isCustomerRowMapEnabled: true
+      rowMapperKey: propertysearch
+      query:
+        baseQuery: >-
+          select ob.file_no as obpas_fileno, ob.applicant_name as applicant_name, pt.propertyid, pt.tenantid, pt.oldpropertyid, pt.createdtime, pt.additionaldetails->>'allotmentNo' as allotmentno, pt.additionaldetails->>'allotmentDate' as allotmentdate, pt.additionaldetails->>'vasikaNo' as vasikano, pt.additionaldetails->>'vasikaDate' as vasikadate
+           from eg_pt_property pt left join obpas_applications ob on ob.propertyid = pt.propertyid
+            $where  and (pt.additionaldetails->>'vasikaNo' is not null or pt.additionaldetails->>'vasikaNo'!='' or pt.additionaldetails->>'allotmentNo' is not null or pt.additionaldetails->>'allotmentNo'!='' ) 
+            and pt.status='ACTIVE' AND pt.source!='WATER_CHARGES' $pagination ;
+      searchParams:
+        condition: AND
+        params:
+          - name: pt.tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+
+          - name: pt.additionaldetails->>'vasikaNo'
+            isMandatory: false
+            jsonPath: $.searchCriteria.vasikaNo
+
+          - name: pt.additionaldetails->>'allotmentNo'
+            isMandatory: false
+            jsonPath: $.searchCriteria.allotmentNo
+
+          - name: pt.propertyid
+            isMandatory: false
+            jsonPath: $.searchCriteria.propertyId
+
+
+        pagination:
+          noOfRecords: $.searchCriteria.limit
+          offset: $.searchCriteria.offset
+      output:
+        jsonFormat:
+          ResponseInfo: {}
+          Property: []
+        outJsonPath: $.Property
+        responseInfoPath: $.ResponseInfo
+    - name: saskipropertycount
+      isCustomerRowMapEnabled: true
+      rowMapperKey: propertysearch
+      query:
+        baseQuery: >-
+          select count(*) from eg_pt_property 
+          $where and status='ACTIVE' AND source!='WATER_CHARGES'
+      searchParams:
+        condition: AND
+        params:
+          - name: tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+      output:
+        jsonFormat:
+          ResponseInfo: {}
+          Property: []
+        outJsonPath: $.Property
+        responseInfoPath: $.ResponseInfo

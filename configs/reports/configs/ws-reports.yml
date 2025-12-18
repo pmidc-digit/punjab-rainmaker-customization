@@ -4048,6 +4048,13 @@ ReportDefinitions:
     source: pt
     total: false
 
+
+  - name: Connection_Status
+    label: Connection Status
+    type: string
+    source: ws
+    total: false
+
   - name: currentReading
     label: Current Reading
     type: string
@@ -4151,6 +4158,7 @@ ReportDefinitions:
     MAX(pt.zonename) AS zonename, 
     MAX(pt.zonecode) AS zonecode, 
     MAX(pt.propertyusagetype) AS propertyusagetype, 
+    MAX(conn.status) AS Connection_Status,
     MAX(pt.propertytype) AS propertytype    FROM  eg_ws_meterreading AS mt
     INNER JOIN eg_ws_connection AS conn ON mt.connectionno = conn.connectionno 
     inner join  eg_ws_service ser on conn.id = ser.connection_id
@@ -4159,7 +4167,7 @@ ReportDefinitions:
     inner join eg_pt_owner ow on ow.propertyid = pro.id 
     inner join eg_user usr on usr.uuid = ow.userid 
     WHERE 
-        conn.tenantid = $tenantid and ser.connectiontype = 'Metered'
+        conn.tenantid = $tenantid and ser.connectiontype = 'Metered' and  conn.status = 'Active'
     AND 
         mt.currentreadingdate = (
             SELECT MAX(currentreadingdate)
