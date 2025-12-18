@@ -93,11 +93,10 @@ SearchDefinitions:
           ad_isactualdemand, ad.purpose AS ad_purpose, ad.additionaldetails as
           ad_additionaldetails, ptadd.doorNo as ptadd_doorNo, ptadd.landmark as
           ptadd_landmark, ptadd.city as ptadd_city, ptadd.pincode as
-          ptadd_pincode, ptadd.locality as ptadd_locality, ptadd.street as ptadd_street, ptadd.region as ptadd_region, ptadd.plotno as ptadd_plotno, ptadd.buildingname as ptadd_buildingname, ptadd.district as ptadd_district, ptadd.state as ptadd_state, ptadd.latitude as ptadd_latitude, ptadd.longitude as ptadd_longitude, ptown.userid as
-          ptown_userid ,lm.connectionno as mr_connectionno, lm.lastreading as mr_lastreading, lm.lastreadingdate as mr_lastreadingdate, lm.currentreading as mr_currentreading, lm.currentreadingdate as mr_currentreadingdate,lm.consumption as mr_consumption, lm.meterstatus as mr_meterstatus, lm.billingperiod as mr_billingperiod
+          ptadd_pincode, ptadd.locality as ptadd_locality, ptadd.street as ptadd_street, ptadd.region as ptadd_region, ptadd.plotno as ptadd_plotno, ptadd.buildingname as ptadd_buildingname, ptadd.district as ptadd_district, ptadd.state as ptadd_state, ptadd.latitude as ptadd_latitude, ptadd.longitude as ptadd_longitude, 
+          ptown.userid as ptown_userid
 
-          FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid INNER JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid INNER JOIN eg_ws_connection conn ON bd.consumercode = conn.connectionno INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id LEFT JOIN (
-          SELECT * FROM ( SELECT mr.*, ROW_NUMBER() OVER (PARTITION BY mr.connectionno ORDER BY mr.createdtime DESC) AS rn FROM eg_ws_meterreading mr) t WHERE rn = 1) lm ON lm.connectionno = conn.connectionno $where and conn.status='Active')
+          FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid INNER JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid INNER JOIN eg_ws_connection conn ON bd.consumercode = conn.connectionno INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id $where and conn.status='Active')
           select * from bill_data inner join (select max(b_createddate) as maxcreateddate, bd_consumercode from bill_data group by bd_consumercode) as max ON max.maxcreateddate=b_createddate
       searchParams:
         condition: AND
