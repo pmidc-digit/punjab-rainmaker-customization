@@ -10,8 +10,8 @@ serviceMaps:
               id, property_id, tenant_id, status,
               application_number, previous_application_number, application_type,
               start_date, end_date,is_gst_applicable, is_cow_cess_applicable, is_refund_applicable_on_discontinuation, term_and_condition, penalty_type,
-              created_time, created_by, lastmodified_time, lastmodified_by,additional_details)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+              created_time, created_by, lastmodified_time, lastmodified_by,additional_details,registration_number,trade_license_number)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: AllotmentDetails
       jsonMaps:
       - jsonPath: $.AllotmentDetails.id
@@ -35,7 +35,9 @@ serviceMaps:
       - jsonPath: $.AllotmentDetails.additionalDetails
         type: JSON
         dbType: JSONB
-
+      - jsonPath: $.AllotmentDetails.registrationNumber
+      - jsonPath: $.AllotmentDetails.tradeLicenseNumber
+      
     - query: UPDATE eg_rl_allotment SET expireflag=true WHERE application_number=?;
       basePath: AllotmentDetails
       jsonMaps:
