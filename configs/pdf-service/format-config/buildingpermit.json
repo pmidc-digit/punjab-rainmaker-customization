@@ -99,11 +99,7 @@
                 "bold": true
               },
               {
-                "text": " {{ownersWithAddress}}, ",
-                "bold": false
-              },
-               {
-                "text": " {{ownersWithName}}",
+                "text": "{{#var_owners}}{{ownerName}} , {{ownerAddress}},{{/var_owners}}",
                 "bold": false
               }
             ] 
@@ -260,10 +256,10 @@
           "text":[
             
             {
-              "text": " The plans are valid up to."
+              "text": " The plans are valid up to "
             },
             {
-              "text": "{{newValidityDate}}",
+              "text": "{{newValidityDate}}.",
               "bold":true
             }
           
@@ -295,7 +291,7 @@
     
             },
             {
-              "text":" ({{ownerName}})/",
+              "text":" ({{#var_owners}}{{ownerName}}, {{/var_owners}})/",
               "bold":true
             },
             {
@@ -397,7 +393,7 @@
           {
            "text":[
   {
-    "text": "In case any information furnished is found to be incorrect, the building plans approved under self-certification shall be void ab-initio and\nApplicant will be liable for punishment which includes levy of penalty, demolition or sealing of the property as per the provisions of The\nPunjab Municipal Act, 1911/The Punjab Municipal Corporation Act, 1976 / Punjab Town Improvement Act, 1922/ Punjab Municipal Building Bye laws as applicable."
+    "text": "In case any information furnished is found to be incorrect, the building plans approved under self-certification shall be void ab-initio and Applicant will be liable for punishment which includes levy of penalty, demolition or sealing of the property as per the provisions of The Punjab Municipal Act, 1911/The Punjab Municipal Corporation Act, 1976 / Punjab Town Improvement Act, 1922/ Punjab Municipal Building Bye laws as applicable."
   }
 ],
 
@@ -424,7 +420,7 @@
           {
             "text":[
               {
-                "text":"{{COLONY_TEXT}} "
+                "text":"{{COLONY_TEXT}}. "
                 
               }
             ],
@@ -816,7 +812,7 @@
                 
               },
               {
-                "text":" {{ownerName}} / {{stakeholderName}} ({{profession}}) ",
+                "text":" {{#var_owners}}{{ownerName}}, {{/var_owners}} / {{stakeholderName}} ({{profession}}) ",
                 "bold":true
               },
               {
