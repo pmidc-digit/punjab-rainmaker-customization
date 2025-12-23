@@ -297,28 +297,45 @@ serviceMaps:
    isTransaction: true
    queryMaps:
 
-    - query: INSERT INTO eg_gc_connection_audit SELECT * FROM eg_gc_connection WHERE id = ?;
-      basePath: $.GarbageConnection
-      jsonMaps:
-      - jsonPath: $.GarbageConnection.id
+     - query: INSERT INTO eg_gc_connection_audit SELECT * FROM eg_gc_connection WHERE id = ?;
+       basePath: $.GarbageConnection
+       jsonMaps:
+         - jsonPath: $.GarbageConnection.id
 
-    - query: UPDATE eg_gc_connection SET applicationstatus=?, status=?, connectionno=?, action=?, lastModifiedBy=?, lastModifiedTime=?  WHERE id=?;
-      basePath: $.GarbageConnection
-      jsonMaps:
+     - query: UPDATE eg_gc_connection SET applicationstatus=?, status=?, connectionno=?, action=?, lastModifiedBy=?, lastModifiedTime=?  WHERE id=?;
+       basePath: $.GarbageConnection
+       jsonMaps:
 
-       - jsonPath: $.GarbageConnection.applicationStatus
+         - jsonPath: $.GarbageConnection.applicationStatus
 
-       - jsonPath: $.GarbageConnection.status
+         - jsonPath: $.GarbageConnection.status
 
-       - jsonPath: $.GarbageConnection.connectionNo
+         - jsonPath: $.GarbageConnection.connectionNo
 
-       - jsonPath: $.GarbageConnection.processInstance.action
+         - jsonPath: $.GarbageConnection.processInstance.action
 
-       - jsonPath: $.GarbageConnection.auditDetails.lastModifiedBy
+         - jsonPath: $.GarbageConnection.auditDetails.lastModifiedBy
 
-       - jsonPath: $.GarbageConnection.auditDetails.lastModifiedTime
+         - jsonPath: $.GarbageConnection.auditDetails.lastModifiedTime
 
-       - jsonPath: $.GarbageConnection.id
+         - jsonPath: $.GarbageConnection.id
+
+     - query: INSERT INTO eg_gc_service_audit SELECT * FROM eg_gc_service WHERE connection_id = ?;
+       basePath: $.GarbageConnection
+       jsonMaps:
+         - jsonPath: $.GarbageConnection.id
+
+     - query: UPDATE eg_gc_service SET connectionexecutiondate = ?, lastModifiedBy=?, lastModifiedTime=? WHERE connection_id=?;
+       basePath: $.GarbageConnection
+       jsonMaps:
+
+         - jsonPath: $.GarbageConnection.connectionExecutionDate
+
+         - jsonPath: $.GarbageConnection.auditDetails.lastModifiedBy
+
+         - jsonPath: $.GarbageConnection.auditDetails.lastModifiedTime
+
+         - jsonPath: $.GarbageConnection.id
 
  - version: 1.0
    name: GarbageConnection
