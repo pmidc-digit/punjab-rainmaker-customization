@@ -227,6 +227,12 @@
                 }
               },
               {
+                "variable": "penaltyFee",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'RL_PENALTY_FEE')].adjustedAmount"
+                }
+              },
+              {
                 "variable": "paymentMode",
                 "value": {
                   "path": "$.paymentMode"
@@ -642,6 +648,10 @@
                {
                 "variable": "rentAndLeaseFee",
                 "formula": "{{rentAndLeaseFee}}>0?{{rentAndLeaseFee}}:0"
+              },
+              {
+                "variable": "penaltyFee",
+                "formula": "{{penaltyFee}}>0?{{penaltyFee}}:0"
               }
             ]
           },
