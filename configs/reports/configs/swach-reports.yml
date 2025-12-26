@@ -591,6 +591,7 @@ ReportDefinitions:
     groupby: group by eu.name, eu.username, eu.mobilenumber
     
   - reportName: AmritsarSummaryEmployeeReport
+    decryptionPathId: STATEPETREPORTS
     summary: Swach Employee Summary Report
     version: 1.0.0
     moduleName: rainmaker-swach
@@ -603,13 +604,13 @@ ReportDefinitions:
         type: string
         source: rainmaker-swach
         total: false
-      - name: employee_name
-        label: employee_name
+      - name: name
+        label: name
         type: string
         source: rainmaker-swach
         total: false
-      - name: employee_mobile
-        label: employee_mobile
+      - name: mobilenumber
+        label: mobilenumber
         type: string
         source: rainmaker-swach
         total: false
@@ -664,8 +665,8 @@ ReportDefinitions:
     query: >
       WITH employee_counts AS (
        SELECT
-        h.code AS employee_code,u.name as employee_name,
-        u.mobilenumber AS employee_mobile,
+        h.code AS employee_code,u.name as name,
+        u.mobilenumber AS mobilenumber,
         ss.createdtime AS created_time,
         COUNT(CASE WHEN ss.applicationstatus = 'PENDINGATLME' THEN ss.servicerequestid END) AS PENDINGATLME,
         COUNT(CASE WHEN ss.applicationstatus = 'PENDINGFORASSIGNMENT' THEN ss.servicerequestid END) AS PENDINGFORASSIGNMENT,
