@@ -233,6 +233,24 @@
                 }
               },
               {
+                "variable": "rentSgst",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'RL_SGST_FEE')].adjustedAmount"
+                }
+              },
+              {
+                "variable": "rentCgst",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'RL_CGST_FEE')].adjustedAmount"
+                }
+              },
+              {
+                "variable": "rentCowcess",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'RL_COWCESS_FEE')].adjustedAmount"
+                }
+              },
+              {
                 "variable": "paymentMode",
                 "value": {
                   "path": "$.paymentMode"
