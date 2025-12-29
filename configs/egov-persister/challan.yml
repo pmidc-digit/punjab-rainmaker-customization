@@ -48,7 +48,7 @@ serviceMaps:
             - jsonPath: $.Challan.citizen.lastModifiedBy
             - jsonPath: $.Challan.citizen.lastModifiedDate
 
-        - query: INSERT INTO eg_challanAddress( id, tenantid, doorno, plotNo, street, buildingName, latitude, longitude, locality, district, landmark, city, pincode, region, state, country, detail, challanId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET tenantid = EXCLUDED.tenantid, doorno = EXCLUDED.doorno, plotNo = EXCLUDED.plotNo, street = EXCLUDED.street, buildingName = EXCLUDED.buildingName, latitude = EXCLUDED.latitude, longitude = EXCLUDED.longitude, locality = EXCLUDED.locality, district = EXCLUDED.district, landmark = EXCLUDED.landmark, city = EXCLUDED.city, pincode = EXCLUDED.pincode, region = EXCLUDED.region, state = EXCLUDED.state, country = EXCLUDED.country, detail = EXCLUDED.detail, challanId = EXCLUDED.challanId, lastmodifiedby = EXCLUDED.lastmodifiedby, lastmodifiedtime = EXCLUDED.lastmodifiedtime;
+        - query: INSERT INTO eg_challanAddress( id, tenantid, doorno, plotNo, street, buildingName, latitude, longitude, locality, district, landmark, city, pincode, region, state, country, detail, addressId, addressNumber, type, addressLine1, addressLine2, challanId, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET tenantid = EXCLUDED.tenantid, doorno = EXCLUDED.doorno, plotNo = EXCLUDED.plotNo, street = EXCLUDED.street, buildingName = EXCLUDED.buildingName, latitude = EXCLUDED.latitude, longitude = EXCLUDED.longitude, locality = EXCLUDED.locality, district = EXCLUDED.district, landmark = EXCLUDED.landmark, city = EXCLUDED.city, pincode = EXCLUDED.pincode, region = EXCLUDED.region, state = EXCLUDED.state, country = EXCLUDED.country, detail = EXCLUDED.detail, addressId = EXCLUDED.addressId, addressNumber = EXCLUDED.addressNumber, type = EXCLUDED.type, addressLine1 = EXCLUDED.addressLine1, addressLine2 = EXCLUDED.addressLine2, challanId = EXCLUDED.challanId, lastmodifiedby = EXCLUDED.lastmodifiedby, lastmodifiedtime = EXCLUDED.lastmodifiedtime;
           basePath: Challan.address
           jsonMaps:
             - jsonPath: $.Challan.address.id
@@ -68,6 +68,11 @@ serviceMaps:
             - jsonPath: $.Challan.address.state
             - jsonPath: $.Challan.address.country
             - jsonPath: $.Challan.address.detail
+            - jsonPath: $.Challan.address.addressId
+            - jsonPath: $.Challan.address.addressNumber
+            - jsonPath: $.Challan.address.type
+            - jsonPath: $.Challan.address.addressLine1
+            - jsonPath: $.Challan.address.addressLine2
             - jsonPath: $.Challan.id
             - jsonPath: $.Challan.auditDetails.createdBy
             - jsonPath: $.Challan.auditDetails.lastModifiedBy
@@ -114,7 +119,7 @@ serviceMaps:
             - jsonPath: $.Challan.challanAmount
             - jsonPath: $.Challan.id
 
-        - query: UPDATE eg_challanAddress SET tenantid = ?, doorno = ?, plotNo = ?, street = ?, buildingName = ?, latitude = ?, longitude = ?, locality = ?, district = ?, landmark = ?, city = ?, pincode = ?, region = ?, state = ?, country = ?, detail = ?, challanId = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE id = ?;
+        - query: UPDATE eg_challanAddress SET tenantid = ?, doorno = ?, plotNo = ?, street = ?, buildingName = ?, latitude = ?, longitude = ?, locality = ?, district = ?, landmark = ?, city = ?, pincode = ?, region = ?, state = ?, country = ?, detail = ?, addressId = ?, addressNumber = ?, type = ?, addressLine1 = ?, addressLine2 = ?, challanId = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE id = ?;
           basePath: Challan.address
           jsonMaps:
             - jsonPath: $.Challan.address.tenantId
@@ -133,6 +138,11 @@ serviceMaps:
             - jsonPath: $.Challan.address.state
             - jsonPath: $.Challan.address.country
             - jsonPath: $.Challan.address.detail
+            - jsonPath: $.Challan.address.addressId
+            - jsonPath: $.Challan.address.addressNumber
+            - jsonPath: $.Challan.address.type
+            - jsonPath: $.Challan.address.addressLine1
+            - jsonPath: $.Challan.address.addressLine2
             - jsonPath: $.Challan.id
             - jsonPath: $.Challan.auditDetails.lastModifiedBy
             - jsonPath: $.Challan.auditDetails.lastModifiedTime

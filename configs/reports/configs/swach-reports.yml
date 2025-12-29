@@ -589,3 +589,111 @@ ReportDefinitions:
           eur.role_code = 'PESCO'
       
     groupby: group by eu.name, eu.username, eu.mobilenumber
+    
+  - reportName: AmritsarSummaryEmployeeReport
+    decryptionPathId: STATEPETREPORTS
+    summary: Swach Employee Summary Report
+    version: 1.0.0
+    moduleName: rainmaker-swach
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: employee_code
+        label: employee_code
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: name
+        label: name
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: mobilenumber
+        label: mobilenumber
+        type: string
+        source: rainmaker-swach
+        total: false
+      - name: pendingatlme
+        label: pendingatlme
+        type: string
+        source: rainmaker-swach
+        total: true
+      - name: pendingforassignment
+        label: pendingforassignment
+        type: string
+        source: rainmaker-swach
+        total: true
+      - name: pendingforreassignment
+        label: pendingforreassignment
+        type: string
+        source: rainmaker-swach
+        total: true
+      - name: rejected
+        label: rejected
+        type: string
+        source: rainmaker-swach
+        total: true
+      - name: resolved
+        label: resolved
+        type: string
+        source: rainmaker-swach
+        total: true
+      - name: total
+        label: total
+        type: string
+        source: rainmaker-swach
+        total: true
+      - name: pendingpercentage
+        label: pendingpercentage
+        type: string
+        source: rainmaker-swach
+        total: false
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: rainmaker-swach
+        isMandatory: false
+        searchClause: AND created_time >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: rainmaker-swach
+        isMandatory: false
+        searchClause: AND created_time <= $toDate
+    query: >
+      WITH employee_counts AS (
+       SELECT
+        h.code AS employee_code,u.name as name,
+        u.mobilenumber AS mobilenumber,
+        ss.createdtime AS created_time,
+        COUNT(CASE WHEN ss.applicationstatus = 'PENDINGATLME' THEN ss.servicerequestid END) AS PENDINGATLME,
+        COUNT(CASE WHEN ss.applicationstatus = 'PENDINGFORASSIGNMENT' THEN ss.servicerequestid END) AS PENDINGFORASSIGNMENT,
+        COUNT(CASE WHEN ss.applicationstatus = 'PENDINGFORREASSIGNMENT' THEN ss.servicerequestid END) AS PENDINGFORREASSIGNMENT,
+        COUNT(CASE WHEN ss.applicationstatus = 'REJECTED' THEN ss.servicerequestid END) AS REJECTED,
+        COUNT(CASE WHEN ss.applicationstatus = 'RESOLVED' THEN ss.servicerequestid END) AS RESOLVED
+       FROM
+          eg_wf_processinstance_v2 p
+       INNER JOIN eg_wf_assignee_v2 a ON a.processinstanceid = p.id
+       INNER JOIN eg_hrms_employee h ON h.uuid = a.assignee
+       INNER JOIN eg_swach_service_v2 ss ON ss.servicerequestid = p.businessid
+      INNER JOIN  eg_user u on u.uuid= h.uuid
+        WHERE
+         p.businessservice = 'SBMR'
+         AND p.tenantid = 'pb.amritsar'
+         AND p.latest = 'true'
+        GROUP BY h.code, u.mobilenumber,u.name,ss.createdtime,ss.applicationstatus,ss.servicerequestid
+      )
+      SELECT
+      *,
+      (PENDINGATLME + PENDINGFORASSIGNMENT + PENDINGFORREASSIGNMENT 
+      + REJECTED + RESOLVED) AS TOTAL,
+       ROUND(
+      100.0 * (PENDINGATLME + PENDINGFORASSIGNMENT + PENDINGFORREASSIGNMENT)
+      / NULLIF(PENDINGATLME + PENDINGFORASSIGNMENT + PENDINGFORREASSIGNMENT + REJECTED + RESOLVED,0),2
+       ) AS pendingpercentage
+      FROM
+      employee_counts
+      WHERE 1=1 
+    orderby: ORDER BY employee_code
