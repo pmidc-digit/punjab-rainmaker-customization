@@ -6159,7 +6159,7 @@ ReportDefinitions:
   query: |
     SELECT ws.tenantid,    ws.connectionno,    ws.status AS ws_status, 
     wss.connectioncategory, wss.connectiontype ,  wss.connectionexecutiondate, 
-    ws.property_id,   u.name,    u.guardian,    u.mobilenumber,    p.oldpropertyid,  
+    ws.property_id,   u.name as ,    u.guardian,    u.mobilenumber,    p.oldpropertyid,  
     p.status AS property_status,    p.source,    p.propertytype,    p.usagecategory,  
     p.landarea, pta.locality,    CONCAT_WS(', ',        pta.doorno,        pta.buildingname, pta.street)
     AS address FROM eg_ws_connection ws JOIN eg_pt_property p ON ws.property_id = p.propertyid JOIN 
