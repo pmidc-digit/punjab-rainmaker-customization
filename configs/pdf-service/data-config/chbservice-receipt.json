@@ -25,6 +25,21 @@
                   "path": "$.additionalDetails.designation"
                 }
               },
+
+              {
+                "variable": "var_bookingSlots",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].bookingSlotDetails[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "string",
+                  "scema": [
+                    { "variable": "bookingDate", "value": "bookingDate" },
+                    { "variable": "bookingEndDate", "value": "bookingEndDate" }
+                  ]
+                }
+              },
               {
                 "variable": "user-name",
                 "value": {
