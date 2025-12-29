@@ -1212,7 +1212,7 @@ ReportDefinitions:
           'CHB'                        AS service,
            b.booking_status             AS application_status,
            b.createdtime                AS createdtime
-           FROM eg_chb_booking_detail b
+           FROM eg_chb_booking_detail b where 1=1
       UNION ALL
           /* ---------------- NDC ---------------- */
         SELECT
@@ -1221,7 +1221,7 @@ ReportDefinitions:
          'NDC'                          AS service,
          a.applicationstatus            AS application_status,
          a.createdtime                  AS createdtime
-         FROM eg_ndc_application a
+         FROM eg_ndc_application a where 1=1
       UNION ALL
          /* ---------------- Pet Registration (PTR) ---------------- */
         SELECT
@@ -1230,7 +1230,7 @@ ReportDefinitions:
         'PTR'                          AS service,
         r.status                       AS application_status,
         r.createdtime                  AS createdtime
-        FROM eg_ptr_registration r
+        FROM eg_ptr_registration r where 1=1
       ) all_services
        WHERE 1=1  
     groupby: GROUP BY tenant_name ,service, application_status
