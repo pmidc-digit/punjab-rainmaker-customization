@@ -1189,15 +1189,14 @@ ReportDefinitions:
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: ndc
         isMandatory: false
-        searchClause: AND tenant_id = $ulb
+        searchClause: AND tenantid = $ulb
       - name: service
         label: service
         type: singlevaluelist
-        pattern: list://Community Hall Booking:CHB,No Due Certficate:NDC,Pet
-          Registration:PTR
+        pattern: list://CHB:Community Hall Booking,NDC:No Due Certficate,PTR:Pet Registration
         source: ndc
         isMandatory: false
-        searchClause: AND servie= $service
+        searchClause: AND service= $service
     query: |
       -- Use CTE to force query plan, compute & use CTE later
       SELECT
@@ -1209,7 +1208,7 @@ ReportDefinitions:
            /* ---------------- Community Hall Booking (CHB) ---------------- */
         SELECT
           split_part(b.tenant_id, '.', 2) AS tenant_name,
-          b.tenant_id                  AS tenant_id,
+          b.tenant_id                  AS tenantid,
           'CHB'                        AS service,
            b.booking_status             AS application_status,
            b.createdtime                AS createdtime
@@ -1218,7 +1217,7 @@ ReportDefinitions:
           /* ---------------- NDC ---------------- */
         SELECT
          split_part(a.tenantid, '.', 2) AS tenant_name,
-         a.tenantid                     AS tenant_id,
+         a.tenantid                     AS tenantid,
          'NDC'                          AS service,
          a.applicationstatus            AS application_status,
          a.createdtime                  AS createdtime
@@ -1227,7 +1226,7 @@ ReportDefinitions:
          /* ---------------- Pet Registration (PTR) ---------------- */
         SELECT
         split_part(r.tenantid, '.', 2) AS tenant_name,
-        r.tenantid                     AS tenant_id,
+        r.tenantid                     AS tenantid,
         'PTR'                          AS service,
         r.status                       AS application_status,
         r.createdtime                  AS createdtime
@@ -1290,14 +1289,14 @@ ReportDefinitions:
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: ndc
         isMandatory: false
-        searchClause: AND tenant_id = $ulb
+        searchClause: AND tenantid = $ulb
       - name: service
         label: service
         type: singlevaluelist
-        pattern: list://No Due Certficate:NDC,Pet Registration:PTR
+        pattern: list://NDC:No Due Certficate,PTR:Pet Registration
         source: ndc
         isMandatory: false
-        searchClause: AND servie= $service
+        searchClause: AND service= $service
     query: >
       -- Use CTE to force query plan, compute & use CTE later
 
@@ -1321,7 +1320,7 @@ ReportDefinitions:
           /* ---------------- NDC ---------------- */
         SELECT 
            split_part(a.tenantid, '.', 2) AS tenant_name,
-           a.tenantid                     AS tenant_id,
+           a.tenantid                     AS tenantid,
            'NDC'                          AS service,
            a.applicationstatus            AS application_status,
            ch.assignee_employee           AS assignee_employee,
@@ -1334,7 +1333,7 @@ ReportDefinitions:
            /* ---------------- PTR ---------------- */
       SELECT
        split_part(r.tenantid, '.', 2) AS tenant_name,
-       r.tenantid                     AS tenant_id,
+       r.tenantid                     AS tenantid,
        'PTR'                          AS service,
        r.status                       AS application_status,
        ch.assignee_employee           AS assignee_employee,
