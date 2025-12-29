@@ -1275,27 +1275,27 @@ ReportDefinitions:
         type: epoch
         source: ndc
         isMandatory: true
-        searchClause: AND createdtime >= $fromDate
+        searchClause: AND 1=1
       - name: toDate
         label: toDate
         type: epoch
         source: ndc
         isMandatory: true
-        searchClause: AND createdtime <= $toDate
+        searchClause: AND 1=1
       - name: ulb
         label: ulb
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: ndc
         isMandatory: false
-        searchClause: AND tenantid = $ulb
+        searchClause: AND 1=1
       - name: service
         label: service
         type: singlevaluelist
         pattern: list://NDC:No Due Certficate,PTR:Pet Registration
         source: ndc
         isMandatory: false
-        searchClause: AND service= $service
+        searchClause: AND 1=1
     query: >
       -- Use CTE to force query plan, compute & use CTE later
 
@@ -1327,6 +1327,7 @@ ReportDefinitions:
           FROM eg_ndc_application a 
           LEFT JOIN current_holder ch ON ch.applicationnumber = a.applicationno AND ch.service = 'ndc-services'
       where a.applicationstatus not in ('APPROVED','INITIATED','PENDINGPAYMENT','REJECTED','CITIZENACTIONREQUIRED')
+      and createdtime >= $fromDate and createdtime <= $toDate and tenantid =  $ulb AND  service= $service
 
       UNION ALL
            /* ---------------- PTR ---------------- */
@@ -1343,5 +1344,6 @@ ReportDefinitions:
        ) all_services
       WHERE
       service IN ('NDC', 'PTR')
+      and createdtime >= $fromDate and createdtime <= $toDate and tenantid =  $ulb AND  service= $service
     groupby: GROUP BY tenant_name ,tenantid,service, application_status , assignee_employee
     orderby: ORDER BY tenant_name ,tenantid,service, application_status , assignee_employee
