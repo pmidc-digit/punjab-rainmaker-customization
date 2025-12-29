@@ -1212,8 +1212,8 @@ ReportDefinitions:
           'CHB'                        AS service,
            b.booking_status             AS application_status,
            b.createdtime                AS createdtime
-          FROM eg_chb_booking_detail b
-       UNION ALL
+           FROM eg_chb_booking_detail b
+      UNION ALL
           /* ---------------- NDC ---------------- */
         SELECT
          split_part(a.tenantid, '.', 2) AS tenant_name,
@@ -1221,8 +1221,8 @@ ReportDefinitions:
          'NDC'                          AS service,
          a.applicationstatus            AS application_status,
          a.createdtime                  AS createdtime
-        FROM eg_ndc_application a
-        UNION ALL
+         FROM eg_ndc_application a
+      UNION ALL
          /* ---------------- Pet Registration (PTR) ---------------- */
         SELECT
         split_part(r.tenantid, '.', 2) AS tenant_name,
@@ -1230,10 +1230,9 @@ ReportDefinitions:
         'PTR'                          AS service,
         r.status                       AS application_status,
         r.createdtime                  AS createdtime
-       FROM eg_ptr_registration r
-       ) all_services
-       WHERE
-          service IN ('CHB', 'NDC', 'PTR')  
+        FROM eg_ptr_registration r
+      ) all_services
+       WHERE 1=1  
     groupby: GROUP BY tenant_name ,service, application_status
     orderby: ORDER BY tenant_name ,service, application_status
     
