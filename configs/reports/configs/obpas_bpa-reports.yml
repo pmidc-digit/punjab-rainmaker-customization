@@ -608,10 +608,11 @@ ReportDefinitions:
     type: epoch
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND createdtime = $fromDate 
+    searchClause: AND createdtime <= $fromDate 
   query: |
        select applicationno,edcrnumber,status,tenantid,'Building_Plan' as
        businessservice from eg_bpa_buildingplan where businessservice = 'BPA_LOW' 
+  orderby : ORDER BY tenantid, applicationno;
 
 - reportName: Pending_Files_Summary
   summary: Pending Files Summary - ulb wise and distt wise
