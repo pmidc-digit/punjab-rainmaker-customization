@@ -608,7 +608,7 @@ ReportDefinitions:
     type: epoch
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND createdtime <= $fromDate
+    searchClause: AND bpa.createdtime <= $fromDate
   - name: district
     label: District
     type: singlevaluelist
@@ -618,7 +618,7 @@ ReportDefinitions:
     searchClause: AND ulb_data.district = $district    
   query: |
        select ulb_data.district,bpa.applicationno,bpa.edcrnumber,bpa.status,bpa.tenantid,'Building_Plan' as
-       businessservice from eg_bpa_buildingplan bpa inner join ulb_data on bpa.tenantid = ulb_data.ulb_code here businessservice = 'BPA_LOW' 
+       businessservice from eg_bpa_buildingplan bpa inner join ulb_data on bpa.tenantid = ulb_data.ulb_code where businessservice = 'BPA_LOW' 
   orderby : ORDER BY ulb_data.district,bpa.tenantid, bpa.applicationno;
 
 - reportName: Pending_Files_Summary
