@@ -6046,4 +6046,265 @@ ReportDefinitions:
     FROM cte
     WHERE bill_status IN ('PAID', 'ACTIVE', 'PARTIALLY_PAID')
   groupby: GROUP BY consumercode
-  orderby: ORDER BY consumercode   
+  orderby: ORDER BY consumercode 
+
+- reportName: StateWater_Dump_report
+  summary: Water Dump Report
+  decryptionPathId: ULBPTDataDumpReport_V2
+  version: 1.0.0
+  moduleName: rainmaker-ws
+  additionalConfig: 
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: tenantid
+    label: ULB_Name
+    type: string
+    source: ws
+    total: false
+  - name: connectionno
+    label: Connection No
+    type: string
+    source: ws
+    total: false
+  - name: ws_status
+    label: ws_status
+    type: string
+    source: ws
+    total: false
+  - name: connectioncategory
+    label: connectioncategory
+    type: string
+    source: ws
+    total: false
+  - name: connectiontype
+    label: connectiontype
+    type: string
+    source: ws
+    total: false
+  - name: connectionexecutiondate
+    label: connectionexecutiondate
+    type: string
+    source: ws
+    total: false
+  - name: property_id
+    label: property_id
+    type: string
+    source: ws
+    total: false
+  - name: ownername
+    label: Name
+    type: string
+    source: ws
+    total: false                                
+  - name: guardianname
+    label: Guardian
+    type: string
+    source: ws
+    total: false
+  - name: mobileno
+    label: mobilenumber
+    type: string
+    source: ws
+    total: false        
+  - name: oldpropertyid
+    label: oldpropertyid
+    type: string
+    source: ws
+    total: false
+  - name: property_status
+    label: property_status
+    type: string
+    source: ws
+    total: false        
+  - name: source
+    label: source
+    type: string
+    source: ws
+    total: false
+  - name: propertytype
+    label: propertytype
+    type: string
+    source: ws
+    total: false
+  - name: usagecategory
+    label: usagecategory
+    type: string
+    source: ws
+    total: false
+  - name: landarea
+    label: landarea
+    type: string
+    source: ws
+    total: false 
+  - name: locality
+    label: locality
+    type: string
+    source: ws
+    total: false
+  - name: address
+    label: address
+    type: string
+    source: ws
+    total: false                   
+  searchParams:
+  - name: ulb
+    label: ULB
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: ws
+    wrapper: true
+    isMandatory: true
+    searchClause: AND ws.tenantid = $ulb
+  query: |
+    SELECT ws.tenantid,    ws.connectionno,    ws.status AS ws_status, 
+    wss.connectioncategory, wss.connectiontype ,  wss.connectionexecutiondate, 
+    ws.property_id,   u.name as ownername,    u.guardian as guardianname,    u.mobilenumber as mobileno,    p.oldpropertyid,  
+    p.status AS property_status,    p.source,    p.propertytype,    p.usagecategory,  
+    p.landarea, pta.locality,    CONCAT_WS(', ',        pta.doorno,        pta.buildingname, pta.street)
+    AS address FROM eg_ws_connection ws JOIN eg_pt_property p ON ws.property_id = p.propertyid JOIN 
+    eg_ws_service wss ON ws.id = wss.connection_id INNER JOIN eg_pt_owner po    ON p.id = po.propertyid 
+    INNER JOIN eg_user u    ON po.userid = u.uuid INNER JOIN  eg_pt_address pta on (pta.propertyid=p.id) 
+    WHERE ws.tenantid = $ulb  and ws.status != 'Inactive'   and p.status != 'INACTIVE'  
+    and ws.connectionno IS NOT NULL
+
+- reportName: StateSewerage_Dump_report
+  summary: Sewerage Dump Report
+  decryptionPathId: ULBPTDataDumpReport_V2
+  version: 1.0.0
+  moduleName: rainmaker-ws
+  additionalConfig: 
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: tenantid
+    label: ULB_Name
+    type: string
+    source: ws
+    total: false
+  - name: connectionno
+    label: Connection No
+    type: string
+    source: ws
+    total: false
+  - name: ws_status
+    label: ws_status
+    type: string
+    source: ws
+    total: false
+  - name: connectiontype
+    label: connectiontype
+    type: string
+    source: ws
+    total: false
+  - name: connectionexecutiondate
+    label: connectionexecutiondate
+    type: string
+    source: ws
+    total: false
+  - name: property_id
+    label: property_id
+    type: string
+    source: ws
+    total: false
+  - name: ownername
+    label: Name
+    type: string
+    source: ws
+    total: false                                
+  - name: guardianname
+    label: Guardian
+    type: string
+    source: ws
+    total: false
+  - name: mobileno
+    label: mobilenumber
+    type: string
+    source: ws
+    total: false        
+  - name: oldpropertyid
+    label: oldpropertyid
+    type: string
+    source: ws
+    total: false
+  - name: property_status
+    label: property_status
+    type: string
+    source: ws
+    total: false        
+  - name: source
+    label: source
+    type: string
+    source: ws
+    total: false
+  - name: propertytype
+    label: propertytype
+    type: string
+    source: ws
+    total: false
+  - name: usagecategory
+    label: usagecategory
+    type: string
+    source: ws
+    total: false
+  - name: landarea
+    label: landarea
+    type: string
+    source: ws
+    total: false 
+  - name: locality
+    label: locality
+    type: string
+    source: ws
+    total: false
+  - name: address
+    label: address
+    type: string
+    source: ws
+    total: false                   
+  searchParams:
+  - name: ulb
+    label: ULB
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: ws
+    wrapper: true
+    isMandatory: true
+    searchClause: AND ws.tenantid = $ulb
+  query: |
+    SELECT 
+        ws.tenantid,
+        ws.connectionno,
+        ws.status AS ws_status,
+      --wss.connectioncategory,
+      wss.connectiontype , 
+      wss.connectionexecutiondate,
+        ws.property_id,
+        u.name as ownername,
+        u.guardian as guardianname,
+        u.mobilenumber as mobileno,
+        p.oldpropertyid,
+        p.status AS property_status,
+        p.source,
+        p.propertytype,
+        p.usagecategory,
+        p.landarea,
+       pta.locality,
+        CONCAT_WS(', ',
+            pta.doorno,
+            pta.buildingname,
+            pta.street
+        ) AS address
+    FROM eg_sw_connection ws
+    JOIN eg_pt_property p
+        ON ws.property_id = p.propertyid
+    JOIN eg_sw_service wss ON ws.id = wss.connection_id
+    INNER JOIN eg_pt_owner po
+        ON p.id = po.propertyid
+    INNER JOIN eg_user u
+        ON po.userid = u.uuid
+    INNER JOIN  eg_pt_address pta on (pta.propertyid=p.id)
+      WHERE ws.tenantid = $ulb
+      and ws.status != 'Inactive' 
+      and p.status != 'INACTIVE'
+      and ws.connectionno IS NOT NULL
