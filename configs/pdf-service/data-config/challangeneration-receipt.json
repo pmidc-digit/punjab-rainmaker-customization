@@ -1,6 +1,6 @@
 {
-  "key": "chbservice-receipt",
-  "documentType": "CHBSERVICE_RECEIPT",
+  "key": "challangeneration-receipt",
+  "documentType": "CHALLANGENERATION_RECEIPT",
   "DataConfigs": {
     "moduleName": "rainmaker-common",
     "version": "1.0.0",
@@ -20,24 +20,15 @@
                 }
               },
               {
+                "variable": "feeWaiver",
+                "value": {
+                  "path": "$.challan.challans[0].feeWaiver"
+                }
+              },
+              {
                 "variable": "designation",
                 "value": {
                   "path": "$.additionalDetails.designation"
-                }
-              },
-
-              {
-                "variable": "var_bookingSlots",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].bookingSlotDetails[*]"
-                },
-                "type": "array",
-                "format": {
-                  "type": "string",
-                  "scema": [
-                    { "variable": "bookingDate", "value": "bookingDate" },
-                    { "variable": "bookingEndDate", "value": "bookingEndDate" }
-                  ]
                 }
               },
               {
@@ -88,129 +79,6 @@
                   "path": "$.totalAmountPaid"
                 }
               },
-              {
-                "variable": "chb_sgst",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_SGST"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbSgst",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SGST')].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "chb_cow_cess",
-                "value": {
-                  "path": "MODULE_CSS_COW_CESS"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chb_service_charge",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_SERVICE_CHARGE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbServiceCharge",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_SERVICE_CHARGE')].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "chbCowCessCharge",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_COW_CESS')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "chb_discount",
-                "value": {
-                  "path": "CHB_DISCOUNT_AMOUNT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbDiscount",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_DISCOUNT')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "chb_booking_fees",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_BOOKING_FEES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbBookingFees",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'BOOKING_FEES')].adjustedAmount"
-                }
-              },
-
-              {
-                "variable": "chb_cgst",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_ADV_CGST"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chb_service",
-                "value": {
-                  "path": "ACTION_TEST_CHB"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbCgst",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CGST')].adjustedAmount"
-                }
-              },
 
               {
                 "variable": "tenantid",
@@ -230,28 +98,21 @@
                 }
               },
               {
+                "variable": "challanFee",
+                "value": {
+                  "path": "$.challan.challans[0].amount[?(@.taxHeadCode=='CH.CHALLAN_FINE')].amount"
+                }
+              },
+              {
+                "variable": "challanAmount",
+                "value": {
+                  "path": "$.challan.challans[0].challanAmount"
+                }
+              },
+              {
                 "variable": "paidAmount",
                 "value": {
                   "path": "$.paymentDetails[0].totalAmountPaid"
-                }
-              },
-
-              {
-                "variable": "hallName",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].communityHallName"
-                }
-              },
-              {
-                "variable": "applicantName",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].applicantDetail.applicantName"
-                }
-              },
-              {
-                "variable": "applicantMobileNo",
-                "value": {
-                  "path": "$.hallsBookingApplication[0].applicantDetail.applicantMobileNo"
                 }
               },
               {
@@ -320,7 +181,44 @@
               {
                 "variable": "payment_receipt",
                 "value": {
-                  "path": "PAYMENT_HEADER_CITIZEN"
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_PAYMENT_RECEIPT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+
+              {
+                "variable": "challan_term_1",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_TERM_1"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "challan_term_2",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_TERM_2"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "challan_term_3",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_CHALLAN_TERM_3"
                 },
                 "type": "label",
                 "localisation": {
@@ -594,6 +492,12 @@
                 }
               },
               {
+                "variable": "epoch",
+                "value": {
+                  "path": "$.transactionDate"
+                }
+              },
+              {
                 "variable": "disclamer_4",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_4"
@@ -615,6 +519,30 @@
                   "required": true,
                   "prefix": null,
                   "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "offenceTypeName",
+                "value": {
+                  "path": "$.challan.challans[0].offenceTypeName"
+                }
+              },
+              {
+                "variable": "offenceDescription",
+                "value": {
+                  "path": "$.challan.challans[0].description"
+                }
+              },
+              {
+                "variable": "offenceCategoryName",
+                "value": {
+                  "path": "$.challan.challans[0].offenceCategoryName"
+                }
+              },
+              {
+                "variable": "offenceSubCategoryName",
+                "value": {
+                  "path": "$.challan.challans[0].offenceSubCategoryName"
                 }
               },
               {
@@ -658,36 +586,19 @@
           {
             "derived": [
               {
-                "variable": "pendingAmount",
-                "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"
+                "variable": "epochIST",
+                "type": "date",
+                "formula": "{{epoch}}",
+                "timezone": "Asia/Kolkata",
+                "format": "HH:mm"
               },
               {
-                "variable": "chbServiceCharge",
-                "formula": "{{chbServiceCharge}}>0?{{chbServiceCharge}}:0"
+                "variable": "TotalChallanAmount",
+                "formula": "{{challanFee}}>{{challanAmount}}?{{challanFee}}-{{feeWaiver}}:{{challanAmount}}-{{feeWaiver}}"
               },
               {
-                "variable": "chbBookingFees",
-                "formula": "{{chbBookingFees}}>0?{{chbBookingFees}}:0"
-              },
-              {
-                "variable": "chbSgst",
-                "formula": "{{chbSgst}}>0?{{chbSgst}}:0"
-              },
-              {
-                "variable": "chbCgst",
-                "formula": "{{chbCgst}}>0?{{chbCgst}}:0"
-              },
-              {
-                "variable": "chbCowCessCharge",
-                "formula": "{{chbCowCessCharge}}>0?{{chbCowCessCharge}}:0"
-              },
-              {
-                "variable": "chbDiscountPositive",
-                "formula": "{{chbDiscount}} < 0 ? -{{chbDiscount}} : {{chbDiscount}}"
-              },
-              {
-                "variable": "chbDiscountPositive",
-                "formula": "{{chbDiscountPositive}}>0?{{chbDiscountPositive}}:0"
+                "variable": "excessAmountPaid",
+                "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
               }
             ]
           },
@@ -711,12 +622,12 @@
                     "value": "$.MdmsRes.tenant.tenants[0].domainUrl"
                   },
                   {
-                    "variable": "email",
-                    "value": "$.MdmsRes.tenant.tenants[0].emailId"
-                  },
-                  {
                     "variable": "ulbType",
                     "value": "$.MdmsRes.tenant.tenants[0].city.ulbType"
+                  },
+                  {
+                    "variable": "email",
+                    "value": "$.MdmsRes.tenant.tenants[0].emailId"
                   },
                   {
                     "variable": "logoImage",

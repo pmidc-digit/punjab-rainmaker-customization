@@ -85,6 +85,20 @@
                 }
               },
               {
+                "variable": "var_owners",
+                "value": {
+                  "path": "$.landInfo.owners[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "string",
+                  "scema": [
+                    { "variable": "ownerName", "value": "name" },
+                    { "variable": "ownerAddress", "value": "permanentAddress" }
+                  ]
+                }
+              },
+              {
                 "variable": "ownerName",
                 "value": {
                   "path": "$.landInfo.owners[0].name"
@@ -107,14 +121,14 @@
               {
                 "variable": "submissionDate",
                 "value": {
-                  "path": "$.applicationDate"
+                  "path": "$.auditDetails.createdTime"
                 },
                 "type": "date"
               },
               {
                 "variable": "submissionDateEpoch",
                 "value": {
-                  "path": "$.applicationDate"
+                  "path": "$.auditDetails.createdTime"
                 }
               },
               {
@@ -904,6 +918,25 @@
                   "required": true,
                   "prefix": null,
                   "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "newValidityDate",
+                "value": {
+                  "path": "$.newValidityDate"
+                },
+                "type": "date"
+              },
+              {
+                "variable": "designation",
+                "value": {
+                  "path": "$.designation"
+                }
+              },
+              {
+                "variable": "base64Image",
+                "value": {
+                  "path": "$.base64Image"
                 }
               },
               {
