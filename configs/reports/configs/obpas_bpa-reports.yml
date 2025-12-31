@@ -641,16 +641,16 @@ ReportDefinitions:
     searchClause: ulb_data.district = $district 
   query: |
        SELECT 
-           INITCAP(REPLACE(tenantid, 'pb.', '')) AS ulb_name,
-           status,
+           ulb_data.district,,
+           INITCAP(REPLACE(eg_bpa_buildingplan.tenantid, 'pb.', '')) AS ulb_name,
            COUNT(*) AS Pending_Files
-       FROM eg_bpa_buildingplan
+       FROM eg_bpa_buildingplan inner join ulb_data on eg_bpa_buildingplan.tenantid = ulb_data.ulb_code
        WHERE businessservice = 'BPA_LOW' and status IN (
            'VERIFICATION_INPROGRESS',
            'FIELDINSPECTION_INPROGRESS',
            'INSPECTION_REPORT_PENDING',
            'DOC_VERIFICATION_INPROGRESS')
-  groupby: GROUP BY tenantid, status
+  groupby: GROUP BY eg_bpa_buildingplan.tenantid,ulb_data.district
   
 - reportName: officers_with_highest_pendency
   summary: Top 7 officers with Highest Pendency
