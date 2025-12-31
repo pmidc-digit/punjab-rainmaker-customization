@@ -642,7 +642,7 @@ ReportDefinitions:
     searchClause: AND ulb_data.district = $district 
   query: |
        SELECT 
-           ulb_data.district,,
+           ulb_data.district,
            INITCAP(REPLACE(eg_bpa_buildingplan.tenantid, 'pb.', '')) AS ulb_name,
            COUNT(*) AS Pending_Files
        FROM eg_bpa_buildingplan inner join ulb_data on eg_bpa_buildingplan.tenantid = ulb_data.ulb_code
