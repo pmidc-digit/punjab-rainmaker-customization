@@ -608,13 +608,21 @@ ReportDefinitions:
     type: epoch
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND createdtime = $fromDate 
+    searchClause: AND bpa.createdtime <= $fromDate
+  - name: district
+    label: District
+    type: singlevaluelist
+    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND ulb_data.district = $district    
   query: |
-       select applicationno,edcrnumber,status,tenantid,'Building_Plan' as
-       businessservice from eg_bpa_buildingplan where businessservice = 'BPA_LOW' 
+       select ulb_data.district,bpa.applicationno,bpa.edcrnumber,bpa.status,bpa.tenantid,'Building_Plan' as
+       businessservice from eg_bpa_buildingplan bpa inner join ulb_data on bpa.tenantid = ulb_data.ulb_code where businessservice = 'BPA_LOW' 
+  orderby : ORDER BY ulb_data.district,bpa.tenantid, bpa.applicationno;
 
 - reportName: Pending_Files_Summary
-  summary: Beyond Time Line Pending Files Summary
+  summary: Pending Files Summary - ulb wise and distt wise
   version: 1.0.0
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
@@ -630,19 +638,27 @@ ReportDefinitions:
     label: Pending Files
     type: string
     source: obpas_bpa
-    total: true 
+    total: true
+  searchParams:    
+  - name: district
+    label: District
+    type: singlevaluelist
+    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND ulb_data.district = $district 
   query: |
        SELECT 
-           INITCAP(REPLACE(tenantid, 'pb.', '')) AS ulb_name,
-           status,
+           ulb_data.district,
+           INITCAP(REPLACE(eg_bpa_buildingplan.tenantid, 'pb.', '')) AS ulb_name,
            COUNT(*) AS Pending_Files
-       FROM eg_bpa_buildingplan
+       FROM eg_bpa_buildingplan inner join ulb_data on eg_bpa_buildingplan.tenantid = ulb_data.ulb_code
        WHERE businessservice = 'BPA_LOW' and status IN (
            'VERIFICATION_INPROGRESS',
            'FIELDINSPECTION_INPROGRESS',
            'INSPECTION_REPORT_PENDING',
            'DOC_VERIFICATION_INPROGRESS')
-  groupby: GROUP BY tenantid, status
+  groupby: GROUP BY eg_bpa_buildingplan.tenantid,ulb_data.district
   
 - reportName: officers_with_highest_pendency
   summary: Top 7 officers with Highest Pendency
@@ -652,11 +668,6 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
-  - name: serial_no
-    label: Serial No
-    type: string
-    source: obpas_bpa
-    total: false
   - name: ulb_name
     label: ULB Name
     type: string
@@ -751,37 +762,37 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: day0
-    label: day0
+    label: Day0
     type: string
     source: obpas_bpa
     total: true
   - name: day1
-    label: day1
+    label: Day1
     type: string
     source: obpas_bpa
     total: true
   - name: day2
-    label: day2
+    label: Day2
     type: string
     source: obpas_bpa
     total: true
   - name: day3
-    label: day3
+    label: Day3
     type: string
     source: obpas_bpa
     total: true
   - name: day4
-    label: day4
+    label: Day4
     type: string
     source: obpas_bpa
     total: true
   - name: day5
-    label: day5
+    label: Day5
     type: string
     source: obpas_bpa
     total: true
   - name: day6
-    label: day6
+    label: Day6
     type: string
     source: obpas_bpa
     total: true                     

@@ -12,58 +12,58 @@ serviceMaps:
               start_date, end_date,is_gst_applicable, is_cow_cess_applicable, is_refund_applicable_on_discontinuation, term_and_condition, penalty_type,
               created_time, created_by, lastmodified_time, lastmodified_by,additional_details,registration_number,trade_license_number)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: AllotmentDetails
+      basePath: AllotmentDetails.*
       jsonMaps:
-      - jsonPath: $.AllotmentDetails.id
-      - jsonPath: $.AllotmentDetails.propertyId
-      - jsonPath: $.AllotmentDetails.tenantId
-      - jsonPath: $.AllotmentDetails.status
-      - jsonPath: $.AllotmentDetails.applicationNumber
-      - jsonPath: $.AllotmentDetails.previousApplicationNumber
-      - jsonPath: $.AllotmentDetails.applicationType
-      - jsonPath: $.AllotmentDetails.startDate
-      - jsonPath: $.AllotmentDetails.endDate
-      - jsonPath: $.AllotmentDetails.isGSTApplicable
-      - jsonPath: $.AllotmentDetails.isCowCessApplicable
-      - jsonPath: $.AllotmentDetails.isRefundApplicableOnDiscontinuation
-      - jsonPath: $.AllotmentDetails.termAndCondition
-      - jsonPath: $.AllotmentDetails.penaltyType
-      - jsonPath: $.AllotmentDetails.auditDetails.createdTime
-      - jsonPath: $.AllotmentDetails.auditDetails.createdBy
-      - jsonPath: $.AllotmentDetails.auditDetails.lastModifiedTime
-      - jsonPath: $.AllotmentDetails.auditDetails.lastModifiedBy
-      - jsonPath: $.AllotmentDetails.additionalDetails
+      - jsonPath: $.AllotmentDetails.*.id
+      - jsonPath: $.AllotmentDetails.*.propertyId
+      - jsonPath: $.AllotmentDetails.*.tenantId
+      - jsonPath: $.AllotmentDetails.*.status
+      - jsonPath: $.AllotmentDetails.*.applicationNumber
+      - jsonPath: $.AllotmentDetails.*.previousApplicationNumber
+      - jsonPath: $.AllotmentDetails.*.applicationType
+      - jsonPath: $.AllotmentDetails.*.startDate
+      - jsonPath: $.AllotmentDetails.*.endDate
+      - jsonPath: $.AllotmentDetails.*.isGSTApplicable
+      - jsonPath: $.AllotmentDetails.*.isCowCessApplicable
+      - jsonPath: $.AllotmentDetails.*.isRefundApplicableOnDiscontinuation
+      - jsonPath: $.AllotmentDetails.*.termAndCondition
+      - jsonPath: $.AllotmentDetails.*.penaltyType
+      - jsonPath: $.AllotmentDetails.*.auditDetails.createdTime
+      - jsonPath: $.AllotmentDetails.*.auditDetails.createdBy
+      - jsonPath: $.AllotmentDetails.*.auditDetails.lastModifiedTime
+      - jsonPath: $.AllotmentDetails.*.auditDetails.lastModifiedBy
+      - jsonPath: $.AllotmentDetails.*.additionalDetails
         type: JSON
         dbType: JSONB
-      - jsonPath: $.AllotmentDetails.registrationNumber
-      - jsonPath: $.AllotmentDetails.tradeLicenseNumber
+      - jsonPath: $.AllotmentDetails.*.registrationNumber
+      - jsonPath: $.AllotmentDetails.*.tradeLicenseNumber
       
     - query: UPDATE eg_rl_allotment SET expireflag=true WHERE application_number=?;
-      basePath: AllotmentDetails
+      basePath: AllotmentDetails.*
       jsonMaps:
-      - jsonPath: $.AllotmentDetails.previousApplicationNumber
+      - jsonPath: $.AllotmentDetails.*.previousApplicationNumber
       
     - query: INSERT INTO eg_rl_owner_info(id, allotment_id, user_uuid, is_primary_owner, owner_type, ownership_percentage, relationship, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
-      basePath: AllotmentDetails.OwnerInfo.*
+      basePath: AllotmentDetails.*.OwnerInfo.*
       jsonMaps:
-      - jsonPath: $.AllotmentDetails.OwnerInfo.*.ownerId
-      - jsonPath: $.AllotmentDetails.OwnerInfo.*.allotmentId
-      - jsonPath: $.AllotmentDetails.OwnerInfo.*.userUuid
-      - jsonPath: $.AllotmentDetails.OwnerInfo.*.isPrimaryOwner
-      - jsonPath: $.AllotmentDetails.OwnerInfo.*.ownerType
-      - jsonPath: $.AllotmentDetails.OwnerInfo.*.ownershipPercentage
-      - jsonPath: $.AllotmentDetails.OwnerInfo.*.relationship
-      - jsonPath: $.AllotmentDetails.OwnerInfo.*.status
+      - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.ownerId
+      - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.allotmentId
+      - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.userUuid
+      - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.isPrimaryOwner
+      - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.ownerType
+      - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.ownershipPercentage
+      - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.relationship
+      - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.status
 
     - query: INSERT INTO eg_rl_document(id, allotment_id, documenttype, filestoreid,status, createdby, createdtime) VALUES (?, ?, ?, ?,'Active', ?, ?);
-      basePath: AllotmentDetails.Document.*
+      basePath: AllotmentDetails.*.Document.*
       jsonMaps:
-      - jsonPath: $.AllotmentDetails.Document.*.docId
-      - jsonPath: $.AllotmentDetails.Document.*.allotmentId
-      - jsonPath: $.AllotmentDetails.Document.*.documentType
-      - jsonPath: $.AllotmentDetails.Document.*.fileStoreId
-      - jsonPath: $.AllotmentDetails.Document.*.auditDetails.createdBy
-      - jsonPath: $.AllotmentDetails.Document.*.auditDetails.createdTime
+      - jsonPath: $.AllotmentDetails.*.Document.*.docId
+      - jsonPath: $.AllotmentDetails.*.Document.*.allotmentId
+      - jsonPath: $.AllotmentDetails.*.Document.*.documentType
+      - jsonPath: $.AllotmentDetails.*.Document.*.fileStoreId
+      - jsonPath: $.AllotmentDetails.*.Document.*.auditDetails.createdBy
+      - jsonPath: $.AllotmentDetails.*.Document.*.auditDetails.createdTime
       
   - version: 1.0
     description: Update Allotment and Applicant Details
@@ -71,31 +71,31 @@ serviceMaps:
     isTransaction: true
     queryMaps:
     - query: UPDATE eg_rl_allotment SET property_id =?, tenant_id=?, status=?,application_type=?, previous_application_number=?, application_number=?,start_date=?, end_date=?,is_gst_applicable=?, is_cow_cess_applicable=?, is_refund_applicable_on_discontinuation=?, term_and_condition=?, penalty_type=?, lastmodified_time=?, lastmodified_by=?, additional_details=?,reason_for_closure=?,amount_tobe_deducted=?,notes_comments=?,amount_to_be_refund=? WHERE id=?;
-      basePath: AllotmentDetails
+      basePath: AllotmentDetails.*
       jsonMaps:
-      - jsonPath: $.AllotmentDetails.propertyId
-      - jsonPath: $.AllotmentDetails.tenantId
-      - jsonPath: $.AllotmentDetails.status
-      - jsonPath: $.AllotmentDetails.applicationType
-      - jsonPath: $.AllotmentDetails.previousApplicationNumber
-      - jsonPath: $.AllotmentDetails.applicationNumber
-      - jsonPath: $.AllotmentDetails.startDate
-      - jsonPath: $.AllotmentDetails.endDate
-      - jsonPath: $.AllotmentDetails.isGSTApplicable
-      - jsonPath: $.AllotmentDetails.isCowCessApplicable
-      - jsonPath: $.AllotmentDetails.isRefundApplicableOnDiscontinuation
-      - jsonPath: $.AllotmentDetails.termAndCondition
-      - jsonPath: $.AllotmentDetails.penaltyType
-      - jsonPath: $.AllotmentDetails.auditDetails.lastModifiedTime
-      - jsonPath: $.AllotmentDetails.auditDetails.lastModifiedBy
-      - jsonPath: $.AllotmentDetails.additionalDetails
+      - jsonPath: $.AllotmentDetails.*.propertyId
+      - jsonPath: $.AllotmentDetails.*.tenantId
+      - jsonPath: $.AllotmentDetails.*.status
+      - jsonPath: $.AllotmentDetails.*.applicationType
+      - jsonPath: $.AllotmentDetails.*.previousApplicationNumber
+      - jsonPath: $.AllotmentDetails.*.applicationNumber
+      - jsonPath: $.AllotmentDetails.*.startDate
+      - jsonPath: $.AllotmentDetails.*.endDate
+      - jsonPath: $.AllotmentDetails.*.isGSTApplicable
+      - jsonPath: $.AllotmentDetails.*.isCowCessApplicable
+      - jsonPath: $.AllotmentDetails.*.isRefundApplicableOnDiscontinuation
+      - jsonPath: $.AllotmentDetails.*.termAndCondition
+      - jsonPath: $.AllotmentDetails.*.penaltyType
+      - jsonPath: $.AllotmentDetails.*.auditDetails.lastModifiedTime
+      - jsonPath: $.AllotmentDetails.*.auditDetails.lastModifiedBy
+      - jsonPath: $.AllotmentDetails.*.additionalDetails
         type: JSON
         dbType: JSONB
-      - jsonPath: $.AllotmentDetails.reasonForClosure
-      - jsonPath: $.AllotmentDetails.amountToBeDeducted
-      - jsonPath: $.AllotmentDetails.notesComments
-      - jsonPath: $.AllotmentDetails.amountToBeRefund
-      - jsonPath: $.AllotmentDetails.id
+      - jsonPath: $.AllotmentDetails.*.reasonForClosure
+      - jsonPath: $.AllotmentDetails.*.amountToBeDeducted
+      - jsonPath: $.AllotmentDetails.*.notesComments
+      - jsonPath: $.AllotmentDetails.*.amountToBeRefund
+      - jsonPath: $.AllotmentDetails.*.id
     
     - query: INSERT INTO eg_rl_owner_info(id, allotment_id, user_uuid, is_primary_owner, owner_type, ownership_percentage, relationship, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
              ON CONFLICT (id) DO UPDATE SET
@@ -104,16 +104,16 @@ serviceMaps:
         ownership_percentage = EXCLUDED.ownership_percentage,
         relationship = EXCLUDED.relationship,
         status = EXCLUDED.status;
-      basePath: AllotmentDetails.OwnerInfo.*
+      basePath: AllotmentDetails.*.OwnerInfo.*
       jsonMaps:
-      - jsonPath: $.AllotmentDetails.OwnerInfo.*.ownerId
-      - jsonPath: $.AllotmentDetails.OwnerInfo.*.allotmentId
-      - jsonPath: $.AllotmentDetails.OwnerInfo.*.userUuid
-      - jsonPath: $.AllotmentDetails.OwnerInfo.*.isPrimaryOwner
-      - jsonPath: $.AllotmentDetails.OwnerInfo.*.ownerType
-      - jsonPath: $.AllotmentDetails.OwnerInfo.*.ownershipPercentage
-      - jsonPath: $.AllotmentDetails.OwnerInfo.*.relationship
-      - jsonPath: $.AllotmentDetails.OwnerInfo.*.status
+      - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.ownerId
+      - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.allotmentId
+      - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.userUuid
+      - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.isPrimaryOwner
+      - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.ownerType
+      - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.ownershipPercentage
+      - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.relationship
+      - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.status
     
     - query: INSERT INTO eg_rl_document(id, allotment_id, documenttype, filestoreid,status, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?,'Active', ?, ?, ?, ?)
             ON CONFLICT (id) DO UPDATE SET
@@ -121,13 +121,13 @@ serviceMaps:
         fileStoreId = EXCLUDED.fileStoreId,
         lastmodifiedby = EXCLUDED.lastmodifiedby,
         lastmodifiedtime = EXCLUDED.lastmodifiedtime;       
-      basePath: AllotmentDetails.Document.*
+      basePath: AllotmentDetails.*.Document.*
       jsonMaps:
-      - jsonPath: $.AllotmentDetails.Document.*.docId
-      - jsonPath: $.AllotmentDetails.Document.*.documentUid
-      - jsonPath: $.AllotmentDetails.Document.*.documentType
-      - jsonPath: $.AllotmentDetails.Document.*.fileStoreId
-      - jsonPath: $.AllotmentDetails.Document.*.auditDetails.createdBy
-      - jsonPath: $.AllotmentDetails.Document.*.auditDetails.createdTime
-      - jsonPath: $.AllotmentDetails.Document.*.auditDetails.lastModifiedBy
-      - jsonPath: $.AllotmentDetails.Document.*.auditDetails.lastModifiedTime
+      - jsonPath: $.AllotmentDetails.*.Document.*.docId
+      - jsonPath: $.AllotmentDetails.*.Document.*.documentUid
+      - jsonPath: $.AllotmentDetails.*.Document.*.documentType
+      - jsonPath: $.AllotmentDetails.*.Document.*.fileStoreId
+      - jsonPath: $.AllotmentDetails.*.Document.*.auditDetails.createdBy
+      - jsonPath: $.AllotmentDetails.*.Document.*.auditDetails.createdTime
+      - jsonPath: $.AllotmentDetails.*.Document.*.auditDetails.lastModifiedBy
+      - jsonPath: $.AllotmentDetails.*.Document.*.auditDetails.lastModifiedTime
