@@ -136,8 +136,7 @@
                     "text": "Payment Details:",
                     "bold": true,
                     "style": "receipt-table-value",
-                    "border": [false, false, false, false],
-                    "margin": [-26, 0, 0, 0]
+                    "border": [false, false, false, false]
                   },
                   {
                     "text": "",
@@ -227,7 +226,8 @@
                 ]
               ]
             },
-            "layout": {}
+            "layout": {},
+            "margin": [-26, 0, 0, 0]
           },
           {
             "style": "next-noc-table",
@@ -275,20 +275,35 @@
                     "margin": [0, 0, 0, 0]
                   },
                   {
-                    "text": "{{dateNow}}",
+                    "text": "{{dateNowFormatted}}",
                     "style": "receipt-table-value-down",
                     "alignment": "left",
                     "margin": [0, 0, 0, 0]
                   }
                 ],
-                "[{\"text\":\"Period of Booking \",\"style\":\"receipt-table-value\",\"bold\":true,\"alignment\":\"left\",\"border\":[true,true,true,true],\"margin\":[0,0,0,0]},{\"text\":\"{{#var_bookingSlots}}{{bookingDate}}  {{/var_bookingSlots}}\",\"style\":\"receipt-table-value-down\",\"alignment\":\"left\",\"border\":[true,true,true,true],\"margin\":[0,0,0,0]}]"
+                "[{\"text\":\"Period of Booking \",\"style\":\"receipt-table-value\",\"bold\":true,\"alignment\":\"left\",\"border\":[true,true,true,true],\"margin\":[0,0,0,0]},{\"text\":\"{{#var_bookingSlots}}{{bookingDate}},  {{/var_bookingSlots}} (0:00 AM to 23:59 PM)\",\"style\":\"receipt-table-value-down\",\"alignment\":\"left\",\"border\":[true,true,true,true],\"margin\":[0,0,0,0]}]",
+                [
+                  {
+                    "text": "Booking Status",
+                    "style": "receipt-table-value",
+                    "bold": true,
+                    "alignment": "left",
+                    "margin": [0, 0, 0, 0]
+                  },
+                  {
+                    "text": "{{bookingStatus}}",
+                    "style": "receipt-table-value-down",
+                    "alignment": "left",
+                    "margin": [0, 0, 0, 0]
+                  }
+                ]
               ]
             },
             "layout": {}
           }
           
         ] ,
-        "margin": [20, 0, 20, 0]
+        "margin": [0, 0, 20, 0]
       },
 
       {

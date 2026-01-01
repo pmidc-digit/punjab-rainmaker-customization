@@ -3,7 +3,7 @@
     "key": "ownerconsent",
     "config": {
       "defaultStyle": {
-        "font": "Cambay",
+        "font": "Roboto",
         "alignment": "justify"
       },
       "content": [
@@ -21,14 +21,14 @@
         },
         {
           "text": [
-            "To,"
+            "To"
           ],
           "margin": [0, 0, 0, 2]
         },
 
          {
           "text": [
-            "The Municipal Commissioner"
+            "{{ulbselection}}"
           ],
           "margin": [0, 0, 0, 2]
         },
@@ -59,7 +59,7 @@
          {
         "text": [
           "I/We, Shri/Smt/Kum ",
-          { "text": "{{ownername}}", "bold": true },
+          { "text": "{{#var_owners}}{{ownerName}}, {{/var_owners}}", "bold": true },
           " undersigned owner of land bearing Kh. No ",
           { "text": "{{khasraNumber}}", "bold": true },
           " of ",
@@ -99,7 +99,8 @@
           "ol": [
             "That I am/We are sole owner of the site.",
             "There is no dispute regarding the site and if any dispute arises then I shall be solely responsible for the same.",
-            "That construction of the building will be undertaken as per the approved building plans and structural design given by the Structural Engineer."
+            "That construction of the building will be undertaken as per the approved building plans and structural design given by the Structural Engineer.",
+            "If there is any shortfall in fees, I will be liable to pay the balance amount."
           ],
           "alignment": "justify",
           "margin": [20, 0, 0, 10]
@@ -108,20 +109,6 @@
           "text": "That above stated facts are true and the requisite documents have been uploaded with this building plan and nothing has been concealed thereof.",
           "margin": [0, 0, 0, 25]
         },
-
-
-
-       
-
-        {
-          "text": [
-            "This Document is Verified By OTP at", {"text": " {{otpverifiedtimeowner}} ", "bold": true}
-          ],
-          
-         
-          "margin": [0, 0, 0, 7]
-        },
-        
        
         {
           "columns": [
@@ -129,7 +116,7 @@
               "width": "auto",
               "alignment": "left",
               "stack": [
-                {"text": ["Date : ", {"text": "{{otpverifieddate}}", "bold": true}]}
+                {"text": ["Date : ", {"text": "{{otpverifiedtimeowner}}", "bold": true}]}
                
               ]
             },
@@ -144,7 +131,7 @@
                 {"text": ["Mobile : ", {"text": "{{mobileNumber}}", "bold": true}]},
                 {"text": ["Signature : ", {"text": "Verified by OTP at {{otpverifiedtimeowner}} ", "bold": true}]}
               ],
-               "margin": [0, 20, 0, 0]
+               "margin": [0, 0, 0, 0]
             }
           ]
         }
