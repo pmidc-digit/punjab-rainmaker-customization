@@ -1199,18 +1199,18 @@ ReportDefinitions:
         searchClause: AND service= $service
     query: |
       -- Use CTE to force query plan, compute & use CTE later
-      WITH chb_data AS (
+      all_services AS (
         /* ---------------- Community Hall Booking (CHB) ---------------- */
         SELECT
-          split_part(b.tenant_id, '.', 2) AS tenant_name,
-          b.tenant_id  AS tenantid,
+           split_part(b.tenant_id, '.', 2) AS tenant_name,
+           b.tenant_id  AS tenantid,
           'CHB' AS service,
            b.booking_status  AS application_status,
            b.createdtime                
            FROM eg_chb_booking_detail b 
-           ),
-         ndc_data AS (
-             /* ---------------- NDC ---------------- */
+          
+          UNION ALL
+           /* ---------------- NDC ---------------- */
             SELECT
              split_part(a.tenantid, '.', 2) AS tenant_name,
              a.tenantid  AS tenantid,
@@ -1218,24 +1218,17 @@ ReportDefinitions:
              a.applicationstatus AS application_status,
              a.createdtime 
              FROM eg_ndc_application a 
-              ),
-         ptr_data AS (
-           /* ---------------- Pet Registration (PTR) ---------------- */
-           SELECT
-           split_part(r.tenantid, '.', 2) AS tenant_name,
-           r.tenantid  AS tenantid,
-           'PTR' AS service,
-           r.status  AS application_status,
-           r.createdtime  
-           FROM eg_ptr_registration r where 1=1
-           ),
-         all_services AS (
-            SELECT * FROM chb_data
-            UNION ALL
-            SELECT * FROM ndc_data
-            UNION ALL
-            SELECT * FROM ptr_data
-             )
+
+           UNION ALL  
+            /* ---------------- Pet Registration (PTR) ---------------- */
+            SELECT
+             split_part(r.tenantid, '.', 2) AS tenant_name,
+             r.tenantid  AS tenantid,
+             'PTR' AS service,
+             r.status  AS application_status,
+             r.createdtime  
+             FROM eg_ptr_registration r  
+         )
          SELECT
              tenant_name,
              service,
@@ -1322,12 +1315,12 @@ ReportDefinitions:
        all_services AS (
           /* ---------------- NDC ---------------- */
         SELECT 
-           split_part(a.tenantid, '.', 2) AS tenant_name,
-           a.tenantid
-           'NDC'  AS service,
-           a.applicationstatus  AS application_status,
-           ch.assignee_employee ,
-           a.createdtime
+            split_part(a.tenantid, '.', 2) AS tenant_name,
+            a.tenantid,
+            'NDC'  AS service,
+            a.applicationstatus  AS application_status,
+            ch.assignee_employee ,
+            a.createdtime
           FROM eg_ndc_application a 
           LEFT JOIN current_holder ch ON ch.applicationnumber = a.applicationno AND ch.service = 'ndc-services'
       where a.applicationstatus not in ('APPROVED','INITIATED','PENDINGPAYMENT','REJECTED','CITIZENACTIONREQUIRED','DOCUMENTVERIFY')
