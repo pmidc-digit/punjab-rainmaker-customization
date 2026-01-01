@@ -1298,50 +1298,50 @@ ReportDefinitions:
         searchClause: AND  service= $service
     query: >
       -- Use CTE to force query plan, compute & use CTE later
-
       WITH current_holder AS (
        SELECT DISTINCT ON (wf.businessid)
-          wf.businessid           AS applicationnumber,
-          wf.businessservice      AS service,
-          u.name                  AS assignee_employee
+          wf.businessid  AS applicationnumber,
+          wf.businessservice AS service,
+          u.name AS assignee_employee
         FROM eg_wf_processinstance_v2 wf
         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
         LEFT JOIN eg_user u ON u.uuid = wa.assignee
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
-       )
-       SELECT
-          tenant_name,
-          service,
-          application_status,
-          COALESCE(assignee_employee) AS pending_with_employee,
-          COUNT(*) AS application_count
-       FROM (
+       ),
+      
+       all_services AS (
           /* ---------------- NDC ---------------- */
         SELECT 
            split_part(a.tenantid, '.', 2) AS tenant_name,
-           a.tenantid                     AS tenantid,
-           'NDC'                          AS service,
-           a.applicationstatus            AS application_status,
-           ch.assignee_employee           AS assignee_employee,
-           a.createdtime                  AS createdtime
+           a.tenantid
+           'NDC'  AS service,
+           a.applicationstatus  AS application_status,
+           ch.assignee_employee ,
+           a.createdtime
           FROM eg_ndc_application a 
           LEFT JOIN current_holder ch ON ch.applicationnumber = a.applicationno AND ch.service = 'ndc-services'
-      where a.applicationstatus not in ('APPROVED','INITIATED','PENDINGPAYMENT','REJECTED','CITIZENACTIONREQUIRED')
+      where a.applicationstatus not in ('APPROVED','INITIATED','PENDINGPAYMENT','REJECTED','CITIZENACTIONREQUIRED','DOCUMENTVERIFY')
 
       UNION ALL
            /* ---------------- PTR ---------------- */
       SELECT
        split_part(r.tenantid, '.', 2) AS tenant_name,
-       r.tenantid                     AS tenantid,
-       'PTR'                          AS service,
-       r.status                       AS application_status,
-       ch.assignee_employee           AS assignee_employee,
-       r.createdtime                  AS createdtime
+       r.tenantid,
+       'PTR' AS service,
+       r.status  AS application_status,
+       ch.assignee_employee ,
+       r.createdtime 
        FROM eg_ptr_registration r
        LEFT JOIN current_holder ch ON ch.applicationnumber = r.applicationnumber AND ch.service = 'ptr'
-      where r.status not in ('APPROVED','INITIATED','PENDINGPAYMENT' ,'REJECTED','CITIZENACTIONREQUIRED','RENEWED')
-       ) all_services
-      WHERE
-      service IN ('NDC', 'PTR')
+      where r.status not in ('DOCUMENTVERIFY','APPROVED','INITIATED','PENDINGPAYMENT' ,'REJECTED','CITIZENACTIONREQUIRED','RENEWED')
+       ) 
+       SELECT
+          tenant_name,
+          service,
+          application_status,
+          assignee_employee AS pending_with_employee,
+          COUNT(*) AS application_count
+        FROM all_services
+        WHERE service IN ('NDC', 'PTR')
     groupby: GROUP BY tenant_name ,tenantid,service, application_status , assignee_employee
     orderby: ORDER BY tenant_name ,tenantid,service, application_status , assignee_employee
