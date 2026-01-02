@@ -1206,9 +1206,9 @@ ReportDefinitions:
            b.tenant_id  AS tenantid,
           'CHB' AS service,
            b.booking_status  AS application_status,
-           b.createdtime                
+           b.createdtime  as createdtime              
            FROM eg_chb_booking_detail b 
-          
+           where 1=1
           UNION ALL
            /* ---------------- NDC ---------------- */
             SELECT
@@ -1216,9 +1216,10 @@ ReportDefinitions:
              a.tenantid  AS tenantid,
             'NDC' AS service,
              a.applicationstatus AS application_status,
-             a.createdtime 
-             FROM eg_ndc_application a 
-
+             a.createdtime as createdtime 
+             FROM eg_ndc_application a
+             where 1=1
+             
            UNION ALL  
             /* ---------------- Pet Registration (PTR) ---------------- */
             SELECT
@@ -1226,17 +1227,18 @@ ReportDefinitions:
              r.tenantid  AS tenantid,
              'PTR' AS service,
              r.status  AS application_status,
-             r.createdtime  
+             r.createdtime  as createdtime 
              FROM eg_ptr_registration r  
+             where 1=1
          )
          SELECT
              tenant_name,
              service,
              application_status,
-             COUNT(*) AS application_count 
+             COUNT(*) AS application_count , createdtime 
            FROM all_services
            WHERE 1 = 1    
-    groupby: GROUP BY tenant_name ,service, application_status 
+    groupby: GROUP BY tenantid ,tenant_name ,service, application_status , createdtime
     orderby: ORDER BY tenant_name ,service, application_status;
     
   - reportName: Employeewisependingreport
@@ -1359,8 +1361,8 @@ ReportDefinitions:
         service,
         application_status,
         COALESCE(assignee_employee, '') AS pending_with_employee,
-        COUNT(*) AS application_count
+        COUNT(*) AS application_count , createdtime
       FROM all_services
       WHERE service IN ('NDC', 'PTR') 
-    groupby: GROUP BY tenant_name, tenantid, service, application_status, assignee_employee
+    groupby: GROUP BY tenant_name, tenantid, service, application_status, assignee_employee , createdtime
     orderby: ORDER BY tenant_name, tenantid, service, application_status, assignee_employee;
