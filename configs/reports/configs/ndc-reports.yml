@@ -1278,11 +1278,13 @@ ReportDefinitions:
         type: epoch
         source: ndc
         isMandatory: true
+        searchClause: AND createdtime >= $fromDate
       - name: toDate
         label: toDate
         type: epoch
         source: ndc
         isMandatory: true
+        searchClause: AND  createdtime <= $toDate
       - name: ulb
         label: ulb
         type: singlevaluelist
@@ -1311,7 +1313,7 @@ ReportDefinitions:
        ),
       
        all_services AS (
-          /* ---------------- NDC ---------------- */
+         
         SELECT 
             split_part(a.tenantid, '.', 2) AS tenant_name,
             a.tenantid,
@@ -1324,7 +1326,7 @@ ReportDefinitions:
       where a.applicationstatus not in ('APPROVED','INITIATED','PENDINGPAYMENT','REJECTED','CITIZENACTIONREQUIRED','DOCUMENTVERIFY')
 
       UNION ALL
-           /* ---------------- PTR ---------------- */
+           
       SELECT
        split_part(r.tenantid, '.', 2) AS tenant_name,
        r.tenantid,
@@ -1344,7 +1346,5 @@ ReportDefinitions:
           COUNT(*) AS application_count
         FROM all_services
         WHERE service IN ('NDC', 'PTR')
-          and createdtime >= $fromDate
-          and createdtime <= $toDate 
-    groupby: GROUP BY tenant_name ,tenantid,service, application_status , assignee_employee 
-    orderby: ORDER BY tenant_name ,tenantid,service, application_status , assignee_employee 
+    groupby: GROUP BY tenant_name ,tenantid,service, application_status , assignee_employee , createdtime
+    orderby: ORDER BY tenant_name ,tenantid,service, application_status , assignee_employee , createdtime
