@@ -1346,6 +1346,6 @@ ReportDefinitions:
       where r.status not in ('APPROVED','INITIATED','PENDINGPAYMENT' ,'REJECTED','CITIZENACTIONREQUIRED','RENEWED')
        ) all_services 
              WHERE
-      service IN ($service)
+      service IN ('NDC', 'PTR')
     groupby: GROUP BY tenant_name, tenantid, service, application_status, assignee_employee 
     orderby: ORDER BY tenant_name, tenantid, service, application_status, assignee_employee;
