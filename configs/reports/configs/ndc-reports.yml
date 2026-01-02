@@ -1344,8 +1344,6 @@ ReportDefinitions:
        FROM eg_ptr_registration r
        LEFT JOIN current_holder ch ON ch.applicationnumber = r.applicationnumber AND ch.service = 'ptr'
       where r.status not in ('APPROVED','INITIATED','PENDINGPAYMENT' ,'REJECTED','CITIZENACTIONREQUIRED','RENEWED')
-       ) all_services
-      WHERE
-      service IN ('NDC', 'PTR') 
-      GROUP BY tenant_name, tenantid, service, application_status, assignee_employee 
+       ) all_services 
+    groupby: GROUP BY tenant_name, tenantid, service, application_status, assignee_employee 
     orderby: ORDER BY tenant_name, tenantid, service, application_status, assignee_employee;
