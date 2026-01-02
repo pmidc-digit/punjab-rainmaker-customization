@@ -1327,7 +1327,7 @@ ReportDefinitions:
            'NDC'                          AS service,
            a.applicationstatus            AS application_status,
            ch.assignee_employee           AS assignee_employee,
-           a.createdtime                  AS createdtime
+           MAX(a.createdtime) AS createdtime
           FROM eg_ndc_application a 
           LEFT JOIN current_holder ch ON ch.applicationnumber = a.applicationno AND ch.service = 'ndc-services'
       where a.applicationstatus not in ('APPROVED','INITIATED','PENDINGPAYMENT','REJECTED','CITIZENACTIONREQUIRED')
@@ -1345,5 +1345,7 @@ ReportDefinitions:
        LEFT JOIN current_holder ch ON ch.applicationnumber = r.applicationnumber AND ch.service = 'ptr'
       where r.status not in ('APPROVED','INITIATED','PENDINGPAYMENT' ,'REJECTED','CITIZENACTIONREQUIRED','RENEWED')
        ) all_services 
+             WHERE
+      service IN ('NDC', 'PTR')
     groupby: GROUP BY tenant_name, tenantid, service, application_status, assignee_employee 
     orderby: ORDER BY tenant_name, tenantid, service, application_status, assignee_employee;
