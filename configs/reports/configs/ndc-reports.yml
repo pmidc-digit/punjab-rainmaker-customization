@@ -1278,13 +1278,11 @@ ReportDefinitions:
         type: epoch
         source: ndc
         isMandatory: true
-        searchClause: and createdtime >= $fromDate
       - name: toDate
         label: toDate
         type: epoch
         source: ndc
         isMandatory: true
-        searchClause: and createdtime <= $toDate
       - name: ulb
         label: ulb
         type: singlevaluelist
@@ -1346,5 +1344,7 @@ ReportDefinitions:
           COUNT(*) AS application_count
         FROM all_services
         WHERE service IN ('NDC', 'PTR')
-        GROUP BY tenant_name ,tenantid,service, application_status , assignee_employee 
-        ORDER BY tenant_name ,tenantid,service, application_status , assignee_employee 
+          and createdtime >= $fromDate
+          and createdtime <= $toDate 
+    groupby: GROUP BY tenant_name ,tenantid,service, application_status , assignee_employee 
+    orderby: ORDER BY tenant_name ,tenantid,service, application_status , assignee_employee 
