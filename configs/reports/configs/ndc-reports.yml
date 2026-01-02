@@ -1299,7 +1299,7 @@ ReportDefinitions:
         type: singlevaluelist
         pattern: list://NDC:No Due Certficate,PTR:Pet Registration
         source: ndc
-        isMandatory: false
+        isMandatory: true
         searchClause: AND  1=1
     query: >
       WITH current_holder AS (
@@ -1346,6 +1346,6 @@ ReportDefinitions:
       where r.status not in ('APPROVED','INITIATED','PENDINGPAYMENT' ,'REJECTED','CITIZENACTIONREQUIRED','RENEWED')
        ) all_services 
              WHERE
-      service IN $service
+      service IN ($service)
     groupby: GROUP BY tenant_name, tenantid, service, application_status, assignee_employee 
     orderby: ORDER BY tenant_name, tenantid, service, application_status, assignee_employee;
