@@ -1361,7 +1361,8 @@ ReportDefinitions:
         service,
         application_status,
         COALESCE(assignee_employee, '') AS pending_with_employee,
-        COUNT(*) AS application_count 
+        COUNT(*) AS application_count ,
+        MAX(createdtime) AS latest_createdtime
       FROM all_services
       WHERE service IN ('NDC', 'PTR') 
     groupby: GROUP BY tenant_name, tenantid, service, application_status, assignee_employee 
