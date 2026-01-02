@@ -1199,7 +1199,7 @@ ReportDefinitions:
         searchClause: AND service= $service
     query: |
       -- Use CTE to force query plan, compute & use CTE later
-      all_services AS (
+       WITH all_services AS (
         /* ---------------- Community Hall Booking (CHB) ---------------- */
         SELECT
            split_part(b.tenant_id, '.', 2) AS tenant_name,
@@ -1233,11 +1233,11 @@ ReportDefinitions:
              tenant_name,
              service,
              application_status,
-             COUNT(*) AS application_count
+             COUNT(*) AS application_count 
            FROM all_services
            WHERE 1 = 1    
-    groupby: GROUP BY tenant_name ,service, application_status
-    orderby: ORDER BY tenant_name ,service, application_status
+    groupby: GROUP BY tenant_name ,service, application_status 
+    orderby: ORDER BY tenant_name ,service, application_status;
     
   - reportName: Employeewisependingreport
     summary: Details of applicant in ndc , chb, pet service
@@ -1359,9 +1359,8 @@ ReportDefinitions:
         service,
         application_status,
         COALESCE(assignee_employee, '') AS pending_with_employee,
-        COUNT(*) AS application_count,createdtime
+        COUNT(*) AS application_count
       FROM all_services
       WHERE service IN ('NDC', 'PTR') 
-    groupby: GROUP BY tenant_name, tenantid, service, application_status, assignee_employee,createdtime
+    groupby: GROUP BY tenant_name, tenantid, service, application_status, assignee_employee
     orderby: ORDER BY tenant_name, tenantid, service, application_status, assignee_employee;
-      
