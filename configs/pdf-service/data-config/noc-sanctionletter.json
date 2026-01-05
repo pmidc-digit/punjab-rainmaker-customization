@@ -27,11 +27,31 @@
                 }
               },
               
+              {
+                "variable": "var_owners",
+                "value": {
+                  "path": "$.Noc[0].owners[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "string",
+                  "scema": [
+                    { "variable": "name", "value": "name" },
+                    { "variable": "permanentAddress", "value": "permanentAddress" }
+                  ]
+                }
+              },
               
               {
                 "variable": "nocType",
                 "value": {
                   "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.specificationNocType"
+                }
+              },
+              {
+                "variable": "proposedSiteAddress",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.proposedSiteAddress"
                 }
               },
               {
