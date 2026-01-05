@@ -1196,50 +1196,60 @@ ReportDefinitions:
         pattern: list://CHB:Community Hall Booking,NDC:No Due Certficate,PTR:Pet Registration
         source: ndc
         isMandatory: false
-        searchClause: AND service= $service
+        searchClause: AND 1=1
     query: |
-      -- Use CTE to force query plan, compute & use CTE later
-       WITH all_services AS (
-        /* ---------------- Community Hall Booking (CHB) ---------------- */
+      WITH all_services AS (
+      
+        /* ---------------- CHB ---------------- */
         SELECT
-           split_part(b.tenant_id, '.', 2) AS tenant_name,
-           b.tenant_id  AS tenantid,
-          'CHB' AS service,
-           b.booking_status  AS application_status,
-           b.createdtime  as createdtime              
-           FROM eg_chb_booking_detail b 
-           where 1=1
-          UNION ALL
-           /* ---------------- NDC ---------------- */
-            SELECT
-             split_part(a.tenantid, '.', 2) AS tenant_name,
-             a.tenantid  AS tenantid,
-            'NDC' AS service,
-             a.applicationstatus AS application_status,
-             a.createdtime as createdtime 
-             FROM eg_ndc_application a
-             where 1=1
-             
-           UNION ALL  
-            /* ---------------- Pet Registration (PTR) ---------------- */
-            SELECT
-             split_part(r.tenantid, '.', 2) AS tenant_name,
-             r.tenantid  AS tenantid,
-             'PTR' AS service,
-             r.status  AS application_status,
-             r.createdtime  as createdtime 
-             FROM eg_ptr_registration r  
-             where 1=1
-         )
-         SELECT
-             tenant_name,
-             service,
-             application_status,
-             COUNT(*) AS application_count , createdtime 
-           FROM all_services
-           WHERE 1 = 1    
-    groupby: GROUP BY tenantid ,tenant_name ,service, application_status , createdtime
-    orderby: ORDER BY tenant_name ,service, application_status
+          split_part(b.tenant_id, '.', 2) AS tenant_name,
+          b.tenant_id                     AS tenantid,
+          'CHB'                           AS service,
+          b.booking_status                AS application_status,
+          COUNT(*)                        AS application_count,
+          MAX(createdtime)                AS createdtime
+        FROM eg_chb_booking_detail b
+        WHERE 1=1
+      
+        UNION ALL
+      
+        /* ---------------- NDC ---------------- */
+        SELECT
+          split_part(a.tenantid, '.', 2) AS tenant_name,
+          a.tenantid                     AS tenantid,
+          'NDC'                          AS service,
+          a.applicationstatus            AS application_status,
+          COUNT(*)                       AS application_count,
+          MAX(createdtime)               AS createdtime
+        FROM eg_ndc_application a
+        WHERE 1=1
+      
+        UNION ALL
+      
+        /* ---------------- PTR ---------------- */
+        SELECT
+          split_part(r.tenantid, '.', 2) AS tenant_name,
+          r.tenantid                     AS tenantid,
+          'PTR'                          AS service,
+          r.status                       AS application_status,
+          COUNT(*)                       AS application_count,
+          MAX(createdtime)               AS createdtime
+        FROM eg_ptr_registration r
+        WHERE  createdtime >= $fromDate AND createdtime <= $toDate
+        GROUP BY tenantid, tenant_name, service, application_status
+      )
+      
+      SELECT
+        tenant_name,
+        service,
+        application_status,
+        SUM(application_count)       AS application_count,
+        MAX(createdtime)      AS createdtime
+      FROM all_services
+      WHERE service = $service
+    groupby: GROUP BY tenantid, tenant_name, service, application_status
+    orderby: ORDER BY tenant_name, service, application_status;
+      
     
   - reportName: Employeewisependingreport
     summary: Details of applicant in ndc , chb, pet service
