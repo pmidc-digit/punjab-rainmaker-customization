@@ -1,70 +1,72 @@
 ---
 ReportDefinitions:
-- reportName: ApplicationDetailReport
-  decryptionPathId: NDCAPPLICATION
-  summary: Details of applicant in ndc service
-  version: 1.0.0
-  moduleName: rainmaker-ndc
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: name
-    label: name
-    type: string
-    source: ndc
-    total: false
-  - name: mobilenumber
-    label: mobilenumber
-    type: string
-    source: ndc
-    total: false
-  - name: applicationstatus
-    label: applicationstatus
-    type: string
-    source: ndc
-    total: false
-  - name: businessservice
-    label: businessservice
-    type: string
-    source: ndc
-    total: false
-  - name: applicationno
-    label: applicationno
-    type: string
-    source: ndc
-    total: false
-  - name: employee_name
-    label: employee_name
-    type: string
-    source: ndc
-    total: false
-  - name: employee_code
-    label: employee_code
-    type: string
-    source: ndc
-    total: false
-  searchParams:
-  - name: fromDate
-    label: fromDate
-    type: epoch
-    source: ndc
-    isMandatory: true
-    searchClause: AND a.createdtime >= $fromDate
-  - name: toDate
-    label: toDate
-    type: epoch
-    source: ndc
-    isMandatory: true
-    searchClause: AND a.createdtime <= $toDate
-  - name: applicationstatus
-    label: Application status
-    type: singlevaluelist
-    pattern: list://INITIATED:INITIATED,PENDINGPAYMENT:PENDINGPAYMENT,DOCUMENTVERIFY:DOCUMENTVERIFY,APPROVED:APPROVED, REJECTED:REJECTED,TL-VERIFICATION:TL-VERIFICATION,WS-SW-VERIFICATION:WS-SW-VERIFICATION ,CITIZENACTIONREQUIRED-DV:CITIZENACTIONREQUIRED-DV,BPA-VERIFICATION:BPA-VERIFICATION,PENDINGAPPROVAL:PENDINGAPPROVAL,CANCELLED:CANCELLED,PT-VERIFICATION:PT-VERIFICATION,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
-    source: ndc
-    isMandatory: true
-    searchClause: AND LOWER(a.applicationstatus) = LOWER($applicationstatus)
-  query: |
+  - reportName: ApplicationDetailReport
+    decryptionPathId: NDCAPPLICATION
+    summary: Details of applicant in ndc service
+    version: 1.0.0
+    moduleName: rainmaker-ndc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: name
+        label: name
+        type: string
+        source: ndc
+        total: false
+      - name: mobilenumber
+        label: mobilenumber
+        type: string
+        source: ndc
+        total: false
+      - name: applicationstatus
+        label: applicationstatus
+        type: string
+        source: ndc
+        total: false
+      - name: businessservice
+        label: businessservice
+        type: string
+        source: ndc
+        total: false
+      - name: applicationno
+        label: applicationno
+        type: string
+        source: ndc
+        total: false
+      - name: employee_name
+        label: employee_name
+        type: string
+        source: ndc
+        total: false
+      - name: employee_code
+        label: employee_code
+        type: string
+        source: ndc
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND a.createdtime >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND a.createdtime <= $toDate
+      - name: applicationstatus
+        label: Application status
+        type: singlevaluelist
+        pattern: list://INITIATED:INITIATED,PENDINGPAYMENT:PENDINGPAYMENT,DOCUMENTVERIFY:DOCUMENTVERIFY,APPROVED:APPROVED,
+          REJECTED:REJECTED,TL-VERIFICATION:TL-VERIFICATION,WS-SW-VERIFICATION:WS-SW-VERIFICATION
+          ,CITIZENACTIONREQUIRED-DV:CITIZENACTIONREQUIRED-DV,BPA-VERIFICATION:BPA-VERIFICATION,PENDINGAPPROVAL:PENDINGAPPROVAL,CANCELLED:CANCELLED,PT-VERIFICATION:PT-VERIFICATION,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
+        source: ndc
+        isMandatory: true
+        searchClause: AND LOWER(a.applicationstatus) = LOWER($applicationstatus)
+    query: |
       -- Use CTE to force query plan, compute & use CTE later
       WITH current_holder AS (
          SELECT DISTINCT ON (wf.businessid)
@@ -95,112 +97,112 @@ ReportDefinitions:
         JOIN eg_ndc_details d ON d.applicationid = o.ndcapplicationuuid
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno
         WHERE a.tenantid = $tenantid
-
-- reportName: CollectionsReport
-  decryptionPathId: NDCAPPLICATION
-  summary: Collections
-  version: 1.0.0
-  moduleName: rainmaker-ndc
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: applicationno
-    label: applicationno
-    type: string
-    source: ndc
-    total: false
-  - name: name
-    label: name
-    type: string
-    source: ndc
-    total: false
-  - name: mobilenumber
-    label: mobilenumber
-    type: string
-    source: ndc
-    total: false
-  - name: businessservice
-    label: businessservice
-    type: string
-    source: ndc
-    total: false
-  - name: applicationstatus
-    label: applicationstatus
-    type: string
-    source: ndc
-    total: false
-  - name: collector_code
-    label: collector_code
-    type: string
-    source: ndc
-    total: false
-  - name: cash_amount
-    label: cash_amount
-    type: string
-    source: ndc
-    total: true
-  - name: cheque_amount
-    label: cheque_amount
-    type: string
-    source: ndc
-    total: true
-  - name: card_amount
-    label: card_amount
-    type: string
-    source: ndc
-    total: true
-  - name: dd_amount
-    label: dd_amount
-    type: string
-    source: ndc
-    total: true
-  - name: neft_amount
-    label: neft_amount
-    type: string
-    source: ndc
-    total: true
-  - name: rtgs_amount
-    label: rtgs_amount
-    type: string
-    source: ndc
-    total: true
-  - name: online_amount
-    label: online_amount
-    type: string
-    source: ndc
-    total: true
-  - name: amountpaid
-    label: amountpaid
-    type: string
-    source: ndc
-    total: true
-  - name: PaymentDate
-    label: PaymentDate
-    type: string
-    source: ndc
-    total: false
-  searchParams:
-  - name: fromDate
-    label: fromDate
-    type: epoch
-    source: ndc
-    isMandatory: true
-    searchClause: AND createdtime >= $fromDate
-  - name: toDate
-    label: toDate
-    type: epoch
-    source: ndc
-    isMandatory: true
-    searchClause: AND createdtime <= $toDate
-  - name: collector_code
-    label: collector_code
-    type: string
-    source: ptr
-    isMandatory: false
-    searchClause: AND collector_code = $collector_code
-  query: |
+  - reportName: CollectionsReport
+    decryptionPathId: NDCAPPLICATION
+    summary: Collections
+    version: 1.0.0
+    moduleName: rainmaker-ndc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: applicationno
+        label: applicationno
+        type: string
+        source: ndc
+        total: false
+      - name: name
+        label: name
+        type: string
+        source: ndc
+        total: false
+      - name: mobilenumber
+        label: mobilenumber
+        type: string
+        source: ndc
+        total: false
+      - name: businessservice
+        label: businessservice
+        type: string
+        source: ndc
+        total: false
+      - name: applicationstatus
+        label: applicationstatus
+        type: string
+        source: ndc
+        total: false
+      - name: collector_code
+        label: collector_code
+        type: string
+        source: ndc
+        total: false
+      - name: cash_amount
+        label: cash_amount
+        type: string
+        source: ndc
+        total: true
+      - name: cheque_amount
+        label: cheque_amount
+        type: string
+        source: ndc
+        total: true
+      - name: card_amount
+        label: card_amount
+        type: string
+        source: ndc
+        total: true
+      - name: dd_amount
+        label: dd_amount
+        type: string
+        source: ndc
+        total: true
+      - name: neft_amount
+        label: neft_amount
+        type: string
+        source: ndc
+        total: true
+      - name: rtgs_amount
+        label: rtgs_amount
+        type: string
+        source: ndc
+        total: true
+      - name: online_amount
+        label: online_amount
+        type: string
+        source: ndc
+        total: true
+      - name: amountpaid
+        label: amountpaid
+        type: string
+        source: ndc
+        total: true
+      - name: PaymentDate
+        label: PaymentDate
+        type: string
+        source: ndc
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND createdtime >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND createdtime <= $toDate
+      - name: collector_code
+        label: collector_code
+        type: string
+        source: ptr
+        isMandatory: false
+        searchClause: AND collector_code = $collector_code
+    query: >
       -- Use CTE to force query plan, compute & use CTE later
+
       WITH current_holder AS (
          SELECT DISTINCT ON (wf.businessid)
            wf.businessid AS applicationno,
@@ -257,76 +259,75 @@ ReportDefinitions:
               to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate
              FROM unique_transactions
              WHERE 1=1 
-  orderby: ORDER BY createdtime DESC
-  
-- reportName: SLAReport
-  decryptionPathId: NDCAPPLICATION
-  summary: SLA report for NDC service
-  version: 1.0.0
-  moduleName: rainmaker-ndc
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: tenantid
-    label: tenantid
-    type: string
-    source: ndc
-    total: false
-  - name: ndc_application_no
-    label: Application Number
-    type: string
-    source: ndc
-    total: false
-  - name: document_verify_on
-    label: Document Verified On
-    type: string
-    source: ndc
-    total: false
-  - name: finalstatus_on
-    label: Approval / Rejection On
-    type: string
-    source: ndc
-    total: false
-  - name: final_status
-    label: Application status
-    type: string
-    source: ndc
-    total: false
-  - name: sla_status
-    label: sla status
-    type: string
-    source: ndc
-    total: false
-  - name: sla_days
-    label: SLA Days 
-    type: string
-    source: ndc
-    total: false
-  - name: employee_name
-    label: employee_name
-    type: string
-    source: ndc
-    total: false
-  - name: employee_code
-    label: Employee Code / Current Holder Code
-    type: string
-    source: ndc
-    total: false
-  searchParams:
-  - name: fromDate
-    label: From Date
-    type: epoch
-    source: ndc
-    isMandatory: true
-    searchClause: AND n.createdtime >= $fromDate
-  - name: toDate
-    label: To Date
-    type: epoch
-    source: ndc
-    isMandatory: true
-    searchClause: AND n.createdtime <= $toDate
-  query: |
+    orderby: ORDER BY createdtime DESC
+  - reportName: SLAReport
+    decryptionPathId: NDCAPPLICATION
+    summary: SLA report for NDC service
+    version: 1.0.0
+    moduleName: rainmaker-ndc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: ndc
+        total: false
+      - name: ndc_application_no
+        label: Application Number
+        type: string
+        source: ndc
+        total: false
+      - name: document_verify_on
+        label: Document Verified On
+        type: string
+        source: ndc
+        total: false
+      - name: finalstatus_on
+        label: Approval / Rejection On
+        type: string
+        source: ndc
+        total: false
+      - name: final_status
+        label: Application status
+        type: string
+        source: ndc
+        total: false
+      - name: sla_status
+        label: sla status
+        type: string
+        source: ndc
+        total: false
+      - name: sla_days
+        label: SLA Days
+        type: string
+        source: ndc
+        total: false
+      - name: employee_name
+        label: employee_name
+        type: string
+        source: ndc
+        total: false
+      - name: employee_code
+        label: Employee Code / Current Holder Code
+        type: string
+        source: ndc
+        total: false
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND n.createdtime >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND n.createdtime <= $toDate
+    query: >
       -- Use CTE to force query plan, compute & use CTE later     
        WITH wf_detailed AS (
          SELECT 
@@ -405,120 +406,121 @@ ReportDefinitions:
             JOIN sla_data sla ON sla.businessservice='ndc-services'
             LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
             WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')             
-  orderby: ORDER BY n.createdtime DESC, tenantid, final_status
-  
-- reportName: ReceiptRegisterNDC
-  decryptionPathId: NDCAPPLICATION
-  summary: Details of collector register in ndc service
-  version: 1.0.0
-  moduleName: rainmaker-ndc
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: receiptno
-    label: receiptno
-    type: string
-    source: ndc
-    total: false
-  - name: connectionno
-    label: connectionno
-    type: string
-    source: ndc
-    total: false
-  - name: receiptdate1
-    label: receiptdate1
-    type: string
-    source: ndc
-    total: false
-  - name: service
-    label: service
-    type: string
-    source: ndc
-    total: false
-  - name: collectorname
-    label: collectorname
-    type: string
-    source: ndc
-    total: false
-  - name: transactiondate
-    label: transactiondate
-    type: string
-    source: ndc
-    total: false
-  - name: instrumentnumber
-    label: instrumentnumber
-    type: string
-    source: ndc
-    total: false
-  - name: payername
-    label: payername
-    type: string
-    source: ndc
-    total: false
-  - name: amountpaid
-    label: amountpaid
-    type: string
-    source: ndc
-    total: false
-  - name: paymentmode
-    label: paymentmode
-    type: string
-    source: ndc
-    total: false
-  - name: paymentstatus
-    label: paymentstatus
-    type: string
-    source: ndc
-    total: false
-  - name: ownername1
-    label: ownername1
-    type: string
-    source: ndc
-    total: false
-  - name: user
-    label: user
-    type: string
-    source: ndc
-    total: false
-  - name: manualreceiptnumber
-    label: manualreceiptnumber
-    type: string
-    source: ndc
-    total: false
-  - name: manualreceiptdate
-    label: manualreceiptdate
-    type: string
-    source: ndc
-    total: false
-  searchParams:
-  - name: fromDate
-    label: fromDate
-    type: epoch
-    source: ndc
-    isMandatory: true
-    searchClause: AND pd.receiptdate >= $fromDate
-  - name: toDate
-    label: toDate
-    type: epoch
-    source: ndc
-    isMandatory: true
-    searchClause: AND pd.receiptdate <= $toDate
-  - name: receiptNumber
-    label: receiptNumber
-    type: string
-    source: ndc
-    isMandatory: false
-    searchClause: AND pd.receiptnumber like $receiptNumber
-  - name: paymentMode
-    label: paymentMode
-    type: singlevaluelist
-    pattern: 'list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT'
-    source: ndc
-    isMandatory: false
-    searchClause: AND payment.paymentmode like $paymentMode
-  query: |
+    orderby: ORDER BY n.createdtime DESC, tenantid, final_status
+  - reportName: ReceiptRegisterNDC
+    decryptionPathId: NDCAPPLICATION
+    summary: Details of collector register in ndc service
+    version: 1.0.0
+    moduleName: rainmaker-ndc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: receiptno
+        label: receiptno
+        type: string
+        source: ndc
+        total: false
+      - name: connectionno
+        label: connectionno
+        type: string
+        source: ndc
+        total: false
+      - name: receiptdate1
+        label: receiptdate1
+        type: string
+        source: ndc
+        total: false
+      - name: service
+        label: service
+        type: string
+        source: ndc
+        total: false
+      - name: collectorname
+        label: collectorname
+        type: string
+        source: ndc
+        total: false
+      - name: transactiondate
+        label: transactiondate
+        type: string
+        source: ndc
+        total: false
+      - name: instrumentnumber
+        label: instrumentnumber
+        type: string
+        source: ndc
+        total: false
+      - name: payername
+        label: payername
+        type: string
+        source: ndc
+        total: false
+      - name: amountpaid
+        label: amountpaid
+        type: string
+        source: ndc
+        total: false
+      - name: paymentmode
+        label: paymentmode
+        type: string
+        source: ndc
+        total: false
+      - name: paymentstatus
+        label: paymentstatus
+        type: string
+        source: ndc
+        total: false
+      - name: ownername1
+        label: ownername1
+        type: string
+        source: ndc
+        total: false
+      - name: user
+        label: user
+        type: string
+        source: ndc
+        total: false
+      - name: manualreceiptnumber
+        label: manualreceiptnumber
+        type: string
+        source: ndc
+        total: false
+      - name: manualreceiptdate
+        label: manualreceiptdate
+        type: string
+        source: ndc
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND pd.receiptdate >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND pd.receiptdate <= $toDate
+      - name: receiptNumber
+        label: receiptNumber
+        type: string
+        source: ndc
+        isMandatory: false
+        searchClause: AND pd.receiptnumber like $receiptNumber
+      - name: paymentMode
+        label: paymentMode
+        type: singlevaluelist
+        pattern: list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE
+          NEFT
+        source: ndc
+        isMandatory: false
+        searchClause: AND payment.paymentmode like $paymentMode
+    query: >
       -- Use CTE to force query plan, compute & use CTE later
+
       SELECT
          pd.receiptnumber AS receiptno,
          bill.consumercode AS connectionno,
@@ -537,95 +539,102 @@ ReportDefinitions:
          pd.manualreceiptdate   
        FROM egcl_paymentdetail pd
       INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = $tenantid
+
       INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
+
       LEFT JOIN eg_ndc_application a ON bill.consumercode = a.applicationno
+
       LEFT JOIN eg_ndc_owner o  ON o.ndcapplicationuuid = a.uuid
+
       LEFT JOIN eg_user u_applicant ON u_applicant.uuid = o.uuid
+
       LEFT JOIN eg_ndc_details d ON d.applicationid = a.uuid
+
       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
        WHERE
          bill.tenantid = $tenantid
          AND pd.businessservice = 'NDC'
          AND payment.paymentstatus != 'CANCELLED'
-  orderby: ORDER BY pd.receiptdate DESC
-
-- reportName: StateApplicationDetailReport
-  decryptionPathId: STATENDCAPPLICATION
-  summary: Details of applicant in ndc service
-  version: 1.0.0
-  moduleName: rainmaker-ndc
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: name
-    label: name
-    type: string
-    source: ndc
-    total: false
-  - name: tenantid
-    label: tenanaid
-    type: string
-    source: ndc
-    total: false
-  - name: mobilenumber
-    label: mobilenumber
-    type: string
-    source: ndc
-    total: false
-  - name: applicationstatus
-    label: applicationstatus
-    type: string
-    source: ndc
-    total: false
-  - name: businessservice
-    label: businessservice
-    type: string
-    source: ndc
-    total: false
-  - name: applicationno
-    label: applicationno
-    type: string
-    source: ndc
-    total: false
-  - name: employee_name
-    label: employee_name
-    type: string
-    source: ndc
-    total: false
-  - name: employee_code
-    label: employee_code
-    type: string
-    source: ndc
-    total: false
-  searchParams:
-  - name: fromDate
-    label: fromDate
-    type: epoch
-    source: ndc
-    isMandatory: true
-    searchClause: AND a.createdtime >= $fromDate
-  - name: toDate
-    label: toDate
-    type: epoch
-    source: ndc
-    isMandatory: true
-    searchClause: AND a.createdtime <= $toDate
-  - name: applicationstatus
-    label: Application status
-    type: singlevaluelist
-    pattern: list://INITIATED:INITIATED,PENDINGPAYMENT:PENDINGPAYMENT,DOCUMENTVERIFY:DOCUMENTVERIFY,APPROVED:APPROVED, REJECTED:REJECTED,TL-VERIFICATION:TL-VERIFICATION,WS-SW-VERIFICATION:WS-SW-VERIFICATION ,CITIZENACTIONREQUIRED-DV:CITIZENACTIONREQUIRED-DV,BPA-VERIFICATION:BPA-VERIFICATION,PENDINGAPPROVAL:PENDINGAPPROVAL,CANCELLED:CANCELLED,PT-VERIFICATION:PT-VERIFICATION,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
-    source: ndc
-    isMandatory: true
-    searchClause: AND LOWER(a.applicationstatus) = LOWER($applicationstatus)
-  - name: ulb
-    label: ulb
-    type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-    source: ndc
-    isMandatory: false
-    searchClause: AND a.tenantid = $ulb
-  query: |
+    orderby: ORDER BY pd.receiptdate DESC;
+  - reportName: StateApplicationDetailReport
+    decryptionPathId: STATENDCAPPLICATION
+    summary: Details of applicant in ndc service
+    version: 1.0.0
+    moduleName: rainmaker-ndc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: name
+        label: name
+        type: string
+        source: ndc
+        total: false
+      - name: tenantid
+        label: tenanaid
+        type: string
+        source: ndc
+        total: false
+      - name: mobilenumber
+        label: mobilenumber
+        type: string
+        source: ndc
+        total: false
+      - name: applicationstatus
+        label: applicationstatus
+        type: string
+        source: ndc
+        total: false
+      - name: businessservice
+        label: businessservice
+        type: string
+        source: ndc
+        total: false
+      - name: applicationno
+        label: applicationno
+        type: string
+        source: ndc
+        total: false
+      - name: employee_name
+        label: employee_name
+        type: string
+        source: ndc
+        total: false
+      - name: employee_code
+        label: employee_code
+        type: string
+        source: ndc
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND a.createdtime >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND a.createdtime <= $toDate
+      - name: applicationstatus
+        label: Application status
+        type: singlevaluelist
+        pattern: list://INITIATED:INITIATED,PENDINGPAYMENT:PENDINGPAYMENT,DOCUMENTVERIFY:DOCUMENTVERIFY,APPROVED:APPROVED,
+          REJECTED:REJECTED,TL-VERIFICATION:TL-VERIFICATION,WS-SW-VERIFICATION:WS-SW-VERIFICATION
+          ,CITIZENACTIONREQUIRED-DV:CITIZENACTIONREQUIRED-DV,BPA-VERIFICATION:BPA-VERIFICATION,PENDINGAPPROVAL:PENDINGAPPROVAL,CANCELLED:CANCELLED,PT-VERIFICATION:PT-VERIFICATION,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
+        source: ndc
+        isMandatory: true
+        searchClause: AND LOWER(a.applicationstatus) = LOWER($applicationstatus)
+      - name: ulb
+        label: ulb
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: ndc
+        isMandatory: false
+        searchClause: AND a.tenantid = $ulb
+    query: |
       -- Use CTE to force query plan, compute & use CTE later
       WITH current_holder AS (
          SELECT DISTINCT ON (wf.businessid)
@@ -657,118 +666,119 @@ ReportDefinitions:
         JOIN eg_ndc_details d ON d.applicationid = o.ndcapplicationuuid
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno
         WHERE 1=1
-- reportName: StateCollectionsReport
-  decryptionPathId: STATENDCAPPLICATION
-  summary: Collections
-  version: 1.0.0
-  moduleName: rainmaker-ndc
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: applicationno
-    label: applicationno
-    type: string
-    source: ndc
-    total: false
-  - name: name
-    label: name
-    type: string
-    source: ndc
-    total: false
-  - name: mobilenumber
-    label: mobilenumber
-    type: string
-    source: ndc
-    total: false
-  - name: businessservice
-    label: businessservice
-    type: string
-    source: ndc
-    total: false
-  - name: applicationstatus
-    label: applicationstatus
-    type: string
-    source: ndc
-    total: false
-  - name: collector_code
-    label: collector_code
-    type: string
-    source: ndc
-    total: false
-  - name: cash_amount
-    label: cash_amount
-    type: string
-    source: ndc
-    total: true
-  - name: cheque_amount
-    label: cheque_amount
-    type: string
-    source: ndc
-    total: true
-  - name: card_amount
-    label: card_amount
-    type: string
-    source: ndc
-    total: true
-  - name: dd_amount
-    label: dd_amount
-    type: string
-    source: ndc
-    total: true
-  - name: neft_amount
-    label: neft_amount
-    type: string
-    source: ndc
-    total: true
-  - name: rtgs_amount
-    label: rtgs_amount
-    type: string
-    source: ndc
-    total: true
-  - name: online_amount
-    label: online_amount
-    type: string
-    source: ndc
-    total: true
-  - name: amountpaid
-    label: amountpaid
-    type: string
-    source: ndc
-    total: true
-  - name: PaymentDate
-    label: PaymentDate
-    type: string
-    source: ndc
-    total: false
-  searchParams:
-  - name: fromDate
-    label: fromDate
-    type: epoch
-    source: ndc
-    isMandatory: true
-    searchClause: AND createdtime >= $fromDate
-  - name: toDate
-    label: toDate
-    type: epoch
-    source: ndc
-    isMandatory: true
-    searchClause: AND createdtime <= $toDate
-  - name: collector_code
-    label: collector_code
-    type: string
-    source: ptr
-    isMandatory: false
-    searchClause: AND collector_code = $collector_code
-  - name: ulb
-    label: ulb
-    type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-    source: ndc
-    isMandatory: false
-    searchClause: AND tenantid = $ulb
-  query: |
+  - reportName: StateCollectionsReport
+    decryptionPathId: STATENDCAPPLICATION
+    summary: Collections
+    version: 1.0.0
+    moduleName: rainmaker-ndc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: applicationno
+        label: applicationno
+        type: string
+        source: ndc
+        total: false
+      - name: name
+        label: name
+        type: string
+        source: ndc
+        total: false
+      - name: mobilenumber
+        label: mobilenumber
+        type: string
+        source: ndc
+        total: false
+      - name: businessservice
+        label: businessservice
+        type: string
+        source: ndc
+        total: false
+      - name: applicationstatus
+        label: applicationstatus
+        type: string
+        source: ndc
+        total: false
+      - name: collector_code
+        label: collector_code
+        type: string
+        source: ndc
+        total: false
+      - name: cash_amount
+        label: cash_amount
+        type: string
+        source: ndc
+        total: true
+      - name: cheque_amount
+        label: cheque_amount
+        type: string
+        source: ndc
+        total: true
+      - name: card_amount
+        label: card_amount
+        type: string
+        source: ndc
+        total: true
+      - name: dd_amount
+        label: dd_amount
+        type: string
+        source: ndc
+        total: true
+      - name: neft_amount
+        label: neft_amount
+        type: string
+        source: ndc
+        total: true
+      - name: rtgs_amount
+        label: rtgs_amount
+        type: string
+        source: ndc
+        total: true
+      - name: online_amount
+        label: online_amount
+        type: string
+        source: ndc
+        total: true
+      - name: amountpaid
+        label: amountpaid
+        type: string
+        source: ndc
+        total: true
+      - name: PaymentDate
+        label: PaymentDate
+        type: string
+        source: ndc
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND createdtime >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND createdtime <= $toDate
+      - name: collector_code
+        label: collector_code
+        type: string
+        source: ptr
+        isMandatory: false
+        searchClause: AND collector_code = $collector_code
+      - name: ulb
+        label: ulb
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: ndc
+        isMandatory: false
+        searchClause: AND tenantid = $ulb
+    query: >
       -- Use CTE to force query plan, compute & use CTE later
+
       WITH current_holder AS (
          SELECT DISTINCT ON (wf.businessid)
            wf.businessid AS applicationno,
@@ -824,83 +834,82 @@ ReportDefinitions:
               to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate
              FROM unique_transactions
              WHERE 1=1 
-  orderby: ORDER BY createdtime DESC
-  
-- reportName: StateSLAReport
-  decryptionPathId: STATENDCAPPLICATION
-  summary: SLA report for NDC service
-  version: 1.0.0
-  moduleName: rainmaker-ndc
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: tenantid
-    label: tenantid
-    type: string
-    source: ndc
-    total: false
-  - name: ndc_application_no
-    label: Application Number
-    type: string
-    source: ndc
-    total: false
-  - name: document_verify_on
-    label: Document Verified On
-    type: string
-    source: ndc
-    total: false
-  - name: finalstatus_on
-    label: Approval / Rejection On
-    type: string
-    source: ndc
-    total: false
-  - name: final_status
-    label: Application status
-    type: string
-    source: ndc
-    total: false
-  - name: sla_status
-    label: sla status
-    type: string
-    source: ndc
-    total: false
-  - name: sla_days
-    label: SLA Days 
-    type: string
-    source: ndc
-    total: false
-  - name: employee_name
-    label: employee_name
-    type: string
-    source: ndc
-    total: false
-  - name: employee_code
-    label: Employee Code / Current Holder Code
-    type: string
-    source: ndc
-    total: false
-  searchParams:
-  - name: fromDate
-    label: From Date
-    type: epoch
-    source: ndc
-    isMandatory: true
-    searchClause: AND n.createdtime >= $fromDate
-  - name: toDate
-    label: To Date
-    type: epoch
-    source: ndc
-    isMandatory: true
-    searchClause: AND n.createdtime <= $toDate
-  - name: ulb
-    label: ulb
-    type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-    source: ndc
-    isMandatory: false
-    searchClause: AND n.tenantid = $ulb
-  query: |
+    orderby: ORDER BY createdtime DESC
+  - reportName: StateSLAReport
+    decryptionPathId: STATENDCAPPLICATION
+    summary: SLA report for NDC service
+    version: 1.0.0
+    moduleName: rainmaker-ndc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: ndc
+        total: false
+      - name: ndc_application_no
+        label: Application Number
+        type: string
+        source: ndc
+        total: false
+      - name: document_verify_on
+        label: Document Verified On
+        type: string
+        source: ndc
+        total: false
+      - name: finalstatus_on
+        label: Approval / Rejection On
+        type: string
+        source: ndc
+        total: false
+      - name: final_status
+        label: Application status
+        type: string
+        source: ndc
+        total: false
+      - name: sla_status
+        label: sla status
+        type: string
+        source: ndc
+        total: false
+      - name: sla_days
+        label: SLA Days
+        type: string
+        source: ndc
+        total: false
+      - name: employee_name
+        label: employee_name
+        type: string
+        source: ndc
+        total: false
+      - name: employee_code
+        label: Employee Code / Current Holder Code
+        type: string
+        source: ndc
+        total: false
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND n.createdtime >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND n.createdtime <= $toDate
+      - name: ulb
+        label: ulb
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: ndc
+        isMandatory: false
+        searchClause: AND n.tenantid = $ulb
+    query: >
       -- Use CTE to force query plan, compute & use CTE later     
        WITH wf_detailed AS (
          SELECT 
@@ -977,127 +986,128 @@ ReportDefinitions:
             JOIN sla_data sla ON sla.businessservice='ndc-services'
             LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
             WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')             
-  orderby: ORDER BY n.createdtime DESC, tenantid, final_status
-  
-- reportName: StateReceiptRegisterNDC
-  decryptionPathId: STATENDCAPPLICATION
-  summary: Details of collector register in ndc service
-  version: 1.0.0
-  moduleName: rainmaker-ndc
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: receiptno
-    label: receiptno
-    type: string
-    source: ndc
-    total: false
-  - name: connectionno
-    label: connectionno
-    type: string
-    source: ndc
-    total: false
-  - name: receiptdate1
-    label: receiptdate1
-    type: string
-    source: ndc
-    total: false
-  - name: service
-    label: service
-    type: string
-    source: ndc
-    total: false
-  - name: collectorname
-    label: collectorname
-    type: string
-    source: ndc
-    total: false
-  - name: transactiondate
-    label: transactiondate
-    type: string
-    source: ndc
-    total: false
-  - name: instrumentnumber
-    label: instrumentnumber
-    type: string
-    source: ndc
-    total: false
-  - name: payername
-    label: payername
-    type: string
-    source: ndc
-    total: false
-  - name: amountpaid
-    label: amountpaid
-    type: string
-    source: ndc
-    total: false
-  - name: paymentmode
-    label: paymentmode
-    type: string
-    source: ndc
-    total: false
-  - name: paymentstatus
-    label: paymentstatus
-    type: string
-    source: ndc
-    total: false
-  - name: ownername1
-    label: ownername1
-    type: string
-    source: ndc
-    total: false
-  - name: user
-    label: user
-    type: string
-    source: ndc
-    total: false
-  - name: manualreceiptnumber
-    label: manualreceiptnumber
-    type: string
-    source: ndc
-    total: false
-  - name: manualreceiptdate
-    label: manualreceiptdate
-    type: string
-    source: ndc
-    total: false
-  searchParams:
-  - name: fromDate
-    label: fromDate
-    type: epoch
-    source: ndc
-    isMandatory: true
-    searchClause: AND pd.receiptdate >= $fromDate
-  - name: toDate
-    label: toDate
-    type: epoch
-    source: ndc
-    isMandatory: true
-    searchClause: AND pd.receiptdate <= $toDate
-  - name: receiptNumber
-    label: receiptNumber
-    type: string
-    source: ndc
-    isMandatory: false
-    searchClause: AND pd.receiptnumber like $receiptNumber
-  - name: paymentMode
-    label: paymentMode
-    type: singlevaluelist
-    pattern: 'list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT'
-    source: ndc
-    isMandatory: false
-    searchClause: AND payment.paymentmode like $paymentMode
-  - name: ulb
-    label: ulb
-    type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-    source: ndc
-    isMandatory: false
-    searchClause: AND bill.tenantid = $ulb
-  query: |
+    orderby: ORDER BY n.createdtime DESC, tenantid, final_status
+  - reportName: StateReceiptRegisterNDC
+    decryptionPathId: STATENDCAPPLICATION
+    summary: Details of collector register in ndc service
+    version: 1.0.0
+    moduleName: rainmaker-ndc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: receiptno
+        label: receiptno
+        type: string
+        source: ndc
+        total: false
+      - name: connectionno
+        label: connectionno
+        type: string
+        source: ndc
+        total: false
+      - name: receiptdate1
+        label: receiptdate1
+        type: string
+        source: ndc
+        total: false
+      - name: service
+        label: service
+        type: string
+        source: ndc
+        total: false
+      - name: collectorname
+        label: collectorname
+        type: string
+        source: ndc
+        total: false
+      - name: transactiondate
+        label: transactiondate
+        type: string
+        source: ndc
+        total: false
+      - name: instrumentnumber
+        label: instrumentnumber
+        type: string
+        source: ndc
+        total: false
+      - name: payername
+        label: payername
+        type: string
+        source: ndc
+        total: false
+      - name: amountpaid
+        label: amountpaid
+        type: string
+        source: ndc
+        total: false
+      - name: paymentmode
+        label: paymentmode
+        type: string
+        source: ndc
+        total: false
+      - name: paymentstatus
+        label: paymentstatus
+        type: string
+        source: ndc
+        total: false
+      - name: ownername1
+        label: ownername1
+        type: string
+        source: ndc
+        total: false
+      - name: user
+        label: user
+        type: string
+        source: ndc
+        total: false
+      - name: manualreceiptnumber
+        label: manualreceiptnumber
+        type: string
+        source: ndc
+        total: false
+      - name: manualreceiptdate
+        label: manualreceiptdate
+        type: string
+        source: ndc
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND pd.receiptdate >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND pd.receiptdate <= $toDate
+      - name: receiptNumber
+        label: receiptNumber
+        type: string
+        source: ndc
+        isMandatory: false
+        searchClause: AND pd.receiptnumber like $receiptNumber
+      - name: paymentMode
+        label: paymentMode
+        type: singlevaluelist
+        pattern: list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE
+          NEFT
+        source: ndc
+        isMandatory: false
+        searchClause: AND payment.paymentmode like $paymentMode
+      - name: ulb
+        label: ulb
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: ndc
+        isMandatory: false
+        searchClause: AND bill.tenantid = $ulb
+    query: >
       -- Use CTE to force query plan, compute & use CTE later
+
       SELECT
          pd.receiptnumber AS receiptno,
          bill.consumercode AS connectionno,
@@ -1116,12 +1126,229 @@ ReportDefinitions:
          pd.manualreceiptdate   
        FROM egcl_paymentdetail pd
       INNER JOIN egcl_bill bill ON bill.id = pd.billid 
+
       INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
+
       LEFT JOIN eg_ndc_application a ON bill.consumercode = a.applicationno
+
       LEFT JOIN eg_ndc_owner o  ON o.ndcapplicationuuid = a.uuid
+
       LEFT JOIN eg_user u_applicant ON u_applicant.uuid = o.uuid
+
       LEFT JOIN eg_ndc_details d ON d.applicationid = a.uuid
+
       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
        WHERE pd.businessservice = 'NDC'
          AND payment.paymentstatus != 'CANCELLED'
-  orderby: ORDER BY pd.receiptdate DESC
+    orderby: ORDER BY pd.receiptdate DESC;
+    
+  - reportName: OverallSummaryReport
+    summary: Details of applicant in ndc , chb, pet service
+    version: 1.0.0
+    moduleName: rainmaker-ndc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenant_name
+        label: tenant_name
+        type: string
+        source: ndc
+        total: false
+      - name: service
+        label: service
+        type: string
+        source: ndc
+        total: false
+      - name: application_status
+        label: application_status
+        type: string
+        source: ndc
+        total: false
+      - name: application_count
+        label: application_count
+        type: string
+        source: ndc
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND createdtime >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND createdtime <= $toDate
+      - name: service
+        label: service
+        type: singlevaluelist
+        pattern: list://CHB:Community Hall Booking,NDC:No Due Certficate,PTR:Pet Registration
+        source: ndc
+        isMandatory: true
+        searchClause: AND 1=1
+    query: |
+      WITH all_services AS (
+      
+        /* ---------------- CHB ---------------- */
+        SELECT
+          split_part(b.tenant_id, '.', 2) AS tenant_name,
+          b.tenant_id                     AS tenantid,
+          'CHB'                           AS service,
+          b.booking_status                AS application_status,
+          COUNT(*)                        AS application_count,
+          MAX(createdtime)                AS createdtime
+        FROM eg_chb_booking_detail b
+        WHERE 1=1
+      
+        UNION ALL
+      
+        /* ---------------- NDC ---------------- */
+        SELECT
+          split_part(a.tenantid, '.', 2) AS tenant_name,
+          a.tenantid                     AS tenantid,
+          'NDC'                          AS service,
+          a.applicationstatus            AS application_status,
+          COUNT(*)                       AS application_count,
+          MAX(createdtime)               AS createdtime
+        FROM eg_ndc_application a
+        WHERE 1=1
+      
+        UNION ALL
+      
+        /* ---------------- PTR ---------------- */
+        SELECT
+          split_part(r.tenantid, '.', 2) AS tenant_name,
+          r.tenantid                     AS tenantid,
+          'PTR'                          AS service,
+          r.status                       AS application_status,
+          COUNT(*)                       AS application_count,
+          MAX(createdtime)               AS createdtime
+        FROM eg_ptr_registration r
+        WHERE  createdtime >= $fromDate AND createdtime <= $toDate
+        GROUP BY tenantid, tenant_name, service, application_status
+      )
+      
+      SELECT
+        tenant_name,
+        service,
+        application_status,
+        SUM(application_count)       AS application_count,
+        MAX(createdtime)      AS createdtime
+      FROM all_services
+      WHERE service = $service
+    groupby: GROUP BY tenantid, tenant_name, service, application_status
+    orderby: ORDER BY tenant_name, service, application_status;
+      
+    
+  - reportName: Employeewisependingreport
+    summary: Details of applicant in ndc , chb, pet service
+    version: 1.0.0
+    moduleName: rainmaker-ndc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenant_name
+        label: tenant_name
+        type: string
+        source: ndc
+        total: false
+      - name: service
+        label: service
+        type: string
+        source: ndc
+        total: false
+      - name: application_status
+        label: application_status
+        type: string
+        source: ndc
+        total: false
+      - name: application_count
+        label: application_count
+        type: string
+        source: ndc
+        total: false
+      - name: pending_with_employee
+        label: pending_with_employee
+        type: string
+        source: ndc
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND createdtime >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND  createdtime <= $toDate
+      - name: ulb
+        label: ulb
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: ndc
+        isMandatory: false
+        searchClause: and tenantid =  $ulb
+      - name: service
+        label: service
+        type: singlevaluelist
+        pattern: list://NDC:No Due Certficate,PTR:Pet Registration
+        source: ndc
+        isMandatory: true
+        searchClause: AND  1=1
+    query: >
+      WITH current_holder AS (
+       SELECT DISTINCT ON (wf.businessid)
+          wf.businessid           AS applicationnumber,
+          wf.businessservice      AS service,
+          u.name                  AS assignee_employee
+        FROM eg_wf_processinstance_v2 wf
+        LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+        LEFT JOIN eg_user u ON u.uuid = wa.assignee
+        ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+       )
+       SELECT
+          tenant_name,
+          service,
+          application_status,
+          COALESCE(assignee_employee) AS pending_with_employee,
+          COUNT(*) AS application_count,
+          MAX(createdtime) AS latest_createdtime
+       FROM (
+          /* ---------------- NDC ---------------- */
+        SELECT 
+           split_part(a.tenantid, '.', 2) AS tenant_name,
+           a.tenantid                     AS tenantid,
+           'NDC'                          AS service,
+           a.applicationstatus            AS application_status,
+           ch.assignee_employee           AS assignee_employee,
+           MAX(a.createdtime) AS createdtime
+          FROM eg_ndc_application a 
+          LEFT JOIN current_holder ch ON ch.applicationnumber = a.applicationno AND ch.service = 'ndc-services'
+      where a.applicationstatus not in ('APPROVED','INITIATED','PENDINGPAYMENT','REJECTED','CITIZENACTIONREQUIRED')
+
+      UNION ALL
+           /* ---------------- PTR ---------------- */
+      SELECT
+       split_part(r.tenantid, '.', 2) AS tenant_name,
+       r.tenantid                     AS tenantid,
+       'PTR'                          AS service,
+       r.status                       AS application_status,
+       ch.assignee_employee           AS assignee_employee,
+       r.createdtime                  AS createdtime
+       FROM eg_ptr_registration r
+       LEFT JOIN current_holder ch ON ch.applicationnumber = r.applicationnumber AND ch.service = 'ptr'
+      where r.status not in ('APPROVED','INITIATED','PENDINGPAYMENT' ,'REJECTED','CITIZENACTIONREQUIRED','RENEWED')
+       ) all_services 
+             WHERE
+      service = $service
+    groupby: GROUP BY tenant_name, tenantid, service, application_status, assignee_employee 
+    orderby: ORDER BY tenant_name, tenantid, service, application_status, assignee_employee;
