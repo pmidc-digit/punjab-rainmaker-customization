@@ -1199,16 +1199,16 @@ ReportDefinitions:
         searchClause: AND service= $service
     query: |
       -- Use CTE to force query plan, compute & use CTE later
-      all_services AS (
+       WITH all_services AS (
         /* ---------------- Community Hall Booking (CHB) ---------------- */
         SELECT
            split_part(b.tenant_id, '.', 2) AS tenant_name,
            b.tenant_id  AS tenantid,
           'CHB' AS service,
            b.booking_status  AS application_status,
-           b.createdtime                
+           b.createdtime  as createdtime              
            FROM eg_chb_booking_detail b 
-          
+           where 1=1
           UNION ALL
            /* ---------------- NDC ---------------- */
             SELECT
@@ -1216,9 +1216,10 @@ ReportDefinitions:
              a.tenantid  AS tenantid,
             'NDC' AS service,
              a.applicationstatus AS application_status,
-             a.createdtime 
-             FROM eg_ndc_application a 
-
+             a.createdtime as createdtime 
+             FROM eg_ndc_application a
+             where 1=1
+             
            UNION ALL  
             /* ---------------- Pet Registration (PTR) ---------------- */
             SELECT
@@ -1226,17 +1227,18 @@ ReportDefinitions:
              r.tenantid  AS tenantid,
              'PTR' AS service,
              r.status  AS application_status,
-             r.createdtime  
+             r.createdtime  as createdtime 
              FROM eg_ptr_registration r  
+             where 1=1
          )
          SELECT
              tenant_name,
              service,
              application_status,
-             COUNT(*) AS application_count
+             COUNT(*) AS application_count , createdtime 
            FROM all_services
            WHERE 1 = 1    
-    groupby: GROUP BY tenant_name ,service, application_status
+    groupby: GROUP BY tenantid ,tenant_name ,service, application_status , createdtime
     orderby: ORDER BY tenant_name ,service, application_status
     
   - reportName: Employeewisependingreport
@@ -1278,13 +1280,13 @@ ReportDefinitions:
         type: epoch
         source: ndc
         isMandatory: true
-        searchClause: and createdtime >= $fromDate
+        searchClause: AND createdtime >= $fromDate
       - name: toDate
         label: toDate
         type: epoch
         source: ndc
         isMandatory: true
-        searchClause: and createdtime <= $toDate
+        searchClause: AND  createdtime <= $toDate
       - name: ulb
         label: ulb
         type: singlevaluelist
@@ -1297,54 +1299,53 @@ ReportDefinitions:
         type: singlevaluelist
         pattern: list://NDC:No Due Certficate,PTR:Pet Registration
         source: ndc
-        isMandatory: false
-        searchClause: AND  service= $service
+        isMandatory: true
+        searchClause: AND  1=1
     query: >
-      -- Use CTE to force query plan, compute & use CTE later
       WITH current_holder AS (
        SELECT DISTINCT ON (wf.businessid)
-          wf.businessid  AS applicationnumber,
-          wf.businessservice AS service,
-          u.name AS assignee_employee
+          wf.businessid           AS applicationnumber,
+          wf.businessservice      AS service,
+          u.name                  AS assignee_employee
         FROM eg_wf_processinstance_v2 wf
         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
         LEFT JOIN eg_user u ON u.uuid = wa.assignee
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
-       ),
-      
-       all_services AS (
+       )
+       SELECT
+          tenant_name,
+          service,
+          application_status,
+          COALESCE(assignee_employee) AS pending_with_employee,
+          COUNT(*) AS application_count,
+          MAX(createdtime) AS latest_createdtime
+       FROM (
           /* ---------------- NDC ---------------- */
         SELECT 
-            split_part(a.tenantid, '.', 2) AS tenant_name,
-            a.tenantid,
-            'NDC'  AS service,
-            a.applicationstatus  AS application_status,
-            ch.assignee_employee ,
-            a.createdtime
+           split_part(a.tenantid, '.', 2) AS tenant_name,
+           a.tenantid                     AS tenantid,
+           'NDC'                          AS service,
+           a.applicationstatus            AS application_status,
+           ch.assignee_employee           AS assignee_employee,
+           MAX(a.createdtime) AS createdtime
           FROM eg_ndc_application a 
           LEFT JOIN current_holder ch ON ch.applicationnumber = a.applicationno AND ch.service = 'ndc-services'
-      where a.applicationstatus not in ('APPROVED','INITIATED','PENDINGPAYMENT','REJECTED','CITIZENACTIONREQUIRED','DOCUMENTVERIFY')
+      where a.applicationstatus not in ('APPROVED','INITIATED','PENDINGPAYMENT','REJECTED','CITIZENACTIONREQUIRED')
 
       UNION ALL
            /* ---------------- PTR ---------------- */
       SELECT
        split_part(r.tenantid, '.', 2) AS tenant_name,
-       r.tenantid,
-       'PTR' AS service,
-       r.status  AS application_status,
-       ch.assignee_employee ,
-       r.createdtime 
+       r.tenantid                     AS tenantid,
+       'PTR'                          AS service,
+       r.status                       AS application_status,
+       ch.assignee_employee           AS assignee_employee,
+       r.createdtime                  AS createdtime
        FROM eg_ptr_registration r
        LEFT JOIN current_holder ch ON ch.applicationnumber = r.applicationnumber AND ch.service = 'ptr'
-      where r.status not in ('DOCUMENTVERIFY','APPROVED','INITIATED','PENDINGPAYMENT' ,'REJECTED','CITIZENACTIONREQUIRED','RENEWED')
-       ) 
-       SELECT
-          tenant_name,
-          service,
-          application_status,
-          assignee_employee AS pending_with_employee,
-          COUNT(*) AS application_count
-        FROM all_services
-        WHERE service IN ('NDC', 'PTR')
-    groupby: GROUP BY tenant_name ,tenantid,service, application_status , assignee_employee
-    orderby: ORDER BY tenant_name ,tenantid,service, application_status , assignee_employee
+      where r.status not in ('APPROVED','INITIATED','PENDINGPAYMENT' ,'REJECTED','CITIZENACTIONREQUIRED','RENEWED')
+       ) all_services 
+             WHERE
+      service = $service
+    groupby: GROUP BY tenant_name, tenantid, service, application_status, assignee_employee 
+    orderby: ORDER BY tenant_name, tenantid, service, application_status, assignee_employee;
