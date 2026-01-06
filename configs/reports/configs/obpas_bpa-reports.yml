@@ -878,4 +878,104 @@ ReportDefinitions:
       FROM agg where 1=1
   groupby:  GROUP BY designation_code, businessservice
   orderby:  ORDER BY officer_designation
-      
+
+- reportName: BeyondTimelineSummary
+  summary: Summary of district-ulb wise application which breached its SLA
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: district
+    label: district
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: name_of_ulb
+    label: name_of_ulb
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: breached_count
+    label: breached_count
+    type: string
+    source: obpas_bpa
+    total: false
+  searchParams:
+  - name: district
+    label: district
+    type: string
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND u.district = $district
+  - name: name_of_ulb
+    label: name_of_ulb
+    type: string
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND u.name_of_ulb= $name_of_ulb
+  - name: businessservice
+    label: Business Service
+    type: singlevaluelist
+    pattern: "list://BPALOW:BPA_LOW"
+    source: pt
+    isMandatory: false
+    searchClause: AND ch.businessservice = $businessservice 
+  query: |
+      WITH wf_history AS (
+         SELECT
+           wf.businessid AS uuid,
+           wf.businessservice,
+           wf.tenantid,
+           wf.createdtime,
+           wf.lastmodifiedtime,
+           st.applicationstatus,
+           st.state,
+           st.sla AS state_sla
+           FROM eg_wf_processinstance_v2 wf
+           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+           WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+           ),
+      latest_status AS (
+         SELECT DISTINCT ON (uuid)
+           uuid,
+           businessservice,
+           tenantid,
+           applicationstatus AS current_status,
+           state AS current_state,
+           lastmodifiedtime
+           FROM wf_history
+           ORDER BY uuid, lastmodifiedtime DESC
+           ),
+      sla_entry AS (
+         SELECT
+           uuid,
+           MIN(createdtime) AS sla_start_time,
+           MAX(state_sla) AS sla_duration
+           FROM wf_history
+           WHERE state = 'DOC_VERIFICATION_PENDING'
+           GROUP BY uuid
+           ),
+      sla_calculation AS (
+         SELECT
+           ls.uuid,
+           ls.tenantid,
+           ls.current_status,
+           CASE WHEN se.sla_start_time IS NULL THEN 'NOT_STARTED'
+                WHEN (ls.lastmodifiedtime - se.sla_start_time) > se.sla_duration THEN 'BREACHED'
+                WHEN ls.current_status = 'APPROVED' THEN 'MET' ELSE 'WITHIN_SLA'
+           END AS sla_status
+           FROM latest_status ls
+           LEFT JOIN sla_entry se ON ls.uuid = se.uuid
+           WHERE ls.current_status NOT IN ( 'INITIATED', 'PENDING_APPL_FEE', 'CITIZEN_APPROVAL_INPROCESS')
+           )
+       SELECT
+          u.district,
+          u.name_of_ulb,
+          COUNT(CASE WHEN sc.sla_status = 'MET' THEN 1 END) AS met_count,
+          COUNT(CASE WHEN sc.sla_status = 'BREACHED' THEN 1 END) AS breached_count
+          FROM sla_calculation sc
+          JOIN ulb_data u ON sc.tenantid = u.ulb_code
+  groupby: GROUP BY u.district, u.name_of_ulb DESC                 
+  orderby: ORDER BY u.district, u.name_of_ulb DESC      
