@@ -916,12 +916,12 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND u.name_of_ulb= $name_of_ulb
   - name: businessservice
-    label: Business Service
+    label: businesservice
     type: singlevaluelist
     pattern: "list://BPA_LOW:Self Certification"
     source: pt
     isMandatory: false
-    searchClause: AND ch.businessservice = $businessservice 
+    searchClause: AND sc.businessservice = $businessservice 
   query: |
       WITH wf_history AS (
          SELECT
@@ -961,6 +961,7 @@ ReportDefinitions:
          SELECT
            ls.uuid,
            ls.tenantid,
+           ls.businessservice,
            ls.current_status,
            CASE WHEN se.sla_start_time IS NULL THEN 'NOT_STARTED'
                 WHEN (ls.lastmodifiedtime - se.sla_start_time) > se.sla_duration THEN 'BREACHED'
@@ -1033,7 +1034,7 @@ ReportDefinitions:
     pattern: "list://BPA_LOW:Self Certification"
     source: pt
     isMandatory: false
-    searchClause: AND ch.businessservice = $businessservice 
+    searchClause: AND sc.businessservice = $businessservice 
   query: |
       WITH wf_history AS (
          SELECT
@@ -1072,6 +1073,7 @@ ReportDefinitions:
          SELECT
            ls.uuid,
            ls.tenantid,
+           ls.businessservice,
            ls.applicationstatus,
            CASE WHEN se.sla_start_time IS NULL THEN 'NOT_STARTED'
                 WHEN (ls.lastmodifiedtime - se.sla_start_time) > se.sla_duration THEN 'BREACHED'
