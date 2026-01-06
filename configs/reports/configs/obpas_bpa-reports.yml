@@ -977,5 +977,5 @@ ReportDefinitions:
           COUNT(CASE WHEN sc.sla_status = 'BREACHED' THEN 1 END) AS breached_count
           FROM sla_calculation sc
           JOIN ulb_data u ON sc.tenantid = u.ulb_code
-  groupby: GROUP BY u.district, u.name_of_ulb DESC                 
+  groupby: GROUP BY u.district, u.name_of_ulb                 
   orderby: ORDER BY u.district, u.name_of_ulb DESC      
