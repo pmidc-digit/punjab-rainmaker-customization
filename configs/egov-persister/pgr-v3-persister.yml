@@ -176,11 +176,13 @@ serviceMaps:
 
        - jsonPath: $.services.*.auditDetails.lastModifiedTime
 
+       - jsonPath: $.services.*.dgr_employee_name
+
+
        - jsonPath: $.services.*.tenantId
 
        - jsonPath: $.services.*.serviceRequestId
 
-       - jsonPath: $.services.*.dgrEmployeeName
 
 
     - query: INSERT INTO eg_pgr_action(uuid, by, "when", action, status, comments, media, assignee, isinternal, tenantid, businesskey) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
