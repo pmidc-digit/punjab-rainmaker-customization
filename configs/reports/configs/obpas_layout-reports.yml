@@ -175,7 +175,7 @@ ReportDefinitions:
     type: string
     source: obpas_layout
     total: true
-  - name: PaymentDate
+  - name: payment_date
     label: PaymentDate
     type: string
     source: obpas_layout
@@ -185,13 +185,13 @@ ReportDefinitions:
     label: fromDate
     type: epoch
     source: obpas_layout
-    isMandatory: true
+    isMandatory: false
     searchClause: AND createdtime >= $fromDate
   - name: toDate
     label: toDate
     type: epoch
     source: obpas_layout
-    isMandatory: true
+    isMandatory: false
     searchClause: AND createdtime <= $toDate
   - name: collector_code
     label: collector_code
@@ -241,7 +241,6 @@ ReportDefinitions:
         FROM egcl_paymentdetail pd
         JOIN egcl_payment p ON pd.paymentid = p.id
         LEFT JOIN egcl_bill bill ON bill.id = pd.billid
-        -- tolerant matching: try matching consumercode to applicationno OR to id (stringified)
         LEFT JOIN eg_layout a ON trim(bill.consumercode) = trim(a.applicationno)
                            OR trim(bill.consumercode) = trim(a.id::text)
         LEFT JOIN eg_layout_owner o ON o.layoutid = a.id
@@ -354,7 +353,7 @@ ReportDefinitions:
         status_times AS (
              SELECT
                 uuid,
-                MAX(CASE WHEN applicationstatus = 'DOCUMENTVERIFY' THEN createdtime END) AS docverify_time,
+                MAX(CASE WHEN applicationstatus = 'DOCUMENTVERIFY_JE/BI' THEN createdtime END) AS docverify_time,
                 MAX(CASE WHEN applicationstatus IN ('APPROVED','REJECTED') THEN lastmodifiedtime END) AS final_time
               FROM wf_detailed
               GROUP BY uuid
@@ -414,9 +413,7 @@ ReportDefinitions:
             JOIN sla_data sla ON sla.businessservice in ('Layout_mcl_up','Layout_mcl_abv','Layout_mco_abv','Layout_mcUp')
             LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
             WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')             
-  orderby:  ORDER BY n.createdtime DESC, tenantid, final_status
-      
-            
+  orderby:  ORDER BY n.createdtime DESC, tenantid, final_status          
   
 - reportName: ReceiptRegisterlayout
   decryptionPathId: LAYOUTREPORTS
