@@ -49,20 +49,20 @@ ReportDefinitions:
     label: fromDate
     type: epoch
     source: obpas_noc
-    isMandatory: true
+    isMandatory: false
     searchClause: AND a.createdtime >= $fromDate
   - name: toDate
     label: toDate
     type: epoch
     source: obpas_noc
-    isMandatory: true
+    isMandatory: false
     searchClause: AND a.createdtime <= $toDate
   - name: applicationstatus
     label: Application status
     type: singlevaluelist
     pattern: list://INITIATED:INITIATED,PENDINGPAYMENT:PENDINGPAYMENT,DOCUMENTVERIFY:DOCUMENTVERIFY,APPROVED:APPROVED, REJECTED:REJECTED,TL-VERIFICATION:TL-VERIFICATION,WS-SW-VERIFICATION:WS-SW-VERIFICATION ,CITIZENACTIONREQUIRED-DV:CITIZENACTIONREQUIRED-DV,BPA-VERIFICATION:BPA-VERIFICATION,PENDINGAPPROVAL:PENDINGAPPROVAL,CANCELLED:CANCELLED,PT-VERIFICATION:PT-VERIFICATION,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
     source: obpas_noc
-    isMandatory: true
+    isMandatory: false
     searchClause: AND LOWER(a.applicationstatus) = LOWER($applicationstatus)
   query: |
       WITH current_holder AS (
@@ -175,8 +175,8 @@ ReportDefinitions:
     type: string
     source: obpas_noc
     total: true
-  - name: PaymentDate
-    label: PaymentDate
+  - name: payment_date
+    label: Payment_Date
     type: string
     source: obpas_noc
     total: false
@@ -185,18 +185,18 @@ ReportDefinitions:
     label: fromDate
     type: epoch
     source: obpas_noc
-    isMandatory: true
+    isMandatory: false
     searchClause: AND createdtime >= $fromDate
   - name: toDate
     label: toDate
     type: epoch
     source: obpas_noc
-    isMandatory: true
+    isMandatory: false
     searchClause: AND createdtime <= $toDate
   - name: collector_code
     label: collector_code
     type: string
-    source: ptr
+    source: obpas_noc
     isMandatory: false
     searchClause: AND collector_code = $collector_code
   query: |
@@ -327,13 +327,13 @@ ReportDefinitions:
     label: From Date
     type: epoch
     source: obpas_noc
-    isMandatory: true
+    isMandatory: false
     searchClause: AND n.createdtime >= $fromDate
   - name: toDate
     label: To Date
     type: epoch
     source: obpas_noc
-    isMandatory: true
+    isMandatory: false
     searchClause: AND n.createdtime <= $toDate
   query: |
       -- Use CTE to force query plan, compute & use CTE later     
@@ -500,13 +500,13 @@ ReportDefinitions:
     label: fromDate
     type: epoch
     source: obpas_noc
-    isMandatory: true
+    isMandatory: false
     searchClause: AND pd.receiptdate >= $fromDate
   - name: toDate
     label: toDate
     type: epoch
     source: obpas_noc
-    isMandatory: true
+    isMandatory: false
     searchClause: AND pd.receiptdate <= $toDate
   - name: receiptNumber
     label: receiptNumber
