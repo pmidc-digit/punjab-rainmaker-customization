@@ -675,6 +675,11 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: ndc
+        total: false
       - name: applicationno
         label: applicationno
         type: string
@@ -813,7 +818,7 @@ ReportDefinitions:
               u_applicant.mobilenumber ,
               ch.employee_name AS assignee_employee,
               ch.assignee_code AS assignee_code ,
-              p.tenantid
+              split_part(p.tenantid, '.', 2) AS tenantid
              FROM egcl_paymentdetail pd
              JOIN egcl_payment p ON pd.paymentid = p.id
              JOIN egcl_bill bill ON bill.id = pd.billid
@@ -829,7 +834,7 @@ ReportDefinitions:
                  )
          SELECT
               applicationno, name, mobilenumber, 'NDC' AS businessservice, applicationstatus,
-              collector_code, cash_amount, cheque_amount,
+              collector_code, cash_amount, cheque_amount,tenantid,
               card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
               to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate
              FROM unique_transactions
@@ -996,6 +1001,11 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: ndc
+        total: false
       - name: receiptno
         label: receiptno
         type: string
@@ -1109,6 +1119,7 @@ ReportDefinitions:
       -- Use CTE to force query plan, compute & use CTE later
 
       SELECT
+         split_part(pd.tenantid, '.', 2) AS tenantid, 
          pd.receiptnumber AS receiptno,
          bill.consumercode AS connectionno,
          TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate1,
@@ -1243,7 +1254,6 @@ ReportDefinitions:
     groupby: GROUP BY tenantid, tenant_name, service, application_status
     orderby: ORDER BY tenant_name, service, application_status;
       
-    
   - reportName: Employeewisependingreport
     decryptionPathId: STATENDCAPPLICATION
     summary: Details of applicant in ndc , chb, pet service
