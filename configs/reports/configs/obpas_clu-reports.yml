@@ -354,7 +354,7 @@ ReportDefinitions:
         status_times AS (
              SELECT
                 uuid,
-                MAX(CASE WHEN applicationstatus = 'DOCUMENTVERIFY' THEN createdtime END) AS docverify_time,
+                MAX(CASE WHEN applicationstatus = 'DOCUMENTVERIFY_JE/BI' THEN createdtime END) AS docverify_time,
                 MAX(CASE WHEN applicationstatus IN ('APPROVED','REJECTED') THEN lastmodifiedtime END) AS final_time
               FROM wf_detailed
               GROUP BY uuid
