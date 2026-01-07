@@ -397,7 +397,7 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-    - name: tenan_tid
+    - name: tenant_id
       label: tenant_id
       type: string
       source: chb
@@ -525,6 +525,11 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
+    - name: tenantid
+      label: tenantid
+      type: string
+      source: chb
+      total: false
     - name: applicationno
       label: applicationno
       type: string
@@ -621,7 +626,7 @@ ReportDefinitions:
         SELECT
           p.id AS transaction_id,
           p.createdtime,
-          p.tenantid AS tenantid, 
+          split_part(p.tenantid, '.', 2) AS tenantid, 
           p.totalamountpaid AS amountpaid,
           CASE WHEN p.paymentmode IN ('CASH','OFFLINE_CASH') THEN p.totalamountpaid ELSE 0 END AS cash_amount,
           CASE WHEN p.paymentmode = 'CHEQUE' THEN p.totalamountpaid ELSE 0 END AS cheque_amount,
@@ -646,7 +651,7 @@ ReportDefinitions:
           AND pd.businessservice = 'chb-services'
       )
       SELECT
-        applicationno, name, mobilenumber, businessservice, status,
+        applicationno, name, mobilenumber, businessservice, status,tenantid
         cash_amount, cheque_amount, card_amount, dd_amount,
         neft_amount, rtgs_amount, online_amount, amountpaid,
         TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate
@@ -774,6 +779,7 @@ ReportDefinitions:
     query: |
       -- Use CTE to force query plan, compute & use CTE later
       SELECT
+            split_part(payment.tenantid, '.', 2) AS tenantid,
             pd.receiptnumber AS receiptno,
             bill.consumercode AS connectionno,   
             TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY' ) AS receiptdate1,
@@ -799,4 +805,4 @@ ReportDefinitions:
         LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer  
         WHERE pd.businessservice = 'chb-services'
         AND payment.paymentstatus != 'CANCELLED'
-    orderby: ORDER BY pd.receiptdate DESC 
+    orderby: ORDER BY pd.receiptdate DESC;  
