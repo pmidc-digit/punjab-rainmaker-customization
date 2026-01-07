@@ -1858,14 +1858,14 @@
         "module": "PT",
         "indexName": "property-services",
         "requestQueryMap": "{\"wardId\" : \"Data.ward.name.keyword\", \r\n  \"district\" : \"Data.tenantData.city.districtCode\", \r\n\"tenantId\" : \"Data.tenantId\" \r\n}",
-        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"terms\":{\"Data.tenantId.keyword\":[\"pb.testing\",\"pb\"]}}]}},\"aggs\":{\"TotalApplication\":{\"value_count\":{\"field\":\"Data.tenantId.keyword\"}},\"withinSLA\":{\"range\":{\"script\":{\"lang\":\"painless\",\"source\":\"\"\"if(doc['Data.status.keyword'].size()==0||doc['Data.auditDetails.createdTime'].size()==0||doc['Data.auditDetails.lastModifiedTime'].size()==0){return 999999;} def status=doc['Data.status.keyword'].value;if(status!='ACTIVE'){return 999999;}return (doc['Data.auditDetails.lastModifiedTime'].value-doc['Data.auditDetails.createdTime'].value)/3600000;\"\"\"},\"ranges\":[{\"key\":\"WithinSLA\",\"from\":0,\"to\":360}]}}}}}}",
+        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"terms\":{\"Data.tenantId.keyword\":[\"pb.testing\",\"pb\"]}}]}},\"aggs\":{\"TotalApplication\":{\"value_count\":{\"field\":\"Data.tenantId.keyword\"}},\"withinSLA\":{\"range\":{\"script\":{\"lang\":\"painless\",\"source\":\"if(doc['Data.status.keyword'].size()==0||doc['Data.auditDetails.createdTime'].size()==0||doc['Data.auditDetails.lastModifiedTime'].size()==0){return 999999;} def status=doc['Data.status.keyword'].value;if(status!='ACTIVE'){return 999999;}return (doc['Data.auditDetails.lastModifiedTime'].value-doc['Data.auditDetails.createdTime'].value)/3600000;\"},\"ranges\":[{\"key\":\"WithinSLA\",\"from\":0,\"to\":360}]}}}}}}",
         "dateRefField": "Data.auditDetails.createdTime"
       },
       {
         "module": "TL",
         "indexName": "tlindex-v1",
         "requestQueryMap": "{\"wardId\" : \"Data.ward.name.keyword\", \r\n  \"district\" : \"Data.tenantData.city.districtCode\", \r\n\"tenantId\" : \"Data.tradelicense.tenantId.keyword\" \r\n}",
-        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"terms\":{\"Data.tradelicense.tenantId.keyword\":[\"pb.testing\",\"pb\"]}}]}},\"aggs\":{\"TotalApplication\":{\"value_count\":{\"field\":\"Data.tradelicense.applicationNumber.keyword\"}},\"withinSLA\":{\"range\":{\"script\":{\"lang\":\"painless\",\"source\":\"\"\"if(doc['Data.tradelicense.applicationDate'].size()==0||doc['Data.tradelicense.issuedDate'].size()==0){return 999999;}return (doc['Data.tradelicense.issuedDate'].value-doc['Data.tradelicense.applicationDate'].value)/3600000;\"\"\"},\"ranges\":[{\"key\":\"WithinSLA\",\"from\":0,\"to\":360}]}}}}}}",
+        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"terms\":{\"Data.tradelicense.tenantId.keyword\":[\"pb.testing\",\"pb\"]}}]}},\"aggs\":{\"TotalApplication\":{\"value_count\":{\"field\":\"Data.tradelicense.applicationNumber.keyword\"}},\"withinSLA\":{\"range\":{\"script\":{\"lang\":\"painless\",\"source\":\"if(doc['Data.tradelicense.applicationDate'].size()==0||doc['Data.tradelicense.issuedDate'].size()==0){return 999999;}return (doc['Data.tradelicense.issuedDate'].value-doc['Data.tradelicense.applicationDate'].value)/3600000;\"},\"ranges\":[{\"key\":\"WithinSLA\",\"from\":0,\"to\":360}]}}}}}}",
         "dateRefField": "Data.tradelicense.applicationDate"
       },
 
@@ -1874,27 +1874,27 @@
         "requestQueryMap": "{\"wardId\" : \"Data.complaintWard.name.keyword\", \r\n  \"module\" : \"businessService.keyword\", \n\"tenantId\" : \"Data.tenantId\"}",
         "dateRefField": "Data.dateOfComplaint",
         "indexName": "pgrindex-v1",
-        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"terms\":{\"Data.tenantId.keyword\":[\"pb.testing\",\"pb\"]}}]}},\"aggs\":{\"TotalApplication\":{\"value_count\":{\"field\":\"Data.tenantId.keyword\"}},\"withinSLA\":{\"range\":{\"script\":{\"lang\":\"painless\",\"source\":\"\"\"if(doc['Data.status.keyword'].size()==0||doc['Data.slaHours'].size()==0){return 999999;} def status=doc['Data.status.keyword'].value;if(status!='REJECTED'&&status!='CLOSEDAFTERRESOLUTION'&&status!='RESOLVED'){return 999999;}return doc['Data.slaHours'].value;\"\"\"},\"ranges\":[{\"key\":\"WithinSLA\",\"from\":0,\"to\":360}]}}}}}}"
+        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"terms\":{\"Data.tenantId.keyword\":[\"pb.testing\",\"pb\"]}}]}},\"aggs\":{\"TotalApplication\":{\"value_count\":{\"field\":\"Data.tenantId.keyword\"}},\"withinSLA\":{\"range\":{\"script\":{\"lang\":\"painless\",\"source\":\"if(doc['Data.status.keyword'].size()==0||doc['Data.slaHours'].size()==0){return 999999;} def status=doc['Data.status.keyword'].value;if(status!='REJECTED'&&status!='CLOSEDAFTERRESOLUTION'&&status!='RESOLVED'){return 999999;}return doc['Data.slaHours'].value;\"},\"ranges\":[{\"key\":\"WithinSLA\",\"from\":0,\"to\":360}]}}}}}}"
       },
       {
         "module": "W&S",
         "indexName": "water-services",
         "requestQueryMap": "{\"wardId\" : \"Data.ward.name.keyword\",\"tenantId\" : \"Data.tenantId.keyword\" \r\n}",
-        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"terms\":{\"Data.tenantId.keyword\":[\"pb.testing\",\"pb\"]}}]}},\"aggs\":{\"TotalApplication\":{\"value_count\":{\"field\":\"Data.tenantId.keyword\"}},\"withinSLA\":{\"range\":{\"script\":{\"lang\":\"painless\",\"source\":\"\"\"if(doc['Data.applicationStatus.keyword'].size()==0||doc['Data.auditDetails.createdTime'].size()==0||doc['Data.auditDetails.lastModifiedTime'].size()==0){return 999999;} def status=doc['Data.applicationStatus.keyword'].value;if(status!='CONNECTION_ACTIVATED'&&status!='REJECTED'){return 999999;}return (doc['Data.auditDetails.createdTime'].value-doc['Data.auditDetails.lastModifiedTime'].value)/3600000;\"\"\"},\"ranges\":[{\"key\":\"WithinSLA\",\"from\":0,\"to\":360}]}}}}}}",
+        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"terms\":{\"Data.tenantId.keyword\":[\"pb.testing\",\"pb\"]}}]}},\"aggs\":{\"TotalApplication\":{\"value_count\":{\"field\":\"Data.tenantId.keyword\"}},\"withinSLA\":{\"range\":{\"script\":{\"lang\":\"painless\",\"source\":\"if(doc['Data.applicationStatus.keyword'].size()==0||doc['Data.auditDetails.createdTime'].size()==0||doc['Data.auditDetails.lastModifiedTime'].size()==0){return 999999;} def status=doc['Data.applicationStatus.keyword'].value;if(status!='CONNECTION_ACTIVATED'&&status!='REJECTED'){return 999999;}return (doc['Data.auditDetails.createdTime'].value-doc['Data.auditDetails.lastModifiedTime'].value)/3600000;\"},\"ranges\":[{\"key\":\"WithinSLA\",\"from\":0,\"to\":360}]}}}}}}",
         "dateRefField": "Data.auditDetails.createdTime"
       },
       {
         "module": "W&S",
         "indexName": "sewerage-services",
         "requestQueryMap": "{\"wardId\" : \"Data.ward.name.keyword\",\"tenantId\" : \"Data.tenantId.keyword\" \r\n}",
-        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"terms\":{\"Data.tenantId.keyword\":[\"pb.testing\",\"pb\"]}}]}},\"aggs\":{\"TotalApplication\":{\"value_count\":{\"field\":\"Data.tenantId.keyword\"}},\"withinSLA\":{\"range\":{\"script\":{\"lang\":\"painless\",\"source\":\"\"\"if(doc['Data.applicationStatus.keyword'].size()==0||doc['Data.connectionExecutionDate'].size()==0||doc['Data.additionalDetails.appCreatedDate'].size()==0){return 999999;} def status=doc['Data.applicationStatus.keyword'].value;if(status!='CONNECTION_ACTIVATED'&&status!='REJECTED'){return 999999;}return (doc['Data.connectionExecutionDate'].value-doc['Data.additionalDetails.appCreatedDate'].value)/3600000;\"\"\"},\"ranges\":[{\"key\":\"WithinSLA\",\"from\":0,\"to\":360}]}}}}}}",
+        "aggrQuery": "{\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"terms\":{\"Data.tenantId.keyword\":[\"pb.testing\",\"pb\"]}}]}},\"aggs\":{\"TotalApplication\":{\"value_count\":{\"field\":\"Data.tenantId.keyword\"}},\"withinSLA\":{\"range\":{\"script\":{\"lang\":\"painless\",\"source\":\"if(doc['Data.applicationStatus.keyword'].size()==0||doc['Data.connectionExecutionDate'].size()==0||doc['Data.additionalDetails.appCreatedDate'].size()==0){return 999999;} def status=doc['Data.applicationStatus.keyword'].value;if(status!='CONNECTION_ACTIVATED'&&status!='REJECTED'){return 999999;}return (doc['Data.connectionExecutionDate'].value-doc['Data.additionalDetails.appCreatedDate'].value)/3600000;\"},\"ranges\":[{\"key\":\"WithinSLA\",\"from\":0,\"to\":360}]}}}}}}",
         "dateRefField": "Data.connectionExecutionDate"
       },
       {
         "module": "FIRENOC",
         "indexName": "firenoc-services",
         "requestQueryMap": "{\"wardId\" : \"Data.ward.name.keyword\",\"tenantId\" : \"Data.tenantId\", \"district\" : \"Data.tenantData.city.districtCode\"}",
-        "aggrQuery": "{\"size\":0,\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"terms\":{\"Data.tenantId.keyword\":[\"pb.testing\",\"pb\"]}}]}},\"aggs\":{\"TotalApplication\":{\"value_count\":{\"field\":\"Data.applicationNumber.keyword\"}},\"withinSLA\":{\"range\":{\"script\":{\"lang\":\"painless\",\"source\":\"\"\"if(doc['Data.fireNOCDetails.status.keyword'].size()==0||doc['Data.auditDetails.createdTime'].size()==0||doc['Data.auditDetails.lastModifiedTime'].size()==0){return 999999;} def status=doc['Data.fireNOCDetails.status.keyword'].value;if(status!='APPROVED'&&status!='CANCELED'&&status!='REJECTED'){return 999999;}return (doc['Data.auditDetails.lastModifiedTime'].value-doc['Data.auditDetails.createdTime'].value)/3600000;\"\"\"},\"ranges\":[{\"key\":\"WithinSLA\",\"from\":0,\"to\":360}]}}}}}}",
+        "aggrQuery": "{\"size\":0,\"aggs\":{\"AGGR\":{\"filter\":{\"bool\":{\"must_not\":[{\"terms\":{\"Data.tenantId.keyword\":[\"pb.testing\",\"pb\"]}}]}},\"aggs\":{\"TotalApplication\":{\"value_count\":{\"field\":\"Data.applicationNumber.keyword\"}},\"withinSLA\":{\"range\":{\"script\":{\"lang\":\"painless\",\"source\":\"if(doc['Data.fireNOCDetails.status.keyword'].size()==0||doc['Data.auditDetails.createdTime'].size()==0||doc['Data.auditDetails.lastModifiedTime'].size()==0){return 999999;} def status=doc['Data.fireNOCDetails.status.keyword'].value;if(status!='APPROVED'&&status!='CANCELED'&&status!='REJECTED'){return 999999;}return (doc['Data.auditDetails.lastModifiedTime'].value-doc['Data.auditDetails.createdTime'].value)/3600000;\"},\"ranges\":[{\"key\":\"WithinSLA\",\"from\":0,\"to\":360}]}}}}}}",
         "dateRefField": "Data.auditDetails.createdTime"
       }
     ],
@@ -1905,7 +1905,7 @@
     "action": "percentage",
     "aggregationPaths": [
       "withinSLA",
-      "Total Application"
+      "TotalApplication"
     ],
     "insight": {
       "chartResponseMap": "slaAchieved",
