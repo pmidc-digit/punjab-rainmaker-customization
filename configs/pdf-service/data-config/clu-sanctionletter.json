@@ -1,7 +1,7 @@
 {
   "key": "clu-sanctionletter",
   "DataConfigs": {
-    "moduleName": "rainmaker-common",
+    "moduleName": "rainmaker-bpa",
     "version": "1.0.0",
     "baseKeyPath": "$.Payments.*",
     "entityIdPath": "$.id",
@@ -206,7 +206,7 @@
                   "path": "$.Clu[0].cluDetails.additionalDetails.applicationDetails.applicantAddress"
                 }
               },
-              
+
               {
                 "variable": "jamabandiArea",
                 "value": {
@@ -251,7 +251,7 @@
                   "path": "$.Clu[0].cluDetails.additionalDetails.siteDetails.ownershipInPct"
                 }
               },
-              
+
               {
                 "variable": "tenantName",
                 "value": {
@@ -260,15 +260,28 @@
                 "localisation": {
                   "required": true,
                   "prefix": "TENANT_TENANTS",
-                  "module": "rainmaker-common"
+                  "module": "rainmaker-bpa"
                 }
               },
-              
-              
+
               {
                 "variable": "applicantName",
                 "value": {
                   "path": "$.Clu[0].cluDetails.additionalDetails.applicationDetails.applicantOwnerOrFirmName"
+                }
+              },
+              {
+                "variable": "var_owners",
+                "value": {
+                  "path": "$.Clu[0].owners[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "string",
+                  "scema": [
+                    { "variable": "name", "value": "name" },
+                    { "variable": "permanentAddress", "value": "permanentAddress" }
+                  ]
                 }
               },
               {
@@ -284,7 +297,7 @@
                   "path": "$.edcrDetail[0].planDetail.planInformation.plotNo"
                 }
               },
-              
+
               {
                 "variable": "wardNo",
                 "value": {
@@ -321,6 +334,186 @@
                 "value": {
                   "path": "$.edcrDetail[0].planDetail.planInfoProperties['KHATA _NO']"
                 }
+              },
+              {
+                "variable": "clu_1",
+                "value": {
+                  "path": "clu_1"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "clu_2",
+                "value": {
+                  "path": "clu_2"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "clu_3",
+                "value": {
+                  "path": "clu_3"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "clu_4",
+                "value": {
+                  "path": "clu_4"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "clu_5",
+                "value": {
+                  "path": "clu_5"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "clu_6",
+                "value": {
+                  "path": "clu_6"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "clu_7",
+                "value": {
+                  "path": "clu_7"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "clu_8",
+                "value": {
+                  "path": "clu_8"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "clu_9",
+                "value": {
+                  "path": "clu_9"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "clu_10",
+                "value": {
+                  "path": "clu_10"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "clu_11",
+                "value": {
+                  "path": "clu_11"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "clu_12",
+                "value": {
+                  "path": "clu_12"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "clu_13",
+                "value": {
+                  "path": "clu_13"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "clu_14",
+                "value": {
+                  "path": "clu_14"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "clu_15",
+                "value": {
+                  "path": "clu_15"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-bpa"
+                }
               }
             ]
           },
@@ -343,7 +536,7 @@
                     "localisation": {
                       "required": true,
                       "prefix": "TENANT_TENANTS",
-                      "module": "rainmaker-common"
+                      "module": "rainmaker-bpa"
                     }
                   }
                 ]

@@ -25,6 +25,21 @@
                   "path": "$.additionalDetails.designation"
                 }
               },
+
+              {
+                "variable": "var_bookingSlots",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].bookingSlotDetails[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "string",
+                  "scema": [
+                    { "variable": "bookingDate", "value": "bookingDate" },
+                    { "variable": "bookingEndDate", "value": "bookingEndDate" }
+                  ]
+                }
+              },
               {
                 "variable": "user-name",
                 "value": {
@@ -651,12 +666,28 @@
                 "formula": "{{chbServiceCharge}}>0?{{chbServiceCharge}}:0"
               },
               {
-                "variable": "excessAmountPaid",
-                "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
+                "variable": "chbBookingFees",
+                "formula": "{{chbBookingFees}}>0?{{chbBookingFees}}:0"
+              },
+              {
+                "variable": "chbSgst",
+                "formula": "{{chbSgst}}>0?{{chbSgst}}:0"
+              },
+              {
+                "variable": "chbCgst",
+                "formula": "{{chbCgst}}>0?{{chbCgst}}:0"
+              },
+              {
+                "variable": "chbCowCessCharge",
+                "formula": "{{chbCowCessCharge}}>0?{{chbCowCessCharge}}:0"
               },
               {
                 "variable": "chbDiscountPositive",
                 "formula": "{{chbDiscount}} < 0 ? -{{chbDiscount}} : {{chbDiscount}}"
+              },
+              {
+                "variable": "chbDiscountPositive",
+                "formula": "{{chbDiscountPositive}}>0?{{chbDiscountPositive}}:0"
               }
             ]
           },

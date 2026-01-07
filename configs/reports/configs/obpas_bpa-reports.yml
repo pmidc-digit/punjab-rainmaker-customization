@@ -608,13 +608,21 @@ ReportDefinitions:
     type: epoch
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND createdtime = $fromDate 
+    searchClause: AND bpa.createdtime <= $fromDate
+  - name: district
+    label: District
+    type: singlevaluelist
+    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND ulb_data.district = $district    
   query: |
-       select applicationno,edcrnumber,status,tenantid,'Building_Plan' as
-       businessservice from eg_bpa_buildingplan where businessservice = 'BPA_LOW' 
+       select ulb_data.district,bpa.applicationno,bpa.edcrnumber,bpa.status,bpa.tenantid,'Building_Plan' as
+       businessservice from eg_bpa_buildingplan bpa inner join ulb_data on bpa.tenantid = ulb_data.ulb_code where businessservice = 'BPA_LOW' 
+  orderby : ORDER BY ulb_data.district,bpa.tenantid, bpa.applicationno;
 
 - reportName: Pending_Files_Summary
-  summary: Beyond Time Line Pending Files Summary
+  summary: Pending Files Summary - ulb wise and distt wise
   version: 1.0.0
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
@@ -630,19 +638,27 @@ ReportDefinitions:
     label: Pending Files
     type: string
     source: obpas_bpa
-    total: true 
+    total: true
+  searchParams:    
+  - name: district
+    label: District
+    type: singlevaluelist
+    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND ulb_data.district = $district 
   query: |
        SELECT 
-           INITCAP(REPLACE(tenantid, 'pb.', '')) AS ulb_name,
-           status,
+           ulb_data.district,
+           INITCAP(REPLACE(eg_bpa_buildingplan.tenantid, 'pb.', '')) AS ulb_name,
            COUNT(*) AS Pending_Files
-       FROM eg_bpa_buildingplan
+       FROM eg_bpa_buildingplan inner join ulb_data on eg_bpa_buildingplan.tenantid = ulb_data.ulb_code
        WHERE businessservice = 'BPA_LOW' and status IN (
            'VERIFICATION_INPROGRESS',
            'FIELDINSPECTION_INPROGRESS',
            'INSPECTION_REPORT_PENDING',
            'DOC_VERIFICATION_INPROGRESS')
-  groupby: GROUP BY tenantid, status
+  groupby: GROUP BY eg_bpa_buildingplan.tenantid,ulb_data.district
   
 - reportName: officers_with_highest_pendency
   summary: Top 7 officers with Highest Pendency
@@ -652,11 +668,6 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
-  - name: serial_no
-    label: Serial No
-    type: string
-    source: obpas_bpa
-    total: false
   - name: ulb_name
     label: ULB Name
     type: string
@@ -751,37 +762,37 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: day0
-    label: day0
+    label: Day0
     type: string
     source: obpas_bpa
     total: true
   - name: day1
-    label: day1
+    label: Day1
     type: string
     source: obpas_bpa
     total: true
   - name: day2
-    label: day2
+    label: Day2
     type: string
     source: obpas_bpa
     total: true
   - name: day3
-    label: day3
+    label: Day3
     type: string
     source: obpas_bpa
     total: true
   - name: day4
-    label: day4
+    label: Day4
     type: string
     source: obpas_bpa
     total: true
   - name: day5
-    label: day5
+    label: Day5
     type: string
     source: obpas_bpa
     total: true
   - name: day6
-    label: day6
+    label: Day6
     type: string
     source: obpas_bpa
     total: true                     
@@ -867,4 +878,513 @@ ReportDefinitions:
       FROM agg where 1=1
   groupby:  GROUP BY designation_code, businessservice
   orderby:  ORDER BY officer_designation
-      
+
+- reportName: BeyondTimelineSummary
+  summary: Summary of district-ulb wise application which breached its SLA
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: district
+    label: District
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: name_of_ulb
+    label: ULB Name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: breached_count
+    label: Breached Count
+    type: string
+    source: obpas_bpa
+    total: false
+  searchParams:
+  - name: district
+    label: district
+    type: string
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND u.district = $district
+  - name: name_of_ulb
+    label: name_of_ulb
+    type: string
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND u.name_of_ulb= $name_of_ulb
+  - name: businessservice
+    label: businesservice
+    type: singlevaluelist
+    pattern: "list://BPA_LOW:Self Certification"
+    source: pt
+    isMandatory: false
+    searchClause: AND sc.businessservice = $businessservice 
+  query: |
+      WITH wf_history AS (
+         SELECT
+           wf.businessid AS uuid,
+           wf.businessservice,
+           wf.tenantid,
+           wf.createdtime,
+           wf.lastmodifiedtime,
+           st.applicationstatus,
+           st.state,
+           st.sla AS state_sla
+           FROM eg_wf_processinstance_v2 wf
+           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+           WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+           ),
+      latest_status AS (
+         SELECT DISTINCT ON (uuid)
+           uuid,
+           businessservice,
+           tenantid,
+           applicationstatus AS current_status,
+           state AS current_state,
+           lastmodifiedtime
+           FROM wf_history
+           ORDER BY uuid, lastmodifiedtime DESC
+           ),
+      sla_entry AS (
+         SELECT
+           uuid,
+           MIN(createdtime) AS sla_start_time,
+           MAX(state_sla) AS sla_duration
+           FROM wf_history
+           WHERE state = 'DOC_VERIFICATION_PENDING'
+           GROUP BY uuid
+           ),
+      sla_calculation AS (
+         SELECT
+           ls.uuid,
+           ls.tenantid,
+           ls.businessservice,
+           ls.current_status,
+           CASE WHEN se.sla_start_time IS NULL THEN 'NOT_STARTED'
+                WHEN (ls.lastmodifiedtime - se.sla_start_time) > se.sla_duration THEN 'BREACHED'
+                WHEN ls.current_status = 'APPROVED' THEN 'MET' ELSE 'WITHIN_SLA'
+           END AS sla_status
+           FROM latest_status ls
+           LEFT JOIN sla_entry se ON ls.uuid = se.uuid
+           WHERE ls.current_status NOT IN ( 'INITIATED', 'PENDING_APPL_FEE', 'CITIZEN_APPROVAL_INPROCESS')
+           )
+       SELECT
+          u.district,
+          u.name_of_ulb,
+          COUNT(CASE WHEN sc.sla_status = 'MET' THEN 1 END) AS met_count,
+          COUNT(CASE WHEN sc.sla_status = 'BREACHED' THEN 1 END) AS breached_count
+          FROM sla_calculation sc
+          JOIN ulb_data u ON sc.tenantid = u.ulb_code
+          WHERE 1=1
+  groupby: GROUP BY u.district, u.name_of_ulb                 
+  orderby: ORDER BY u.district, u.name_of_ulb DESC      
+
+- reportName: DetailedListBeyondTimelineSummary
+  summary: Summary of district-ulb wise application which breached its SLA
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: district
+    label: District
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: name_of_ulb
+    label: ULB Name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: modulename
+    label: Module Name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: applicationstatus
+    label: Application Status
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: fileno
+    label: File No
+    type: string
+    source: obpas_bpa
+    total: false
+  searchParams:
+  - name: district
+    label: district
+    type: string
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND u.district = $district
+  - name: name_of_ulb
+    label: name_of_ulb
+    type: string
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND u.name_of_ulb= $name_of_ulb
+  - name: businessservice
+    label: Business Service
+    type: singlevaluelist
+    pattern: "list://BPA_LOW:Self Certification"
+    source: pt
+    isMandatory: false
+    searchClause: AND sc.businessservice = $businessservice 
+  query: |
+      WITH wf_history AS (
+         SELECT
+           wf.businessid AS uuid,
+           wf.businessservice,
+           wf.tenantid,
+           wf.createdtime,
+           wf.lastmodifiedtime,
+           st.applicationstatus,
+           st.state,
+           st.sla AS state_sla
+           FROM eg_wf_processinstance_v2 wf
+           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+           WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+           ),
+      latest_status AS (
+         SELECT DISTINCT ON (uuid)
+           uuid,
+           businessservice,
+           tenantid,
+           applicationstatus ,
+           lastmodifiedtime
+           FROM wf_history
+           ORDER BY uuid, lastmodifiedtime DESC
+           ),
+      sla_entry AS (
+         SELECT
+           uuid,
+           MIN(createdtime) AS sla_start_time,
+           MAX(state_sla) AS sla_duration
+           FROM wf_history
+           WHERE state = 'DOC_VERIFICATION_PENDING'
+           GROUP BY uuid
+           ),
+      sla_calculation AS (
+         SELECT
+           ls.uuid,
+           ls.tenantid,
+           ls.businessservice,
+           ls.applicationstatus,
+           CASE WHEN se.sla_start_time IS NULL THEN 'NOT_STARTED'
+                WHEN (ls.lastmodifiedtime - se.sla_start_time) > se.sla_duration THEN 'BREACHED'
+                WHEN ls.applicationstatus = 'APPROVED' THEN 'MET' ELSE 'WITHIN_SLA'
+           END AS sla_status
+           FROM latest_status ls
+           LEFT JOIN sla_entry se ON ls.uuid = se.uuid
+           WHERE ls.applicationstatus NOT IN ( 'INITIATED', 'PENDING_APPL_FEE', 'CITIZEN_APPROVAL_INPROCESS')
+           )
+       SELECT
+          u.district,
+          u.name_of_ulb,
+          sc.applicationstatus,
+          sc.uuid as fileno,
+          'Building_Plan' as modulename
+          FROM sla_calculation sc
+          JOIN ulb_data u ON sc.tenantid = u.ulb_code
+          WHERE sc.sla_status = 'BREACHED'
+  orderby: ORDER BY u.district, u.name_of_ulb,sc.applicationstatus,sc.uuid DESC      
+
+- reportName: FilesNearTimelineBreachSummary
+  summary: Summary list of district-ulb wise application upcoming  breached its SLA for next 7 days 
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: district
+    label: District
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: name_of_ulb
+    label: ULB Name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: day0
+    label: Day 0
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: day1
+    label: Day 1
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: day2
+    label: Day 2
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: day3
+    label: Day 3
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: day4
+    label: Day 4
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: day5
+    label: Day 5
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: day6
+    label: Day 6
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: day7
+    label: Day 7
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: total_upcoming_breaches
+    label: Total Upcoming Breaches 
+    type: string
+    source: obpas_bpa
+    total: false
+  searchParams:
+  - name: fromDate
+    label: fromDate
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND 1=1
+  - name: district
+    label: district
+    type: string
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND u.district = $district
+  - name: name_of_ulb
+    label: name_of_ulb
+    type: string
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND u.name_of_ulb= $name_of_ulb
+  - name: businessservice
+    label: Business Service
+    type: singlevaluelist
+    pattern: "list://BPA_LOW:Self Certification"
+    source: pt
+    isMandatory: false
+    searchClause: AND ub.businessservice = $businessservice 
+  query: |
+      WITH params AS (
+        SELECT
+            (to_timestamp($fromDate / 1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS report_dt
+        ),
+      wf_history AS (
+        SELECT
+           wf.businessid AS uuid,
+           wf.businessservice,
+           wf.tenantid,
+           wf.createdtime,
+           wf.lastmodifiedtime,
+           st.applicationstatus,
+           st.state,
+           st.sla AS state_sla
+           FROM eg_wf_processinstance_v2 wf
+           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+        ),
+      latest_status AS (
+        SELECT DISTINCT ON (uuid)
+           uuid,
+           businessservice,
+           tenantid,
+           applicationstatus,
+           lastmodifiedtime
+           FROM wf_history
+           ORDER BY uuid, lastmodifiedtime DESC
+        ),
+      sla_entry AS (
+        SELECT
+           uuid,
+           MIN(createdtime) AS sla_start_time,
+           MAX(state_sla) AS sla_duration
+           FROM wf_history
+           WHERE state = 'DOC_VERIFICATION_PENDING'
+           GROUP BY uuid
+        ),
+      sla_dates AS (
+        SELECT
+           ls.uuid,
+           ls.tenantid,
+           ls.businessservice,
+           to_timestamp((se.sla_start_time + se.sla_duration) / 1000.0) AT TIME ZONE 'Asia/Kolkata' AS sla_breach_ts
+           FROM latest_status ls
+           JOIN sla_entry se ON ls.uuid = se.uuid
+           WHERE ls.applicationstatus NOT IN ('INITIATED','PENDING_APPL_FEE','CITIZEN_APPROVAL_INPROCESS' )
+        ),
+      upcoming_breaches AS (
+        SELECT
+           sd.tenantid,
+           sd.businessservice,
+           sd.sla_breach_ts::date AS breach_date
+           FROM sla_dates sd
+           JOIN params p ON TRUE
+           WHERE sd.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
+        )
+       SELECT
+         u.district,
+         u.name_of_ulb,
+         COUNT(*) FILTER (WHERE breach_date = p.report_dt)   AS day0, 
+         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '1 day') AS day1,  
+         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '2 day') AS day2, 
+         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '3 day') AS day3,  
+         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '4 day') AS day4,  
+         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '5 day') AS day5, 
+         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '6 day') AS day6, 
+         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '7 day') AS day7,  
+         COUNT(*) AS total_upcoming_breaches
+         FROM upcoming_breaches ub
+         JOIN ulb_data u ON ub.tenantid = u.ulb_code
+         JOIN params p ON TRUE
+         WHERE 1=1 
+  groupby: GROUP BY u.district, u.name_of_ulb
+  orderby: ORDER BY u.district, u.name_of_ulb DESC   
+
+- reportName: DetailedFilesNearTimelineBreach
+  summary: Detailed file list of district-ulb wise application upcoming  breached its SLA for next 7 days 
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: district
+    label: District
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: name_of_ulb
+    label: ULB Name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: applicationstatus
+    label: application status
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: fileno
+    label: File No
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: modulename
+    label: Module Name
+    type: string
+    source: obpas_bpa
+    total: false
+  searchParams:
+  - name: fromDate
+    label: fromDate
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND 1=1
+  - name: district
+    label: district
+    type: string
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND u.district = $district
+  - name: name_of_ulb
+    label: name_of_ulb
+    type: string
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND u.name_of_ulb= $name_of_ulb
+  - name: businessservice
+    label: Business Service
+    type: singlevaluelist
+    pattern: "list://BPA_LOW:Self Certification"
+    source: pt
+    isMandatory: false
+    searchClause: AND ub.businessservice = $businessservice 
+  query: |
+      WITH params AS (
+        SELECT
+            (to_timestamp($fromDate / 1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS report_dt
+        ),
+      wf_history AS (
+        SELECT
+           wf.businessid AS uuid,
+           wf.businessservice,
+           wf.tenantid,
+           wf.createdtime,
+           wf.lastmodifiedtime,
+           st.applicationstatus,
+           st.state,
+           st.sla AS state_sla
+           FROM eg_wf_processinstance_v2 wf
+           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+        ),
+      latest_status AS (
+        SELECT DISTINCT ON (uuid)
+           uuid,
+           businessservice,
+           tenantid,
+           applicationstatus,
+           lastmodifiedtime
+           FROM wf_history
+           ORDER BY uuid, lastmodifiedtime DESC
+        ),
+      sla_entry AS (
+        SELECT
+           uuid,
+           MIN(createdtime) AS sla_start_time,
+           MAX(state_sla) AS sla_duration
+           FROM wf_history
+           WHERE state = 'DOC_VERIFICATION_PENDING'
+           GROUP BY uuid
+        ),
+      sla_dates AS (
+        SELECT
+           ls.uuid,
+           ls.tenantid,
+           ls.businessservice,
+           ls.applicationstatus,
+           to_timestamp((se.sla_start_time + se.sla_duration) / 1000.0) AT TIME ZONE 'Asia/Kolkata' AS sla_breach_ts
+           FROM latest_status ls
+           JOIN sla_entry se ON ls.uuid = se.uuid
+           WHERE ls.applicationstatus NOT IN ('INITIATED','PENDING_APPL_FEE','CITIZEN_APPROVAL_INPROCESS' )
+        ),
+      upcoming_breaches AS (
+        SELECT
+           sd.uuid,
+           sd.tenantid,
+           sd.businessservice,
+           sd.applicationstatus,
+           sd.sla_breach_ts::date AS breach_date
+           FROM sla_dates sd
+           JOIN params p ON TRUE
+           WHERE sd.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
+        )
+       SELECT
+         u.district,
+         u.name_of_ulb,
+         ub.applicationstatus,
+         ub.uuid as fileno,
+         'Building_Plan' as modulename
+         FROM upcoming_breaches ub
+         JOIN ulb_data u ON ub.tenantid = u.ulb_code
+         JOIN params p ON TRUE
+         WHERE 1=1 
+  groupby: GROUP BY u.district, u.name_of_ulb,ub.applicationstatus,ub.uuid
+  orderby: ORDER BY u.district, u.name_of_ulb ,ub.applicationstatus,ub.uuid DESC        

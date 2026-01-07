@@ -2,7 +2,7 @@
   "key": "buildingpermit",
   "config": {
     "defaultStyle": {
-      "font": "Cambay",
+      "font": "Roboto",
       "fontSize":8
     },
     "content": [
@@ -99,11 +99,7 @@
                 "bold": true
               },
               {
-                "text": " {{ownersWithAddress}}, ",
-                "bold": false
-              },
-               {
-                "text": " {{ownersWithName}}",
+                "text": "{{#var_owners}}{{ownerName}} , {{ownerAddress}},{{/var_owners}}",
                 "bold": false
               }
             ] 
@@ -158,7 +154,7 @@
             "text": "Dear Sir or Madam , "
           }
         ],
-        "margin":[0,-5,0,10]
+        "margin":[0,0,0,10]
         
       },
       {
@@ -260,10 +256,10 @@
           "text":[
             
             {
-              "text": " The plans are valid up to."
+              "text": " The plans are valid up to "
             },
             {
-              "text": "{{validityDate}}",
+              "text": "{{newValidityDate}}.",
               "bold":true
             }
           
@@ -295,7 +291,7 @@
     
             },
             {
-              "text":" ({{ownerName}})/",
+              "text":" ({{#var_owners}}{{ownerName}}, {{/var_owners}})/",
               "bold":true
             },
             {
@@ -397,7 +393,7 @@
           {
            "text":[
   {
-    "text": "In case any information furnished is found to be incorrect, the building plans approved under self-certification shall be void ab-initio and\nApplicant will be liable for punishment which includes levy of penalty, demolition or sealing of the property as per the provisions of The\nPunjab Municipal Act, 1911/The Punjab Municipal Corporation Act, 1976 / Punjab Town Improvement Act, 1922/ Punjab Municipal Building Bye laws as applicable."
+    "text": "In case any information furnished is found to be incorrect, the building plans approved under self-certification shall be void ab-initio and Applicant will be liable for punishment which includes levy of penalty, demolition or sealing of the property as per the provisions of The Punjab Municipal Act, 1911/The Punjab Municipal Corporation Act, 1976 / Punjab Town Improvement Act, 1922/ Punjab Municipal Building Bye laws as applicable."
   }
 ],
 
@@ -424,7 +420,7 @@
           {
             "text":[
               {
-                "text":"{{COLONY_TEXT}} "
+                "text":"{{COLONY_TEXT}}. "
                 
               }
             ],
@@ -728,12 +724,40 @@
           
         ]
       },
+      
       {
         "columns":[
           {
             "stack":[
               {
                 "text": " 12.  ",
+                "margin":[15,0,0,0]
+              }
+            
+            
+            ]
+          },
+          {
+            "text":[
+              {
+                "text": "The owner will ensure collective insurance of all workers working at site during construction."
+                
+              }
+              
+            ],
+            "margin":[-230,0,0,0],
+            "alignment":"justify",
+            "style": "top-margin"
+
+          }
+        ]      
+      },
+      {
+        "columns":[
+          {
+            "stack":[
+              {
+                "text": " 13.  ",
                 "margin":[15,0,0,0]
               }
             
@@ -774,7 +798,7 @@
           {
             "stack":[
               {
-                "text": " 13. ",
+                "text": " 14. ",
                 "margin":[15,0,0,0]
               }
             
@@ -788,7 +812,7 @@
                 
               },
               {
-                "text":" {{stakeholderName}} ({{profession}}) ",
+                "text":" {{#var_owners}}{{ownerName}}, {{/var_owners}} / {{stakeholderName}} ({{profession}}) ",
                 "bold":true
               },
               {
@@ -808,26 +832,28 @@
         "columns":[
           {
             "stack":[
-              
-                {
-                  "text": "{{ulbType}}"
-                },
-                {
-                  "text": "{{ulbName}}"
-
-                },
-                {
-                  "text": [
-                    {
-                      "text":"Date and Time:"
-                    },
-                    {
-                      "text":" {{nowIST}}"
-                    }
-                  ] 
-                }
-                
-              
+              {
+                "text": "Counter Signed:"
+              },
+              {
+                "text": "{{designation}}"
+              },
+              {
+                "text": "{{ulbType}}"
+              },
+              {
+                "text": "{{ulbName}}"
+              },
+              {
+                "text": [
+                  {
+                    "text": "Date and Time:"
+                  },
+                  {
+                    "text": " {{nowIST}}"
+                  }
+                ]
+              }
             ],
             "style": "top-margin",
             "alignment":"left"
@@ -835,56 +861,56 @@
           {
             "stack":[
               {
+                "image": "{{base64Image}}",
+                "width": 80,
+                "height": 80,
+                "margin": [0, -8, 0, 5]
+              },
+              {
                 "text": [
                   {
-                    "text":" Self-Certified By:"
+                    "text": " Self-Certified By:"
                   },
                   {
                     "text": " {{stakeholderName}}"
                   },
                   {
                     "text": " ({{profession}})"
-                   
                   }
                 ]
-                
-                
               },
-              
+
               {
                 "text": [
                   {
-                    "text":" Registration Number:"
+                    "text": " Registration Number:"
                   },
                   {
                     "text": " {{stakeholderRegistrationNumber}}",
-                   "font":"Roboto"
-                  }
-                ]
-                
-                
-              },
-              {
-                "text":[
-                  {
-                    "text":"Address:"
-                  },
-                  {
-                    "text":" {{stakeholderAddress}}"
+                    "font": "Roboto"
                   }
                 ]
               },
               {
-                "text":[
+                "text": [
                   {
-                    "text":"Date"
+                    "text": "Address:"
                   },
                   {
-                    "text":" {{submissionDate}}"
+                    "text": " {{stakeholderAddress}}"
+                  }
+                ]
+              },
+              {
+                "text": [
+                  {
+                    "text": "Date"
+                  },
+                  {
+                    "text": " {{submissionDate}}"
                   }
                 ]
               }
-              
             ],
             "alignment":"right"
           }
@@ -896,11 +922,11 @@
       {
         "text":[
           {
-            "text":"**{{COMPUTER_GENERATED_STATEMENT}}"
+            "text":"{{COMPUTER_GENERATED_STATEMENT}}"
           }
         ],
         "alignment":"center",
-        "margin":[0,5,0,0]
+        "margin":[0,50,0,0]
       } 
 ],
   

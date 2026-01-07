@@ -10,7 +10,7 @@ SearchDefinitions:
         baseQuery: >-
           select count(pt.*)from eg_pt_property pt left join obpas_applications ob on ob.propertyid = pt.propertyid
            $where  and (pt.additionaldetails->>'vasikaNo' is not null or pt.additionaldetails->>'vasikaNo'!='' or pt.additionaldetails->>'allotmentNo' is not null or pt.additionaldetails->>'allotmentNo'!='' ) 
-           and pt.status='ACTIVE'
+           and pt.status='ACTIVE' AND pt.source!='WATER_CHARGES'
       searchParams:
         condition: AND
         params:
@@ -41,7 +41,7 @@ SearchDefinitions:
                 ) / NULLIF(COUNT(*), 0)
               , 2) AS percentage_matching
             FROM eg_pt_property
-            $where and status = 'ACTIVE'
+            $where and status = 'ACTIVE' AND  source!='WATER_CHARGES'
       searchParams:
         condition: AND
         params:
@@ -62,7 +62,7 @@ SearchDefinitions:
           select ob.file_no as obpas_fileno, ob.applicant_name as applicant_name, pt.propertyid, pt.tenantid, pt.oldpropertyid, pt.createdtime, pt.additionaldetails->>'allotmentNo' as allotmentno, pt.additionaldetails->>'allotmentDate' as allotmentdate, pt.additionaldetails->>'vasikaNo' as vasikano, pt.additionaldetails->>'vasikaDate' as vasikadate
            from eg_pt_property pt left join obpas_applications ob on ob.propertyid = pt.propertyid
             $where  and (pt.additionaldetails->>'vasikaNo' is not null or pt.additionaldetails->>'vasikaNo'!='' or pt.additionaldetails->>'allotmentNo' is not null or pt.additionaldetails->>'allotmentNo'!='' ) 
-            and pt.status='ACTIVE' $pagination ;
+            and pt.status='ACTIVE' AND pt.source!='WATER_CHARGES' $pagination ;
       searchParams:
         condition: AND
         params:
@@ -98,7 +98,7 @@ SearchDefinitions:
       query:
         baseQuery: >-
           select count(*) from eg_pt_property 
-          $where and status='ACTIVE'
+          $where and status='ACTIVE' AND source!='WATER_CHARGES'
       searchParams:
         condition: AND
         params:

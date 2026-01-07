@@ -690,7 +690,7 @@ ReportDefinitions:
            AND r.tenantid =$tenantid
 
   - reportName: StatePetDetailsReport
-    decryptionPathId: PETREPORTS
+    decryptionPathId: STATEPETREPORTS
     summary: Details of pets in pet service
     version: 1.0.0
     moduleName: rainmaker-ptr
@@ -698,6 +698,11 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: ptr
+        total: false
       - name: applicationnumber
         label: applicationnumber
         type: string
@@ -805,6 +810,13 @@ ReportDefinitions:
         source: ptr
         isMandatory: true
         searchClause: AND r.createdtime<=$toDate
+      - name: ulb
+        label: ulb
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: ptr
+        isMandatory: false
+        searchClause: AND r.tenantid = $ulb
     query: |
       -- Use CTE to force query plan, compute & use CTE later
        WITH current_holder AS (
@@ -817,12 +829,11 @@ ReportDefinitions:
               LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
               LEFT JOIN eg_user u ON u.uuid = wa.assignee
               LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-              WHERE wf.tenantid = $tenantid
-              AND wf.businessservice = 'ptr'
+              WHERE wf.businessservice = 'ptr'
                ORDER BY wf.businessid, wf.lastmodifiedtime DESC
               )
          SELECT
-           r.applicationnumber, r.status, pd.petname, pd.pettype,
+           r.applicationnumber, r.status, pd.petname, pd.pettype, r.tenantid ,
            pd.breedtype, pd.petage, pd.petgender, pd.petcolor, pd.identificationmark,
            pd.vaccinationnumber, pd.doctorname, pd.clinicname, u.mobilenumber, u.name,
            ch.assignee_employee, ch.assignee_code
@@ -831,10 +842,10 @@ ReportDefinitions:
            LEFT JOIN eg_ptr_petdetails AS pd ON r.id = pd.petdetailsid
            LEFT JOIN eg_user AS u ON u.uuid = o.uuid
            LEFT JOIN current_holder ch ON ch.applicationnumber = r.applicationnumber
-            WHERE  r.tenantid = $tenantid
+            WHERE  1=1
             
   - reportName: StateCollectionsReport
-    decryptionPathId: PETREPORTS
+    decryptionPathId: STATEPETREPORTS
     summary: Collections
     version: 1.0.0
     moduleName: rainmaker-ptr
@@ -842,6 +853,11 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: ptr
+        total: false
       - name: applicationno
         label: applicationno
         type: string
@@ -936,10 +952,16 @@ ReportDefinitions:
         source: ptr
         isMandatory: true
         searchClause: AND createdtime <= $toDate
+      - name: ulb
+        label: ulb
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: ptr
+        isMandatory: false
+        searchClause: AND tenantid = $ulb
     query: >
       -- Use CTE to force query plan, compute & use CTE later
-
-      WITH current_holder AS (
+       WITH current_holder AS (
             SELECT DISTINCT ON (wf.businessid)
                  wf.businessid AS applicationno,
                  u.name AS employee_name,
@@ -950,11 +972,10 @@ ReportDefinitions:
                LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
                LEFT JOIN eg_user u ON u.uuid = wa.assignee
                LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-               WHERE wf.tenantid = $tenantid
-               AND wf.businessservice = 'pet-services'
+               WHERE wf.businessservice = 'pet-services'
               ORDER BY wf.businessid, wf.lastmodifiedtime DESC
                ),
-        unique_transactions AS (
+         unique_transactions AS (
             SELECT
                  p.id AS transaction_id,
                  p.createdtime,
@@ -968,7 +989,7 @@ ReportDefinitions:
                  CASE WHEN p.paymentmode = 'ONLINE' THEN p.totalamountpaid ELSE 0 END AS online_amount,
                  COALESCE(emp.code, 'SELF') AS collector_code,
                  r.applicationnumber AS applicationno,
-                 r.status,
+                 r.status, r.tenantid ,
                 'pet-services' AS businessservice,
                  u_cust.name AS name,
                  u_cust.mobilenumber AS mobilenumber,
@@ -985,10 +1006,9 @@ ReportDefinitions:
             LEFT JOIN current_holder ch ON ch.applicationno = r.applicationnumber
              WHERE p.paymentstatus != 'CANCELLED'
               AND pd.businessservice = 'pet-services'
-              AND p.tenantid = $tenantid
               )
           SELECT 
-             applicationno,name,mobilenumber,businessservice,status,collector_code,
+             applicationno,name,mobilenumber,businessservice,status,collector_code,tenantid,
              assignee_code,cash_amount,cheque_amount,card_amount,
              dd_amount,neft_amount,rtgs_amount,online_amount,amountpaid,
              TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS "PaymentDate"
@@ -997,7 +1017,7 @@ ReportDefinitions:
     orderby: ORDER BY createdtime DESC;
     
   - reportName: StateSLAReport
-    decryptionPathId: PETREPORTS
+    decryptionPathId: STATEPETREPORTS
     summary: Sla report for ptr service
     version: 1.0.0
     moduleName: rainmaker-ptr
@@ -1063,6 +1083,13 @@ ReportDefinitions:
         source: ptr
         isMandatory: true
         searchClause: AND ptr.createdtime <= $toDate
+      - name: ulb
+        label: ulb
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: ptr
+        isMandatory: false
+        searchClause: AND ptr.tenantid = $ulb
     query: >
       -- Use CTE to force query plan, compute & use CTE later
 
@@ -1072,8 +1099,7 @@ ReportDefinitions:
         wf.lastmodifiedtime,  wf.businessservicesla, wf.tenantid, wf.id AS processinstanceid
         FROM eg_wf_processinstance_v2 wf
         JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-        WHERE wf.tenantid = $tenantid
-        AND wf.businessservice = 'ptr'
+        WHERE wf.businessservice = 'ptr'
        ),
       status_times AS (
        SELECT
@@ -1107,8 +1133,7 @@ ReportDefinitions:
          JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
          JOIN eg_hrms_employee e ON e.uuid = wa.assignee
          JOIN eg_user u ON e.uuid = u.uuid  
-         WHERE wf.tenantid = $tenantid
-         AND wf.businessservice = 'ptr'
+         WHERE wf.businessservice = 'ptr'
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
           )
        SELECT
@@ -1142,7 +1167,7 @@ ReportDefinitions:
     orderby: ORDER BY ptr.createdtime DESC, tenantid, ls.applicationstatus; 
     
   - reportName: StateReceiptRegisterPET
-    decryptionPathId: PETREPORTS
+    decryptionPathId: STATEPETREPORTS
     summary: Details of collector register in pet service
     version: 1.0.0
     moduleName: rainmaker-ptr
@@ -1251,6 +1276,13 @@ ReportDefinitions:
       source: ptr
       isMandatory: false
       searchClause: AND payment.paymentmode like $paymentMode
+    - name: ulb
+      label: ulb
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: ptr
+      isMandatory: false
+      searchClause: AND bill.tenantid = $ulb
     query: |
       -- Use CTE to force query plan, compute & use CTE later
       SELECT
@@ -1271,20 +1303,19 @@ ReportDefinitions:
             pd.manualreceiptdate
 
           FROM egcl_paymentdetail pd
-          INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = $tenantid
+          INNER JOIN egcl_bill bill ON bill.id = pd.billid
           INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
           LEFT JOIN eg_ptr_registration r ON r.applicationnumber = bill.consumercode
           LEFT JOIN eg_ptr_owner o  ON o.ptrregistrationid = r.id
           LEFT JOIN eg_user u_owner ON u_owner.uuid = o.uuid      
-          LEFT JOIN eg_user usr  ON usr.id = payment.createdby::integer  -- Collector
+          LEFT JOIN eg_user usr  ON usr.id = payment.createdby::integer  
           WHERE
-              bill.tenantid = $tenantid
-              AND pd.businessservice = 'pet-services'
+              pd.businessservice = 'pet-services'
               AND payment.paymentstatus != 'CANCELLED'
     orderby: ORDER BY pd.receiptdate DESC;  
 
   - reportName: StateDefaulterReport
-    decryptionPathId: PETREPORTS
+    decryptionPathId: STATEPETREPORTS
     summary: Details of Defaulter for renew of pet applications
     version: 1.0.0
     moduleName: rainmaker-ptr
@@ -1292,6 +1323,11 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: ptr
+        total: false
       - name: applicationnumber
         label: applicationnumber
         type: string
@@ -1345,6 +1381,13 @@ ReportDefinitions:
         source: ptr
         isMandatory: true
         searchClause: AND r.createdtime<=$toDate
+      - name: ulb
+        label: ulb
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: ptr
+        isMandatory: false
+        searchClause: AND r.tenantid =$ulb
     query: |
       -- Use CTE to force query plan, compute & use CTE later
        WITH latest_holder AS (
@@ -1364,7 +1407,7 @@ ReportDefinitions:
            r.applicationnumber AS applicationnumber,
            u.mobilenumber AS mobilenumber,
            -- COALESCE(o.address, o.permanentaddress, NULL) AS "Address",
-           r.status,
+           r.status, r.tenantid,
            pd.petname,
            pd.pettype,
            pd.breedtype,
@@ -1375,5 +1418,4 @@ ReportDefinitions:
            LEFT JOIN eg_user u ON u.uuid = o.uuid
            LEFT JOIN latest_holder ch ON ch.applicationnumber = r.applicationnumber
            WHERE  (TO_TIMESTAMP(r.validitydate/1000)::date < CURRENT_DATE)   
-           AND r.status NOT IN ('RENEWED', 'APPROVED')
-           AND r.tenantid =$tenantid       
+           AND r.status NOT IN ('RENEWED', 'APPROVED')   

@@ -1,7 +1,7 @@
 ---
 ReportDefinitions:
 - reportName: ApplicationDetailReportCLU
-  decryptionPathId: CLUREPORTS
+  decryptionPathId: LAYOUTREPORTS
   summary: Details of applicant in CLU service
   version: 1.0.0
   moduleName: rainmaker-obpas_clu
@@ -49,20 +49,20 @@ ReportDefinitions:
     label: fromDate
     type: epoch
     source: obpas_clu
-    isMandatory: true
+    isMandatory: false
     searchClause: AND a.createdtime >= $fromDate
   - name: toDate
     label: toDate
     type: epoch
     source: obpas_clu
-    isMandatory: true
+    isMandatory: false
     searchClause: AND a.createdtime <= $toDate
   - name: applicationstatus
     label: Application status
     type: singlevaluelist
     pattern: list://INITIATED:INITIATED,PENDINGPAYMENT:PENDINGPAYMENT,DOCUMENTVERIFY:DOCUMENTVERIFY,APPROVED:APPROVED, REJECTED:REJECTED,TL-VERIFICATION:TL-VERIFICATION,WS-SW-VERIFICATION:WS-SW-VERIFICATION ,CITIZENACTIONREQUIRED-DV:CITIZENACTIONREQUIRED-DV,BPA-VERIFICATION:BPA-VERIFICATION,PENDINGAPPROVAL:PENDINGAPPROVAL,CANCELLED:CANCELLED,PT-VERIFICATION:PT-VERIFICATION,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
     source: obpas_clu
-    isMandatory: true
+    isMandatory: false
     searchClause: AND LOWER(a.applicationstatus) = LOWER($applicationstatus)
   query: |
       WITH current_holder AS (
@@ -97,7 +97,7 @@ ReportDefinitions:
       WHERE a.tenantid = $tenantid 
 
 - reportName: CollectionsReportCLU
-  decryptionPathId: CLUREPORTS
+  decryptionPathId: LAYOUTREPORTS
   summary: Collections
   version: 1.0.0
   moduleName: rainmaker-obpas_clu
@@ -175,7 +175,7 @@ ReportDefinitions:
     type: string
     source: obpas_clu
     total: true
-  - name: PaymentDate
+  - name: payment_date
     label: PaymentDate
     type: string
     source: obpas_clu
@@ -185,18 +185,18 @@ ReportDefinitions:
     label: fromDate
     type: epoch
     source: obpas_clu
-    isMandatory: true
+    isMandatory: false
     searchClause: AND createdtime >= $fromDate
   - name: toDate
     label: toDate
     type: epoch
     source: obpas_clu
-    isMandatory: true
+    isMandatory: false
     searchClause: AND createdtime <= $toDate
   - name: collector_code
     label: collector_code
     type: string
-    source: ptr
+    source: obpas_clu
     isMandatory: false
     searchClause: AND collector_code = $collector_code
   query: |
@@ -269,7 +269,7 @@ ReportDefinitions:
   orderby: ORDER BY createdtime DESC 
   
 - reportName: SLAReportCLU
-  decryptionPathId: CLUREPORTS
+  decryptionPathId: LAYOUTREPORTS
   summary: SLA report for clu service
   version: 1.0.0
   moduleName: rainmaker-obpas_clu
@@ -327,13 +327,13 @@ ReportDefinitions:
     label: From Date
     type: epoch
     source: obpas_clu
-    isMandatory: true
+    isMandatory: false
     searchClause: AND n.createdtime >= $fromDate
   - name: toDate
     label: To Date
     type: epoch
     source: obpas_clu
-    isMandatory: true
+    isMandatory: false
     searchClause: AND n.createdtime <= $toDate
   query: |
       -- Use CTE to force query plan, compute & use CTE later     
@@ -354,7 +354,7 @@ ReportDefinitions:
         status_times AS (
              SELECT
                 uuid,
-                MAX(CASE WHEN applicationstatus = 'DOCUMENTVERIFY' THEN createdtime END) AS docverify_time,
+                MAX(CASE WHEN applicationstatus = 'DOCUMENTVERIFY_JE/BI' THEN createdtime END) AS docverify_time,
                 MAX(CASE WHEN applicationstatus IN ('APPROVED','REJECTED') THEN lastmodifiedtime END) AS final_time
               FROM wf_detailed
               GROUP BY uuid
@@ -417,7 +417,7 @@ ReportDefinitions:
   orderby:  ORDER BY n.createdtime DESC, tenantid, final_status
       
 - reportName: ReceiptRegisterCLU
-  decryptionPathId: CLUREPORTS
+  decryptionPathId: LAYOUTREPORTS
   summary: Details of collector register in CLU service
   version: 1.0.0
   moduleName: rainmaker-obpas_clu
@@ -500,13 +500,13 @@ ReportDefinitions:
     label: fromDate
     type: epoch
     source: obpas_clu
-    isMandatory: true
+    isMandatory: false
     searchClause: AND pd.receiptdate >= $fromDate
   - name: toDate
     label: toDate
     type: epoch
     source: obpas_clu
-    isMandatory: true
+    isMandatory: false
     searchClause: AND pd.receiptdate <= $toDate
   - name: receiptNumber
     label: receiptNumber
