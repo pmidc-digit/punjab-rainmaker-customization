@@ -95,7 +95,7 @@ serviceMaps:
     isTransaction: true
     queryMaps:
 
-    - query: UPDATE eg_pgr_service_v2 SET servicecode=?, rating = ?,servicerequestid=?, description=?, accountid=?, additionaldetails=?, applicationstatus=?, lastmodifiedby=?, lastmodifiedtime=? WHERE id=?;
+    - query: UPDATE eg_pgr_service_v2 SET servicecode=?, rating = ?,servicerequestid=?, description=?, accountid=?, additionaldetails=?, applicationstatus=?, lastmodifiedby=?, lastmodifiedtime=?,dgr_employee_name=?  WHERE id=?;
       basePath: service
       jsonMaps:
       - jsonPath: $.service.serviceCode
@@ -117,6 +117,7 @@ serviceMaps:
       - jsonPath: $.service.auditDetails.lastModifiedBy
 
       - jsonPath: $.service.auditDetails.lastModifiedTime
+      - jsonPath: $.service.dgr_employee_name
 
       - jsonPath: $.service.id
 
@@ -182,3 +183,21 @@ serviceMaps:
       - jsonPath: $.ProcessInstances.*.businessId
 
       - jsonPath: $.ProcessInstances.*.tenantId
+
+  - version: 1.0
+    name: PGR
+    description: Persists asset details in eg_asset table
+    fromTopic: update-pgr-dgr-pgrid
+    isTransaction: true
+    queryMaps:
+
+      - query: UPDATE eg_pgr_service_v2 SET dgr_grievance_id=? WHERE tenantid=? AND servicerequestid=?;
+
+        basePath: service
+        jsonMaps:
+
+        - jsonPath: $.service.dgr_grievance_id
+
+        - jsonPath: $.service.tenantId
+
+        - jsonPath: $.service.serviceRequestId
