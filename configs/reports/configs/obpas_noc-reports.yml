@@ -49,13 +49,13 @@ ReportDefinitions:
     label: fromDate
     type: epoch
     source: obpas_noc
-    isMandatory: true
+    isMandatory: false
     searchClause: AND a.createdtime >= $fromDate
   - name: toDate
     label: toDate
     type: epoch
     source: obpas_noc
-    isMandatory: true
+    isMandatory: false
     searchClause: AND a.createdtime <= $toDate
   - name: applicationstatus
     label: Application status
@@ -196,7 +196,7 @@ ReportDefinitions:
   - name: collector_code
     label: collector_code
     type: string
-    source: ptr
+    source: obpas_noc
     isMandatory: false
     searchClause: AND collector_code = $collector_code
   query: |
@@ -327,13 +327,13 @@ ReportDefinitions:
     label: From Date
     type: epoch
     source: obpas_noc
-    isMandatory: true
+    isMandatory: false
     searchClause: AND n.createdtime >= $fromDate
   - name: toDate
     label: To Date
     type: epoch
     source: obpas_noc
-    isMandatory: true
+    isMandatory: false
     searchClause: AND n.createdtime <= $toDate
   query: |
       -- Use CTE to force query plan, compute & use CTE later     
@@ -500,13 +500,13 @@ ReportDefinitions:
     label: fromDate
     type: epoch
     source: obpas_noc
-    isMandatory: true
+    isMandatory: false
     searchClause: AND pd.receiptdate >= $fromDate
   - name: toDate
     label: toDate
     type: epoch
     source: obpas_noc
-    isMandatory: true
+    isMandatory: false
     searchClause: AND pd.receiptdate <= $toDate
   - name: receiptNumber
     label: receiptNumber

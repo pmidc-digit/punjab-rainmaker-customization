@@ -1175,6 +1175,11 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
+    - name: tenantid
+      label: tenantid
+      type: string
+      source: ptr
+      total: false
     - name: receiptno
       label: receiptno
       type: string
@@ -1286,6 +1291,7 @@ ReportDefinitions:
     query: |
       -- Use CTE to force query plan, compute & use CTE later
       SELECT
+            split_part(payment.tenantid, '.', 2) AS tenantid,
             pd.receiptnumber AS receiptno,
             bill.consumercode AS connectionno,
             TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate1,
