@@ -521,11 +521,11 @@ ReportDefinitions:
     query: >
       -- Use CTE to force query plan, compute & use CTE later
 
-      SELECT
+      SELECT DISTINCT ON (pd.receiptnumber)
          pd.receiptnumber AS receiptno,
          bill.consumercode AS connectionno,
          TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate1,
-         d.businessservice AS service,
+         'NDC' AS service,
          usr.name AS collectorname,
          TO_CHAR( TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS transactiondate,
          payment.instrumentnumber,   
@@ -555,7 +555,7 @@ ReportDefinitions:
          bill.tenantid = $tenantid
          AND pd.businessservice = 'NDC'
          AND payment.paymentstatus != 'CANCELLED'
-    orderby: ORDER BY pd.receiptdate DESC;
+    orderby: ORDER BY pd.receiptnumber,pd.receiptdate DESC;
   - reportName: StateApplicationDetailReport
     decryptionPathId: STATENDCAPPLICATION
     summary: Details of applicant in ndc service
@@ -1118,12 +1118,12 @@ ReportDefinitions:
     query: >
       -- Use CTE to force query plan, compute & use CTE later
 
-      SELECT
+      SELECT DISTINCT ON (pd.receiptnumber)
          split_part(pd.tenantid, '.', 2) AS tenantid, 
          pd.receiptnumber AS receiptno,
          bill.consumercode AS connectionno,
          TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate1,
-         d.businessservice AS service,
+         'NDC'  AS service,
          usr.name AS collectorname,
          TO_CHAR( TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS transactiondate,
          payment.instrumentnumber,   
@@ -1151,7 +1151,7 @@ ReportDefinitions:
       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
        WHERE pd.businessservice = 'NDC'
          AND payment.paymentstatus != 'CANCELLED'
-    orderby: ORDER BY pd.receiptdate DESC;
+    orderby: ORDER BY pd.receiptnumber, pd.receiptdate DESC;
     
   - reportName: OverallSummaryReport
     summary: Details of applicant in ndc , chb, pet service
