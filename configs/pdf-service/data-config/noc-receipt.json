@@ -201,6 +201,12 @@
                 }
               },
               {
+                "variable": "nocFee",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'NOC_FEES')].adjustedAmount"
+                }
+              },
+              {
                 "variable": "noc_urban_development_cess",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_URBAN_DEVELOPMENT_CESS"
@@ -240,6 +246,18 @@
                 "variable": "noc_external_development_charges",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_EXTERNAL_DEVELOPMENT_CHARGES"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "noc_fees",
+                "value": {
+                  "path": "BILLINGSERVICE_BUSINESSSERVICE_OTHER_NOC_FEES"
                 },
                 "type": "label",
                 "localisation": {
@@ -817,6 +835,10 @@
                {
                 "variable": "nocRainWaterHarvestingCharges",
                 "formula": "{{nocRainWaterHarvestingCharges}}>0?{{nocRainWaterHarvestingCharges}}:0"
+              },
+              {
+                "variable": "nocFee",
+                "formula": "{{nocFee}}>0?{{nocFee}}:0"
               }
             ]
           },
