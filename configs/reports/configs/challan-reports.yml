@@ -461,7 +461,7 @@ ReportDefinitions:
              WHERE pd.businessservice = 'Challan_Generation'
                AND p.paymentstatus != 'CANCELLED'
               )
-            SELECT
+          SELECT
               challanno, name, mobilenumber, 'CHALLAN' AS businessservice, applicationstatus,
               collector_code, cash_amount, cheque_amount,
               card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
@@ -590,7 +590,7 @@ ReportDefinitions:
         searchClause: AND bill.tenantid = $ulb
     query: >
       -- Use CTE to force query plan, compute & use CTE later
-      SELECT
+       SELECT
          pd.receiptnumber AS receiptno,
          bill.consumercode AS connectionno,
          TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate1,
@@ -606,14 +606,14 @@ ReportDefinitions:
          usr.id AS user,
        	 pd.manualreceiptnumber,
          pd.manualreceiptdate   
-       FROM egcl_paymentdetail pd
-       INNER JOIN egcl_bill bill ON bill.id = pd.billid 
-       INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
-       LEFT JOIN eg_challan c ON c.challanno = bill.consumercode
-       LEFT JOIN eg_challan_citizen cc ON cc.challanid = c.id
-       LEFT JOIN eg_user u_citizen ON u_citizen.uuid = cc.uuid
-       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
-       WHERE pd.businessservice = 'Challan_Generation'
+        FROM egcl_paymentdetail pd
+        INNER JOIN egcl_bill bill ON bill.id = pd.billid 
+        INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
+        LEFT JOIN eg_challan c ON c.challanno = bill.consumercode
+        LEFT JOIN eg_challan_citizen cc ON cc.challanid = c.id
+        LEFT JOIN eg_user u_citizen ON u_citizen.uuid = cc.uuid
+        LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
+        WHERE pd.businessservice = 'Challan_Generation'
          AND payment.paymentstatus != 'CANCELLED'
     orderby: ORDER BY pd.receiptdate DESC
     
