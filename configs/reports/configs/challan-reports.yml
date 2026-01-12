@@ -119,8 +119,8 @@ ReportDefinitions:
          WHERE wf.tenantid = $tenantid
          AND wf.businessservice = 'CHALLAN'
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
-            ),
-        unique_transactions AS (
+      ),
+       unique_transactions AS (
            SELECT
               p.id AS transaction_id,
               p.createdtime,
@@ -151,8 +151,8 @@ ReportDefinitions:
              WHERE pd.businessservice = 'Challan_Generation'
               AND p.paymentstatus != 'CANCELLED'
               AND p.tenantid = $tenantid
-                 )
-         SELECT
+       )
+       SELECT
               challanno, name, mobilenumber, 'CHALLAN' AS businessservice, applicationstatus,
               collector_code, cash_amount, cheque_amount,
               card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
@@ -428,8 +428,8 @@ ReportDefinitions:
          LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
          WHERE wf.businessservice = 'CHALLAN'
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
-            ),
-        unique_transactions AS (
+       ),
+       unique_transactions AS (
            SELECT
               p.id AS transaction_id,
               p.createdtime,
@@ -460,7 +460,7 @@ ReportDefinitions:
              LEFT JOIN current_holder ch ON ch.challanno = c.challanno
              WHERE pd.businessservice = 'Challan_Generation'
                AND p.paymentstatus != 'CANCELLED'
-                 )
+            )
          SELECT
               challanno, name, mobilenumber, 'CHALLAN' AS businessservice, applicationstatus,
               collector_code, cash_amount, cheque_amount,
