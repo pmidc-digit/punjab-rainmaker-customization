@@ -1,4 +1,3 @@
-
 ---
 ReportDefinitions:
   - reportName: CollectionsReport
@@ -105,7 +104,6 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND collector_code = $collector_code
     query: >
-      -- Use CTE to force query plan, compute & use CTE later
       WITH current_holder AS (
          SELECT DISTINCT ON (wf.businessid)
            wf.businessid AS challanno,
@@ -120,8 +118,8 @@ ReportDefinitions:
          WHERE wf.tenantid = $tenantid
          AND wf.businessservice = 'CHALLAN'
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
-            ),
-        unique_transactions AS (
+      ),
+       unique_transactions AS (
            SELECT
               p.id AS transaction_id,
               p.createdtime,
@@ -152,8 +150,8 @@ ReportDefinitions:
              WHERE pd.businessservice = 'Challan_Generation'
               AND p.paymentstatus != 'CANCELLED'
               AND p.tenantid = $tenantid
-                 )
-         SELECT
+       )
+       SELECT
               challanno, name, mobilenumber, 'CHALLAN' AS businessservice, applicationstatus,
               collector_code, cash_amount, cheque_amount,
               card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
@@ -274,36 +272,47 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND payment.paymentmode like $paymentMode
     query: >
-      -- Use CTE to force query plan, compute & use CTE later
       SELECT
-         pd.receiptnumber AS receiptno,
-         bill.consumercode AS connectionno,
-         TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate1,
-         'CHALLAN' AS service,
-         usr.name AS collectorname,
-         TO_CHAR( TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS transactiondate,
-         payment.instrumentnumber,   
-         u_citizen.name AS payername,
-         pd.amountpaid,
-         payment.paymentmode,
-         payment.paymentstatus,
-         u_citizen.name AS ownername1,
-         usr.id AS user,
-       	 pd.manualreceiptnumber,
-         pd.manualreceiptdate   
-       FROM egcl_paymentdetail pd
-       INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = $tenantid
-       INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
-       LEFT JOIN eg_challan c ON c.challanno = bill.consumercode
-       LEFT JOIN eg_challan_citizen cc ON cc.challanid = c.id
-       LEFT JOIN eg_user u_citizen ON u_citizen.uuid = cc.uuid
-       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
-       WHERE
-         bill.tenantid = $tenantid
-         AND pd.businessservice = 'Challan_Generation'
-         AND payment.paymentstatus != 'CANCELLED'
-    orderby: ORDER BY pd.receiptdate DESC;
-
+          pd.receiptnumber AS receiptno,
+          bill.consumercode AS connectionno,
+          TO_CHAR(
+              TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata',
+              'DD-MM-YYYY'
+          ) AS receiptdate1,
+          'CHALLAN' AS service,
+          usr.name AS collectorname,
+          TO_CHAR(
+              TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata',
+              'DD-MM-YYYY'
+          ) AS transactiondate,
+          payment.instrumentnumber,
+          u_citizen.name AS payername,
+          pd.amountpaid,
+          payment.paymentmode,
+          payment.paymentstatus,
+          u_citizen.name AS ownername1,
+          usr.id AS userid,
+          pd.manualreceiptnumber,
+          pd.manualreceiptdate
+      FROM egcl_paymentdetail pd
+      INNER JOIN egcl_bill bill
+          ON bill.id = pd.billid
+          AND pd.tenantid = 'pb.testing'
+      INNER JOIN egcl_payment payment
+          ON payment.id = pd.paymentid
+      LEFT JOIN eg_challan c
+          ON c.challanno = bill.consumercode
+      LEFT JOIN eg_challan_citizen cc
+          ON cc.challanid = c.id
+      LEFT JOIN eg_user u_citizen
+          ON u_citizen.uuid = cc.uuid
+      LEFT JOIN eg_user usr
+          ON usr.id = payment.createdby::integer
+      WHERE bill.tenantid = 'pb.testing'
+        AND pd.businessservice = 'Challan_Generation'
+        AND payment.paymentstatus != 'CANCELLED'
+    orderby: ORDER BY pd.receiptdate DESC
+      
   - reportName: StateCollectionsReport
     decryptionPathId: CHALLANREPORTS
     summary: Collections
@@ -415,7 +424,6 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND tenantid = $ulb
     query: >
-      -- Use CTE to force query plan, compute & use CTE later
       WITH current_holder AS (
          SELECT DISTINCT ON (wf.businessid)
            wf.businessid AS challanno,
@@ -428,8 +436,8 @@ ReportDefinitions:
          LEFT JOIN eg_user u ON u.uuid = wa.assignee
          LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
          WHERE wf.businessservice = 'CHALLAN'
-        ORDER BY wf.businessid, wf.lastmodifiedtime DESC
-            ),
+         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+          ),
         unique_transactions AS (
            SELECT
               p.id AS transaction_id,
@@ -461,13 +469,13 @@ ReportDefinitions:
              LEFT JOIN current_holder ch ON ch.challanno = c.challanno
              WHERE pd.businessservice = 'Challan_Generation'
                AND p.paymentstatus != 'CANCELLED'
-                 )
-         SELECT
+              )
+          SELECT
               challanno, name, mobilenumber, 'CHALLAN' AS businessservice, applicationstatus,
               collector_code, cash_amount, cheque_amount,
               card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
               TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS paymentdate         
-            FROM unique_transactions
+             FROM unique_transactions
              WHERE 1=1 
     orderby: ORDER BY createdtime DESC
     
@@ -590,8 +598,7 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND bill.tenantid = $ulb
     query: >
-      -- Use CTE to force query plan, compute & use CTE later
-      SELECT
+       SELECT
          pd.receiptnumber AS receiptno,
          bill.consumercode AS connectionno,
          TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate1,
@@ -607,14 +614,14 @@ ReportDefinitions:
          usr.id AS user,
        	 pd.manualreceiptnumber,
          pd.manualreceiptdate   
-       FROM egcl_paymentdetail pd
-       INNER JOIN egcl_bill bill ON bill.id = pd.billid 
-       INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
-       LEFT JOIN eg_challan c ON c.challanno = bill.consumercode
-       LEFT JOIN eg_challan_citizen cc ON cc.challanid = c.id
-       LEFT JOIN eg_user u_citizen ON u_citizen.uuid = cc.uuid
-       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
-       WHERE pd.businessservice = 'Challan_Generation'
+        FROM egcl_paymentdetail pd
+        INNER JOIN egcl_bill bill ON bill.id = pd.billid 
+        INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
+        LEFT JOIN eg_challan c ON c.challanno = bill.consumercode
+        LEFT JOIN eg_challan_citizen cc ON cc.challanid = c.id
+        LEFT JOIN eg_user u_citizen ON u_citizen.uuid = cc.uuid
+        LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
+        WHERE pd.businessservice = 'Challan_Generation'
          AND payment.paymentstatus != 'CANCELLED'
     orderby: ORDER BY pd.receiptdate DESC
     
@@ -720,7 +727,6 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND c.offence_subcategory_name = $offence_subcategory_name
     query: >
-      -- Use CTE to force query plan, compute & use CTE later
       SELECT c.challanno , c.businessservice , c.applicationstatus , c.receiptnumber ,
          c.challanstatus , c.offence_type_name , c.offence_category_name , c.offence_subcategory_name , 
          c.challan_amount , c.tenantid , ca.addressline1 , u.name , u.mobilenumber 
