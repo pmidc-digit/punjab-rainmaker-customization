@@ -120,9 +120,9 @@
                 }
               },
               {
-                "variable": "chb_service_charge",
+                "variable": "chb_security_deposit",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_SERVICE_CHARGE"
+                  "path": "SECURITY_DEPOSIT"
                 },
                 "type": "label",
                 "localisation": {
@@ -132,9 +132,9 @@
                 }
               },
               {
-                "variable": "chbServiceCharge",
+                "variable": "chbSecurityDeposit",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_SERVICE_CHARGE')].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_SECURITY_DEPOSIT')].adjustedAmount"
                 }
               },
 
@@ -662,8 +662,8 @@
                 "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"
               },
               {
-                "variable": "chbServiceCharge",
-                "formula": "{{chbServiceCharge}}>0?{{chbServiceCharge}}:0"
+                "variable": "chbSecurityDeposit",
+                "formula": "{{chbSecurityDeposit}}>0?{{chbSecurityDeposit}}:0"
               },
               {
                 "variable": "chbBookingFees",
