@@ -104,7 +104,6 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND collector_code = $collector_code
     query: >
-      -- Use CTE to force query plan, compute & use CTE later
       WITH current_holder AS (
          SELECT DISTINCT ON (wf.businessid)
            wf.businessid AS challanno,
