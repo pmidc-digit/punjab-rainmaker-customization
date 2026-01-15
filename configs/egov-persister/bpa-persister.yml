@@ -259,3 +259,133 @@ serviceMaps:
           - jsonPath: $.BPA.auditDetails.lastModifiedTime
 
           - jsonPath: $.BPA.applicationno
+
+      
+ - version: 1.0
+   description: update buildingplan details in EG_BPA_BuildingPlan  table
+   fromTopic: update-bpa-workflow
+   isTransaction: true
+   queryMaps:
+   
+          
+       - query: INSERT INTO eg_bpa_document(id, documentType, fileStoreId, buildingplanid, documentUid, additionalDetails, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET documenttype =?,  fileStoreId =?, additionalDetails=?, lastmodifiedby =?, lastmodifiedtime =?;
+         basePath: BPA.documents.*
+         jsonMaps:
+          
+           - jsonPath: $.BPA.documents.*.id
+  
+           - jsonPath: $.BPA.documents.*.documentType
+  
+           - jsonPath: $.BPA.documents.*.fileStoreId
+  
+           - jsonPath: $.BPA.id
+  
+           - jsonPath: $.BPA.documents.*.documentUid
+  
+           - jsonPath: $.BPA.documents.*.additionalDetails
+             type: JSON
+             dbType: JSONB
+  
+           - jsonPath: $.BPA.auditDetails.createdBy
+  
+           - jsonPath: $.BPA.auditDetails.lastModifiedBy
+  
+           - jsonPath: $.BPA.auditDetails.createdTime
+
+           - jsonPath: $.BPA.auditDetails.lastModifiedTime
+
+           - jsonPath: $.BPA.documents.*.documentType
+
+           - jsonPath: $.BPA.documents.*.fileStoreId
+  
+           - jsonPath: $.BPA.documents.*.additionalDetails
+             type: JSON
+             dbType: JSONB
+
+           - jsonPath: $.BPA.auditDetails.lastModifiedBy
+
+           - jsonPath: $.BPA.auditDetails.lastModifiedTime
+           
+           
+       - query: INSERT INTO eg_bpa_auditdetails SELECT * FROM eg_bpa_buildingplan WHERE id =?;
+         basePath: BPA
+         jsonMaps:
+
+           - jsonPath: $.BPA.id
+
+
+       - query: UPDATE eg_bpa_buildingplan SET applicationno=?, approvalNo=?, applicationDate=?, status=?, additionaldetails=?, lastmodifiedby=?, lastmodifiedtime=?, approvalDate=?, landId=? WHERE id=?;
+         basePath: BPA
+         jsonMaps:
+          - jsonPath: $.BPA.applicationNo
+          
+          - jsonPath: $.BPA.approvalNo
+          
+          - jsonPath: $.BPA.applicationDate
+
+          - jsonPath: $.BPA.status
+
+          - jsonPath: $.BPA.additionalDetails
+            type: JSON
+            dbType: JSONB
+
+          - jsonPath: $.BPA.auditDetails.lastModifiedBy
+
+          - jsonPath: $.BPA.auditDetails.lastModifiedTime
+
+          - jsonPath: $.BPA.approvalDate
+
+          - jsonPath: $.BPA.landId
+
+          - jsonPath: $.BPA.id
+
+
+ - version: 1.0
+   description: Save bpa Document Check List
+   fromTopic: save-bpa-document-checklist
+   isTransaction: true
+   queryMaps:
+       - query: INSERT INTO public.eg_bpa_document_check_list(id, documentuid, applicationno, tenantId, action, remarks, createdby, lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+         basePath: checkList.*
+         jsonMaps:
+
+          - jsonPath: $.checkList.*.id
+
+          - jsonPath: $.checkList.*.documentuid
+
+          - jsonPath: $.checkList.*.applicationNo
+
+          - jsonPath: $.checkList.*.tenantId
+
+          - jsonPath: $.checkList.*.action
+
+          - jsonPath: $.checkList.*.remarks
+
+          - jsonPath: $.checkList.*.createdby
+
+          - jsonPath: $.checkList.*.lastmodifiedby
+
+          - jsonPath: $.checkList.*.createdtime
+
+          - jsonPath: $.checkList.*.lastmodifiedtime
+
+ - version: 1.0
+   description: Update bpa Document Check List
+   fromTopic: update-bpa-document-checklist
+   isTransaction: true
+   queryMaps:
+       - query: UPDATE public.eg_bpa_document_check_list SET action = ?, remarks = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE applicationno = ? AND tenantId = ?;
+         basePath: checkList.*
+         jsonMaps:
+
+          - jsonPath: $.checkList.*.action
+
+          - jsonPath: $.checkList.*.remarks
+
+          - jsonPath: $.checkList.*.lastmodifiedby
+
+          - jsonPath: $.checkList.*.lastmodifiedtime
+
+          - jsonPath: $.checkList.*.applicationNo
+
+          - jsonPath: $.checkList.*.tenantId
