@@ -226,7 +226,55 @@ serviceMaps:
 
 
 
+    - version: 1.0
+      description: Save noc Document Check List
+      fromTopic: save-noc-document-checklist
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO public.eg_noc_document_check_list(id, documentuid, applicationno, tenantId, action, remarks, createdby, lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: checkList.*
+          jsonMaps:
 
+            - jsonPath: $.checkList.*.id
+
+            - jsonPath: $.checkList.*.documentuid
+
+            - jsonPath: $.checkList.*.applicationNo
+
+            - jsonPath: $.checkList.*.tenantId
+
+            - jsonPath: $.checkList.*.action
+
+            - jsonPath: $.checkList.*.remarks
+
+            - jsonPath: $.checkList.*.createdby
+
+            - jsonPath: $.checkList.*.lastmodifiedby
+
+            - jsonPath: $.checkList.*.createdtime
+
+            - jsonPath: $.checkList.*.lastmodifiedtime
+
+    - version: 1.0
+      description: Update noc Document Check List
+      fromTopic: update-noc-document-checklist
+      isTransaction: true
+      queryMaps:
+        - query: UPDATE public.eg_noc_document_check_list SET action = ?, remarks = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE applicationno = ? AND tenantId = ?;
+          basePath: checkList.*
+          jsonMaps:
+
+            - jsonPath: $.checkList.*.action
+
+            - jsonPath: $.checkList.*.remarks
+
+            - jsonPath: $.checkList.*.lastmodifiedby
+
+            - jsonPath: $.checkList.*.lastmodifiedtime
+
+            - jsonPath: $.checkList.*.applicationNo
+
+            - jsonPath: $.checkList.*.tenantId
 
 
 
