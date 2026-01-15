@@ -163,9 +163,9 @@ ReportDefinitions:
     query: |
       select 
       CASE
-      WHEN initcap(split_part(sc.tenantid, '.', 2)) IN ('Abohar', 'Amritsar', 'Batala', 'Bathinda', 'Mohali', 'Moga',
+      WHEN initcap(split_part(sc.tenantid, '.', 2)) IN ('Abohar', 'Amritsar', 'Batala', 'Barnala', 'Bathinda', 'Mohali', 'Moga',
       'Pathankot', 'Phagwara', 'Patiala', 'Jalandhar', 'Kapurthala', 'Hoshiarpur', 'Ludhiana')
-      THEN 'MC ' || initcap(split_part(sc.tenantid, '.', 2))
+      THEN 'M C ' || initcap(split_part(sc.tenantid, '.', 2))
       ELSE initcap(split_part(sc.tenantid, '.', 2))
       END AS "ULB",
       ulb.district as District,
