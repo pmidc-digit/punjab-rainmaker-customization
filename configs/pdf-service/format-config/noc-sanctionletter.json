@@ -139,7 +139,7 @@
       {
         "style": "next-noc-table",
         "table": {
-          "widths": ["20%", "20%", "20%", "20%", "20%"],
+          "widths": ["20%", "16%", "16%", "16%", "16%", "16%"],
           "body": [
             [
               {
@@ -165,6 +165,11 @@
                 "border": [false, false, false, false]
               },
               {
+                "text": "",
+                "style": "receipt-table-value-down",
+                "border": [false, false, false, false]
+              },
+               {
                 "text": "",
                 "style": "receipt-table-value-down",
                 "border": [false, false, false, false]
@@ -200,6 +205,12 @@
                 "border": [true, true, true, false],
                 "style": "receipt-table-value",
                 "fillColor": "#f2f2f2"
+              },
+              {
+                "text": "Vasika Date",
+                "border": [false, true, true, false],
+                "style": "receipt-table-value",
+                "fillColor": "#f2f2f2"
               }
             ],
             [
@@ -227,6 +238,11 @@
                 "text": "{{khewatAndKhatuniNo}}",
                 "border": [true, true, true, false],
                 "style": "receipt-table-value-down"
+              },
+              {
+                "text": "{{vasikaDate}}",
+                "border": [false, true, true, false],
+                "style": "receipt-table-value-down"
               }
             ],
             [
@@ -241,8 +257,9 @@
                 "text": "{{khasraNo}}",
                 "border": [false, true, true, true],
                 "style": "receipt-table-value-down",
-                "colSpan": 4
+                "colSpan": 5
               },
+              {},
               {},
               {},
               {}
@@ -400,7 +417,8 @@
         "table": {
           "widths": ["3%", "97%"],
           "body": [
-            "{{#var_sanctionTerms}}[{\"text\":\"{{number}}\",\"style\":\"receipt-table-value-down\",\"alignment\":\"left\",\"margin\":[3,2,0,2]},{\"text\":\"{{text}}\",\"style\":\"receipt-table-value-down\",\"alignment\":\"justify\",\"margin\":[3,2,0,2]}]{{/var_sanctionTerms}}"
+            "{{#var_sanctionTerms}}[{\"text\":\"{{number}}\",\"style\":\"receipt-table-value-down\",\"alignment\":\"left\",\"margin\":[3,2,0,2]},{\"text\":\"{{text}}\",\"style\":\"receipt-table-value-down\",\"alignment\":\"justify\",\"margin\":[3,2,0,2]}]{{/var_sanctionTerms}}",
+            "[{\"text\":\"\",\"style\":\"receipt-table-value-down\",\"alignment\":\"left\",\"margin\":[3,2,0,2]},{\"text\":\"{{approverComment}}\",\"style\":\"receipt-table-value-down\",\"alignment\":\"justify\",\"margin\":[3,2,0,2]}]"
           ]
         },
         "layout": "noBorders"
