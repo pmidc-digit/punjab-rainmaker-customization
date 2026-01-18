@@ -11,8 +11,8 @@ serviceMaps:
             INSERT INTO eg_clu (
               id, applicationno, tenantid, status, createdby,
               lastmodifiedby, createdtime, lastmodifiedtime, cluno, applicationtype, clutype,
-              accountid, applicationstatus
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+              accountid, applicationstatus,vasikaNumber, vasikaDate
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?);
           basePath: $.Clu
           jsonMaps:
             - jsonPath: $.Clu.id
@@ -28,6 +28,8 @@ serviceMaps:
             - jsonPath: $.Clu.cluType
             - jsonPath: $.Clu.accountId
             - jsonPath: $.Clu.applicationStatus
+            - jsonPath: $.Clu.vasikaNumber
+            - jsonPath: $.Clu.vasikaDate
 
         - query: >
             INSERT INTO eg_clu_auditdetails (
