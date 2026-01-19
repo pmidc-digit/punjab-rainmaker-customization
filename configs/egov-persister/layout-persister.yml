@@ -11,8 +11,8 @@ serviceMaps:
             INSERT INTO eg_layout (
               id, applicationno, tenantid, status, createdby,
               lastmodifiedby, createdtime, lastmodifiedtime, layoutno, applicationtype, layouttype,
-              accountid, applicationstatus
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+              accountid, applicationstatus, vasikaNumber, vasikaDate
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?);
           basePath: $.Layout
           jsonMaps:
             - jsonPath: $.Layout.id
@@ -28,6 +28,8 @@ serviceMaps:
             - jsonPath: $.Layout.layoutType
             - jsonPath: $.Layout.accountId
             - jsonPath: $.Layout.applicationStatus
+            - jsonPath: $.Layout.vasikaNumber
+            - jsonPath: $.Layout.vasikaDate
 
         - query: >
             INSERT INTO eg_layout_auditdetails (
@@ -258,7 +260,7 @@ serviceMaps:
       fromTopic: update-layout-document-checklist
       isTransaction: true
       queryMaps:
-        - query: UPDATE public.eg_layout_document_check_list SET action = ?, remarks = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE applicationno = ? AND tenantId = ?;
+        - query: UPDATE public.eg_layout_document_check_list SET action = ?, remarks = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE documentuid = ? AND tenantId = ?;
           basePath: checkList.*
           jsonMaps:
 
@@ -270,7 +272,7 @@ serviceMaps:
 
             - jsonPath: $.checkList.*.lastmodifiedtime
 
-            - jsonPath: $.checkList.*.applicationNo
+            - jsonPath: $.checkList.*.documentuid
 
             - jsonPath: $.checkList.*.tenantId
 
