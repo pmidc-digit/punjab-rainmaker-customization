@@ -260,7 +260,7 @@ serviceMaps:
       fromTopic: update-layout-document-checklist
       isTransaction: true
       queryMaps:
-        - query: UPDATE public.eg_layout_document_check_list SET action = ?, remarks = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE applicationno = ? AND tenantId = ?;
+        - query: UPDATE public.eg_layout_document_check_list SET action = ?, remarks = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE documentuid = ? AND tenantId = ?;
           basePath: checkList.*
           jsonMaps:
 
@@ -272,7 +272,7 @@ serviceMaps:
 
             - jsonPath: $.checkList.*.lastmodifiedtime
 
-            - jsonPath: $.checkList.*.applicationNo
+            - jsonPath: $.checkList.*.documentuid
 
             - jsonPath: $.checkList.*.tenantId
 
