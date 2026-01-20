@@ -521,7 +521,7 @@ ReportDefinitions:
     query: >
       -- Use CTE to force query plan, compute & use CTE later
 
-      SELECT  DISTINCT ON (pd.receiptnumber)
+      SELECT DISTINCT ON (pd.receiptnumber)
          pd.receiptnumber AS receiptno,
          bill.consumercode AS connectionno,
          TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate1,
@@ -665,7 +665,7 @@ ReportDefinitions:
         JOIN eg_user u ON u.uuid = o.uuid
         JOIN eg_ndc_details d ON d.applicationid = o.ndcapplicationuuid
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno
-        WHERE 1=1
+        WHERE a.tenantid not in ('pb.testing')
   - reportName: StateCollectionsReport
     decryptionPathId: STATENDCAPPLICATION
     summary: Collections
@@ -838,7 +838,7 @@ ReportDefinitions:
               card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
               to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate
              FROM unique_transactions
-             WHERE 1=1 
+             WHERE tenantid not in ('testing') 
     orderby: ORDER BY createdtime DESC
   - reportName: StateSLAReport
     decryptionPathId: STATENDCAPPLICATION
@@ -990,7 +990,7 @@ ReportDefinitions:
             LEFT JOIN latest_status ls ON n.applicationno = ls.uuid
             JOIN sla_data sla ON sla.businessservice='ndc-services'
             LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
-            WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')             
+            WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT') and tenantid not in ('pb.testing')          
     orderby: ORDER BY n.createdtime DESC, tenantid, final_status
   - reportName: StateReceiptRegisterNDC
     decryptionPathId: STATENDCAPPLICATION
@@ -1117,12 +1117,13 @@ ReportDefinitions:
         searchClause: AND bill.tenantid = $ulb
     query: >
       -- Use CTE to force query plan, compute & use CTE later
+
       SELECT DISTINCT ON (pd.receiptnumber)
-         pd.tenantid AS tenantid, 
+         split_part(pd.tenantid, '.', 2) AS tenantid, 
          pd.receiptnumber AS receiptno,
          bill.consumercode AS connectionno,
          TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate1,
-         'NDC' AS service,
+         'NDC'  AS service,
          usr.name AS collectorname,
          TO_CHAR( TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS transactiondate,
          payment.instrumentnumber,   
@@ -1149,8 +1150,9 @@ ReportDefinitions:
 
       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
        WHERE pd.businessservice = 'NDC'
-         AND payment.paymentstatus != 'CANCELLED'
-    orderby: ORDER BY pd.receiptnumber,pd.receiptdate DESC;
+         AND payment.paymentstatus != 'CANCELLED' 
+         and pd.tenantid not in ('pb.testing')
+    orderby: ORDER BY pd.receiptnumber, pd.receiptdate DESC;
     
   - reportName: OverallSummaryReport
     summary: Details of applicant in ndc , chb, pet service
@@ -1249,7 +1251,7 @@ ReportDefinitions:
         SUM(application_count)       AS application_count,
         MAX(createdtime)      AS createdtime
       FROM all_services
-      WHERE service = $service
+      WHERE service = $service and tenant_name not in ('testing')
     groupby: GROUP BY tenantid, tenant_name, service, application_status
     orderby: ORDER BY tenant_name, service, application_status;
       
@@ -1359,6 +1361,6 @@ ReportDefinitions:
       where r.status not in ('APPROVED','INITIATED','PENDINGPAYMENT' ,'REJECTED','CITIZENACTIONREQUIRED','RENEWED')
        ) all_services 
              WHERE
-      service = $service
+      service = $service and tenant_name not in ('testing')
     groupby: GROUP BY tenant_name, tenantid, service, application_status, assignee_employee 
     orderby: ORDER BY tenant_name, tenantid, service, application_status, assignee_employee;
