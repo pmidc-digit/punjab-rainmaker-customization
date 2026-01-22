@@ -842,7 +842,7 @@ ReportDefinitions:
            LEFT JOIN eg_ptr_petdetails AS pd ON r.id = pd.petdetailsid
            LEFT JOIN eg_user AS u ON u.uuid = o.uuid
            LEFT JOIN current_holder ch ON ch.applicationnumber = r.applicationnumber
-            WHERE  1=1
+            WHERE  1=1 and r.tenantid not in ('pb.testing')
             
   - reportName: StateCollectionsReport
     decryptionPathId: STATEPETREPORTS
@@ -1013,7 +1013,7 @@ ReportDefinitions:
              dd_amount,neft_amount,rtgs_amount,online_amount,amountpaid,
              TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS "PaymentDate"
            FROM unique_transactions
-           WHERE 1 = 1
+           WHERE 1 = 1 and tenantid not in ('pb.testing')
     orderby: ORDER BY createdtime DESC;
     
   - reportName: StateSLAReport
@@ -1164,6 +1164,7 @@ ReportDefinitions:
          JOIN sla_data sla ON 'ptr' = sla.businessservice
          LEFT JOIN assignee_details ae ON ptr.applicationnumber = ae.businessid
          WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY', 'INITIATED', 'PENDINGPAYMENT')
+          and tenantid not in ('pb.testing')
     orderby: ORDER BY ptr.createdtime DESC, tenantid, ls.applicationstatus; 
     
   - reportName: StateReceiptRegisterPET
@@ -1318,6 +1319,7 @@ ReportDefinitions:
           WHERE
               pd.businessservice = 'pet-services'
               AND payment.paymentstatus != 'CANCELLED'
+              and payment.tenantid not in ('pb.testing')
     orderby: ORDER BY pd.receiptdate DESC;  
 
   - reportName: StateDefaulterReport
@@ -1425,3 +1427,4 @@ ReportDefinitions:
            LEFT JOIN latest_holder ch ON ch.applicationnumber = r.applicationnumber
            WHERE  (TO_TIMESTAMP(r.validitydate/1000)::date < CURRENT_DATE)   
            AND r.status NOT IN ('RENEWED', 'APPROVED')   
+            and r.tenantid not in ('pb.testing')
