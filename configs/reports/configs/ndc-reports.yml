@@ -836,7 +836,7 @@ ReportDefinitions:
           FROM (
            SELECT
               applicationno, name, mobilenumber, 'NDC' AS businessservice, applicationstatus,
-              collector_code, cash_amount, cheque_amount,tenantid,
+              collector_code, cash_amount, cheque_amount,tenantid,createdtime,
               card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
               to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate,
               ROW_NUMBER() OVER ( PARTITION BY applicationno

@@ -259,7 +259,7 @@ serviceMaps:
       fromTopic: update-clu-document-checklist
       isTransaction: true
       queryMaps:
-        - query: UPDATE public.eg_clu_document_check_list SET action = ?, remarks = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE documentuid = ? AND tenantId = ?;
+        - query: UPDATE public.eg_clu_document_check_list SET action = ?, remarks = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE id = ? AND tenantId = ?;
           basePath: checkList.*
           jsonMaps:
 
@@ -271,7 +271,7 @@ serviceMaps:
 
             - jsonPath: $.checkList.*.lastmodifiedtime
 
-            - jsonPath: $.checkList.*.documentuid
+            - jsonPath: $.checkList.*.id
 
             - jsonPath: $.checkList.*.tenantId
 
