@@ -514,7 +514,7 @@ ReportDefinitions:
           INNER JOIN eg_chb_applicant_detail a ON a.booking_id = b.booking_id
           INNER JOIN eg_chb_address_detail ad ON ad.applicant_detail_id = a.applicant_detail_id
           INNER JOIN eg_chb_slot_detail s ON s.booking_id = b.booking_id
-          WHERE 1=1
+          WHERE b.tenant_id not in ('pb.testing')
           
   - reportName: StateCollectionsReport
     decryptionPathId: STATECHBREPORTS
@@ -656,7 +656,7 @@ ReportDefinitions:
         neft_amount, rtgs_amount, online_amount, amountpaid,
         TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate
       FROM unique_transactions
-      WHERE 1=1
+      WHERE tenantid not in ('testing')
     orderby: ORDER BY createdtime DESC
     
   - reportName: StateReceiptRegisterVenueBooking
@@ -810,4 +810,5 @@ ReportDefinitions:
         LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer  
         WHERE pd.businessservice = 'chb-services'
         AND payment.paymentstatus != 'CANCELLED'
+        and pd.tenantid not in ('pb.testing')
     orderby: ORDER BY pd.receiptdate DESC;  
