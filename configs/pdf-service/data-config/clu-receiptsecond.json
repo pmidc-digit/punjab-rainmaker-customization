@@ -1,6 +1,6 @@
 {
-  "key": "clu-receipt",
-  "documentType": "CLU_RECEIPT",
+  "key": "clu-receiptsecond",
+  "documentType": "CLU_RECEIPTSECOND",
   "DataConfigs": {
     "moduleName": "rainmaker-common",
     "version": "1.0.0",
@@ -101,7 +101,7 @@
                   "path": "$.tenantId"
                 }
               },
-             {
+              {
                 "variable": "serviceType",
                 "value": {
                   "path": "ACTION_TEST_CLU_HOME"
@@ -121,9 +121,9 @@
                 }
               },
               {
-                "variable": "clu_charge",
+                "variable": "clu_other1_fee",
                 "value": {
-                  "path": "BPA_CLU_CHARGES"
+                  "path": "PDF_STATIC_LABEL_CLU_OTHER1_FEE"
                 },
                 "type": "label",
                 "localisation": {
@@ -133,15 +133,15 @@
                 }
               },
               {
-                "variable": "CluCharge",
+                "variable": "CluOther1Fee",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_CLU_CHARGES')].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_OTHER1_FEE')].adjustedAmount"
                 }
               },
               {
-                "variable": "clu_processing_fee",
+                "variable": "clu_total_fee",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_PROCESSING_FEES"
+                  "path": "PDF_STATIC_LABEL_CLU_TOTAL_FEE"
                 },
                 "type": "label",
                 "localisation": {
@@ -151,15 +151,15 @@
                 }
               },
               {
-                "variable": "CluProcessingFee",
+                "variable": "CluTotalFee",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_PROCESSING_FEE')].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_TOTAL_FEE')].adjustedAmount"
                 }
               },
               {
-                "variable": "clu_external_development_charges",
+                "variable": "clu_other2_fee",
                 "value": {
-                  "path": "BILLINGSERVICE_BUSINESSSERVICE_NKS_EXTERNAL_DEVELOPMENT_CHARGES"
+                  "path": "PDF_STATIC_LABEL_CLU_OTHER2_FEE"
                 },
                 "type": "label",
                 "localisation": {
@@ -169,15 +169,15 @@
                 }
               },
               {
-                "variable": "CluExternalDevelopmentCharges",
+                "variable": "CluOther2Fee",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_EXTERNAL_DEVELOPMENT_CHARGES')].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_OTHER2_FEE')].adjustedAmount"
                 }
               },
               {
-                "variable": "clu_urban_development_cess",
+                "variable": "clu_udc_fee",
                 "value": {
-                  "path": "BPA_URBAN_DEVELOPMENT_CESS"
+                  "path": "PDF_STATIC_LABEL_CLU_UDC_FEE"
                 },
                 "type": "label",
                 "localisation": {
@@ -187,12 +187,29 @@
                 }
               },
               {
-                "variable": "CluUrbanDevelopmentCess",
+                "variable": "CluUdcFee",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_URBAN_DEVELOPMENT_CESS')].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_UDC_FEE')].adjustedAmount"
                 }
               },
-
+              {
+                "variable": "clu_lf_fee",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CLU_LF_FEE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "CluLfFee",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_LF_FEE')].adjustedAmount"
+                }
+              },
               {
                 "variable": "fromPeriod",
                 "value": {
