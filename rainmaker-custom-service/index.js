@@ -463,20 +463,20 @@ async function findEstimate(requestBody){
 // }
 
 
-async function _estimateIntegrationTaxProcessor(req1, res1) {
+//async function _estimateIntegrationTaxProcessor(req1, res1) {
 
-    log("Calling PMIDC estimate API: "+ JSON.stringify(res1) )
+   // log("Calling PMIDC estimate API: "+ JSON.stringify(res1) )
 
-    let estimate = await request.post({
-        url: url.resolve(PT_INTEGRATION_HOST, "/apt_estimate_pt_2013/api_estimate_pt_2013"),
-        body: {request:req1, response:res1},
-        json: true
-    })
+   // let estimate = await request.post({
+   //     url: url.resolve(PT_INTEGRATION_HOST, "/apt_estimate_pt_2013/api_estimate_pt_2013"),
+  //      body: {request:req1, response:res1},
+   //     json: true
+   // })
 
-    log("Got response from PMIDC estimate API: " + JSON.stringify(estimate))
+   // log("Got response from PMIDC estimate API: " + JSON.stringify(estimate))
 
-    return estimate;
-}
+   // return estimate;
+//}
 
 
 
