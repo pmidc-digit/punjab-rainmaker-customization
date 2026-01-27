@@ -1,0 +1,34 @@
+serviceMaps:
+  serviceName: Property Tax Assessment Service
+  mappings:
+    - version: 1.0
+      name: assessment scheduler job logging
+      description: Log results to eg_pt_assessment_job
+      fromTopic: assessment-scheduler-success # This should match configs.getAssessmentPerisiterTopic()
+      queryMaps:
+        - query: |
+            INSERT INTO eg_pt_assessment_job
+            (id, assessmentnumber, propertyid, financialyear, createdtime, status, error, tenantid, additionaldetails)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $
+          jsonMaps:
+            # We use 'default' values or safe paths to prevent the LoggingErrorHandler
+            - jsonPath: $.assessment.id
+            
+            - jsonPath: $.assessment.assessmentNumber
+            
+            - jsonPath: $.assessment.propertyId
+            
+            - jsonPath: $.assessment.financialYear
+            
+            # Using $.timestamp from your Map instead of nested auditDetails is safer for logging
+            - jsonPath: $.timestamp 
+              type: LONG
+            
+            - jsonPath: $.status
+            
+            - jsonPath: $.error
+            
+            - jsonPath: $.tenantId
+            
+            - jsonPath: $.assessment.additionalDetails
