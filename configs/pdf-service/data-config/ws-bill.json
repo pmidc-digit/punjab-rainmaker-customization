@@ -734,6 +734,10 @@
                 "formula": "{{ws_charge}}"
               },
               {
+                "variable": "discharge",
+                "formula": "{{WS_DISCHARGE_CHARGES}}"
+              },
+              {
                 "variable": "penalty",
                 "formula": "{{timePenalty}}+{{adhocPenalty}}"
               },
@@ -747,7 +751,7 @@
               },
               {
                 "variable": "demandTotalAmount",
-                "formula": "{{ws_roundoff}}+{{ws_charge}}+{{ws_water_cess}}+{{ws_time_interest}}+{{ws_time_penalty}}"
+                "formula": "{{ws_roundoff}}+{{ws_charge}}+{{WS_DISCHARGE_CHARGES}}+{{ws_water_cess}}+{{ws_time_interest}}+{{ws_time_penalty}}+{{}}"
               },
               {
                 "variable": "billTotalAmount",
@@ -834,6 +838,10 @@
                   {
                     "variable": "ws_charge",
                     "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_CHARGE')].taxAmount"
+                  },
+                  {
+                    "variable": "WS_DISCHARGE_CHARGES",
+                    "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_DISCHARGE_CHARGES')].taxAmount"
                   },
                   {
                     "variable": "ws_water_cess",
