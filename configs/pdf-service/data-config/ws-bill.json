@@ -725,9 +725,9 @@
                               "value": {
                                 "condition": {
                                   "if": {
-                                    ">": [
-                                      { "var": "meterReading.length" },
-                                      0
+                                    "and": [
+                                      { "!=": [{ "var": "meterReading" }, null] },
+                                      { ">": [{ "var": "meterReading.length" }, 0] }
                                     ]
                                   },
                                   "then": true,
