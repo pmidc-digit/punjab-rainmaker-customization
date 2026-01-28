@@ -1,0 +1,52 @@
+serviceMaps:
+  serviceName: property-rate
+  mappings:
+  - version: 1.0
+    description: Persists revenue property integration rates
+    fromTopic: save-property-rate-topic
+    isTransaction: true
+    queryMaps:
+
+    # FIX: Change the first '?' to '?::uuid' so Postgres converts the String to UUID
+    - query: INSERT INTO public.revenue_property_integration(id, propertyid, tenantid, districtid, tehsilid, villageid, isurban, segmentid, categoryid, subcategoryid, locality, rate, unit, rateid, isactive, isproratacal, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: PropertyRates.*
+      jsonMaps:
+      - jsonPath: $.PropertyRates.*.id
+
+      - jsonPath: $.PropertyRates.*.propertyId
+
+      - jsonPath: $.PropertyRates.*.tenantId
+
+      - jsonPath: $.PropertyRates.*.districtId
+
+      - jsonPath: $.PropertyRates.*.tehsilId
+
+      - jsonPath: $.PropertyRates.*.villageId
+
+      - jsonPath: $.PropertyRates.*.isUrban
+
+      - jsonPath: $.PropertyRates.*.segmentId
+
+      - jsonPath: $.PropertyRates.*.categoryId
+
+      - jsonPath: $.PropertyRates.*.subCategoryId
+
+      - jsonPath: $.PropertyRates.*.locality
+
+      - jsonPath: $.PropertyRates.*.rate
+
+      - jsonPath: $.PropertyRates.*.unit
+
+      - jsonPath: $.PropertyRates.*.rateId
+
+      - jsonPath: $.PropertyRates.*.isActive
+
+      - jsonPath: $.PropertyRates.*.isProrataCal
+
+      - jsonPath: $.PropertyRates.*.createdBy
+
+      - jsonPath: $.PropertyRates.*.lastModifiedBy
+
+      - jsonPath: $.PropertyRates.*.createdTime
+
+      - jsonPath: $.PropertyRates.*.lastModifiedTime
