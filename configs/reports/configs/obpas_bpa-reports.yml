@@ -39,11 +39,6 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: employee_code
-    label: employee_code
-    type: string
-    source: obpas_bpa
-    total: false
   searchParams:
   - name: fromDate
     label: fromDate
@@ -60,7 +55,7 @@ ReportDefinitions:
   - name: businessservice
     label: Business Service
     type: singlevaluelist
-    pattern: "list://BPALOW:BPA_LOW"
+    pattern: "list://BPA_LOW:Self Certification"
     source: pt
     isMandatory: false
     searchClause: AND ch.businessservice = $businessservice 
@@ -81,20 +76,20 @@ ReportDefinitions:
           AND wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       )
-      
-      SELECT
+  
+      SELECT DISTINCT ON (o.applicationno)
         u.name,
         u.mobilenumber,
-        o.status,
+        o.status as applicationstatus,
         'BPA' as businessservice,
         o.applicationno,
-        ch.assignee_name  AS employee_name,
-        ch.assignee_code  AS employee_code
+        ch.assignee_name  AS employee_name
       FROM  eg_bpa_document  a
       JOIN eg_bpa_buildingplan o   ON a.buildingplanid = o.id            
       JOIN eg_user u        ON u.uuid = o.accountid           
       LEFT JOIN current_holder ch ON ch.applicationno = o.applicationno
       WHERE o.tenantid = $tenantid
+  orderby:  ORDER BY o.applicationno;
 
 - reportName: CollectionsReportBPA
   decryptionPathId: LAYOUTREPORTS
@@ -125,8 +120,8 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: applicationstatus
-    label: applicationstatus
+  - name: status
+    label: status
     type: string
     source: obpas_bpa
     total: false
@@ -175,8 +170,8 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: true
-  - name: PaymentDate
-    label: PaymentDate
+  - name: payment_date
+    label: payment_date
     type: string
     source: obpas_bpa
     total: false
@@ -250,7 +245,6 @@ ReportDefinitions:
         FROM egcl_paymentdetail pd
         JOIN egcl_payment p ON pd.paymentid = p.id
         LEFT JOIN egcl_bill bill ON bill.id = pd.billid
-        -- tolerant matching: try matching consumercode to applicationno OR to id (stringified)
         LEFT JOIN eg_bpa_buildingplan a ON trim(bill.consumercode) = trim(a.applicationno)
                            OR trim(bill.consumercode) = trim(a.id::text)
         LEFT JOIN eg_user u_applicant ON u_applicant.uuid = a.accountid
@@ -262,7 +256,7 @@ ReportDefinitions:
           AND p.tenantid = $tenantid
       )
       
-      SELECT
+      SELECT  DISTINCT ON (applicationno)
         to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS payment_date,
         applicationno,
         bill_consumercode,
@@ -273,7 +267,7 @@ ReportDefinitions:
         collector_code,
         cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
       FROM unique_transactions where 1=1
-  orderby: ORDER BY createdtime DESC 
+  orderby: ORDER BY applicationno,createdtime DESC 
   
 - reportName: SLAReportbpa
   decryptionPathId: LAYOUTREPORTS
@@ -367,7 +361,7 @@ ReportDefinitions:
         status_times AS (
              SELECT
                 uuid,
-                MAX(CASE WHEN applicationstatus = 'DOCUMENTVERIFY' THEN createdtime END) AS docverify_time,
+                MAX(CASE WHEN applicationstatus = 'VERIFICATION_INPROGRESS' THEN createdtime END) AS docverify_time,
                 MAX(CASE WHEN applicationstatus IN ('APPROVED','REJECTED') THEN lastmodifiedtime END) AS final_time
               FROM wf_detailed
               GROUP BY uuid
