@@ -474,218 +474,69 @@
         },
         "layout": {}
       },
-       {
-        "style": "noc-table2",
-        "table": {
-          "widths": [
-            "103%"
-          ],
-          "body": [
-            [
-              {
-                "text": "{{billing_summary_property_tax}} {{serviceType}}",
-                "border": [
-                  true,
-                  true,
-                  true,
-                  false
-                ],
-                "style": "receipt-table-value"
-              }
+     {
+  "text": "{{#if meterreadingstatus}}",
+  "margin": [0, 0, 0, 0]
+},
+{
+  "style": "noc-table2",
+  "table": {
+    "widths": ["103%"],
+    "body": [
+      [
+        {
+          "text": "{{billing_summary_property_tax}} {{serviceType}}",
+          "border": [true, true, true, false],
+          "style": "receipt-table-value"
+        }
+      ],
+      [
+        {
+          "table": {
+            "widths": [
+              "12%",
+              "23%",
+              "15%",
+              "10%",
+              "10%",
+              "10%",
+              "10%",
+              "*"
             ],
-            [
-              {
-                "table": {
-                  "widths": [
-                    "12%",
-                    "23%",
-                    "15%",
-                    "10%",
-                    "10%",
-                    "10%",
-                    "10%",
-                    "*"
-                  ],
-                  "body": [
-                    [
-                      {
-                        "text": "{{arrears_label}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table-value2"
-                      },
-                      {
-                        "text": "{{advanceAdjusted_label}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table-value2"
-                      },
-                      {
-                        "text": "Advance",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table-value2"
-                      },
-                      {
-                        "text": "{{charge_label}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table-value2"
-                      },
-                      {
-                        "text": "{{penalty_label}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table-value2"
-                      },
-                      {
-                        "text": "{{rebate_label}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table-value2"
-                      },
-                      {
-                        "text": "{{others_label}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table-value2"
-                      },
-                      {
-                        "text": "{{total_label}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table-value2"
-                      }
-                    ],
-                    [
-                      {
-                        "text": "{{arrears}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table2"
-                      },
-                      {
-                        "text": "{{advanceAdjusted}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table2"
-                      },
-                      {
-                        "text": "{{advanceAvailable}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table2"
-                      },
-                      {
-                        "text": "{{charge}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table2"
-                      },
-                      {
-                        "text": "{{penalty}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table2"
-                      },
-                      {
-                        "text": "{{rebate}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table2"
-                      },
-                      {
-                        "text": "{{others}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table2"
-                      },
-                      {
-                        "text": "{{calculatedTotal}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table2",
-                        "bold": true
-                      }
-                    ]
-                  ]
-                },
-                "border": [
-                  true,
-                  true,
-                  true,
-                  true
-                ]
-              }
+            "body": [
+              [
+                { "text": "{{arrears_label}}", "border": [false,false,false,false], "style": "receipt-table-value2" },
+                { "text": "{{advanceAdjusted_label}}", "border": [false,false,false,false], "style": "receipt-table-value2" },
+                { "text": "Advance", "border": [false,false,false,false], "style": "receipt-table-value2" },
+                { "text": "{{charge_label}}", "border": [false,false,false,false], "style": "receipt-table-value2" },
+                { "text": "{{penalty_label}}", "border": [false,false,false,false], "style": "receipt-table-value2" },
+                { "text": "{{rebate_label}}", "border": [false,false,false,false], "style": "receipt-table-value2" },
+                { "text": "{{others_label}}", "border": [false,false,false,false], "style": "receipt-table-value2" },
+                { "text": "{{total_label}}", "border": [false,false,false,false], "style": "receipt-table-value2" }
+              ],
+              [
+                { "text": "{{arrears}}", "border": [false,false,false,false], "style": "receipt-table2" },
+                { "text": "{{advanceAdjusted}}", "border": [false,false,false,false], "style": "receipt-table2" },
+                { "text": "{{advanceAvailable}}", "border": [false,false,false,false], "style": "receipt-table2" },
+                { "text": "{{charge}}", "border": [false,false,false,false], "style": "receipt-table2" },
+                { "text": "{{penalty}}", "border": [false,false,false,false], "style": "receipt-table2" },
+                { "text": "{{rebate}}", "border": [false,false,false,false], "style": "receipt-table2" },
+                { "text": "{{others}}", "border": [false,false,false,false], "style": "receipt-table2" },
+                { "text": "{{calculatedTotal}}", "border": [false,false,false,false], "style": "receipt-table2", "bold": true }
+              ]
             ]
-          ]
-        },
-        "layout": {}
-      },
+          },
+          "border": [true, true, true, true]
+        }
+      ]
+    ]
+  },
+  "layout": {}
+},
+{
+  "text": "{{/if}}",
+  "margin": [0, 0, 0, 0]
+}
       {
         "style": "noc-table2",
         "table": {
