@@ -463,20 +463,20 @@ async function findEstimate(requestBody){
 // }
 
 
-//async function _estimateIntegrationTaxProcessor(req1, res1) {
+ async function _estimateIntegrationTaxProcessor(req1, res1) {
 
-   // log("Calling PMIDC estimate API: "+ JSON.stringify(res1) )
+    log("Calling PMIDC estimate API: "+ JSON.stringify(res1) )
 
-   // let estimate = await request.post({
-   //     url: url.resolve(PT_INTEGRATION_HOST, "/apt_estimate_pt_2013/api_estimate_pt_2013"),
-  //      body: {request:req1, response:res1},
-   //     json: true
-   // })
+    let estimate = await request.post({
+        url: url.resolve(PT_INTEGRATION_HOST, "/apt_estimate_pt_2013/api_estimate_pt_2013"),
+       body: {request:req1, response:res1},
+        json: true
+    })
 
-   // log("Got response from PMIDC estimate API: " + JSON.stringify(estimate))
+    log("Got response from PMIDC estimate API: " + JSON.stringify(estimate))
 
-   // return estimate;
-//}
+    return estimate;
+}
 
 
 
@@ -734,7 +734,7 @@ async function _createAndUpdateIntegrationTaxProcessor(req, response){
 
         let estimateResponseBody = await findEstimate(req)
         console.log("After Getting Response from entimate sending it to PMIDC TO get the Estimate Response")
-       // let estimateResponse = await _estimateIntegrationTaxProcessor(oldRequestbody, estimateResponseBody)
+        let estimateResponse = await _estimateIntegrationTaxProcessor(oldRequestbody, estimateResponseBody)
 
 
         
@@ -1058,7 +1058,7 @@ router.post('/protected/punjab-pt/pt-calculator-v2/_estimate', asyncMiddleware(a
                 log("Got request for tenantid: "+tenantId+" and finanancial year: "+assessmentYear)
                 log("Request body: "+ JSON.stringify(request));
                 
-             //   response = await _estimateIntegrationTaxProcessor(oldRequestbody, response)
+                response = await _estimateIntegrationTaxProcessor(oldRequestbody, response)
         } else if(isCitizen(request)){
             data =  
             {
