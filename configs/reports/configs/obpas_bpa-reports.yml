@@ -55,7 +55,7 @@ ReportDefinitions:
   - name: businessservice
     label: Business Service
     type: singlevaluelist
-    pattern: "list://BPA_LOW:Self Certification"
+    pattern: "list://BPA_LOW:Self_Certification"
     source: pt
     isMandatory: false
     searchClause: AND ch.businessservice = $businessservice 
@@ -448,8 +448,8 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: service
-    label: service
+  - name: businessservice
+    label: businessservice
     type: string
     source: obpas_bpa
     total: false
@@ -537,7 +537,7 @@ ReportDefinitions:
               TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata',
               'DD-MM-YYYY'
           ) AS receiptdate,
-          pd.businessservice AS service,
+          pd.businessservice ,
           usr.name AS collectorname,
           TO_CHAR(
               TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata',
