@@ -729,7 +729,8 @@
                             {
                                 "variable": "lastMeterReading",
                                 "value": {
-                                    "path": "$.meterReading.lastReading"
+                                    "path": "$.meterReading.lastReading",
+                                    "default": 0
                                 }
                             },
                             {
@@ -742,7 +743,8 @@
                             {
                                 "variable": "currentMeterReading",
                                 "value": {
-                                    "path": "$.meterReading.currentReading"
+                                    "path": "$.meterReading.currentReading",
+                                    "default": 0
                                 }
                             },
                             {
@@ -816,6 +818,10 @@
                             {
                                 "variable": "calculatedTotal",
                                 "formula": "{{billTotalAmount}}>0?{{billTotalAmount}}:0"
+                            },
+                            {
+                                "variable": "consumedUnit",
+                                "formula": "{{currentMeterReading}}-{{lastMeterReading}}"
                             }
                         ]
                     },
