@@ -102,7 +102,7 @@ serviceMaps:
           jsonMaps:
             - jsonPath: $.Clu.owners.*.id
             - jsonPath: $.Clu.owners.*.tenantId
-            - jsonPath: $.Clu.id  # nocid from eg_noc(id)
+            - jsonPath: $.Clu.id
             - jsonPath: $.Clu.owners.*.status
             - jsonPath: $.Clu.owners.*.isPrimaryOwner
             - jsonPath: $.Clu.owners.*.type
@@ -223,6 +223,37 @@ serviceMaps:
             - jsonPath: $.Clu.cluDetails.auditDetails.lastModifiedBy
             - jsonPath: $.Clu.cluDetails.auditDetails.lastModifiedTime
             - jsonPath: $.Clu.cluDetails.id
+
+
+        - query: > 
+            INSERT INTO eg_clu_owner (
+              id, tenantid, cluId, status, isprimaryowner,
+              ownertype, ownershippercentage, institutionid, relationship,
+              createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails
+            ,uuid
+            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+            ON CONFLICT (uuid, cluId) DO UPDATE SET
+            status = EXCLUDED.status;
+          basePath: $.Clu.owners.*
+
+          jsonMaps:
+            - jsonPath: $.Clu.owners.*.id
+            - jsonPath: $.Clu.owners.*.tenantId
+            - jsonPath: $.Clu.id
+            - jsonPath: $.Clu.owners.*.status
+            - jsonPath: $.Clu.owners.*.isPrimaryOwner
+            - jsonPath: $.Clu.owners.*.type
+            - jsonPath: $.Clu.owners.*.ownershipPercentage
+            - jsonPath: $.Clu.owners.*.institutionId
+            - jsonPath: $.Clu.owners.*.relationship
+            - jsonPath: $.Clu.owners.*.createdBy
+            - jsonPath: $.Clu.owners.*.createdDate
+            - jsonPath: $.Clu.owners.*.lastModifiedBy
+            - jsonPath: $.Clu.owners.*.lastModifiedDate
+            - jsonPath: $.Clu.owners.*.additionalDetails
+              type: JSON
+              dbType: JSONB
+            - jsonPath: $.Clu.owners.*.uuid
 
 
     - version: 1.0
