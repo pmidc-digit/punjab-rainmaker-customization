@@ -102,7 +102,7 @@ serviceMaps:
           jsonMaps:
             - jsonPath: $.Layout.owners.*.id
             - jsonPath: $.Layout.owners.*.tenantId
-            - jsonPath: $.Layout.id  # nocid from eg_noc(id)
+            - jsonPath: $.Layout.id
             - jsonPath: $.Layout.owners.*.status
             - jsonPath: $.Layout.owners.*.isPrimaryOwner
             - jsonPath: $.Layout.owners.*.type
@@ -224,6 +224,36 @@ serviceMaps:
             - jsonPath: $.Layout.layoutDetails.auditDetails.lastModifiedTime
             - jsonPath: $.Layout.layoutDetails.id
 
+
+        - query: > 
+            INSERT INTO eg_layout_owner (
+              id, tenantid, layoutId, status, isprimaryowner,
+              ownertype, ownershippercentage, institutionid, relationship,
+              createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails
+            ,uuid
+            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+            ON CONFLICT (uuid, layoutId) DO UPDATE SET
+            status = EXCLUDED.status;
+          basePath: $.Layout.owners.*
+
+          jsonMaps:
+            - jsonPath: $.Layout.owners.*.id
+            - jsonPath: $.Layout.owners.*.tenantId
+            - jsonPath: $.Layout.id
+            - jsonPath: $.Layout.owners.*.status
+            - jsonPath: $.Layout.owners.*.isPrimaryOwner
+            - jsonPath: $.Layout.owners.*.type
+            - jsonPath: $.Layout.owners.*.ownershipPercentage
+            - jsonPath: $.Layout.owners.*.institutionId
+            - jsonPath: $.Layout.owners.*.relationship
+            - jsonPath: $.Layout.owners.*.createdBy
+            - jsonPath: $.Layout.owners.*.createdDate
+            - jsonPath: $.Layout.owners.*.lastModifiedBy
+            - jsonPath: $.Layout.owners.*.lastModifiedDate
+            - jsonPath: $.Layout.owners.*.additionalDetails
+              type: JSON
+              dbType: JSONB
+            - jsonPath: $.Layout.owners.*.uuid
 
 
     - version: 1.0

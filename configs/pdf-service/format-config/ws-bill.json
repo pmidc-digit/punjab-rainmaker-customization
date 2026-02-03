@@ -95,7 +95,8 @@
         },
         "layout": {}
       },
-      {
+     
+        {
         "style": "noc-table2",
         "table": {
           "widths": [
@@ -229,7 +230,7 @@
                         "style": "receipt-table-value2"
                       },
                       {
-                        "text": "House No.",
+                        "text": "Consumer Name",
                         "border": [
                           false,
                           false,
@@ -239,7 +240,7 @@
                         "style": "receipt-table-value2"
                       },
                       {
-                        "text": "Ledger No / Group ID",
+                        "text": "Guardian Name",
                         "border": [
                           false,
                           false,
@@ -271,7 +272,7 @@
                         "style": "receipt-table2"
                       },
                       {
-                        "text": "{{houseNo}} {{buildingName}}",
+                        "text": "{{ownerName}}",
                         "border": [
                           false,
                           false,
@@ -281,7 +282,7 @@
                         "style": "receipt-table2"
                       },
                       {
-                        "text": "{{ledgerId}} {{groupId}}",
+                        "text": "{{guardianName}}",
                         "border": [
                           false,
                           false,
@@ -303,7 +304,7 @@
                         "style": "receipt-table-value2"
                       },
                       {
-                        "text": "Consumer Name",
+                        "text": "Ledger No / Group ID ",
                         "border": [
                           false,
                           false,
@@ -313,7 +314,7 @@
                         "style": "receipt-table-value2"
                       },
                       {
-                        "text": "Guardian Name",
+                        "text": "Usage Type",
                         "border": [
                           false,
                           false,
@@ -323,7 +324,7 @@
                         "style": "receipt-table-value2"
                       },
                       {
-                        "text": "Locality",
+                        "text": "Mobile Number",
                         "border": [
                           false,
                           false,
@@ -345,7 +346,7 @@
                         "style": "receipt-table2"
                       },
                       {
-                        "text": "{{ownerName}}",
+                        "text": "{{ledgerId}} {{groupId}}",
                         "border": [
                           false,
                           false,
@@ -355,7 +356,7 @@
                         "style": "receipt-table2"
                       },
                       {
-                        "text": "{{guardianName}}",
+                        "text": "{{usageType}}",
                         "border": [
                           false,
                           false,
@@ -365,7 +366,7 @@
                         "style": "receipt-table2"
                       },
                       {
-                        "text": "{{locality}}",
+                        "text": "{{mobileNo}}",
                         "border": [
                           false,
                           false,
@@ -374,30 +375,39 @@
                         ],
                         "style": "receipt-table2"
                       }
-                    ],
+                    ]                    
+                  ]
+                },
+                "border": [
+                  true,
+                  false,
+                  true,
+                  false
+                ]
+              }
+            ]
+          ]
+        },
+        "layout": {}
+      },
+       {
+        "style": "noc-table2",
+        "table": {
+          "widths": [
+            "103%"
+          ],
+          "body": [
+            [
+              {
+                "table": {
+                  "widths": [
+                    "50%",
+                    "50%"
+                  ],
+                  "body": [
                     [
                       {
-                        "text": "Usage Type",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table-value2"
-                      },
-                      {
-                        "text": "Mobile Number",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table-value2"
-                      },
-                      {
-                        "text": "Street Name/Landmark",
+                        "text": "Locality",
                         "border": [
                           false,
                           false,
@@ -419,27 +429,7 @@
                     ],
                     [
                       {
-                        "text": "{{usageType}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table2"
-                      },
-                      {
-                        "text": "{{mobileNo}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table2"
-                      },
-                      {
-                        "text": "{{streetName}}{{landmark}}",
+                        "text": "{{locality}}",
                         "border": [
                           false,
                           false,
@@ -458,12 +448,12 @@
                         ],
                         "style": "receipt-table2"
                       }
-                    ]
+                    ]                 
                   ]
                 },
                 "border": [
                   true,
-                  true,
+                  false,
                   true,
                   true
                 ]
@@ -473,7 +463,7 @@
         },
         "layout": {}
       },
-      {
+       {
         "style": "noc-table2",
         "table": {
           "widths": [
@@ -482,10 +472,10 @@
           "body": [
             [
               {
-                "text": "{{billing_summary_property_tax}} {{serviceType}}",
+                "text": "Meter Details                          Meter Status : {{meterStatus}}",
                 "border": [
                   true,
-                  true,
+                  false,
                   true,
                   false
                 ],
@@ -496,89 +486,56 @@
               {
                 "table": {
                   "widths": [
-                    "12%",
-                    "23%",
-                    "15%",
-                    "10%",
-                    "10%",
-                    "10%",
-                    "10%",
-                    "*"
+                    "20%",
+                    "20%",
+                    "20%",
+                    "20%",
+                    "20%"
                   ],
                   "body": [
                     [
                       {
-                        "text": "{{arrears_label}}",
+                        "text": "Last Reading (KL)",
                         "border": [
                           false,
                           false,
-                          false,
+                          true,
                           false
                         ],
                         "style": "receipt-table-value2"
                       },
                       {
-                        "text": "{{advanceAdjusted_label}}",
+                        "text": "Last Reading Date",
                         "border": [
                           false,
                           false,
-                          false,
+                          true,
                           false
                         ],
                         "style": "receipt-table-value2"
                       },
                       {
-                        "text": "Advance",
+                        "text": "Current Reading (KL)",
                         "border": [
                           false,
                           false,
-                          false,
+                          true,
                           false
                         ],
                         "style": "receipt-table-value2"
                       },
                       {
-                        "text": "{{charge_label}}",
+                        "text": "Current Reading Date",
                         "border": [
                           false,
                           false,
-                          false,
+                          true,
                           false
                         ],
                         "style": "receipt-table-value2"
                       },
                       {
-                        "text": "{{penalty_label}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table-value2"
-                      },
-                      {
-                        "text": "{{rebate_label}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table-value2"
-                      },
-                      {
-                        "text": "{{others_label}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table-value2"
-                      },
-                      {
-                        "text": "{{total_label}}",
+                        "text": "Unit Consumed (KL)",
                         "border": [
                           false,
                           false,
@@ -590,85 +547,54 @@
                     ],
                     [
                       {
-                        "text": "{{arrears}}",
+                        "text": "{{lastMeterReading}}",
                         "border": [
                           false,
-                          false,
-                          false,
+                          true,
+                          true,
                           false
                         ],
                         "style": "receipt-table2"
                       },
                       {
-                        "text": "{{advanceAdjusted}}",
+                        "text": "{{lastMeterReadingDate}}",
                         "border": [
                           false,
-                          false,
-                          false,
+                          true,
+                          true,
                           false
                         ],
                         "style": "receipt-table2"
                       },
                       {
-                        "text": "{{advanceAvailable}}",
+                        "text": "{{currentMeterReading}}",
                         "border": [
                           false,
-                          false,
-                          false,
+                          true,
+                          true,
                           false
                         ],
                         "style": "receipt-table2"
                       },
                       {
-                        "text": "{{charge}}",
+                        "text": "{{currentMeterReadingDate}}",
                         "border": [
                           false,
-                          false,
-                          false,
+                          true,
+                          true,
                           false
                         ],
                         "style": "receipt-table2"
                       },
                       {
-                        "text": "{{penalty}}",
+                        "text": "{{consumedUnit}}",
                         "border": [
                           false,
-                          false,
+                          true,
                           false,
                           false
                         ],
                         "style": "receipt-table2"
-                      },
-                      {
-                        "text": "{{rebate}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table2"
-                      },
-                      {
-                        "text": "{{others}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table2"
-                      },
-                      {
-                        "text": "{{calculatedTotal}}",
-                        "border": [
-                          false,
-                          false,
-                          false,
-                          false
-                        ],
-                        "style": "receipt-table2",
-                        "bold": true
                       }
                     ]
                   ]
@@ -685,6 +611,63 @@
         },
         "layout": {}
       },
+    {
+    "style": "noc-table2",
+    "table": {
+        "widths": ["103%"],
+        "body": [
+        [
+            {
+            "text": "{{billing_summary_property_tax}} {{serviceType}}",
+            "border": [true, true, true, false],
+            "style": "receipt-table-value"
+            }
+        ],
+        [
+            {
+            "table": {
+                "widths": [
+                "12%",
+                "23%",
+                "15%",
+                "10%",
+                "10%",
+                "10%",
+                "10%",
+                "*"
+                ],
+                "body": [
+                [
+                    { "text": "{{arrears_label}}", "border": [false,false,false,false], "style": "receipt-table-value2" },
+                    { "text": "{{advanceAdjusted_label}}", "border": [false,false,false,false], "style": "receipt-table-value2" },
+                    { "text": "Advance", "border": [false,false,false,false], "style": "receipt-table-value2" },
+                    { "text": "{{charge_label}}", "border": [false,false,false,false], "style": "receipt-table-value2" },
+                    { "text": "{{penalty_label}}", "border": [false,false,false,false], "style": "receipt-table-value2" },
+                    { "text": "{{rebate_label}}", "border": [false,false,false,false], "style": "receipt-table-value2" },
+                    { "text": "{{others_label}}", "border": [false,false,false,false], "style": "receipt-table-value2" },
+                    { "text": "{{total_label}}", "border": [false,false,false,false], "style": "receipt-table-value2" }
+                ],
+                [
+                    { "text": "{{arrears}}", "border": [false,false,false,false], "style": "receipt-table2" },
+                    { "text": "{{advanceAdjusted}}", "border": [false,false,false,false], "style": "receipt-table2" },
+                    { "text": "{{advanceAvailable}}", "border": [false,false,false,false], "style": "receipt-table2" },
+                    { "text": "{{charge}}", "border": [false,false,false,false], "style": "receipt-table2" },
+                    { "text": "{{penalty}}", "border": [false,false,false,false], "style": "receipt-table2" },
+                    { "text": "{{rebate}}", "border": [false,false,false,false], "style": "receipt-table2" },
+                    { "text": "{{others}}", "border": [false,false,false,false], "style": "receipt-table2" },
+                    { "text": "{{calculatedTotal}}", "border": [false,false,false,false], "style": "receipt-table2", "bold": true }
+                ]
+                ]
+            },
+            "border": [true, true, true, true]
+            }
+        ]
+        ]
+    },
+    "layout": {}
+    },
+
+     
       {
         "style": "noc-table3",
         "table": {
@@ -720,7 +703,7 @@
                   false
                 ],
                 "margin": [
-                  4,
+                  1,
                   0,
                   0,
                   0.5
@@ -737,7 +720,7 @@
                   false
                 ],
                 "margin": [
-                  4,
+                  1,
                   0,
                   0,
                   0.5
@@ -754,7 +737,7 @@
                   false
                 ],
                 "margin": [
-                  4,
+                  1,
                   0,
                   0,
                   0.5
@@ -771,7 +754,7 @@
                   false
                 ],
                 "margin": [
-                  4,
+                  1,
                   0,
                   0,
                   0.5
@@ -788,7 +771,7 @@
                   true
                 ],
                 "margin": [
-                  4,
+                  1,
                   0,
                   0,
                   0.5
@@ -1036,11 +1019,11 @@
         ]
       },
       "noc-table3": {
-        "fontSize": 10,
+        "fontSize": 8,
         "color": "#484848",
         "margin": [
           -25,
-          13,
+          10,
           -8,
           -8
         ]

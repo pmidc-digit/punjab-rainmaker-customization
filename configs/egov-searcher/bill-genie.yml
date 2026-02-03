@@ -94,9 +94,11 @@ SearchDefinitions:
           ad_additionaldetails, ptadd.doorNo as ptadd_doorNo, ptadd.landmark as
           ptadd_landmark, ptadd.city as ptadd_city, ptadd.pincode as
           ptadd_pincode, ptadd.locality as ptadd_locality, ptadd.street as ptadd_street, ptadd.region as ptadd_region, ptadd.plotno as ptadd_plotno, ptadd.buildingname as ptadd_buildingname, ptadd.district as ptadd_district, ptadd.state as ptadd_state, ptadd.latitude as ptadd_latitude, ptadd.longitude as ptadd_longitude, 
-          ptown.userid as ptown_userid
+          ptown.userid as ptown_userid,lm.connectionno AS mr_connectionno,lm.lastreading AS mr_lastreading,lm.lastreadingdate AS mr_lastreadingdate,lm.currentreading AS mr_currentreading,lm.currentreadingdate AS mr_currentreadingdate,lm.consumption AS mr_consumption,lm.meterstatus AS mr_meterstatus,lm.billingperiod AS mr_billingperiod
 
-          FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid INNER JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid INNER JOIN eg_ws_connection conn ON bd.consumercode = conn.connectionno INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id $where and conn.status='Active')
+          FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid INNER JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid INNER JOIN eg_ws_connection conn ON bd.consumercode = conn.connectionno INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id     LEFT JOIN (
+          SELECT * FROM (SELECT mr.*, ROW_NUMBER() OVER (PARTITION BY mr.connectionno ORDER BY mr.createdtime DESC) rn FROM eg_ws_meterreading mr) t WHERE rn = 1
+          ) lm ON lm.connectionno = conn.connectionno $where and conn.status='Active')
           select * from bill_data inner join (select max(b_createddate) as maxcreateddate, bd_consumercode from bill_data group by bd_consumercode) as max ON max.maxcreateddate=b_createddate
       searchParams:
         condition: AND
@@ -229,12 +231,34 @@ SearchDefinitions:
       rowMapperKey: billsearch
       query:
         baseQuery: >-
-          WITH bill_data AS (
+          WITH latest_meter AS (
+            SELECT DISTINCT ON (mr.connectionno)
+              mr.connectionno                     AS mr_connectionno,
+              mr.lastreading                      AS mr_lastreading,
+              mr.lastreadingdate                  AS mr_lastreadingdate,
+              mr.currentreading                   AS mr_currentreading,
+              mr.currentreadingdate               AS mr_currentreadingdate,
+              mr.consumption                      AS mr_consumption,
+              mr.meterstatus                      AS mr_meterstatus,
+              mr.billingperiod                    AS mr_billingperiod
+            FROM eg_ws_meterreading mr
+            ORDER BY mr.connectionno, mr.currentreadingdate DESC
+          ),
+          bill_data AS (
             SELECT DISTINCT ON (ad.id)
               conn.status AS conn_status,
               conn.property_id AS propertyId,
               conn.oldConnectionNo AS oldPropertyId,
               conn.additionaldetails AS conn_add,
+
+              lm.mr_connectionno,
+              lm.mr_lastreading,
+              lm.mr_lastreadingdate,
+              lm.mr_currentreading,
+              lm.mr_currentreadingdate,
+              lm.mr_consumption,
+              lm.mr_meterstatus,
+              lm.mr_billingperiod,
 
               b.id AS b_id,
               b.mobilenumber,
@@ -305,6 +329,8 @@ SearchDefinitions:
             AND bd.tenantid = ad.tenantid
             INNER JOIN eg_ws_connection conn
               ON bd.consumercode = conn.connectionno
+            LEFT JOIN latest_meter lm
+              ON lm.mr_connectionno = conn.connectionno
             INNER JOIN eg_pt_property pt
               ON conn.property_id = pt.propertyid
             INNER JOIN eg_pt_address ptadd
@@ -368,7 +394,16 @@ SearchDefinitions:
         baseQuery: >-
           with bill_data as ( SELECT conn.status as
           conn_status,conn.property_id as pid,conn.oldConnectionNo as
-          oldpid,conn.additionaldetails as conn_add,b.id AS b_id,
+          oldpid,conn.additionaldetails as conn_add,
+          lm.connectionno AS mr_connectionno,
+          lm.lastreading AS mr_lastreading,
+          lm.lastreadingdate AS mr_lastreadingdate,
+          lm.currentreading AS mr_currentreading,
+          lm.currentreadingdate AS mr_currentreadingdate,
+          lm.consumption AS mr_consumption,
+          lm.meterstatus AS mr_meterstatus,
+          lm.billingperiod AS mr_billingperiod,
+          b.id AS b_id,
           b.mobilenumber, b.tenantid AS b_tenantid, b.payername AS b_payername,
           b.payeraddress AS b_payeraddress, b.payeremail AS b_payeremail,
           b.isactive AS b_isactive, b.iscancelled AS b_iscancelled, b.createdby
@@ -398,7 +433,9 @@ SearchDefinitions:
           ptadd_pincode, ptadd.locality as ptadd_locality, ptadd.street as ptadd_street, ptadd.region as ptadd_region, ptadd.plotno as ptadd_plotno, ptadd.buildingname as ptadd_buildingname, ptadd.district as ptadd_district, ptadd.state as ptadd_state, ptadd.latitude as ptadd_latitude, ptadd.longitude as ptadd_longitude, 
           ptown.userid as ptown_userid
 
-          FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid INNER JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid INNER JOIN eg_ws_connection conn ON bd.consumercode = conn.connectionno INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id $where and conn.status='Active' and b.status = 'ACTIVE')
+          FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid INNER JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid INNER JOIN eg_ws_connection conn ON bd.consumercode = conn.connectionno INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id LEFT JOIN (
+          SELECT * FROM (SELECT mr.*,ROW_NUMBER() OVER (PARTITION BY mr.connectionno ORDER BY mr.createdtime DESC) rn FROM eg_ws_meterreading mr) t WHERE rn = 1
+          ) lm ON lm.connectionno = conn.connectionno $where and conn.status='Active' and b.status = 'ACTIVE')
           select * from bill_data inner join (select max(b_createddate) as maxcreateddate, bd_consumercode from bill_data group by bd_consumercode) as max ON max.maxcreateddate=b_createddate
       searchParams:
         condition: AND
@@ -957,11 +994,21 @@ SearchDefinitions:
           ptadd.state AS ptadd_state,
           ptadd.latitude AS ptadd_latitude,
           ptadd.longitude AS ptadd_longitude,
-          ptown.userid AS ptown_userid
+          ptown.userid AS ptown_userid,
+          lm.connectionno AS mr_connectionno,
+          lm.lastreading AS mr_lastreading,
+          lm.lastreadingdate AS mr_lastreadingdate,
+          lm.currentreading AS mr_currentreading,
+          lm.currentreadingdate AS mr_currentreadingdate,
+          lm.consumption AS mr_consumption,
+          lm.meterstatus AS mr_meterstatus,
+          lm.billingperiod AS mr_billingperiod
           FROM eg_ws_connection conn
           INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid
           INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id
           INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id
+          LEFT JOIN (SELECT * FROM (SELECT mr.*, ROW_NUMBER() OVER (PARTITION BY mr.connectionno ORDER BY mr.createdtime DESC) rn
+          FROM eg_ws_meterreading mr) t WHERE rn = 1) lm ON lm.connectionno = conn.connectionno
           $where
           AND conn.status = 'Active'
           ),
