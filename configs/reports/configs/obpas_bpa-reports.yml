@@ -470,11 +470,6 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: collectorname
-    label: collectorname
-    type: string
-    source: obpas_bpa
-    total: false
   - name: transactiondate
     label: transactiondate
     type: string
@@ -494,7 +489,7 @@ ReportDefinitions:
     label: amountpaid
     type: string
     source: obpas_bpa
-    total: false
+    total: true
   - name: paymentmode
     label: paymentmode
     type: string
@@ -619,7 +614,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: and  bpa.tenantid= = $ulb   
+    searchClause: and  bpa.tenantid = $ulb   
   query: |
        select ulb_data.district,bpa.applicationno,bpa.edcrnumber,bpa.status,bpa.tenantid,'Building_Plan' as
        businessservice from eg_bpa_buildingplan bpa inner join ulb_data on bpa.tenantid = ulb_data.ulb_code where businessservice = 'BPA_LOW' 
@@ -651,13 +646,13 @@ ReportDefinitions:
     source: obpas_bpa
     isMandatory: false
     searchClause: AND ulb_data.district = $district 
-  - name: ulb
-    label: ulb
+  - name: tenant_name
+    label: tenant_name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: and  bpa.tenantideg_bpa_buildingplan.tenantid = $ulb
+    searchClause: and eg_bpa_buildingplan.tenantid = $tenant_name
   query: |
        SELECT 
            ulb_data.district,
@@ -693,7 +688,7 @@ ReportDefinitions:
     label: Pending Files
     type: string
     source: obpas_bpa
-    total: false  
+    total: true  
   searchParams:    
   - name: businessservice
     label: Business Service
