@@ -361,8 +361,8 @@ ReportDefinitions:
         status_times AS (
              SELECT
                 uuid,
-                MAX(CASE WHEN applicationstatus = 'VERIFICATION_INPROGRESS' THEN createdtime END) AS docverify_time,
-                MAX(CASE WHEN applicationstatus IN ('APPROVED','REJECTED') THEN lastmodifiedtime END) AS final_time
+                MAX(CASE WHEN applicationstatus = 'FIELDINSPECTION_INPROGRESS' THEN createdtime END) AS docverify_time,
+                MAX(CASE WHEN applicationstatus IN ('APPROVED','REJECTED','PENDING_SANC_FEE_PAYMENT','BLOCKED') THEN lastmodifiedtime END) AS final_time
               FROM wf_detailed
               GROUP BY uuid
              ),
@@ -392,7 +392,7 @@ ReportDefinitions:
                AND wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
               ORDER BY wf.businessid,wf.lastmodifiedtime DESC
                )
-         SELECT
+         SELECT DISTINCT ON (n.applicationno)
             split_part(n.tenantid,'.',2) AS tenantid,
              n.applicationno AS bpa_application_no,                 
              UPPER(ls.applicationstatus) AS final_status,
@@ -406,13 +406,25 @@ ReportDefinitions:
              ELSE NULL
             END AS sla_days,
             CASE
-               WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL THEN
-            CASE WHEN (st.final_time-st.docverify_time) > sla.businessservicesla THEN 'BREACHED'
-                 ELSE 'MET' END
-                WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
-                THEN 'IN-PROGRESS'
-               ELSE 'AWAITING DOCVERIFY'
-            END AS sla_status,
+        WHEN st.docverify_time IS NOT NULL
+             AND st.final_time IS NOT NULL THEN
+            CASE
+                WHEN (st.final_time - st.docverify_time)
+                     > sla.businessservicesla
+                THEN 'BREACHED'
+                ELSE 'MET'
+            END
+        WHEN st.docverify_time IS NOT NULL
+             AND st.final_time IS NULL THEN
+            CASE
+                WHEN (EXTRACT(EPOCH FROM NOW()) * 1000 - st.docverify_time)
+                     > sla.businessservicesla
+                THEN 'BREACHED'
+                ELSE 'IN-PROGRESS'
+            END
+
+        ELSE 'AWAITING DOCVERIFY'
+        END AS sla_status,
             ad.employee_name AS employee_name,
             ad.employee_code AS employee_code
             FROM eg_bpa_buildingplan n
@@ -422,7 +434,7 @@ ReportDefinitions:
             
             LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
             WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')             
-  orderby:  ORDER BY n.createdtime DESC, tenantid, final_status
+  orderby:  ORDER BY n.applicationno,n.createdtime DESC, tenantid, final_status
 
 - reportName: ReceiptRegisterbpa
   decryptionPathId: LAYOUTREPORTS
@@ -438,8 +450,8 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: connectionno
-    label: connectionno
+  - name: applicationno
+    label: applicationno
     type: string
     source: obpas_bpa
     total: false
@@ -453,6 +465,11 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
+  - name: service
+    label: service
+    type: string
+    source: obpas_bpa
+    total: false
   - name: collectorname
     label: collectorname
     type: string
@@ -463,8 +480,8 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: instrumentnumber
-    label: instrumentnumber
+  - name: transaction_id
+    label: transaction_id
     type: string
     source: obpas_bpa
     total: false
@@ -485,21 +502,6 @@ ReportDefinitions:
     total: false
   - name: paymentstatus
     label: paymentstatus
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: user
-    label: user
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: manualreceiptnumber
-    label: manualreceiptnumber
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: manualreceiptdate
-    label: manualreceiptdate
     type: string
     source: obpas_bpa
     total: false
@@ -532,25 +534,22 @@ ReportDefinitions:
   query: |
       SELECT
           pd.receiptnumber AS receiptno,
-          bill.consumercode AS connectionno,
+          bill.consumercode AS applicationno,
           TO_CHAR(
               TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata',
               'DD-MM-YYYY'
           ) AS receiptdate,
           pd.businessservice ,
-          usr.name AS collectorname,
+          'BPA' AS service,
           TO_CHAR(
               TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata',
               'DD-MM-YYYY'
           ) AS transactiondate,
-          payment.instrumentnumber,
+          payment.instrumentnumber AS transaction_id,
           usr.name AS ownername1,
           pd.amountpaid,
           payment.paymentmode,
-          payment.paymentstatus,
-          usr.id AS user,
-          pd.manualreceiptnumber,
-          pd.manualreceiptdate
+          payment.paymentstatus
       FROM egcl_paymentdetail pd
       INNER JOIN egcl_bill bill 
           ON bill.id = pd.billid 
@@ -613,7 +612,14 @@ ReportDefinitions:
     pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND ulb_data.district = $district    
+    searchClause: AND ulb_data.district = $district 
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: and  bpa.tenantid= = $ulb   
   query: |
        select ulb_data.district,bpa.applicationno,bpa.edcrnumber,bpa.status,bpa.tenantid,'Building_Plan' as
        businessservice from eg_bpa_buildingplan bpa inner join ulb_data on bpa.tenantid = ulb_data.ulb_code where businessservice = 'BPA_LOW' 
@@ -645,6 +651,13 @@ ReportDefinitions:
     source: obpas_bpa
     isMandatory: false
     searchClause: AND ulb_data.district = $district 
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: and  bpa.tenantideg_bpa_buildingplan.tenantid = $ulb
   query: |
        SELECT 
            ulb_data.district,
@@ -689,6 +702,14 @@ ReportDefinitions:
     source: pt
     isMandatory: false
     searchClause: AND businessservice = $businessservice
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND tenantid = $ulb
+
 
   query: |
        WITH latest_assignee AS (
@@ -725,6 +746,7 @@ ReportDefinitions:
        
        merged AS (
          SELECT
+           la.tenantid, 
            INITCAP(REPLACE(la.tenantid, 'pb.', '')) AS ulb_name,
            la.designation_code,
            la.businessservice,
@@ -743,7 +765,7 @@ ReportDefinitions:
          ulb_name ,businessservice,
          designation_code as Officer_Designation,
          pending_files 
-       FROM merged where 1=1
+       FROM merged where  designation_code <> 'Clerk'
   orderby:  ORDER BY pending_files DESC limit 7
 
 - reportName: officers_wise_pendency
@@ -808,6 +830,13 @@ ReportDefinitions:
     source: pt
     isMandatory: false
     searchClause: AND businessservice = $businessservice
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND tenantid = $ulb
   query: |
       WITH params AS (
         SELECT
@@ -818,6 +847,7 @@ ReportDefinitions:
       latest_assignee AS (
         SELECT DISTINCT ON (wf.businessid)
           wf.businessid,
+          wf.tenantid,
           d.name AS designation_code
         FROM eg_wf_processinstance_v2 wf
         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
@@ -829,7 +859,6 @@ ReportDefinitions:
       ),
       
       wf_data AS (
-        -- createdtime stored as epoch-ms? If your createdtime is timestamptz, replace to_timestamp(p.createdtime/1000.0) with p.createdtime
         SELECT
           la.designation_code,
           p.businessservice,
@@ -848,18 +877,19 @@ ReportDefinitions:
       
       date_list AS (
         SELECT (base_dt - offs) AS dt
-        FROM params, generate_series(0,7) AS g(offs)   -- 0 = base date, 7 = base - 7 days
+        FROM params, generate_series(0,7) AS g(offs)  
       ),
       
       agg AS (
         SELECT
           d.dt,
+          w.tenantid,
           w.designation_code,
           w.businessservice,
           COUNT(w.created_date) AS cnt
         FROM date_list d
         LEFT JOIN wf_data w ON w.created_date = d.dt
-        GROUP BY d.dt, w.designation_code, w.businessservice
+        GROUP BY d.dt,w.tenantid, w.designation_code, w.businessservice
       )
       
       SELECT
@@ -903,16 +933,18 @@ ReportDefinitions:
   searchParams:
   - name: district
     label: district
-    type: string
+    type: singlevaluelist
+    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
-  - name: name_of_ulb
-    label: name_of_ulb
-    type: string
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $name_of_ulb
+    searchClause: AND u.name_of_ulb= $ulb  
   - name: businessservice
     label: businesservice
     type: singlevaluelist
@@ -1016,16 +1048,18 @@ ReportDefinitions:
   searchParams:
   - name: district
     label: district
-    type: string
+    type: singlevaluelist
+    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
-  - name: name_of_ulb
-    label: name_of_ulb
-    type: string
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $name_of_ulb
+    searchClause: AND u.name_of_ulb= $ulb 
   - name: businessservice
     label: Business Service
     type: singlevaluelist
@@ -1164,16 +1198,18 @@ ReportDefinitions:
     searchClause: AND 1=1
   - name: district
     label: district
-    type: string
+    type: singlevaluelist
+    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
-  - name: name_of_ulb
-    label: name_of_ulb
-    type: string
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $name_of_ulb
+    searchClause: AND u.name_of_ulb= $ulb 
   - name: businessservice
     label: Business Service
     type: singlevaluelist
@@ -1298,16 +1334,18 @@ ReportDefinitions:
     searchClause: AND 1=1
   - name: district
     label: district
-    type: string
+    type: singlevaluelist
+    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
-  - name: name_of_ulb
-    label: name_of_ulb
-    type: string
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $name_of_ulb
+    searchClause: AND u.name_of_ulb= $ulb 
   - name: businessservice
     label: Business Service
     type: singlevaluelist
