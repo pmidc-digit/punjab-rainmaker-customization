@@ -71,6 +71,18 @@
                   "module": "rainmaker-common"
                 }
               },
+               {
+                "variable": "paymentType2",
+                "value": {
+                  "path": "BPA_PAYMENT_TYPE2"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
               {
                 "variable": "receiptNo",
                 "value": {
@@ -139,9 +151,9 @@
                 }
               },
               {
-                "variable": "clu_total_fee",
+                "variable": "clu_clu_fee",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CLU_TOTAL_FEE"
+                  "path": "PDF_STATIC_LABEL_CLU_CLU_FEE"
                 },
                 "type": "label",
                 "localisation": {
@@ -151,9 +163,27 @@
                 }
               },
               {
-                "variable": "CluTotalFee",
+                "variable": "CluCluFee",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_TOTAL_FEE')].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_CLU_FEE')].adjustedAmount"
+                }
+              },
+              {
+                "variable": "clu_edc_fee",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CLU_EDC_FEE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "CluEdcFee",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_EDC_FEE')].adjustedAmount"
                 }
               },
               {
