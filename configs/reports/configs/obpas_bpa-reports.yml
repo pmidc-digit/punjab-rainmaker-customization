@@ -1199,13 +1199,13 @@ ReportDefinitions:
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
-  - name: name_of_ulb
-    label: name_of_ulb
+  - name: tenant
+    label: tenant
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $name_of_ulb
+    searchClause: AND u.name_of_ulb= $tenant
   - name: businessservice
     label: Business Service
     type: singlevaluelist
@@ -1335,13 +1335,13 @@ ReportDefinitions:
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
-  - name: name_of_ulb
-    label: name_of_ulb
+  - name: tenant
+    label: tenant
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $name_of_ulb 
+    searchClause: AND u.name_of_ulb= $tenant 
   - name: businessservice
     label: Business Service
     type: singlevaluelist
