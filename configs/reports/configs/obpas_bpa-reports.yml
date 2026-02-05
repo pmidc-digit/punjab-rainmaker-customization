@@ -855,6 +855,7 @@ ReportDefinitions:
       
       wf_data AS (
         SELECT
+          la.tenantid,
           la.designation_code,
           p.businessservice,
           (to_timestamp(p.createdtime/1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS created_date
