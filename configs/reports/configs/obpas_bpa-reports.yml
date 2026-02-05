@@ -256,7 +256,7 @@ ReportDefinitions:
           AND p.tenantid = $tenantid
       )
       
-      SELECT  DISTINCT ON (applicationno)
+      SELECT  
         to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS payment_date,
         applicationno,
         bill_consumercode,
@@ -1218,73 +1218,76 @@ ReportDefinitions:
         SELECT
             (to_timestamp($fromDate / 1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS report_dt
         ),
-      wf_history AS (
+       wf_detailed AS (
         SELECT
-           wf.businessid AS uuid,
-           wf.businessservice,
+           wf.businessid AS applicationno,
            wf.tenantid,
+           wf.businessservice,
+           UPPER(st.applicationstatus) AS applicationstatus,
            wf.createdtime,
-           wf.lastmodifiedtime,
-           st.applicationstatus,
-           st.state,
-           st.sla AS state_sla
+           wf.lastmodifiedtime
            FROM eg_wf_processinstance_v2 wf
            JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+           WHERE wf.businessservice IN (
+           'BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP',
+           'BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH'
+            )
         ),
-      latest_status AS (
-        SELECT DISTINCT ON (uuid)
-           uuid,
-           businessservice,
-           tenantid,
-           applicationstatus,
-           lastmodifiedtime
-           FROM wf_history
-           ORDER BY uuid, lastmodifiedtime DESC
-        ),
-      sla_entry AS (
+       status_times AS (
         SELECT
-           uuid,
-           MIN(createdtime) AS sla_start_time,
-           MAX(state_sla) AS sla_duration
-           FROM wf_history
-           WHERE state = 'DOC_VERIFICATION_PENDING'
-           GROUP BY uuid
-        ),
-      sla_dates AS (
+          applicationno,
+          tenantid,
+          businessservice,
+          MIN(createdtime) FILTER ( WHERE applicationstatus = 'FIELDINSPECTION_INPROGRESS' ) AS sla_start_time,
+          MAX(lastmodifiedtime) FILTER ( WHERE applicationstatus IN ( 'APPROVED','REJECTED','BLOCKED','PENDING_SANC_FEE_PAYMENT' )) AS final_time
+          FROM wf_detailed
+          GROUP BY applicationno, tenantid, businessservice
+          ), 
+       sla_master AS (
         SELECT
-           ls.uuid,
-           ls.tenantid,
-           ls.businessservice,
-           to_timestamp((se.sla_start_time + se.sla_duration) / 1000.0) AT TIME ZONE 'Asia/Kolkata' AS sla_breach_ts
-           FROM latest_status ls
-           JOIN sla_entry se ON ls.uuid = se.uuid
-           WHERE ls.applicationstatus NOT IN ('INITIATED','PENDING_APPL_FEE','CITIZEN_APPROVAL_INPROCESS' )
-        ),
-      upcoming_breaches AS (
+          businessservice,
+          businessservicesla
+          FROM eg_wf_businessservice_v2
+          ),
+       sla_calc AS (
         SELECT
-           sd.tenantid,
-           sd.businessservice,
-           sd.sla_breach_ts::date AS breach_date
-           FROM sla_dates sd
-           JOIN params p ON TRUE
-           WHERE sd.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
-        )
-       SELECT
-         u.district,
-         u.name_of_ulb,
-         COUNT(*) FILTER (WHERE breach_date = p.report_dt)   AS day0, 
-         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '1 day') AS day1,  
-         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '2 day') AS day2, 
-         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '3 day') AS day3,  
-         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '4 day') AS day4,  
-         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '5 day') AS day5, 
-         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '6 day') AS day6, 
-         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '7 day') AS day7,  
-         COUNT(*) AS total_upcoming_breaches
-         FROM upcoming_breaches ub
-         JOIN ulb_data u ON ub.tenantid = u.ulb_code
+          st.applicationno,
+          st.tenantid,
+          st.businessservice,
+          st.sla_start_time,
+          st.final_time,
+          (to_timestamp( (st.sla_start_time + sm.businessservicesla) / 1000.0) AT TIME ZONE 'Asia/Kolkata') AS sla_breach_ts
+          FROM status_times st
+          JOIN sla_master sm ON sm.businessservice = st.businessservice
+          WHERE st.sla_start_time IS NOT NULL
+           ),
+       upcoming_breaches AS (
+        SELECT
+         tenantid,
+         businessservice,
+         sla_breach_ts::date AS breach_date
+         FROM sla_calc sc
          JOIN params p ON TRUE
-         WHERE 1=1 
+         WHERE sc.final_time IS NULL 
+          AND sc.sla_breach_ts::date
+          BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
+           )
+        SELECT
+          u.district,
+          u.name_of_ulb,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt)   AS day0,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '1 day') AS day1,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '2 day') AS day2,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '3 day') AS day3,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '4 day') AS day4,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '5 day') AS day5,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '6 day') AS day6,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '7 day') AS day7,
+          COUNT(*) AS total_upcoming_breaches
+          FROM upcoming_breaches ub
+          JOIN ulb_data u ON ub.tenantid = u.ulb_code
+          JOIN params p ON TRUE    
+             WHERE 1=1 
   groupby: GROUP BY u.district, u.name_of_ulb
   orderby: ORDER BY u.district, u.name_of_ulb DESC   
 
@@ -1354,59 +1357,69 @@ ReportDefinitions:
         SELECT
             (to_timestamp($fromDate / 1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS report_dt
         ),
-      wf_history AS (
+      wf_detailed AS (
         SELECT
            wf.businessid AS uuid,
            wf.businessservice,
            wf.tenantid,
+           UPPER(st.applicationstatus) AS applicationstatus,
            wf.createdtime,
-           wf.lastmodifiedtime,
-           st.applicationstatus,
-           st.state,
-           st.sla AS state_sla
+           wf.lastmodifiedtime
            FROM eg_wf_processinstance_v2 wf
            JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+           WHERE wf.businessservice IN (
+          'BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP',
+          'BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH'
+           )
         ),
       latest_status AS (
         SELECT DISTINCT ON (uuid)
            uuid,
-           businessservice,
-           tenantid,
-           applicationstatus,
-           lastmodifiedtime
-           FROM wf_history
+           applicationstatus
+           FROM wf_detailed
            ORDER BY uuid, lastmodifiedtime DESC
         ),
-      sla_entry AS (
-        SELECT
+      status_times AS (
+          SELECT
            uuid,
-           MIN(createdtime) AS sla_start_time,
-           MAX(state_sla) AS sla_duration
-           FROM wf_history
-           WHERE state = 'DOC_VERIFICATION_PENDING'
-           GROUP BY uuid
-        ),
-      sla_dates AS (
+           tenantid,
+           businessservice,
+           MIN(createdtime) FILTER (
+            WHERE applicationstatus = 'FIELDINSPECTION_INPROGRESS') AS sla_start_time,
+           MAX(lastmodifiedtime) FILTER (  WHERE applicationstatus IN (  'APPROVED','REJECTED','BLOCKED','PENDING_SANC_FEE_PAYMENT'
+            ) ) AS final_time
+           FROM wf_detailed
+           GROUP BY uuid, tenantid, businessservice
+         ),
+      sla_master AS (
         SELECT
-           ls.uuid,
-           ls.tenantid,
-           ls.businessservice,
+           businessservice,
+           businessservicesla
+          FROM eg_wf_businessservice_v2
+          ),
+      sla_calc AS (
+         SELECT
+           st.uuid,
+           st.tenantid,
+           st.businessservice,
            ls.applicationstatus,
-           to_timestamp((se.sla_start_time + se.sla_duration) / 1000.0) AT TIME ZONE 'Asia/Kolkata' AS sla_breach_ts
-           FROM latest_status ls
-           JOIN sla_entry se ON ls.uuid = se.uuid
-           WHERE ls.applicationstatus NOT IN ('INITIATED','PENDING_APPL_FEE','CITIZEN_APPROVAL_INPROCESS' )
-        ),
+           (to_timestamp((st.sla_start_time + sm.businessservicesla) / 1000.0) AT TIME ZONE 'Asia/Kolkata') AS sla_breach_ts
+           FROM status_times st
+           JOIN sla_master sm ON sm.businessservice = st.businessservice
+           JOIN latest_status ls ON ls.uuid = st.uuid
+           WHERE st.sla_start_time IS NOT NULL
+           AND st.final_time IS NULL
+           ),
       upcoming_breaches AS (
         SELECT
-           sd.uuid,
-           sd.tenantid,
-           sd.businessservice,
-           sd.applicationstatus,
-           sd.sla_breach_ts::date AS breach_date
-           FROM sla_dates sd
+           sc.uuid,
+           sc.tenantid,
+           sc.businessservice,
+           sc.applicationstatus,
+           sc.sla_breach_ts::date AS breach_date
+           FROM sla_calc sc
            JOIN params p ON TRUE
-           WHERE sd.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
+           WHERE sc.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
         )
        SELECT
          u.district,
@@ -1416,7 +1429,6 @@ ReportDefinitions:
          'Building_Plan' as modulename
          FROM upcoming_breaches ub
          JOIN ulb_data u ON ub.tenantid = u.ulb_code
-         JOIN params p ON TRUE
          WHERE 1=1 
   groupby: GROUP BY u.district, u.name_of_ulb,ub.applicationstatus,ub.uuid
   orderby: ORDER BY u.district, u.name_of_ulb ,ub.applicationstatus,ub.uuid DESC        
