@@ -1,0 +1,248 @@
+{
+  "key": "wsn-integrated",
+  "config": {
+    "defaultStyle": {
+      "font": "Cambay"
+    },
+    "content": [
+      {
+        "style": "noc-head",
+        "table": {
+          "widths": [60, "*", 120],
+          "body": [
+            [
+              { "image": "{{logoImage}}", "width": 45, "height": 50 },
+              {
+                "stack": [
+                  { "text": "{{deptHeader}}", "style": "receipt-logo-header" },
+                  { "text": "{{deptSubHeader}}", "style": "receipt-logo-sub-header" }
+                ],
+                "alignment": "center"
+              },
+              {
+                "stack": [
+                  { "text": "Total Net Amount (Rs.)" },
+                  { "text": "{{netAmount}}", "style": "amount-due" }
+                ],
+                "alignment": "right"
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+
+      {
+        "style": "noc-table2",
+        "table": {
+          "widths": ["100%"],
+          "body": [
+            [
+              {
+                "text": "ACKNOWLEDGEMENT FOR WATER AND SEWERAGE INTEGRATED BILL",
+                "alignment": "center",
+                "style": "receipt-table-value"
+              }
+            ]
+          ]
+        },
+        "layout": {}
+      },
+
+      {
+        "style": "noc-table2",
+        "table": {
+          "widths": ["100%"],
+          "body": [
+            [
+              {
+                "table": {
+                  "widths": ["25%", "25%", "25%", "25%"],
+                  "body": [
+                    [
+                      { "text": "Water Consumer No", "style": "receipt-table-value2" },
+                      { "text": "{{waterConsumerNo}}", "style": "receipt-table2" },
+                      { "text": "Sewerage Consumer No", "style": "receipt-table-value2" },
+                      { "text": "{{sewerageConsumerNo}}", "style": "receipt-table2" }
+                    ],
+                    [
+                      { "text": "House No", "style": "receipt-table-value2" },
+                      { "text": "{{houseNo}}", "style": "receipt-table2" },
+                      { "text": "Zone", "style": "receipt-table-value2" },
+                      { "text": "{{zone}}", "style": "receipt-table2" }
+                    ],
+                    [
+                      { "text": "Block", "style": "receipt-table-value2" },
+                      { "text": "{{block}}", "style": "receipt-table2" },
+                      { "text": "Consumer Name", "style": "receipt-table-value2" },
+                      { "text": "{{consumerName}}", "style": "receipt-table2" }
+                    ],
+                    [
+                      { "text": "Guardian Name", "style": "receipt-table-value2" },
+                      { "text": "{{guardianName}}", "style": "receipt-table2" },
+                      { "text": "Mobile No", "style": "receipt-table-value2" },
+                      { "text": "{{mobileNo}}", "style": "receipt-table2" }
+                    ],
+                    [
+                      { "text": "Address", "style": "receipt-table-value2" },
+                      { "colSpan": 3, "text": "{{address}}", "style": "receipt-table2" },
+                      {},
+                      {}
+                    ]
+                  ]
+                }
+              }
+            ]
+          ]
+        }
+      },
+
+      {
+        "style": "noc-table2",
+        "table": {
+          "widths": ["100%"],
+          "body": [
+            [
+              { "text": "METER DETAILS", "style": "receipt-table-value" }
+            ],
+            [
+              {
+                "table": {
+                  "widths": ["20%", "20%", "20%", "20%", "20%"],
+                  "body": [
+                    [
+                      { "text": "Last Reading", "style": "receipt-table-value2" },
+                      { "text": "Last Reading Date", "style": "receipt-table-value2" },
+                      { "text": "Current Reading", "style": "receipt-table-value2" },
+                      { "text": "Current Reading Date", "style": "receipt-table-value2" },
+                      { "text": "Units (KL)", "style": "receipt-table-value2" }
+                    ],
+                    [
+                      { "text": "{{lastReading}}", "style": "receipt-table2" },
+                      { "text": "{{lastReadingDate}}", "style": "receipt-table2" },
+                      { "text": "{{currentReading}}", "style": "receipt-table2" },
+                      { "text": "{{currentReadingDate}}", "style": "receipt-table2" },
+                      { "text": "{{units}}", "style": "receipt-table2" }
+                    ]
+                  ]
+                }
+              }
+            ]
+          ]
+        }
+      },
+
+      {
+        "style": "noc-table2",
+        "table": {
+          "widths": ["100%"],
+          "body": [
+            [
+              { "text": "BILL SUMMARY", "style": "receipt-table-value" }
+            ],
+            [
+              {
+                "table": {
+                  "widths": ["20%", "20%", "20%", "20%", "20%"],
+                  "body": [
+                    [
+                      { "text": "Water Charges", "style": "receipt-table-value2" },
+                      { "text": "Sewerage Charges", "style": "receipt-table-value2" },
+                      { "text": "Arrears", "style": "receipt-table-value2" },
+                      { "text": "Late Fee", "style": "receipt-table-value2" },
+                      { "text": "Total", "style": "receipt-table-value2" }
+                    ],
+                    [
+                      { "text": "{{waterAmount}}", "style": "receipt-table2" },
+                      { "text": "{{sewerageAmount}}", "style": "receipt-table2" },
+                      { "text": "{{arrears}}", "style": "receipt-table2" },
+                      { "text": "{{lateFee}}", "style": "receipt-table2" },
+                      { "text": "{{totalAmount}}", "style": "receipt-table2", "bold": true }
+                    ]
+                  ]
+                }
+              }
+            ]
+          ]
+        }
+      },
+
+      {
+        "style": "noc-table3",
+        "table": {
+          "widths": ["100%"],
+          "body": [
+            [
+              { "text": "IMPORTANT INSTRUCTIONS", "style": "receipt-table-value" }
+            ],
+            [
+              { "text": "1. Online payment available at https://mseva.lgpunjab.gov.in/citizen" }
+            ],
+            [
+              { "text": "2. Pay before due date to avoid penalty." }
+            ],
+            [
+              { "text": "3. Office collection timing: 9:00 AM to 1:30 PM" }
+            ]
+          ]
+        }
+      },
+
+      {
+        "canvas": [
+          {
+            "type": "line",
+            "x1": -40,
+            "y1": 28,
+            "x2": 700,
+            "y2": 28,
+            "dash": { "length": 10, "space": 5 }
+          }
+        ]
+      },
+
+      { "text": "Authorized Signatory", "style": "footer-bottom" },
+
+      { "text": "ACKNOWLEDGEMENT SLIP", "style": "footer-header" },
+
+      {
+        "style": "noc-table4",
+        "table": {
+          "widths": ["25%", "25%", "25%", "25%"],
+          "body": [
+            [
+              { "text": "Consumer No", "style": "receipt-table-value" },
+              { "text": "{{consumerNo}}", "style": "receipt-table" },
+              { "text": "Bill No", "style": "receipt-table-value" },
+              { "text": "{{billNo}}", "style": "receipt-table" }
+            ],
+            [
+              { "text": "Name", "style": "receipt-table-value" },
+              { "text": "{{payerName}}", "style": "receipt-table" },
+              { "text": "Amount Paid", "style": "receipt-table-value" },
+              { "text": "{{paidAmount}}", "style": "receipt-table" }
+            ]
+          ]
+        }
+      },
+
+      { "text": "Signature of Receiver", "style": "footer-bottom" }
+    ],
+
+    "styles": {
+      "noc-head": { "margin": [-25, -30, 0, 1] },
+      "receipt-logo-header": { "fontSize": 12, "bold": true },
+      "receipt-logo-sub-header": { "fontSize": 10 },
+      "noc-table2": { "fontSize": 10, "margin": [-25, 8, -8, -8] },
+      "noc-table3": { "fontSize": 8, "margin": [-25, 10, -8, -8] },
+      "noc-table4": { "fontSize": 10, "margin": [-25, 40, -8, -8] },
+      "receipt-table-value": { "bold": true, "fontSize": 10 },
+      "receipt-table-value2": { "bold": true, "fontSize": 10 },
+      "receipt-table": { "fontSize": 10 },
+      "receipt-table2": { "fontSize": 10 },
+      "footer-header": { "bold": true, "alignment": "center" },
+      "footer-bottom": { "bold": true, "alignment": "right" },
+      "amount-due": { "fontSize": 20, "bold": true }
+    }
+  }
+}
