@@ -225,6 +225,35 @@ serviceMaps:
             - jsonPath: $.Noc.nocDetails.auditDetails.lastModifiedTime
             - jsonPath: $.Noc.nocDetails.id
 
+        - query: > 
+            INSERT INTO eg_noc_owner (
+              id, tenantid, nocid, status, isprimaryowner,
+              ownertype, ownershippercentage, institutionid, relationship,
+              createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails
+            ,uuid
+            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+            ON CONFLICT (uuid, nocid) DO UPDATE SET
+            status = EXCLUDED.status;
+          basePath: $.Noc.owners.*
+
+          jsonMaps:
+            - jsonPath: $.Noc.owners.*.id
+            - jsonPath: $.Noc.owners.*.tenantId
+            - jsonPath: $.Noc.id  # nocid from eg_noc(id)
+            - jsonPath: $.Noc.owners.*.status
+            - jsonPath: $.Noc.owners.*.isPrimaryOwner
+            - jsonPath: $.Noc.owners.*.type
+            - jsonPath: $.Noc.owners.*.ownershipPercentage
+            - jsonPath: $.Noc.owners.*.institutionId
+            - jsonPath: $.Noc.owners.*.relationship
+            - jsonPath: $.Noc.owners.*.createdBy
+            - jsonPath: $.Noc.owners.*.createdDate
+            - jsonPath: $.Noc.owners.*.lastModifiedBy
+            - jsonPath: $.Noc.owners.*.lastModifiedDate
+            - jsonPath: $.Noc.owners.*.additionalDetails
+              type: JSON
+              dbType: JSONB
+            - jsonPath: $.Noc.owners.*.uuid
 
 
 
@@ -262,7 +291,7 @@ serviceMaps:
       fromTopic: update-noc-document-checklist
       isTransaction: true
       queryMaps:
-        - query: UPDATE public.eg_noc_document_check_list SET action = ?, remarks = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE documentuid = ? AND tenantId = ?;
+        - query: UPDATE public.eg_noc_document_check_list SET action = ?, remarks = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE id = ? AND tenantId = ?;
           basePath: checkList.*
           jsonMaps:
 
@@ -274,7 +303,7 @@ serviceMaps:
 
             - jsonPath: $.checkList.*.lastmodifiedtime
 
-            - jsonPath: $.checkList.*.documentuid
+            - jsonPath: $.checkList.*.id
 
             - jsonPath: $.checkList.*.tenantId
 
