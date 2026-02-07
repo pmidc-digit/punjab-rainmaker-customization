@@ -6,7 +6,7 @@ serviceMaps:
     fromTopic: save-property-rate-topic
     isTransaction: true
     queryMaps:
-    - query: INSERT INTO public.revenue_property_integration(id, propertyid, tenantid, districtid, tehsilid, villageid, isurban, segmentid, categoryid, subcategoryid, locality, unit, isproratacal, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO public.revenue_property_integration(id, propertyid, tenantid, districtid, tehsilid, village_id, isurban, segmentid, categoryid, subcategoryid, locality, unit, isproratacal, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: PropertyRates.*
       jsonMaps:
       - jsonPath: $.PropertyRates.*.id
