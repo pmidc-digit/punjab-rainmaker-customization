@@ -6,7 +6,7 @@ serviceMaps:
     fromTopic: save-property-rate-topic
     isTransaction: true
     queryMaps:
-    - query: INSERT INTO public.revenue_property_integration(id, propertyid, tenantid, districtid, tehsilid, village_id, isurban, segmentid, categoryid, subcategoryid, locality, unit, isproratacal, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO public.revenue_property_integration(id, propertyid, tenantid, districtid, tehsilid, village_id, isurban, segmentid, categoryid, subsegmentid, locality, unit, isproratacal, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
       basePath: PropertyRates.*
       jsonMaps:
       - jsonPath: $.PropertyRates.*.id
@@ -18,7 +18,7 @@ serviceMaps:
       - jsonPath: $.PropertyRates.*.isUrban
       - jsonPath: $.PropertyRates.*.segmentId
       - jsonPath: $.PropertyRates.*.categoryId
-      - jsonPath: $.PropertyRates.*.subCategoryId
+      - jsonPath: $.PropertyRates.*.subSegmentId
       - jsonPath: $.PropertyRates.*.locality
       - jsonPath: $.PropertyRates.*.unit
       - jsonPath: $.PropertyRates.*.isActive
@@ -33,7 +33,7 @@ serviceMaps:
     fromTopic: update-property-rate-topic
     isTransaction: true
     queryMaps:
-    - query: UPDATE public.revenue_property_integration SET districtid = ?, tehsilid = ?, village_id = ?, isurban = ?, segmentid = ?, categoryid = ?, subcategoryid = ?, locality = ?, unit = ?, isproratacal = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE id = ?::uuid AND propertyid = ?;
+    - query: UPDATE public.revenue_property_integration SET districtid = ?, tehsilid = ?, village_id = ?, isurban = ?, segmentid = ?, categoryid = ?, subsegmentid = ?, locality = ?, unit = ?, isproratacal = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE id = ?::uuid AND propertyid = ?;
       basePath: PropertyRates.*
       jsonMaps:
       - jsonPath: $.PropertyRates.*.districtId
@@ -42,7 +42,7 @@ serviceMaps:
       - jsonPath: $.PropertyRates.*.isUrban
       - jsonPath: $.PropertyRates.*.segmentId
       - jsonPath: $.PropertyRates.*.categoryId
-      - jsonPath: $.PropertyRates.*.subCategoryId
+      - jsonPath: $.PropertyRates.*.subSegmentId
       - jsonPath: $.PropertyRates.*.locality
       - jsonPath: $.PropertyRates.*.unit
       - jsonPath: $.PropertyRates.*.isActive
