@@ -214,6 +214,24 @@
                 }
               },
               {
+                "variable": "chbSecurityDeposit",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_SECURITY_DEPOSIT')].adjustedAmount"
+                }
+              },
+              {
+                "variable": "chb_security_deposit",
+                "value": {
+                  "path": "SECURITY_DEPOSIT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
                 "variable": "chbServiceCharge",
                 "value": {
                   "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_SERVICE_CHARGE')].adjustedAmount"
@@ -942,6 +960,10 @@
               {
                 "variable": "chbServiceCharge",
                 "formula": "{{chbServiceCharge}}>0?{{chbServiceCharge}}:0"
+              },
+              {
+                "variable": "chbSecurityDeposit",
+                "formula": "{{chbSecurityDeposit}}>0?{{chbSecurityDeposit}}:0"
               },
               {
                 "variable": "chbDiscountPositive",
