@@ -133,7 +133,7 @@ serviceMaps:
    isTransaction: true
    queryMaps:
 
-    - query: UPDATE eg_pgr_service SET servicecode=?, description=?,lat=?, "long"=?, email=?, deviceid=?, firstname=?, lastname=?, phone=?, attributes=?,  status=?, source=?, expectedtime=?, feedback=?, rating=?, landmark=?, lastmodifiedby=?, lastmodifiedtime=? WHERE tenantid=? AND servicerequestid=?;
+    - query: UPDATE eg_pgr_service SET servicecode=?, description=?,lat=?, "long"=?, email=?, deviceid=?, firstname=?, lastname=?, phone=?, attributes=?,  status=?, source=?, expectedtime=?, feedback=?, rating=?, landmark=?, lastmodifiedby=?, lastmodifiedtime=?,dgr_employee_name=? WHERE tenantid=? AND servicerequestid=?;
 
       basePath: services.*
       jsonMaps:
@@ -176,9 +176,13 @@ serviceMaps:
 
        - jsonPath: $.services.*.auditDetails.lastModifiedTime
 
+       - jsonPath: $.services.*.dgr_employee_name
+
+
        - jsonPath: $.services.*.tenantId
 
        - jsonPath: $.services.*.serviceRequestId
+
 
 
     - query: INSERT INTO eg_pgr_action(uuid, by, "when", action, status, comments, media, assignee, isinternal, tenantid, businesskey) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
@@ -209,3 +213,21 @@ serviceMaps:
        - jsonPath: $.actionInfo.*.tenantId
 
        - jsonPath: $.actionInfo.*.businessKey
+
+ - version: 1.0
+   name: PGR
+   description: Persists asset details in eg_asset table
+   fromTopic: update-dgr-pgrid
+   isTransaction: true
+   queryMaps:
+
+    - query: UPDATE eg_pgr_service SET dgr_grievance_id=? WHERE tenantid=? AND servicerequestid=?;
+
+      basePath: services.*
+      jsonMaps:
+
+       - jsonPath: $.services.*.dgr_grievance_id
+
+       - jsonPath: $.services.*.tenantId
+
+       - jsonPath: $.services.*.serviceRequestId

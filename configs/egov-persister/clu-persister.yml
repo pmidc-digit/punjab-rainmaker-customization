@@ -1,0 +1,319 @@
+serviceMaps:
+  serviceName: clu-service
+  version: 1.0.0
+  mappings:
+    - version: 1.0
+      description: Create clu entry
+      fromTopic: save-clu-application
+      isTransaction: true
+      queryMaps:
+        - query: >
+            INSERT INTO eg_clu (
+              id, applicationno, tenantid, status, createdby,
+              lastmodifiedby, createdtime, lastmodifiedtime, cluno, applicationtype, clutype,
+              accountid, applicationstatus,vasikaNumber, vasikaDate
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?);
+          basePath: $.Clu
+          jsonMaps:
+            - jsonPath: $.Clu.id
+            - jsonPath: $.Clu.applicationNo
+            - jsonPath: $.Clu.tenantId
+            - jsonPath: $.Clu.status
+            - jsonPath: $.Clu.auditDetails.createdBy
+            - jsonPath: $.Clu.auditDetails.lastModifiedBy
+            - jsonPath: $.Clu.auditDetails.createdTime
+            - jsonPath: $.Clu.auditDetails.lastModifiedTime
+            - jsonPath: $.Clu.cluNo
+            - jsonPath: $.Clu.applicationType
+            - jsonPath: $.Clu.cluType
+            - jsonPath: $.Clu.accountId
+            - jsonPath: $.Clu.applicationStatus
+            - jsonPath: $.Clu.vasikaNumber
+            - jsonPath: $.Clu.vasikaDate
+
+        - query: >
+            INSERT INTO eg_clu_auditdetails (
+              id, applicationno, tenantid, status, createdby,
+              lastmodifiedby, createdtime, lastmodifiedtime, cluno, applicationtype, clutype,
+              accountid, applicationstatus
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Clu
+          jsonMaps:
+            - jsonPath: $.Clu.id
+            - jsonPath: $.Clu.applicationNo
+            - jsonPath: $.Clu.tenantId
+            - jsonPath: $.Clu.status
+            - jsonPath: $.Clu.auditDetails.createdBy
+            - jsonPath: $.Clu.auditDetails.lastModifiedBy
+            - jsonPath: $.Clu.auditDetails.createdTime
+            - jsonPath: $.Clu.auditDetails.lastModifiedTime
+            - jsonPath: $.Clu.cluNo
+            - jsonPath: $.Clu.applicationType
+            - jsonPath: $.Clu.cluType
+            - jsonPath: $.Clu.accountId
+            - jsonPath: $.Clu.applicationStatus
+
+        - query: >
+            INSERT INTO eg_clu_document (
+              uuid, documenttype, documentAttachment, documentuid, cluid, additionaldetails, createdby,
+              lastmodifiedby, createdtime, lastmodifiedtime
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Clu.documents.*
+          jsonMaps:
+            - jsonPath: $.Clu.documents.*.uuid
+            - jsonPath: $.Clu.documents.*.documentType
+            - jsonPath: $.Clu.documents.*.documentAttachment
+            - jsonPath: $.Clu.documents.*.documentUid
+            - jsonPath: $.Clu.documents.*.cluId
+            - jsonPath: $.Clu.documents.*.additionalDetails
+              type: JSON
+              dbType: JSONB
+
+            - jsonPath: $.Clu.documents.*.auditDetails.createdBy
+            - jsonPath: $.Clu.documents.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Clu.documents.*.auditDetails.createdTime
+            - jsonPath: $.Clu.documents.*.auditDetails.lastModifiedTime
+        - query: >
+            INSERT INTO eg_clu_details (
+              id, cluid, additionaldetails, createdby, lastmodifiedby, createdtime, lastmodifiedtime, tenantid
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Clu.cluDetails
+          jsonMaps:
+            - jsonPath: $.Clu.cluDetails.id
+            - jsonPath: $.Clu.cluDetails.cluId
+            - jsonPath: $.Clu.cluDetails.additionalDetails
+              type: JSON
+              dbType: JSONB
+            - jsonPath: $.Clu.cluDetails.auditDetails.createdBy
+            - jsonPath: $.Clu.cluDetails.auditDetails.lastModifiedBy
+            - jsonPath: $.Clu.cluDetails.auditDetails.createdTime
+            - jsonPath: $.Clu.cluDetails.auditDetails.lastModifiedTime
+            - jsonPath: $.Clu.cluDetails.tenantId
+
+            
+        - query: > 
+            INSERT INTO eg_clu_owner (
+              id, tenantid, cluId, status, isprimaryowner,
+              ownertype, ownershippercentage, institutionid, relationship,
+              createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails,uuid
+            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?);
+          basePath: $.Clu.owners.*
+
+          jsonMaps:
+            - jsonPath: $.Clu.owners.*.id
+            - jsonPath: $.Clu.owners.*.tenantId
+            - jsonPath: $.Clu.id
+            - jsonPath: $.Clu.owners.*.status
+            - jsonPath: $.Clu.owners.*.isPrimaryOwner
+            - jsonPath: $.Clu.owners.*.type
+            - jsonPath: $.Clu.owners.*.ownershipPercentage
+            - jsonPath: $.Clu.owners.*.institutionId
+            - jsonPath: $.Clu.owners.*.relationship
+            - jsonPath: $.Clu.owners.*.createdBy
+            - jsonPath: $.Clu.owners.*.createdDate
+            - jsonPath: $.Clu.owners.*.lastModifiedBy
+            - jsonPath: $.Clu.owners.*.lastModifiedDate
+            - jsonPath: $.Clu.owners.*.additionalDetails
+              type: JSON
+              dbType: JSONB
+            - jsonPath: $.Clu.owners.*.uuid
+
+
+
+
+
+
+    - version: 1.0
+      description: Update clu entry (strict UPDATE + auditdetails)
+      fromTopic: update-clu-application
+      isTransaction: true
+
+      queryMaps:
+        - query: >
+            
+             UPDATE eg_clu
+              SET status = ?, applicationstatus = ?, cluno = ?,
+              applicationtype = ?, clutype = ?,
+              lastmodifiedby = ?, lastmodifiedtime = ?
+              WHERE id = ?;
+
+          basePath: $.Clu
+          jsonMaps:
+            - jsonPath: $.Clu.status
+            - jsonPath: $.Clu.applicationStatus
+            
+            - jsonPath: $.Clu.cluNo
+            - jsonPath: $.Clu.applicationType
+            - jsonPath: $.Clu.cluType
+            
+            - jsonPath: $.Clu.auditDetails.lastModifiedBy
+            - jsonPath: $.Clu.auditDetails.lastModifiedTime
+            
+            - jsonPath: $.Clu.id
+
+
+            
+
+
+        - query: >
+             INSERT INTO eg_clu_auditdetails (
+              id, applicationno, tenantid, status, createdby,
+              lastmodifiedby, createdtime, lastmodifiedtime, cluno, applicationtype, clutype,
+              accountid, applicationstatus
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Clu
+          jsonMaps:
+            - jsonPath: $.Clu.id
+            - jsonPath: $.Clu.applicationNo
+            - jsonPath: $.Clu.tenantId
+            - jsonPath: $.Clu.status
+            - jsonPath: $.Clu.auditDetails.createdBy
+            - jsonPath: $.Clu.auditDetails.lastModifiedBy
+            - jsonPath: $.Clu.auditDetails.createdTime
+            - jsonPath: $.Clu.auditDetails.lastModifiedTime
+            - jsonPath: $.Clu.cluNo
+            - jsonPath: $.Clu.applicationType
+            - jsonPath: $.Clu.cluType
+            - jsonPath: $.Clu.accountId
+            - jsonPath: $.Clu.applicationStatus
+
+
+
+        - query: >
+             INSERT INTO eg_clu_document (
+             uuid, documenttype,documentAttachment, documentuid, cluId,createdby,
+             lastmodifiedby, createdtime, lastmodifiedtime
+             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+              ON CONFLICT (uuid) DO UPDATE SET
+               documenttype = EXCLUDED.documenttype,
+               documentAttachment = EXCLUDED.documentAttachment,
+               documentuid = EXCLUDED.documentuid,
+               cluid = EXCLUDED.cluid,
+               createdby = EXCLUDED.createdby,
+               lastmodifiedby = EXCLUDED.lastmodifiedby,
+               createdtime = EXCLUDED.createdtime,
+               lastmodifiedtime = EXCLUDED.lastmodifiedtime;
+          basePath: $.Clu.documents.*
+          jsonMaps:
+            - jsonPath: $.Clu.documents.*.uuid
+            - jsonPath: $.Clu.documents.*.documentType
+            - jsonPath: $.Clu.documents.*.documentAttachment
+            - jsonPath: $.Clu.documents.*.documentUid
+            - jsonPath: $.Clu.documents.*.cluId
+            - jsonPath: $.Clu.documents.*.auditDetails.createdBy
+            - jsonPath: $.Clu.documents.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Clu.documents.*.auditDetails.createdTime
+            - jsonPath: $.Clu.documents.*.auditDetails.lastModifiedTime
+
+
+
+
+        - query: >
+             UPDATE eg_clu_details
+             SET additionaldetails = ?, tenantid = ?,
+             lastmodifiedby = ?, lastmodifiedtime = ?
+             WHERE id = ?;
+          basePath: $.Clu.cluDetails
+          jsonMaps:
+
+            - jsonPath: $.Clu.cluDetails.additionalDetails
+              type: JSON
+              dbType: JSONB
+            - jsonPath: $.Clu.cluDetails.tenantId
+            - jsonPath: $.Clu.cluDetails.auditDetails.lastModifiedBy
+            - jsonPath: $.Clu.cluDetails.auditDetails.lastModifiedTime
+            - jsonPath: $.Clu.cluDetails.id
+
+
+        - query: > 
+            INSERT INTO eg_clu_owner (
+              id, tenantid, cluId, status, isprimaryowner,
+              ownertype, ownershippercentage, institutionid, relationship,
+              createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails
+            ,uuid
+            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+            ON CONFLICT (uuid, cluId) DO UPDATE SET
+            status = EXCLUDED.status;
+          basePath: $.Clu.owners.*
+
+          jsonMaps:
+            - jsonPath: $.Clu.owners.*.id
+            - jsonPath: $.Clu.owners.*.tenantId
+            - jsonPath: $.Clu.id
+            - jsonPath: $.Clu.owners.*.status
+            - jsonPath: $.Clu.owners.*.isPrimaryOwner
+            - jsonPath: $.Clu.owners.*.type
+            - jsonPath: $.Clu.owners.*.ownershipPercentage
+            - jsonPath: $.Clu.owners.*.institutionId
+            - jsonPath: $.Clu.owners.*.relationship
+            - jsonPath: $.Clu.owners.*.createdBy
+            - jsonPath: $.Clu.owners.*.createdDate
+            - jsonPath: $.Clu.owners.*.lastModifiedBy
+            - jsonPath: $.Clu.owners.*.lastModifiedDate
+            - jsonPath: $.Clu.owners.*.additionalDetails
+              type: JSON
+              dbType: JSONB
+            - jsonPath: $.Clu.owners.*.uuid
+
+
+    - version: 1.0
+      description: Save clu Document Check List
+      fromTopic: save-clu-document-checklist
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO public.eg_clu_document_check_list(id, documentuid, applicationno, tenantId, action, remarks, createdby, lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: checkList.*
+          jsonMaps:
+
+            - jsonPath: $.checkList.*.id
+
+            - jsonPath: $.checkList.*.documentuid
+
+            - jsonPath: $.checkList.*.applicationNo
+
+            - jsonPath: $.checkList.*.tenantId
+
+            - jsonPath: $.checkList.*.action
+
+            - jsonPath: $.checkList.*.remarks
+
+            - jsonPath: $.checkList.*.createdby
+
+            - jsonPath: $.checkList.*.lastmodifiedby
+
+            - jsonPath: $.checkList.*.createdtime
+
+            - jsonPath: $.checkList.*.lastmodifiedtime
+
+    - version: 1.0
+      description: Update clu Document Check List
+      fromTopic: update-clu-document-checklist
+      isTransaction: true
+      queryMaps:
+        - query: UPDATE public.eg_clu_document_check_list SET action = ?, remarks = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE id = ? AND tenantId = ?;
+          basePath: checkList.*
+          jsonMaps:
+
+            - jsonPath: $.checkList.*.action
+
+            - jsonPath: $.checkList.*.remarks
+
+            - jsonPath: $.checkList.*.lastmodifiedby
+
+            - jsonPath: $.checkList.*.lastmodifiedtime
+
+            - jsonPath: $.checkList.*.id
+
+            - jsonPath: $.checkList.*.tenantId
+
+
+
+
+
+
+
+
+
+
+
+    

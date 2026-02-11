@@ -1,15 +1,15 @@
 ServiceMaps:
-  serviceName: egov-noc-services
+  serviceName: egov-clu-services
   version: 1.0.0
   mappings:
-    - topic: save-noc-application
+    - topic: save-clu-application
       configKey: INDEX
       indexes:
-        - name: noc-application-index
+        - name: clu-application-index
           type: general
-          id: $.Noc.id, $.Noc.tenantId
+          id: $.Clu.id, $.Clu.tenantId
           isBulk: false
-          timeStampField: $.Noc.auditDetails.createdTime
+          timeStampField: $.Clu.auditDetails.createdTime
           jsonPath: $
           customJsonMapping:
             indexMapping:
@@ -18,9 +18,9 @@ ServiceMaps:
                 tenantId: tenantId
                 applicationNo: applicationNo
                 status: status
-                nocNo: nocNo
+                cluNo: cluNo
                 applicationType: applicationType
-                nocType: nocType
+                cluType: cluType
                 accountId: accountId
                 applicationStatus: applicationStatus
                 createdBy: createdBy
@@ -28,50 +28,50 @@ ServiceMaps:
                 createdTime: createdTime
                 lastModifiedTime: lastModifiedTime
                 documents: documents
-                nocDetails: nocDetails
+                cluDetails: cluDetails
                 owners: owners
             fieldMapping:
-              - inJsonPath: $.Noc.id
+              - inJsonPath: $.Clu.id
                 outJsonPath: $.Data.id
-              - inJsonPath: $.Noc.tenantId
+              - inJsonPath: $.Clu.tenantId
                 outJsonPath: $.Data.tenantId
-              - inJsonPath: $.Noc.applicationNo
+              - inJsonPath: $.Clu.applicationNo
                 outJsonPath: $.Data.applicationNo
-              - inJsonPath: $.Noc.status
+              - inJsonPath: $.Clu.status
                 outJsonPath: $.Data.status
-              - inJsonPath: $.Noc.nocNo
-                outJsonPath: $.Data.nocNo
-              - inJsonPath: $.Noc.applicationType
+              - inJsonPath: $.Clu.cluNo
+                outJsonPath: $.Data.cluNo
+              - inJsonPath: $.Clu.applicationType
                 outJsonPath: $.Data.applicationType
-              - inJsonPath: $.Noc.nocType
-                outJsonPath: $.Data.nocType
-              - inJsonPath: $.Noc.accountId
+              - inJsonPath: $.Clu.cluType
+                outJsonPath: $.Data.cluType
+              - inJsonPath: $.Clu.accountId
                 outJsonPath: $.Data.accountId
-              - inJsonPath: $.Noc.applicationStatus
+              - inJsonPath: $.Clu.applicationStatus
                 outJsonPath: $.Data.applicationStatus
-              - inJsonPath: $.Noc.auditDetails.createdBy
+              - inJsonPath: $.Clu.auditDetails.createdBy
                 outJsonPath: $.Data.createdBy
-              - inJsonPath: $.Noc.auditDetails.lastModifiedBy
+              - inJsonPath: $.Clu.auditDetails.lastModifiedBy
                 outJsonPath: $.Data.lastModifiedBy
-              - inJsonPath: $.Noc.auditDetails.createdTime
+              - inJsonPath: $.Clu.auditDetails.createdTime
                 outJsonPath: $.Data.createdTime
-              - inJsonPath: $.Noc.auditDetails.lastModifiedTime
+              - inJsonPath: $.Clu.auditDetails.lastModifiedTime
                 outJsonPath: $.Data.lastModifiedTime
-              - inJsonPath: $.Noc.documents
+              - inJsonPath: $.Clu.documents
                 outJsonPath: $.Data.documents
-              - inJsonPath: $.Noc.nocDetails
-                outJsonPath: $.Data.nocDetails
-              - inJsonPath: $.Noc.owners
+              - inJsonPath: $.Clu.cluDetails
+                outJsonPath: $.Data.cluDetails
+              - inJsonPath: $.Clu.owners
                 outJsonPath: $.Data.owners
 
-    - topic: update-noc-application
+    - topic: update-clu-application
       configKey: INDEX
       indexes:
-        - name: update-noc-application-index
+        - name: update-clu-application-index
           type: general
-          id: $.Noc.id, $.Noc.tenantId
+          id: $.Clu.id, $.Clu.tenantId
           isBulk: false
-          timeStampField: $.Noc.auditDetails.lastModifiedTime
+          timeStampField: $.Clu.auditDetails.lastModifiedTime
           jsonPath: $
           customJsonMapping:
             indexMapping:
@@ -80,9 +80,9 @@ ServiceMaps:
                 tenantId: tenantId
                 applicationNo: applicationNo
                 status: status
-                nocNo: nocNo
+                cluNo: cluNo
                 applicationType: applicationType
-                nocType: nocType
+                cluType: cluType
                 accountId: accountId
                 applicationStatus: applicationStatus
                 createdBy: createdBy
@@ -90,38 +90,38 @@ ServiceMaps:
                 createdTime: createdTime
                 lastModifiedTime: lastModifiedTime
                 documents: []
-                nocDetails: {}
+                cluDetails: {}
                 owners: owners
             fieldMapping:
-              - inJsonPath: $.Noc.id
+              - inJsonPath: $.Clu.id
                 outJsonPath: $.Data.id
-              - inJsonPath: $.Noc.tenantId
+              - inJsonPath: $.Clu.tenantId
                 outJsonPath: $.Data.tenantId
-              - inJsonPath: $.Noc.applicationNo
+              - inJsonPath: $.Clu.applicationNo
                 outJsonPath: $.Data.applicationNo
-              - inJsonPath: $.Noc.status
+              - inJsonPath: $.Clu.status
                 outJsonPath: $.Data.status
-              - inJsonPath: $.Noc.nocNo
-                outJsonPath: $.Data.nocNo
-              - inJsonPath: $.Noc.applicationType
+              - inJsonPath: $.Clu.cluNo
+                outJsonPath: $.Data.cluNo
+              - inJsonPath: $.Clu.applicationType
                 outJsonPath: $.Data.applicationType
-              - inJsonPath: $.Noc.nocType
-                outJsonPath: $.Data.nocType
-              - inJsonPath: $.Noc.accountId
+              - inJsonPath: $.Clu.cluType
+                outJsonPath: $.Data.cluType
+              - inJsonPath: $.Clu.accountId
                 outJsonPath: $.Data.accountId
-              - inJsonPath: $.Noc.applicationStatus
+              - inJsonPath: $.Clu.applicationStatus
                 outJsonPath: $.Data.applicationStatus
-              - inJsonPath: $.Noc.auditDetails.createdBy
+              - inJsonPath: $.Clu.auditDetails.createdBy
                 outJsonPath: $.Data.createdBy
-              - inJsonPath: $.Noc.auditDetails.lastModifiedBy
+              - inJsonPath: $.Clu.auditDetails.lastModifiedBy
                 outJsonPath: $.Data.lastModifiedBy
-              - inJsonPath: $.Noc.auditDetails.createdTime
+              - inJsonPath: $.Clu.auditDetails.createdTime
                 outJsonPath: $.Data.createdTime
-              - inJsonPath: $.Noc.auditDetails.lastModifiedTime
+              - inJsonPath: $.Clu.auditDetails.lastModifiedTime
                 outJsonPath: $.Data.lastModifiedTime
-              - inJsonPath: $.Noc.documents
+              - inJsonPath: $.Clu.documents
                 outJsonPath: $.Data.documents
-              - inJsonPath: $.Noc.nocDetails
-                outJsonPath: $.Data.nocDetails
-              - inJsonPath: $.Noc.owners
+              - inJsonPath: $.Clu.cluDetails
+                outJsonPath: $.Data.cluDetails
+              - inJsonPath: $.Clu.owners
                 outJsonPath: $.Data.owners

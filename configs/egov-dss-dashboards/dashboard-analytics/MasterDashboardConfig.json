@@ -1644,28 +1644,28 @@
               "name": "DSS_WATER_SEWERAGE",
               "vizType": "module",
               "moduleLevel": "W&S",
-               "ref": {
-                 "url": "ws",
-                 "logoUrl": "",
-                 "type": "internal"
-            },
-            "label": "",
-            "charts": [
-              {
-                "id": "wstotalCollection",
-                "name": "DSS_WS_TOTAL_COLLECTION",
-                "code": "",
-                "chartType": "metric",
-                "filter": "",
-                "headers": []
+              "ref": {
+                "url": "ws",
+                "logoUrl": "",
+                "type": "internal"
               },
-              {
-                "id": "wstotalConnectionOverview",
-                "name": "DSS_W&S_ACTIVE_CONNECTIONS",
-                "code": "",
-                "chartType": "metric",
-                "filter": "",
-                "headers": []
+              "label": "",
+              "charts": [
+                {
+                  "id": "wstotalCollection",
+                  "name": "DSS_WS_TOTAL_COLLECTION",
+                  "code": "",
+                  "chartType": "metric",
+                  "filter": "",
+                  "headers": []
+                },
+                {
+                  "id": "wstotalConnectionOverview",
+                  "name": "DSS_W&S_ACTIVE_CONNECTIONS",
+                  "code": "",
+                  "chartType": "metric",
+                  "filter": "",
+                  "headers": []
                 }
               ]
             }
@@ -1708,7 +1708,7 @@
           ]
         }
       ]
-    }, 
+    },
     {
       "name": "DSS_PGR_DASHBOARD",
       "id": "ulb-pgr",
@@ -3225,7 +3225,9 @@
                   "name": "DSS_W&S_TODAYS_COLLECTION",
                   "code": "",
                   "chartType": "metric",
-                  "filter": "",
+                  "filter": {
+                    "title": "TODAY"
+                  },
                   "headers": []
                 },
                 {
@@ -3297,7 +3299,7 @@
                   "id": "wstopPerformingUlbs",
                   "name": "DSS_W&S_TOP_3_PERFORMING_ULBS",
                   "code": "",
-                  "chartType": "",
+                  "chartType": "bar",
                   "filter": "",
                   "headers": []
                 }
@@ -3380,7 +3382,7 @@
           "vizArray": [
             {
               "id": 231,
-              "name": "DSS_W&S_DEMAND_COLLECTION_BOUNDARY",
+              "name": "DSS_WS_KEY_FY_INDICATORS",
               "dimensions": {
                 "height": 350,
                 "width": 12
@@ -3448,6 +3450,22 @@
               "isCollapsible": true,
               "charts": [
                 {
+                  "id": "wstotalApplications",
+                  "name": "DSS_WS_TOTAL_APPLICATIONS",
+                  "code": "",
+                  "chartType": "metric",
+                  "filter": "",
+                  "headers": []
+                },
+                {
+                  "id": "wsSLACompliance",
+                  "name": "DSS_WS_SLA_COMPLIANCE",
+                  "code": "",
+                  "chartType": "metric",
+                  "filter": "",
+                  "headers": []
+                },
+                {
                   "id": "wstotalConnection",
                   "name": "DSS_W&S_CONNECTIONS",
                   "code": "",
@@ -3456,24 +3474,24 @@
                   "headers": []
                 },
                 {
-                  "id": "wsNewWaterConnection",
-                  "name": "DSS_W&S_WATER_CONNECTIONS",
+                  "id": "wsActiveMeteredWaterConnection",
+                  "name": "DSS_W&S_ACTIVE_METERED_WATER_CONNECTIONS",
+                  "code": "",
+                  "chartType": "metric",
+                  "filter": "",
+                  "headers": []
+                },
+                 {
+                  "id": "wsActiveNonMeteredWaterConnection",
+                  "name": "DSS_W&S_ACTIVE_NON_METERED_WATER_CONNECTIONS",
                   "code": "",
                   "chartType": "metric",
                   "filter": "",
                   "headers": []
                 },
                 {
-                  "id": "wsNewSewerageConnection",
-                  "name": "DSS_W&S_SEWERAGE_CONNECTIONS",
-                  "code": "",
-                  "chartType": "metric",
-                  "filter": "",
-                  "headers": []
-                },
-                {
-                  "id": "wsActiveUlbs",
-                  "name": "DSS_W&S_ACTIVE_ULBS",
+                  "id": "wsActiveSewerageConnection",
+                  "name": "DSS_W&S_ACTIVE_SEWERAGE_CONNECTIONS",
                   "code": "",
                   "chartType": "metric",
                   "filter": "",
@@ -3483,7 +3501,7 @@
             },
             {
               "id": 232,
-              "name": "DSS_W&S_CUMULATIVE_COLLECTION",
+              "name": "DSS_W&S_CUMULATIVE_CONNECTION",
               "dimensions": {
                 "height": 350,
                 "width": 7
@@ -3520,7 +3538,7 @@
               "isCollapsible": true,
               "charts": [
                 {
-                  "id": "wsWaterConsumersByUsageType",
+                  "id": "wsConsumersByConnectionType",
                   "name": "",
                   "code": "",
                   "chartType": "donut",
@@ -3542,7 +3560,7 @@
               "isCollapsible": true,
               "charts": [
                 {
-                  "id": "wsSewerageConsumersByUsageType",
+                  "id": "wsConsumersByUsageType",
                   "name": "",
                   "code": "",
                   "chartType": "donut",
@@ -3593,7 +3611,7 @@
               "charts": [
                 {
                   "id": "wsConnectionAgeingDDR",
-                  "name": "",
+                  "name": "DSS_W&S_CONNECTION_AGEING",
                   "code": "",
                   "chartType": "table",
                   "filter": "",
@@ -3633,7 +3651,9 @@
                   "name": "DSS_W&S_TODAYS_COLLECTION",
                   "code": "",
                   "chartType": "metric",
-                  "filter": "",
+                  "filter": {
+                    "title": "TODAY"
+                  },
                   "headers": []
                 },
                 {
@@ -3788,7 +3808,7 @@
           "vizArray": [
             {
               "id": 231,
-              "name": "DSS_W&S_DEMAND_COLLECTION_BOUNDARY",
+              "name": "DSS_WS_KEY_FY_INDICATORS",
               "dimensions": {
                 "height": 350,
                 "width": 12
@@ -3856,6 +3876,22 @@
               "isCollapsible": true,
               "charts": [
                 {
+                  "id": "wstotalApplications",
+                  "name": "DSS_WS_TOTAL_APPLICATIONS",
+                  "code": "",
+                  "chartType": "metric",
+                  "filter": "",
+                  "headers": []
+                },
+                {
+                  "id": "wsSLACompliance",
+                  "name": "DSS_WS_SLA_COMPLIANCE",
+                  "code": "",
+                  "chartType": "metric",
+                  "filter": "",
+                  "headers": []
+                },
+                {
                   "id": "wstotalConnection",
                   "name": "DSS_W&S_CONNECTIONS",
                   "code": "",
@@ -3864,24 +3900,24 @@
                   "headers": []
                 },
                 {
-                  "id": "wsNewWaterConnection",
-                  "name": "DSS_W&S_WATER_CONNECTIONS",
+                  "id": "wsActiveMeteredWaterConnection",
+                  "name": "DSS_W&S_ACTIVE_METERED_WATER_CONNECTIONS",
+                  "code": "",
+                  "chartType": "metric",
+                  "filter": "",
+                  "headers": []
+                },
+                 {
+                  "id": "wsActiveNonMeteredWaterConnection",
+                  "name": "DSS_W&S_ACTIVE_NON_METERED_WATER_CONNECTIONS",
                   "code": "",
                   "chartType": "metric",
                   "filter": "",
                   "headers": []
                 },
                 {
-                  "id": "wsNewSewerageConnection",
-                  "name": "DSS_W&S_SEWERAGE_CONNECTIONS",
-                  "code": "",
-                  "chartType": "metric",
-                  "filter": "",
-                  "headers": []
-                },
-                {
-                  "id": "wsActiveUlbs",
-                  "name": "DSS_W&S_ACTIVE_ULBS",
+                  "id": "wsActiveSewerageConnection",
+                  "name": "DSS_W&S_ACTIVE_SEWERAGE_CONNECTIONS",
                   "code": "",
                   "chartType": "metric",
                   "filter": "",
@@ -3891,7 +3927,7 @@
             },
             {
               "id": 232,
-              "name": "DSS_W&S_CUMULATIVE_COLLECTION",
+              "name": "DSS_W&S_CUMULATIVE_CONNECTION",
               "dimensions": {
                 "height": 350,
                 "width": 7
@@ -3928,7 +3964,7 @@
               "isCollapsible": true,
               "charts": [
                 {
-                  "id": "wsWaterConsumersByUsageType",
+                  "id": "wsConsumersByConnectionType",
                   "name": "",
                   "code": "",
                   "chartType": "donut",
@@ -3950,7 +3986,7 @@
               "isCollapsible": true,
               "charts": [
                 {
-                  "id": "wsSewerageConsumersByUsageType",
+                  "id": "wsConsumersByUsageType",
                   "name": "",
                   "code": "",
                   "chartType": "donut",
