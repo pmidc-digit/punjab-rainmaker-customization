@@ -12,7 +12,7 @@ serviceMaps:
           isurban, segmentid, subsegmentid, categoryid, subcategoryid, 
           locality, rate, unit, is_verified, createdby, lastmodifiedby, 
           createdtime, lastmodifiedtime
-        ) VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        ) VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, false, ?, ?, ?, ?);
       basePath: PropertyRates.*
       jsonMaps:
       - jsonPath: $.PropertyRates.*.id
@@ -29,23 +29,34 @@ serviceMaps:
       - jsonPath: $.PropertyRates.*.locality
       - jsonPath: $.PropertyRates.*.rate
       - jsonPath: $.PropertyRates.*.unit
-      - jsonPath: $.PropertyRates.*.isVerified
+      # is_verified is hardcoded to 'false' in the VALUES clause above
       - jsonPath: $.PropertyRates.*.createdBy
       - jsonPath: $.PropertyRates.*.lastModifiedBy
       - jsonPath: $.PropertyRates.*.createdTime
       - jsonPath: $.PropertyRates.*.lastModifiedTime
 
   - version: 1.0
-    description: Updates existing revenue property integration rates
+    description: Updates existing revenue property integration rates (Handles partial data)
     fromTopic: update-property-rate-topic
     isTransaction: true
     queryMaps:
     - query: >
         UPDATE public.revenue_property_integration 
-        SET districtid = ?, tehsilid = ?, village_id = ?, isurban = ?, 
-            segmentid = ?, subsegmentid = ?, categoryid = ?, subcategoryid = ?, 
-            locality = ?, rate = ?, unit = ?, is_verified = ?, 
-            lastmodifiedby = ?, lastmodifiedtime = ? 
+        SET 
+          districtid = COALESCE(?, districtid), 
+          tehsilid = COALESCE(?, tehsilid), 
+          village_id = COALESCE(?, village_id), 
+          isurban = COALESCE(?, isurban), 
+          segmentid = COALESCE(?, segmentid), 
+          subsegmentid = COALESCE(?, subsegmentid), 
+          categoryid = COALESCE(?, categoryid), 
+          subcategoryid = COALESCE(?, subcategoryid), 
+          locality = COALESCE(?, locality), 
+          rate = COALESCE(?, rate), 
+          unit = COALESCE(?, unit), 
+          is_verified = COALESCE(?, is_verified), 
+          lastmodifiedby = ?, 
+          lastmodifiedtime = ? 
         WHERE id = ?::uuid AND propertyid = ?;
       basePath: PropertyRates.*
       jsonMaps:
@@ -63,6 +74,5 @@ serviceMaps:
       - jsonPath: $.PropertyRates.*.isVerified
       - jsonPath: $.PropertyRates.*.lastModifiedBy
       - jsonPath: $.PropertyRates.*.lastModifiedTime
-      # WHERE clause parameters
       - jsonPath: $.PropertyRates.*.id
       - jsonPath: $.PropertyRates.*.propertyId
