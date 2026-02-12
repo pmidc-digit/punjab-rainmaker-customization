@@ -1,158 +1,128 @@
 {
   "key": "wsn-integrated",
   "config": {
-    "pageSize": "A4",
-    "pageMargins": [30, 30, 30, 40],
-
     "defaultStyle": {
       "font": "Cambay",
       "fontSize": 9
     },
 
+    "pageMargins": [30, 30, 30, 30],
+
     "content": [
+
       {
-        "style": "header-block",
         "table": {
-          "widths": [60, "*", 140],
-          "body": [[
-            { "image": "{{logoImage}}", "width": 45, "height": 45 },
-            {
-              "stack": [
-                { "text": "{{logo_header}} {{mcGrade}}", "style": "header-title" },
-                { "text": "{{address}}", "style": "header-sub" },
-                { "text": "{{website}} | {{email}}", "style": "header-sub" }
-              ],
-              "alignment": "center"
-            },
-            {
-              "stack": [
-                { "text": "{{total_amount_due}}", "style": "amount-title" },
-                { "text": "{{Rs}} {{totalAmountDue}}", "style": "amount-value" }
-              ],
-              "alignment": "right"
-            }
-          ]]
+          "widths": [60, "*", 120],
+          "body": [
+            [
+              { "image": "{{logoImage}}", "width": 45 },
+              {
+                "stack": [
+                  { "text": "{{logo_header}} {{mcGrade}}", "style": "header-title" },
+                  { "text": "{{address}}", "style": "header-sub" },
+                  { "text": "{{website}}  |  {{email}}", "style": "header-sub" }
+                ],
+                "alignment": "center"
+              },
+              {
+                "stack": [
+                  { "text": "TOTAL AMOUNT DUE", "style": "amount-label" },
+                  { "text": "₹ {{totalAmountDue}}", "style": "amount-value" }
+                ],
+                "alignment": "right"
+              }
+            ]
+          ]
         },
         "layout": "noBorders"
       },
 
-      { "canvas": [{ "type": "line", "x1": 0, "y1": 0, "x2": 535, "y2": 0 }] },
+      { "canvas": [{ "type": "line", "x1": 0, "y1": 5, "x2": 515, "y2": 5 }] },
+
+      { "text": "PROPERTY & OWNER DETAILS", "style": "section-header" },
 
       {
-        "style": "section",
         "table": {
-          "widths": ["100%"],
-          "body": [[{
-            "table": {
-              "widths": ["25%", "25%", "25%", "25%"],
-              "body": [
-                ["Property Id", "Ledger / Group", "Plot Size", "Usage Type"],
-                ["{{propertyId}}", "{{landmark}}", "{{plotSize}}", "{{usageType}}"],
-                ["Payer Name", "Guardian", "Mobile", "Locality"],
-                ["{{ownerName}}", "{{guardianName}}", "{{mobileNo}}", "{{locality}}"]
-              ]
-            }
-          }]]
+          "widths": ["25%", "25%", "25%", "25%"],
+          "body": [
+            ["Property Id", "Ledger / Group", "Plot Size", "Usage Type"],
+            ["{{propertyId}}", "{{landmark}}", "{{plotSize}}", "{{usageType}}"],
+            ["Owner Name", "Guardian Name", "Mobile No", "Locality"],
+            ["{{ownerName}}", "{{guardianName}}", "{{mobileNo}}", "{{locality}}"]
+          ]
         },
-        "layout": "noBorders"
+        "style": "data-table"
       },
 
+      { "text": "CONSUMER DETAILS", "style": "section-header" },
+
       {
-        "style": "section",
         "table": {
-          "widths": ["100%"],
-          "body": [[{
-            "table": {
-              "widths": ["25%", "25%", "25%", "25%"],
-              "body": [
-                ["Water Consumer", "{{wsconsumerCode}}", "Sewerage Consumer", "{{swconsumerCode}}"],
-                ["Water Payer", "{{wspayerName}}", "Sewerage Payer", "{{swpayerName}}"],
-                ["Water Bill Date", "{{wsbillDate}}", "Sewerage Bill Date", "{{swbilldate}}"]
-              ]
-            }
-          }]]
+          "widths": ["25%", "25%", "25%", "25%"],
+          "body": [
+            ["Water Consumer", "{{wsconsumerCode}}", "Sewerage Consumer", "{{swconsumerCode}}"],
+            ["Water Payer", "{{wspayerName}}", "Sewerage Payer", "{{swpayerName}}"],
+            ["Water Bill Date", "{{wsbillDate}}", "Sewerage Bill Date", "{{swbillDate}}"]
+          ]
         },
-        "layout": "noBorders"
+        "style": "data-table"
       },
 
-      { "text": "METER DETAILS", "style": "section-title" },
+      { "text": "METER DETAILS", "style": "section-header" },
 
       {
-        "style": "section",
         "table": {
-          "widths": ["100%"],
-          "body": [[{
-            "table": {
-              "widths": ["20%", "20%", "20%", "20%", "20%"],
-              "body": [
-                ["Last Reading", "Last Date", "Current Reading", "Current Date", "Units (KL)"],
-                ["{{lastReading}}", "{{lastReadingDate}}", "{{currentReading}}", "{{currentReadingDate}}", "{{units}}"]
-              ]
-            }
-          }]]
+          "widths": ["20%", "20%", "20%", "20%", "20%"],
+          "body": [
+            ["Last Reading", "Last Date", "Current Reading", "Current Date", "Units (KL)"],
+            ["{{lastReading}}", "{{lastReadingDate}}", "{{currentReading}}", "{{currentReadingDate}}", "{{units}}"]
+          ]
         },
-        "layout": "noBorders"
+        "style": "data-table"
       },
 
-      { "text": "WATER BILL SUMMARY", "style": "section-title" },
+      { "text": "WATER BILL SUMMARY", "style": "section-header" },
 
       {
-        "style": "section",
         "table": {
-          "widths": ["100%"],
-          "body": [[{
-            "table": {
-              "widths": ["16%", "16%", "16%", "16%", "16%", "20%"],
-              "body": [
-                ["Bill No", "{{wsbillNumber}}", "From", "{{wsfromPeriod}}", "To", "{{wstoPeriod}}"],
-                ["Water", "Arrears", "Penalty", "Interest", "Advance", "Total"],
-                ["{{wscharge}}", "{{wsarrears}}", "{{wspenalty}}", "{{wsinterest}}", "{{wsadvance}}", "{{wschargestotalAmount}}"]
-              ]
-            }
-          }]]
+          "widths": ["16%", "16%", "16%", "16%", "16%", "20%"],
+          "body": [
+            ["Bill No", "From", "To", "Arrears", "Penalty", "Total"],
+            ["{{wsbillNumber}}", "{{wsfromPeriod}}", "{{wstoPeriod}}", "{{wsarrears}}", "{{wspenalty}}", "{{wschargestotalAmount}}"]
+          ]
         },
-        "layout": "noBorders"
+        "style": "data-table"
       },
 
-      { "text": "SEWERAGE BILL SUMMARY", "style": "section-title" },
+      { "text": "SEWERAGE BILL SUMMARY", "style": "section-header" },
 
       {
-        "style": "section",
         "table": {
-          "widths": ["100%"],
-          "body": [[{
-            "table": {
-              "widths": ["16%", "16%", "16%", "16%", "16%", "20%"],
-              "body": [
-                ["Bill No", "{{swbillNumber}}", "From", "{{swfromPeriod}}", "To", "{{swtoPeriod}}"],
-                ["Charges", "Arrears", "Penalty", "Interest", "Advance", "Total"],
-                ["{{swcharge}}", "{{swarrears}}", "{{swpenalty}}", "{{swinterest}}", "{{swadvance}}", "{{swchargestotalAmount}}"]
-              ]
-            }
-          }]]
+          "widths": ["16%", "16%", "16%", "16%", "16%", "20%"],
+          "body": [
+            ["Bill No", "From", "To", "Arrears", "Penalty", "Total"],
+            ["{{swbillNumber}}", "{{swfromPeriod}}", "{{swtoPeriod}}", "{{swarrears}}", "{{swpenalty}}", "{{swchargestotalAmount}}"]
+          ]
         },
-        "layout": "noBorders"
+        "style": "data-table"
       },
 
-      { "text": "IMPORTANT INSTRUCTIONS", "style": "section-title" },
+      { "text": "IMPORTANT INSTRUCTIONS", "style": "section-header" },
 
       {
-        "style": "instruction",
         "ul": [
           "Online payment available at https://mseva.lgpunjab.gov.in/citizen",
           "Pay before due date to avoid penalty.",
           "Office collection timing: 9:00 AM to 1:30 PM"
-        ]
+        ],
+        "style": "instruction-box"
       },
 
-      { "text": "Authorized Signatory", "style": "signatory" },
+      { "canvas": [{ "type": "line", "x1": 0, "y1": 10, "x2": 515, "y2": 10, "dash": { "length": 6 } }] },
 
-      { "canvas": [{ "type": "line", "x1": 0, "y1": 0, "x2": 535, "y2": 0, "dash": { "length": 6, "space": 4 } }] },
-
-      { "text": "ACKNOWLEDGEMENT SLIP", "style": "ack-title" },
+      { "text": "ACKNOWLEDGEMENT SLIP", "style": "footer-header" },
 
       {
-        "style": "section",
         "table": {
           "widths": ["25%", "25%", "25%", "25%"],
           "body": [
@@ -160,35 +130,46 @@
             ["Name", "{{payerName}}", "Amount Paid", "{{paidAmount}}"]
           ]
         },
-        "layout": "noBorders"
+        "style": "data-table"
       },
 
-      { "text": "Signature of Receiver", "style": "signatory" }
+      { "text": "Signature of Receiver", "style": "footer-bottom" }
     ],
 
     "styles": {
-      "header-block": { "margin": [0, 0, 0, 6] },
+      "header-title": { "fontSize": 13, "bold": true, "alignment": "center" },
+      "header-sub": { "fontSize": 9, "alignment": "center" },
 
-      "header-title": { "fontSize": 13, "bold": true },
-      "header-sub": { "fontSize": 9 },
-
-      "amount-title": { "fontSize": 9, "bold": true },
+      "amount-label": { "fontSize": 9, "bold": true },
       "amount-value": { "fontSize": 18, "bold": true },
 
-      "section": { "margin": [0, 6, 0, 6] },
-
-      "section-title": {
+      "section-header": {
         "fontSize": 10,
         "bold": true,
-        "margin": [0, 8, 0, 4],
-        "color": "#2c3e50"
+        "fillColor": "#f2f2f2",
+        "margin": [0, 12, 0, 6]
       },
 
-      "instruction": { "fontSize": 8, "margin": [10, 0, 0, 10] },
+      "data-table": {
+        "margin": [0, 2, 0, 8]
+      },
 
-      "signatory": { "fontSize": 9, "bold": true, "alignment": "right", "margin": [0, 12, 0, 6] },
+      "instruction-box": {
+        "fontSize": 9,
+        "margin": [0, 4, 0, 8]
+      },
 
-      "ack-title": { "fontSize": 11, "bold": true, "alignment": "center", "margin": [0, 10, 0, 6] }
+      "footer-header": {
+        "fontSize": 11,
+        "bold": true,
+        "alignment": "center",
+        "margin": [0, 12, 0, 6]
+      },
+
+      "footer-bottom": {
+        "alignment": "right",
+        "margin": [0, 10, 0, 0]
+      }
     }
   }
 }
