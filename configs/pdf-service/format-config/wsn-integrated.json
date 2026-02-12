@@ -5,26 +5,66 @@
       "font": "Cambay"
     },
     "content": [
-      {
+       {
         "style": "noc-head",
         "table": {
-          "widths": [60, "*", 120],
+          "widths": [
+            60,
+            "*",
+            120
+          ],
           "body": [
             [
-              { "image": "{{logoImage}}", "width": 45, "height": 50 },
               {
-                "stack": [
-                  { "text": "{{deptHeader}}", "style": "receipt-logo-header" },
-                  { "text": "{{deptSubHeader}}", "style": "receipt-logo-sub-header" }
-                ],
-                "alignment": "center"
+                "image": "{{logoImage}}",
+                "width": 45,
+                "height": 50
               },
               {
                 "stack": [
-                  { "text": "Total Net Amount (Rs.)" },
-                  { "text": "{{netAmount}}", "style": "amount-due" }
+                  {
+                    "text": "{{logo_header}} {{mcGrade}}",
+                    "style": "receipt-logo-header"
+                  },
+                  {
+                    "stack": [
+                      {
+                        "text": "{{address}}",
+                        "style": "receipt-logo-sub-header"
+                      },
+                      {
+                        "text": "{{website}} {{email}}",
+                        "style": "receipt-logo-sub-header"
+                      }
+                    ]
+                  }
                 ],
-                "alignment": "right"
+                "alignment": "center",
+                "margin": [
+                  0,
+                  1,
+                  0,
+                  0
+                ]
+              },
+              {
+                "stack": [
+                  {
+                    "text": "{{total_amount_due}} {{testing billWS}}"
+                  },
+                  {
+                    "text": "{{Rs}} {{totalAmountDue}}",
+                    "style": "amount-due"
+                  }
+                ],
+                "alignment": "right",
+                "color": "#484848",
+                "margin": [
+                  -150,
+                  1,
+                  -20,
+                  0
+                ]
               }
             ]
           ]
@@ -35,12 +75,23 @@
       {
         "style": "noc-table2",
         "table": {
-          "widths": ["100%"],
+          "widths": ["25%","25%","25%","25%"],
           "body": [
             [
               {
-                "text": "ACKNOWLEDGEMENT FOR WATER AND SEWERAGE INTEGRATED BILL",
-                "alignment": "center",
+                "text": "Bill Number",
+                "style": "receipt-table-value"
+              },
+              {
+                "text": "{{billNo}}",
+                "style": "receipt-table-value"
+              },
+              {
+                "text": "Bill Date",
+                "style": "receipt-table-value"
+              },
+              {
+                "text": "{{billDate}}",
                 "style": "receipt-table-value"
               }
             ]
@@ -48,7 +99,47 @@
         },
         "layout": {}
       },
-
+      {
+        "style": "noc-table2",
+        "table": {
+          "widths": ["100%"],
+          "body": [
+            [
+              {
+                "table": {
+                  "widths": ["25%", "25%", "25%", "25%"],
+                  "body": [
+                    [
+                      { "text": "Property Id", "style": "receipt-table-value2" },
+                      { "text": "Ledger No/ Group No", "style": "receipt-table2" },
+                      { "text": "Plot Size", "style": "receipt-table-value2" },
+                      { "text": "Ussage Type", "style": "receipt-table2" }
+                    ],
+                    [
+                      { "text": "{{}}", "style": "receipt-table-value2" },
+                      { "text": "{{}}", "style": "receipt-table2" },
+                      { "text": "{{}}", "style": "receipt-table-value2" },
+                      { "text": "{{}}", "style": "receipt-table2" }
+                    ],
+                    [
+                      { "text": "Payer Name", "style": "receipt-table-value2" },
+                      { "text": "Guardian Name", "style": "receipt-table2" },
+                      { "text": "Mobile Number", "style": "receipt-table-value2" },
+                      { "text": "Mobile Number", "style": "receipt-table-value2" }
+                    ],
+                    [
+                      { "text": "{{}}", "style": "receipt-table-value2" },
+                      { "text": "{{}}", "style": "receipt-table2" },
+                      { "text": "{{}}", "style": "receipt-table-value2" },
+                      { "text": "{{}}", "style": "receipt-table-value2" }
+                    ]
+                  ]
+                }
+              }
+            ]
+          ]
+        }
+      },
       {
         "style": "noc-table2",
         "table": {
@@ -61,33 +152,21 @@
                   "body": [
                     [
                       { "text": "Water Consumer No", "style": "receipt-table-value2" },
-                      { "text": "{{waterConsumerNo}}", "style": "receipt-table2" },
+                      { "text": "{{wsconsumerno}}", "style": "receipt-table2" },
                       { "text": "Sewerage Consumer No", "style": "receipt-table-value2" },
-                      { "text": "{{sewerageConsumerNo}}", "style": "receipt-table2" }
+                      { "text": "{{swconsumerno}}", "style": "receipt-table2" }
                     ],
                     [
-                      { "text": "House No", "style": "receipt-table-value2" },
-                      { "text": "{{houseNo}}", "style": "receipt-table2" },
-                      { "text": "Zone", "style": "receipt-table-value2" },
-                      { "text": "{{zone}}", "style": "receipt-table2" }
+                      { "text": "Water Bill No", "style": "receipt-table-value2" },
+                      { "text": "{{wsbillno}}", "style": "receipt-table2" },
+                      { "text": "Sewerage Bill No", "style": "receipt-table-value2" },
+                      { "text": "{{swbillno}}", "style": "receipt-table2" }
                     ],
                     [
-                      { "text": "Block", "style": "receipt-table-value2" },
-                      { "text": "{{block}}", "style": "receipt-table2" },
-                      { "text": "Consumer Name", "style": "receipt-table-value2" },
-                      { "text": "{{consumerName}}", "style": "receipt-table2" }
-                    ],
-                    [
-                      { "text": "Guardian Name", "style": "receipt-table-value2" },
-                      { "text": "{{guardianName}}", "style": "receipt-table2" },
-                      { "text": "Mobile No", "style": "receipt-table-value2" },
-                      { "text": "{{mobileNo}}", "style": "receipt-table2" }
-                    ],
-                    [
-                      { "text": "Address", "style": "receipt-table-value2" },
-                      { "colSpan": 3, "text": "{{address}}", "style": "receipt-table2" },
-                      {},
-                      {}
+                      { "text": "Water Bill Date", "style": "receipt-table-value2" },
+                      { "text": "{{wsbilldate}}", "style": "receipt-table2" },
+                      { "text": "Sewerage Bill Date", "style": "receipt-table-value2" },
+                      { "text": "{{wsbilldate}}", "style": "receipt-table2" }
                     ]
                   ]
                 }
