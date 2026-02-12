@@ -433,130 +433,338 @@
                                 }
                             },
                             {
-                                "variable": "propertyID",
-                                "value": {
-                                    "path": "$.propertyId"
-                                }
-                            },
-                            {
-                                "variable": "tenantId",
-                                "value": {
-                                    "path": "$.tenantId"
-                                }
-                            },
-                            {
-                                "variable": "mobileNo",
-                                "value": {
-                                    "path": "$.mobileNo"
-                                }
-                            },
-                            {
-                                "variable": "locality",
-                                "value": {
-                                    "path": "$.locality"
-                                }
-                            },
-                            {
-                                "variable": "payer_address",
-                                "value": {
-                                    "path": "$.address"
-                                }
-                            },
-                            {
-                                "variable": "totalwater",
-                                "value": {
-                                    "path": "$.connection.totalWaterAmount"
-                                }
-                            },
-                            {
-                                "variable": "totalsewerage",
-                                "value": {
-                                    "path": "$.connection.totalSewerageAmount"
-                                }
-                            },
-                            {
                                 "variable": "totalAmountDue",
                                 "value": {
                                     "path": "$.connection.propertyTotalAmount"
                                 }
                             },
                             {
-                                "variable": "wsbillno",
+                                "variable": "total",
                                 "value": {
-                                    "path": "$.connection.waterDetails[0].billNumber"
+                                    "path": "$.totalAmount"
                                 }
                             },
                             {
-                                "variable": "wsbilldate",
+                                "variable": "payerName",
                                 "value": {
-                                    "path": "$.connection.waterDetails[0].billDate"
+                                    "path": "$.payerName"
+                                }
+                            },
+                            {
+                                "variable": "mobileNo",
+                                "value": {
+                                    "path": "$.mobileNumber"
+                                }
+                            },
+                            {
+                                "variable": "propertyID",
+                                "value": {
+                                    "path": "$.connection.propertyId"
+                                }
+                            },
+                            {
+                                "variable": "oldConnectionNo",
+                                "value": {
+                                    "path": "$.connection.oldConnectionNo"
+                                }
+                            },
+                            {
+                                "variable": "rate",
+                                "value": {
+                                    "path": "$.additionalDetails.penaltyRate"
+                                }
+                            },
+                            {
+                                "variable": "ledgerId",
+                                "value": {
+                                    "path": "$.connection.additionalDetails.value.ledgerId"
+                                }
+                            },
+                            {
+                                "variable": "latePaymentc",
+                                "value": {
+                                    "path": "$.additionalDetails.latePaymentc"
+                                }
+                            },
+                            {
+                                "variable": "ledgerId",
+                                "value": {
+                                    "path": "$.connection.additionalDetails.value.ledgerId"
+                                }
+                            },
+                            {
+                                "variable": "groupId",
+                                "value": {
+                                    "path": "$.connection.additionalDetails.value.groups"
+                                }
+                            },
+                            {
+                                "variable": "Addresscity",
+                                "value": {
+                                    "path": "$.address.city"
+                                }
+                            },
+                            {
+                                "variable": "Addresspincode",
+                                "value": {
+                                    "path": "$.address.pincode"
+                                }
+                            },
+                            {
+                                "variable": "AddressdoorNo",
+                                "value": {
+                                    "path": "$.address.doorNo"
+                                }
+                            },
+                            {
+                                "variable": "Addressregion",
+                                "value": {
+                                    "path": "$.address.region"
+                                }
+                            },
+                            {
+                                "variable": "Addressstreet",
+                                "value": {
+                                    "path": "$.address.street"
+                                }
+                            },
+                            {
+                                "variable": "Addresslandmark",
+                                "value": {
+                                    "path": "$.address.landmark"
+                                }
+                            },
+                            {
+                                "variable": "tenant",
+                                "value": {
+                                    "path": "$.tenantId"
+                                }
+                            },
+                            {
+                                "variable": "nameAddress",
+                                "value": {
+                                    "path": "$.payerAddress"
+                                }
+                            },
+                            {
+                                "variable": "billNo",
+                                "value": {
+                                    "path": "$.billNumber"
+                                }
+                            },
+                            {
+                                "variable": "fromPeriod",
+                                "value": {
+                                    "path": "$.billDetails[(@.length-1)].fromPeriod"
                                 },
                                 "type": "date"
                             },
                             {
-                                "variable": "wsconsumerno",
+                                "variable": "toPeriod",
                                 "value": {
-                                    "path": "$.connection.waterDetails[0].consumerCode"
-                                }
-                            },
-                            {
-                                "variable": "payerNameWS",
-                                "value": {
-                                    "path": "$.connection.waterDetails[0].payerName"
-                                }
-                            },
-                            {
-                                "variable": "swbillno",
-                                "value": {
-                                    "path": "$.connection.sewerageDetails[0].billNumber"
-                                }
-                            },
-                            {
-                                "variable": "swbilldate",
-                                "value": {
-                                    "path": "$.connection.sewerageDetails[0].billDate"
+                                    "path": "$.billDetails[0].toPeriod"
                                 },
                                 "type": "date"
                             },
                             {
-                                "variable": "swconsumerno",
+                                "variable": "billIssueDate",
                                 "value": {
-                                    "path": "$.connection.sewerageDetails[0].consumerCode"
+                                    "path": "$.billDate"
+                                },
+                                "type": "date"
+                            },
+                            {
+                                "variable": "billDueDate",
+                                "value": {
+                                    "path": "$.billDetails[0].expiryDate"
+                                },
+                                "type": "date"
+                            },
+                            {
+                                "variable": "billdate",
+                                "value": {
+                                    "path": "$.billDate"
+                                },
+                                "type": "date"
+                            },
+                            {
+                                "variable": "consumerCode",
+                                "value": {
+                                    "path": "$.consumerCode"
                                 }
                             },
                             {
-                                "variable": "payerNameSW",
+                                "variable": "taxCharge",
                                 "value": {
-                                    "path": "$.connection.sewerageDetails[0].payerName"
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_TAX' || @.taxHeadCode == 'TL_TAX' || @.taxHeadCode == 'FIRENOC_TAXES' || @.taxHeadCode == 'WS_CHARGE' || @.taxHeadCode == 'SW_CHARGE' )].amount"
                                 }
                             },
                             {
-                                "variable": "ws_fromPeriod",
+                                "variable": "timeRebate",
                                 "value": {
-                                    "path": "$.connection.waterDetails[0].integratedBillDetails[0].fromPeriod"
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_TIME_REBATE' || @.taxHeadCode == 'WS_TIME_REBATE' || @.taxHeadCode == 'SW_TIME_REBATE')].amount"
+                                }
+                            },
+                            {
+                                "variable": "adhocRebate",
+                                "value": {
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_ADHOC_REBATE' || @.taxHeadCode == 'TL_ADHOC_REBATE' || @.taxHeadCode == 'FIRENOC_ADHOC_REBATE')].amount"
+                                }
+                            },
+                            {
+                                "variable": "timePenalty",
+                                "value": {
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_TIME_PENALTY' || @.taxHeadCode == 'WS_TIME_PENALTY' || @.taxHeadCode == 'SW_TIME_PENALTY')].amount"
+                                }
+                            },
+                            {
+                                "variable": "adhocPenalty",
+                                "value": {
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_ADHOC_PENALTY' || @.taxHeadCode == 'TL_ADHOC_PENALTY' || @.taxHeadCode == 'FIRENOC_ADHOC_PENALTY')].amount"
+                                }
+                            },
+                            {
+                                "variable": "firecess",
+                                "value": {
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_FIRE_CESS')].amount"
+                                }
+                            },
+                            {
+                                "variable": "usageExemption",
+                                "value": {
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_UNIT_USAGE_EXEMPTION')].amount"
+                                }
+                            },
+                            {
+                                "variable": "roundoff",
+                                "value": {
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_ROUNDOFF' || @.taxHeadCode == 'TL_ROUNDOFF' || @.taxHeadCode == 'FIRENOC_ROUNDOFF' || @.taxHeadCode == 'WS_Round_Off' || @.taxHeadCode == 'SW_Round_Off')].amount"
+                                }
+                            },
+                            {
+                                "variable": "fees",
+                                "value": {
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'FIRENOC_FEES')].amount"
+                                }
+                            },
+                            {
+                                "variable": "ownerExemption",
+                                "value": {
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_OWNER_EXEMPTION')].amount"
+                                }
+                            },
+                            {
+                                "variable": "cancerCess",
+                                "value": {
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_CANCER_CESS')].amount"
+                                }
+                            },
+                            {
+                                "variable": "waterCess",
+                                "value": {
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_WATER_CESS' || @.taxHeadCode == 'SW_SEWERAGE_CESS')].amount"
+                                }
+                            },
+                            {
+                                "variable": "timeInterest",
+                                "value": {
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_TIME_INTEREST' || @.taxHeadCode == 'WS_TIME_INTEREST' || @.taxHeadCode == 'SW_TIME_INTEREST')].amount"
+                                }
+                            },
+                            {
+                                "variable": "ceilingDebit",
+                                "value": {
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_DECIMAL_CEILING_DEBIT')].amount"
+                                }
+                            },
+                            {
+                                "variable": "ceilingCredit",
+                                "value": {
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_DECIMAL_CEILING_CREDIT')].amount"
+                                }
+                            },
+                            {
+                                "variable": "carryForward",
+                                "value": {
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_ADVANCE_CARRYFORWARD' || @.taxHeadCode == 'SW_ADVANCE_CARRYFORWARD')].amount"
+                                }
+                            },
+                            {
+                                "variable": "consumerID",
+                                "value": {
+                                    "path": "$.consumerCode"
+                                }
+                            },
+                            {
+                                "variable": "date",
+                                "value": {
+                                    "path": "$.billDate"
                                 },
                                 "type": "date"
                             },
                             {
-                                "variable": "ws_toPeriod",
+                                "variable": "totalPayment",
                                 "value": {
-                                    "path": "$.connection.waterDetails[0].integratedBillDetails[0].toPeriod"
+                                    "path": "$.billDetails[0].amountPaid"
+                                }
+                            },
+                            {
+                                "variable": "WS_arrears",
+                                "value": {
+                                    "path": "$.arrearAmount"
+                                }
+                            },
+                            {
+                                "variable": "WS_AdvanceAdjusted",
+                                "value": {
+                                    "path": "$.AdvanceAdjustedValue"
+                                }
+                            },
+                            {
+                                "variable": "meterConnectionNo",
+                                "value": {
+                                    "path": "$.meterReading.connectionno"
+                                }
+                            },
+                            {
+                                "variable": "lastMeterReading",
+                                "value": {
+                                    "path": "$.meterReading.lastReading",
+                                    "default": 0
+                                }
+                            },
+                            {
+                                "variable": "lastMeterReadingDate",
+                                "value": {
+                                    "path": "$.meterReading.lastReadingDate"
                                 },
                                 "type": "date"
                             },
                             {
-                                "variable": "sw_fromPeriod",
+                                "variable": "currentMeterReading",
                                 "value": {
-                                    "path": "$.connection.sewerageDetails[0].integratedBillDetails[0].fromPeriod"
+                                    "path": "$.meterReading.currentReading",
+                                    "default": 0
+                                }
+                            },
+                            {
+                                "variable": "currentMeterReadingDate",
+                                "value": {
+                                    "path": "$.meterReading.currentReadingDate"
                                 },
                                 "type": "date"
                             },
                             {
-                                "variable": "sw_toPeriod",
+                                "variable": "meterStatus",
                                 "value": {
-                                    "path": "$.connection.sewerageDetails[0].integratedBillDetails[0].toPeriod"
-                                },
-                                "type": "date"
+                                    "path": "$.meterReading.meterStatus"
+                                }
+                            },
+                            {
+                                "variable": "meterBillingPeriod",
+                                "value": {
+                                    "path": "$.meterReading.billingPeriod"
+                                }
                             },
                             {
                                 "variable": "scissorImage",
@@ -657,6 +865,80 @@
                                             "prefix": "TENANT_TENANTS",
                                             "module": "rainmaker-common"
                                         }
+                                    }
+                                ]
+                            },
+                            {
+                                "path": "http://billing-service:8080/billing-service/demand/_search",
+                                "queryParam": "tenantId=$.tenantId,consumerCode=$.consumerCode,businessService=WS,filter=%5B?(@.status=='ACTIVE')%5D",
+                                "apiRequest": null,
+                                "responseMapping": [
+                                    {
+                                        "variable": "ws_advanceAmount",
+                                        "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_ADVANCE_CARRYFORWARD')].taxAmount"
+                                    },
+                                    {
+                                        "variable": "ws_roundoff",
+                                        "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_Round_Off')].taxAmount"
+                                    },
+                                    {
+                                        "variable": "ws_charge",
+                                        "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_CHARGE')].taxAmount"
+                                    },
+                                    {
+                                        "variable": "ws_water_cess",
+                                        "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_WATER_CESS')].taxAmount"
+                                    },
+                                    {
+                                        "variable": "ws_time_interest",
+                                        "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_TIME_INTEREST')].taxAmount"
+                                    },
+                                    {
+                                        "variable": "ws_time_penalty",
+                                        "value": "$.Demands[(@.length-1)].demandDetails[?(@.taxHeadMasterCode == 'WS_TIME_PENALTY')].taxAmount"
+                                    }
+                                ]
+                            },
+                            {
+                                "path": "http://property-services.egov:8080/property-services/property/_search",
+                                "queryParam": "tenantId=$.tenantId,propertyIds=$.connection.propertyId",
+                                "apiRequest": null,
+                                "responseMapping": [
+                                    {
+                                        "variable": "usageType",
+                                        "value": "$.Properties[0].usageCategory"
+                                    },
+                                    {
+                                        "variable": "plotSize",
+                                        "value": "$.Properties[0].landArea"
+                                    },
+                                    {
+                                        "variable": "houseNo",
+                                        "value": "$.Properties[0].address.doorNo"
+                                    },
+                                    {
+                                        "variable": "buildingName",
+                                        "value": "$.Properties[0].address.buildingName"
+                                    },
+                                    {
+                                        "variable": "streetName",
+                                        "value": "$.Properties[0].address.street"
+                                    },
+                                    {
+                                        "variable": "locality",
+                                        "value": "$.Properties[0].address.locality.name"
+                                    },
+                                    {
+                                        "variable": "landmark",
+                                        "value": "$.Properties[0].address.landmark"
+                                    },
+                                    {
+                                        "variable": "ownerName",
+                                        "value": "$.Properties[0].owners[0].name"
+                                    },
+                                    {
+                                        "variable": "guardianName",
+                                        "value": "$.Properties[0].owners[0].fatherOrHusbandName"
                                     }
                                 ]
                             }
