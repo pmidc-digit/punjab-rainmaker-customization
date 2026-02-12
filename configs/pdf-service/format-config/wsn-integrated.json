@@ -72,33 +72,7 @@
         "layout": "noBorders"
       },
 
-      {
-        "style": "noc-table2",
-        "table": {
-          "widths": ["25%","25%","25%","25%"],
-          "body": [
-            [
-              {
-                "text": "Bill Number",
-                "style": "receipt-table-value"
-              },
-              {
-                "text": "{{billNo}}",
-                "style": "receipt-table-value"
-              },
-              {
-                "text": "Bill Date",
-                "style": "receipt-table-value"
-              },
-              {
-                "text": "{{billDate}}",
-                "style": "receipt-table-value"
-              }
-            ]
-          ]
-        },
-        "layout": {}
-      },
+      
       {
         "style": "noc-table2",
         "table": {
@@ -116,22 +90,22 @@
                       { "text": "Ussage Type", "style": "receipt-table2" }
                     ],
                     [
-                      { "text": "{{}}", "style": "receipt-table-value2" },
+                      { "text": "{{propertyId}}", "style": "receipt-table-value2" },
                       { "text": "{{}}", "style": "receipt-table2" },
-                      { "text": "{{}}", "style": "receipt-table-value2" },
-                      { "text": "{{}}", "style": "receipt-table2" }
+                      { "text": "{{plotSize}}", "style": "receipt-table-value2" },
+                      { "text": "{{usageType}}", "style": "receipt-table2" }
                     ],
                     [
                       { "text": "Payer Name", "style": "receipt-table-value2" },
                       { "text": "Guardian Name", "style": "receipt-table2" },
                       { "text": "Mobile Number", "style": "receipt-table-value2" },
-                      { "text": "Mobile Number", "style": "receipt-table-value2" }
+                      { "text": "Locality", "style": "receipt-table-value2" }
                     ],
                     [
                       { "text": "{{}}", "style": "receipt-table-value2" },
                       { "text": "{{}}", "style": "receipt-table2" },
-                      { "text": "{{}}", "style": "receipt-table-value2" },
-                      { "text": "{{}}", "style": "receipt-table-value2" }
+                      { "text": "{{mobileNo}}", "style": "receipt-table-value2" },
+                      { "text": "{{locality}}", "style": "receipt-table-value2" }
                     ]
                   ]
                 }
@@ -217,26 +191,76 @@
           "widths": ["100%"],
           "body": [
             [
-              { "text": "BILL SUMMARY", "style": "receipt-table-value" }
+              { "text": "Water BILL SUMMARY", "style": "receipt-table-value" }
             ],
             [
               {
                 "table": {
-                  "widths": ["20%", "20%", "20%", "20%", "20%"],
+                  "widths": ["16%", "16%", "16%", "16%", "16%", "20%"],
                   "body": [
                     [
+                      { "text": "Bill From ", "colspan" : "2", "style": "receipt-table-value2" },
+                      { "text": "{{wsfromPeriod}}", "style": "receipt-table-value2" },
+                      { "text": "Bill To", "colspan" : "2", "style": "receipt-table-value2" },
+                      { "text": "{{wstoPeriod}}", "style": "receipt-table-value2" }
+                    ],
+                    [
                       { "text": "Water Charges", "style": "receipt-table-value2" },
-                      { "text": "Sewerage Charges", "style": "receipt-table-value2" },
                       { "text": "Arrears", "style": "receipt-table-value2" },
-                      { "text": "Late Fee", "style": "receipt-table-value2" },
+                      { "text": "Penalty", "style": "receipt-table-value2" },
+                      { "text": "Intrest", "style": "receipt-table-value2" },
+                      { "text": "Advance", "style": "receipt-table-value2" },
                       { "text": "Total", "style": "receipt-table-value2" }
                     ],
                     [
-                      { "text": "{{waterAmount}}", "style": "receipt-table2" },
-                      { "text": "{{sewerageAmount}}", "style": "receipt-table2" },
-                      { "text": "{{arrears}}", "style": "receipt-table2" },
-                      { "text": "{{lateFee}}", "style": "receipt-table2" },
-                      { "text": "{{totalAmount}}", "style": "receipt-table2", "bold": true }
+                      { "text": "{{wscharge}}", "style": "receipt-table2" },
+                      { "text": "{{wsarrears}}", "style": "receipt-table2" },
+                      { "text": "{{wspenalty}}", "style": "receipt-table2" },
+                      { "text": "{{wsinterest}}", "style": "receipt-table2" },
+                       { "text": "{{wsadvance}}", "style": "receipt-table2" },
+                      { "text": "{{wschargestotalAmount}}", "style": "receipt-table2", "bold": true }
+                    ]
+                  ]
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "style": "noc-table2",
+        "table": {
+          "widths": ["100%"],
+          "body": [
+            [
+              { "text": "Sewerage BILL SUMMARY", "style": "receipt-table-value" }
+            ],
+            [
+              {
+                "table": {
+                  "widths": ["16%", "16%", "16%", "16%", "16%", "20%"],
+                  "body": [
+                     [
+                      { "text": "Bill From ", "colspan" : "2", "style": "receipt-table-value2" },
+                      { "text": "{{swfromPeriod}}", "style": "receipt-table-value2" },
+                      { "text": "Bill To", "colspan" : "2", "style": "receipt-table-value2" },
+                      { "text": "{{swtoPeriod}}", "style": "receipt-table-value2" }
+                    ],
+                    [
+                      { "text": "Sewerage Charges", "style": "receipt-table-value2" },
+                      { "text": "Arrears", "style": "receipt-table-value2" },
+                      { "text": "Penalty", "style": "receipt-table-value2" },
+                      { "text": "Intrest", "style": "receipt-table-value2" },
+                      { "text": "Advance", "style": "receipt-table-value2" },
+                      { "text": "Total", "style": "receipt-table-value2" }
+                    ],
+                    [
+                     { "text": "{{swcharge}}", "style": "receipt-table2" },
+                      { "text": "{{swarrears}}", "style": "receipt-table2" },
+                      { "text": "{{swpenalty}}", "style": "receipt-table2" },
+                      { "text": "{{swinterest}}", "style": "receipt-table2" },
+                       { "text": "{{swadvance}}", "style": "receipt-table2" },
+                      { "text": "{{swchargestotalAmount}}", "style": "receipt-table2", "bold": true }
                     ]
                   ]
                 }
