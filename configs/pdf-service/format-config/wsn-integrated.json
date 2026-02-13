@@ -61,6 +61,7 @@
           "widths": ["25%", "25%", "25%", "25%"],
           "body": [
             ["Water Consumer", "{{wsconsumerCode}}", "Sewerage Consumer", "{{swconsumerCode}}"],
+            ["Water Old Consumer", "{{wsoldconsumerCode}}", "Sewerage Old Consumer", "{{swoldconsumerCode}}"],
             ["Water Payer", "{{wspayerName}}", "Sewerage Payer", "{{swpayerName}}"],
             ["Water Bill Date", "{{wsbillDate}}", "Sewerage Bill Date", "{{swbillDate}}"]
           ]
@@ -85,28 +86,47 @@
 
       {
         "table": {
-          "widths": ["16%", "16%", "16%", "16%", "16%", "20%"],
+          "widths": ["40%", "30%", "30%"],
           "body": [
-            ["Bill No", "From", "To", "Arrears", "Penalty", "Total"],
+            ["Bill No", "From", "To"],
             ["{{wsbillNumber}}", "{{wsfromPeriod}}", "{{wstoPeriod}}", "{{wsarrears}}", "{{wspenalty}}", "{{wschargestotalAmount}}"]
           ]
         },
         "style": "data-table"
+      },
+      {
+        "table": {
+          "widths": ["20%", "10%", "10%", "10%", "10%", "10%", "10%", "20%"],
+          "body": [
+            ["{{charge_label}}", "{{arrears_label}", "{{penalty_label}}", "{{intrest_label}}", "{{advance_label}}", "{{others_label}}", "{{rebate_label}}" , "{{total_label}}"],
+            [ "{{wscharge}}", "{{wsarrears}}", "{{wspenalty}}", "{{wsinterest}}", "{{wsadvance}}","{{wsothers}}", "{{wsrebate}}", "{{wschargestotalAmount}}"]
+          ]
+        },
+        "style": "data-table-bill"
       },
 
       { "text": "SEWERAGE BILL SUMMARY", "style": "section-header" },
 
       {
         "table": {
-          "widths": ["16%", "16%", "16%", "16%", "16%", "20%"],
+          "widths": ["40%", "30%", "30%"],
           "body": [
-            ["Bill No", "From", "To", "Arrears", "Penalty", "Total"],
-            ["{{swbillNumber}}", "{{swfromPeriod}}", "{{swtoPeriod}}", "{{swarrears}}", "{{swpenalty}}", "{{swchargestotalAmount}}"]
+            ["Bill No", "From", "To"],
+            ["{{swbillNumber}}", "{{swfromPeriod}}", "{{swtoPeriod}}"]
           ]
         },
         "style": "data-table"
       },
-
+      {
+        "table": {
+          "widths": ["20%", "10%", "10%", "10%", "10%", "10%", "10%", "20%"],
+          "body": [
+            ["{{charge_label}}", "{{arrears_label}", "{{penalty_label}}", "{{intrest_label}}", "{{advance_label}}", "{{others_label}}", "{{rebate_label}}" , "{{total_label}}"],
+            [ "{{swcharge}}", "{{swarrears}}", "{{swpenalty}}", "{{swinterest}}", "{{swadvance}}","{{swothers}}", "{{swrebate}}", "{{swchargestotalAmount}}"]
+          ]
+        },
+        "style": "data-table-bill"
+      },
       { "text": "IMPORTANT INSTRUCTIONS", "style": "section-header" },
 
       {
@@ -147,7 +167,7 @@
         "fontSize": 10,
         "bold": true,
         "fillColor": "#f2f2f2",
-        "margin": [0, 12, 0, 6]
+        "margin": [0, 5, 0, 6]
       },
 
       "data-table": {
