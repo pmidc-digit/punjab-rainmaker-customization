@@ -6,8 +6,6 @@
       "fontSize": 9
     },
 
-    "pageMargins": [15, 15, 15, 15],
-
     "content": [
 
       {
@@ -37,7 +35,7 @@
         "layout": "noBorders"
       },
 
-      { "canvas": [{ "type": "line", "x1": -40, "y1": 28, "x2": 700, "y2": 28}] },
+      { "canvas": [{ "type": "line", "x1": -40, "y1": 28, "x2": 550, "y2": 28}] },
 
       { "text": "PROPERTY & OWNER DETAILS", "style": "section-header" },
 
@@ -130,10 +128,12 @@
       { "text": "IMPORTANT INSTRUCTIONS", "style": "section-header" },
 
       {
-        "ul": [
-          "Online payment available at https://mseva.lgpunjab.gov.in/citizen",
-          "Pay before due date to avoid penalty.",
-          "Office collection timing: 9:00 AM to 1:30 PM"
+        "ol": [
+          "Online payment https://mseva.lgpunjab.gov.in/citizen",
+          "If last date of bill is a holiday. Kindly pay your bills either online or offline on previous working day to avoid penalty.",
+          "Please bring this bill while making payment at office counter during collection hours i.e. 9.00AM to 1:30PM",
+          "{{latePaymentc}}",
+          "To report any financial cybercrime call 1930 immediately or register any cybercrime at www.cybercrime.gov.in . For latest updates on cybercrime, follow official social media handle Cyberdost of Ministry of Home Affairs"
         ],
         "style": "instruction-box"
       },
@@ -144,7 +144,7 @@
             "type": "line",
             "x1": -40,
             "y1": 28,
-            "x2": 700,
+            "x2": 550,
             "y2": 28,
             "dash": {
               "length": 10,
@@ -165,14 +165,17 @@
         ]
       },
 
-      { "text": "ACKNOWLEDGEMENT SLIP", "style": "footer-header" },
+      { "text": "ACKNOWLEDGEMENT (For Official use only)", "style": "footer-header" },
 
       {
         "table": {
           "widths": ["25%", "25%", "25%", "25%"],
           "body": [
-            ["Consumer No", "{{consumerNo}}", "Bill No", "{{billNo}}"],
-            ["Name", "{{payerName}}", "Amount Paid", "{{paidAmount}}"]
+            ["water Consumer No", "{{wsconsumerCode}}", "Water Bill No", "{{wsbillDate}}"],
+            ["Water Consumer Name", "{{wspayerName}}", "Water Amount", "{{wschargestotalAmount}}"],
+            ["Sewerage Consumer No", "{{swconsumerCode}}", "Sewerage Bill No", "{{swbillDate}}"],
+            ["Sewerage Consumer Name", "{{swpayerName}}", "Sewerage Amount", "{{swchargestotalAmount}}"],
+            ["Property ID", "{{propertyId}}","Total Amount Paid", "{{totalAmountDue}}" ]
           ]
         },
         "style": "data-table"
@@ -202,7 +205,7 @@
         "margin": [0, 0, 0, 0]
       },
       "instruction-box": {
-        "fontSize": 9,
+        "fontSize": 6,
         "margin": [0, 2, 0, 8]
       },
 
