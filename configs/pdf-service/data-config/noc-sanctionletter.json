@@ -13,7 +13,6 @@
         "mappings": [
           {
             "direct": [
-              
               {
                 "variable": "applicantOwnerOrFirmName",
                 "value": {
@@ -21,9 +20,15 @@
                 }
               },
               {
-                "variable": "approverComment",
+                "variable": "approverCommentLine",
                 "value": {
-                  "path": "$.Noc[0].approverComment"
+                  "path": "$.Noc[0].approverComment.ConditionLine"
+                }
+              },
+              {
+                "variable": "approverCommentText",
+                "value": {
+                  "path": "$.Noc[0].approverComment.ConditionText"
                 }
               },
               {
@@ -32,7 +37,7 @@
                   "path": "$.Noc[0].currentDate"
                 }
               },
-              
+
               {
                 "variable": "var_owners",
                 "value": {
@@ -43,11 +48,14 @@
                   "type": "string",
                   "scema": [
                     { "variable": "name", "value": "name" },
-                    { "variable": "permanentAddress", "value": "permanentAddress" }
+                    {
+                      "variable": "permanentAddress",
+                      "value": "permanentAddress"
+                    }
                   ]
                 }
               },
-              
+
               {
                 "variable": "nocType",
                 "value": {
@@ -79,8 +87,6 @@
                   "path": "$.Noc[0].nocDetails.additionalDetails.applicationDetails.applicantAddress"
                 }
               },
-              
-              
 
               {
                 "variable": "var_floorArea",
@@ -93,7 +99,6 @@
                   "scema": [
                     { "variable": "floorNo", "value": "floorNo" },
                     { "variable": "value", "value": "value" }
-
                   ]
                 }
               },
@@ -108,12 +113,10 @@
                   "scema": [
                     { "variable": "number", "value": "number" },
                     { "variable": "text", "value": "text" }
-
                   ]
                 }
               },
-              
-            
+
               {
                 "variable": "ulbName",
                 "value": {
@@ -223,15 +226,14 @@
                   "path": "$.totalAmountPaid"
                 }
               },
-              
+
               {
                 "variable": "nocTermThree",
                 "value": {
                   "path": "$.Noc[0].nocTermThree"
                 }
               },
-              
-              
+
               {
                 "variable": "tenantid",
                 "value": {
@@ -286,12 +288,12 @@
                 "type": "date"
               },
               {
-                  "variable": "dateNow",
-                  "value": {
-                    "path": "$.auditDetails.lastModifiedTime"
-                  },
-                  "type" : "date"
+                "variable": "dateNow",
+                "value": {
+                  "path": "$.auditDetails.lastModifiedTime"
                 },
+                "type": "date"
+              },
               {
                 "variable": "toPeriod",
                 "value": {
