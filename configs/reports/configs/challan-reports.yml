@@ -10,77 +10,92 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
       - name: challanno
-        label: challanno
+        label: Challan Number
         type: string
         source: ch
         total: false
       - name: name
-        label: name
+        label: Name
         type: string
         source: ch
         total: false
       - name: mobilenumber
-        label: mobilenumber
+        label: Mobile Number
         type: string
         source: ch
         total: false
       - name: businessservice
-        label: businessservice
+        label: Business Service
         type: string
         source: ch
         total: false
       - name: applicationstatus
-        label: applicationstatus
+        label: Application Status
         type: string
         source: ch
         total: false
       - name: collector_code
-        label: collector_code
+        label: Collector Code
+        type: string
+        source: ch
+        total: false
+      - name: offence_type_name
+        label: Offence Type Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_category_name
+        label: Offence Category Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_subcategory_name
+        label: Offence Subactegory Name
         type: string
         source: ch
         total: false
       - name: cash_amount
-        label: cash_amount
+        label: Cash Amount
         type: string
         source: ch
         total: true
       - name: cheque_amount
-        label: cheque_amount
+        label: Cheque Amount
         type: string
         source: ch
         total: true
       - name: card_amount
-        label: card_amount
+        label: Card Amount
         type: string
         source: ch
         total: true
       - name: dd_amount
-        label: dd_amount
+        label: DD Amount
         type: string
         source: ch
         total: true
       - name: neft_amount
-        label: neft_amount
+        label: NEFT Amount
         type: string
         source: ch
         total: true
       - name: rtgs_amount
-        label: rtgs_amount
+        label: RTGS Amount
         type: string
         source: ch
         total: true
       - name: online_amount
-        label: online_amount
+        label: Online Amount
         type: string
         source: ch
         total: true
       - name: amountpaid
-        label: amountpaid
+        label: Amount Paid
         type: string
         source: ch
         total: true
       - name: PaymentDate
-        label: PaymentDate
+        label: Payment Date
         type: string
         source: ch
         total: false
@@ -134,6 +149,9 @@ ReportDefinitions:
               COALESCE(emp.code, 'SELF') AS collector_code,
               c.challanno,
               c.applicationstatus,
+              c.offence_type_name,
+              c.offence_category_name,
+              c.offence_subcategory_name,
               u_owner.name ,
               u_owner.mobilenumber ,
               ch.employee_name AS assignee_employee,
@@ -153,13 +171,12 @@ ReportDefinitions:
        )
        SELECT
               challanno, name, mobilenumber, 'CHALLAN' AS businessservice, applicationstatus,
-              collector_code, cash_amount, cheque_amount,
-              card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
+              collector_code, cash_amount, cheque_amount,offence_type_name,offence_category_name,
+              offence_subcategory_name,card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
               TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS paymentdate
              FROM unique_transactions
              WHERE 1=1 
     orderby: ORDER BY createdtime DESC
-    
   - reportName: ReceiptRegisterCHALLAN
     decryptionPathId: CHALLANREPORTS
     summary: Details of collector register in challan service
@@ -170,7 +187,7 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
       - name: receiptno
-        label: receiptno
+        label: Receipt Number
         type: string
         source: ch
         total: false
@@ -180,67 +197,62 @@ ReportDefinitions:
         source: ch
         total: false
       - name: receiptdate1
-        label: receiptdate1
+        label: Receipt Date
         type: string
         source: ch
         total: false
       - name: service
-        label: service
+        label: Service
         type: string
         source: ch
         total: false
       - name: collectorname
-        label: collectorname
+        label: Collector Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_type_name
+        label: Offence Type Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_category_name
+        label: Offence Category Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_subcategory_name
+        label: Offence Subactegory Name
         type: string
         source: ch
         total: false
       - name: transactiondate
-        label: transactiondate
+        label: Transaction Date
         type: string
         source: ch
         total: false
-      - name: instrumentnumber
-        label: instrumentnumber
+      - name: transaction_id
+        label: Transaction Id
         type: string
         source: ch
         total: false
       - name: payername
-        label: payername
+        label: Payer Name
         type: string
         source: ch
         total: false
       - name: amountpaid
-        label: amountpaid
+        label: Amount Paid
         type: string
         source: ch
-        total: false
+        total: true
       - name: paymentmode
-        label: paymentmode
+        label: Payment Mode
         type: string
         source: ch
         total: false
       - name: paymentstatus
-        label: paymentstatus
-        type: string
-        source: ch
-        total: false
-      - name: ownername1
-        label: ownername1
-        type: string
-        source: ch
-        total: false
-      - name: user
-        label: user
-        type: string
-        source: ch
-        total: false
-      - name: manualreceiptnumber
-        label: manualreceiptnumber
-        type: string
-        source: ch
-        total: false
-      - name: manualreceiptdate
-        label: manualreceiptdate
+        label: Payment Status
         type: string
         source: ch
         total: false
@@ -285,19 +297,17 @@ ReportDefinitions:
               TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata',
               'DD-MM-YYYY'
           ) AS transactiondate,
-          payment.instrumentnumber,
+          payment.instrumentnumber AS transaction_id,
           u_citizen.name AS payername,
           pd.amountpaid,
           payment.paymentmode,
           payment.paymentstatus,
-          u_citizen.name AS ownername1,
-          usr.id AS userid,
-          pd.manualreceiptnumber,
-          pd.manualreceiptdate
-      FROM egcl_paymentdetail pd
-      INNER JOIN egcl_bill bill
+          u_citizen.name AS ownername1 ,
+          c.offence_type_name,c.offence_category_name,
+          c.offence_subcategory_name
+      FROM egcl_paymentdetail pd INNER JOIN egcl_bill bill
           ON bill.id = pd.billid
-          AND pd.tenantid = 'pb.testing'
+          AND pd.tenantid = $tenantid
       INNER JOIN egcl_payment payment
           ON payment.id = pd.paymentid
       LEFT JOIN eg_challan c
@@ -308,11 +318,10 @@ ReportDefinitions:
           ON u_citizen.uuid = cc.uuid
       LEFT JOIN eg_user usr
           ON usr.id = payment.createdby::integer
-      WHERE bill.tenantid = 'pb.testing'
+      WHERE bill.tenantid = $tenantid
         AND pd.businessservice = 'Challan_Generation'
         AND payment.paymentstatus != 'CANCELLED'
     orderby: ORDER BY pd.receiptdate DESC
-      
   - reportName: StateCollectionsReport
     decryptionPathId: CHALLANREPORTS
     summary: Collections
@@ -322,78 +331,98 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
+      - name: tenant
+        label: Tenant Id
+        type: string
+        source: ch
+        total: false
       - name: challanno
-        label: challanno
+        label: Challan Number
         type: string
         source: ch
         total: false
       - name: name
-        label: name
+        label: Name
         type: string
         source: ch
         total: false
       - name: mobilenumber
-        label: mobilenumber
+        label: Mobile Number
         type: string
         source: ch
         total: false
       - name: businessservice
-        label: businessservice
+        label: Business Service
         type: string
         source: ch
         total: false
       - name: applicationstatus
-        label: applicationstatus
+        label: Application Status
         type: string
         source: ch
         total: false
       - name: collector_code
-        label: collector_code
+        label: Collector Code
+        type: string
+        source: ch
+        total: false
+      - name: offence_type_name
+        label: Offence Type Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_category_name
+        label: Offence Category Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_subcategory_name
+        label: Offence Subactegory Name
         type: string
         source: ch
         total: false
       - name: cash_amount
-        label: cash_amount
+        label: Cash Amount
         type: string
         source: ch
         total: true
       - name: cheque_amount
-        label: cheque_amount
+        label: Cheque Amount
         type: string
         source: ch
         total: true
       - name: card_amount
-        label: card_amount
+        label: Card Amount
         type: string
         source: ch
         total: true
       - name: dd_amount
-        label: dd_amount
+        label: DD Amount
         type: string
         source: ch
         total: true
       - name: neft_amount
-        label: neft_amount
+        label: NEFT Amount
         type: string
         source: ch
         total: true
       - name: rtgs_amount
-        label: rtgs_amount
+        label: RTGS Amount
         type: string
         source: ch
         total: true
       - name: online_amount
-        label: online_amount
+        label: Online Amount
         type: string
         source: ch
         total: true
       - name: amountpaid
-        label: amountpaid
+        label: Amount Paid
         type: string
         source: ch
         total: true
       - name: PaymentDate
-        label: PaymentDate
+        label: Payment Date
         type: string
         source: ch
         total: false
@@ -453,6 +482,9 @@ ReportDefinitions:
               COALESCE(emp.code, 'SELF') AS collector_code,
               c.challanno,
               c.applicationstatus,
+              c.offence_type_name,
+              c.offence_category_name,
+              c.offence_subcategory_name,
               u_owner.name ,
               u_owner.mobilenumber ,
               ch.employee_name AS assignee_employee,
@@ -471,14 +503,14 @@ ReportDefinitions:
                AND p.paymentstatus != 'CANCELLED'
               )
           SELECT
+              split_part(tenantid, '.', 2) AS tenant,
               challanno, name, mobilenumber, 'CHALLAN' AS businessservice, applicationstatus,
-              collector_code, cash_amount, cheque_amount,
+              collector_code, cash_amount, cheque_amount,offence_category_name,offence_subcategory_name,offence_type_name,
               card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
               TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS paymentdate         
              FROM unique_transactions
              WHERE 1=1 
     orderby: ORDER BY createdtime DESC
-    
   - reportName: StateReceiptRegisterchallan
     decryptionPathId: CHALLANREPORTS
     summary: Details of collector register in Challan service
@@ -488,8 +520,13 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
+      - name: tenant
+        label: Tenant Id
+        type: string
+        source: ch
+        total: false
       - name: receiptno
-        label: receiptno
+        label: Receipt Number
         type: string
         source: ch
         total: false
@@ -499,67 +536,62 @@ ReportDefinitions:
         source: ch
         total: false
       - name: receiptdate1
-        label: receiptdate1
+        label: Receipt Date
         type: string
         source: ch
         total: false
       - name: service
-        label: service
+        label: Service
         type: string
         source: ch
         total: false
       - name: collectorname
-        label: collectorname
+        label: Collector Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_type_name
+        label: Offence Type Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_category_name
+        label: Offence Category Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_subcategory_name
+        label: Offence Subactegory Name
         type: string
         source: ch
         total: false
       - name: transactiondate
-        label: transactiondate
+        label: Transaction Date
         type: string
         source: ch
         total: false
-      - name: instrumentnumber
-        label: instrumentnumber
+      - name: transaction_id
+        label: Transaction Id
         type: string
         source: ch
         total: false
       - name: payername
-        label: payername
+        label: Payer Name
         type: string
         source: ch
         total: false
       - name: amountpaid
-        label: amountpaid
+        label: Amount Paid
         type: string
         source: ch
-        total: false
+        total: true
       - name: paymentmode
-        label: paymentmode
+        label: Payment Mode
         type: string
         source: ch
         total: false
       - name: paymentstatus
-        label: paymentstatus
-        type: string
-        source: ch
-        total: false
-      - name: ownername1
-        label: ownername1
-        type: string
-        source: ch
-        total: false
-      - name: user
-        label: user
-        type: string
-        source: ch
-        total: false
-      - name: manualreceiptnumber
-        label: manualreceiptnumber
-        type: string
-        source: ch
-        total: false
-      - name: manualreceiptdate
-        label: manualreceiptdate
+        label: Payment Status
         type: string
         source: ch
         total: false
@@ -598,33 +630,36 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND bill.tenantid = $ulb
     query: >
-       SELECT
-         pd.receiptnumber AS receiptno,
-         bill.consumercode AS connectionno,
-         TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate1,
-         'CHALLAN' AS service,
-         usr.name AS collectorname,
-         TO_CHAR( TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS transactiondate,
-         payment.instrumentnumber,   
-         u_citizen.name AS payername,
-         pd.amountpaid,
-         payment.paymentmode,
-         payment.paymentstatus,
-         u_citizen.name AS ownername1,
-         usr.id AS user,
-       	 pd.manualreceiptnumber,
-         pd.manualreceiptdate   
-        FROM egcl_paymentdetail pd
-        INNER JOIN egcl_bill bill ON bill.id = pd.billid 
-        INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
-        LEFT JOIN eg_challan c ON c.challanno = bill.consumercode
-        LEFT JOIN eg_challan_citizen cc ON cc.challanid = c.id
-        LEFT JOIN eg_user u_citizen ON u_citizen.uuid = cc.uuid
-        LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
-        WHERE pd.businessservice = 'Challan_Generation'
-         AND payment.paymentstatus != 'CANCELLED'
+      SELECT
+        split_part(payment.tenantid, '.', 2) AS tenant,
+        pd.receiptnumber AS receiptno,
+        bill.consumercode AS connectionno,
+        TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate1,
+        'CHALLAN' AS service,
+        usr.name AS collectorname,
+        TO_CHAR( TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS transactiondate,
+        payment.instrumentnumber AS transaction_id,   
+        u_citizen.name AS payername,
+        pd.amountpaid,
+        payment.paymentmode,
+        payment.paymentstatus,
+        u_citizen.name AS ownername1,
+        usr.id AS user,
+      	 pd.manualreceiptnumber,
+        pd.manualreceiptdate ,
+        c.offence_type_name,
+        c.offence_category_name,
+        c.offence_subcategory_name  
+       FROM egcl_paymentdetail pd
+       INNER JOIN egcl_bill bill ON bill.id = pd.billid 
+       INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
+       LEFT JOIN eg_challan c ON c.challanno = bill.consumercode
+       LEFT JOIN eg_challan_citizen cc ON cc.challanid = c.id
+       LEFT JOIN eg_user u_citizen ON u_citizen.uuid = cc.uuid
+       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
+       WHERE pd.businessservice = 'Challan_Generation'
+        AND payment.paymentstatus != 'CANCELLED'
     orderby: ORDER BY pd.receiptdate DESC
-    
   - reportName: ChallanDetailReport
     decryptionPathId: CHALLANREPORTS
     summary: Challan wise detail report per tenant
@@ -635,22 +670,22 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
       - name: challanno
-        label: Challan No
+        label: Challan Number
         type: string
         source: ch
         total: false
       - name: name
-        label: name
+        label: Name
         type: string
         source: ch
         total: false
       - name: mobilenumber
-        label: mobilenumber
+        label: Mobile Number
         type: string
         source: ch
         total: false
       - name: businessservice
-        label: Businessservice
+        label: Business Service
         type: string
         source: ch
         total: false
@@ -670,32 +705,27 @@ ReportDefinitions:
         source: ch
         total: false
       - name: offence_type_name
-        label: offence_type_name
+        label: Offence Type Name
         type: string
         source: ch
         total: false
       - name: offence_category_name
-        label: offence_category_name
+        label: Offence Category Name
         type: string
         source: ch
         total: false
       - name: offence_subcategory_name
-        label: offence_subcategory_name
+        label: Offence Subcategory Name
         type: string
         source: ch
         total: false
       - name: challan_amount
-        label: challan_amount
+        label: Challan Amount
         type: string
         source: ch
         total: true
       - name: tenantid
-        label: tenantid
-        type: string
-        source: ch
-        total: false
-      - name: addressline1
-        label: Address
+        label: Tenantid
         type: string
         source: ch
         total: false
@@ -722,14 +752,122 @@ ReportDefinitions:
       - name: offence_subcategory_name
         label: offence_subcategory_name
         type: singlevaluelist
-        pattern: list://Littering of Waste:Littering of Waste,Open Defecation:Open Defecation,Plastic:Plastic,Burning of Waste:Burning of Waste
+        pattern: list://Littering of Waste:Littering of Waste,Open Defecation:Open
+          Defecation,Plastic:Plastic,Burning of Waste:Burning of Waste
         source: ch
         isMandatory: false
         searchClause: AND c.offence_subcategory_name = $offence_subcategory_name
     query: >
-      SELECT c.challanno , c.businessservice , c.applicationstatus , c.receiptnumber ,
+      SELECT c.challanno , c.businessservice , c.applicationstatus ,
+      c.receiptnumber ,
          c.challanstatus , c.offence_type_name , c.offence_category_name , c.offence_subcategory_name , 
          c.challan_amount , c.tenantid , ca.addressline1 , u.name , u.mobilenumber 
+         from eg_challan c
+         LEFT JOIN eg_challanaddress ca on ca.challanid = c.id
+         LEFT JOIN eg_user u on u.uuid = c.accountid
+         WHERE 1=1
+  - reportName: StateChallanDetailReport
+    decryptionPathId: CHALLANREPORTS
+    summary: Challan wise detail report per tenant
+    version: 1.0.0
+    moduleName: rainmaker-ch
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenant
+        label: Tenant Id
+        type: string
+        source: ch
+        total: false
+      - name: challanno
+        label: Challan Number
+        type: string
+        source: ch
+        total: false
+      - name: name
+        label: Name
+        type: string
+        source: ch
+        total: false
+      - name: mobilenumber
+        label: Mobile Number
+        type: string
+        source: ch
+        total: false
+      - name: businessservice
+        label: Business Service
+        type: string
+        source: ch
+        total: false
+      - name: applicationstatus
+        label: Application Status
+        type: string
+        source: ch
+        total: false
+      - name: receiptnumber
+        label: Receipt Number
+        type: string
+        source: ch
+        total: false
+      - name: challanstatus
+        label: Challan Status
+        type: string
+        source: ch
+        total: false
+      - name: offence_type_name
+        label: Offence Type Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_category_name
+        label: Offence Category Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_subcategory_name
+        label: Offence Subcategory Name
+        type: string
+        source: ch
+        total: false
+      - name: challan_amount
+        label: Challan Amount
+        type: string
+        source: ch
+        total: true
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ch
+        isMandatory: false
+        searchClause: AND c.createdtime>= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ch
+        isMandatory: false
+        searchClause: AND c.createdtime <= $toDate
+      - name: offence_category_name
+        label: offence_category_name
+        type: singlevaluelist
+        pattern: list://Solid Waste Management:Solid Waste Management
+        source: ch
+        isMandatory: false
+        searchClause: AND c.offence_category_name = $offence_category_name
+      - name: offence_subcategory_name
+        label: offence_subcategory_name
+        type: singlevaluelist
+        pattern: list://Littering of Waste:Littering of Waste,Open Defecation:Open
+          Defecation,Plastic:Plastic,Burning of Waste:Burning of Waste
+        source: ch
+        isMandatory: false
+        searchClause: AND c.offence_subcategory_name = $offence_subcategory_name
+    query: >
+      SELECT c.challanno , c.businessservice , c.applicationstatus ,
+         c.receiptnumber ,
+         c.challanstatus , c.offence_type_name , c.offence_category_name , c.offence_subcategory_name , 
+         c.challan_amount , c.tenantid , ca.addressline1 , u.name , u.mobilenumber ,split_part(c.tenantid, '.', 2) AS tenant,
          from eg_challan c
          LEFT JOIN eg_challanaddress ca on ca.challanid = c.id
          LEFT JOIN eg_user u on u.uuid = c.accountid
