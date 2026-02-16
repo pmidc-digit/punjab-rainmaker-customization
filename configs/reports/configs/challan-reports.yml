@@ -898,7 +898,7 @@ ReportDefinitions:
         type: string
         source: ch
         total: false
-      - name: owner_name
+      - name: name
         label: Name
         type: string
         source: ch
@@ -988,7 +988,7 @@ ReportDefinitions:
       defaulter_challans AS (
         SELECT
          c.challanno,c.createdtime,c.applicationstatus, c.offence_type_name,
-         c.offence_category_name,c.offence_subcategory_name,u.name AS owner_name,
+         c.offence_category_name,c.offence_subcategory_name,u.name AS name,
          u.mobilenumber,c.tenantid,
          FLOOR((EXTRACT(EPOCH FROM NOW()) * 1000 - c.createdtime) / 86400000) AS pending_days
          FROM eg_challan c
@@ -1001,7 +1001,7 @@ ReportDefinitions:
        )
       SELECT
         'Challan' as businessservice, split_part(tenantid, '.', 2) AS tenantid,
-         challanno, owner_name, mobilenumber, applicationstatus, offence_category_name,
+         challanno, name, mobilenumber, applicationstatus, offence_category_name,
          offence_subcategory_name, offence_type_name, pending_days,
          TO_CHAR( TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY' ) AS challan_date,
         'DEFAULTER' AS defaulter_status
@@ -1026,7 +1026,7 @@ ReportDefinitions:
         type: string
         source: ch
         total: false
-      - name: owner_name
+      - name: name
         label: Name
         type: string
         source: ch
@@ -1123,7 +1123,7 @@ ReportDefinitions:
       defaulter_challans AS (
         SELECT
          c.challanno,c.createdtime,c.applicationstatus, c.offence_type_name,
-         c.offence_category_name,c.offence_subcategory_name,u.name AS owner_name,
+         c.offence_category_name,c.offence_subcategory_name,u.name AS name,
          u.mobilenumber,c.tenantid,
          FLOOR((EXTRACT(EPOCH FROM NOW()) * 1000 - c.createdtime) / 86400000) AS pending_days
          FROM eg_challan c
@@ -1135,7 +1135,7 @@ ReportDefinitions:
        )
       SELECT
         'Challan' as businessservice, split_part(tenantid, '.', 2) AS tenantid,
-         challanno, owner_name, mobilenumber, applicationstatus, offence_category_name,
+         challanno, name, mobilenumber, applicationstatus, offence_category_name,
          offence_subcategory_name, offence_type_name, pending_days,
          TO_CHAR( TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY' ) AS challan_date,
         'DEFAULTER' AS defaulter_status
