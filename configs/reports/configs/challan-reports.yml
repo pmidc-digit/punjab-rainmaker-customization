@@ -503,13 +503,13 @@ ReportDefinitions:
                AND p.paymentstatus != 'CANCELLED'
               )
           SELECT
-              split_part(tenantid, '.', 2) AS tenant_name,
+              split_part(tenantid, '.', 2) AS tenantid,
               challanno, name, mobilenumber, 'CHALLAN' AS businessservice, applicationstatus,
               collector_code, cash_amount, cheque_amount,offence_category_name,offence_subcategory_name,offence_type_name,
               card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
               TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS paymentdate         
              FROM unique_transactions
-             WHERE 1=1 
+             WHERE tenantid != 'pb.testing'
     orderby: ORDER BY createdtime DESC
   - reportName: StateReceiptRegisterchallan
     decryptionPathId: CHALLANREPORTS
@@ -520,7 +520,7 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: tenant_name
+      - name: tenantid
         label: Tenant Id
         type: string
         source: ch
@@ -631,7 +631,7 @@ ReportDefinitions:
         searchClause: AND bill.tenantid = $ulb
     query: >
       SELECT
-        split_part(payment.tenantid, '.', 2) AS tenant_name,
+        split_part(payment.tenantid, '.', 2) AS tenantid,
         pd.receiptnumber AS receiptno,
         bill.consumercode AS connectionno,
         TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate1,
@@ -659,6 +659,7 @@ ReportDefinitions:
        LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
        WHERE pd.businessservice = 'Challan_Generation'
         AND payment.paymentstatus != 'CANCELLED'
+        and pd.tenantid not in ('pb.testing')
     orderby: ORDER BY pd.receiptdate DESC
   - reportName: ChallanDetailReport
     decryptionPathId: CHALLANREPORTS
