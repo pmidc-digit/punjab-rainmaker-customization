@@ -131,7 +131,7 @@ ReportDefinitions:
          LEFT JOIN eg_user u ON u.uuid = wa.assignee
          LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
          WHERE wf.tenantid = $tenantid
-         AND wf.businessservice = 'CHALLAN'
+         AND wf.businessservice = 'Challan_Generation'
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       ),
        unique_transactions AS (
@@ -331,7 +331,7 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: tenant
+      - name: tenant_name
         label: Tenant Id
         type: string
         source: ch
@@ -464,7 +464,7 @@ ReportDefinitions:
          LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
          LEFT JOIN eg_user u ON u.uuid = wa.assignee
          LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-         WHERE wf.businessservice = 'CHALLAN'
+         WHERE wf.businessservice = 'Challan_Generation'
          ORDER BY wf.businessid, wf.lastmodifiedtime DESC
           ),
         unique_transactions AS (
@@ -503,7 +503,7 @@ ReportDefinitions:
                AND p.paymentstatus != 'CANCELLED'
               )
           SELECT
-              split_part(tenantid, '.', 2) AS tenant,
+              split_part(tenantid, '.', 2) AS tenant_name,
               challanno, name, mobilenumber, 'CHALLAN' AS businessservice, applicationstatus,
               collector_code, cash_amount, cheque_amount,offence_category_name,offence_subcategory_name,offence_type_name,
               card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
@@ -520,7 +520,7 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: tenant
+      - name: tenant_name
         label: Tenant Id
         type: string
         source: ch
@@ -631,7 +631,7 @@ ReportDefinitions:
         searchClause: AND bill.tenantid = $ulb
     query: >
       SELECT
-        split_part(payment.tenantid, '.', 2) AS tenant,
+        split_part(payment.tenantid, '.', 2) AS tenant_name,
         pd.receiptnumber AS receiptno,
         bill.consumercode AS connectionno,
         TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate1,
@@ -758,8 +758,7 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND c.offence_subcategory_name = $offence_subcategory_name
     query: >
-      SELECT c.challanno , c.businessservice , c.applicationstatus ,
-      c.receiptnumber ,
+      SELECT c.challanno , c.businessservice , c.applicationstatus , c.receiptnumber ,
          c.challanstatus , c.offence_type_name , c.offence_category_name , c.offence_subcategory_name , 
          c.challan_amount , c.tenantid , ca.addressline1 , u.name , u.mobilenumber 
          from eg_challan c
@@ -775,7 +774,7 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: tenant
+      - name: tenant_name
         label: Tenant Id
         type: string
         source: ch
@@ -867,7 +866,7 @@ ReportDefinitions:
       SELECT c.challanno , c.businessservice , c.applicationstatus ,
          c.receiptnumber ,
          c.challanstatus , c.offence_type_name , c.offence_category_name , c.offence_subcategory_name , 
-         c.challan_amount , c.tenantid , ca.addressline1 , u.name , u.mobilenumber ,split_part(c.tenantid, '.', 2) AS tenant,
+         c.challan_amount , c.tenantid , ca.addressline1 , u.name , u.mobilenumber ,split_part(c.tenantid, '.', 2) AS tenant_name,
          from eg_challan c
          LEFT JOIN eg_challanaddress ca on ca.challanid = c.id
          LEFT JOIN eg_user u on u.uuid = c.accountid
