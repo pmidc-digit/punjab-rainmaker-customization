@@ -867,7 +867,7 @@ ReportDefinitions:
       SELECT c.challanno , c.businessservice , c.applicationstatus ,
          c.receiptnumber ,
          c.challanstatus , c.offence_type_name , c.offence_category_name , c.offence_subcategory_name , 
-         c.challan_amount , c.tenantid , ca.addressline1 , u.name , u.mobilenumber ,split_part(c.tenantid, '.', 2) AS tenant_name,
+         c.challan_amount , c.tenantid , ca.addressline1 , u.name , u.mobilenumber ,split_part(c.tenantid, '.', 2) AS tenant_name
          from eg_challan c
          LEFT JOIN eg_challanaddress ca on ca.challanid = c.id
          LEFT JOIN eg_user u on u.uuid = c.accountid
