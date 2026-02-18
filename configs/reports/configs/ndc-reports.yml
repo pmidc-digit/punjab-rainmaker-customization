@@ -1160,7 +1160,7 @@ ReportDefinitions:
     orderby: ORDER BY pd.receiptnumber, pd.receiptdate DESC;
     
   - reportName: OverallSummaryReport
-    summary: Details of applicant in ndc , chb, pet service
+    summary: Details of applicant in No Due Certificate , Venue Booking, Pet service
     version: 1.0.0
     moduleName: rainmaker-ndc
     additionalConfig:
@@ -1203,7 +1203,7 @@ ReportDefinitions:
       - name: service
         label: service
         type: singlevaluelist
-        pattern: list://CHB:Community Hall Booking,NDC:No Due Certficate,PTR:Pet Registration
+        pattern: list://CHB:Venue Booking,NDC:No Due Certficate,PTR:Pet Registration
         source: ndc
         isMandatory: true
         searchClause: AND 1=1
@@ -1214,7 +1214,7 @@ ReportDefinitions:
         SELECT
           split_part(b.tenant_id, '.', 2) AS tenant_name,
           b.tenant_id                     AS tenantid,
-          'CHB'                           AS service,
+          'Venue Booking'                 AS service,
           b.booking_status                AS application_status,
           COUNT(*)                        AS application_count,
           MAX(createdtime)                AS createdtime
@@ -1227,7 +1227,7 @@ ReportDefinitions:
         SELECT
           split_part(a.tenantid, '.', 2) AS tenant_name,
           a.tenantid                     AS tenantid,
-          'NDC'                          AS service,
+          'No Due Certificate'                          AS service,
           a.applicationstatus            AS application_status,
           COUNT(*)                       AS application_count,
           MAX(createdtime)               AS createdtime
@@ -1240,7 +1240,7 @@ ReportDefinitions:
         SELECT
           split_part(r.tenantid, '.', 2) AS tenant_name,
           r.tenantid                     AS tenantid,
-          'PTR'                          AS service,
+          'Pet Registration'             AS service,
           r.status                       AS application_status,
           COUNT(*)                       AS application_count,
           MAX(createdtime)               AS createdtime
@@ -1262,7 +1262,7 @@ ReportDefinitions:
       
   - reportName: Employeewisependingreport
     decryptionPathId: STATENDCAPPLICATION
-    summary: Details of applicant in ndc , chb, pet service
+    summary: Details of applicant in No Due Certficate , Venue Booking , Pet service
     version: 1.0.0
     moduleName: rainmaker-ndc
     additionalConfig:
