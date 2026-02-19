@@ -1255,6 +1255,7 @@ ReportDefinitions:
           COUNT(*)                       AS application_count,
           MIN(c.createdtime)             AS createdtime
           FROM eg_challan c
+          GROUP BY tenantid, tenant_name, service, application_status
        )
       
       SELECT
