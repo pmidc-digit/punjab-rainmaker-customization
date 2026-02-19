@@ -1219,7 +1219,6 @@ ReportDefinitions:
           COUNT(*)                        AS application_count,
           MIN(b.createdtime)              AS createdtime
         FROM eg_chb_booking_detail b
-        GROUP BY tenantid, tenant_name, service, application_status
       
         UNION ALL
       
@@ -1232,7 +1231,6 @@ ReportDefinitions:
           COUNT(*)                       AS application_count,
           MIN(a.createdtime)             AS createdtime
         FROM eg_ndc_application a
-        GROUP BY tenantid, tenant_name, service, application_status
       
         UNION ALL
       
@@ -1245,7 +1243,6 @@ ReportDefinitions:
           COUNT(*)                       AS application_count,
           MIN(r.createdtime)             AS createdtime
         FROM eg_ptr_registration r
-        GROUP BY tenantid, tenant_name, service, application_status
 
          UNION ALL
 
@@ -1258,7 +1255,6 @@ ReportDefinitions:
           COUNT(*)                       AS application_count,
           MIN(c.createdtime)             AS createdtime
           FROM eg_challan c
-          GROUP BY tenant_name, tenantid, service, application_status
        )
       
       SELECT
