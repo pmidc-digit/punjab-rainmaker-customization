@@ -1168,45 +1168,45 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
       - name: tenant_name
-        label: tenant_name
+        label: ULB Name
         type: string
         source: ndc
         total: false
       - name: service
-        label: service
+        label: Service
         type: string
         source: ndc
         total: false
       - name: application_status
-        label: application_status
+        label: Application Status
         type: string
         source: ndc
         total: false
       - name: application_count
-        label: application_count
+        label: Application Count
         type: string
         source: ndc
         total: false
     searchParams:
       - name: fromDate
-        label: fromDate
+        label: From Date
         type: epoch
         source: ndc
-        isMandatory: true
+        isMandatory: false
         searchClause: AND createdtime >= $fromDate
       - name: toDate
-        label: toDate
+        label: To Date
         type: epoch
         source: ndc
-        isMandatory: true
+        isMandatory: false
         searchClause: AND createdtime <= $toDate
       - name: service
-        label: service
+        label: Service
         type: singlevaluelist
-        pattern: list://CHB:Community Hall Booking,NDC:No Due Certficate,PTR:Pet Registration
+        pattern: list://Venue_Booking:Venue Booking,No Due CertificateDC:No Due Certficate,Pet Registration:Pet Registration
         source: ndc
-        isMandatory: true
-        searchClause: AND 1=1
+        isMandatory: false
+        searchClause: AND service = $service
     query: |
       WITH all_services AS (
       
@@ -1214,12 +1214,12 @@ ReportDefinitions:
         SELECT
           split_part(b.tenant_id, '.', 2) AS tenant_name,
           b.tenant_id                     AS tenantid,
-          'CHB'                           AS service,
+          'Venue_Booking'                 AS service,
           b.booking_status                AS application_status,
           COUNT(*)                        AS application_count,
-          MAX(createdtime)                AS createdtime
+          MIN(b.createdtime)              AS createdtime
         FROM eg_chb_booking_detail b
-        WHERE 1=1
+        GROUP BY tenantid, tenant_name, service, application_status
       
         UNION ALL
       
@@ -1227,12 +1227,12 @@ ReportDefinitions:
         SELECT
           split_part(a.tenantid, '.', 2) AS tenant_name,
           a.tenantid                     AS tenantid,
-          'NDC'                          AS service,
+          'No Due Certificate'           AS service,
           a.applicationstatus            AS application_status,
           COUNT(*)                       AS application_count,
-          MAX(createdtime)               AS createdtime
+          MIN(a.createdtime)             AS createdtime
         FROM eg_ndc_application a
-        WHERE 1=1
+        GROUP BY tenantid, tenant_name, service, application_status
       
         UNION ALL
       
@@ -1240,23 +1240,34 @@ ReportDefinitions:
         SELECT
           split_part(r.tenantid, '.', 2) AS tenant_name,
           r.tenantid                     AS tenantid,
-          'PTR'                          AS service,
+          'Pet Registration'             AS service,
           r.status                       AS application_status,
           COUNT(*)                       AS application_count,
-          MAX(createdtime)               AS createdtime
+          MIN(r.createdtime)             AS createdtime
         FROM eg_ptr_registration r
-        WHERE  createdtime >= $fromDate AND createdtime <= $toDate
         GROUP BY tenantid, tenant_name, service, application_status
-      )
+
+         UNION ALL
+
+       /* ---------------- CHALLAN ---------------- */
+        SELECT
+          split_part(c.tenantid, '.', 2) AS tenant_name,
+          c.tenantid                     AS tenantid,
+          'CHALLAN'                      AS service,
+          c.applicationstatus            AS application_status,
+          COUNT(*)                       AS application_count,
+          MIN(c.createdtime)             AS createdtime
+          FROM eg_challan c
+          GROUP BY tenant_name, tenantid, service, application_status
+       )
       
       SELECT
         tenant_name,
         service,
         application_status,
-        SUM(application_count)       AS application_count,
-        MAX(createdtime)      AS createdtime
+        SUM(application_count)       AS application_count
       FROM all_services
-      WHERE service = $service and tenant_name not in ('testing')
+      WHERE tenant_name not in ('testing')
     groupby: GROUP BY tenantid, tenant_name, service, application_status
     orderby: ORDER BY tenant_name, service, application_status;
       
