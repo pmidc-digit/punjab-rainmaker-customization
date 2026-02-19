@@ -1203,7 +1203,7 @@ ReportDefinitions:
       - name: service
         label: Service
         type: singlevaluelist
-        pattern: list://Venue_Booking:Venue Booking,No Due CertificateDC:No Due Certficate,Pet Registration:Pet Registration
+        pattern: list://Venue Booking:Venue Booking,No Due CertificateDC:No Due Certficate,Pet Registration:Pet Registration
         source: ndc
         isMandatory: false
         searchClause: AND service = $service
@@ -1214,7 +1214,7 @@ ReportDefinitions:
         SELECT
           split_part(b.tenant_id, '.', 2) AS tenant_name,
           b.tenant_id                     AS tenantid,
-          'Venue_Booking'                 AS service,
+          'Venue Booking'                 AS service,
           b.booking_status                AS application_status,
           COUNT(*)                        AS application_count,
           MIN(b.createdtime)              AS createdtime
