@@ -540,6 +540,18 @@
                     }
                   }
                 ]
+              },
+               {
+                "path": "http://egov-filestore:8080/filestore/v1/files/url",
+                "queryParam": "tenantId=$.tenantId,fileStoreIds=$.fileStoreId",
+                "apiRequest": null,
+                "requesttype": "GET",
+                "responseMapping": [
+                  {
+                    "variable": "fileUrl",
+                    "value": "$.fileStoreIds[0].url"
+                  }
+                ]
               }
             ]
           },
@@ -573,7 +585,7 @@
             "qrcodeConfig": [
               {
                 "variable": "qrCode",
-                "value": "Applicant Name: {{favourOf}}, Permit Order Number : {{planPermissionNo}}, Permit Order Date : {{orderGeneratedOn}}, eDCR Scrutiny Number: {{edcrNo}}, Approver Name : {{approvedBy}}"
+                "value": "{{fileUrl}}"
               }
             ]
           }
