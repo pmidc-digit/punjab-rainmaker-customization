@@ -1196,7 +1196,7 @@ ReportDefinitions:
         pattern: list://Venue Booking:Venue Booking,No Due CertificateDC:No Due Certficate,Pet Registration:Pet Registration
         source: ndc
         isMandatory: false
-        searchClause: AND service = $service
+        searchClause: AND 1=1
     query: |
       WITH all_services AS (
       
@@ -1209,6 +1209,7 @@ ReportDefinitions:
           COUNT(*)                        AS application_count,
           MIN(b.createdtime)              AS createdtime
         FROM eg_chb_booking_detail b
+        where 1=1
       
         UNION ALL
       
@@ -1221,6 +1222,7 @@ ReportDefinitions:
           COUNT(*)                       AS application_count,
           MIN(a.createdtime)             AS createdtime
         FROM eg_ndc_application a
+        where 1=1
       
         UNION ALL
       
@@ -1233,6 +1235,7 @@ ReportDefinitions:
           COUNT(*)                       AS application_count,
           MIN(r.createdtime)             AS createdtime
         FROM eg_ptr_registration r
+        where 1=1
 
          UNION ALL
 
@@ -1254,7 +1257,7 @@ ReportDefinitions:
         application_status,
         SUM(application_count)       AS application_count
       FROM all_services
-      WHERE tenant_name not in ('testing')
+      WHERE tenant_name not in ('testing') and service = $service
     groupby: GROUP BY tenantid, tenant_name, service, application_status
     orderby: ORDER BY tenant_name, service, application_status;
       
