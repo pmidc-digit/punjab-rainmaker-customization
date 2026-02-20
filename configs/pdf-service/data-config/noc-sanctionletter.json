@@ -955,6 +955,18 @@
                 ]
               },
               {
+                "path": "http://egov-filestore:8080/filestore/v1/files/url",
+                "queryParam": "tenantId=$.tenantId,fileStoreIds=$.fileStoreId",
+                "apiRequest": null,
+                "requesttype": "GET",
+                "responseMapping": [
+                  {
+                    "variable": "fileUrl",
+                    "value": "$.fileStoreIds[0].url"
+                  }
+                ]
+              },
+              {
                 "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
                 "queryParam": "moduleName=tenant&masterName=footer&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}' %26%26 @.service=='{$.paymentDetails[0].businessService}')%5D",
                 "apiRequest": null,
@@ -987,7 +999,7 @@
             "qrcodeConfig": [
               {
                 "variable": "qrcodeimage",
-                "value": "/digit-ui/citizen/payment/verification?tenantId={{tenantid}}&receiptNumber={{receiptNo}}"
+                "value": "{{fileUrl}}"
               }
             ]
           }
