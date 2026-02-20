@@ -1,0 +1,225 @@
+{
+  "key": "wsn-integrated",
+  "config": {
+    "defaultStyle": {
+      "font": "Cambay",
+      "fontSize": 9
+    },
+
+    "content": [
+
+      {
+        "table": {
+          "widths": [60, "*", 120],
+          "body": [
+            [
+              { "image": "{{logoImage}}", "width": 35 },
+              {
+                "stack": [
+                  { "text": "{{logo_header}} {{mcGrade}}", "style": "header-title" },
+                  { "text": "{{address}}", "style": "header-sub" },
+                  { "text": "{{website}}  |  {{email}}", "style": "header-sub" }
+                ],
+                "alignment": "center"
+              },
+              {
+                "stack": [
+                  { "text": "TOTAL AMOUNT DUE", "style": "amount-label" },
+                  { "text": "₹ {{totalAmountDue}}", "style": "amount-value" }
+                ],
+                "alignment": "right"
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+
+      { "canvas": [{ "type": "line", "x1": -40, "y1": 28, "x2": 550, "y2": 28}],  "margin": [0, -20, 0, 4] },
+
+      { "text": "PROPERTY & OWNER DETAILS", "style": "section-header" },
+
+      {
+        "table": {
+          "widths": ["25%", "25%", "25%", "25%"],
+          "body": [
+            ["Property Id", "Ledger / Group", "Plot Size", "Usage Type"],
+            ["{{propertyId}}", "{{landmark}}", "{{plotSize}}", "{{usageType}}"],
+            ["Owner Name", "Guardian Name", "Mobile No", "Locality"],
+            ["{{ownerName}}", "{{guardianName}}", "{{mobileNo}}", "{{locality}}"]
+          ]
+        },
+        "style": "data-table"
+      },
+
+      { "text": "CONSUMER DETAILS", "style": "section-header" },
+
+      {
+        "table": {
+          "widths": ["25%", "25%", "25%", "25%"],
+          "body": [
+            ["Water Consumer", "{{wsconsumerCode}}", "Sewerage Consumer", "{{swconsumerCode}}"],
+            ["Water Old Consumer", "{{wsoldconsumerCode}}", "Sewerage Old Consumer", "{{swoldconsumerCode}}"],
+            ["Water Payer", "{{wspayerName}}", "Sewerage Payer", "{{swpayerName}}"],
+            ["Water Bill Date", "{{wsbillDate}}", "Sewerage Bill Date", "{{swbillDate}}"]
+          ]
+        },
+        "style": "data-table"
+      },
+
+      { "text": "METER DETAILS", "style": "section-header" },
+
+      {
+        "table": {
+          "widths": ["20%", "20%", "20%", "20%", "20%"],
+          "body": [
+            ["Last Reading", "Last Date", "Current Reading", "Current Date", "Units (KL)"],
+            ["{{lastReading}}", "{{lastReadingDate}}", "{{currentReading}}", "{{currentReadingDate}}", "{{units}}"]
+          ]
+        },
+        "style": "data-table"
+      },
+
+      { "text": "WATER BILL SUMMARY", "style": "section-header" },
+
+      {
+        "table": {
+          "widths": ["40%", "30%", "30%"],
+          "body": [
+            ["Bill No", "From", "To"],
+            ["{{wsbillNumber}}", "{{wsfromPeriod}}", "{{wstoPeriod}}"]
+          ]
+        },
+        "style": "data-table-bill"
+      },
+      {
+        "table": {
+          "widths": ["20%", "10%", "10%", "10%", "10%", "10%", "10%", "20%"],
+          "body": [
+            ["{{charge_label}}", "{{arrears_label}}", "{{penalty_label}}", "{{intrest_label}}", "{{advance_label}}", "{{others_label}}", "{{rebate_label}}" , "{{total_label}}"],
+            [ "{{wscharge}}", "{{wsarrears}}", "{{wspenalty}}", "{{wsinterest}}", "{{wsadvance}}","{{wsothers}}", "{{wsrebate}}", "{{wschargestotalAmount}}"]
+          ]
+        },
+        "style": "data-table-bill"
+      },
+
+      { "text": "SEWERAGE BILL SUMMARY", "style": "section-header" },
+
+      {
+        "table": {
+          "widths": ["40%", "30%", "30%"],
+          "body": [
+            ["Bill No", "From", "To"],
+            ["{{swbillNumber}}", "{{swfromPeriod}}", "{{swtoPeriod}}"]
+          ]
+        },
+        "style": "data-table-bill"
+      },
+      {
+        "table": {
+          "widths": ["20%", "10%", "10%", "10%", "10%", "10%", "10%", "20%"],
+          "body": [
+            ["{{charge_label}}", "{{arrears_label}}", "{{penalty_label}}", "{{intrest_label}}", "{{advance_label}}", "{{others_label}}", "{{rebate_label}}" , "{{total_label}}"],
+            [ "{{swcharge}}", "{{swarrears}}", "{{swpenalty}}", "{{swinterest}}", "{{swadvance}}","{{swothers}}", "{{swrebate}}", "{{swchargestotalAmount}}"]
+          ]
+        },
+        "style": "data-table-bill"
+      },
+      { "text": "IMPORTANT INSTRUCTIONS", "style": "section-header" },
+
+      {
+        "ol": [
+          "Online payment https://mseva.lgpunjab.gov.in/citizen",
+          "If last date of bill is a holiday. Kindly pay your bills either online or offline on previous working day to avoid penalty.",
+          "Please bring this bill while making payment at office counter during collection hours i.e. 9.00AM to 1:30PM",
+          "{{latePaymentc}}",
+          "To report any financial cybercrime call 1930 immediately or register any cybercrime at www.cybercrime.gov.in . For latest updates on cybercrime, follow official social media handle Cyberdost of Ministry of Home Affairs"
+        ],
+        "style": "instruction-box"
+      },
+
+       {
+        "canvas": [
+          {
+            "type": "line",
+            "x1": -40,
+            "y1": 28,
+            "x2": 550,
+            "y2": 28,
+            "dash": {
+              "length": 10,
+              "space": 5
+            }
+          }
+        ]
+      },
+      {
+        "image": "{{scissorImage}}",
+        "width": 19,
+        "height": 19,
+        "margin": [
+          -30,
+          -9.8,
+          0,
+          0
+        ]
+      },
+
+      { "text": "ACKNOWLEDGEMENT (For Official use only)", "style": "footer-header" },
+
+      {
+        "table": {
+          "widths": ["25%", "25%", "25%", "25%"],
+          "body": [
+            ["water Consumer No", "{{wsconsumerCode}}", "Water Bill No", "{{wsbillDate}}"],
+            ["Water Consumer Name", "{{wspayerName}}", "Water Amount", "{{wschargestotalAmount}}"],
+            ["Sewerage Consumer No", "{{swconsumerCode}}", "Sewerage Bill No", "{{swbillDate}}"],
+            ["Sewerage Consumer Name", "{{swpayerName}}", "Sewerage Amount", "{{swchargestotalAmount}}"],
+            ["Property ID", "{{propertyId}}","Total Amount Paid", "{{totalAmountDue}}" ]
+          ]
+        },
+        "style": "data-table-footer"
+      },
+
+      { "text": "Signature of Receiver", "style": "footer-bottom" }
+    ],
+
+    "styles": {
+      "header-title": { "fontSize": 10, "bold": true, "alignment": "center" },
+      "header-sub": { "fontSize": 8, "alignment": "center" },
+
+      "amount-label": { "fontSize": 8, "bold": true },
+      "amount-value": { "fontSize": 16, "bold": true },
+
+      "section-header": {
+        "fontSize": 8,
+        "bold": true,
+        "fillColor": "#f2f2f2",
+        "margin": [0, 1, 0, 1]
+      },
+
+      "data-table": {
+        "margin": [0, 0, 0, 1]
+      },
+      "data-table-bill" :{
+        "margin": [0, 0, 0, 0]
+      },
+      "instruction-box": {
+        "fontSize": 6,
+        "margin": [0, 1, 0, 1]
+      },
+
+      "footer-header": {
+        "fontSize": 8,
+        "bold": true,
+        "alignment": "center",
+        "margin": [0, 1, 0, 1]
+      },
+
+      "footer-bottom": {
+        "alignment": "right",
+        "margin": [0, 1, 0, 0]
+      }
+    }
+  }
+}
