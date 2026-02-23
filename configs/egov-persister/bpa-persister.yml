@@ -41,7 +41,7 @@ serviceMaps:
           - jsonPath: $.BPA.auditDetails.lastModifiedTime
 
 
-       - query: INSERT INTO eg_bpa_document( id, documenttype, fileStoreId, buildingplanid, documentuid, additionalDetails, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+       - query: INSERT INTO eg_bpa_document( id, documenttype, fileStoreId, buildingplanid, documentuid, doc_order, additionalDetails, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
          basePath: BPA.documents.*
          jsonMaps:
           - jsonPath: $.BPA.documents.*.id
@@ -53,6 +53,8 @@ serviceMaps:
           - jsonPath: $.BPA.id
 
           - jsonPath: $.BPA.documents.*.documentUid
+
+          - jsonPath: $.BPA.documents.*.order
 
           - jsonPath: $.BPA.documents.*.additionalDetails
             type: JSON
@@ -118,7 +120,7 @@ serviceMaps:
            - jsonPath: $.BPA.id
 
         
-       - query: INSERT INTO eg_bpa_document(id, documenttype, fileStoreId, buildingplanid, documentuid, additionalDetails, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET documenttype =?,  fileStoreId =?, additionalDetails=?, lastmodifiedby =?, lastmodifiedtime =?;
+       - query: INSERT INTO eg_bpa_document(id, documenttype, fileStoreId, buildingplanid, documentuid, doc_order, additionalDetails, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET documenttype =?,  fileStoreId =?, additionalDetails=?, lastmodifiedby =?, lastmodifiedtime =?, doc_order=?;
          basePath: BPA.documents.*
          jsonMaps:
           
@@ -131,6 +133,8 @@ serviceMaps:
            - jsonPath: $.BPA.id
   
            - jsonPath: $.BPA.documents.*.documentUid
+
+           - jsonPath: $.BPA.documents.*.order
   
            - jsonPath: $.BPA.documents.*.additionalDetails
              type: JSON
@@ -155,6 +159,8 @@ serviceMaps:
            - jsonPath: $.BPA.auditDetails.lastModifiedBy
 
            - jsonPath: $.BPA.auditDetails.lastModifiedTime
+
+           - jsonPath: $.BPA.documents.*.order
           
  - version: 1.0
    description: update buildingplan details in EG_BPA_BuildingPlan  table
@@ -163,7 +169,7 @@ serviceMaps:
    queryMaps:
    
           
-       - query: INSERT INTO eg_bpa_document(id, documentType, fileStoreId, buildingplanid, documentUid, additionalDetails, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET documenttype =?,  fileStoreId =?, additionalDetails=?, lastmodifiedby =?, lastmodifiedtime =?;
+       - query: INSERT INTO eg_bpa_document(id, documentType, fileStoreId, buildingplanid, documentUid, doc_order, additionalDetails, createdby, lastmodifiedby, createdtime, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET documenttype =?,  fileStoreId =?, additionalDetails=?, lastmodifiedby =?, lastmodifiedtime =?, doc_order=?;
          basePath: BPA.documents.*
          jsonMaps:
           
@@ -176,6 +182,8 @@ serviceMaps:
            - jsonPath: $.BPA.id
   
            - jsonPath: $.BPA.documents.*.documentUid
+
+           - jsonPath: $.BPA.documents.*.order
   
            - jsonPath: $.BPA.documents.*.additionalDetails
              type: JSON
@@ -200,6 +208,8 @@ serviceMaps:
            - jsonPath: $.BPA.auditDetails.lastModifiedBy
 
            - jsonPath: $.BPA.auditDetails.lastModifiedTime
+
+           - jsonPath: $.BPA.documents.*.order
            
            
        - query: INSERT INTO eg_bpa_auditdetails SELECT * FROM eg_bpa_buildingplan WHERE id =?;

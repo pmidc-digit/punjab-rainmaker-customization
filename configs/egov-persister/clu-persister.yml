@@ -55,9 +55,9 @@ serviceMaps:
 
         - query: >
             INSERT INTO eg_clu_document (
-              uuid, documenttype, documentAttachment, documentuid, cluid, additionaldetails, createdby,
+              uuid, documenttype, documentAttachment, documentuid, cluid, doc_order, additionaldetails, createdby,
               lastmodifiedby, createdtime, lastmodifiedtime
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
           basePath: $.Clu.documents.*
           jsonMaps:
             - jsonPath: $.Clu.documents.*.uuid
@@ -65,6 +65,7 @@ serviceMaps:
             - jsonPath: $.Clu.documents.*.documentAttachment
             - jsonPath: $.Clu.documents.*.documentUid
             - jsonPath: $.Clu.documents.*.cluId
+            - jsonPath: $.Clu.documents.*.order
             - jsonPath: $.Clu.documents.*.additionalDetails
               type: JSON
               dbType: JSONB
@@ -181,14 +182,15 @@ serviceMaps:
 
         - query: >
              INSERT INTO eg_clu_document (
-             uuid, documenttype,documentAttachment, documentuid, cluId,createdby,
+             uuid, documenttype,documentAttachment, documentuid, cluId, doc_order,createdby,
              lastmodifiedby, createdtime, lastmodifiedtime
-             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
               ON CONFLICT (uuid) DO UPDATE SET
                documenttype = EXCLUDED.documenttype,
                documentAttachment = EXCLUDED.documentAttachment,
                documentuid = EXCLUDED.documentuid,
                cluid = EXCLUDED.cluid,
+               doc_order = EXCLUDED.doc_order,
                createdby = EXCLUDED.createdby,
                lastmodifiedby = EXCLUDED.lastmodifiedby,
                createdtime = EXCLUDED.createdtime,
@@ -200,6 +202,7 @@ serviceMaps:
             - jsonPath: $.Clu.documents.*.documentAttachment
             - jsonPath: $.Clu.documents.*.documentUid
             - jsonPath: $.Clu.documents.*.cluId
+            - jsonPath: $.Clu.documents.*.order
             - jsonPath: $.Clu.documents.*.auditDetails.createdBy
             - jsonPath: $.Clu.documents.*.auditDetails.lastModifiedBy
             - jsonPath: $.Clu.documents.*.auditDetails.createdTime
