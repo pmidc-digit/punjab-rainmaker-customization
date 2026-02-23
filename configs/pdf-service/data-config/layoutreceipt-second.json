@@ -1,6 +1,6 @@
 {
-  "key": "layout-receipt",
-  "documentType": "LAYOUT_RECEIPT",
+  "key": "layoutreceipt-second",
+  "documentType": "LAYOUTRECEIPT_SECOND",
   "DataConfigs": {
     "moduleName": "rainmaker-common",
     "version": "1.0.0",
@@ -71,6 +71,18 @@
                   "module": "rainmaker-common"
                 }
               },
+               {
+                "variable": "paymentType2",
+                "value": {
+                  "path": "BPA_PAYMENT_TYPE2"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
               {
                 "variable": "receiptNo",
                 "value": {
@@ -121,9 +133,9 @@
                 }
               },
               {
-                "variable": "layout_scrutiny_fee",
+                "variable": "clu_other1_fee",
                 "value": {
-                  "path": "LAYOUT_SCRUTINY_FEE"
+                  "path": "PDF_STATIC_LABEL_CLU_OTHER1_FEE"
                 },
                 "type": "label",
                 "localisation": {
@@ -133,21 +145,15 @@
                 }
               },
               {
-                "variable": "LayoutCluCharge",
+                "variable": "CluOther1Fee",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'LAYOUT_CLU_CHARGES')].adjustedAmount"
-                }
-              },
-               {
-                "variable": "LayoutScrutinyFee",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'LAYOUT_SCRUTINY_FEE')].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'LAYOUT_OTHERCHARGES1_FEE')].adjustedAmount"
                 }
               },
               {
-                "variable": "layout_processing_fee",
+                "variable": "layout_layout_fee",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_PROCESSING_FEES"
+                  "path": "PDF_STATIC_LABEL_LAYOUT_LAYOUT_FEE"
                 },
                 "type": "label",
                 "localisation": {
@@ -157,15 +163,15 @@
                 }
               },
               {
-                "variable": "LayoutProcessingFee",
+                "variable": "layoutLayoutFee",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'LAYOUT_PROCESSING_FEE')].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'LAYOUT_LAYOUT_FEE')].adjustedAmount"
                 }
               },
               {
-                "variable": "layout_external_development_charges",
+                "variable": "layout_clu_fee",
                 "value": {
-                  "path": "BILLINGSERVICE_BUSINESSSERVICE_NKS_EXTERNAL_DEVELOPMENT_CHARGES"
+                  "path": "PDF_STATIC_LABEL_CLU_CLU_FEE"
                 },
                 "type": "label",
                 "localisation": {
@@ -175,15 +181,15 @@
                 }
               },
               {
-                "variable": "LayoutExternalDevelopmentCharges",
+                "variable": "ClucluFee",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'LAYOUT_EXTERNAL_DEVELOPMENT_CHARGES')].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'LAYOUT_CLU_FEE')].adjustedAmount"
                 }
               },
               {
-                "variable": "layout_urban_development_cess",
+                "variable": "clu_edc_fee",
                 "value": {
-                  "path": "BPA_URBAN_DEVELOPMENT_CESS"
+                  "path": "PDF_STATIC_LABEL_CLU_EDC_FEE"
                 },
                 "type": "label",
                 "localisation": {
@@ -193,12 +199,65 @@
                 }
               },
               {
-                "variable": "LayoutUrbanDevelopmentCess",
+                "variable": "CluEdcFee",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'LAYOUT_URBAN_DEVELOPMENT_CESS')].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'LAYOUT_EDC_FEE')].adjustedAmount"
                 }
               },
-
+              {
+                "variable": "clu_other2_fee",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CLU_OTHER2_FEE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "CluOther2Fee",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'LAYOUT_OTHERCHARGES2_FEE')].adjustedAmount"
+                }
+              },
+              {
+                "variable": "clu_udc_fee",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CLU_UDC_FEE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "CluUdcFee",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'LAYOUT_UDC_FEE')].adjustedAmount"
+                }
+              },
+              {
+                "variable": "layout_pf_fee",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_LAYOUT_PF_FEE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "LayoutPfFee",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'LAYOUT_PF_FEE')].adjustedAmount"
+                }
+              },
               {
                 "variable": "fromPeriod",
                 "value": {
