@@ -55,9 +55,9 @@ serviceMaps:
 
         - query: >
             INSERT INTO eg_layout_document (
-              uuid, documenttype, documentAttachment, documentuid, layoutid, additionaldetails, createdby,
+              uuid, documenttype, documentAttachment, documentuid, layoutid, doc_order, additionaldetails, createdby,
               lastmodifiedby, createdtime, lastmodifiedtime
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
           basePath: $.Layout.documents.*
           jsonMaps:
             - jsonPath: $.Layout.documents.*.uuid
@@ -65,6 +65,7 @@ serviceMaps:
             - jsonPath: $.Layout.documents.*.documentAttachment
             - jsonPath: $.Layout.documents.*.documentUid
             - jsonPath: $.Layout.documents.*.layoutId
+            - jsonPath: $.Layout.documents.*.order
             - jsonPath: $.Layout.documents.*.additionalDetails
               type: JSON
               dbType: JSONB
@@ -181,14 +182,15 @@ serviceMaps:
 
         - query: >
              INSERT INTO eg_layout_document (
-             uuid, documenttype,documentAttachment, documentuid, layoutId,createdby,
+             uuid, documenttype,documentAttachment, documentuid, layoutId, doc_order, createdby,
              lastmodifiedby, createdtime, lastmodifiedtime
-             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
               ON CONFLICT (uuid) DO UPDATE SET
                documenttype = EXCLUDED.documenttype,
                documentAttachment = EXCLUDED.documentAttachment,
                documentuid = EXCLUDED.documentuid,
                layoutid = EXCLUDED.layoutid,
+               doc_order = EXCLUDED.doc_order,
                createdby = EXCLUDED.createdby,
                lastmodifiedby = EXCLUDED.lastmodifiedby,
                createdtime = EXCLUDED.createdtime,
@@ -200,6 +202,7 @@ serviceMaps:
             - jsonPath: $.Layout.documents.*.documentAttachment
             - jsonPath: $.Layout.documents.*.documentUid
             - jsonPath: $.Layout.documents.*.layoutId
+            - jsonPath: $.Layout.documents.*.order
             - jsonPath: $.Layout.documents.*.auditDetails.createdBy
             - jsonPath: $.Layout.documents.*.auditDetails.lastModifiedBy
             - jsonPath: $.Layout.documents.*.auditDetails.createdTime
