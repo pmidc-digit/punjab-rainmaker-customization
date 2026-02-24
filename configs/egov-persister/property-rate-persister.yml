@@ -11,8 +11,8 @@ serviceMaps:
           id, propertyid, tenantid, districtid, tehsilid, village_id, 
           isurban, segmentid, subsegmentid, categoryid, subcategoryid, 
           locality, rate, unit, is_verified, createdby, lastmodifiedby, 
-          createdtime, lastmodifiedtime
-        ) VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, false, ?, ?, ?, ?);
+          createdtime, lastmodifiedtime, is_modified
+        ) VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, false, ?, ?, ?, ?,?);
       basePath: PropertyRates.*
       jsonMaps:
       - jsonPath: $.PropertyRates.*.id
@@ -34,6 +34,7 @@ serviceMaps:
       - jsonPath: $.PropertyRates.*.lastModifiedBy
       - jsonPath: $.PropertyRates.*.createdTime
       - jsonPath: $.PropertyRates.*.lastModifiedTime
+      - jsonPath: $.PropertyRates.*.isModified
 
   - version: 1.0
     description: Updates existing revenue property integration rates (Handles partial data)
@@ -55,6 +56,7 @@ serviceMaps:
           rate = COALESCE(?, rate), 
           unit = COALESCE(?, unit), 
           is_verified = COALESCE(?, is_verified), 
+          is_modified = COALESCE(?, is_modified),
           lastmodifiedby = ?, 
           lastmodifiedtime = ? 
         WHERE id = ?::uuid AND propertyid = ?;
@@ -72,6 +74,7 @@ serviceMaps:
       - jsonPath: $.PropertyRates.*.rate
       - jsonPath: $.PropertyRates.*.unit
       - jsonPath: $.PropertyRates.*.isVerified
+      - jsonPath: $.PropertyRates.*.isModified
       - jsonPath: $.PropertyRates.*.lastModifiedBy
       - jsonPath: $.PropertyRates.*.lastModifiedTime
       - jsonPath: $.PropertyRates.*.id
