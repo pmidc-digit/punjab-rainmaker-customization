@@ -8,13 +8,14 @@
       {
         "style": "noc-head",
         "table": {
-          "widths": [60, "*", 120],
+          "widths": [90, "*", 90],
           "body": [
             [
               {
                 "image": "{{logoImage}}",
-                "width": 50,
-                "height": 61.25
+                "width": 60,
+                "height": 60,
+                "alignment": "left"
               },
               {
                 "stack": [
@@ -25,30 +26,36 @@
                   {
                     "text": "{{serviceType}} Permission Letter",
                     "style": "receipt-logo-sub-header"
+                  },
+                  {
+                    "stack": [
+                      {
+                        "text": "{{address}}"
+                      },
+                      {
+                        "text": "{{phoneNumber}}"
+                      },
+                      {
+                        "text": "{{website}}"
+                      },
+                      {
+                        "text": "{{email}}"
+                      }
+                    ],
+                    "color": "#484848"
                   }
                 ],
-                "alignment": "left",
+                "alignment": "center",
                 "margin": [0, 10, 0, 0]
               },
               {
-                "stack": [
-                  {
-                    "text": "{{address}}"
-                  },
-                  {
-                    "text": "{{phoneNumber}}"
-                  },
-                  {
-                    "text": "{{website}}"
-                  },
-                  {
-                    "text": "{{email}}"
-                  }
-                ],
+                "image": "{{qrcodeimage}}",
+                "width": 72,
+                "height": 72,
                 "alignment": "right",
-                "color": "#484848",
-                "margin": [-100, 0, -25, 0]
+                "border": [false, false, false, false]
               }
+              
             ]
           ]
         },
@@ -59,19 +66,6 @@
         "table": {
           "widths": ["55%", "45%"],
           "body": [
-            [
-              {
-                "text": "",
-                "border": [false, false, false, false]
-              },
-              {
-                "text": "Booking No: {{consumerID}}",
-                "style": "receipt-table-value",
-                "alignment": "right",
-                "border": [false, false, false, false],
-                "margin": [0, 5, 10, 5]
-              }
-            ],
             [
               {
                 "stack": [
@@ -85,12 +79,11 @@
                 "margin": [10, 0, 0, 0]
               },
               {
-                "image": "{{qrcodeimage}}",
-                "width": 72,
-                "height": 72,
+                "text": "Booking No: {{consumerID}}",
+                "style": "receipt-table-value",
                 "alignment": "right",
-                "margin": [0, 0, 10, 0],
-                "border": [false, false, false, false]
+                "border": [false, false, false, false],
+                "margin": [0, 5, 10, 5]
               }
             ]
           ]
