@@ -58,14 +58,14 @@
                                 ],
                                 "alignment": "center",
                                 "color": "#484848",
-                                "margin": [0, 2, 0, 2]
+                                "margin": [0, 2, 0, 0]
                               },
                               {
                                 "text": "E-CHALLAN NOTICE",
                                 "style": "receipt-logo-sub-header",
                                 "fontSize": 13,
                                 "alignment": "center",
-                                "margin": [0, 5, 0, -3]
+                                "margin": [0, 2, 0, -7]
                               }
                             ],
                             "alignment": "center"
@@ -82,7 +82,7 @@
                     },
                     "layout": "noBorders"
                   },
-                  
+
                   {
                     "style": "next-noc-table",
                     "table": {
@@ -90,9 +90,14 @@
                       "body": [
                         [
                           {
-                            "text": "{{Challan_actsMsg}} {{offenceActs}}",
+                            "text": [
+                              { "text": "{{Challan_actsMsg}}", "bold": true },
+                              " : ",
+                              { "text": "{{offenceActs}}" }
+                            ],
                             "style": "receipt-table",
-                            "fontSize": 9 
+                            "fontSize": 9,
+                            "margin": [0, -3, 0, 0]
                           }
                         ]
                       ]
@@ -156,7 +161,7 @@
                             "style": "receipt-table-value",
                             "fillColor": "#d1d1d1",
                             "border": [true, true, false, true],
-                             "fontSize": 12
+                            "fontSize": 12
                           },
                           {
                             "text": " ",
@@ -175,7 +180,6 @@
                     "table": {
                       "widths": ["30%", "70%"],
                       "body": [
-                        
                         [
                           {
                             "text": "Name",
@@ -224,7 +228,7 @@
                             "style": "receipt-table-value",
                             "fillColor": "#d1d1d1",
                             "border": [true, true, false, true],
-                             "fontSize": 12
+                            "fontSize": 12
                           },
                           {
                             "text": " ",
@@ -243,7 +247,6 @@
                     "table": {
                       "widths": ["30%", "70%"],
                       "body": [
-                        
                         [
                           {
                             "text": "Location of Violation",
@@ -303,7 +306,7 @@
                             "style": "receipt-table-value",
                             "fillColor": "#d1d1d1",
                             "border": [true, true, false, true],
-                             "fontSize": 12
+                            "fontSize": 12
                           },
                           {
                             "text": " ",
@@ -322,7 +325,6 @@
                     "table": {
                       "widths": ["30%", "70%"],
                       "body": [
-                        
                         [
                           {
                             "text": "Total Challan (in Rs)",
@@ -362,7 +364,7 @@
                             "style": "receipt-table-value",
                             "fillColor": "#d1d1d1",
                             "border": [true, true, false, true],
-                             "fontSize": 12
+                            "fontSize": 12
                           },
                           {
                             "text": " ",
@@ -381,43 +383,42 @@
                     "table": {
                       "widths": ["30%", "70%"],
                       "body": [
-                        
                         [
                           {
                             "text": "Name & ID",
-                             
+
                             "bold": true,
                             "style": "receipt-table-value"
                           },
                           {
                             "text": "{{officerName}} ({{officerCode}}) ({{officerID}})",
-                             
+
                             "style": "receipt-table"
                           }
                         ],
                         [
                           {
                             "text": "Department",
-                             
+
                             "bold": true,
                             "style": "receipt-table-value"
                           },
                           {
                             "text": "{{officerdept}}",
-                             
+
                             "style": "receipt-table"
                           }
                         ],
                         [
                           {
                             "text": "Digital Signature",
-                             
+
                             "bold": true,
                             "style": "receipt-table-value"
                           },
                           {
                             "text": "{{officerName}}",
-                             
+
                             "style": "receipt-table"
                           }
                         ]
@@ -436,29 +437,21 @@
                             "bold": true,
                             "style": "receipt-table-value-down",
                             "alignment": "left",
-                             
+
                             "margin": [4, 0, 0, 0]
                           }
                         ],
                         [
                           {
-                            "stack": [
-                              {
-                                "text": "1. {{challan_notice_1}}"
-                              },
-                              {
-                                "text": "2. {{challan_notice_2}}"
-                              },
-                              {
-                                "text": "3. {{challan_notice_3}}"
-                              },
-                              {
-                                "text": "4. {{challan_notice_4}}"
-                              }
+                            "ol": [
+                              "{{challan_notice_1}}",
+                              "{{challan_notice_2}}",
+                              "{{challan_notice_3}}",
+                              "{{challan_notice_4}}"
                             ],
                             "style": "receipt-table",
                             "alignment": "left",
-                             
+
                             "margin": [10, 2, 10, 2]
                           }
                         ]
@@ -477,7 +470,7 @@
                             "bold": true,
                             "style": "receipt-table-value-down",
                             "alignment": "left",
-                             
+
                             "margin": [4, 0, 0, 0]
                           }
                         ],
@@ -495,7 +488,7 @@
                             ],
                             "style": "receipt-table",
                             "alignment": "left",
-                             
+
                             "margin": [10, 0, 10, 0]
                           }
                         ]
@@ -552,21 +545,21 @@
       "next-noc-table": {
         "fontSize": 9,
         "color": "#000000",
-        "margin": [0, 2, 0, 5]
+        "margin": [-10, 2, -10, 5]
       },
       "receipt-table-value": {
         "color": "#000000",
         "bold": true,
         "fontSize": 9,
         "fontWeight": 500,
-        "margin": [3, 2, 2, 2]
+        "margin": [3, 0, 2, 0]
       },
       "receipt-table": {
         "color": "#000000",
         "bold": false,
         "fontSize": 9,
         "fontWeight": 400,
-        "margin": [3, 2, 0, 2]
+        "margin": [3, 0, 0, 0]
       },
       "receipt-approver": {
         "fontSize": 9,
