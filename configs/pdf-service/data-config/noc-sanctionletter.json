@@ -308,6 +308,12 @@
                 }
               },
               {
+                "variable": "sanctionFilestoreID",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.sanctionLetterFilestoreId"
+                }
+              },
+              {
                 "variable": "paymentMode",
                 "value": {
                   "path": "$.paymentMode"
@@ -956,7 +962,7 @@
               },
               {
                 "path": "http://egov-filestore:8080/filestore/v1/files/url",
-                "queryParam": "tenantId=$.tenantId,fileStoreIds=$.fileStoreId",
+                "queryParam": "tenantId=$.tenantId,fileStoreIds=$.Noc[0].nocDetails.additionalDetails.sanctionLetterFilestoreId",
                 "apiRequest": null,
                 "requesttype": "GET",
                 "responseMapping": [
