@@ -10,77 +10,77 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
       - name: challanno
-        label: challanno
+        label: Challan Number
         type: string
         source: ch
         total: false
       - name: name
-        label: name
+        label: Name
         type: string
         source: ch
         total: false
       - name: mobilenumber
-        label: mobilenumber
+        label: Mobile Number
         type: string
         source: ch
         total: false
       - name: businessservice
-        label: businessservice
+        label: Business Service
         type: string
         source: ch
         total: false
       - name: applicationstatus
-        label: applicationstatus
+        label: Application Status
         type: string
         source: ch
         total: false
       - name: collector_code
-        label: collector_code
+        label: Collector Code
         type: string
         source: ch
         total: false
       - name: cash_amount
-        label: cash_amount
+        label: Cash Amount
         type: string
         source: ch
         total: true
       - name: cheque_amount
-        label: cheque_amount
+        label: Cheque Amount
         type: string
         source: ch
         total: true
       - name: card_amount
-        label: card_amount
+        label: Card Amount
         type: string
         source: ch
         total: true
       - name: dd_amount
-        label: dd_amount
+        label: DD Amount
         type: string
         source: ch
         total: true
       - name: neft_amount
-        label: neft_amount
+        label: NEFT Amount
         type: string
         source: ch
         total: true
       - name: rtgs_amount
-        label: rtgs_amount
+        label: RTGS Amount
         type: string
         source: ch
         total: true
       - name: online_amount
-        label: online_amount
+        label: Online Amount
         type: string
         source: ch
         total: true
       - name: amountpaid
-        label: amountpaid
+        label: Amount Paid
         type: string
         source: ch
         total: true
       - name: PaymentDate
-        label: PaymentDate
+        label: Payment Date
         type: string
         source: ch
         total: false
@@ -170,7 +170,7 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
       - name: receiptno
-        label: receiptno
+        label: Receipt Number
         type: string
         source: ch
         total: false
@@ -180,67 +180,47 @@ ReportDefinitions:
         source: ch
         total: false
       - name: receiptdate1
-        label: receiptdate1
+        label: Receipt Date
         type: string
         source: ch
         total: false
       - name: service
-        label: service
+        label: Service
         type: string
         source: ch
         total: false
       - name: collectorname
-        label: collectorname
+        label: Collector Name
         type: string
         source: ch
         total: false
       - name: transactiondate
-        label: transactiondate
+        label: Transaction Date
         type: string
         source: ch
         total: false
-      - name: instrumentnumber
-        label: instrumentnumber
+      - name: transaction_id
+        label: Transaction Id
         type: string
         source: ch
         total: false
       - name: payername
-        label: payername
+        label: Payer Name
         type: string
         source: ch
         total: false
       - name: amountpaid
-        label: amountpaid
+        label: Amount Paid
         type: string
         source: ch
         total: false
       - name: paymentmode
-        label: paymentmode
+        label: Payment Mode
         type: string
         source: ch
         total: false
       - name: paymentstatus
-        label: paymentstatus
-        type: string
-        source: ch
-        total: false
-      - name: ownername1
-        label: ownername1
-        type: string
-        source: ch
-        total: false
-      - name: user
-        label: user
-        type: string
-        source: ch
-        total: false
-      - name: manualreceiptnumber
-        label: manualreceiptnumber
-        type: string
-        source: ch
-        total: false
-      - name: manualreceiptdate
-        label: manualreceiptdate
+        label: Payment Status
         type: string
         source: ch
         total: false
@@ -285,19 +265,16 @@ ReportDefinitions:
               TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata',
               'DD-MM-YYYY'
           ) AS transactiondate,
-          payment.instrumentnumber,
+          payment.instrumentnumber AS transaction_id,
           u_citizen.name AS payername,
           pd.amountpaid,
           payment.paymentmode,
           payment.paymentstatus,
-          u_citizen.name AS ownername1,
-          usr.id AS userid,
-          pd.manualreceiptnumber,
-          pd.manualreceiptdate
+          u_citizen.name AS ownername1
       FROM egcl_paymentdetail pd
       INNER JOIN egcl_bill bill
           ON bill.id = pd.billid
-          AND pd.tenantid = 'pb.testing'
+          AND pd.tenantid = $tenantid
       INNER JOIN egcl_payment payment
           ON payment.id = pd.paymentid
       LEFT JOIN eg_challan c
@@ -308,7 +285,7 @@ ReportDefinitions:
           ON u_citizen.uuid = cc.uuid
       LEFT JOIN eg_user usr
           ON usr.id = payment.createdby::integer
-      WHERE bill.tenantid = 'pb.testing'
+      WHERE bill.tenantid = $tenantid
         AND pd.businessservice = 'Challan_Generation'
         AND payment.paymentstatus != 'CANCELLED'
     orderby: ORDER BY pd.receiptdate DESC
@@ -323,77 +300,77 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
       - name: challanno
-        label: challanno
+        label: Challan Number
         type: string
         source: ch
         total: false
       - name: name
-        label: name
+        label: Name
         type: string
         source: ch
         total: false
       - name: mobilenumber
-        label: mobilenumber
+        label: Mobile Number
         type: string
         source: ch
         total: false
       - name: businessservice
-        label: businessservice
+        label: Business Service
         type: string
         source: ch
         total: false
       - name: applicationstatus
-        label: applicationstatus
+        label: Application Status
         type: string
         source: ch
         total: false
       - name: collector_code
-        label: collector_code
+        label: Collector Code
         type: string
         source: ch
         total: false
       - name: cash_amount
-        label: cash_amount
+        label: Cash Amount
         type: string
         source: ch
         total: true
       - name: cheque_amount
-        label: cheque_amount
+        label: Cheque Amount
         type: string
         source: ch
         total: true
       - name: card_amount
-        label: card_amount
+        label: Card Amount
         type: string
         source: ch
         total: true
       - name: dd_amount
-        label: dd_amount
+        label: DD Amount
         type: string
         source: ch
         total: true
       - name: neft_amount
-        label: neft_amount
+        label: NEFT Amount
         type: string
         source: ch
         total: true
       - name: rtgs_amount
-        label: rtgs_amount
+        label: RTGS Amount
         type: string
         source: ch
         total: true
       - name: online_amount
-        label: online_amount
+        label: Online Amount
         type: string
         source: ch
         total: true
       - name: amountpaid
-        label: amountpaid
+        label: Amount Paid
         type: string
         source: ch
         total: true
       - name: PaymentDate
-        label: PaymentDate
+        label: Payment Date
         type: string
         source: ch
         total: false
@@ -499,67 +476,47 @@ ReportDefinitions:
         source: ch
         total: false
       - name: receiptdate1
-        label: receiptdate1
+        label: Receipt Date
         type: string
         source: ch
         total: false
       - name: service
-        label: service
+        label: Service
         type: string
         source: ch
         total: false
       - name: collectorname
-        label: collectorname
+        label: Collector Name
         type: string
         source: ch
         total: false
       - name: transactiondate
-        label: transactiondate
+        label: Transaction Date
         type: string
         source: ch
         total: false
-      - name: instrumentnumber
-        label: instrumentnumber
+      - name: transaction_id
+        label: Transaction Id
         type: string
         source: ch
         total: false
       - name: payername
-        label: payername
+        label: Payer Name
         type: string
         source: ch
         total: false
       - name: amountpaid
-        label: amountpaid
+        label: Amount Paid
         type: string
         source: ch
         total: false
       - name: paymentmode
-        label: paymentmode
+        label: Payment Mode
         type: string
         source: ch
         total: false
       - name: paymentstatus
-        label: paymentstatus
-        type: string
-        source: ch
-        total: false
-      - name: ownername1
-        label: ownername1
-        type: string
-        source: ch
-        total: false
-      - name: user
-        label: user
-        type: string
-        source: ch
-        total: false
-      - name: manualreceiptnumber
-        label: manualreceiptnumber
-        type: string
-        source: ch
-        total: false
-      - name: manualreceiptdate
-        label: manualreceiptdate
+        label: Payment Status
         type: string
         source: ch
         total: false
@@ -605,7 +562,7 @@ ReportDefinitions:
          'CHALLAN' AS service,
          usr.name AS collectorname,
          TO_CHAR( TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS transactiondate,
-         payment.instrumentnumber,   
+         payment.instrumentnumber AS transaction_id,   
          u_citizen.name AS payername,
          pd.amountpaid,
          payment.paymentmode,
@@ -635,7 +592,7 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
       - name: challanno
-        label: Challan No
+        label: Challan Number
         type: string
         source: ch
         total: false
@@ -645,12 +602,12 @@ ReportDefinitions:
         source: ch
         total: false
       - name: mobilenumber
-        label: mobilenumber
+        label: Mobile Number
         type: string
         source: ch
         total: false
       - name: businessservice
-        label: Businessservice
+        label: Business Service
         type: string
         source: ch
         total: false
@@ -670,32 +627,27 @@ ReportDefinitions:
         source: ch
         total: false
       - name: offence_type_name
-        label: offence_type_name
+        label: Offence Type Name
         type: string
         source: ch
         total: false
       - name: offence_category_name
-        label: offence_category_name
+        label: Offence Category Name
         type: string
         source: ch
         total: false
       - name: offence_subcategory_name
-        label: offence_subcategory_name
+        label: Offence Subcategory Name
         type: string
         source: ch
         total: false
       - name: challan_amount
-        label: challan_amount
+        label: Challan Amount
         type: string
         source: ch
         total: true
       - name: tenantid
-        label: tenantid
-        type: string
-        source: ch
-        total: false
-      - name: addressline1
-        label: Address
+        label: Tenantid
         type: string
         source: ch
         total: false

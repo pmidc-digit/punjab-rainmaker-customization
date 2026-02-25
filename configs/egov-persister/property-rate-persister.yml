@@ -1,0 +1,78 @@
+serviceMaps:
+  serviceName: property-rate
+  mappings:
+  - version: 1.0
+    description: Persists revenue property integration rates (Create)
+    fromTopic: save-property-rate-topic
+    isTransaction: true
+    queryMaps:
+    - query: >
+        INSERT INTO public.revenue_property_integration (
+          id, propertyid, tenantid, districtid, tehsilid, village_id, 
+          isurban, segmentid, subsegmentid, categoryid, subcategoryid, 
+          locality, rate, unit, is_verified, createdby, lastmodifiedby, 
+          createdtime, lastmodifiedtime
+        ) VALUES (?::uuid, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, false, ?, ?, ?, ?);
+      basePath: PropertyRates.*
+      jsonMaps:
+      - jsonPath: $.PropertyRates.*.id
+      - jsonPath: $.PropertyRates.*.propertyId
+      - jsonPath: $.PropertyRates.*.tenantId
+      - jsonPath: $.PropertyRates.*.districtId
+      - jsonPath: $.PropertyRates.*.tehsilId
+      - jsonPath: $.PropertyRates.*.villageId
+      - jsonPath: $.PropertyRates.*.isUrban
+      - jsonPath: $.PropertyRates.*.segmentId
+      - jsonPath: $.PropertyRates.*.subSegmentId
+      - jsonPath: $.PropertyRates.*.categoryId
+      - jsonPath: $.PropertyRates.*.subCategoryId
+      - jsonPath: $.PropertyRates.*.locality
+      - jsonPath: $.PropertyRates.*.rate
+      - jsonPath: $.PropertyRates.*.unit
+      # is_verified is hardcoded to 'false' in the VALUES clause above
+      - jsonPath: $.PropertyRates.*.createdBy
+      - jsonPath: $.PropertyRates.*.lastModifiedBy
+      - jsonPath: $.PropertyRates.*.createdTime
+      - jsonPath: $.PropertyRates.*.lastModifiedTime
+
+  - version: 1.0
+    description: Updates existing revenue property integration rates (Handles partial data)
+    fromTopic: update-property-rate-topic
+    isTransaction: true
+    queryMaps:
+    - query: >
+        UPDATE public.revenue_property_integration 
+        SET 
+          districtid = COALESCE(?, districtid), 
+          tehsilid = COALESCE(?, tehsilid), 
+          village_id = COALESCE(?, village_id), 
+          isurban = COALESCE(?, isurban), 
+          segmentid = COALESCE(?, segmentid), 
+          subsegmentid = COALESCE(?, subsegmentid), 
+          categoryid = COALESCE(?, categoryid), 
+          subcategoryid = COALESCE(?, subcategoryid), 
+          locality = COALESCE(?, locality), 
+          rate = COALESCE(?, rate), 
+          unit = COALESCE(?, unit), 
+          is_verified = COALESCE(?, is_verified), 
+          lastmodifiedby = ?, 
+          lastmodifiedtime = ? 
+        WHERE id = ?::uuid AND propertyid = ?;
+      basePath: PropertyRates.*
+      jsonMaps:
+      - jsonPath: $.PropertyRates.*.districtId
+      - jsonPath: $.PropertyRates.*.tehsilId
+      - jsonPath: $.PropertyRates.*.villageId
+      - jsonPath: $.PropertyRates.*.isUrban
+      - jsonPath: $.PropertyRates.*.segmentId
+      - jsonPath: $.PropertyRates.*.subSegmentId
+      - jsonPath: $.PropertyRates.*.categoryId
+      - jsonPath: $.PropertyRates.*.subCategoryId
+      - jsonPath: $.PropertyRates.*.locality
+      - jsonPath: $.PropertyRates.*.rate
+      - jsonPath: $.PropertyRates.*.unit
+      - jsonPath: $.PropertyRates.*.isVerified
+      - jsonPath: $.PropertyRates.*.lastModifiedBy
+      - jsonPath: $.PropertyRates.*.lastModifiedTime
+      - jsonPath: $.PropertyRates.*.id
+      - jsonPath: $.PropertyRates.*.propertyId
