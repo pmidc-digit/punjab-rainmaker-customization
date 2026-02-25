@@ -678,43 +678,43 @@
               {
                 "variable": "SecurityDeposit",
                 "value": {
-                  "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'RL_SECURITY_DEPOSIT_FEE')].adjustedAmount"
+                  "path": "$.billDetails[*].billAccountDetails[?(@.taxHeadCode == 'RL_SECURITY_DEPOSIT_FEE')].amount"
                 }
               },
               {
                 "variable": "rentAndLeaseFee",
                 "value": {
-                  "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'RENT_LEASE_FEE')].adjustedAmount"
+                  "path": "$.billDetails[*].billAccountDetails[?(@.taxHeadCode == 'RENT_LEASE_FEE')].amount"
                 }
               },
               {
                 "variable": "penaltyFee",
                 "value": {
-                  "path": "$.billDetails[1].billAccountDetails[?(@.taxHeadCode == 'RL_PENALTY_FEE')].adjustedAmount"
+                  "path": "$.billDetails[*].billAccountDetails[?(@.taxHeadCode == 'RL_PENALTY_FEE')].amount"
                 }
               },
               {
                 "variable": "rentSgst",
                 "value": {
-                  "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'RL_SGST_FEE')].adjustedAmount"
+                  "path": "$.billDetails[*].billAccountDetails[?(@.taxHeadCode == 'RL_SGST_FEE')].amount"
                 }
               },
                {
                 "variable": "rentArrears",
                 "value": {
-                  "path": "$.billDetails[1].billAccountDetails[?(@.taxHeadCode == 'RL_ARREAR_FEE')].adjustedAmount"
+                  "path": "$.billDetails[*].billAccountDetails[?(@.taxHeadCode == 'RL_ARREAR_FEE')].amount"
                 }
               },
               {
                 "variable": "rentCgst",
                 "value": {
-                  "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'RL_CGST_FEE')].adjustedAmount"
+                  "path": "$.billDetails[*].billAccountDetails[?(@.taxHeadCode == 'RL_CGST_FEE')].amount"
                 }
               },
               {
                 "variable": "rentCowcess",
                 "value": {
-                  "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'RL_COWCESS_FEE')].adjustedAmount"
+                  "path": "$.billDetails[*].billAccountDetails[?(@.taxHeadCode == 'RL_COWCESS_FEE')].amount"
                 }
               },
               {
@@ -896,6 +896,34 @@
               {
                 "variable": "billTotalAmount",
                 "formula": "{{total}}"
+              },
+              {
+                "variable": "SecurityDeposit",
+                "formula": "{{SecurityDeposit}} > 0 ? {{SecurityDeposit}} : 0"
+              },
+              {
+                "variable": "rentAndLeaseFee",
+                "formula": "{{rentAndLeaseFee}} > 0 ? {{rentAndLeaseFee}} : 0"
+              },
+              {
+                "variable": "penaltyFee",
+                "formula": "{{penaltyFee}} > 0 ? {{penaltyFee}} : 0"
+              },
+              {
+                "variable": "rentCgst",
+                "formula": "{{rentCgst}} > 0 ? {{rentCgst}} : 0"
+              },
+              {
+                "variable": "rentSgst",
+                "formula": "{{rentSgst}} > 0 ? {{rentSgst}} : 0"
+              },
+              {
+                "variable": "rentCowcess",
+                "formula": "{{rentCowcess}} > 0 ? {{rentCowcess}} : 0"
+              },
+              {
+                "variable": "rentArrears",
+                "formula": "{{rentArrears}} > 0 ? {{rentArrears}} : 0"
               },
               {
                 "variable": "arrears",
