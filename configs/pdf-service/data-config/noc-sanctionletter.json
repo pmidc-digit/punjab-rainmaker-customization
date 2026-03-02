@@ -13,11 +13,22 @@
         "mappings": [
           {
             "direct": [
-              
               {
                 "variable": "applicantOwnerOrFirmName",
                 "value": {
                   "path": "$.Noc[0].nocDetails.additionalDetails.applicationDetails.applicantOwnerOrFirmName"
+                }
+              },
+              {
+                "variable": "approverCommentLine",
+                "value": {
+                  "path": "$.Noc[0].approverComment.ConditionLine"
+                }
+              },
+              {
+                "variable": "approverCommentText",
+                "value": {
+                  "path": "$.Noc[0].approverComment.ConditionText"
                 }
               },
               {
@@ -26,12 +37,35 @@
                   "path": "$.Noc[0].currentDate"
                 }
               },
-              
-              
+
+              {
+                "variable": "var_owners",
+                "value": {
+                  "path": "$.Noc[0].owners[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "string",
+                  "scema": [
+                    { "variable": "name", "value": "name" },
+                    {
+                      "variable": "permanentAddress",
+                      "value": "permanentAddress"
+                    }
+                  ]
+                }
+              },
+
               {
                 "variable": "nocType",
                 "value": {
                   "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.specificationNocType"
+                }
+              },
+              {
+                "variable": "proposedSiteAddress",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.proposedSiteAddress"
                 }
               },
               {
@@ -53,8 +87,6 @@
                   "path": "$.Noc[0].nocDetails.additionalDetails.applicationDetails.applicantAddress"
                 }
               },
-              
-              
 
               {
                 "variable": "var_floorArea",
@@ -67,7 +99,6 @@
                   "scema": [
                     { "variable": "floorNo", "value": "floorNo" },
                     { "variable": "value", "value": "value" }
-
                   ]
                 }
               },
@@ -82,12 +113,10 @@
                   "scema": [
                     { "variable": "number", "value": "number" },
                     { "variable": "text", "value": "text" }
-
                   ]
                 }
               },
-              
-            
+
               {
                 "variable": "ulbName",
                 "value": {
@@ -129,6 +158,12 @@
                 "variable": "vasikaNo",
                 "value": {
                   "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.vasikaNumber"
+                }
+              },
+              {
+                "variable": "vasikaDate",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.vasikaDate"
                 }
               },
               {
@@ -191,15 +226,14 @@
                   "path": "$.totalAmountPaid"
                 }
               },
-              
+
               {
                 "variable": "nocTermThree",
                 "value": {
                   "path": "$.Noc[0].nocTermThree"
                 }
               },
-              
-              
+
               {
                 "variable": "tenantid",
                 "value": {
@@ -230,9 +264,20 @@
                 }
               },
               {
+                "variable": "ownerNames",
+                "value": {
+                  "path": "$.Noc[0].ownersString"
+                }
+              },
+              {
                 "variable": "officerDesignation",
                 "value": {
                   "path": "$.Noc[0].officer.designation"
+                },
+                "localisation": {
+                  "required": true,
+                  "prefix": "COMMON_MASTERS_DESIGNATION",
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -243,18 +288,30 @@
                 "type": "date"
               },
               {
-                  "variable": "dateNow",
-                  "value": {
-                    "path": "$.auditDetails.lastModifiedTime"
-                  },
-                  "type" : "date"
+                "variable": "dateNow",
+                "value": {
+                  "path": "$.auditDetails.lastModifiedTime"
                 },
+                "type": "date"
+              },
               {
                 "variable": "toPeriod",
                 "value": {
                   "path": "$.paymentDetails[0].bill.billDetails[0].toPeriod"
                 },
                 "type": "date"
+              },
+              {
+                "variable": "areaSummary",
+                "value": {
+                  "path": "$.Noc[0].areaSummary"
+                }
+              },
+              {
+                "variable": "sanctionFilestoreID",
+                "value": {
+                  "path": "$.Noc[0].nocDetails.additionalDetails.sanctionLetterFilestoreId"
+                }
               },
               {
                 "variable": "paymentMode",
@@ -904,6 +961,18 @@
                 ]
               },
               {
+                "path": "http://egov-filestore:8080/filestore/v1/files/url",
+                "queryParam": "tenantId=$.tenantId,fileStoreIds=$.Noc[0].nocDetails.additionalDetails.sanctionLetterFilestoreId",
+                "apiRequest": null,
+                "requesttype": "GET",
+                "responseMapping": [
+                  {
+                    "variable": "fileUrl",
+                    "value": "$.fileStoreIds[0].url"
+                  }
+                ]
+              },
+              {
                 "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
                 "queryParam": "moduleName=tenant&masterName=footer&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}' %26%26 @.service=='{$.paymentDetails[0].businessService}')%5D",
                 "apiRequest": null,
@@ -936,7 +1005,7 @@
             "qrcodeConfig": [
               {
                 "variable": "qrcodeimage",
-                "value": "/digit-ui/citizen/payment/verification?tenantId={{tenantid}}&receiptNumber={{receiptNo}}"
+                "value": "{{fileUrl}}"
               }
             ]
           }

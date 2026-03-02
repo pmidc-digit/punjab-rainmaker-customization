@@ -1,6 +1,6 @@
 {
-  "key": "bpa-receipt",
-  "documentType": "BPA_RECEIPT",
+  "key": "clu-receiptsecond",
+  "documentType": "CLU_RECEIPTSECOND",
   "DataConfigs": {
     "moduleName": "rainmaker-common",
     "version": "1.0.0",
@@ -49,7 +49,7 @@
               {
                 "variable": "Category",
                 "value": {
-                  "path": "$.licenseType"
+                  "path": "$.usage"
                 }
               },
 
@@ -63,6 +63,18 @@
                 "variable": "paymentType",
                 "value": {
                   "path": "BPA_PAYMENT_TYPE1"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+               {
+                "variable": "paymentType2",
+                "value": {
+                  "path": "BPA_PAYMENT_TYPE2"
                 },
                 "type": "label",
                 "localisation": {
@@ -104,14 +116,16 @@
               {
                 "variable": "serviceType",
                 "value": {
-                  "path": "$.paymentDetails[0].businessService"
+                  "path": "ACTION_TEST_CLU_HOME"
                 },
+                "type": "label",
                 "localisation": {
                   "required": true,
-                  "prefix": "MODULE",
+                  "prefix": null,
                   "module": "rainmaker-common"
                 }
               },
+
               {
                 "variable": "paidAmount",
                 "value": {
@@ -119,15 +133,111 @@
                 }
               },
               {
-                "variable": "buildingApplicationFees",
+                "variable": "clu_other1_fee",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[0].amount"
+                  "path": "PDF_STATIC_LABEL_CLU_OTHER1_FEE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
                 }
               },
               {
-                "variable": "boundaryWallFee",
+                "variable": "CluOther1Fee",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[1].amount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_OTHER1_FEE')].adjustedAmount"
+                }
+              },
+              {
+                "variable": "clu_clu_fee",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CLU_CLU_FEE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "CluCluFee",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_CLU_FEE')].adjustedAmount"
+                }
+              },
+              {
+                "variable": "clu_edc_fee",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CLU_EDC_FEE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "CluEdcFee",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_EDC_FEE')].adjustedAmount"
+                }
+              },
+              {
+                "variable": "clu_other2_fee",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CLU_OTHER2_FEE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "CluOther2Fee",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_OTHER2_FEE')].adjustedAmount"
+                }
+              },
+              {
+                "variable": "clu_udc_fee",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CLU_UDC_FEE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "CluUdcFee",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_UDC_FEE')].adjustedAmount"
+                }
+              },
+              {
+                "variable": "clu_lf_fee",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CLU_LF_FEE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "CluLfFee",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_LF_FEE')].adjustedAmount"
                 }
               },
               {
@@ -543,7 +653,6 @@
                 "variable": "pendingAmount",
                 "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"
               },
-              
               {
                 "variable": "excessAmountPaid",
                 "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
@@ -566,16 +675,16 @@
                     "value": "$.MdmsRes.tenant.tenants[0].contactNumber"
                   },
                   {
-                    "variable": "ulbType",
-                    "value": "$.MdmsRes.tenant.tenants[0].city.ulbType"
-                  },
-                  {
                     "variable": "website",
                     "value": "$.MdmsRes.tenant.tenants[0].domainUrl"
                   },
                   {
                     "variable": "email",
                     "value": "$.MdmsRes.tenant.tenants[0].emailId"
+                  },
+                  {
+                    "variable": "ulbType",
+                    "value": "$.MdmsRes.tenant.tenants[0].city.ulbType"
                   },
                   {
                     "variable": "logoImage",
