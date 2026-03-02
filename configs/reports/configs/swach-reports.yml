@@ -430,32 +430,87 @@ ReportDefinitions:
       isMandatory: false
       searchClause: AND ess.status=$appstatus
     query: |
-      SELECT 
-      DISTINCT ON (servicerequestid)
-      (case when ua.name is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else ua.name end) as lastassignedto,
-      (SELECT deptmap_def.name FROM (VALUES tbl_def_dept) AS deptmap_def(name,code) INNER JOIN (VALUES tbl_dept) AS deptmap(serviceCode, department, slaHours) on deptmap.serviceCode = ess.servicecode and deptmap_def.code = deptmap.department) AS department, 
-      regexp_replace(servicecode, '([a-z])([A-Z])', '\1 \2','g') AS servicecode,
-      servicerequestid AS complaintNo, 
-      to_char(to_timestamp(TRUNC(CAST(ess.createdtime AS bigint) / 1000)), 'DD/MM/YYYY') AS date, 
-      (case when eg_user.name is null then '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' else eg_user.name end) as name,  --value for NULL
-      eg_user.mobilenumber AS mobileno, 
-      esa.landmark as landmark, 
-      esa.doorno||', '||esa.plotno||', '||esa.buildingname||', '||esa.street as address, 
-      ess.description,
-      ess.source,
-      ess.tenantid,
-      Initcap(ess.applicationstatus) as status,
-      to_char((To_timestamp(ess.createdtime/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY')  AS actiondate
-      FROM eg_swach_service_v2 ess
-      left outer join eg_swach_address_v2 esa on ess.id = esa.parentid
-      left outer join eg_user on eg_user.uuid::text = ess.createdby
-      left outer join eg_pgr_action as epa on epa.businesskey = ess.servicerequestid and epa.action in ('assign','reassign','resolve')
-      left outer join eg_user as ua on (ua.id = epa.assignee::int or ua.id = split_part(epa.by,':',1)::INTEGER)
-      WHERE 
-      ess.tenantid !='pb.testing'
-      --AND ess.status IN ('open','assigned','reassigrequested','rejected','closed','resolved')
-   
-    orderby: ORDER BY servicerequestid, ess.createdtime desc
+      WITH ranked_assignments AS (
+        SELECT
+          p.businessid                                AS servicerequestid,
+          a.assignee::text                            AS assignee_uuid,
+          COALESCE(a.lastmodifiedtime, a.createdtime) AS asg_time,
+          ROW_NUMBER() OVER (
+            PARTITION BY p.businessid
+            ORDER BY COALESCE(a.lastmodifiedtime, a.createdtime) DESC
+          ) AS rn
+        FROM public.eg_wf_processinstance_v2 p
+        JOIN public.eg_wf_assignee_v2 a
+          ON a.processinstanceid = p.id
+      ),
+      assignee_two AS (
+        SELECT
+          servicerequestid,
+          -- we only need the second latest assignee (previous)
+          MAX(CASE WHEN rn = 2 THEN assignee_uuid END) AS lastassignedto_uuid
+        FROM ranked_assignments
+        GROUP BY servicerequestid
+      )
+      SELECT DISTINCT ON (ess.servicerequestid)
+          -- match legacy style: use ua alias + CASE expression
+          (CASE
+             WHEN ua.name IS NULL THEN '30048|23/xn3x2FAxn8vYAN0IdplsOxaE='
+             ELSE ua.name
+           END) AS lastassignedto,
+      
+          initcap(split_part(ess.tenantid, '.', 2)) AS "ULB",
+      
+          -- department mapping expressed like your legacy subselect
+          (
+            SELECT dmap_def.name
+            FROM public.departments_swach AS dmap_def(name, code)
+            JOIN public.swachbharatcategory AS dmap(servicecode, department, slahours)
+              ON dmap.servicecode = ess.servicecode
+             AND dmap_def.code    = dmap.department
+          ) AS department,
+      
+          regexp_replace(ess.servicecode, '([a-z])([A-Z])', '\1 \2','g') AS servicecode,
+          ess.servicerequestid AS complaintNo,
+          to_char(to_timestamp(TRUNC(CAST(ess.createdtime AS bigint) / 1000)), 'DD/MM/YYYY') AS date,
+      
+          -- creator info (kept as in your pattern)
+          (CASE
+             WHEN creator.name IS NULL THEN '30048|23/xn3x2FAxn8vYAN0IdplsOxaE='
+             ELSE creator.name
+           END) AS name,
+          creator.mobilenumber AS mobileno,
+      
+          esa.landmark AS landmark,
+          (esa.doorno||', '||esa.plotno||', '||esa.buildingname||', '||esa.street) AS address,
+      
+          ess.description,
+          ess.source,
+          ess.tenantid,
+          initcap(ess.applicationstatus) AS status,
+          to_char((to_timestamp(ess.createdtime/1000) AT TIME ZONE 'Asia/Kolkata'),'DD-MM-YYYY') AS actiondate
+      
+      FROM public.eg_swach_service_v2 AS ess
+      LEFT OUTER JOIN public.eg_swach_address_v2 AS esa
+        ON ess.id = esa.parentid
+      
+      -- resolve creator (who created the complaint)
+      LEFT OUTER JOIN public.eg_user AS creator
+        ON creator.uuid::text = ess.createdby
+      
+      -- bring in only the previous (second-latest) assignee as per ranked CTE
+      LEFT OUTER JOIN assignee_two AS atwo
+        ON atwo.servicerequestid = ess.servicerequestid
+      
+      -- resolve previous assignee -> employee -> user, and alias user as 'ua' to match legacy syntax
+      LEFT OUTER JOIN public.eg_hrms_employee AS h_prev
+        ON h_prev.uuid = atwo.lastassignedto_uuid
+      LEFT OUTER JOIN public.eg_user AS ua
+        ON ua.uuid::text = h_prev.uuid
+      
+      WHERE ess.tenantid <> 'pb.testing'
+      
+    orderby: ORDER BY ess.servicerequestid, ess.createdtime DESC;    
+    
 
   - reportName: Detailed_Attendance_report_swach
     decryptionPathId: ULBPTDataDumpReport_V2 
