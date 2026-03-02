@@ -34,6 +34,11 @@ ReportDefinitions:
         type: string
         source: ch
         total: false
+      - name: collector_name
+        label: Collector Name
+        type: string
+        source: ch
+        total: false
       - name: collector_code
         label: Collector Code
         type: string
@@ -113,9 +118,10 @@ ReportDefinitions:
         isMandatory: true
         searchClause: AND createdtime <= $toDate
       - name: collector_code
-        label: collector_code
-        type: string
-        source: ptr
+        label: collector Name
+        type: singlevaluelist
+        pattern: http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=CHALLAN REPORTS,VIEW_CHALLANGENERATION_CARD,CHALLAN_ADMIN|$.Employees[*].user.code|$.Employees[*].user.name
+        source: ch
         isMandatory: false
         searchClause: AND collector_code = $collector_code
     query: >
@@ -146,8 +152,8 @@ ReportDefinitions:
               CASE WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN pd.amountpaid ELSE 0 END AS neft_amount,
               CASE WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN pd.amountpaid ELSE 0 END AS rtgs_amount,
               CASE WHEN p.paymentmode = 'ONLINE' THEN pd.amountpaid ELSE 0 END AS online_amount,
-              COALESCE(emp.code, 'SELF') AS collector_code,
-              c.challanno,
+              COALESCE(emp.code, 'SELF') AS collector_code, uu.name as emp_name,uu.mobilenumber as emp_mobile,
+              c.challanno, 
               c.applicationstatus,
               c.offence_type_name,
               c.offence_category_name,
@@ -164,14 +170,15 @@ ReportDefinitions:
              LEFT JOIN eg_user u_owner ON u_owner.uuid = co.uuid
              LEFT JOIN eg_user u ON u.id::text = p.createdby::text
              LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
+             LEFT JOIN eg_user uu on uu.uuid=emp.uuid
              LEFT JOIN current_holder ch ON ch.challanno = c.challanno
              WHERE pd.businessservice = 'Challan_Generation'
-              AND p.paymentstatus != 'CANCELLED'
+              AND p.paymentstatus != 'CANCELLED' and c.applicationstatus='PAID'
               AND p.tenantid = $tenantid
        )
        SELECT
               challanno, name, mobilenumber, 'CHALLAN' AS businessservice, applicationstatus,
-              collector_code, cash_amount, cheque_amount,offence_type_name,offence_category_name,
+              collector_code, emp_name,emp_mobile, cash_amount, cheque_amount,offence_type_name,offence_category_name,
               offence_subcategory_name,card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
               TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS paymentdate
              FROM unique_transactions
@@ -361,6 +368,11 @@ ReportDefinitions:
         type: string
         source: ch
         total: false
+      - name: collector_name
+        label: Collector Name
+        type: string
+        source: ch
+        total: false
       - name: collector_code
         label: Collector Code
         type: string
@@ -440,9 +452,10 @@ ReportDefinitions:
         isMandatory: true
         searchClause: AND createdtime <= $toDate
       - name: collector_code
-        label: collector_code
-        type: string
-        source: ptr
+        label: collector Name
+        type: singlevaluelist
+        pattern: http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=CHALLAN REPORTS,VIEW_CHALLANGENERATION_CARD,CHALLAN_ADMIN|$.Employees[*].user.code|$.Employees[*].user.name
+        source: ch
         isMandatory: false
         searchClause: AND collector_code = $collector_code
       - name: ulb
@@ -479,7 +492,7 @@ ReportDefinitions:
               CASE WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN pd.amountpaid ELSE 0 END AS neft_amount,
               CASE WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN pd.amountpaid ELSE 0 END AS rtgs_amount,
               CASE WHEN p.paymentmode = 'ONLINE' THEN pd.amountpaid ELSE 0 END AS online_amount,
-              COALESCE(emp.code, 'SELF') AS collector_code,
+              COALESCE(emp.code, 'SELF') AS collector_code,uu.name as emp_name,uu.mobilenumber as emp_mobile,
               c.challanno,
               c.applicationstatus,
               c.offence_type_name,
@@ -498,14 +511,15 @@ ReportDefinitions:
              LEFT JOIN eg_user u_owner ON u_owner.uuid = co.uuid 
              LEFT JOIN eg_user u ON u.id::text = p.createdby::text
              LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
+             LEFT JOIN eg_user uu on uu.uuid=emp.uuid
              LEFT JOIN current_holder ch ON ch.challanno = c.challanno
              WHERE pd.businessservice = 'Challan_Generation'
-               AND p.paymentstatus != 'CANCELLED'
+               AND p.paymentstatus != 'CANCELLED'  and c.applicationstatus='PAID'
               )
           SELECT
               split_part(tenantid, '.', 2) AS tenantid,
               challanno, name, mobilenumber, 'CHALLAN' AS businessservice, applicationstatus,
-              collector_code, cash_amount, cheque_amount,offence_category_name,offence_subcategory_name,offence_type_name,
+              collector_code, emp_name,emp_mobile, cash_amount, cheque_amount,offence_category_name,offence_subcategory_name,offence_type_name,
               card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
               TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS paymentdate         
              FROM unique_transactions
