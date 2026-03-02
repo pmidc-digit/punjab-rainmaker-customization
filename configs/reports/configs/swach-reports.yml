@@ -463,8 +463,8 @@ ReportDefinitions:
           -- department mapping expressed like your legacy subselect
           (
             SELECT dmap_def.name
-            FROM public.departments_swach AS dmap_def(name, code)
-            JOIN public.swachbharatcategory AS dmap(servicecode, department, slahours)
+            FROM (VALUES tbl_def_dept) AS dmap_def(name, code)
+            JOIN (VALUES tbl_dept) AS dmap(servicecode, department, slahours)
               ON dmap.servicecode = ess.servicecode
              AND dmap_def.code    = dmap.department
           ) AS department,
