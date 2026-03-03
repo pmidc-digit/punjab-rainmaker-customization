@@ -124,7 +124,7 @@ ReportDefinitions:
         source: ws
         wrapper: true
         isMandatory: false
-        searchClause: AND userid = $collectorname
+        searchClause: AND userid::text = $collectorname
     query: >
       WITH current_holder AS (
          SELECT DISTINCT ON (wf.businessid)
