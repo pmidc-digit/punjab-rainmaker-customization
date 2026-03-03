@@ -34,7 +34,7 @@ ReportDefinitions:
         type: string
         source: ch
         total: false
-      - name: collector_name
+      - name: emp_name
         label: Collector Name
         type: string
         source: ch
@@ -370,7 +370,7 @@ ReportDefinitions:
         type: string
         source: ch
         total: false
-      - name: collector_name
+      - name: emp_name
         label: Collector Name
         type: string
         source: ch
@@ -453,13 +453,14 @@ ReportDefinitions:
         source: ch
         isMandatory: true
         searchClause: AND createdtime <= $toDate
-      - name: id
-        label: collector Name
+      - name: collectorname
+        label: User Name
         type: singlevaluelist
-        pattern: 'http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=VIEW_CHALLANGENERATION_CARD,CHALLAN_ADMIN|$.Employees[*].user.id|$.Employees[*].user.name'
-        source: ch
+        pattern: 'http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=WS_CEMP,WS_CLERK,SW_CEMP,SW_CLERK|$.Employees[*].user.id|$.Employees[*].user.name'
+        source: ws
+        wrapper: true
         isMandatory: false
-        searchClause: AND id::text = $id
+        searchClause: AND userid::text = $collectorname
       - name: ulb
         label: ulb
         type: singlevaluelist
