@@ -34,8 +34,28 @@ ReportDefinitions:
         type: string
         source: ch
         total: false
+      - name: collector_name
+        label: Collector Name
+        type: string
+        source: ch
+        total: false
       - name: collector_code
         label: Collector Code
+        type: string
+        source: ch
+        total: false
+      - name: offence_type_name
+        label: Offence Type Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_category_name
+        label: Offence Category Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_subcategory_name
+        label: Offence Subactegory Name
         type: string
         source: ch
         total: false
@@ -98,9 +118,10 @@ ReportDefinitions:
         isMandatory: true
         searchClause: AND createdtime <= $toDate
       - name: collector_code
-        label: collector_code
-        type: string
-        source: ptr
+        label: collector Name
+        type: singlevaluelist
+        pattern: 'http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=VIEW_CHALLANGENERATION_CARD,CHALLAN_ADMIN|$.Employees[*].user.userName|$.Employees[*].user.name'
+        source: ch
         isMandatory: false
         searchClause: AND collector_code = $collector_code
     query: >
@@ -116,7 +137,7 @@ ReportDefinitions:
          LEFT JOIN eg_user u ON u.uuid = wa.assignee
          LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
          WHERE wf.tenantid = $tenantid
-         AND wf.businessservice = 'CHALLAN'
+         AND wf.businessservice = 'Challan_Generation'
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       ),
        unique_transactions AS (
@@ -131,9 +152,12 @@ ReportDefinitions:
               CASE WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN pd.amountpaid ELSE 0 END AS neft_amount,
               CASE WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN pd.amountpaid ELSE 0 END AS rtgs_amount,
               CASE WHEN p.paymentmode = 'ONLINE' THEN pd.amountpaid ELSE 0 END AS online_amount,
-              COALESCE(emp.code, 'SELF') AS collector_code,
-              c.challanno,
+              COALESCE(emp.code, 'SELF') AS collector_code, uu.name as emp_name,uu.mobilenumber as emp_mobile,
+              c.challanno, 
               c.applicationstatus,
+              c.offence_type_name,
+              c.offence_category_name,
+              c.offence_subcategory_name,
               u_owner.name ,
               u_owner.mobilenumber ,
               ch.employee_name AS assignee_employee,
@@ -146,20 +170,20 @@ ReportDefinitions:
              LEFT JOIN eg_user u_owner ON u_owner.uuid = co.uuid
              LEFT JOIN eg_user u ON u.id::text = p.createdby::text
              LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
+             LEFT JOIN eg_user uu on uu.uuid=emp.uuid
              LEFT JOIN current_holder ch ON ch.challanno = c.challanno
              WHERE pd.businessservice = 'Challan_Generation'
-              AND p.paymentstatus != 'CANCELLED'
+              AND p.paymentstatus != 'CANCELLED' and c.applicationstatus='PAID'
               AND p.tenantid = $tenantid
        )
        SELECT
               challanno, name, mobilenumber, 'CHALLAN' AS businessservice, applicationstatus,
-              collector_code, cash_amount, cheque_amount,
-              card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
+              collector_code, emp_name,emp_mobile, cash_amount, cheque_amount,offence_type_name,offence_category_name,
+              offence_subcategory_name,card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
               TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS paymentdate
              FROM unique_transactions
-             WHERE 1=1 
+             WHERE 1=1
     orderby: ORDER BY createdtime DESC
-    
   - reportName: ReceiptRegisterCHALLAN
     decryptionPathId: CHALLANREPORTS
     summary: Details of collector register in challan service
@@ -194,6 +218,21 @@ ReportDefinitions:
         type: string
         source: ch
         total: false
+      - name: offence_type_name
+        label: Offence Type Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_category_name
+        label: Offence Category Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_subcategory_name
+        label: Offence Subactegory Name
+        type: string
+        source: ch
+        total: false
       - name: transactiondate
         label: Transaction Date
         type: string
@@ -213,7 +252,7 @@ ReportDefinitions:
         label: Amount Paid
         type: string
         source: ch
-        total: false
+        total: true
       - name: paymentmode
         label: Payment Mode
         type: string
@@ -270,9 +309,10 @@ ReportDefinitions:
           pd.amountpaid,
           payment.paymentmode,
           payment.paymentstatus,
-          u_citizen.name AS ownername1
-      FROM egcl_paymentdetail pd
-      INNER JOIN egcl_bill bill
+          u_citizen.name AS ownername1 ,
+          c.offence_type_name,c.offence_category_name,
+          c.offence_subcategory_name
+      FROM egcl_paymentdetail pd INNER JOIN egcl_bill bill
           ON bill.id = pd.billid
           AND pd.tenantid = $tenantid
       INNER JOIN egcl_payment payment
@@ -289,7 +329,6 @@ ReportDefinitions:
         AND pd.businessservice = 'Challan_Generation'
         AND payment.paymentstatus != 'CANCELLED'
     orderby: ORDER BY pd.receiptdate DESC
-      
   - reportName: StateCollectionsReport
     decryptionPathId: CHALLANREPORTS
     summary: Collections
@@ -299,6 +338,11 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
+      - name: tenant_name
+        label: Tenant Id
+        type: string
+        source: ch
+        total: false
       - name: challanno
         label: Challan Number
         type: string
@@ -324,8 +368,28 @@ ReportDefinitions:
         type: string
         source: ch
         total: false
+      - name: emp_name
+        label: Collector Name
+        type: string
+        source: ch
+        total: false
       - name: collector_code
         label: Collector Code
+        type: string
+        source: ch
+        total: false
+      - name: offence_type_name
+        label: Offence Type Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_category_name
+        label: Offence Category Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_subcategory_name
+        label: Offence Subactegory Name
         type: string
         source: ch
         total: false
@@ -388,9 +452,10 @@ ReportDefinitions:
         isMandatory: true
         searchClause: AND createdtime <= $toDate
       - name: collector_code
-        label: collector_code
-        type: string
-        source: ptr
+        label: collector Name
+        type: singlevaluelist
+        pattern: 'http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=VIEW_CHALLANGENERATION_CARD,CHALLAN_ADMIN|$.Employees[*].user.userName|$.Employees[*].user.name'
+        source: ch
         isMandatory: false
         searchClause: AND collector_code = $collector_code
       - name: ulb
@@ -412,7 +477,7 @@ ReportDefinitions:
          LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
          LEFT JOIN eg_user u ON u.uuid = wa.assignee
          LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-         WHERE wf.businessservice = 'CHALLAN'
+         WHERE wf.businessservice = 'Challan_Generation'
          ORDER BY wf.businessid, wf.lastmodifiedtime DESC
           ),
         unique_transactions AS (
@@ -427,9 +492,12 @@ ReportDefinitions:
               CASE WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN pd.amountpaid ELSE 0 END AS neft_amount,
               CASE WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN pd.amountpaid ELSE 0 END AS rtgs_amount,
               CASE WHEN p.paymentmode = 'ONLINE' THEN pd.amountpaid ELSE 0 END AS online_amount,
-              COALESCE(emp.code, 'SELF') AS collector_code,
+              COALESCE(emp.code, 'SELF') AS collector_code,uu.name as emp_name,uu.mobilenumber as emp_mobile,
               c.challanno,
               c.applicationstatus,
+              c.offence_type_name,
+              c.offence_category_name,
+              c.offence_subcategory_name,
               u_owner.name ,
               u_owner.mobilenumber ,
               ch.employee_name AS assignee_employee,
@@ -443,19 +511,20 @@ ReportDefinitions:
              LEFT JOIN eg_user u_owner ON u_owner.uuid = co.uuid 
              LEFT JOIN eg_user u ON u.id::text = p.createdby::text
              LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
+             LEFT JOIN eg_user uu on uu.uuid=emp.uuid
              LEFT JOIN current_holder ch ON ch.challanno = c.challanno
              WHERE pd.businessservice = 'Challan_Generation'
-               AND p.paymentstatus != 'CANCELLED'
+               AND p.paymentstatus != 'CANCELLED'  and c.applicationstatus='PAID'
               )
           SELECT
+              split_part(tenantid, '.', 2) AS tenantid,
               challanno, name, mobilenumber, 'CHALLAN' AS businessservice, applicationstatus,
-              collector_code, cash_amount, cheque_amount,
+              collector_code, emp_name,emp_mobile, cash_amount, cheque_amount,offence_category_name,offence_subcategory_name,offence_type_name,
               card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
               TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS paymentdate         
              FROM unique_transactions
-             WHERE 1=1 
+             WHERE tenantid != 'pb.testing'
     orderby: ORDER BY createdtime DESC
-    
   - reportName: StateReceiptRegisterchallan
     decryptionPathId: CHALLANREPORTS
     summary: Details of collector register in Challan service
@@ -465,8 +534,13 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
+      - name: tenantid
+        label: Tenant Id
+        type: string
+        source: ch
+        total: false
       - name: receiptno
-        label: receiptno
+        label: Receipt Number
         type: string
         source: ch
         total: false
@@ -490,6 +564,21 @@ ReportDefinitions:
         type: string
         source: ch
         total: false
+      - name: offence_type_name
+        label: Offence Type Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_category_name
+        label: Offence Category Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_subcategory_name
+        label: Offence Subactegory Name
+        type: string
+        source: ch
+        total: false
       - name: transactiondate
         label: Transaction Date
         type: string
@@ -509,7 +598,7 @@ ReportDefinitions:
         label: Amount Paid
         type: string
         source: ch
-        total: false
+        total: true
       - name: paymentmode
         label: Payment Mode
         type: string
@@ -555,33 +644,37 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND bill.tenantid = $ulb
     query: >
-       SELECT
-         pd.receiptnumber AS receiptno,
-         bill.consumercode AS connectionno,
-         TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate1,
-         'CHALLAN' AS service,
-         usr.name AS collectorname,
-         TO_CHAR( TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS transactiondate,
-         payment.instrumentnumber AS transaction_id,   
-         u_citizen.name AS payername,
-         pd.amountpaid,
-         payment.paymentmode,
-         payment.paymentstatus,
-         u_citizen.name AS ownername1,
-         usr.id AS user,
-       	 pd.manualreceiptnumber,
-         pd.manualreceiptdate   
-        FROM egcl_paymentdetail pd
-        INNER JOIN egcl_bill bill ON bill.id = pd.billid 
-        INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
-        LEFT JOIN eg_challan c ON c.challanno = bill.consumercode
-        LEFT JOIN eg_challan_citizen cc ON cc.challanid = c.id
-        LEFT JOIN eg_user u_citizen ON u_citizen.uuid = cc.uuid
-        LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
-        WHERE pd.businessservice = 'Challan_Generation'
-         AND payment.paymentstatus != 'CANCELLED'
+      SELECT
+        split_part(payment.tenantid, '.', 2) AS tenantid,
+        pd.receiptnumber AS receiptno,
+        bill.consumercode AS connectionno,
+        TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate1,
+        'CHALLAN' AS service,
+        usr.name AS collectorname,
+        TO_CHAR( TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS transactiondate,
+        payment.instrumentnumber AS transaction_id,   
+        u_citizen.name AS payername,
+        pd.amountpaid,
+        payment.paymentmode,
+        payment.paymentstatus,
+        u_citizen.name AS ownername1,
+        usr.id AS user,
+      	 pd.manualreceiptnumber,
+        pd.manualreceiptdate ,
+        c.offence_type_name,
+        c.offence_category_name,
+        c.offence_subcategory_name  
+       FROM egcl_paymentdetail pd
+       INNER JOIN egcl_bill bill ON bill.id = pd.billid 
+       INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
+       LEFT JOIN eg_challan c ON c.challanno = bill.consumercode
+       LEFT JOIN eg_challan_citizen cc ON cc.challanid = c.id
+       LEFT JOIN eg_user u_citizen ON u_citizen.uuid = cc.uuid
+       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
+       WHERE pd.businessservice = 'Challan_Generation'
+        AND payment.paymentstatus != 'CANCELLED'
+        and pd.tenantid not in ('pb.testing')
     orderby: ORDER BY pd.receiptdate DESC
-    
   - reportName: ChallanDetailReport
     decryptionPathId: CHALLANREPORTS
     summary: Challan wise detail report per tenant
@@ -597,7 +690,7 @@ ReportDefinitions:
         source: ch
         total: false
       - name: name
-        label: name
+        label: Name
         type: string
         source: ch
         total: false
@@ -674,7 +767,8 @@ ReportDefinitions:
       - name: offence_subcategory_name
         label: offence_subcategory_name
         type: singlevaluelist
-        pattern: list://Littering of Waste:Littering of Waste,Open Defecation:Open Defecation,Plastic:Plastic,Burning of Waste:Burning of Waste
+        pattern: list://Littering of Waste:Littering of Waste,Open Defecation:Open
+          Defecation,Plastic:Plastic,Burning of Waste:Burning of Waste
         source: ch
         isMandatory: false
         searchClause: AND c.offence_subcategory_name = $offence_subcategory_name
@@ -686,3 +780,378 @@ ReportDefinitions:
          LEFT JOIN eg_challanaddress ca on ca.challanid = c.id
          LEFT JOIN eg_user u on u.uuid = c.accountid
          WHERE 1=1
+  - reportName: StateChallanDetailReport
+    decryptionPathId: CHALLANREPORTS
+    summary: Challan wise detail report per tenant
+    version: 1.0.0
+    moduleName: rainmaker-ch
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenantid
+        label: Tenant Id
+        type: string
+        source: ch
+        total: false
+      - name: challanno
+        label: Challan Number
+        type: string
+        source: ch
+        total: false
+      - name: name
+        label: Name
+        type: string
+        source: ch
+        total: false
+      - name: mobilenumber
+        label: Mobile Number
+        type: string
+        source: ch
+        total: false
+      - name: businessservice
+        label: Business Service
+        type: string
+        source: ch
+        total: false
+      - name: applicationstatus
+        label: Application Status
+        type: string
+        source: ch
+        total: false
+      - name: receiptnumber
+        label: Receipt Number
+        type: string
+        source: ch
+        total: false
+      - name: challanstatus
+        label: Challan Status
+        type: string
+        source: ch
+        total: false
+      - name: offence_type_name
+        label: Offence Type Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_category_name
+        label: Offence Category Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_subcategory_name
+        label: Offence Subcategory Name
+        type: string
+        source: ch
+        total: false
+      - name: challan_amount
+        label: Challan Amount
+        type: string
+        source: ch
+        total: true
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ch
+        isMandatory: false
+        searchClause: AND c.createdtime>= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ch
+        isMandatory: false
+        searchClause: AND c.createdtime <= $toDate
+      - name: offence_category_name
+        label: offence_category_name
+        type: singlevaluelist
+        pattern: list://Solid Waste Management:Solid Waste Management
+        source: ch
+        isMandatory: false
+        searchClause: AND c.offence_category_name = $offence_category_name
+      - name: offence_subcategory_name
+        label: offence_subcategory_name
+        type: singlevaluelist
+        pattern: list://Littering of Waste:Littering of Waste,Open Defecation:Open
+          Defecation,Plastic:Plastic,Burning of Waste:Burning of Waste
+        source: ch
+        isMandatory: false
+        searchClause: AND c.offence_subcategory_name = $offence_subcategory_name
+      - name: ulb
+        label: ulb
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: ch
+        isMandatory: false
+        searchClause: AND c.tenantid = $ulb
+    query: >
+      SELECT c.challanno , c.businessservice , c.applicationstatus ,
+         c.receiptnumber ,
+         c.challanstatus , c.offence_type_name , c.offence_category_name , c.offence_subcategory_name , 
+         c.challan_amount , c.tenantid , ca.addressline1 , u.name , u.mobilenumber ,split_part(c.tenantid, '.', 2) AS tenantid
+         from eg_challan c
+         LEFT JOIN eg_challanaddress ca on ca.challanid = c.id
+         LEFT JOIN eg_user u on u.uuid = c.accountid
+         WHERE 1=1
+  - reportName: ChallanDefaulterReport
+    decryptionPathId: CHALLANREPORTS
+    summary: Details of user who doesn't pay his challan within 10 days till now.
+    version: 1.0.0
+    moduleName: rainmaker-ch
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenantid
+        label: Tenant Id
+        type: string
+        source: ch
+        total: false
+      - name: challanno
+        label: Challan Number
+        type: string
+        source: ch
+        total: false
+      - name: name
+        label: Name
+        type: string
+        source: ch
+        total: false
+      - name: mobilenumber
+        label: Mobile Number
+        type: string
+        source: ch
+        total: false
+      - name: businessservice
+        label: Business Service
+        type: string
+        source: ch
+        total: false
+      - name: applicationstatus
+        label: Application Status
+        type: string
+        source: ch
+        total: false
+      - name: offence_type_name
+        label: Offence Type Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_category_name
+        label: Offence Category Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_subcategory_name
+        label: Offence Subcategory Name
+        type: string
+        source: ch
+        total: false
+      - name: pending_days
+        label: Pending Days
+        type: string
+        source: ch
+        total: false
+      - name: challan_date
+        label: Challan Date
+        type: string
+        source: ch
+        total: false
+      - name: defaulter_status
+        label: Defaulter Status
+        type: string
+        source: ch
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ch
+        isMandatory: false
+        searchClause: AND c.createdtime>= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ch
+        isMandatory: false
+        searchClause: AND c.createdtime <= $toDate
+      - name: offence_category_name
+        label: offence_category_name
+        type: singlevaluelist
+        pattern: list://Solid Waste Management:Solid Waste Management
+        source: ch
+        isMandatory: false
+        searchClause: AND c.offence_category_name = $offence_category_name
+      - name: offence_subcategory_name
+        label: offence_subcategory_name
+        type: singlevaluelist
+        pattern: list://Littering of Waste:Littering of Waste,Open Defecation:Open Defecation,Plastic:Plastic,Burning of Waste:Burning of Waste
+        source: ch
+        isMandatory: false
+        searchClause: AND c.offence_subcategory_name = $offence_subcategory_name
+    query: >
+      WITH paid_challans AS (
+        SELECT DISTINCT
+           bill.consumercode AS challanno
+           FROM egcl_paymentdetail pd
+           JOIN egcl_payment p ON pd.paymentid = p.id
+           JOIN egcl_bill bill ON bill.id = pd.billid
+           WHERE pd.businessservice = 'Challan_Generation'
+           AND p.paymentstatus != 'CANCELLED'
+      ),
+      defaulter_challans AS (
+        SELECT
+         c.challanno,c.createdtime,c.applicationstatus, c.offence_type_name,
+         c.offence_category_name,c.offence_subcategory_name,u.name AS name,
+         u.mobilenumber,c.tenantid,
+         FLOOR((EXTRACT(EPOCH FROM NOW()) * 1000 - c.createdtime) / 86400000) AS pending_days
+         FROM eg_challan c
+         LEFT JOIN eg_challan_citizen cc ON cc.challanid = c.id
+         LEFT JOIN eg_user u ON u.uuid = cc.uuid
+         LEFT JOIN paid_challans p ON p.challanno = c.challanno
+         WHERE c.tenantid = $tenantid
+         AND p.challanno IS NULL              
+         AND (EXTRACT(EPOCH FROM NOW()) * 1000 - c.createdtime) > (10 * 86400000)             
+       )
+      SELECT
+        'Challan' as businessservice, split_part(tenantid, '.', 2) AS tenantid,
+         challanno, name, mobilenumber, applicationstatus, offence_category_name,
+         offence_subcategory_name, offence_type_name, pending_days,
+         TO_CHAR( TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY' ) AS challan_date,
+        'DEFAULTER' AS defaulter_status
+        FROM defaulter_challans
+    orderby: ORDER BY pending_days DESC
+  - reportName: StateChallanDefaulterReport
+    decryptionPathId: CHALLANREPORTS
+    summary: Details of user who doesn't pay his challan within 10 days till now.
+    version: 1.0.0
+    moduleName: rainmaker-ch
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenantid
+        label: Tenant Id
+        type: string
+        source: ch
+        total: false
+      - name: challanno
+        label: Challan Number
+        type: string
+        source: ch
+        total: false
+      - name: name
+        label: Name
+        type: string
+        source: ch
+        total: false
+      - name: mobilenumber
+        label: Mobile Number
+        type: string
+        source: ch
+        total: false
+      - name: businessservice
+        label: Business Service
+        type: string
+        source: ch
+        total: false
+      - name: applicationstatus
+        label: Application Status
+        type: string
+        source: ch
+        total: false
+      - name: offence_type_name
+        label: Offence Type Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_category_name
+        label: Offence Category Name
+        type: string
+        source: ch
+        total: false
+      - name: offence_subcategory_name
+        label: Offence Subcategory Name
+        type: string
+        source: ch
+        total: false
+      - name: pending_days
+        label: Pending Days
+        type: string
+        source: ch
+        total: false
+      - name: challan_date
+        label: Challan Date
+        type: string
+        source: ch
+        total: false
+      - name: defaulter_status
+        label: Defaulter Status
+        type: string
+        source: ch
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ch
+        isMandatory: false
+        searchClause: AND c.createdtime>= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ch
+        isMandatory: false
+        searchClause: AND c.createdtime <= $toDate
+      - name: offence_category_name
+        label: offence_category_name
+        type: singlevaluelist
+        pattern: list://Solid Waste Management:Solid Waste Management
+        source: ch
+        isMandatory: false
+        searchClause: AND c.offence_category_name = $offence_category_name
+      - name: offence_subcategory_name
+        label: offence_subcategory_name
+        type: singlevaluelist
+        pattern: list://Littering of Waste:Littering of Waste,Open Defecation:Open Defecation,Plastic:Plastic,Burning of Waste:Burning of Waste
+        source: ch
+        isMandatory: false
+        searchClause: AND c.offence_subcategory_name = $offence_subcategory_name
+      - name: ulb
+        label: ulb
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: ch
+        isMandatory: false
+        searchClause: AND tenantid = $ulb
+    query: >
+      WITH paid_challans AS (
+        SELECT DISTINCT
+           bill.consumercode AS challanno
+           FROM egcl_paymentdetail pd
+           JOIN egcl_payment p ON pd.paymentid = p.id
+           JOIN egcl_bill bill ON bill.id = pd.billid
+           WHERE pd.businessservice = 'Challan_Generation'
+           AND p.paymentstatus != 'CANCELLED'
+      ),
+      defaulter_challans AS (
+        SELECT
+         c.challanno,c.createdtime,c.applicationstatus, c.offence_type_name,
+         c.offence_category_name,c.offence_subcategory_name,u.name AS name,
+         u.mobilenumber,c.tenantid,
+         FLOOR((EXTRACT(EPOCH FROM NOW()) * 1000 - c.createdtime) / 86400000) AS pending_days
+         FROM eg_challan c
+         LEFT JOIN eg_challan_citizen cc ON cc.challanid = c.id
+         LEFT JOIN eg_user u ON u.uuid = cc.uuid
+         LEFT JOIN paid_challans p ON p.challanno = c.challanno
+         WHERE  p.challanno IS NULL              
+         AND (EXTRACT(EPOCH FROM NOW()) * 1000 - c.createdtime) > (10 * 86400000)             
+       )
+      SELECT
+        'Challan' as businessservice, split_part(tenantid, '.', 2) AS tenantid,
+         challanno, name, mobilenumber, applicationstatus, offence_category_name,
+         offence_subcategory_name, offence_type_name, pending_days,
+         TO_CHAR( TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY' ) AS challan_date,
+        'DEFAULTER' AS defaulter_status
+        FROM defaulter_challans
+    orderby: ORDER BY pending_days DESC
