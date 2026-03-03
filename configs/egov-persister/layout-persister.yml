@@ -1,0 +1,321 @@
+serviceMaps:
+  serviceName: layout-service
+  version: 1.0.0
+  mappings:
+    - version: 1.0
+      description: Create Layout entry
+      fromTopic: save-layout-application
+      isTransaction: true
+      queryMaps:
+        - query: >
+            INSERT INTO eg_layout (
+              id, applicationno, tenantid, status, createdby,
+              lastmodifiedby, createdtime, lastmodifiedtime, layoutno, applicationtype, layouttype,
+              accountid, applicationstatus, vasikaNumber, vasikaDate
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?);
+          basePath: $.Layout
+          jsonMaps:
+            - jsonPath: $.Layout.id
+            - jsonPath: $.Layout.applicationNo
+            - jsonPath: $.Layout.tenantId
+            - jsonPath: $.Layout.status
+            - jsonPath: $.Layout.auditDetails.createdBy
+            - jsonPath: $.Layout.auditDetails.lastModifiedBy
+            - jsonPath: $.Layout.auditDetails.createdTime
+            - jsonPath: $.Layout.auditDetails.lastModifiedTime
+            - jsonPath: $.Layout.layoutNo
+            - jsonPath: $.Layout.applicationType
+            - jsonPath: $.Layout.layoutType
+            - jsonPath: $.Layout.accountId
+            - jsonPath: $.Layout.applicationStatus
+            - jsonPath: $.Layout.vasikaNumber
+            - jsonPath: $.Layout.vasikaDate
+
+        - query: >
+            INSERT INTO eg_layout_auditdetails (
+              id, applicationno, tenantid, status, createdby,
+              lastmodifiedby, createdtime, lastmodifiedtime, layoutno, applicationtype, layouttype,
+              accountid, applicationstatus
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Layout
+          jsonMaps:
+            - jsonPath: $.Layout.id
+            - jsonPath: $.Layout.applicationNo
+            - jsonPath: $.Layout.tenantId
+            - jsonPath: $.Layout.status
+            - jsonPath: $.Layout.auditDetails.createdBy
+            - jsonPath: $.Layout.auditDetails.lastModifiedBy
+            - jsonPath: $.Layout.auditDetails.createdTime
+            - jsonPath: $.Layout.auditDetails.lastModifiedTime
+            - jsonPath: $.Layout.layoutNo
+            - jsonPath: $.Layout.applicationType
+            - jsonPath: $.Layout.layoutType
+            - jsonPath: $.Layout.accountId
+            - jsonPath: $.Layout.applicationStatus
+
+        - query: >
+            INSERT INTO eg_layout_document (
+              uuid, documenttype, documentAttachment, documentuid, layoutid, doc_order, additionaldetails, createdby,
+              lastmodifiedby, createdtime, lastmodifiedtime
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Layout.documents.*
+          jsonMaps:
+            - jsonPath: $.Layout.documents.*.uuid
+            - jsonPath: $.Layout.documents.*.documentType
+            - jsonPath: $.Layout.documents.*.documentAttachment
+            - jsonPath: $.Layout.documents.*.documentUid
+            - jsonPath: $.Layout.documents.*.layoutId
+            - jsonPath: $.Layout.documents.*.order
+            - jsonPath: $.Layout.documents.*.additionalDetails
+              type: JSON
+              dbType: JSONB
+
+            - jsonPath: $.Layout.documents.*.auditDetails.createdBy
+            - jsonPath: $.Layout.documents.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Layout.documents.*.auditDetails.createdTime
+            - jsonPath: $.Layout.documents.*.auditDetails.lastModifiedTime
+        - query: >
+            INSERT INTO eg_layout_details (
+              id, layoutid, additionaldetails, createdby, lastmodifiedby, createdtime, lastmodifiedtime, tenantid
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Layout.layoutDetails
+          jsonMaps:
+            - jsonPath: $.Layout.layoutDetails.id
+            - jsonPath: $.Layout.layoutDetails.layoutId
+            - jsonPath: $.Layout.layoutDetails.additionalDetails
+              type: JSON
+              dbType: JSONB
+            - jsonPath: $.Layout.layoutDetails.auditDetails.createdBy
+            - jsonPath: $.Layout.layoutDetails.auditDetails.lastModifiedBy
+            - jsonPath: $.Layout.layoutDetails.auditDetails.createdTime
+            - jsonPath: $.Layout.layoutDetails.auditDetails.lastModifiedTime
+            - jsonPath: $.Layout.layoutDetails.tenantId
+
+            
+        - query: > 
+            INSERT INTO eg_layout_owner (
+              id, tenantid, layoutId, status, isprimaryowner,
+              ownertype, ownershippercentage, institutionid, relationship,
+              createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails,uuid
+            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?);
+          basePath: $.Layout.owners.*
+
+          jsonMaps:
+            - jsonPath: $.Layout.owners.*.id
+            - jsonPath: $.Layout.owners.*.tenantId
+            - jsonPath: $.Layout.id
+            - jsonPath: $.Layout.owners.*.status
+            - jsonPath: $.Layout.owners.*.isPrimaryOwner
+            - jsonPath: $.Layout.owners.*.type
+            - jsonPath: $.Layout.owners.*.ownershipPercentage
+            - jsonPath: $.Layout.owners.*.institutionId
+            - jsonPath: $.Layout.owners.*.relationship
+            - jsonPath: $.Layout.owners.*.createdBy
+            - jsonPath: $.Layout.owners.*.createdDate
+            - jsonPath: $.Layout.owners.*.lastModifiedBy
+            - jsonPath: $.Layout.owners.*.lastModifiedDate
+            - jsonPath: $.Layout.owners.*.additionalDetails
+              type: JSON
+              dbType: JSONB
+            - jsonPath: $.Layout.owners.*.uuid
+
+
+
+
+
+
+    - version: 1.0
+      description: Update Layout entry (strict UPDATE + auditdetails)
+      fromTopic: update-layout-application
+      isTransaction: true
+
+      queryMaps:
+        - query: >
+            
+             UPDATE eg_layout
+              SET status = ?, applicationstatus = ?, layoutno = ?,
+              applicationtype = ?, layouttype = ?,
+              lastmodifiedby = ?, lastmodifiedtime = ?
+              WHERE id = ?;
+
+          basePath: $.Layout
+          jsonMaps:
+            - jsonPath: $.Layout.status
+            - jsonPath: $.Layout.applicationStatus
+            
+            - jsonPath: $.Layout.layoutNo
+            - jsonPath: $.Layout.applicationType
+            - jsonPath: $.Layout.layoutType
+            
+            - jsonPath: $.Layout.auditDetails.lastModifiedBy
+            - jsonPath: $.Layout.auditDetails.lastModifiedTime
+            
+            - jsonPath: $.Layout.id
+
+
+            
+
+
+        - query: >
+             INSERT INTO eg_layout_auditdetails (
+              id, applicationno, tenantid, status, createdby,
+              lastmodifiedby, createdtime, lastmodifiedtime, layoutno, applicationtype, layouttype,
+              accountid, applicationstatus
+              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: $.Layout
+          jsonMaps:
+            - jsonPath: $.Layout.id
+            - jsonPath: $.Layout.applicationNo
+            - jsonPath: $.Layout.tenantId
+            - jsonPath: $.Layout.status
+            - jsonPath: $.Layout.auditDetails.createdBy
+            - jsonPath: $.Layout.auditDetails.lastModifiedBy
+            - jsonPath: $.Layout.auditDetails.createdTime
+            - jsonPath: $.Layout.auditDetails.lastModifiedTime
+            - jsonPath: $.Layout.layoutNo
+            - jsonPath: $.Layout.applicationType
+            - jsonPath: $.Layout.layoutType
+            - jsonPath: $.Layout.accountId
+            - jsonPath: $.Layout.applicationStatus
+
+
+
+        - query: >
+             INSERT INTO eg_layout_document (
+             uuid, documenttype,documentAttachment, documentuid, layoutId, doc_order, createdby,
+             lastmodifiedby, createdtime, lastmodifiedtime
+             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+              ON CONFLICT (uuid) DO UPDATE SET
+               documenttype = EXCLUDED.documenttype,
+               documentAttachment = EXCLUDED.documentAttachment,
+               documentuid = EXCLUDED.documentuid,
+               layoutid = EXCLUDED.layoutid,
+               doc_order = EXCLUDED.doc_order,
+               createdby = EXCLUDED.createdby,
+               lastmodifiedby = EXCLUDED.lastmodifiedby,
+               createdtime = EXCLUDED.createdtime,
+               lastmodifiedtime = EXCLUDED.lastmodifiedtime;
+          basePath: $.Layout.documents.*
+          jsonMaps:
+            - jsonPath: $.Layout.documents.*.uuid
+            - jsonPath: $.Layout.documents.*.documentType
+            - jsonPath: $.Layout.documents.*.documentAttachment
+            - jsonPath: $.Layout.documents.*.documentUid
+            - jsonPath: $.Layout.documents.*.layoutId
+            - jsonPath: $.Layout.documents.*.order
+            - jsonPath: $.Layout.documents.*.auditDetails.createdBy
+            - jsonPath: $.Layout.documents.*.auditDetails.lastModifiedBy
+            - jsonPath: $.Layout.documents.*.auditDetails.createdTime
+            - jsonPath: $.Layout.documents.*.auditDetails.lastModifiedTime
+
+
+
+
+        - query: >
+             UPDATE eg_layout_details
+             SET additionaldetails = ?, tenantid = ?,
+             lastmodifiedby = ?, lastmodifiedtime = ?
+             WHERE id = ?;
+          basePath: $.Layout.layoutDetails
+          jsonMaps:
+
+            - jsonPath: $.Layout.layoutDetails.additionalDetails
+              type: JSON
+              dbType: JSONB
+            - jsonPath: $.Layout.layoutDetails.tenantId
+            - jsonPath: $.Layout.layoutDetails.auditDetails.lastModifiedBy
+            - jsonPath: $.Layout.layoutDetails.auditDetails.lastModifiedTime
+            - jsonPath: $.Layout.layoutDetails.id
+
+
+        - query: > 
+            INSERT INTO eg_layout_owner (
+              id, tenantid, layoutId, status, isprimaryowner,
+              ownertype, ownershippercentage, institutionid, relationship,
+              createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails
+            ,uuid
+            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+            ON CONFLICT (uuid, layoutId) DO UPDATE SET
+            status = EXCLUDED.status;
+          basePath: $.Layout.owners.*
+
+          jsonMaps:
+            - jsonPath: $.Layout.owners.*.id
+            - jsonPath: $.Layout.owners.*.tenantId
+            - jsonPath: $.Layout.id
+            - jsonPath: $.Layout.owners.*.status
+            - jsonPath: $.Layout.owners.*.isPrimaryOwner
+            - jsonPath: $.Layout.owners.*.type
+            - jsonPath: $.Layout.owners.*.ownershipPercentage
+            - jsonPath: $.Layout.owners.*.institutionId
+            - jsonPath: $.Layout.owners.*.relationship
+            - jsonPath: $.Layout.owners.*.createdBy
+            - jsonPath: $.Layout.owners.*.createdDate
+            - jsonPath: $.Layout.owners.*.lastModifiedBy
+            - jsonPath: $.Layout.owners.*.lastModifiedDate
+            - jsonPath: $.Layout.owners.*.additionalDetails
+              type: JSON
+              dbType: JSONB
+            - jsonPath: $.Layout.owners.*.uuid
+
+
+    - version: 1.0
+      description: Save layout Document Check List
+      fromTopic: save-layout-document-checklist
+      isTransaction: true
+      queryMaps:
+        - query: INSERT INTO public.eg_layout_document_check_list(id, documentuid, applicationno, tenantId, action, remarks, createdby, lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: checkList.*
+          jsonMaps:
+
+            - jsonPath: $.checkList.*.id
+
+            - jsonPath: $.checkList.*.documentuid
+
+            - jsonPath: $.checkList.*.applicationNo
+
+            - jsonPath: $.checkList.*.tenantId
+
+            - jsonPath: $.checkList.*.action
+
+            - jsonPath: $.checkList.*.remarks
+
+            - jsonPath: $.checkList.*.createdby
+
+            - jsonPath: $.checkList.*.lastmodifiedby
+
+            - jsonPath: $.checkList.*.createdtime
+
+            - jsonPath: $.checkList.*.lastmodifiedtime
+
+    - version: 1.0
+      description: Update layout Document Check List
+      fromTopic: update-layout-document-checklist
+      isTransaction: true
+      queryMaps:
+        - query: UPDATE public.eg_layout_document_check_list SET action = ?, remarks = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE id = ? AND tenantId = ?;
+          basePath: checkList.*
+          jsonMaps:
+
+            - jsonPath: $.checkList.*.action
+
+            - jsonPath: $.checkList.*.remarks
+
+            - jsonPath: $.checkList.*.lastmodifiedby
+
+            - jsonPath: $.checkList.*.lastmodifiedtime
+
+            - jsonPath: $.checkList.*.id
+
+            - jsonPath: $.checkList.*.tenantId
+
+
+
+
+
+
+
+
+
+
+    

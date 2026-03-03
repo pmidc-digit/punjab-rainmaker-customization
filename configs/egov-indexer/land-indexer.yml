@@ -1,0 +1,129 @@
+ServiceMaps:
+  serviceName: land-services
+  version: 1.0.0
+  mappings:
+
+    # ================= SAVE LAND INFO =================
+    - topic: save-landinfo
+      configKey: INDEX
+      indexes:
+        - name: land-info-index
+          type: general
+          id: $.LandInfo.id
+          isBulk: true
+          timeStampField: $.LandInfo.auditDetails.createdTime
+          jsonPath: $
+          customJsonMapping:
+            indexMapping:
+              Data: {}
+            fieldMapping:
+              - inJsonPath: $.LandInfo.id
+                outJsonPath: $.Data.id
+
+              - inJsonPath: $.LandInfo.tenantId
+                outJsonPath: $.Data.tenantId
+
+              - inJsonPath: $.LandInfo.landUId
+                outJsonPath: $.Data.landUId
+
+              - inJsonPath: $.LandInfo.landUniqueRegNo
+                outJsonPath: $.Data.landUniqueRegNo
+
+              - inJsonPath: $.LandInfo.status
+                outJsonPath: $.Data.status
+
+              - inJsonPath: $.LandInfo.ownershipCategory
+                outJsonPath: $.Data.ownershipCategory
+
+              - inJsonPath: $.LandInfo.source
+                outJsonPath: $.Data.source
+
+              - inJsonPath: $.LandInfo.channel
+                outJsonPath: $.Data.channel
+
+              - inJsonPath: $.LandInfo.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+
+              - inJsonPath: $.LandInfo.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+
+              - inJsonPath: $.LandInfo.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
+
+              - inJsonPath: $.LandInfo.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+
+              - inJsonPath: $.LandInfo.address
+                outJsonPath: $.Data.address
+
+              - inJsonPath: $.LandInfo.owners
+                outJsonPath: $.Data.owners
+
+              - inJsonPath: $.LandInfo.documents
+                outJsonPath: $.Data.documents
+
+              - inJsonPath: $.LandInfo.unit
+                outJsonPath: $.Data.unit
+
+
+    # ================= UPDATE LAND INFO =================
+    - topic: update-landinfo
+      configKey: INDEX
+      indexes:
+        - name: land-info-index
+          type: general
+          id: $.LandInfo.id
+          isBulk: true
+          timeStampField: $.LandInfo.auditDetails.lastModifiedTime
+          jsonPath: $
+          customJsonMapping:
+            indexMapping:
+              Data: {}
+            fieldMapping:
+              - inJsonPath: $.LandInfo.id
+                outJsonPath: $.Data.id
+
+              - inJsonPath: $.LandInfo.tenantId
+                outJsonPath: $.Data.tenantId
+
+              - inJsonPath: $.LandInfo.landUId
+                outJsonPath: $.Data.landUId
+
+              - inJsonPath: $.LandInfo.landUniqueRegNo
+                outJsonPath: $.Data.landUniqueRegNo
+
+              - inJsonPath: $.LandInfo.status
+                outJsonPath: $.Data.status
+
+              - inJsonPath: $.LandInfo.ownershipCategory
+                outJsonPath: $.Data.ownershipCategory
+
+              - inJsonPath: $.LandInfo.source
+                outJsonPath: $.Data.source
+
+              - inJsonPath: $.LandInfo.channel
+                outJsonPath: $.Data.channel
+
+              - inJsonPath: $.LandInfo.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+
+              - inJsonPath: $.LandInfo.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+
+              - inJsonPath: $.LandInfo.address
+                outJsonPath: $.Data.address
+
+              - inJsonPath: $.LandInfo.address.city
+                outJsonPath: $.Data.addressCity
+
+              - inJsonPath: $.LandInfo.address.locality.code
+                outJsonPath: $.Data.addressLocalityCode
+
+              - inJsonPath: $.LandInfo.owners
+                outJsonPath: $.Data.owners
+
+              - inJsonPath: $.LandInfo.documents
+                outJsonPath: $.Data.documents
+
+              - inJsonPath: $.LandInfo.unit
+                outJsonPath: $.Data.unit
