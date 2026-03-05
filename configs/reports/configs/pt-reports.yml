@@ -10294,51 +10294,51 @@ ReportDefinitions:
   additionalConfig:
     print:
        pdfPageSize: A1
-    sourceColumns:
-      - name: ulb
-        label: ULB Name
-        type: string
-        source: pt
-        total: false
-      - name: total_properties
-        label: Total Properties
-        type: string
-        source: pt
-        total: true
-      - name: properties_mapped
-        label: Properties Mapped
-        type: string
-        source: pt
-        total: true
-      - name: pending_for_mapping
-        label: Pending For Mapping
-        type: string
-        source: pt
-        total: true
-      - name: pending_for_verification
-        label: Pending For Verification
-        type: string
-        source: pt
-        total: true
-      - name: verification_done
-        label: Verification Done
-        type: string
-        source: pt
-        total: true
-    searchParams:
-      - name: fromDate
-        label: From Date
-        type: epoch
-        source: pt
-        isMandatory: false
-        searchClause: AND p.createdtime>= $fromDate
-      - name: toDate
-        label: To Date
-        type: epoch
-        source: pt
-        isMandatory: false
-        searchClause: AND p.createdtime<= $toDate
-    query: >
+  sourceColumns:
+    - name: ulb
+      label: ULB Name
+      type: string
+      source: pt
+      total: false
+    - name: total_properties
+      label: Total Properties
+      type: string
+      source: pt
+      total: true
+    - name: properties_mapped
+      label: Properties Mapped
+      type: string
+      source: pt
+      total: true
+    - name: pending_for_mapping
+      label: Pending For Mapping
+      type: string
+      source: pt
+      total: true
+    - name: pending_for_verification
+      label: Pending For Verification
+      type: string
+      source: pt
+      total: true
+    - name: verification_done
+      label: Verification Done
+      type: string
+      source: pt
+      total: true
+  searchParams:
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: pt
+      isMandatory: false
+      searchClause: AND p.createdtime>= $fromDate
+    - name: toDate
+      label: To Date
+      type: epoch
+      source: pt
+      isMandatory: false
+      searchClause: AND p.createdtime<= $toDate
+  query: >
       -- Use CTE to force query plan, compute & use CTE later
        SELECT 
          split_part(p.tenantid, '.', 2) AS ulb ,
@@ -10350,6 +10350,6 @@ ReportDefinitions:
          FROM eg_pt_property p
          LEFT JOIN revenue_property_integration r ON r.propertyid = p.propertyid
          WHERE 1=1
-    groupby: GROUP BY p.tenantid
-    orderby: ORDER BY p.tenantid DESC
+  groupby: GROUP BY p.tenantid
+  orderby: ORDER BY p.tenantid DESC
  
