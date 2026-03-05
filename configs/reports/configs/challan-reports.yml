@@ -152,7 +152,7 @@ ReportDefinitions:
               CASE WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN pd.amountpaid ELSE 0 END AS neft_amount,
               CASE WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN pd.amountpaid ELSE 0 END AS rtgs_amount,
               CASE WHEN p.paymentmode = 'ONLINE' THEN pd.amountpaid ELSE 0 END AS online_amount,
-              COALESCE(emp.code, 'SELF') AS collector_code, uu.name as emp_name,uu.mobilenumber as emp_mobile,
+              COALESCE(emp.code, 'SELF') AS collector_code, uu.name as emp_name as collector_name,uu.mobilenumber as emp_mobile,
               c.challanno, 
               c.applicationstatus,
               c.offence_type_name,
@@ -178,7 +178,7 @@ ReportDefinitions:
        )
        SELECT
               challanno, name, mobilenumber, 'CHALLAN' AS businessservice, applicationstatus,
-              collector_code, emp_name,emp_mobile, cash_amount, cheque_amount,offence_type_name,offence_category_name,
+              collector_code, collector_name,emp_mobile, cash_amount, cheque_amount,offence_type_name,offence_category_name,
               offence_subcategory_name,card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
               TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS paymentdate
              FROM unique_transactions
@@ -368,7 +368,7 @@ ReportDefinitions:
         type: string
         source: ch
         total: false
-      - name: emp_name
+      - name: collector_name
         label: Collector Name
         type: string
         source: ch
@@ -492,7 +492,7 @@ ReportDefinitions:
               CASE WHEN p.paymentmode IN ('NEFT','OFFLINE_NEFT') THEN pd.amountpaid ELSE 0 END AS neft_amount,
               CASE WHEN p.paymentmode IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN pd.amountpaid ELSE 0 END AS rtgs_amount,
               CASE WHEN p.paymentmode = 'ONLINE' THEN pd.amountpaid ELSE 0 END AS online_amount,
-              COALESCE(emp.code, 'SELF') AS collector_code,uu.name as emp_name,uu.mobilenumber as emp_mobile,
+              COALESCE(emp.code, 'SELF') AS collector_code,uu.name as emp_name as collector_name,uu.mobilenumber as emp_mobile,
               c.challanno,
               c.applicationstatus,
               c.offence_type_name,
@@ -519,7 +519,7 @@ ReportDefinitions:
           SELECT
               split_part(tenantid, '.', 2) AS tenantid,
               challanno, name, mobilenumber, 'CHALLAN' AS businessservice, applicationstatus,
-              collector_code, emp_name,emp_mobile, cash_amount, cheque_amount,offence_category_name,offence_subcategory_name,offence_type_name,
+              collector_code, collector_name,emp_mobile, cash_amount, cheque_amount,offence_category_name,offence_subcategory_name,offence_type_name,
               card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid,
               TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS paymentdate         
              FROM unique_transactions
