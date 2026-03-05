@@ -23,7 +23,7 @@ SearchDefinitions:
                    owner.relationship,
                    owner.ownershippercentage
             from eg_layout as layout
-            LEFT JOIN eg_layout_owner owner ON owner.layoutid = layout.id
+            LEFT JOIN eg_layout_owner owner ON owner.layoutid = layout.id AND owner.isprimaryowner = true
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = layout.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where 
