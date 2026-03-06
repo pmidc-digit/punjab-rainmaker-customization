@@ -58,7 +58,7 @@ ReportDefinitions:
         label: Payment Mode
         type: string
         source: ch
-        total: true
+        total: false
       - name: amountpaid
         label: Amount Paid
         type: string
@@ -889,27 +889,27 @@ ReportDefinitions:
         type: epoch
         source: ch
         isMandatory: false
-        searchClause: AND c.createdtime>= $fromDate
+        searchClause: AND createdtime>= $fromDate
       - name: toDate
         label: To Date
         type: epoch
         source: ch
         isMandatory: false
-        searchClause: AND c.createdtime <= $toDate
+        searchClause: AND createdtime <= $toDate
       - name: offence_category_name
         label: Offence Category Name
         type: singlevaluelist
         pattern: list://Solid Waste Management:Solid Waste Management
         source: ch
         isMandatory: false
-        searchClause: AND c.offence_category_name = $offence_category_name
+        searchClause: AND offence_category_name = $offence_category_name
       - name: offence_subcategory_name
         label: Offence Subcategory Name
         type: singlevaluelist
         pattern: list://Littering of Waste:Littering of Waste,Open Defecation:Open Defecation,Plastic:Plastic,Burning of Waste:Burning of Waste
         source: ch
         isMandatory: false
-        searchClause: AND c.offence_subcategory_name = $offence_subcategory_name
+        searchClause: AND offence_subcategory_name = $offence_subcategory_name
     query: >
       WITH paid_challans AS (
         SELECT DISTINCT
@@ -1018,27 +1018,27 @@ ReportDefinitions:
         type: epoch
         source: ch
         isMandatory: false
-        searchClause: AND c.createdtime>= $fromDate
+        searchClause: AND createdtime>= $fromDate
       - name: toDate
         label: To Date
         type: epoch
         source: ch
         isMandatory: false
-        searchClause: AND c.createdtime <= $toDate
+        searchClause: AND createdtime <= $toDate
       - name: offence_category_name
         label: Offence Category Name
         type: singlevaluelist
         pattern: list://Solid Waste Management:Solid Waste Management
         source: ch
         isMandatory: false
-        searchClause: AND c.offence_category_name = $offence_category_name
+        searchClause: AND offence_category_name = $offence_category_name
       - name: offence_subcategory_name
         label: Offence Subcategory Name
         type: singlevaluelist
         pattern: list://Littering of Waste:Littering of Waste,Open Defecation:Open Defecation,Plastic:Plastic,Burning of Waste:Burning of Waste
         source: ch
         isMandatory: false
-        searchClause: AND c.offence_subcategory_name = $offence_subcategory_name
+        searchClause: AND offence_subcategory_name = $offence_subcategory_name
       - name: ulb
         label: ULB
         type: singlevaluelist
@@ -1253,6 +1253,6 @@ ReportDefinitions:
        COALESCE(SUM(p.amountpaid),0) AS total_collection
        FROM challan_data c
        LEFT JOIN payment_data p ON p.challanno = c.challanno
-       WHERE 1=1
+       WHERE 1=1 and c.tenantid != 'pb.testing'
     groupby: GROUP BY split_part(c.tenantid,'.',2),c.offence_category_name
     orderby: ORDER BY  ulb,  offence_category_name;
