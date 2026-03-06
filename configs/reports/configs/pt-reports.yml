@@ -7147,7 +7147,7 @@ ReportDefinitions:
     query: >
       -- Use CTE to force query plan, compute & use CTE later
        SELECT 
-         u.district , u.type , u.name_of_ulb, ,
+         u.district , u.type , u.name_of_ulb, 
          COUNT(DISTINCT p.propertyid) AS total_properties,
          COUNT(DISTINCT CASE  WHEN r.propertyid IS NOT NULL  THEN p.propertyid  END) AS properties_mapped,
          COUNT(DISTINCT CASE  WHEN r.propertyid IS NULL  THEN p.propertyid  END) AS pending_for_mapping,
