@@ -7044,7 +7044,7 @@ ReportDefinitions:
         source: pt
         wrapper: true
         isMandatory: false
-        searchClause: AND usagecategorymajor = $usage    
+        searchClause: AND pt.usagecategory = $usage    
       - name: occupancy
         label: Occupancy Type
         type: singlevaluelist
@@ -7056,7 +7056,7 @@ ReportDefinitions:
         label: reports.pt.zoneList
         type: boundarylist
         source: pt
-        isMandatory: false
+        isMandatory: true
         searchClause: AND pta.locality IN ($localityArray)
     query: >        
        WITH eg_pt_unit_v2_ot AS (
@@ -7146,9 +7146,6 @@ ReportDefinitions:
           payment.paymentstatus != 'CANCELLED'
          AND payd.businessservice = 'PT' 
          AND pt.status != 'INACTIVE' 
-          -- AND pt.propertyid in ('PT-1013-3025446','PT-1013-1539305')
-          -- AND payd.receiptdate >= 1767413735000
-          -- AND payd.receiptdate <= 1772511335000
        
-    orderby: ORDER BY payd.receiptnumber, payd.createdtime DESC limit 20    
+    orderby: ORDER BY payd.receiptnumber, payd.createdtime DESC   
 
