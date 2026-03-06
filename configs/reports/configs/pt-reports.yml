@@ -6898,22 +6898,32 @@ ReportDefinitions:
         source: pt
         total: true
     searchParams:
-      - name: fromDate
-        label: From Date
-        type: epoch
+      - name: district
+        label: District
+        type: singlevaluelist
+        pattern: list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,:Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib
         source: pt
         isMandatory: false
-        searchClause: AND p.createdtime>= $fromDate
-      - name: toDate
-        label: To Date
-        type: epoch
+        searchClause: AND u.district = $district
+      - name: ulb
+        label: ULB
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: pt
         isMandatory: false
-        searchClause: AND p.createdtime<= $toDate
+        searchClause: AND u.ulb_code = $ulb
+      - name: type
+        label: ULB Type
+        type: singlevaluelist
+        pattern: list://MC Class II:MC Class II,NP:NP,MC Class I:MC Class I,Municipal Corporation:Municipal Corporation,MC Class III:MC Class III
+        source: pt
+        isMandatory: false
+        searchClause: AND u.type = $type
+
     query: >
       -- Use CTE to force query plan, compute & use CTE later
        SELECT 
-         split_part(p.tenantid, '.', 2) AS ulb ,
+         u.district , u.type , u.name_of_ulb, ,
          COUNT(DISTINCT p.propertyid) AS total_properties,
          COUNT(DISTINCT CASE  WHEN r.propertyid IS NOT NULL  THEN p.propertyid  END) AS properties_mapped,
          COUNT(DISTINCT CASE  WHEN r.propertyid IS NULL  THEN p.propertyid  END) AS pending_for_mapping,
@@ -6921,6 +6931,7 @@ ReportDefinitions:
          COUNT(DISTINCT CASE  WHEN r.is_verified = true  THEN r.propertyid  END) AS verification_done
          FROM eg_pt_property p
          LEFT JOIN revenue_property_integration r ON r.propertyid = p.propertyid
+         LEFT JOIN ulb_data u ON p.tenantid=u.ulb_code
          WHERE 1=1
-    groupby: GROUP BY p.tenantid
-    orderby: ORDER BY p.tenantid DESC
+    groupby: GROUP BY u.district,u.type ,u.name_of_ulb,p.tenantid
+    orderby: ORDER BY u.district,u.type ,u.name_of_ulb DESC
