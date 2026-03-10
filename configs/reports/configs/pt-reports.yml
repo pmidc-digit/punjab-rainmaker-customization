@@ -7275,7 +7275,7 @@ ReportDefinitions:
         pattern: list://True:True,False:False,
         source: pt
         isMandatory: false
-        searchClause: AND is_verified = $is_verified ::boolean              
+        searchClause: AND is_verified = $is_verified              
     query: >
       WITH dedup AS (
         SELECT
@@ -7295,7 +7295,7 @@ ReportDefinitions:
           rss.sub_segment_name,
           ru.usage_category_name,
           rsc.sub_category_name,
-          rpi.is_verified,
+          CASE WHEN rpi.is_verified IS False THEN 'False' ELSE 'True' END AS is_verified,
           rpi.rate,
           ROW_NUMBER() OVER (
             PARTITION BY pt.propertyid
