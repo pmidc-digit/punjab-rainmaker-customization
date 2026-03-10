@@ -7240,7 +7240,7 @@ ReportDefinitions:
         total: false 
       - name: is_verified
         label: is_verified
-        type: string
+        type: boolean
         source: pt
         total: false 
       - name: rate
@@ -7275,7 +7275,7 @@ ReportDefinitions:
         pattern: list://True:True,False:False,
         source: pt
         isMandatory: false
-        searchClause: AND is_verified = $is_verified               
+        searchClause: AND is_verified = $is_verified ::boolean              
     query: >
       WITH dedup AS (
         SELECT
