@@ -7156,7 +7156,7 @@ ReportDefinitions:
          FROM eg_pt_property p
          LEFT JOIN revenue_property_integration r ON r.propertyid = p.propertyid
          LEFT JOIN ulb_data u ON p.tenantid=u.ulb_code
-         WHERE 1=1
+         WHERE 1=1 and and u.name_of_ulb not in ('pb.testing','pb.balianvali', 'pb.chaunke', 'pb.rampura' ,'pb.mandikalan')
     groupby: GROUP BY u.district,u.type ,u.name_of_ulb,p.tenantid
     orderby: ORDER BY u.district,u.type ,u.name_of_ulb DESC
 
@@ -7314,4 +7314,4 @@ ReportDefinitions:
       )
       SELECT *
       FROM dedup
-      WHERE rn = 1     
+      WHERE rn = 1 and tenantid not in ('pb.testing','pb.balianvali', 'pb.chaunke', 'pb.rampura' ,'pb.mandikalan')    
