@@ -10532,7 +10532,8 @@ ReportDefinitions:
        LEFT JOIN ulb_data u ON p.tenantid=u.ulb_code
        WHERE 1=1  and u.name_of_ulb = $tenantid
   groupby: GROUP BY u.district,u.type ,u.name_of_ulb,p.tenantid
-  orderby: ORDER BY u.district,u.type ,u.name_of_ulb DES
+  orderby: ORDER BY u.district,u.type ,u.name_of_ulb DESC
+
 - reportName: ulbrevenuepropertymapping
   summary: Revenue Property Mapping Detail Report - for ULB wise
   version: 1.0.0
