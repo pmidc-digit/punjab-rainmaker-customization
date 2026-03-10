@@ -7084,7 +7084,7 @@ ReportDefinitions:
     orderby: ORDER BY payd.receiptnumber, payd.createdtime DESC   
 
   - reportName: Revenuepropertysummary
-    summary: ULB wise summary of property Ids for verification status , mapping status
+    summary: State report of  summary of property Ids for verification status , mapping status
     version: 1.0.0
     moduleName: rainmaker-pt
     additionalConfig:
@@ -7160,7 +7160,7 @@ ReportDefinitions:
     orderby: ORDER BY u.district,u.type ,u.name_of_ulb DESC
 
   - reportName: Revenuepropertymapping
-    summary: Revenue Property Mapping Detail Report
+    summary: Revenue Property Mapping Detail Report - state Report
     version: 1.0.0
     moduleName: rainmaker-pt
     additionalConfig:
@@ -7313,4 +7313,207 @@ ReportDefinitions:
       )
       SELECT *
       FROM dedup
-      WHERE rn = 1 and tenantid not in ('pb.testing','pb.balianvali', 'pb.chaunke', 'pb.rampura' ,'pb.mandikalan')    
+      WHERE rn = 1 and tenantid not in ('pb.testing','pb.balianvali', 'pb.chaunke', 'pb.rampura' ,'pb.mandikalan')
+
+  - reportName: ulbrevenuepropertysummary
+    summary: ULB wise summary of property Ids for verification status , mapping status 
+    version: 1.0.0
+    moduleName: rainmaker-pt
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: name_of_ulb
+        label: ULB Name
+        type: string
+        source: pt
+        total: false
+      - name: total_properties
+        label: Total Properties
+        type: string
+        source: pt
+        total: true
+      - name: properties_mapped
+        label: Properties Mapped
+        type: string
+        source: pt
+        total: true
+      - name: pending_for_mapping
+        label: Pending For Mapping
+        type: string
+        source: pt
+        total: true
+      - name: pending_for_verification
+        label: Pending For Verification
+        type: string
+        source: pt
+        total: true
+      - name: verification_done
+        label: Verification Done
+        type: string
+        source: pt
+        total: true
+    query: >
+      -- Use CTE to force query plan, compute & use CTE later
+       SELECT 
+         u.district , u.type , u.name_of_ulb, 
+         COUNT(DISTINCT p.propertyid) AS total_properties,
+         COUNT(DISTINCT CASE  WHEN r.propertyid IS NOT NULL  THEN p.propertyid  END) AS properties_mapped,
+         COUNT(DISTINCT CASE  WHEN r.propertyid IS NULL  THEN p.propertyid  END) AS pending_for_mapping,
+         COUNT(DISTINCT CASE  WHEN r.is_verified = false  THEN r.propertyid  END) AS pending_for_verification,
+         COUNT(DISTINCT CASE  WHEN r.is_verified = true  THEN r.propertyid  END) AS verification_done
+         FROM eg_pt_property p
+         LEFT JOIN revenue_property_integration r ON r.propertyid = p.propertyid
+         LEFT JOIN ulb_data u ON p.tenantid=u.ulb_code
+         WHERE 1=1 and and u.name_of_ulb not in ('pb.testing','pb.balianvali', 'pb.chaunke', 'pb.rampura' ,'pb.mandikalan') and u.name_of_ulb = $tenantid
+    groupby: GROUP BY u.district,u.type ,u.name_of_ulb,p.tenantid
+    orderby: ORDER BY u.district,u.type ,u.name_of_ulb DESC
+
+  - reportName: ulbrevenuepropertymapping
+    summary: Revenue Property Mapping Detail Report - for ULB wise
+    version: 1.0.0
+    moduleName: rainmaker-pt
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: propertyid
+        label: Propertyid
+        type: string
+        source: pt
+        total: false
+      - name: tenantid
+        label: Tenantid
+        type: string
+        source: pt
+        total: false
+      - name: mapped
+        label: Mapped Status
+        type: string
+        source: pt
+        total: false
+      - name: zonename
+        label: zonename
+        type: string
+        source: pt
+        total: false
+      - name: blockname
+        label: blockname
+        type: string
+        source: pt
+        total: false
+      - name: localityname
+        label: localityname
+        type: string
+        source: pt
+        total: false
+      - name: area
+        label: area
+        type: string
+        source: pt
+        total: false
+      - name: district_name
+        label: district_name
+        type: string
+        source: pt
+        total: false
+      - name: tehsil_name
+        label: tehsil_name
+        type: string
+        source: pt
+        total: false
+      - name: village_name
+        label: village_name
+        type: string
+        source: pt
+        total: false
+      - name: segment_name
+        label: segment_name
+        type: string
+        source: pt
+        total: false
+      - name: sub_segment_name
+        label: sub_segment_name
+        type: string
+        source: pt
+        total: false
+      - name: usage_category_name
+        label: usage_category_name
+        type: string
+        source: pt
+        total: false
+      - name: sub_category_name
+        label: sub_category_name
+        type: string
+        source: pt
+        total: false 
+      - name: is_verified
+        label: is_verified
+        type: string
+        source: pt
+        total: false 
+      - name: rate
+        label: rate
+        type: string
+        source: pt
+        total: false                                                                                
+    searchParams:
+      - name: localityArray
+        label: reports.pt.zoneList
+        type: boundarylist
+        source: pt
+        isMandatory: false
+        searchClause: AND locality IN ($localityArray)
+      - name: mapped
+        label: mapped
+        type: singlevaluelist
+        pattern: list://True:True,False:False,
+        source: pt
+        isMandatory: false
+        searchClause: AND mapped = $mapped
+      - name: is_verified
+        label: is_verified
+        type: singlevaluelist
+        pattern: list://True:True,False:False,
+        source: pt
+        isMandatory: false
+        searchClause: AND is_verified = $is_verified              
+    query: >
+      WITH dedup AS (
+        SELECT
+          pt.propertyid,
+          pt.tenantid,
+          rpi.propertyid AS revenue_propertyid,
+          CASE WHEN rpi.propertyid IS NULL THEN 'False' ELSE 'True' END AS mapped,
+          rpi.locality,
+          bd.zonename,
+          bd.blockname,
+          bd.localityname,
+          bd.area,
+          rd.district_name,
+          rt.tehsil_name,
+          rv.village_name,
+          rs.segment_name,
+          rss.sub_segment_name,
+          ru.usage_category_name,
+          rsc.sub_category_name,
+          CASE WHEN rpi.is_verified IS False THEN 'False' ELSE 'True' END AS is_verified,
+          rpi.rate,
+          ROW_NUMBER() OVER (
+            PARTITION BY pt.propertyid
+            ORDER BY rpi.rate DESC NULLS LAST  -- change ordering rule as needed
+          ) AS rn
+        FROM eg_pt_property pt
+        LEFT JOIN revenue_property_integration rpi ON rpi.propertyid = pt.propertyid
+        LEFT JOIN revenue_district_master rd ON rpi.districtid = rd.district_id::varchar
+        LEFT JOIN revenue_tehsil_master rt ON rpi.tehsilid = rt.tehsil_id::varchar
+        LEFT JOIN revenue_village_master rv ON rpi.village_id = rv.village_id::varchar
+        LEFT JOIN revenue_segment_master rs ON  rpi.segmentid = rs.segment_level_id::varchar
+        LEFT JOIN revenue_sub_segment_list rss ON rpi.subsegmentid = rss.sub_segment_id::varchar
+        LEFT JOIN revenue_usage_category_master ru ON rpi.categoryid = ru.usage_category_id::varchar
+        LEFT JOIN revenue_sub_category_master rsc ON rpi.subcategoryid = rsc.sub_category_id::varchar
+        LEFT JOIN eg_bndry_mohalla bd ON rpi.locality = bd.localitycode
+      )
+      SELECT *
+      FROM dedup
+      WHERE rn = 1 and tenantid not in ('pb.testing','pb.balianvali', 'pb.chaunke', 'pb.rampura' ,'pb.mandikalan') and tenantid = $tenantid          
