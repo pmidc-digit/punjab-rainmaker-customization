@@ -1,182 +1,203 @@
 ---
 ReportDefinitions:
-- reportName: ApplicationDetailReportNOC
-  summary: Details of file for NOC  per ULB
-  version: 1.0.0
-  moduleName: rainmaker-obpas_noc
-  sourceColumns:
-  - name: applicationno
-    label: Application Number
-    type: string
-    source: rainmaker-obpas_noc
-    total: false
-  - name: applicationstatus
-    label: Application Status
-    type: string
-    source: rainmaker-obpas_noc
-    total: false
-  - name: vasikadate
-    label: Vasika Date
-    type: string
-    source: rainmaker-obpas_noc
-    total: false
-  - name: vasikanumber
-    label: Vasika Number
-    type: string
-    source: rainmaker-obpas_noc
-    total: false
-  - name: plot_no
-    label: Plot Number
-    type: string
-    source: rainmaker-obpas_noc
-    total: false
-  - name: khasra_no
-    label: Khasra Number
-    type: string
-    source: rainmaker-obpas_noc
-    total: false
-  - name: village_name
-    label: Village Name
-    type: string
-    source: rainmaker-obpas_noc
-    total: false
-  - name: ULB_type
-    label: ULB Type
-    type: string
-    source: rainmaker-obpas_noc
-    total: false
-  - name: road_type
-    label: Road Type
-    type: string
-    source: rainmaker-obpas_noc
-    total: false
-  - name: site_address
-    label: Site Address
-    type: string
-    source: rainmaker-obpas_noc
-    total: false
-  - name: total_floor_area
-    label: Total Floor Area
-    type: number
-    source: rainmaker-obpas_noc
-    total: false
-  - name: basement_area
-    label: Basement Area
-    type: number
-    source: rainmaker-obpas_noc
-    total: false
-  - name: building_status
-    label: Building Status
-    type: string
-    source: rainmaker-obpas_noc
-    total: false
-  - name: net_plot_area
-    label: Net Plot Area
-    type: number
-    source: rainmaker-obpas_noc
-    total: false
-  - name: road_widening_area
-    label: Area Left For Road Widening
-    type: number
-    source: rainmaker-obpas_noc
-    total: false
-  - name: road_width
-    label: Road Width At Site
-    type: number
-    source: rainmaker-obpas_noc
-    total: false
-  - name: building_category
-    label: Building Category
-    type: string
-    source: rainmaker-obpas_noc
-    total: false
-  - name: applicant_name
-    label: Applicant Name
-    type: string
-    source: rainmaker-obpas_noc
-    total: false
-  - name: applicant_mobile
-    label: Applicant Mobile
-    type: string
-    source: rainmaker-obpas_noc
-    total: false
-  - name: professional_name
-    label: Professional Name
-    type: string
-    source: rainmaker-obpas_noc
-    total: false
-  - name: professional_reg_id
-    label: Professional Registration ID
-    type: string
-    source: rainmaker-obpas_noc
-    total: false
-  - name: professional_mobile
-    label: Professional Mobile
-    type: string
-    source: rainmaker-obpas_noc
-    total: false
-  searchParams:
-  - name: fromDate
-    label: From Date
-    type: epoch
-    source: rainmaker-obpas_noc
-    isMandatory: false
-    searchClause: n.createdtime >= $fromDate
-  - name: toDate
-    label: To Date
-    type: epoch
-    source: rainmaker-obpas_noc
-    isMandatory: false
-    searchClause: n.createdtime <= $toDate
-  - name: ulb
-    label: ULB
-    type: singlevaluelist
-    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-    source: rainmaker-obpas_noc
-    wrapper: true
-    isMandatory: false
-    searchClause: AND n.tenantid = $ulb
-  - name: applicationstatus
-    label: Application Status
-    type: singlevaluelist
-    pattern: 'list://JC_VERIFICATION_PENDING:JC Verification Pending,DOCUMENTVERIFY:Document Verify,ATP_VERIFICATION_PENDING:ATP Verification Pending,MTP_VERIFICATION_PENDING:MTP Verification Pending,PENDINGAPPROVAL:Pending Approval,E-SIGNED:E-Signed,FIELDINSPECTION_INPROGRESS:Field Inspection In Progress,REJECTED:Rejected,APPROVED:Approved,EO_VERIFICATION_PENDING:EO Verification Pending,INSPECTION_REPORT_PENDING:Inspection Report Pending'
-    source: rainmaker-obpas_noc
-    wrapper: true
-    isMandatory: false
-    searchClause: AND n.applicationstatus = $applicationstatus
-  - name: ULB_Type
-    label: ULB Type
-    type: singlevaluelist
-    pattern: 'list://Municipal Council:Municipal Council,Municipal Corporation:Municipal Corporation,Nagar Panchayat:Nagar Panchayat'
-    source: rainmaker-obpas_noc
-    wrapper: true
-    isMandatory: false
-    searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails'-> 'ulbName' ->'city' ->> 'ulbType' = $ULB_Type
-  - name: road_type
-    label: Road Type
-    type: singlevaluelist
-    pattern: 'list://National Highway:National Highway,State Highway:State Highway,Major District Road:Major District Road,Bypass/Scheduled Road:Bypass/Scheduled Road,Other Road:Other Road'
-    source: rainmaker-obpas_noc
-    wrapper: true
-    isMandatory: false
-    searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails' -> 'roadType' ->> 'name' = $road_type
-  - name: district_name
-    label: District
-    type: singlevaluelist
-    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,:Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
-    source: rainmaker-obpas_noc
-    wrapper: true
-    isMandatory: false
-    searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails' -> 'ulbName' ->'city'->>'districtName'  = $district_name
-  - name: building_category
-    label: Building Category
-    type: singlevaluelist
-    pattern: 'list://Residential Plotted:Residential Plotted,Residential Independent Floors:Residential Independent Floors,Commercial:Commercial,Industrial / Warehouse Building:Industrial / Warehouse Building'
-    source: rainmaker-obpas_noc
-    wrapper: true
-    isMandatory: false
-    searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails' -> 'specificationBuildingCategory' ->> 'name' = $building_category
-  query: |
+  - reportName: ApplicationDetailReportNOC
+    summary: Details of file for NOC  per ULB
+    version: 1.0.0
+    moduleName: obpas_noc
+    sourceColumns:
+      - name: applicationno
+        label: Application Number
+        type: string
+        source: obpas_noc
+        total: false
+      - name: applicationstatus
+        label: Application Status
+        type: string
+        source: obpas_noc
+        total: false
+      - name: vasikadate
+        label: Vasika Date
+        type: string
+        source: obpas_noc
+        total: false
+      - name: vasikanumber
+        label: Vasika Number
+        type: string
+        source: obpas_noc
+        total: false
+      - name: plot_no
+        label: Plot Number
+        type: string
+        source: obpas_noc
+        total: false
+      - name: khasra_no
+        label: Khasra Number
+        type: string
+        source: obpas_noc
+        total: false
+      - name: village_name
+        label: Village Name
+        type: string
+        source: obpas_noc
+        total: false
+      - name: ULB_type
+        label: ULB Type
+        type: string
+        source: obpas_noc
+        total: false
+      - name: road_type
+        label: Road Type
+        type: string
+        source: obpas_noc
+        total: false
+      - name: site_address
+        label: Site Address
+        type: string
+        source: obpas_noc
+        total: false
+      - name: total_floor_area
+        label: Total Floor Area
+        type: number
+        source: obpas_noc
+        total: false
+      - name: basement_area
+        label: Basement Area
+        type: number
+        source: obpas_noc
+        total: false
+      - name: building_status
+        label: Building Status
+        type: string
+        source: obpas_noc
+        total: false
+      - name: net_plot_area
+        label: Net Plot Area
+        type: number
+        source: obpas_noc
+        total: false
+      - name: road_widening_area
+        label: Area Left For Road Widening
+        type: number
+        source: obpas_noc
+        total: false
+      - name: road_width
+        label: Road Width At Site
+        type: number
+        source: obpas_noc
+        total: false
+      - name: building_category
+        label: Building Category
+        type: string
+        source: obpas_noc
+        total: false
+      - name: applicant_name
+        label: Applicant Name
+        type: string
+        source: obpas_noc
+        total: false
+      - name: applicant_mobile
+        label: Applicant Mobile
+        type: string
+        source: obpas_noc
+        total: false
+      - name: professional_name
+        label: Professional Name
+        type: string
+        source: obpas_noc
+        total: false
+      - name: professional_reg_id
+        label: Professional Registration ID
+        type: string
+        source: obpas_noc
+        total: false
+      - name: professional_mobile
+        label: Professional Mobile
+        type: string
+        source: obpas_noc
+        total: false
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: obpas_noc
+        isMandatory: false
+        searchClause: n.createdtime >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: obpas_noc
+        isMandatory: false
+        searchClause: n.createdtime <= $toDate
+      - name: ulb
+        label: ULB
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: obpas_noc
+        wrapper: true
+        isMandatory: false
+        searchClause: AND n.tenantid = $ulb
+      - name: applicationstatus
+        label: Application Status
+        type: singlevaluelist
+        pattern: list://JC_VERIFICATION_PENDING:JC Verification
+          Pending,DOCUMENTVERIFY:Document Verify,ATP_VERIFICATION_PENDING:ATP
+          Verification Pending,MTP_VERIFICATION_PENDING:MTP Verification
+          Pending,PENDINGAPPROVAL:Pending
+          Approval,E-SIGNED:E-Signed,FIELDINSPECTION_INPROGRESS:Field Inspection
+          In
+          Progress,REJECTED:Rejected,APPROVED:Approved,EO_VERIFICATION_PENDING:EO
+          Verification Pending,INSPECTION_REPORT_PENDING:Inspection Report
+          Pending
+        source: obpas_noc
+        wrapper: true
+        isMandatory: false
+        searchClause: AND n.applicationstatus = $applicationstatus
+      - name: ULB_Type
+        label: ULB Type
+        type: singlevaluelist
+        pattern: list://Municipal Council:Municipal Council,Municipal
+          Corporation:Municipal Corporation,Nagar Panchayat:Nagar Panchayat
+        source: obpas_noc
+        wrapper: true
+        isMandatory: false
+        searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails'-> 'ulbName'
+          ->'city' ->> 'ulbType' = $ULB_Type
+      - name: road_type
+        label: Road Type
+        type: singlevaluelist
+        pattern: list://National Highway:National Highway,State Highway:State
+          Highway,Major District Road:Major District Road,Bypass/Scheduled
+          Road:Bypass/Scheduled Road,Other Road:Other Road
+        source: obpas_noc
+        wrapper: true
+        isMandatory: false
+        searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails' -> 'roadType' ->>
+          'name' = $road_type
+      - name: district_name
+        label: District
+        type: singlevaluelist
+        pattern: list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS
+          Nagar:SAS
+          Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,:Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS
+          Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh
+          Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri
+          Muktsar Sahib:Sri Muktsar Sahib
+        source: obpas_noc
+        wrapper: true
+        isMandatory: false
+        searchClause: AND u.district  = $district_name
+      - name: building_category
+        label: Building Category
+        type: singlevaluelist
+        pattern: list://Residential Plotted:Residential Plotted,Residential Independent
+          Floors:Residential Independent Floors,Commercial:Commercial,Industrial
+          / Warehouse Building:Industrial / Warehouse Building
+        source: obpas_noc
+        wrapper: true
+        isMandatory: false
+        searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails' ->
+          'specificationBuildingCategory' ->> 'name' = $building_category
+    query: >
       select n.applicationno,n.applicationstatus,n.vasikadate,n.vasikanumber,
              ad.additionaldetails::jsonb -> 'siteDetails' -> 'zone' ->> 'name' AS zone_name,
              ad.additionaldetails::jsonb -> 'siteDetails' ->> 'plotNo' AS plot_no,
@@ -206,77 +227,100 @@ ReportDefinitions:
              ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'professionalMobileNumber' AS professional_mobile
           FROM eg_noc n
           LEFT JOIN eg_noc_details ad ON ad.nocid = n.id
+          inner join ulb_data u on u.ulb_code=n.tenantid
          WHERE n.applicationstatus not in ('INITIATED', 'CANCELLED','CITIZENACTIONREQUIRED')
-  groupby: GROUP BY n.applicationno,n.applicationstatus, n.vasikadate, n.vasikanumber,ad.additionaldetails
-  orderby: ORDER BY n.vasikadate
-- reportName: SLAReportNOC
-  decryptionPathId: LAYOUTREPORTS
-  summary: SLA report for noc service
-  version: 1.0.0
-  moduleName: rainmaker-obpas_noc
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: tenantid
-    label: tenantid
-    type: string
-    source: obpas_noc
-    total: false
-  - name: noc_application_no
-    label: Application Number
-    type: string
-    source: obpas_noc
-    total: false
-  - name: field_inspection_on
-    label: Field Inspection On
-    type: string
-    source: obpas_noc
-    total: false
-  - name: finalstatus_on
-    label: Approval / Rejection On
-    type: string
-    source: obpas_noc
-    total: false
-  - name: final_status
-    label: Application status
-    type: string
-    source: obpas_noc
-    total: false
-  - name: sla_status
-    label: sla status
-    type: string
-    source: obpas_noc
-    total: false
-  - name: sla_days
-    label: SLA Days
-    type: string
-    source: obpas_noc
-    total: false
-  - name: employee_name
-    label: employee_name
-    type: string
-    source: obpas_noc
-    total: false
-  - name: employee_code
-    label: Employee Code / Current Holder Code
-    type: string
-    source: obpas_noc
-    total: false
-  searchParams:
-  - name: fromDate
-    label: From Date
-    type: epoch
-    source: obpas_noc
-    isMandatory: false
-    searchClause: AND n.createdtime >= $fromDate
-  - name: toDate
-    label: To Date
-    type: epoch
-    source: obpas_noc
-    isMandatory: false
-    searchClause: AND n.createdtime <= $toDate
-  query: |
+    groupby: GROUP BY n.applicationno,n.applicationstatus, n.vasikadate,
+      n.vasikanumber,ad.additionaldetails
+    orderby: ORDER BY n.vasikadate
+  - reportName: SLAReportNOC
+    decryptionPathId: LAYOUTREPORTS
+    summary: SLA report for noc service
+    version: 1.0.0
+    moduleName: obpas_noc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: obpas_noc
+        total: false
+      - name: noc_application_no
+        label: Application Number
+        type: string
+        source: obpas_noc
+        total: false
+      - name: field_inspection_on
+        label: Field Inspection On
+        type: string
+        source: obpas_noc
+        total: false
+      - name: finalstatus_on
+        label: Approval / Rejection On
+        type: string
+        source: obpas_noc
+        total: false
+      - name: final_status
+        label: Application status
+        type: string
+        source: obpas_noc
+        total: false
+      - name: sla_status
+        label: sla status
+        type: string
+        source: obpas_noc
+        total: false
+      - name: sla_days
+        label: SLA Days
+        type: string
+        source: obpas_noc
+        total: false
+      - name: employee_name
+        label: employee_name
+        type: string
+        source: obpas_noc
+        total: false
+      - name: employee_code
+        label: Employee Code / Current Holder Code
+        type: string
+        source: obpas_noc
+        total: false
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: obpas_noc
+        isMandatory: false
+        searchClause: AND n.createdtime >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: obpas_noc
+        isMandatory: false
+        searchClause: AND n.createdtime <= $toDate
+      - name: district_name
+        label: District
+        type: singlevaluelist
+        pattern: list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS
+          Nagar:SAS
+          Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,:Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS
+          Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh
+          Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri
+          Muktsar Sahib:Sri Muktsar Sahib
+        source: obpas_noc
+        wrapper: true
+        isMandatory: false
+        searchClause: AND u.district  = $district_name
+      - name: ulb
+        label: ULB
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: obpas_noc
+        wrapper: true
+        isMandatory: false
+        searchClause: AND u.ulb_code= $ulb
+    query: >
       -- Use CTE to force query plan, compute & use CTE later     
        WITH wf_detailed AS (
          SELECT 
@@ -344,123 +388,348 @@ ReportDefinitions:
                  ELSE 'Met' END
                 WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
                 THEN 'In-Progress'
-               ELSE 'AWwaiting Field Inspection'
+               ELSE 'Awaiting Field Inspection'
             END AS sla_status,
             ad.employee_name AS employee_name,
             ad.employee_code AS employee_code
             FROM eg_noc n
             LEFT JOIN status_times st ON n.applicationno = st.uuid
             LEFT JOIN latest_status ls ON n.applicationno = ls.uuid
+            inner join ulb_data u on u.ulb_code=n.tenantid
             JOIN sla_data sla ON sla.businessservice in ('NOC_MC','NOC_NP')
             LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
             WHERE UPPER(ls.applicationstatus) NOT IN ('INITIATED','CANCELLED')
-  orderby:  ORDER BY n.createdtime DESC, tenantid, final_status
+    orderby: ORDER BY n.createdtime DESC, tenantid, final_status
+  - reportName: officers_with_highest_pendency
+    summary: Top 7 officers with Highest Pendency
+    version: 1.0.0
+    moduleName: obpas_noc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: ulb_name
+        label: ULB Name
+        type: string
+        source: obpas_noc
+        total: false
+      - name: Officer_Designation
+        label: Officer Designation
+        type: string
+        source: obpas_noc
+        total: false
+      - name: pending_files
+        label: Pending Files
+        type: string
+        source: obpas_noc
+        total: true
+    searchParams:
+      - name: businessservice
+        label: Business Service
+        type: singlevaluelist
+        pattern: list://NOC_MC:Municipal Corporation,NOC_NP:Municipal
+          Council,NOC_NP:Nagar Panchayat
+        source: obpas_noc
+        isMandatory: false
+        searchClause: AND businessservice = $businessservice
+      - name: ulb
+        label: ulb
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: obpas_noc
+        isMandatory: false
+        searchClause: AND tenantid = $ulb
+      - name: district_name
+        label: District
+        type: singlevaluelist
+        pattern: list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS
+          Nagar:SAS
+          Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,:Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS
+          Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh
+          Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri
+          Muktsar Sahib:Sri Muktsar Sahib
+        source: obpas_noc
+        wrapper: true
+        isMandatory: false
+        searchClause: AND u.district  = $district_name
+    query: >
+      WITH latest_assignee AS (
+        SELECT DISTINCT ON (wf.businessid)
+          wf.businessid,st.applicationstatus,
+          wf.tenantid,
+          wf.businessservice,
+          d.name AS designation_code
+        FROM eg_wf_processinstance_v2 wf
+        JOIN eg_wf_state_v2 st    ON wf.status = st.uuid
+        LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+        LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+        inner JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
+        inner join designation d on a.designation = d.code
+         WHERE wf.businessservice in ('NOC_MC','NOC_NP')
+        ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+      ),    
 
+      pending_files AS (
+        SELECT
+          id::text AS noc_id,
+          applicationno,
+          tenantid,
+          status
+        FROM eg_noc
+        WHERE status NOT IN (
+            'INITIATED',
+            'CANCELLED'
+          )
+      ),    
 
-- reportName: CollectionsReportNOC
-  decryptionPathId: LAYOUTREPORTS
-  summary: Collections
-  version: 1.0.0
-  moduleName: rainmaker-obpas_noc
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: applicationno
-    label: applicationno
-    type: string
-    source: obpas_noc
-    total: false
-  - name: name
-    label: name
-    type: string
-    source: obpas_noc
-    total: false
-  - name: mobilenumber
-    label: mobilenumber
-    type: string
-    source: obpas_noc
-    total: false
-  - name: businessservice
-    label: businessservice
-    type: string
-    source: obpas_noc
-    total: false
-  - name: applicationstatus
-    label: applicationstatus
-    type: string
-    source: obpas_noc
-    total: false
-  - name: collector_code
-    label: collector_code
-    type: string
-    source: obpas_noc
-    total: false
-  - name: cash_amount
-    label: cash_amount
-    type: string
-    source: obpas_noc
-    total: true
-  - name: cheque_amount
-    label: cheque_amount
-    type: string
-    source: obpas_noc
-    total: true
-  - name: card_amount
-    label: card_amount
-    type: string
-    source: obpas_noc
-    total: true
-  - name: dd_amount
-    label: dd_amount
-    type: string
-    source: obpas_noc
-    total: true
-  - name: neft_amount
-    label: neft_amount
-    type: string
-    source: obpas_noc
-    total: true
-  - name: rtgs_amount
-    label: rtgs_amount
-    type: string
-    source: obpas_noc
-    total: true
-  - name: online_amount
-    label: online_amount
-    type: string
-    source: obpas_noc
-    total: true
-  - name: amountpaid
-    label: amountpaid
-    type: string
-    source: obpas_noc
-    total: true
-  - name: payment_date
-    label: Payment_Date
-    type: string
-    source: obpas_noc
-    total: false
-  searchParams:
-  - name: fromDate
-    label: fromDate
-    type: epoch
-    source: obpas_noc
-    isMandatory: false
-    searchClause: AND createdtime >= $fromDate
-  - name: toDate
-    label: toDate
-    type: epoch
-    source: obpas_noc
-    isMandatory: false
-    searchClause: AND createdtime <= $toDate
-  - name: collector_code
-    label: collector_code
-    type: string
-    source: obpas_noc
-    isMandatory: false
-    searchClause: AND collector_code = $collector_code
-  query: |
+      merged AS (
+        SELECT
+          la.tenantid, 
+          INITCAP(REPLACE(la.tenantid, 'pb.', '')) AS ulb_name,
+          la.designation_code,
+          la.businessservice,
+          COUNT(DISTINCT p.noc_id) AS pending_files
+        FROM latest_assignee la
+        LEFT JOIN pending_files p
+          ON (
+               p.noc_id = la.businessid
+            OR p.applicationno = la.businessid
+          )
+        GROUP BY la.tenantid, INITCAP(REPLACE(la.tenantid, 'pb.', '')), la.designation_code, la.businessservice
+      )      
+
+      SELECT
+        ROW_NUMBER() OVER (ORDER BY pending_files DESC) AS Serial_No,
+        ulb_name ,businessservice,
+        designation_code as Officer_Designation,
+        pending_files 
+      FROM merged  m
+
+      inner join ulb_data u on u.name_of_ulb=m.ulb_name
+
+      where  designation_code <> 'Clerk' and designation_code <> 'Accountant'
+    orderby: ORDER BY pending_files DESC limit 7
+  - reportName: BeyondTimelineSummary
+    summary: Summary of district-ulb wise application which breached its SLA
+    version: 1.0.0
+    moduleName: obpas_noc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: district
+        label: District
+        type: string
+        source: obpas_bpa
+        total: false
+      - name: name_of_ulb
+        label: ULB Name
+        type: string
+        source: obpas_bpa
+        total: false
+      - name: beyond_timeline_count
+        label: Beyond Timeline Count
+        type: string
+        source: obpas_bpa
+        total: false
+    searchParams:
+      - name: district
+        label: district
+        type: singlevaluelist
+        pattern: list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS
+          Nagar:SAS
+          Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS
+          Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh
+          Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri
+          Muktsar Sahib:Sri Muktsar Sahib
+        source: obpas_bpa
+        isMandatory: false
+        searchClause: AND u.district = $district
+      - name: ulb
+        label: ulb
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: obpas_bpa
+        isMandatory: false
+        searchClause: AND u.name_of_ulb= $ulb
+      - name: businessservice
+        label: businesservice
+        type: singlevaluelist
+        pattern: list://NOC_MC:Municipal Corporation,NOC_NP:Nagar
+          Panchayat,NOC_NP:Municipal Council
+        source: obpas_bpa
+        isMandatory: false
+        searchClause: AND sc.businessservice = $businessservice
+    query: >
+      WITH wf_detailed AS (
+         SELECT
+           wf.businessid AS uuid,
+           wf.businessservice,UPPER(st.applicationstatus) AS applicationstatus,
+           wf.tenantid,
+           wf.createdtime,
+           wf.lastmodifiedtime,
+           st.applicationstatus,
+           st.state,
+           st.sla AS state_sla
+           FROM eg_wf_processinstance_v2 wf
+           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+           WHERE wf.businessservice IN ('NOC_MC','NOC_NP')
+           and st.applicationstatus not in ('CANCELLED')]          
+       ),
+      inspection_time AS (
+          SELECT
+           uuid,
+             MAX(CASE  WHEN applicationstatus = 'FIELDINSPECTION_INPROGRESS'  THEN createdtime  END
+              ) AS inspection_start
+           FROM wf_detailed
+          GROUP BY uuid
+          ), 
+      latest_status AS (
+         SELECT DISTINCT ON (uuid)
+           uuid,
+           businessservice,
+           tenantid,
+           applicationstatus ,
+           state AS current_state,
+           lastmodifiedtime
+           FROM wf_detailed
+           ORDER BY uuid, lastmodifiedtime DESC
+           ),
+      sla_data AS (
+         SELECT
+           businessservice, businessservicesla
+           FROM eg_wf_businessservice_v2
+           WHERE businessservice IN ('NOC_MC','NOC_NP')
+           ),
+      sla_calc AS (
+         SELECT
+           ls.uuid,
+           ls.tenantid,
+           ls.businessservice,
+           it.inspection_start,
+           ls.lastmodifiedtime,
+           sla.businessservicesla,
+           CASE WHEN(ls.lastmodifiedtime - it.inspection_start) > sla.businessservicesla  THEN 'BREACHED' ELSE 'MET'
+           END AS timeline_status
+           FROM latest_status ls
+           JOIN inspection_time it ON ls.uuid = it.uuid
+           JOIN sla_data sla  ON sla.businessservice = ls.businessservice
+           WHERE it.inspection_start IS NOT NULL
+           )
+       SELECT
+          u.district,
+          u.name_of_ulb,
+          COUNT(CASE WHEN sc.timeline_status = 'MET' THEN 1 END) AS met_count,
+          COUNT(CASE WHEN sc.timeline_status = 'BREACHED' THEN 1 END) AS beyond_timeline_count
+          FROM sla_calc sc
+          JOIN ulb_data u ON sc.tenantid = u.ulb_code
+          WHERE 1=1
+    groupby: GROUP BY u.district, u.name_of_ulb
+    orderby: ORDER BY u.district, u.name_of_ulb DESC
+  - reportName: CollectionsReportNOC
+    decryptionPathId: LAYOUTREPORTS
+    summary: Collections
+    version: 1.0.0
+    moduleName: obpas_noc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: applicationno
+        label: applicationno
+        type: string
+        source: obpas_noc
+        total: false
+      - name: name
+        label: name
+        type: string
+        source: obpas_noc
+        total: false
+      - name: mobilenumber
+        label: mobilenumber
+        type: string
+        source: obpas_noc
+        total: false
+      - name: businessservice
+        label: businessservice
+        type: string
+        source: obpas_noc
+        total: false
+      - name: applicationstatus
+        label: applicationstatus
+        type: string
+        source: obpas_noc
+        total: false
+      - name: collector_code
+        label: collector_code
+        type: string
+        source: obpas_noc
+        total: false
+      - name: cash_amount
+        label: cash_amount
+        type: string
+        source: obpas_noc
+        total: true
+      - name: cheque_amount
+        label: cheque_amount
+        type: string
+        source: obpas_noc
+        total: true
+      - name: card_amount
+        label: card_amount
+        type: string
+        source: obpas_noc
+        total: true
+      - name: dd_amount
+        label: dd_amount
+        type: string
+        source: obpas_noc
+        total: true
+      - name: neft_amount
+        label: neft_amount
+        type: string
+        source: obpas_noc
+        total: true
+      - name: rtgs_amount
+        label: rtgs_amount
+        type: string
+        source: obpas_noc
+        total: true
+      - name: online_amount
+        label: online_amount
+        type: string
+        source: obpas_noc
+        total: true
+      - name: amountpaid
+        label: amountpaid
+        type: string
+        source: obpas_noc
+        total: true
+      - name: payment_date
+        label: Payment_Date
+        type: string
+        source: obpas_noc
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: obpas_noc
+        isMandatory: false
+        searchClause: AND createdtime >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: obpas_noc
+        isMandatory: false
+        searchClause: AND createdtime <= $toDate
+      - name: collector_code
+        label: collector_code
+        type: string
+        source: obpas_noc
+        isMandatory: false
+        searchClause: AND collector_code = $collector_code
+    query: >
       WITH current_holder AS (
         SELECT DISTINCT ON (wf.businessid)
           wf.businessid AS applicationno,
@@ -476,7 +745,8 @@ ReportDefinitions:
           AND wf.businessservice = 'obpas_noc'
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       ),
-      
+
+
       unique_transactions AS (
         SELECT
           p.id AS transaction_id,
@@ -515,7 +785,8 @@ ReportDefinitions:
           AND upper(p.paymentstatus) != 'CANCELLED'
           AND p.tenantid = $tenantid
       )
-      
+
+
       SELECT
         to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS payment_date,
         applicationno,
@@ -527,114 +798,114 @@ ReportDefinitions:
         collector_code,
         cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
       FROM unique_transactions where 1=1
-  orderby: ORDER BY createdtime DESC 
-
-- reportName: ReceiptRegisterNOC
-  decryptionPathId: LAYOUTREPORTS
-  summary: Details of collector register in noc service
-  version: 1.0.0
-  moduleName: rainmaker-obpas_noc
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: receiptno
-    label: receiptno
-    type: string
-    source: obpas_noc
-    total: false
-  - name: connectionno
-    label: connectionno
-    type: string
-    source: obpas_noc
-    total: false
-  - name: receiptdate
-    label: receiptdate
-    type: string
-    source: obpas_noc
-    total: false
-  - name: service
-    label: service
-    type: string
-    source: obpas_noc
-    total: false
-  - name: collectorname
-    label: collectorname
-    type: string
-    source: obpas_noc
-    total: false
-  - name: transactiondate
-    label: transactiondate
-    type: string
-    source: obpas_noc
-    total: false
-  - name: instrumentnumber
-    label: instrumentnumber
-    type: string
-    source: obpas_noc
-    total: false
-  - name: ownername1
-    label: ownername1
-    type: string
-    source: obpas_noc
-    total: false
-  - name: amountpaid
-    label: amountpaid
-    type: string
-    source: obpas_noc
-    total: false
-  - name: paymentmode
-    label: paymentmode
-    type: string
-    source: obpas_noc
-    total: false
-  - name: paymentstatus
-    label: paymentstatus
-    type: string
-    source: obpas_noc
-    total: false
-  - name: user
-    label: user
-    type: string
-    source: obpas_noc
-    total: false
-  - name: manualreceiptnumber
-    label: manualreceiptnumber
-    type: string
-    source: obpas_noc
-    total: false
-  - name: manualreceiptdate
-    label: manualreceiptdate
-    type: string
-    source: obpas_noc
-    total: false
-  searchParams:
-  - name: fromDate
-    label: fromDate
-    type: epoch
-    source: obpas_noc
-    isMandatory: false
-    searchClause: AND pd.receiptdate >= $fromDate
-  - name: toDate
-    label: toDate
-    type: epoch
-    source: obpas_noc
-    isMandatory: false
-    searchClause: AND pd.receiptdate <= $toDate
-  - name: receiptNumber
-    label: receiptNumber
-    type: string
-    source: obpas_noc
-    isMandatory: false
-    searchClause: AND pd.receiptnumber like $receiptNumber
-  - name: paymentMode
-    label: paymentMode
-    type: singlevaluelist
-    pattern: 'list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT'
-    source: obpas_noc
-    isMandatory: false
-    searchClause: AND payment.paymentmode like $paymentMode
-  query: |
+    orderby: ORDER BY createdtime DESC
+  - reportName: ReceiptRegisterNOC
+    decryptionPathId: LAYOUTREPORTS
+    summary: Details of collector register in noc service
+    version: 1.0.0
+    moduleName: obpas_noc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: receiptno
+        label: receiptno
+        type: string
+        source: obpas_noc
+        total: false
+      - name: connectionno
+        label: connectionno
+        type: string
+        source: obpas_noc
+        total: false
+      - name: receiptdate
+        label: receiptdate
+        type: string
+        source: obpas_noc
+        total: false
+      - name: service
+        label: service
+        type: string
+        source: obpas_noc
+        total: false
+      - name: collectorname
+        label: collectorname
+        type: string
+        source: obpas_noc
+        total: false
+      - name: transactiondate
+        label: transactiondate
+        type: string
+        source: obpas_noc
+        total: false
+      - name: instrumentnumber
+        label: instrumentnumber
+        type: string
+        source: obpas_noc
+        total: false
+      - name: ownername1
+        label: ownername1
+        type: string
+        source: obpas_noc
+        total: false
+      - name: amountpaid
+        label: amountpaid
+        type: string
+        source: obpas_noc
+        total: false
+      - name: paymentmode
+        label: paymentmode
+        type: string
+        source: obpas_noc
+        total: false
+      - name: paymentstatus
+        label: paymentstatus
+        type: string
+        source: obpas_noc
+        total: false
+      - name: user
+        label: user
+        type: string
+        source: obpas_noc
+        total: false
+      - name: manualreceiptnumber
+        label: manualreceiptnumber
+        type: string
+        source: obpas_noc
+        total: false
+      - name: manualreceiptdate
+        label: manualreceiptdate
+        type: string
+        source: obpas_noc
+        total: false
+    searchParams:
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: obpas_noc
+        isMandatory: false
+        searchClause: AND pd.receiptdate >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: obpas_noc
+        isMandatory: false
+        searchClause: AND pd.receiptdate <= $toDate
+      - name: receiptNumber
+        label: receiptNumber
+        type: string
+        source: obpas_noc
+        isMandatory: false
+        searchClause: AND pd.receiptnumber like $receiptNumber
+      - name: paymentMode
+        label: paymentMode
+        type: singlevaluelist
+        pattern: list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE
+          NEFT
+        source: obpas_noc
+        isMandatory: false
+        searchClause: AND payment.paymentmode like $paymentMode
+    query: >
       SELECT
           pd.receiptnumber AS receiptno,
           bill.consumercode AS connectionno,
@@ -657,6 +928,7 @@ ReportDefinitions:
           pd.manualreceiptnumber,
           pd.manualreceiptdate
       FROM egcl_paymentdetail pd
+
       INNER JOIN egcl_bill bill 
           ON bill.id = pd.billid 
           AND pd.tenantid = $tenantid
@@ -674,4 +946,4 @@ ReportDefinitions:
           bill.tenantid = $tenantid
           AND pd.businessservice = 'obpas_noc'
           AND payment.paymentstatus != 'CANCELLED'
-  orderby: ORDER BY pd.receiptdate DESC;
+    orderby: ORDER BY pd.receiptdate DESC;
