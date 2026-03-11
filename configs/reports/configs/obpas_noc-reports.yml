@@ -1,36 +1,260 @@
 ---
 ReportDefinitions:
 - reportName: ApplicationDetailReportNOC
+  summary: Details of file for NOC  per ULB
+  version: 1.0.0
+  moduleName: rainmaker-obpas_noc
+  sourceColumns:
+  - name: applicationno
+    label: Application Number
+    type: string
+    source: rainmaker-obpas_noc
+    total: false
+  - name: applicationstatus
+    label: Application Status
+    type: string
+    source: rainmaker-obpas_noc
+    total: false
+  - name: vasikadate
+    label: Vasika Date
+    type: string
+    source: rainmaker-obpas_noc
+    total: false
+  - name: vasikanumber
+    label: Vasika Number
+    type: string
+    source: rainmaker-obpas_noc
+    total: false
+  - name: plot_no
+    label: Plot Number
+    type: string
+    source: rainmaker-obpas_noc
+    total: false
+  - name: khasra_no
+    label: Khasra Number
+    type: string
+    source: rainmaker-obpas_noc
+    total: false
+  - name: village_name
+    label: Village Name
+    type: string
+    source: rainmaker-obpas_noc
+    total: false
+  - name: ULB_type
+    label: ULB Type
+    type: string
+    source: rainmaker-obpas_noc
+    total: false
+  - name: road_type
+    label: Road Type
+    type: string
+    source: rainmaker-obpas_noc
+    total: false
+  - name: site_address
+    label: Site Address
+    type: string
+    source: rainmaker-obpas_noc
+    total: false
+  - name: total_floor_area
+    label: Total Floor Area
+    type: number
+    source: rainmaker-obpas_noc
+    total: false
+  - name: basement_area
+    label: Basement Area
+    type: number
+    source: rainmaker-obpas_noc
+    total: false
+  - name: building_status
+    label: Building Status
+    type: string
+    source: rainmaker-obpas_noc
+    total: false
+  - name: net_plot_area
+    label: Net Plot Area
+    type: number
+    source: rainmaker-obpas_noc
+    total: false
+  - name: road_widening_area
+    label: Area Left For Road Widening
+    type: number
+    source: rainmaker-obpas_noc
+    total: false
+  - name: road_width
+    label: Road Width At Site
+    type: number
+    source: rainmaker-obpas_noc
+    total: false
+  - name: building_category
+    label: Building Category
+    type: string
+    source: rainmaker-obpas_noc
+    total: false
+  - name: applicant_name
+    label: Applicant Name
+    type: string
+    source: rainmaker-obpas_noc
+    total: false
+  - name: applicant_mobile
+    label: Applicant Mobile
+    type: string
+    source: rainmaker-obpas_noc
+    total: false
+  - name: professional_name
+    label: Professional Name
+    type: string
+    source: rainmaker-obpas_noc
+    total: false
+  - name: professional_reg_id
+    label: Professional Registration ID
+    type: string
+    source: rainmaker-obpas_noc
+    total: false
+  - name: professional_mobile
+    label: Professional Mobile
+    type: string
+    source: rainmaker-obpas_noc
+    total: false
+  searchParams:
+  - name: fromDate
+    label: From Date
+    type: epoch
+    source: rainmaker-obpas_noc
+    isMandatory: false
+    searchClause: n.createdtime >= $fromDate
+  - name: toDate
+    label: To Date
+    type: epoch
+    source: rainmaker-obpas_noc
+    isMandatory: false
+    searchClause: n.createdtime <= $toDate
+  - name: ulb
+    label: ULB
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: rainmaker-obpas_noc
+    wrapper: true
+    isMandatory: false
+    searchClause: AND n.tenantid = $ulb
+  - name: applicationstatus
+    label: Application Status
+    type: singlevaluelist
+    pattern: 'list://JC_VERIFICATION_PENDING:JC Verification Pending,DOCUMENTVERIFY:Document Verify,ATP_VERIFICATION_PENDING:ATP Verification Pending,MTP_VERIFICATION_PENDING:MTP Verification Pending,PENDINGAPPROVAL:Pending Approval,E-SIGNED:E-Signed,FIELDINSPECTION_INPROGRESS:Field Inspection In Progress,REJECTED:Rejected,APPROVED:Approved,EO_VERIFICATION_PENDING:EO Verification Pending,INSPECTION_REPORT_PENDING:Inspection Report Pending'
+    source: rainmaker-obpas_noc
+    wrapper: true
+    isMandatory: false
+    searchClause: AND n.applicationstatus = $applicationstatus
+  - name: ULB_Type
+    label: ULB Type
+    type: string
+    source: rainmaker-obpas_noc
+    wrapper: true
+    isMandatory: false
+    searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails'-> 'ulbName' ->'city' ->> 'ulbType' = $ULB_Type
+  - name: road_type
+    label: Road Type
+    type: string
+    source: rainmaker-obpas_noc
+    wrapper: true
+    isMandatory: false
+    searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails' -> 'roadType' ->> 'name' = $road_type
+  - name: building_status
+    label: Building Status
+    type: string
+    source: rainmaker-obpas_noc
+    wrapper: true
+    isMandatory: false
+    searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails' -> 'buildingStatus' ->> 'name'  = $building_status
+  - name: district_name
+    label: District
+    type: string
+    source: rainmaker-obpas_noc
+    wrapper: true
+    isMandatory: false
+    searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails' -> 'ulbName' ->'city'->>'districtName'  = $district_name
+  - name: building_category
+    label: Building Category
+    type: string
+    source: rainmaker-obpas_noc
+    wrapper: true
+    isMandatory: false
+    searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails' -> 'specificationBuildingCategory' ->> 'name' = $building_category
+
+
+  query: |
+      select n.applicationno,n.applicationstatus,n.vasikadate,n.vasikanumber,
+             ad.additionaldetails::jsonb -> 'siteDetails' -> 'zone' ->> 'name' AS zone_name,
+             ad.additionaldetails::jsonb -> 'siteDetails' ->> 'plotNo' AS plot_no,
+             ad.additionaldetails::jsonb -> 'siteDetails' ->> 'wardNo' AS ward_no,
+             ad.additionaldetails::jsonb -> 'siteDetails' ->> 'khasraNo' AS khasra_no,
+             ad.additionaldetails::jsonb -> 'siteDetails' ->> 'villageName' AS village_name,
+             ad.additionaldetails::jsonb -> 'siteDetails' ->> 'hadbastNo' AS hadbast_no,
+             ad.additionaldetails::jsonb -> 'siteDetails' -> 'ulbName' ->'city' ->> 'ddrName'  AS DDR_Name,
+             ad.additionaldetails::jsonb -> 'siteDetails'-> 'ulbName' ->'city' ->> 'ulbType'  AS ULB_Type,
+             ad.additionaldetails::jsonb -> 'siteDetails' -> 'ulbName' ->'city'->> 'ulbGrade'  AS ULB_Grade,
+             ad.additionaldetails::jsonb -> 'siteDetails' -> 'ulbName'->'city'->> 'regionName'  AS Region_Name,
+             ad.additionaldetails::jsonb -> 'siteDetails' -> 'roadType' ->> 'name' AS road_type,
+             ad.additionaldetails::jsonb -> 'siteDetails' ->> 'proposedSiteAddress' AS site_address,
+             ad.additionaldetails::jsonb -> 'siteDetails' ->> 'totalFloorArea' AS total_floor_area,
+             ad.additionaldetails::jsonb -> 'siteDetails' ->> 'basementArea' AS basement_area,
+             ad.additionaldetails::jsonb -> 'siteDetails' -> 'ulbName' ->'city'->>'districtName'  AS district_name,
+             ad.additionaldetails::jsonb -> 'siteDetails' -> 'buildingStatus' ->> 'name' AS building_status,
+             ad.additionaldetails::jsonb -> 'siteDetails' ->> 'specificationPlotArea' AS specification_plot_area,
+             ad.additionaldetails::jsonb -> 'siteDetails' ->> 'netPlotAreaAfterWidening' AS net_plot_area,
+             ad.additionaldetails::jsonb -> 'siteDetails' ->> 'areaLeftForRoadWidening' AS road_widening_area,
+             ad.additionaldetails::jsonb -> 'siteDetails' ->> 'roadWidthAtSite' AS road_width,
+             ad.additionaldetails::jsonb -> 'siteDetails' -> 'specificationBuildingCategory' ->> 'name' AS building_category,
+             ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'applicantOwnerOrFirmName' AS applicant_name,
+             ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'applicantMobileNumber' AS applicant_mobile,
+             ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'professionalName' AS professional_name,
+             ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'professionalRegId' AS professional_reg_id,
+             ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'professionalMobileNumber' AS professional_mobile
+          FROM eg_noc n
+          LEFT JOIN eg_noc_details ad ON ad.nocid = n.id
+         WHERE n.applicationstatus not in ('INITIATED', 'CANCELLED','PENDINGPAYMENT','CITIZENACTIONREQUIRED')
+  groupby: GROUP BY n.applicationno,n.applicationstatus, n.vasikadate, n.vasikanumber,ad.additionaldetails
+  orderby: ORDER BY n.vasikadate
+- reportName: SLAReportNOC
   decryptionPathId: LAYOUTREPORTS
-  summary: Details of applicant in noc service
+  summary: SLA report for noc service
   version: 1.0.0
   moduleName: rainmaker-obpas_noc
   additionalConfig:
     print:
       pdfPageSize: A1
   sourceColumns:
-  - name: name
-    label: name
+  - name: tenantid
+    label: tenantid
     type: string
     source: obpas_noc
     total: false
-  - name: mobilenumber
-    label: mobilenumber
+  - name: noc_application_no
+    label: Application Number
     type: string
     source: obpas_noc
     total: false
-  - name: applicationstatus
-    label: applicationstatus
+  - name: field_inspection_on
+    label: Field Inspection On
     type: string
     source: obpas_noc
     total: false
-  - name: businessservice
-    label: businessservice
+  - name: finalstatus_on
+    label: Approval / Rejection On
     type: string
     source: obpas_noc
     total: false
-  - name: applicationno
-    label: applicationno
+  - name: final_status
+    label: Application status
+    type: string
+    source: obpas_noc
+    total: false
+  - name: sla_status
+    label: sla status
+    type: string
+    source: obpas_noc
+    total: false
+  - name: sla_days
+    label: SLA Days
     type: string
     source: obpas_noc
     total: false
@@ -40,61 +264,105 @@ ReportDefinitions:
     source: obpas_noc
     total: false
   - name: employee_code
-    label: employee_code
+    label: Employee Code / Current Holder Code
     type: string
     source: obpas_noc
     total: false
   searchParams:
   - name: fromDate
-    label: fromDate
+    label: From Date
     type: epoch
     source: obpas_noc
     isMandatory: false
-    searchClause: AND a.createdtime >= $fromDate
+    searchClause: AND n.createdtime >= $fromDate
   - name: toDate
-    label: toDate
+    label: To Date
     type: epoch
     source: obpas_noc
     isMandatory: false
-    searchClause: AND a.createdtime <= $toDate
-  - name: applicationstatus
-    label: Application status
-    type: singlevaluelist
-    pattern: list://INITIATED:INITIATED,PENDINGPAYMENT:PENDINGPAYMENT,DOCUMENTVERIFY:DOCUMENTVERIFY,APPROVED:APPROVED, REJECTED:REJECTED,TL-VERIFICATION:TL-VERIFICATION,WS-SW-VERIFICATION:WS-SW-VERIFICATION ,CITIZENACTIONREQUIRED-DV:CITIZENACTIONREQUIRED-DV,BPA-VERIFICATION:BPA-VERIFICATION,PENDINGAPPROVAL:PENDINGAPPROVAL,CANCELLED:CANCELLED,PT-VERIFICATION:PT-VERIFICATION,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
-    source: obpas_noc
-    isMandatory: false
-    searchClause: AND LOWER(a.applicationstatus) = LOWER($applicationstatus)
+    searchClause: AND n.createdtime <= $toDate
   query: |
-      WITH current_holder AS (
-        SELECT DISTINCT ON (wf.businessid)
-          wf.businessid AS applicationno,
-          u.name AS assignee_name,
-          e.code AS assignee_code,
-          UPPER(st.applicationstatus) AS current_stage
-        FROM eg_wf_processinstance_v2 wf
-        JOIN eg_wf_state_v2 st    ON wf.status = st.uuid
-        LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
-        LEFT JOIN eg_user u       ON u.uuid = wa.assignee
-        LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        WHERE wf.tenantid = $tenantid
-          AND wf.businessservice = 'obpas_noc'    -- adjust if your workflow uses a different businessservice string
-        ORDER BY wf.businessid, wf.lastmodifiedtime DESC
-      )
-      
-      SELECT
-        u.name,
-        u.mobilenumber,
-        a.applicationstatus,
-        'NOC' AS businessservice,
-        a.applicationno,
-        ch.assignee_name  AS employee_name,
-        ch.assignee_code  AS employee_code
-      FROM eg_noc a
-      JOIN eg_noc_owner o   ON a.id = o.nocid            -- owner.nocid references eg_noc.id
-      JOIN eg_user u        ON u.uuid = o.uuid           -- owner.uuid references eg_user.uuid
-      JOIN eg_noc_details d ON d.nocid = o.nocid         -- details.nocid references the same noc id
-      LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno
-      WHERE a.tenantid = $tenantid  
+      -- Use CTE to force query plan, compute & use CTE later     
+       WITH wf_detailed AS (
+         SELECT 
+           wf.businessid AS uuid, 
+           wf.businessservice,
+           UPPER(st.applicationstatus) AS applicationstatus,
+           wf.createdtime,
+           wf.lastmodifiedtime,
+           wf.businessservicesla,
+           wf.tenantid,
+           wf.id AS processinstanceid
+          FROM eg_wf_processinstance_v2 wf
+          JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+          WHERE wf.tenantid = $tenantid
+         AND wf.businessservice IN ('NOC_MC','NOC_NP')                      
+          ),
+        status_times AS (
+             SELECT
+                uuid,
+                MAX(CASE WHEN applicationstatus = 'FIELDINSPECTION_INPROGRESS' THEN createdtime END) AS docverify_time,
+                MAX(CASE WHEN applicationstatus IN ('APPROVED','REJECTED','E-SIGNED') THEN lastmodifiedtime END) AS final_time
+              FROM wf_detailed
+              GROUP BY uuid
+             ),
+        latest_status AS (
+              SELECT uuid, applicationstatus
+                 FROM (
+                      SELECT uuid, applicationstatus, lastmodifiedtime,
+                         ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY lastmodifiedtime DESC NULLS LAST) AS rn
+                          FROM wf_detailed
+                        ) x WHERE rn = 1
+                     ),
+        sla_data AS (
+            SELECT businessservice,businessservicesla
+            FROM eg_wf_businessservice_v2
+            WHERE businessservice IN ('NOC_MC','NOC_NP')
+           ),
+        assignee_details AS (
+             SELECT DISTINCT ON (wf.businessid)
+                 wf.businessid,
+                 e.code AS employee_code,
+                 u.name AS employee_name
+              FROM eg_wf_processinstance_v2 wf
+              JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+              JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+              JOIN eg_user u ON e.uuid = u.uuid
+               WHERE wf.tenantid = $tenantid
+               AND wf.businessservice IN ('NOC_MC','NOC_NP')
+              ORDER BY wf.businessid,wf.lastmodifiedtime DESC
+               )
+         SELECT
+            split_part(n.tenantid,'.',2) AS tenantid,
+             n.applicationno AS noc_application_no,                 
+             UPPER(ls.applicationstatus) AS final_status,
+            TO_CHAR(TO_TIMESTAMP(st.docverify_time/1000),'DD-MM-YYYY') AS field_inspection_on,
+            TO_CHAR(TO_TIMESTAMP(st.final_time/1000),'DD-MM-YYYY') AS finalstatus_on,   
+            CASE
+              WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL
+               THEN FLOOR((st.final_time-st.docverify_time)/86400000)
+              WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
+               THEN FLOOR((EXTRACT(EPOCH FROM NOW())*1000-st.docverify_time)/86400000)
+             ELSE NULL
+            END AS sla_days,
+            CASE
+               WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL THEN
+            CASE WHEN (st.final_time-st.docverify_time) > sla.businessservicesla THEN 'Breached'
+                 ELSE 'Met' END
+                WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
+                THEN 'In-Progress'
+               ELSE 'AWwaiting Field Inspection'
+            END AS sla_status,
+            ad.employee_name AS employee_name,
+            ad.employee_code AS employee_code
+            FROM eg_noc n
+            LEFT JOIN status_times st ON n.applicationno = st.uuid
+            LEFT JOIN latest_status ls ON n.applicationno = ls.uuid
+            JOIN sla_data sla ON sla.businessservice in ('NOC_MC','NOC_NP')
+            LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
+            WHERE UPPER(ls.applicationstatus) NOT IN ('INITIATED','CANCELLED')
+  orderby:  ORDER BY n.createdtime DESC, tenantid, final_status
+
 
 - reportName: CollectionsReportNOC
   decryptionPathId: LAYOUTREPORTS
@@ -267,155 +535,7 @@ ReportDefinitions:
         cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
       FROM unique_transactions where 1=1
   orderby: ORDER BY createdtime DESC 
-  
-- reportName: SLAReportNOC
-  decryptionPathId: LAYOUTREPORTS
-  summary: SLA report for noc service
-  version: 1.0.0
-  moduleName: rainmaker-obpas_noc
-  additionalConfig:
-    print:
-      pdfPageSize: A1
-  sourceColumns:
-  - name: tenantid
-    label: tenantid
-    type: string
-    source: obpas_noc
-    total: false
-  - name: noc_application_no
-    label: Application Number
-    type: string
-    source: obpas_noc
-    total: false
-  - name: document_verify_on
-    label: Document Verified On
-    type: string
-    source: obpas_noc
-    total: false
-  - name: finalstatus_on
-    label: Approval / Rejection On
-    type: string
-    source: obpas_noc
-    total: false
-  - name: final_status
-    label: Application status
-    type: string
-    source: obpas_noc
-    total: false
-  - name: sla_status
-    label: sla status
-    type: string
-    source: obpas_noc
-    total: false
-  - name: sla_days
-    label: SLA Days 
-    type: string
-    source: obpas_noc
-    total: false
-  - name: employee_name
-    label: employee_name
-    type: string
-    source: obpas_noc
-    total: false
-  - name: employee_code
-    label: Employee Code / Current Holder Code
-    type: string
-    source: obpas_noc
-    total: false
-  searchParams:
-  - name: fromDate
-    label: From Date
-    type: epoch
-    source: obpas_noc
-    isMandatory: false
-    searchClause: AND n.createdtime >= $fromDate
-  - name: toDate
-    label: To Date
-    type: epoch
-    source: obpas_noc
-    isMandatory: false
-    searchClause: AND n.createdtime <= $toDate
-  query: |
-      -- Use CTE to force query plan, compute & use CTE later     
-       WITH wf_detailed AS (
-         SELECT 
-           wf.businessid AS uuid,                                 
-           UPPER(st.applicationstatus) AS applicationstatus,
-           wf.createdtime,
-           wf.lastmodifiedtime,
-           wf.businessservicesla,
-           wf.tenantid,
-           wf.id AS processinstanceid
-          FROM eg_wf_processinstance_v2 wf
-          JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-          WHERE wf.tenantid = $tenantid
-         AND wf.businessservice = 'obpas_noc'                    
-          ),
-        status_times AS (
-             SELECT
-                uuid,
-                MAX(CASE WHEN applicationstatus = 'DOCUMENTVERIFY' THEN createdtime END) AS docverify_time,
-                MAX(CASE WHEN applicationstatus IN ('APPROVED','REJECTED') THEN lastmodifiedtime END) AS final_time
-              FROM wf_detailed
-              GROUP BY uuid
-             ),
-        latest_status AS (
-              SELECT uuid, applicationstatus
-                 FROM (
-                      SELECT uuid, applicationstatus, lastmodifiedtime,
-                         ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY lastmodifiedtime DESC NULLS LAST) AS rn
-                          FROM wf_detailed
-                        ) x WHERE rn = 1
-                     ),
-        sla_data AS (
-            SELECT businessservice,businessservicesla
-            FROM eg_wf_businessservice_v2
-            WHERE businessservice = 'obpas_noc'
-           ),
-        assignee_details AS (
-             SELECT DISTINCT ON (wf.businessid)
-                 wf.businessid,
-                 e.code AS employee_code,
-                 u.name AS employee_name
-              FROM eg_wf_processinstance_v2 wf
-              JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
-              JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-              JOIN eg_user u ON e.uuid = u.uuid
-               WHERE wf.tenantid = $tenantid
-               AND wf.businessservice = 'obpas_noc'
-              ORDER BY wf.businessid,wf.lastmodifiedtime DESC
-               )
-         SELECT
-            split_part(n.tenantid,'.',2) AS tenantid,
-             n.applicationno AS noc_application_no,                 
-             UPPER(ls.applicationstatus) AS final_status,
-            TO_CHAR(TO_TIMESTAMP(st.docverify_time/1000),'DD-MM-YYYY') AS document_verify_on,
-            TO_CHAR(TO_TIMESTAMP(st.final_time/1000),'DD-MM-YYYY') AS finalstatus_on,   
-            CASE
-              WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL
-               THEN FLOOR((st.final_time-st.docverify_time)/86400000)
-              WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
-               THEN FLOOR((EXTRACT(EPOCH FROM NOW())*1000-st.docverify_time)/86400000)
-             ELSE NULL
-            END AS sla_days,
-            CASE
-               WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL THEN
-            CASE WHEN (st.final_time-st.docverify_time) > sla.businessservicesla THEN 'BREACHED'
-                 ELSE 'MET' END
-                WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
-                THEN 'IN-PROGRESS'
-               ELSE 'AWAITING DOCVERIFY'
-            END AS sla_status,
-            ad.employee_name AS employee_name,
-            ad.employee_code AS employee_code
-            FROM eg_noc n
-            LEFT JOIN status_times st ON n.applicationno = st.uuid
-            LEFT JOIN latest_status ls ON n.applicationno = ls.uuid
-            JOIN sla_data sla ON sla.businessservice='obpas_noc'
-            LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
-            WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')             
-  orderby:  ORDER BY n.createdtime DESC, tenantid, final_status
-  
+
 - reportName: ReceiptRegisterNOC
   decryptionPathId: LAYOUTREPORTS
   summary: Details of collector register in noc service
