@@ -146,41 +146,36 @@ ReportDefinitions:
     searchClause: AND n.applicationstatus = $applicationstatus
   - name: ULB_Type
     label: ULB Type
-    type: string
+    type: singlevaluelist
+    pattern: 'list://Municipal Council:Municipal Council,Municipal Corporation:Municipal Corporation,Nagar Panchayat:Nagar Panchayat'
     source: rainmaker-obpas_noc
     wrapper: true
     isMandatory: false
     searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails'-> 'ulbName' ->'city' ->> 'ulbType' = $ULB_Type
   - name: road_type
     label: Road Type
-    type: string
+    type: singlevaluelist
+    pattern: 'list://National Highway:National Highway,State Highway:State Highway,Major District Road:Major District Road,Bypass/Scheduled Road:Bypass/Scheduled Road,Other Road:Other Road'
     source: rainmaker-obpas_noc
     wrapper: true
     isMandatory: false
     searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails' -> 'roadType' ->> 'name' = $road_type
-  - name: building_status
-    label: Building Status
-    type: string
-    source: rainmaker-obpas_noc
-    wrapper: true
-    isMandatory: false
-    searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails' -> 'buildingStatus' ->> 'name'  = $building_status
   - name: district_name
     label: District
-    type: string
+    type: singlevaluelist
+    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,:Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
     source: rainmaker-obpas_noc
     wrapper: true
     isMandatory: false
     searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails' -> 'ulbName' ->'city'->>'districtName'  = $district_name
   - name: building_category
     label: Building Category
-    type: string
+    type: singlevaluelist
+    pattern: 'list://Residential Plotted:Residential Plotted,Residential Independent Floors:Residential Independent Floors,Commercial:Commercial,Industrial / Warehouse Building:Industrial / Warehouse Building'
     source: rainmaker-obpas_noc
     wrapper: true
     isMandatory: false
     searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails' -> 'specificationBuildingCategory' ->> 'name' = $building_category
-
-
   query: |
       select n.applicationno,n.applicationstatus,n.vasikadate,n.vasikanumber,
              ad.additionaldetails::jsonb -> 'siteDetails' -> 'zone' ->> 'name' AS zone_name,
@@ -190,7 +185,7 @@ ReportDefinitions:
              ad.additionaldetails::jsonb -> 'siteDetails' ->> 'villageName' AS village_name,
              ad.additionaldetails::jsonb -> 'siteDetails' ->> 'hadbastNo' AS hadbast_no,
              ad.additionaldetails::jsonb -> 'siteDetails' -> 'ulbName' ->'city' ->> 'ddrName'  AS DDR_Name,
-             ad.additionaldetails::jsonb -> 'siteDetails'-> 'ulbName' ->'city' ->> 'ulbType'  AS ULB_Type,
+             ad.additionaldetails::jsonb -> 'siteDetails'->> 'ulbType'  AS ULB_Type,
              ad.additionaldetails::jsonb -> 'siteDetails' -> 'ulbName' ->'city'->> 'ulbGrade'  AS ULB_Grade,
              ad.additionaldetails::jsonb -> 'siteDetails' -> 'ulbName'->'city'->> 'regionName'  AS Region_Name,
              ad.additionaldetails::jsonb -> 'siteDetails' -> 'roadType' ->> 'name' AS road_type,
@@ -211,7 +206,7 @@ ReportDefinitions:
              ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'professionalMobileNumber' AS professional_mobile
           FROM eg_noc n
           LEFT JOIN eg_noc_details ad ON ad.nocid = n.id
-         WHERE n.applicationstatus not in ('INITIATED', 'CANCELLED','PENDINGPAYMENT','CITIZENACTIONREQUIRED')
+         WHERE n.applicationstatus not in ('INITIATED', 'CANCELLED','CITIZENACTIONREQUIRED')
   groupby: GROUP BY n.applicationno,n.applicationstatus, n.vasikadate, n.vasikanumber,ad.additionaldetails
   orderby: ORDER BY n.vasikadate
 - reportName: SLAReportNOC
@@ -295,8 +290,7 @@ ReportDefinitions:
            wf.id AS processinstanceid
           FROM eg_wf_processinstance_v2 wf
           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-          WHERE wf.tenantid = $tenantid
-         AND wf.businessservice IN ('NOC_MC','NOC_NP')                      
+          WHERE  wf.businessservice IN ('NOC_MC','NOC_NP')                      
           ),
         status_times AS (
              SELECT
@@ -328,8 +322,7 @@ ReportDefinitions:
               JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
               JOIN eg_hrms_employee e ON e.uuid = wa.assignee
               JOIN eg_user u ON e.uuid = u.uuid
-               WHERE wf.tenantid = $tenantid
-               AND wf.businessservice IN ('NOC_MC','NOC_NP')
+               WHERE  wf.businessservice IN ('NOC_MC','NOC_NP')
               ORDER BY wf.businessid,wf.lastmodifiedtime DESC
                )
          SELECT
