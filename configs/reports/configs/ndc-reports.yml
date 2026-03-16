@@ -266,7 +266,7 @@ ReportDefinitions:
           online_amount,
           amountpaid,
           to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate
-      FROM unique_transactions
+      FROM unique_transactions where 1=1
     orderby: ORDER BY applicationno, createdtime DESC;
     
   - reportName: SLAReport
@@ -851,7 +851,7 @@ ReportDefinitions:
           online_amount,
           amountpaid,
           to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate
-      FROM unique_transactions
+      FROM unique_transactions where 1=1
     orderby: ORDER BY applicationno, createdtime DESC;
     
   - reportName: StateSLAReport
