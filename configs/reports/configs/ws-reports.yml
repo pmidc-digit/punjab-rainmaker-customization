@@ -3860,20 +3860,20 @@ ReportDefinitions:
         label: From Date
         type: epoch
         source: ws
-        isMandatory: true
+        isMandatory: false
         searchClause: AND eg.effectivefrom >= $fromDate
       - name: toDate
         label: To Date
         type: epoch
         source: ws
-        isMandatory: true
-        searchClause: AND and eg.effectivetill <= $toDate
+        isMandatory: false
+        searchClause: AND  eg.effectivetill <= $toDate
       - name: sevicetype
         label: Sevice Type
         type: singlevaluelist
         pattern: list://WS%:Water,SW%:Sewerage
         source: ws
-        isMandatory: true
+        isMandatory: false
         searchClause: AND eg.businessservice = $sevicetype                                                                   
     query:
        select eg.consumercode,eg.amendmentid,
