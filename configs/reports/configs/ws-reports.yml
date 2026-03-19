@@ -3795,4 +3795,96 @@ ReportDefinitions:
       JOIN egbs_bill_v1 b     ON lb.billid = b.id and b.tenantid = $tenantid
       WHERE wc.tenantid = $tenantid
         AND wc.connectionno IS NOT NULL
-        AND wc.status = 'Active'         
+        AND wc.status = 'Active'
+
+  - reportName: Bill_Amendment_Report
+    summary: Bill Amendment Report
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: consumercode
+        type: string
+        source: ws
+        total: false
+      - name: amendmentid
+        label: amendmentid
+        type: string
+        source: ws
+        total: false
+      - name: Amendment_date
+        label: Amendment_date
+        type: string
+        source: ws
+        total: false
+      - name: businessservice
+        label: businessservice
+        type: string
+        source: ws
+        total: false     
+      - name: reasondocumentnumber
+        label: reasondocumentnumber
+        type: string
+        source: ws
+        total: false
+      - name: amendmentreason
+        label: amendmentreason
+        type: string
+        source: ws
+        total: true
+      - name: From_date
+        label: From_date
+        type: string
+        source: ws
+        total: false    
+      - name: To_Date
+        label: To_Date
+        type: string
+        source: ws
+        total: false 
+      - name: taxamount
+        label: taxamount
+        type: string
+        source: ws
+        total: false 
+      - name: status
+        label: status
+        type: string
+        source: ws
+        total: false 
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND eg.effectivefrom >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND and eg.effectivetill <= $toDate
+      - name: sevicetype
+        label: Sevice Type
+        type: singlevaluelist
+        pattern: list://WS%:Water,SW%:Sewerage
+        source: ws
+        isMandatory: true
+        searchClause: AND eg.businessservice = $sevicetype                                                                   
+    query:
+       select eg.consumercode,eg.amendmentid,
+       to_char(to_timestamp(eg.createdtime / 1000), 'DD-MM-YYYY') AS Amendment_date ,
+       eg.businessservice,eg.reasondocumentnumber,eg.amendmentreason,
+       to_char(to_timestamp(eg.effectivefrom / 1000), 'DD-MM-YYYY') AS From_date ,
+       to_char(to_timestamp(eg.effectivetill / 1000), 'DD-MM-YYYY') AS To_DAte,
+       egt.taxamount ,
+       eg.status
+       from egbs_amendment eg
+       inner join egbs_amendment_taxdetail egt
+       on eg.id = egt.amendmentid
+       where eg.tenantid = $tenantid
+       AND STATUS =  'CONSUMED'
