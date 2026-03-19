@@ -80,7 +80,7 @@ ReportDefinitions:
         swach.last_updated_by as lastupdatedby, us.name as ownername,us.mobilenumber as mobileno
         FROM public.egov_swach_imagedata  swach
         INNER JOIN ulb_data ulb on swach.tenant_id = ulb.ulb_code
-        INNER JOIN public.eg_user us ON us.uuid = swach.uuid
+        INNER JOIN public.eg_user us ON us.uuid = swach.uuid and tenant_id = $tenantid
 
   - reportName: ULBwiseComplaintCountReport
     summary: Fetches complaint stats ULB wise
