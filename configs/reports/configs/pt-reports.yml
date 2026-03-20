@@ -8363,6 +8363,19 @@ ReportDefinitions:
     type: string
     source: pt
     total: true
+  searchParams:
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: ws
+      isMandatory: false
+      searchClause: AND createdtime >= $fromDate
+    - name: toDate
+      label: To Date
+      type: epoch
+      source: ws
+      isMandatory: false
+      searchClause: AND  createdtime <= $toDate    
   query: |
       -- Use CTE to force query plan, compute & use CTE later
         SELECT
