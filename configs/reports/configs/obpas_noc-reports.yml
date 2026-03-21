@@ -721,7 +721,7 @@ ReportDefinitions:
   - reportName: officers_wise_pendency
     summary: officers wise  Pendency Trend Analysis - Last 7 Days
     version: 1.0.0
-    moduleName: rainmaker-obpas_noc
+    moduleName: obpas_noc
     additionalConfig:
       print:
         pdfPageSize: A1
@@ -841,7 +841,291 @@ ReportDefinitions:
       FROM agg where 1=1
     groupby:  GROUP BY designation_code
     orderby:  ORDER BY officer_designation
-  
+    
+  - reportName: FilesNearTimelineBreachSummary
+    summary: Summary list of district-ulb wise application upcoming  breached its SLA for next 7 days 
+    version: 1.0.0
+    moduleName: obpas_noc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+    - name: district
+      label: District
+      type: string
+      source: obpas_noc
+      total: false
+    - name: name_of_ulb
+      label: ULB Name
+      type: string
+      source: obpas_noc
+      total: false
+    - name: day0
+      label: Day 0
+      type: string
+      source: obpas_noc
+      total: true
+    - name: day1
+      label: Day 1
+      type: string
+      source: obpas_noc
+      total: true 
+    - name: day2
+      label: Day 2
+      type: string
+      source: obpas_noc
+      total: true
+    - name: day3
+      label: Day 3
+      type: string
+      source: obpas_noc
+      total: true
+    - name: day4
+      label: Day 4
+      type: string
+      source: obpas_noc
+      total: true
+    - name: day5
+      label: Day 5
+      type: string
+      source: obpas_noc
+      total: true
+    - name: day6
+      label: Day 6
+      type: string
+      source: obpas_noc
+      total: true
+    - name: total_upcoming_breaches
+      label: Total Upcoming Breaches 
+      type: string
+      source: obpas_noc
+      total: true
+    searchParams:
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: obpas_noc
+      isMandatory: true
+      searchClause: AND 1=1
+    - name: district
+      label: District
+      type: singlevaluelist
+      pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+      source: obpas_noc
+      isMandatory: false
+      searchClause: AND u.district = $district
+    - name: tenant
+      label: tenant
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: obpas_noc
+      isMandatory: false
+      searchClause: AND u.name_of_ulb= $tenant
+    query: |
+      WITH params AS (
+        SELECT
+            (to_timestamp($fromDate / 1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS report_dt
+        ),
+       wf_detailed AS (
+        SELECT
+           wf.businessid AS applicationno,
+           wf.tenantid,
+           wf.businessservice,
+           UPPER(st.applicationstatus) AS applicationstatus,
+           wf.createdtime,
+           wf.lastmodifiedtime
+           FROM eg_wf_processinstance_v2 wf
+           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+           WHERE wf.businessservice in ('NOC_NP','NOC_MC') AND st.applicationstatus not in ('INITIATED','CANCELLED')
+        ),
+       status_times AS (
+        SELECT
+          applicationno,
+          tenantid,
+          businessservice,
+          MIN(createdtime) FILTER ( WHERE applicationstatus = 'FIELDINSPECTION_INPROGRESS' ) AS sla_start_time,
+          MAX(lastmodifiedtime) FILTER ( WHERE applicationstatus IN ( 'APPROVED','REJECTED','PENDINGPAYMENT')) AS final_time
+          FROM wf_detailed
+          GROUP BY applicationno, tenantid, businessservice
+          ), 
+       sla_master AS (
+        SELECT
+          businessservice,
+          businessservicesla
+          FROM eg_wf_businessservice_v2
+          ),
+       sla_calc AS (
+        SELECT
+          st.applicationno,
+          st.tenantid,
+          st.businessservice,
+          st.sla_start_time,
+          st.final_time,
+          (to_timestamp( (st.sla_start_time + sm.businessservicesla) / 1000.0) AT TIME ZONE 'Asia/Kolkata') AS sla_breach_ts
+          FROM status_times st
+          JOIN sla_master sm ON sm.businessservice = st.businessservice
+          WHERE st.sla_start_time IS NOT NULL
+           ),
+       upcoming_breaches AS (
+        SELECT
+         tenantid,
+         businessservice,
+         sla_breach_ts::date AS breach_date
+         FROM sla_calc sc
+         JOIN params p ON TRUE
+         WHERE sc.final_time IS NULL 
+          AND sc.sla_breach_ts::date
+          BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
+           )
+        SELECT
+          u.district,
+          u.name_of_ulb,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt)   AS day0,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '1 day') AS day1,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '2 day') AS day2,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '3 day') AS day3,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '4 day') AS day4,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '5 day') AS day5,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '6 day') AS day6,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '7 day') AS day7,
+          COUNT(*) AS total_upcoming_breaches
+          FROM upcoming_breaches ub
+          JOIN ulb_data u ON ub.tenantid = u.ulb_code
+          JOIN params p ON TRUE    
+             WHERE 1=1 
+    groupby: GROUP BY u.district, u.name_of_ulb
+    orderby: ORDER BY u.district, u.name_of_ulb DESC  
+    
+  - reportName: DetailedFilesNearTimelineBreach
+    summary: Detailed file list of district-ulb wise application upcoming  breached its SLA for next 7 days 
+    version: 1.0.0
+    moduleName: obpas_noc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+    - name: district
+      label: District 
+      type: string
+      source: obpas_noc
+      total: false
+    - name: name_of_ulb
+      label: ULB Name
+      type: string
+      source: obpas_noc
+      total: false
+    - name: applicationstatus
+      label: application status
+      type: string
+      source: obpas_noc
+      total: false
+    - name: fileno
+      label: File No
+      type: string
+      source: obpas_noc
+      total: false
+    - name: modulename
+      label: Module Name
+      type: string
+      source: obpas_noc
+      total: false
+    searchParams:
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: obpas_noc
+      isMandatory: true
+      searchClause: AND 1=1
+    - name: district
+      label: District
+      type: singlevaluelist
+      pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+      source: obpas_noc
+      isMandatory: false
+      searchClause: AND u.district = $district
+    - name: tenant
+      label: ULB
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: obpas_noc
+      isMandatory: false
+      searchClause: AND u.name_of_ulb= $tenant 
+    query: |
+      WITH params AS (
+        SELECT
+            (to_timestamp($fromDate / 1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS report_dt
+        ),
+      wf_detailed AS (
+        SELECT
+           wf.businessid AS uuid,
+           wf.businessservice,
+           wf.tenantid,
+           UPPER(st.applicationstatus) AS applicationstatus,
+           wf.createdtime,
+           wf.lastmodifiedtime
+           FROM eg_wf_processinstance_v2 wf
+           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+           WHERE wf.businessservice ('NOC_NP','NOC_MC') AND st.applicationstatus not in ('INITIATED','CANCELLED')
+        ),
+      latest_status AS (
+        SELECT DISTINCT ON (uuid)
+           uuid,
+           applicationstatus
+           FROM wf_detailed
+           ORDER BY uuid, lastmodifiedtime DESC
+        ),
+      status_times AS (
+          SELECT
+           uuid,
+           tenantid,
+           businessservice,
+           MIN(createdtime) FILTER (
+            WHERE applicationstatus = 'FIELDINSPECTION_INPROGRESS') AS sla_start_time,
+           MAX(lastmodifiedtime) FILTER ( WHERE applicationstatus IN ( 'APPROVED','REJECTED','PENDINGPAYMENT')) AS final_time
+           FROM wf_detailed
+           GROUP BY uuid, tenantid, businessservice
+         ),
+      sla_master AS (
+        SELECT
+           businessservice,
+           businessservicesla
+          FROM eg_wf_businessservice_v2
+          ),
+      sla_calc AS (
+         SELECT
+           st.uuid,
+           st.tenantid,
+           st.businessservice,
+           ls.applicationstatus,
+           (to_timestamp((st.sla_start_time + sm.businessservicesla) / 1000.0) AT TIME ZONE 'Asia/Kolkata') AS sla_breach_ts
+           FROM status_times st
+           JOIN sla_master sm ON sm.businessservice = st.businessservice
+           JOIN latest_status ls ON ls.uuid = st.uuid
+           WHERE st.sla_start_time IS NOT NULL
+           AND st.final_time IS NULL
+           ),
+      upcoming_breaches AS (
+        SELECT
+           sc.uuid,
+           sc.tenantid,
+           sc.businessservice,
+           sc.applicationstatus,
+           sc.sla_breach_ts::date AS breach_date
+           FROM sla_calc sc
+           JOIN params p ON TRUE
+           WHERE sc.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
+        )
+       SELECT
+         u.district,
+         u.name_of_ulb,
+         ub.applicationstatus,
+         ub.uuid as fileno,
+         'NOC' as modulename
+         FROM upcoming_breaches ub
+         JOIN ulb_data u ON ub.tenantid = u.ulb_code
+         WHERE 1=1 
+    groupby: GROUP BY u.district, u.name_of_ulb,ub.applicationstatus,ub.uuid
+    orderby: ORDER BY u.district, u.name_of_ulb ,ub.applicationstatus,ub.uuid DESC          
   - reportName: CollectionsReportNOC
     decryptionPathId: LAYOUTREPORTS
     summary: Collections
