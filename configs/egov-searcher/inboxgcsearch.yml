@@ -1,0 +1,343 @@
+SearchDefinitions:
+  moduleName: gc-services
+  summary: Garbage Collection Services Inbox API
+  version: 1.0.0
+  definitions:
+
+    # ============================================================
+    # 1. inboxgcsearch (ASC)
+    # ============================================================
+    - name: inboxgcsearch
+      query:
+        baseQuery: |
+          SELECT row_to_json(result) FROM (
+            SELECT DISTINCT(conn.applicationno),
+                   pi.status AS status_id,
+                   conn.id,
+                   conn.tenantid,
+                   conn.property_id,
+                   conn.createdtime,
+                   conn.applicationstatus,
+                   conn.status,
+                   conn.connectionno,
+                   conn.oldconnectionno,
+                   conn.applicationtype,
+                   conn.dateeffectivefrom,
+                   conn.locality,
+                   conn.channel,
+                   assg.assignee AS wf_assignee
+            FROM eg_gc_connection conn
+            INNER JOIN eg_wf_processinstance_v2 pi 
+                ON pi.businessid = conn.applicationno
+            INNER JOIN eg_gc_connectionholder holder 
+                ON holder.connectionid = conn.id
+            LEFT JOIN eg_wf_assignee_v2 assg 
+                ON pi.id = assg.processinstanceid
+            $where
+            AND pi.latest = TRUE
+            ORDER BY conn.createdtime ASC
+            $pagination
+          ) result
+        groupBy:
+        orderBy:
+
+      searchParams:
+        condition: AND
+        params:
+          - name: conn.tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+
+          - name: conn.id
+            isMandatory: false
+            jsonPath: $.searchCriteria.id
+
+          - name: pi.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.status
+            operator: IN
+
+          - name: conn.applicationno
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationNumber
+
+          - name: conn.connectionno
+            isMandatory: false
+            jsonPath: $.searchCriteria.connectionNumber
+
+          - name: conn.oldconnectionno
+            isMandatory: false
+            jsonPath: $.searchCriteria.oldConnectionNumber
+
+          - name: pi.businessservice
+            isMandatory: false
+            jsonPath: $.searchCriteria.businessservice
+
+          - name: assg.assignee
+            isMandatory: false
+            jsonPath: $.searchCriteria.assignee
+
+          - name: conn.applicationstatus
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationStatus
+
+          - name: conn.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.connectionStatus
+
+          - name: conn.applicationtype
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationType
+
+          - name: conn.locality
+            isMandatory: false
+            jsonPath: $.searchCriteria.locality
+
+          - name: conn.channel
+            isMandatory: false
+            jsonPath: $.searchCriteria.channel
+
+          - name: holder.userid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
+
+          - name: holder.userid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
+
+          - name: holder.userid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
+
+        pagination:
+          noOfRecords: $.searchCriteria.noOfRecords
+          offset: $.searchCriteria.offset
+
+      output:
+        jsonFormat: {"ResponseInfo": {}, "garbageApplications": []}
+        outJsonPath: $.garbageApplications
+        responseInfoPath: $.ResponseInfo
+
+    # ============================================================
+    # 2. inboxgcsearchcount (NO pagination)
+    # ============================================================
+    - name: inboxgcsearchcount
+      query:
+        baseQuery: |
+          SELECT row_to_json(result) FROM (
+            SELECT COUNT(DISTINCT conn.applicationno) AS totalCount
+            FROM eg_gc_connection conn
+            INNER JOIN eg_wf_processinstance_v2 pi 
+                ON pi.businessid = conn.applicationno
+                AND pi.latest = TRUE
+            LEFT JOIN eg_wf_assignee_v2 assg 
+                ON pi.id = assg.processinstanceid
+
+            $where
+          ) result
+        groupBy:
+        orderBy:
+
+      searchParams:
+        condition: AND
+        params:
+          - name: conn.tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+
+          - name: conn.id
+            isMandatory: false
+            jsonPath: $.searchCriteria.id
+
+          - name: pi.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.status
+            operator: IN
+
+          - name: conn.applicationno
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationNumber
+
+          - name: conn.connectionno
+            isMandatory: false
+            jsonPath: $.searchCriteria.connectionNumber
+
+          - name: conn.oldconnectionno
+            isMandatory: false
+            jsonPath: $.searchCriteria.oldConnectionNumber
+
+          - name: pi.businessservice
+            isMandatory: false
+            jsonPath: $.searchCriteria.businessservice
+
+          - name: assg.assignee
+            isMandatory: false
+            jsonPath: $.searchCriteria.assignee
+
+          - name: conn.applicationstatus
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationStatus
+
+          - name: conn.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.connectionStatus
+
+          - name: conn.applicationtype
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationType
+
+          - name: conn.property_id
+            isMandatory: false
+            jsonPath: $.searchCriteria.propertyId
+
+          - name: svc.connectioncategory
+            isMandatory: false
+            jsonPath: $.searchCriteria.connectionCategory
+
+          - name: svc.connectiontype
+            isMandatory: false
+            jsonPath: $.searchCriteria.connectionType
+
+          - name: conn.locality
+            isMandatory: false
+            jsonPath: $.searchCriteria.locality
+
+          - name: conn.channel
+            isMandatory: false
+            jsonPath: $.searchCriteria.channel
+
+        pagination:
+          noOfRecords: $.searchCriteria.noOfRecords
+          offset: $.searchCriteria.offset
+
+      output:
+        jsonFormat: {"ResponseInfo": {}, "totalCount": []}
+        outJsonPath: $.totalCount
+        responseInfoPath: $.ResponseInfo
+
+    # ============================================================
+    # 3. inboxgcsearchdesc (DESC)
+    # ============================================================
+    - name: inboxgcsearchdesc
+      query:
+        baseQuery: |
+          SELECT row_to_json(result) FROM (
+            SELECT DISTINCT(conn.applicationno),
+                   pi.status AS status_id,
+                   conn.id,
+                   conn.tenantid,
+                   conn.property_id,
+                   conn.createdtime,
+                   conn.applicationstatus,
+                   conn.status,
+                   conn.connectionno,
+                   conn.oldconnectionno,
+                   conn.applicationtype,
+                   conn.dateeffectivefrom,
+                   conn.locality,
+                   conn.channel,
+                   assg.assignee AS wf_assignee
+            FROM eg_gc_connection conn
+            INNER JOIN eg_wf_processinstance_v2 pi 
+                ON pi.businessid = conn.applicationno
+            INNER JOIN eg_gc_connectionholder holder 
+                ON holder.connectionid = conn.id
+            LEFT JOIN eg_wf_assignee_v2 assg 
+                ON pi.id = assg.processinstanceid
+            $where
+            AND pi.latest = TRUE
+            ORDER BY conn.createdtime DESC
+            $pagination
+          ) result
+        groupBy:
+        orderBy:
+
+      searchParams:
+        condition: AND
+        params:
+          - name: conn.tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+
+          - name: conn.id
+            isMandatory: false
+            jsonPath: $.searchCriteria.id
+
+          - name: pi.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.status
+            operator: IN
+
+          - name: conn.applicationno
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationNumber
+
+          - name: conn.connectionno
+            isMandatory: false
+            jsonPath: $.searchCriteria.connectionNumber
+
+          - name: conn.oldconnectionno
+            isMandatory: false
+            jsonPath: $.searchCriteria.oldConnectionNumber
+
+          - name: pi.businessservice
+            isMandatory: false
+            jsonPath: $.searchCriteria.businessservice
+
+          - name: assg.assignee
+            isMandatory: false
+            jsonPath: $.searchCriteria.assignee
+
+          - name: conn.applicationstatus
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationStatus
+
+          - name: conn.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.connectionStatus
+
+          - name: conn.applicationtype
+            isMandatory: false
+            jsonPath: $.searchCriteria.applicationType
+
+          - name: conn.property_id
+            isMandatory: false
+            jsonPath: $.searchCriteria.propertyId
+
+          - name: svc.connectioncategory
+            isMandatory: false
+            jsonPath: $.searchCriteria.connectionCategory
+
+          - name: svc.connectiontype
+            isMandatory: false
+            jsonPath: $.searchCriteria.connectionType
+
+          - name: conn.locality
+            isMandatory: false
+            jsonPath: $.searchCriteria.locality
+
+          - name: conn.channel
+            isMandatory: false
+            jsonPath: $.searchCriteria.channel
+
+
+          - name: holder.userid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
+
+          - name: holder.userid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
+
+          - name: holder.userid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
+
+        pagination:
+          noOfRecords: $.searchCriteria.noOfRecords
+          offset: $.searchCriteria.offset
+
+      output:
+        jsonFormat: {"ResponseInfo": {}, "garbageApplications": []}
+        outJsonPath: $.garbageApplications
+        responseInfoPath: $.ResponseInfo

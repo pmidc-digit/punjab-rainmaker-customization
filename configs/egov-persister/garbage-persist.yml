@@ -1,0 +1,392 @@
+serviceMaps:
+ serviceName: Garbage Connection Service
+ mappings:
+ - version: 1.0
+   name: GarbageConnection
+   description: create ConnectionDetails in connection and garbage_service_connection
+   fromTopic: save-gc-connection
+   isTransaction: true
+   queryMaps:
+    - query: INSERT INTO eg_gc_connection (id, tenantid, property_id, applicationno, applicationstatus, status, connectionno, oldconnectionno,action, createdby, lastmodifiedby, createdtime, lastmodifiedtime, applicationtype, dateEffectiveFrom, locality, isoldapplication,additionaldetails, channel,isDisconnectionTemporary, disconnectionReason,property_type,plot_size,location,frequency_of_garbage_collection,type_of_waste,unit_id) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+      basePath: $.GarbageConnection
+      jsonMaps:
+       - jsonPath: $.GarbageConnection.id
+
+       - jsonPath: $.GarbageConnection.tenantId
+
+       - jsonPath: $.GarbageConnection.propertyId
+
+       - jsonPath: $.GarbageConnection.applicationNo
+
+       - jsonPath: $.GarbageConnection.applicationStatus
+
+       - jsonPath: $.GarbageConnection.status
+
+       - jsonPath: $.GarbageConnection.connectionNo
+
+       - jsonPath: $.GarbageConnection.oldConnectionNo
+
+
+
+       - jsonPath: $.GarbageConnection.processInstance.action
+
+
+
+       - jsonPath: $.GarbageConnection.auditDetails.createdBy
+
+       - jsonPath: $.GarbageConnection.auditDetails.lastModifiedBy
+
+       - jsonPath: $.GarbageConnection.auditDetails.createdTime
+
+       - jsonPath: $.GarbageConnection.auditDetails.lastModifiedTime
+
+       - jsonPath: $.GarbageConnection.applicationType
+
+       - jsonPath: $.GarbageConnection.dateEffectiveFrom
+
+       - jsonPath: $.GarbageConnection.additionalDetails.locality
+
+       - jsonPath: $.GarbageConnection.oldApplication
+
+       - jsonPath: $.GarbageConnection.additionalDetails
+         type: JSON
+         dbType: JSONB
+       - jsonPath: $.GarbageConnection.channel
+
+       - jsonPath: $.GarbageConnection.isDisconnectionTemporary
+
+       - jsonPath: $.GarbageConnection.disconnectionReason
+       - jsonPath: $.GarbageConnection.propertyType
+       - jsonPath: $.GarbageConnection.plotSize
+       - jsonPath: $.GarbageConnection.location
+       - jsonPath: $.GarbageConnection.frequency
+       - jsonPath: $.GarbageConnection.typeOfWaste
+       - jsonPath: $.GarbageConnection.unitId
+        
+
+
+
+    - query: INSERT INTO eg_gc_service(connection_id,connectionCategory,connectionType,connectionexecutiondate, appCreatedDate, createdby, lastmodifiedby, createdtime, lastmodifiedtime,disconnectionExecutionDate) VALUES(?,?,?,?,?,?,?,?,?,?);
+      basePath: $.GarbageConnection
+      jsonMaps:
+
+       - jsonPath: $.GarbageConnection.id
+       - jsonPath: $.GarbageConnection.connectionCategory
+
+       - jsonPath: $.GarbageConnection.connectionType
+
+
+       - jsonPath: $.GarbageConnection.connectionExecutionDate
+
+       - jsonPath: $.GarbageConnection.additionalDetails.appCreatedDate
+
+       - jsonPath: $.GarbageConnection.auditDetails.createdBy
+
+       - jsonPath: $.GarbageConnection.auditDetails.lastModifiedBy
+
+       - jsonPath: $.GarbageConnection.auditDetails.createdTime
+
+       - jsonPath: $.GarbageConnection.auditDetails.lastModifiedTime
+
+       - jsonPath: $.GarbageConnection.disconnectionExecutionDate
+
+
+    - query: INSERT INTO eg_gc_connectionholder(tenantid, connectionid, userid, status, isprimaryholder, connectionholdertype, holdershippercentage, relationship, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: $.GarbageConnection.connectionHolders.*
+      jsonMaps:
+
+       - jsonPath: $.GarbageConnection.tenantId
+
+       - jsonPath: $.GarbageConnection.id
+
+       - jsonPath: $.GarbageConnection.connectionHolders.*.uuid
+
+       - jsonPath: $.GarbageConnection.connectionHolders.*.status
+
+       - jsonPath: $.GarbageConnection.connectionHolders.*.isPrimaryOwner
+
+       - jsonPath: $.GarbageConnection.connectionHolders.*.ownerType
+
+       - jsonPath: $.GarbageConnection.connectionHolders.*.ownerShipPercentage
+
+       - jsonPath: $.GarbageConnection.connectionHolders.*.relationship
+
+       - jsonPath: $.GarbageConnection.auditDetails.createdBy
+
+       - jsonPath: $.GarbageConnection.auditDetails.createdTime
+
+       - jsonPath: $.GarbageConnection.auditDetails.lastModifiedBy
+
+       - jsonPath: $.GarbageConnection.auditDetails.lastModifiedTime
+
+
+
+ - version: 1.0
+   name: WaterConnection
+   description: update ConnectionDetails in eg_gc_connection and eg_gc_service
+   fromTopic: update-gc-connection
+   isTransaction: true
+   queryMaps:
+
+    - query: INSERT INTO eg_gc_connection_audit SELECT * FROM eg_gc_connection WHERE id = ?;
+      basePath: $.GarbageConnection
+      jsonMaps:
+      - jsonPath: $.GarbageConnection.id
+
+    - query: UPDATE eg_gc_connection SET applicationstatus=?, status=?, connectionno=?, oldconnectionno=?, action=?, adhocpenalty=?, adhocrebate=?, adhocpenaltyreason=?, adhocpenaltycomment=?, adhocrebatereason=?, adhocrebatecomment=?, lastModifiedBy=?, lastModifiedTime=?, dateEffectiveFrom=?, isoldapplication=?, property_id=?, additionaldetails=?,isDisconnectionTemporary=?, disconnectionReason=? ,property_type=?,plot_size=?,location=?,frequency_of_garbage_collection=?,type_of_waste=? WHERE id=?;
+
+      basePath: $.GarbageConnection
+      jsonMaps:
+
+       - jsonPath: $.GarbageConnection.applicationStatus
+
+       - jsonPath: $.GarbageConnection.status
+
+       - jsonPath: $.GarbageConnection.connectionNo
+
+       - jsonPath: $.GarbageConnection.oldConnectionNo
+
+       - jsonPath: $.GarbageConnection.processInstance.action
+
+       - jsonPath: $.GarbageConnection.additionalDetails.adhocPenalty
+
+       - jsonPath: $.GarbageConnection.additionalDetails.adhocRebate
+
+       - jsonPath: $.GarbageConnection.additionalDetails.adhocPenaltyReason
+
+       - jsonPath: $.GarbageConnection.additionalDetails.adhocPenaltyComment
+
+       - jsonPath: $.GarbageConnection.additionalDetails.adhocRebateReason
+
+       - jsonPath: $.GarbageConnection.additionalDetails.adhocRebateComment
+
+       - jsonPath: $.GarbageConnection.auditDetails.lastModifiedBy
+
+       - jsonPath: $.GarbageConnection.auditDetails.lastModifiedTime
+
+       - jsonPath: $.GarbageConnection.dateEffectiveFrom
+
+#       - jsonPath: $.GarbageConnection.additionalDetails.locality
+
+       - jsonPath: $.GarbageConnection.oldApplication
+
+       - jsonPath: $.GarbageConnection.propertyId
+
+       - jsonPath: $.GarbageConnection.additionalDetails
+         type: JSON
+         dbType: JSONB
+
+       - jsonPath: $.GarbageConnection.isDisconnectionTemporary
+
+       - jsonPath: $.GarbageConnection.disconnectionReason
+       - jsonPath: $.GarbageConnection.propertyType
+       - jsonPath: $.GarbageConnection.plotSize
+       - jsonPath: $.GarbageConnection.location
+       - jsonPath: $.GarbageConnection.frequency
+       - jsonPath: $.GarbageConnection.typeOfWaste
+
+       - jsonPath: $.GarbageConnection.id
+
+    - query: INSERT INTO eg_gc_service_audit SELECT * FROM eg_gc_service WHERE connection_id = ?;
+      basePath: $.GarbageConnection
+      jsonMaps:
+      - jsonPath: $.GarbageConnection.id
+
+    - query: UPDATE eg_gc_service SET connectionCategory=?,connectionType=?, connectionexecutiondate = ?, detailsprovidedby = ?, estimationfileStoreId = ?, sanctionfileStoreId = ?, estimationLetterDate = ?, lastModifiedBy=?, lastModifiedTime=?,disconnectionExecutionDate=? WHERE connection_id=?;
+      basePath: $.GarbageConnection
+      jsonMaps:
+
+       - jsonPath: $.GarbageConnection.connectionCategory
+
+       - jsonPath: $.GarbageConnection.connectionType
+
+
+
+
+
+
+
+       - jsonPath: $.GarbageConnection.connectionExecutionDate
+
+       - jsonPath: $.GarbageConnection.additionalDetails.detailsProvidedBy
+
+       - jsonPath: $.GarbageConnection.additionalDetails.estimationFileStoreId
+
+       - jsonPath: $.GarbageConnection.additionalDetails.sanctionFileStoreId
+
+       - jsonPath: $.GarbageConnection.additionalDetails.estimationLetterDate
+
+       - jsonPath: $.GarbageConnection.auditDetails.lastModifiedBy
+
+       - jsonPath: $.GarbageConnection.auditDetails.lastModifiedTime
+
+       - jsonPath: $.GarbageConnection.disconnectionExecutionDate
+
+       - jsonPath: $.GarbageConnection.id
+
+    - query: INSERT INTO eg_gc_applicationDocument(id, tenantId, documenttype, filestoreid, gcid, active, createdBy, lastModifiedBy, createdTime, lastModifiedTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET active = ?, documenttype =?, filestoreid =?,lastmodifiedby =?, lastmodifiedtime =?;
+      basePath: $.GarbageConnection.documents.*
+      jsonMaps:
+
+          - jsonPath: $.GarbageConnection.documents.*.id
+
+          - jsonPath: $.GarbageConnection.tenantId
+
+          - jsonPath: $.GarbageConnection.documents.*.documentType
+
+          - jsonPath: $.GarbageConnection.documents.*.fileStoreId
+
+          - jsonPath: $.GarbageConnection.id
+
+          - jsonPath: $.GarbageConnection.documents.*.status
+
+          - jsonPath: $.GarbageConnection.documents.*.auditDetails.createdBy
+
+          - jsonPath: $.GarbageConnection.documents.*.auditDetails.lastModifiedBy
+
+          - jsonPath: $.GarbageConnection.documents.*.auditDetails.createdTime
+
+          - jsonPath: $.GarbageConnection.documents.*.auditDetails.lastModifiedTime
+
+          - jsonPath: $.GarbageConnection.documents.*.status
+
+          - jsonPath: $.GarbageConnection.documents.*.documentType
+
+          - jsonPath: $.GarbageConnection.documents.*.fileStoreId
+
+          - jsonPath: $.GarbageConnection.documents.*.auditDetails.lastModifiedBy
+
+          - jsonPath: $.GarbageConnection.documents.*.auditDetails.lastModifiedTime
+
+
+
+#    - query: INSERT INTO eg_gc_connectionholder(tenantid, connectionid, userid, status, isprimaryholder, connectionholdertype, holdershippercentage, relationship, createdby, createdtime, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (connectionid) DO UPDATE SET tenantid =?, userid =?,status =?, isprimaryholder =?, connectionholdertype =?, holdershippercentage =?, relationship=?, lastmodifiedby =?, lastmodifiedtime =?;
+#      basePath: $.GarbageConnection.connectionHolders.*
+#      jsonMaps:
+#
+#       - jsonPath: $.GarbageConnection.tenantId
+#
+#       - jsonPath: $.GarbageConnection.id
+#
+#       - jsonPath: $.GarbageConnection.connectionHolders.*.uuid
+#
+#       - jsonPath: $.GarbageConnection.connectionHolders.*.status
+#
+#       - jsonPath: $.GarbageConnection.connectionHolders.*.isPrimaryOwner
+#
+#       - jsonPath: $.GarbageConnection.connectionHolders.*.ownerType
+#
+#       - jsonPath: $.GarbageConnection.connectionHolders.*.ownerShipPercentage
+#
+#       - jsonPath: $.GarbageConnection.connectionHolders.*.relationship
+#
+#       - jsonPath: $.GarbageConnection.auditDetails.createdBy
+#
+#       - jsonPath: $.GarbageConnection.auditDetails.createdTime
+#
+#       - jsonPath: $.GarbageConnection.auditDetails.lastModifiedBy
+#
+#       - jsonPath: $.GarbageConnection.auditDetails.lastModifiedTime
+
+
+
+
+
+ - version: 1.0
+   name: GarbageConnection
+   description: update ConnectionDetails in eg_gc_connection and eg_gc_service
+   fromTopic: update-gc-workflow
+   isTransaction: true
+   queryMaps:
+
+     - query: INSERT INTO eg_gc_connection_audit SELECT * FROM eg_gc_connection WHERE id = ?;
+       basePath: $.GarbageConnection
+       jsonMaps:
+         - jsonPath: $.GarbageConnection.id
+
+     - query: UPDATE eg_gc_connection SET applicationstatus=?, status=?, connectionno=?, action=?, lastModifiedBy=?, lastModifiedTime=?  WHERE id=?;
+       basePath: $.GarbageConnection
+       jsonMaps:
+
+         - jsonPath: $.GarbageConnection.applicationStatus
+
+         - jsonPath: $.GarbageConnection.status
+
+         - jsonPath: $.GarbageConnection.connectionNo
+
+         - jsonPath: $.GarbageConnection.processInstance.action
+
+         - jsonPath: $.GarbageConnection.auditDetails.lastModifiedBy
+
+         - jsonPath: $.GarbageConnection.auditDetails.lastModifiedTime
+
+         - jsonPath: $.GarbageConnection.id
+
+     - query: INSERT INTO eg_gc_service_audit SELECT * FROM eg_gc_service WHERE connection_id = ?;
+       basePath: $.GarbageConnection
+       jsonMaps:
+         - jsonPath: $.GarbageConnection.id
+
+     - query: UPDATE eg_gc_service SET connectionexecutiondate = ?, lastModifiedBy=?, lastModifiedTime=? WHERE connection_id=?;
+       basePath: $.GarbageConnection
+       jsonMaps:
+
+         - jsonPath: $.GarbageConnection.connectionExecutionDate
+
+         - jsonPath: $.GarbageConnection.auditDetails.lastModifiedBy
+
+         - jsonPath: $.GarbageConnection.auditDetails.lastModifiedTime
+
+         - jsonPath: $.GarbageConnection.id
+
+ - version: 1.0
+   name: GarbageConnection
+   description: save filestore id
+   fromTopic: save-gc-filestoreids
+   isTransaction: true
+   queryMaps:
+
+    - query: INSERT INTO eg_gc_service_audit SELECT * FROM eg_gc_service WHERE connection_id = ?;
+      basePath: $.GarbageConnection
+      jsonMaps:
+      - jsonPath: $.GarbageConnection.id
+
+    - query: UPDATE eg_gc_service SET estimationfileStoreId = ?, sanctionfileStoreId = ?,estimationLetterDate = ?, appCreatedDate = ? WHERE connection_id=?;
+      basePath: $.GarbageConnection
+      jsonMaps:
+
+      - jsonPath: $.GarbageConnection.additionalDetails.estimationFileStoreId
+
+      - jsonPath: $.GarbageConnection.additionalDetails.sanctionFileStoreId
+
+      - jsonPath: $.GarbageConnection.additionalDetails.estimationLetterDate
+
+      - jsonPath: $.GarbageConnection.additionalDetails.appCreatedDate
+
+      - jsonPath: $.GarbageConnection.id
+
+ - version: 1.0
+
+   description: Updates gc status for auto escalate
+
+   fromTopic: gc-auto-escalation
+
+   isTransaction: true
+
+   queryMaps:
+    - query: UPDATE eg_gc_connection SET applicationstatus=?, lastmodifiedby=?, lastmodifiedtime=? WHERE applicationno=? AND tenantId=?;
+
+      basePath: ProcessInstances.*
+
+      jsonMaps:
+
+      - jsonPath: $.ProcessInstances.*.state.applicationStatus
+
+      - jsonPath: $.ProcessInstances.*.auditDetails.lastModifiedBy
+
+      - jsonPath: $.ProcessInstances.*.auditDetails.lastModifiedTime
+
+      - jsonPath: $.ProcessInstances.*.businessId
+
+      - jsonPath: $.ProcessInstances.*.tenantId
+
