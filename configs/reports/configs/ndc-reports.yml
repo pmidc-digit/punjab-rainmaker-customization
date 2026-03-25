@@ -1431,33 +1431,56 @@ ReportDefinitions:
         total: true
     query: >
       SELECT 
-          tenantid,
+          t.tenantid,
       
-          SUM(CASE WHEN service = 'CHB' THEN 1 ELSE 0 END) AS CHB,
-          SUM(CASE WHEN service = 'NDC' THEN 1 ELSE 0 END) AS NDC,
-          SUM(CASE WHEN service = 'PTR' THEN 1 ELSE 0 END) AS Pet_Registration,
-          SUM(CASE WHEN service = 'CHALLAN' THEN 1 ELSE 0 END) AS Challan,
-          SUM(CASE WHEN service = 'ADV' THEN 1 ELSE 0 END) AS Advertisement,
-          SUM(CASE WHEN service = 'GC' THEN 1 ELSE 0 END) AS Garbage_Collection,
-          SUM(CASE WHEN service = 'RL' THEN 1 ELSE 0 END) AS Rent_and_Lease 
+          COALESCE(chb.count, 0) AS chb,
+          COALESCE(ndc.count, 0) AS ndc,
+          COALESCE(ptr.count, 0) AS pet_registration,
+          COALESCE(challan.count, 0) AS challan,
+          COALESCE(adv.count, 0) AS advertisement,
+          COALESCE(gc.count, 0) AS garbage_collection,
+          COALESCE(rl.count, 0) AS rent_and_lease
       
       FROM (
-      
-          SELECT tenant_id AS tenantid, 'CHB' AS service FROM eg_chb_booking_detail
-          UNION ALL
-          SELECT tenantid, 'NDC' FROM eg_ndc_application
-          UNION ALL
-          SELECT tenantid, 'PTR' FROM eg_ptr_registration
-          UNION ALL
-          SELECT tenantid, 'CHALLAN' FROM eg_challan
-          UNION ALL
-          SELECT tenant_id, 'ADV' FROM eg_adv_booking_detail
-          UNION ALL
-          SELECT tenantid, 'GC' FROM eg_gc_connection
-          UNION ALL
-          SELECT tenant_id, 'RL' FROM eg_rl_allotment
-      
+          SELECT DISTINCT tenant_id AS tenantid FROM eg_chb_booking_detail
+          UNION
+          SELECT DISTINCT tenantid FROM eg_ndc_application
+          UNION
+          SELECT DISTINCT tenantid FROM eg_ptr_registration
+          UNION
+          SELECT DISTINCT tenantid FROM eg_challan
+          UNION
+          SELECT DISTINCT tenant_id FROM eg_adv_booking_detail
+          UNION
+          SELECT DISTINCT tenantid FROM eg_gc_connection
+          UNION
+          SELECT DISTINCT tenant_id FROM eg_rl_allotment
       ) t
       
-    groupby: GROUP BY tenantid
-    orderby: ORDER BY tenantid;
+      LEFT JOIN (
+          SELECT tenant_id, COUNT(*) AS count FROM eg_chb_booking_detail GROUP BY tenant_id
+      ) chb ON t.tenantid = chb.tenant_id
+      
+      LEFT JOIN (
+          SELECT tenantid, COUNT(*) AS count FROM eg_ndc_application GROUP BY tenantid
+      ) ndc ON t.tenantid = ndc.tenantid
+      
+      LEFT JOIN (
+          SELECT tenantid, COUNT(*) AS count FROM eg_ptr_registration GROUP BY tenantid
+      ) ptr ON t.tenantid = ptr.tenantid
+      
+      LEFT JOIN (
+          SELECT tenantid, COUNT(*) AS count FROM eg_challan GROUP BY tenantid
+      ) challan ON t.tenantid = challan.tenantid
+      
+      LEFT JOIN (
+          SELECT tenant_id, COUNT(*) AS count FROM eg_adv_booking_detail GROUP BY tenant_id
+      ) adv ON t.tenantid = adv.tenant_id
+      
+      LEFT JOIN (
+          SELECT tenantid, COUNT(*) AS count FROM eg_gc_connection GROUP BY tenantid
+      ) gc ON t.tenantid = gc.tenantid
+      
+      LEFT JOIN (
+          SELECT tenant_id, COUNT(*) AS count FROM eg_rl_allotment GROUP BY tenant_id
+      ) rl ON t.tenantid = rl.tenant_id;
