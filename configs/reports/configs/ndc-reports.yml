@@ -1380,3 +1380,84 @@ ReportDefinitions:
       service = $service and tenant_name not in ('testing')
     groupby: GROUP BY tenant_name, tenantid, service, application_status, assignee_employee 
     orderby: ORDER BY tenant_name, tenantid, service, application_status, assignee_employee;
+
+  - reportName: ULB_Wise_Applicationcount
+    summary: ULB Wise Application Count of No Dues Certificate issuance,Rent and Lease Collection,Pet Registration,Advertisement & Hoardings,Garbage Collection Fee Management,Community Centre Booking,Challan Generation
+    version: 1.0.0
+    moduleName: rainmaker-ndc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenantid
+        label: tenantid
+        type: string
+        source: ndc
+        total: false
+      - name: CHB
+        label: CHB
+        type: string
+        source: ndc
+        total: true
+      - name: NDC
+        label: NDC
+        type: string
+        source: ndc
+        total: true
+      - name: Pet_Registration
+        label: Pet_Registration
+        type: string
+        source: ndc
+        total: true
+      - name: Challan
+        label: Challan
+        type: string
+        source: ndc
+        total: true
+      - name: Advertisement
+        label: Advertisement
+        type: string
+        source: ndc
+        total: true
+      - name: Garbage_Collection
+        label: Garbage_Collection
+        type: string
+        source: ndc
+        total: true
+      - name: Rent_and_Lease
+        label: Rent_and_Lease
+        type: string
+        source: ndc
+        total: true
+    query: >
+      SELECT 
+          tenantid,
+      
+          SUM(CASE WHEN service = 'CHB' THEN 1 ELSE 0 END) AS CHB,
+          SUM(CASE WHEN service = 'NDC' THEN 1 ELSE 0 END) AS NDC,
+          SUM(CASE WHEN service = 'PTR' THEN 1 ELSE 0 END) AS Pet_Registration,
+          SUM(CASE WHEN service = 'CHALLAN' THEN 1 ELSE 0 END) AS Challan,
+          SUM(CASE WHEN service = 'ADV' THEN 1 ELSE 0 END) AS Advertisement,
+          SUM(CASE WHEN service = 'GC' THEN 1 ELSE 0 END) AS Garbage_Collection,
+          SUM(CASE WHEN service = 'RL' THEN 1 ELSE 0 END) AS Rent_and_Lease 
+      
+      FROM (
+      
+          SELECT tenant_id AS tenantid, 'CHB' AS service FROM eg_chb_booking_detail
+          UNION ALL
+          SELECT tenantid, 'NDC' FROM eg_ndc_application
+          UNION ALL
+          SELECT tenantid, 'PTR' FROM eg_ptr_registration
+          UNION ALL
+          SELECT tenantid, 'CHALLAN' FROM eg_challan
+          UNION ALL
+          SELECT tenant_id, 'ADV' FROM eg_adv_booking_detail
+          UNION ALL
+          SELECT tenantid, 'GC' FROM eg_gc_connection
+          UNION ALL
+          SELECT tenant_id, 'RL' FROM eg_rl_allotment
+      
+      ) t
+      
+    groupby: GROUP BY tenantid
+    orderby: ORDER BY tenantid;
