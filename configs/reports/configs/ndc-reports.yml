@@ -1384,3 +1384,107 @@ ReportDefinitions:
       service = $service and tenant_name not in ('testing')
     groupby: GROUP BY tenant_name, tenantid, service, application_status, assignee_employee 
     orderby: ORDER BY tenant_name, tenantid, service, application_status, assignee_employee;
+
+  - reportName: ULB_Wise_Applicationcount
+    summary: ULB Wise Application Count of No Dues Certificate issuance,Rent and Lease Collection,Pet Registration,Advertisement & Hoardings,Garbage Collection Fee Management,Community Centre Booking,Challan Generation
+    version: 1.0.0
+    moduleName: rainmaker-ndc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenantid
+        label: ULB Name
+        type: string
+        source: ndc
+        total: false
+      - name: CHB
+        label: Community Hall Booking
+        type: string
+        source: ndc
+        total: true
+      - name: NDC
+        label: No Dues Certificate issuance
+        type: string
+        source: ndc
+        total: true
+      - name: Pet_Registration 
+        label: Pet Registration
+        type: string
+        source: ndc
+        total: true
+      - name: Challan
+        label: Challan Generation
+        type: string
+        source: ndc
+        total: true
+      - name: Advertisement
+        label: Advertisement & Hoardings
+        type: string
+        source: ndc
+        total: true
+      - name: Garbage_Collection
+        label: Garbage Collection Fee Management
+        type: string
+        source: ndc
+        total: true
+      - name: Rent_and_Lease
+        label: Rent and Lease Collection
+        type: string
+        source: ndc
+        total: true
+    query: >
+      SELECT 
+          t.tenantid,
+      
+          COALESCE(chb.count, 0) AS chb,
+          COALESCE(ndc.count, 0) AS ndc,
+          COALESCE(ptr.count, 0) AS pet_registration,
+          COALESCE(challan.count, 0) AS challan,
+          COALESCE(adv.count, 0) AS advertisement,
+          COALESCE(gc.count, 0) AS garbage_collection,
+          COALESCE(rl.count, 0) AS rent_and_lease
+      
+      FROM (
+          SELECT DISTINCT tenant_id AS tenantid FROM eg_chb_booking_detail
+          UNION
+          SELECT DISTINCT tenantid FROM eg_ndc_application
+          UNION
+          SELECT DISTINCT tenantid FROM eg_ptr_registration
+          UNION
+          SELECT DISTINCT tenantid FROM eg_challan
+          UNION
+          SELECT DISTINCT tenant_id FROM eg_adv_booking_detail
+          UNION
+          SELECT DISTINCT tenantid FROM eg_gc_connection
+          UNION
+          SELECT DISTINCT tenant_id FROM eg_rl_allotment
+      ) t
+      
+      LEFT JOIN (
+          SELECT tenant_id, COUNT(*) AS count FROM eg_chb_booking_detail GROUP BY tenant_id
+      ) chb ON t.tenantid = chb.tenant_id
+      
+      LEFT JOIN (
+          SELECT tenantid, COUNT(*) AS count FROM eg_ndc_application GROUP BY tenantid
+      ) ndc ON t.tenantid = ndc.tenantid
+      
+      LEFT JOIN (
+          SELECT tenantid, COUNT(*) AS count FROM eg_ptr_registration GROUP BY tenantid
+      ) ptr ON t.tenantid = ptr.tenantid
+      
+      LEFT JOIN (
+          SELECT tenantid, COUNT(*) AS count FROM eg_challan GROUP BY tenantid
+      ) challan ON t.tenantid = challan.tenantid
+      
+      LEFT JOIN (
+          SELECT tenant_id, COUNT(*) AS count FROM eg_adv_booking_detail GROUP BY tenant_id
+      ) adv ON t.tenantid = adv.tenant_id
+      
+      LEFT JOIN (
+          SELECT tenantid, COUNT(*) AS count FROM eg_gc_connection GROUP BY tenantid
+      ) gc ON t.tenantid = gc.tenantid
+      
+      LEFT JOIN (
+          SELECT tenant_id, COUNT(*) AS count FROM eg_rl_allotment GROUP BY tenant_id
+      ) rl ON t.tenantid = rl.tenant_id;    
