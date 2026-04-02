@@ -148,6 +148,154 @@ ReportDefinitions:
     and payment.paymentstatus != 'CANCELLED'
   orderby: order by pd.receiptdate desc
 
+- reportName: ReceiptRegisterSW_mseva
+  decryptionPathId: MiscReceiptULB_v2
+  summary: Receipt Register
+  version: 1.0.0
+  moduleName: rainmaker-ws
+  additionalConfig:
+    print:
+      pdfPageSize: "A1"
+  sourceColumns:
+  - name: receiptno
+    label: receiptno
+    type: string
+    source: ws
+    total: false
+  - name: connectionno
+    label: connectionno
+    type: string
+    source: ws
+    total: false 
+  - name: receiptdate1
+    label: receiptdate
+    type: string
+    source: ws
+    total: false
+  - name: service
+    label: serive
+    type: string
+    source: ws
+    total: false
+  - name: collectorname
+    label: collectorname
+    type: string
+    source: ws
+    total: false
+  - name: transactiondate
+    label: transactiondate
+    type: string
+    source: ws
+    total: false
+  - name: instrumentnumber
+    label: instrumentnumber
+    type: string
+    source: ws
+    total: false    
+  - name: payername
+    label: payername
+    type: string
+    source: ws
+    total: false
+  - name: amountpaid
+    label: amountpaid
+    type: string
+    source: ws
+    total: true
+  - name: paymentmode
+    label: paymentmode
+    type: string
+    source: ws
+    total: false
+  - name: paymentstatus
+    label: paymentstatus
+    type: string
+    source: ws
+    total: false
+  - name: ownername1
+    label: ownername1
+    type: string
+    source: ws
+    total: false  
+  - name: user
+    label: user
+    type: string
+    source: ws
+    total: false
+  - name: manualreceiptnumber
+    label: manualreceiptnumber
+    type: string
+    source: ws
+    total: false
+  - name: receiptdate
+    label: receiptdate
+    type: epoch
+    source: ws
+    total: false    
+  searchParams:
+  - name: fromDate
+    label: fromDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND pd.receiptdate >= $fromDate
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND pd.receiptdate <= $toDate
+  - name: serviceType
+    label: serviceType
+    type: singlevaluelist
+    pattern: 'list://WS%:Water,SW%:Sewerage'
+    source: pt
+    isMandatory: true
+    searchClause: AND pd.businessservice like $serviceType
+  - name: receiptNumber
+    label: receiptNumber
+    type: string
+    source: pt
+    isMandatory: false
+    searchClause: AND pd.receiptnumber like $receiptNumber
+  - name: paymentStatus
+    label: paymentStatus
+    type: singlevaluelist
+    pattern: 'list://NEW:NEW,DEPOSITED:DEPOSITED'
+    source: pt
+    isMandatory: false
+    searchClause: AND payment.paymentstatus like $paymentStatus
+  - name: paymentMode
+    label: paymentMode
+    type: singlevaluelist
+    pattern: 'list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT'
+    source: pt
+    isMandatory: false
+    searchClause: AND payment.paymentmode like $paymentMode
+  query: |
+    select pd.manualreceiptnumber,pd.manualreceiptdate,
+    pd.receiptnumber AS receiptno,
+    bill.consumercode AS connectionno,     
+    TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate1,
+    bill.businessservice AS service,   
+    payment.paidby AS payername,
+    pd.amountpaid,
+    payment.paymentmode,
+    payment.paymentstatus,
+    payment.instrumentnumber,
+    to_char((To_timestamp(payment.instrumentdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') AS transactiondate, 
+    usr.name as collectorname,
+    payername as ownername1,
+    usr.id as user
+    from egcl_paymentdetail pd
+    inner join egcl_bill as bill on bill.id=pd.billid and pd.tenantid = $tenantid  
+    inner join egcl_payment as payment on payment.id=pd.paymentid    
+    left join eg_user as usr on usr.id=payment.createdby::integer 
+    where bill.tenantid = $tenantid and pd.businessservice in ('WS','SW','WS.ONE_TIME_FEE','SW.ONE_TIME_FEE') 
+    and bill.status='ACTIVE'
+    and payment.paymentstatus != 'CANCELLED'
+  orderby: order by pd.receiptdate desc  
+
 
 - reportName: ReceiptRegisterSW_OLD
   summary: Receipt Register
