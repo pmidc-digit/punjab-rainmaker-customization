@@ -72,11 +72,9 @@ ReportDefinitions:
         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
         LEFT JOIN eg_user u       ON u.uuid = wa.assignee
         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        WHERE wf.tenantid = $tenantid
-          AND wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+        WHERE wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       )
-  
       SELECT DISTINCT ON (o.applicationno)
         u.name,
         u.mobilenumber,
@@ -88,7 +86,7 @@ ReportDefinitions:
       JOIN eg_bpa_buildingplan o   ON a.buildingplanid = o.id            
       JOIN eg_user u        ON u.uuid = o.accountid           
       LEFT JOIN current_holder ch ON ch.applicationno = o.applicationno
-      WHERE o.tenantid = $tenantid
+      WHERE 1=1
   orderby:  ORDER BY o.applicationno;
 
 - reportName: CollectionsReportBPA
@@ -214,8 +212,7 @@ ReportDefinitions:
         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
         LEFT JOIN eg_user u ON u.uuid = wa.assignee
         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        WHERE wf.tenantid = $tenantid
-        AND wf.businessservice in   ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') 
+        WHERE wf.businessservice in   ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') 
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       ),
       
@@ -253,7 +250,6 @@ ReportDefinitions:
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno OR ch.applicationno = a.id::text
         WHERE pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG')
           AND upper(p.paymentstatus) != 'CANCELLED'
-          AND p.tenantid = $tenantid
       )
       
       SELECT  
@@ -355,8 +351,7 @@ ReportDefinitions:
            wf.id AS processinstanceid
           FROM eg_wf_processinstance_v2 wf
           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-          WHERE wf.tenantid = $tenantid
-         AND wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')                
+          WHERE  wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')                
           ),
         status_times AS (
              SELECT
@@ -388,8 +383,7 @@ ReportDefinitions:
               JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
               JOIN eg_hrms_employee e ON e.uuid = wa.assignee
               JOIN eg_user u ON e.uuid = u.uuid
-               WHERE wf.tenantid = $tenantid
-               AND wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+               WHERE wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
               ORDER BY wf.businessid,wf.lastmodifiedtime DESC
                )
          SELECT DISTINCT ON (n.applicationno)
@@ -548,7 +542,6 @@ ReportDefinitions:
       FROM egcl_paymentdetail pd
       INNER JOIN egcl_bill bill 
           ON bill.id = pd.billid 
-          AND pd.tenantid = $tenantid
       INNER JOIN egcl_payment payment 
           ON payment.id = pd.paymentid
       LEFT JOIN eg_bpa_buildingplan a 
@@ -556,8 +549,7 @@ ReportDefinitions:
       LEFT JOIN eg_user usr 
           ON usr.id = payment.createdby::integer
       WHERE
-          bill.tenantid = $tenantid
-          AND pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG')
+          pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG')
           AND payment.paymentstatus != 'CANCELLED'
   orderby: ORDER BY pd.receiptdate DESC;
 
