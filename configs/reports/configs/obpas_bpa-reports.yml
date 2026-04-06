@@ -9,6 +9,11 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
+  - name: Tenant
+    label: tenant
+    type: string
+    source: obpas_bpa
+    total: false
   - name: name
     label: name
     type: string
@@ -39,11 +44,6 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: employee_code
-    label: employee_code
-    type: string
-    source: obpas_bpa
-    total: false
   searchParams:
   - name: fromDate
     label: fromDate
@@ -60,14 +60,15 @@ ReportDefinitions:
   - name: businessservice
     label: Business Service
     type: singlevaluelist
-    pattern: "list://BPALOW:BPA_LOW"
-    source: pt
+    pattern: "list://BPA_LOW:Self_Certification"
+    source: obpas_bpa
     isMandatory: false
     searchClause: AND ch.businessservice = $businessservice 
   query: |
       WITH current_holder AS (
         SELECT DISTINCT ON (wf.businessid)
           wf.businessid AS applicationno,
+          split_part(wf.tenantid, '.', 2) AS tenant, 
           u.name AS assignee_name,
           e.code AS assignee_code,
           wf.businessservice,
@@ -77,24 +78,23 @@ ReportDefinitions:
         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
         LEFT JOIN eg_user u       ON u.uuid = wa.assignee
         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        WHERE wf.tenantid = $tenantid
-          AND wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+        WHERE wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       )
-      
-      SELECT
+      SELECT DISTINCT ON (o.applicationno)
         u.name,
         u.mobilenumber,
-        o.status,
+        o.status as applicationstatus,
+        ch.tenant,
         'BPA' as businessservice,
         o.applicationno,
-        ch.assignee_name  AS employee_name,
-        ch.assignee_code  AS employee_code
+        ch.assignee_name  AS employee_name
       FROM  eg_bpa_document  a
       JOIN eg_bpa_buildingplan o   ON a.buildingplanid = o.id            
       JOIN eg_user u        ON u.uuid = o.accountid           
       LEFT JOIN current_holder ch ON ch.applicationno = o.applicationno
-      WHERE o.tenantid = $tenantid
+      WHERE 1=1
+  orderby:  ORDER BY o.applicationno;
 
 - reportName: CollectionsReportBPA
   decryptionPathId: LAYOUTREPORTS
@@ -105,6 +105,11 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
+  - name: Tenant
+    label: tenant
+    type: string
+    source: obpas_bpa
+    total: false
   - name: applicationno
     label: applicationno
     type: string
@@ -125,8 +130,8 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: applicationstatus
-    label: applicationstatus
+  - name: status
+    label: status
     type: string
     source: obpas_bpa
     total: false
@@ -175,8 +180,8 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: true
-  - name: PaymentDate
-    label: PaymentDate
+  - name: payment_date
+    label: payment_date
     type: string
     source: obpas_bpa
     total: false
@@ -197,20 +202,20 @@ ReportDefinitions:
     label: Business Service
     type: singlevaluelist
     pattern: list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH
-    source: pt
+    source: obpas_bpa
     isMandatory: false
     searchClause: AND businessservice = $businessservice    
   - name: collector_code
     label: collector_code
     type: string
-    source: ptr
+    source: obpas_bpa
     isMandatory: false
     searchClause: AND collector_code = $collector_code
   query: |
       WITH current_holder AS (
         SELECT DISTINCT ON (wf.businessid)
           wf.businessid AS applicationno,
-          u.name AS employee_name,
+          u.name AS employee_name,wf.tenantid,
           e.code AS assignee_code,
           wf.businessservice,
           UPPER(st.applicationstatus) AS current_stage
@@ -219,15 +224,14 @@ ReportDefinitions:
         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
         LEFT JOIN eg_user u ON u.uuid = wa.assignee
         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        WHERE wf.tenantid = $tenantid
-        AND wf.businessservice in   ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') 
+        WHERE wf.businessservice in   ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') 
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       ),
       
       unique_transactions AS (
         SELECT
           p.id AS transaction_id,
-          p.createdtime,
+          p.createdtime,split_part(p.tenantid, '.', 2) AS tenant, 
           pd.amountpaid,
           CASE WHEN upper(p.paymentmode) IN ('CASH','OFFLINE_CASH') THEN pd.amountpaid ELSE 0 END AS cash_amount,
           CASE WHEN upper(p.paymentmode) = 'CHEQUE' THEN pd.amountpaid ELSE 0 END AS cheque_amount,
@@ -250,7 +254,6 @@ ReportDefinitions:
         FROM egcl_paymentdetail pd
         JOIN egcl_payment p ON pd.paymentid = p.id
         LEFT JOIN egcl_bill bill ON bill.id = pd.billid
-        -- tolerant matching: try matching consumercode to applicationno OR to id (stringified)
         LEFT JOIN eg_bpa_buildingplan a ON trim(bill.consumercode) = trim(a.applicationno)
                            OR trim(bill.consumercode) = trim(a.id::text)
         LEFT JOIN eg_user u_applicant ON u_applicant.uuid = a.accountid
@@ -259,12 +262,11 @@ ReportDefinitions:
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno OR ch.applicationno = a.id::text
         WHERE pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG')
           AND upper(p.paymentstatus) != 'CANCELLED'
-          AND p.tenantid = $tenantid
       )
       
-      SELECT
+      SELECT  
         to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS payment_date,
-        applicationno,
+        applicationno,tenant,
         bill_consumercode,
         name,
         mobilenumber,
@@ -273,7 +275,7 @@ ReportDefinitions:
         collector_code,
         cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
       FROM unique_transactions where 1=1
-  orderby: ORDER BY createdtime DESC 
+  orderby: ORDER BY applicationno,createdtime DESC 
   
 - reportName: SLAReportbpa
   decryptionPathId: LAYOUTREPORTS
@@ -346,7 +348,7 @@ ReportDefinitions:
     label: Business Service
     type: singlevaluelist
     pattern: list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH
-    source: pt
+    source: obpas_bpa
     isMandatory: false
     searchClause: AND sla.businessservice = $businessservice     
   query: |
@@ -361,14 +363,13 @@ ReportDefinitions:
            wf.id AS processinstanceid
           FROM eg_wf_processinstance_v2 wf
           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-          WHERE wf.tenantid = $tenantid
-         AND wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')                
+          WHERE  wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')                
           ),
         status_times AS (
              SELECT
                 uuid,
-                MAX(CASE WHEN applicationstatus = 'DOCUMENTVERIFY' THEN createdtime END) AS docverify_time,
-                MAX(CASE WHEN applicationstatus IN ('APPROVED','REJECTED') THEN lastmodifiedtime END) AS final_time
+                MAX(CASE WHEN applicationstatus = 'FIELDINSPECTION_INPROGRESS' THEN createdtime END) AS docverify_time,
+                MAX(CASE WHEN applicationstatus IN ('E-SIGNED','APPROVED','REJECTED','PENDING_SANC_FEE_PAYMENT','BLOCKED') THEN lastmodifiedtime END) AS final_time
               FROM wf_detailed
               GROUP BY uuid
              ),
@@ -394,11 +395,10 @@ ReportDefinitions:
               JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
               JOIN eg_hrms_employee e ON e.uuid = wa.assignee
               JOIN eg_user u ON e.uuid = u.uuid
-               WHERE wf.tenantid = $tenantid
-               AND wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+               WHERE wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
               ORDER BY wf.businessid,wf.lastmodifiedtime DESC
                )
-         SELECT
+         SELECT DISTINCT ON (n.applicationno)
             split_part(n.tenantid,'.',2) AS tenantid,
              n.applicationno AS bpa_application_no,                 
              UPPER(ls.applicationstatus) AS final_status,
@@ -412,13 +412,25 @@ ReportDefinitions:
              ELSE NULL
             END AS sla_days,
             CASE
-               WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL THEN
-            CASE WHEN (st.final_time-st.docverify_time) > sla.businessservicesla THEN 'BREACHED'
-                 ELSE 'MET' END
-                WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
-                THEN 'IN-PROGRESS'
-               ELSE 'AWAITING DOCVERIFY'
-            END AS sla_status,
+        WHEN st.docverify_time IS NOT NULL
+             AND st.final_time IS NOT NULL THEN
+            CASE
+                WHEN (st.final_time - st.docverify_time)
+                     > sla.businessservicesla
+                THEN 'BREACHED'
+                ELSE 'MET'
+            END
+        WHEN st.docverify_time IS NOT NULL
+             AND st.final_time IS NULL THEN
+            CASE
+                WHEN (EXTRACT(EPOCH FROM NOW()) * 1000 - st.docverify_time)
+                     > sla.businessservicesla
+                THEN 'BREACHED'
+                ELSE 'IN-PROGRESS'
+            END
+
+        ELSE 'AWAITING DOCVERIFY'
+        END AS sla_status,
             ad.employee_name AS employee_name,
             ad.employee_code AS employee_code
             FROM eg_bpa_buildingplan n
@@ -427,8 +439,8 @@ ReportDefinitions:
             JOIN sla_data sla ON sla.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
             
             LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
-            WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')             
-  orderby:  ORDER BY n.createdtime DESC, tenantid, final_status
+            WHERE UPPER(ls.applicationstatus) NOT IN  ('CITIZEN_APPROVAL_INPROCESS','PENDING_APPL_FEE','INITIATED')           
+  orderby:  ORDER BY n.applicationno,n.createdtime DESC, tenantid, final_status
 
 - reportName: ReceiptRegisterbpa
   decryptionPathId: LAYOUTREPORTS
@@ -439,13 +451,18 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
+  - name: Tenant
+    label: tenant
+    type: string
+    source: obpas_bpa
+    total: false
   - name: receiptno
     label: receiptno
     type: string
     source: obpas_bpa
     total: false
-  - name: connectionno
-    label: connectionno
+  - name: applicationno
+    label: applicationno
     type: string
     source: obpas_bpa
     total: false
@@ -454,13 +471,13 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: service
-    label: service
+  - name: businessservice
+    label: businessservice
     type: string
     source: obpas_bpa
     total: false
-  - name: collectorname
-    label: collectorname
+  - name: service
+    label: service
     type: string
     source: obpas_bpa
     total: false
@@ -469,8 +486,8 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: instrumentnumber
-    label: instrumentnumber
+  - name: transaction_id
+    label: transaction_id
     type: string
     source: obpas_bpa
     total: false
@@ -483,7 +500,7 @@ ReportDefinitions:
     label: amountpaid
     type: string
     source: obpas_bpa
-    total: false
+    total: true
   - name: paymentmode
     label: paymentmode
     type: string
@@ -491,21 +508,6 @@ ReportDefinitions:
     total: false
   - name: paymentstatus
     label: paymentstatus
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: user
-    label: user
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: manualreceiptnumber
-    label: manualreceiptnumber
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: manualreceiptdate
-    label: manualreceiptdate
     type: string
     source: obpas_bpa
     total: false
@@ -538,29 +540,26 @@ ReportDefinitions:
   query: |
       SELECT
           pd.receiptnumber AS receiptno,
-          bill.consumercode AS connectionno,
+          bill.consumercode AS applicationno,
+          split_part(pd.tenantid, '.', 2) AS tenant,
           TO_CHAR(
               TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata',
               'DD-MM-YYYY'
           ) AS receiptdate,
-          pd.businessservice AS service,
-          usr.name AS collectorname,
+          pd.businessservice ,
+          'BPA' AS service,
           TO_CHAR(
               TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata',
               'DD-MM-YYYY'
           ) AS transactiondate,
-          payment.instrumentnumber,
+          payment.instrumentnumber AS transaction_id,
           usr.name AS ownername1,
           pd.amountpaid,
           payment.paymentmode,
-          payment.paymentstatus,
-          usr.id AS user,
-          pd.manualreceiptnumber,
-          pd.manualreceiptdate
+          payment.paymentstatus
       FROM egcl_paymentdetail pd
       INNER JOIN egcl_bill bill 
           ON bill.id = pd.billid 
-          AND pd.tenantid = $tenantid
       INNER JOIN egcl_payment payment 
           ON payment.id = pd.paymentid
       LEFT JOIN eg_bpa_buildingplan a 
@@ -568,8 +567,7 @@ ReportDefinitions:
       LEFT JOIN eg_user usr 
           ON usr.id = payment.createdby::integer
       WHERE
-          bill.tenantid = $tenantid
-          AND pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG')
+          pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG')
           AND payment.paymentstatus != 'CANCELLED'
   orderby: ORDER BY pd.receiptdate DESC;
 
@@ -619,7 +617,14 @@ ReportDefinitions:
     pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND ulb_data.district = $district    
+    searchClause: AND ulb_data.district = $district 
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: and  bpa.tenantid = $ulb   
   query: |
        select ulb_data.district,bpa.applicationno,bpa.edcrnumber,bpa.status,bpa.tenantid,'Building_Plan' as
        businessservice from eg_bpa_buildingplan bpa inner join ulb_data on bpa.tenantid = ulb_data.ulb_code where businessservice = 'BPA_LOW' 
@@ -651,6 +656,13 @@ ReportDefinitions:
     source: obpas_bpa
     isMandatory: false
     searchClause: AND ulb_data.district = $district 
+  - name: tenant_name
+    label: tenant_name
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: and eg_bpa_buildingplan.tenantid = $tenant_name
   query: |
        SELECT 
            ulb_data.district,
@@ -686,15 +698,23 @@ ReportDefinitions:
     label: Pending Files
     type: string
     source: obpas_bpa
-    total: false  
+    total: true  
   searchParams:    
   - name: businessservice
     label: Business Service
     type: singlevaluelist
     pattern: 'list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH'
-    source: pt
+    source: obpas_bpa
     isMandatory: false
     searchClause: AND businessservice = $businessservice
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND tenantid = $ulb
+
 
   query: |
        WITH latest_assignee AS (
@@ -731,6 +751,7 @@ ReportDefinitions:
        
        merged AS (
          SELECT
+           la.tenantid, 
            INITCAP(REPLACE(la.tenantid, 'pb.', '')) AS ulb_name,
            la.designation_code,
            la.businessservice,
@@ -749,7 +770,7 @@ ReportDefinitions:
          ulb_name ,businessservice,
          designation_code as Officer_Designation,
          pending_files 
-       FROM merged where 1=1
+       FROM merged where  designation_code <> 'Clerk'
   orderby:  ORDER BY pending_files DESC limit 7
 
 - reportName: officers_wise_pendency
@@ -811,9 +832,16 @@ ReportDefinitions:
     label: Business Service
     type: singlevaluelist
     pattern: list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH
-    source: pt
+    source: obpas_bpa
     isMandatory: false
     searchClause: AND businessservice = $businessservice
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND tenantid = $ulb
   query: |
       WITH params AS (
         SELECT
@@ -824,6 +852,7 @@ ReportDefinitions:
       latest_assignee AS (
         SELECT DISTINCT ON (wf.businessid)
           wf.businessid,
+          wf.tenantid,
           d.name AS designation_code
         FROM eg_wf_processinstance_v2 wf
         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
@@ -835,8 +864,8 @@ ReportDefinitions:
       ),
       
       wf_data AS (
-        -- createdtime stored as epoch-ms? If your createdtime is timestamptz, replace to_timestamp(p.createdtime/1000.0) with p.createdtime
         SELECT
+          la.tenantid,
           la.designation_code,
           p.businessservice,
           (to_timestamp(p.createdtime/1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS created_date
@@ -854,18 +883,19 @@ ReportDefinitions:
       
       date_list AS (
         SELECT (base_dt - offs) AS dt
-        FROM params, generate_series(0,7) AS g(offs)   -- 0 = base date, 7 = base - 7 days
+        FROM params, generate_series(0,7) AS g(offs)  
       ),
       
       agg AS (
         SELECT
           d.dt,
+          w.tenantid,
           w.designation_code,
           w.businessservice,
           COUNT(w.created_date) AS cnt
         FROM date_list d
         LEFT JOIN wf_data w ON w.created_date = d.dt
-        GROUP BY d.dt, w.designation_code, w.businessservice
+        GROUP BY d.dt,w.tenantid, w.designation_code, w.businessservice
       )
       
       SELECT
@@ -909,21 +939,23 @@ ReportDefinitions:
   searchParams:
   - name: district
     label: district
-    type: string
+    type: singlevaluelist
+    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
-  - name: name_of_ulb
-    label: name_of_ulb
-    type: string
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $name_of_ulb
+    searchClause: AND u.name_of_ulb= $ulb  
   - name: businessservice
     label: businesservice
     type: singlevaluelist
     pattern: "list://BPA_LOW:Self Certification"
-    source: pt
+    source: obpas_bpa
     isMandatory: false
     searchClause: AND sc.businessservice = $businessservice 
   query: |
@@ -1022,21 +1054,23 @@ ReportDefinitions:
   searchParams:
   - name: district
     label: district
-    type: string
+    type: singlevaluelist
+    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
-  - name: name_of_ulb
-    label: name_of_ulb
-    type: string
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $name_of_ulb
+    searchClause: AND u.name_of_ulb= $ulb 
   - name: businessservice
     label: Business Service
     type: singlevaluelist
     pattern: "list://BPA_LOW:Self Certification"
-    source: pt
+    source: obpas_bpa
     isMandatory: false
     searchClause: AND sc.businessservice = $businessservice 
   query: |
@@ -1170,21 +1204,23 @@ ReportDefinitions:
     searchClause: AND 1=1
   - name: district
     label: district
-    type: string
+    type: singlevaluelist
+    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
-  - name: name_of_ulb
-    label: name_of_ulb
-    type: string
+  - name: tenant
+    label: tenant
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $name_of_ulb
+    searchClause: AND u.name_of_ulb= $tenant
   - name: businessservice
     label: Business Service
     type: singlevaluelist
     pattern: "list://BPA_LOW:Self Certification"
-    source: pt
+    source: obpas_bpa
     isMandatory: false
     searchClause: AND ub.businessservice = $businessservice 
   query: |
@@ -1192,73 +1228,76 @@ ReportDefinitions:
         SELECT
             (to_timestamp($fromDate / 1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS report_dt
         ),
-      wf_history AS (
+       wf_detailed AS (
         SELECT
-           wf.businessid AS uuid,
-           wf.businessservice,
+           wf.businessid AS applicationno,
            wf.tenantid,
+           wf.businessservice,
+           UPPER(st.applicationstatus) AS applicationstatus,
            wf.createdtime,
-           wf.lastmodifiedtime,
-           st.applicationstatus,
-           st.state,
-           st.sla AS state_sla
+           wf.lastmodifiedtime
            FROM eg_wf_processinstance_v2 wf
            JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+           WHERE wf.businessservice IN (
+           'BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP',
+           'BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH'
+            )
         ),
-      latest_status AS (
-        SELECT DISTINCT ON (uuid)
-           uuid,
-           businessservice,
-           tenantid,
-           applicationstatus,
-           lastmodifiedtime
-           FROM wf_history
-           ORDER BY uuid, lastmodifiedtime DESC
-        ),
-      sla_entry AS (
+       status_times AS (
         SELECT
-           uuid,
-           MIN(createdtime) AS sla_start_time,
-           MAX(state_sla) AS sla_duration
-           FROM wf_history
-           WHERE state = 'DOC_VERIFICATION_PENDING'
-           GROUP BY uuid
-        ),
-      sla_dates AS (
+          applicationno,
+          tenantid,
+          businessservice,
+          MIN(createdtime) FILTER ( WHERE applicationstatus = 'FIELDINSPECTION_INPROGRESS' ) AS sla_start_time,
+          MAX(lastmodifiedtime) FILTER ( WHERE applicationstatus IN ( 'APPROVED','REJECTED','BLOCKED','PENDING_SANC_FEE_PAYMENT' )) AS final_time
+          FROM wf_detailed
+          GROUP BY applicationno, tenantid, businessservice
+          ), 
+       sla_master AS (
         SELECT
-           ls.uuid,
-           ls.tenantid,
-           ls.businessservice,
-           to_timestamp((se.sla_start_time + se.sla_duration) / 1000.0) AT TIME ZONE 'Asia/Kolkata' AS sla_breach_ts
-           FROM latest_status ls
-           JOIN sla_entry se ON ls.uuid = se.uuid
-           WHERE ls.applicationstatus NOT IN ('INITIATED','PENDING_APPL_FEE','CITIZEN_APPROVAL_INPROCESS' )
-        ),
-      upcoming_breaches AS (
+          businessservice,
+          businessservicesla
+          FROM eg_wf_businessservice_v2
+          ),
+       sla_calc AS (
         SELECT
-           sd.tenantid,
-           sd.businessservice,
-           sd.sla_breach_ts::date AS breach_date
-           FROM sla_dates sd
-           JOIN params p ON TRUE
-           WHERE sd.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
-        )
-       SELECT
-         u.district,
-         u.name_of_ulb,
-         COUNT(*) FILTER (WHERE breach_date = p.report_dt)   AS day0, 
-         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '1 day') AS day1,  
-         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '2 day') AS day2, 
-         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '3 day') AS day3,  
-         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '4 day') AS day4,  
-         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '5 day') AS day5, 
-         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '6 day') AS day6, 
-         COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '7 day') AS day7,  
-         COUNT(*) AS total_upcoming_breaches
-         FROM upcoming_breaches ub
-         JOIN ulb_data u ON ub.tenantid = u.ulb_code
+          st.applicationno,
+          st.tenantid,
+          st.businessservice,
+          st.sla_start_time,
+          st.final_time,
+          (to_timestamp( (st.sla_start_time + sm.businessservicesla) / 1000.0) AT TIME ZONE 'Asia/Kolkata') AS sla_breach_ts
+          FROM status_times st
+          JOIN sla_master sm ON sm.businessservice = st.businessservice
+          WHERE st.sla_start_time IS NOT NULL
+           ),
+       upcoming_breaches AS (
+        SELECT
+         tenantid,
+         businessservice,
+         sla_breach_ts::date AS breach_date
+         FROM sla_calc sc
          JOIN params p ON TRUE
-         WHERE 1=1 
+         WHERE sc.final_time IS NULL 
+          AND sc.sla_breach_ts::date
+          BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
+           )
+        SELECT
+          u.district,
+          u.name_of_ulb,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt)   AS day0,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '1 day') AS day1,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '2 day') AS day2,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '3 day') AS day3,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '4 day') AS day4,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '5 day') AS day5,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '6 day') AS day6,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '7 day') AS day7,
+          COUNT(*) AS total_upcoming_breaches
+          FROM upcoming_breaches ub
+          JOIN ulb_data u ON ub.tenantid = u.ulb_code
+          JOIN params p ON TRUE    
+             WHERE 1=1 
   groupby: GROUP BY u.district, u.name_of_ulb
   orderby: ORDER BY u.district, u.name_of_ulb DESC   
 
@@ -1304,21 +1343,23 @@ ReportDefinitions:
     searchClause: AND 1=1
   - name: district
     label: district
-    type: string
+    type: singlevaluelist
+    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
-  - name: name_of_ulb
-    label: name_of_ulb
-    type: string
+  - name: tenant
+    label: tenant
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $name_of_ulb
+    searchClause: AND u.name_of_ulb= $tenant 
   - name: businessservice
     label: Business Service
     type: singlevaluelist
     pattern: "list://BPA_LOW:Self Certification"
-    source: pt
+    source: obpas_bpa
     isMandatory: false
     searchClause: AND ub.businessservice = $businessservice 
   query: |
@@ -1326,59 +1367,69 @@ ReportDefinitions:
         SELECT
             (to_timestamp($fromDate / 1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS report_dt
         ),
-      wf_history AS (
+      wf_detailed AS (
         SELECT
            wf.businessid AS uuid,
            wf.businessservice,
            wf.tenantid,
+           UPPER(st.applicationstatus) AS applicationstatus,
            wf.createdtime,
-           wf.lastmodifiedtime,
-           st.applicationstatus,
-           st.state,
-           st.sla AS state_sla
+           wf.lastmodifiedtime
            FROM eg_wf_processinstance_v2 wf
            JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+           WHERE wf.businessservice IN (
+          'BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP',
+          'BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH'
+           )
         ),
       latest_status AS (
         SELECT DISTINCT ON (uuid)
            uuid,
-           businessservice,
-           tenantid,
-           applicationstatus,
-           lastmodifiedtime
-           FROM wf_history
+           applicationstatus
+           FROM wf_detailed
            ORDER BY uuid, lastmodifiedtime DESC
         ),
-      sla_entry AS (
-        SELECT
+      status_times AS (
+          SELECT
            uuid,
-           MIN(createdtime) AS sla_start_time,
-           MAX(state_sla) AS sla_duration
-           FROM wf_history
-           WHERE state = 'DOC_VERIFICATION_PENDING'
-           GROUP BY uuid
-        ),
-      sla_dates AS (
+           tenantid,
+           businessservice,
+           MIN(createdtime) FILTER (
+            WHERE applicationstatus = 'FIELDINSPECTION_INPROGRESS') AS sla_start_time,
+           MAX(lastmodifiedtime) FILTER (  WHERE applicationstatus IN (  'APPROVED','REJECTED','BLOCKED','PENDING_SANC_FEE_PAYMENT'
+            ) ) AS final_time
+           FROM wf_detailed
+           GROUP BY uuid, tenantid, businessservice
+         ),
+      sla_master AS (
         SELECT
-           ls.uuid,
-           ls.tenantid,
-           ls.businessservice,
+           businessservice,
+           businessservicesla
+          FROM eg_wf_businessservice_v2
+          ),
+      sla_calc AS (
+         SELECT
+           st.uuid,
+           st.tenantid,
+           st.businessservice,
            ls.applicationstatus,
-           to_timestamp((se.sla_start_time + se.sla_duration) / 1000.0) AT TIME ZONE 'Asia/Kolkata' AS sla_breach_ts
-           FROM latest_status ls
-           JOIN sla_entry se ON ls.uuid = se.uuid
-           WHERE ls.applicationstatus NOT IN ('INITIATED','PENDING_APPL_FEE','CITIZEN_APPROVAL_INPROCESS' )
-        ),
+           (to_timestamp((st.sla_start_time + sm.businessservicesla) / 1000.0) AT TIME ZONE 'Asia/Kolkata') AS sla_breach_ts
+           FROM status_times st
+           JOIN sla_master sm ON sm.businessservice = st.businessservice
+           JOIN latest_status ls ON ls.uuid = st.uuid
+           WHERE st.sla_start_time IS NOT NULL
+           AND st.final_time IS NULL
+           ),
       upcoming_breaches AS (
         SELECT
-           sd.uuid,
-           sd.tenantid,
-           sd.businessservice,
-           sd.applicationstatus,
-           sd.sla_breach_ts::date AS breach_date
-           FROM sla_dates sd
+           sc.uuid,
+           sc.tenantid,
+           sc.businessservice,
+           sc.applicationstatus,
+           sc.sla_breach_ts::date AS breach_date
+           FROM sla_calc sc
            JOIN params p ON TRUE
-           WHERE sd.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
+           WHERE sc.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
         )
        SELECT
          u.district,
@@ -1388,7 +1439,6 @@ ReportDefinitions:
          'Building_Plan' as modulename
          FROM upcoming_breaches ub
          JOIN ulb_data u ON ub.tenantid = u.ulb_code
-         JOIN params p ON TRUE
          WHERE 1=1 
   groupby: GROUP BY u.district, u.name_of_ulb,ub.applicationstatus,ub.uuid
   orderby: ORDER BY u.district, u.name_of_ulb ,ub.applicationstatus,ub.uuid DESC        
