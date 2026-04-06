@@ -33,7 +33,8 @@ ServiceMaps:
               "cityCode":"cityCode","locality":"locality","localityCode":"localityCode",
               "pincode":"pincode",
               "bookingSlotDetails":"bookingSlotDetails",
-              "workflow":"workflow","owners":"owners"
+              "workflow":"workflow","owners":"owners",
+              "workflowStatusId":"","workflowApplicationStatus":"","workflowAssigneeUuids":[],"history":{}
             }}
             fieldMapping:
               # All paths now start with $.hallsBookingApplication
@@ -119,6 +120,19 @@ ServiceMaps:
                 outJsonPath: $.Data.workflow
               - inJsonPath: $.hallsBookingApplication.owners
                 outJsonPath: $.Data.owners
+            externalUriMapping:
+              - path: http://egov-workflow-v2.egov:8080/egov-workflow-v2/egov-wf/process/_search
+                queryParam: businessIds=$.hallsBookingApplication.bookingNo,history=true,tenantId=$.hallsBookingApplication.tenantId
+                apiRequest: {"RequestInfo":{"apiId":"org.egov.pt","ver":"1.0","ts":1502890899493,"action":"asd","did":"4354648646","key":"xyz","msgId":"654654","requesterId":"61","authToken":"d9994555-7656-4a67-ab3a-a952a0d4dfc8","userInfo":{"id":1,"uuid":"1fec8102-0e02-4d0a-b283-cd80d5dab067","type":"EMPLOYEE","tenantId":"pb.amritsar","roles":[{"name":"Employee","code":"EMPLOYEE","tenantId":"pb.amritsar"}]}}}
+                uriResponseMapping:
+                  - inJsonPath: $.ProcessInstances
+                    outJsonPath: $.Data.history
+                  - inJsonPath: $.ProcessInstances[0].state.uuid
+                    outJsonPath: $.Data.workflowStatusId
+                  - inJsonPath: $.ProcessInstances[0].state.applicationStatus
+                    outJsonPath: $.Data.workflowApplicationStatus
+                  - inJsonPath: $.ProcessInstances[0].assignes.*.uuid
+                    outJsonPath: $.Data.workflowAssigneeUuids
 
     - topic: update-community-hall-booking
       configKey: INDEX
@@ -148,7 +162,8 @@ ServiceMaps:
               "addressLine1":"addressLine1","landmark":"landmark","city":"city",
               "cityCode":"cityCode","locality":"locality","localityCode":"localityCode",
               "pincode":"pincode","bookingSlotDetails":"bookingSlotDetails",
-              "workflow":"workflow","owners":"owners"
+              "workflow":"workflow","owners":"owners",
+              "workflowStatusId":"","workflowApplicationStatus":"","workflowAssigneeUuids":[],"history":{}
             }}
             fieldMapping:
               - inJsonPath: $.hallsBookingApplication.bookingId
@@ -233,6 +248,19 @@ ServiceMaps:
                 outJsonPath: $.Data.workflow
               - inJsonPath: $.hallsBookingApplication.owners
                 outJsonPath: $.Data.owners
+            externalUriMapping:
+              - path: http://egov-workflow-v2.egov:8080/egov-workflow-v2/egov-wf/process/_search
+                queryParam: businessIds=$.hallsBookingApplication.bookingNo,history=true,tenantId=$.hallsBookingApplication.tenantId
+                apiRequest: {"RequestInfo":{"apiId":"org.egov.pt","ver":"1.0","ts":1502890899493,"action":"asd","did":"4354648646","key":"xyz","msgId":"654654","requesterId":"61","authToken":"d9994555-7656-4a67-ab3a-a952a0d4dfc8","userInfo":{"id":1,"uuid":"1fec8102-0e02-4d0a-b283-cd80d5dab067","type":"EMPLOYEE","tenantId":"pb.amritsar","roles":[{"name":"Employee","code":"EMPLOYEE","tenantId":"pb.amritsar"}]}}}
+                uriResponseMapping:
+                  - inJsonPath: $.ProcessInstances
+                    outJsonPath: $.Data.history
+                  - inJsonPath: $.ProcessInstances[0].state.uuid
+                    outJsonPath: $.Data.workflowStatusId
+                  - inJsonPath: $.ProcessInstances[0].state.applicationStatus
+                    outJsonPath: $.Data.workflowApplicationStatus
+                  - inJsonPath: $.ProcessInstances[0].assignes.*.uuid
+                    outJsonPath: $.Data.workflowAssigneeUuids
 
     - topic: community-hall-booking-legacyIndex
       configKey: LEGACYINDEX
@@ -262,7 +290,8 @@ ServiceMaps:
               "cityCode": "cityCode","locality": "locality","localityCode": "localityCode",
               "pincode": "pincode",
               "bookingSlotDetails": "bookingSlotDetails",
-              "workflow": "workflow","owners": "owners"
+              "workflow": "workflow","owners": "owners",
+              "workflowStatusId":"","workflowApplicationStatus":"","workflowAssigneeUuids":[],"history":{}
             } }
             fieldMapping:
               - inJsonPath: $.hallsBookingApplication.bookingId
@@ -339,3 +368,16 @@ ServiceMaps:
                 outJsonPath: $.Data.workflow
               - inJsonPath: $.hallsBookingApplication.owners
                 outJsonPath: $.Data.owners
+            externalUriMapping:
+              - path: http://egov-workflow-v2.egov:8080/egov-workflow-v2/egov-wf/process/_search
+                queryParam: businessIds=$.hallsBookingApplication.bookingNo,history=true,tenantId=$.hallsBookingApplication.tenantId
+                apiRequest: {"RequestInfo":{"apiId":"org.egov.pt","ver":"1.0","ts":1502890899493,"action":"asd","did":"4354648646","key":"xyz","msgId":"654654","requesterId":"61","authToken":"d9994555-7656-4a67-ab3a-a952a0d4dfc8","userInfo":{"id":1,"uuid":"1fec8102-0e02-4d0a-b283-cd80d5dab067","type":"EMPLOYEE","tenantId":"pb.amritsar","roles":[{"name":"Employee","code":"EMPLOYEE","tenantId":"pb.amritsar"}]}}}
+                uriResponseMapping:
+                  - inJsonPath: $.ProcessInstances
+                    outJsonPath: $.Data.history
+                  - inJsonPath: $.ProcessInstances[0].state.uuid
+                    outJsonPath: $.Data.workflowStatusId
+                  - inJsonPath: $.ProcessInstances[0].state.applicationStatus
+                    outJsonPath: $.Data.workflowApplicationStatus
+                  - inJsonPath: $.ProcessInstances[0].assignes.*.uuid
+                    outJsonPath: $.Data.workflowAssigneeUuids
