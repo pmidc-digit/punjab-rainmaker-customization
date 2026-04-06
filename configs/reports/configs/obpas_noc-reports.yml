@@ -1064,7 +1064,7 @@ ReportDefinitions:
            wf.lastmodifiedtime
            FROM eg_wf_processinstance_v2 wf
            JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-           WHERE wf.businessservice ('NOC_NP','NOC_MC') AND st.applicationstatus not in ('INITIATED','CANCELLED')
+           WHERE wf.businessservice in ('NOC_NP','NOC_MC') AND st.applicationstatus not in ('INITIATED','CANCELLED')
         ),
       latest_status AS (
         SELECT DISTINCT ON (uuid)
