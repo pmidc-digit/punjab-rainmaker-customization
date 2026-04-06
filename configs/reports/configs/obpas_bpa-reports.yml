@@ -9,6 +9,11 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
+  - name: Tenant
+    label: tenant
+    type: string
+    source: obpas_bpa
+    total: false
   - name: name
     label: name
     type: string
@@ -63,6 +68,7 @@ ReportDefinitions:
       WITH current_holder AS (
         SELECT DISTINCT ON (wf.businessid)
           wf.businessid AS applicationno,
+          split_part(wf.tenantid, '.', 2) AS tenant, 
           u.name AS assignee_name,
           e.code AS assignee_code,
           wf.businessservice,
@@ -79,6 +85,7 @@ ReportDefinitions:
         u.name,
         u.mobilenumber,
         o.status as applicationstatus,
+        o.tenant,
         'BPA' as businessservice,
         o.applicationno,
         ch.assignee_name  AS employee_name
@@ -98,6 +105,11 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
+  - name: Tenant
+    label: tenant
+    type: string
+    source: obpas_bpa
+    total: false
   - name: applicationno
     label: applicationno
     type: string
@@ -203,7 +215,7 @@ ReportDefinitions:
       WITH current_holder AS (
         SELECT DISTINCT ON (wf.businessid)
           wf.businessid AS applicationno,
-          u.name AS employee_name,
+          u.name AS employee_name,wf.tenantid,
           e.code AS assignee_code,
           wf.businessservice,
           UPPER(st.applicationstatus) AS current_stage
@@ -219,7 +231,7 @@ ReportDefinitions:
       unique_transactions AS (
         SELECT
           p.id AS transaction_id,
-          p.createdtime,
+          p.createdtime,split_part(p.tenantid, '.', 2) AS tenant, 
           pd.amountpaid,
           CASE WHEN upper(p.paymentmode) IN ('CASH','OFFLINE_CASH') THEN pd.amountpaid ELSE 0 END AS cash_amount,
           CASE WHEN upper(p.paymentmode) = 'CHEQUE' THEN pd.amountpaid ELSE 0 END AS cheque_amount,
@@ -254,7 +266,7 @@ ReportDefinitions:
       
       SELECT  
         to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS payment_date,
-        applicationno,
+        applicationno,tenant,
         bill_consumercode,
         name,
         mobilenumber,
@@ -439,6 +451,11 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
+  - name: Tenant
+    label: tenant
+    type: string
+    source: obpas_bpa
+    total: false
   - name: receiptno
     label: receiptno
     type: string
@@ -524,6 +541,7 @@ ReportDefinitions:
       SELECT
           pd.receiptnumber AS receiptno,
           bill.consumercode AS applicationno,
+          split_part(pd.tenantid, '.', 2)) AS tenant,
           TO_CHAR(
               TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata',
               'DD-MM-YYYY'
