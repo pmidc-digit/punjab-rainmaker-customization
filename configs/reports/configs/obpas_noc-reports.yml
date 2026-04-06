@@ -1240,8 +1240,7 @@ ReportDefinitions:
         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
         LEFT JOIN eg_user u ON u.uuid = wa.assignee
         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        WHERE wf.tenantid = $tenantid
-          AND wf.businessservice = 'obpas_noc'
+        WHERE  wf.businessservice in ('NOC_MC','NOC_NP')
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       ),
 
@@ -1280,9 +1279,9 @@ ReportDefinitions:
         LEFT JOIN eg_user u ON u.id::text = p.createdby::text
         LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno OR ch.applicationno = a.id::text
-        WHERE pd.businessservice = 'obpas_noc'
+        WHERE pd.businessservice in ('NOC_MC','NOC_NP')
           AND upper(p.paymentstatus) != 'CANCELLED'
-          AND p.tenantid = $tenantid
+         
       )
 
 
@@ -1298,6 +1297,7 @@ ReportDefinitions:
         cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
       FROM unique_transactions where 1=1
     orderby: ORDER BY createdtime DESC
+    
   - reportName: ReceiptRegisterNOC
     decryptionPathId: LAYOUTREPORTS
     summary: Details of collector register in noc service
@@ -1430,7 +1430,6 @@ ReportDefinitions:
 
       INNER JOIN egcl_bill bill 
           ON bill.id = pd.billid 
-          AND pd.tenantid = $tenantid
       INNER JOIN egcl_payment payment 
           ON payment.id = pd.paymentid
       LEFT JOIN eg_noc a 
@@ -1442,7 +1441,6 @@ ReportDefinitions:
       LEFT JOIN eg_user usr 
           ON usr.id = payment.createdby::integer
       WHERE
-          bill.tenantid = $tenantid
-          AND pd.businessservice = 'obpas_noc'
+          pd.businessservice in  ('NOC_MC','NOC_NP')
           AND payment.paymentstatus != 'CANCELLED'
     orderby: ORDER BY pd.receiptdate DESC;
