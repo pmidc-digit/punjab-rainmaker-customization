@@ -85,7 +85,7 @@ ReportDefinitions:
         u.name,
         u.mobilenumber,
         o.status as applicationstatus,
-        o.tenant,
+        ch.tenant,
         'BPA' as businessservice,
         o.applicationno,
         ch.assignee_name  AS employee_name
@@ -541,7 +541,7 @@ ReportDefinitions:
       SELECT
           pd.receiptnumber AS receiptno,
           bill.consumercode AS applicationno,
-          split_part(pd.tenantid, '.', 2)) AS tenant,
+          split_part(pd.tenantid, '.', 2) AS tenant,
           TO_CHAR(
               TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata',
               'DD-MM-YYYY'
