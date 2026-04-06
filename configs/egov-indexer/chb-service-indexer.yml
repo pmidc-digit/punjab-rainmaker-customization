@@ -387,110 +387,32 @@ ServiceMaps:
       indexes:
         - name: chb-booking-application-index
           type: general
-          jsonPath: $
-          id: $.hallsBookingApplication.bookingId
+          jsonPath: $.bookingSyncUpdate
+          id: $.bookingId
           isBulk: false
-          timeStampField: $.hallsBookingApplication.auditDetails.lastModifiedTime
+          timeStampField: $.lastModifiedTime
           customJsonMapping:
             indexMapping: {"Data":{
-              "bookingId":"bookingId","tenantId":"tenantId","bookingNo":"bookingNo",
-              "applicationDate":"applicationDate","paymentDate":"paymentDate",
-              "receiptNo":"receiptNo","permissionLetterFilestoreId":"permissionLetterFilestoreId",
-              "paymentReceiptFilestoreId":"paymentReceiptFilestoreId","bookingStatus":"bookingStatus",
-              "communityHallCode":"communityHallCode","communityHallName":"communityHallName",
-              "purpose":"purpose","purposeDescription":"purposeDescription",
-              "specialCategory":"specialCategory",
-              "applicantDetailId":"applicantDetailId","applicantName":"applicantName",
-              "applicantMobileNo":"applicantMobileNo","applicantAlternateMobileNo":"applicantAlternateMobileNo",
-              "applicantEmailId":"applicantEmailId",
-              "createdBy":"createdBy","lastModifiedBy":"lastModifiedBy",
-              "createdTime":"createdTime","lastModifiedTime":"lastModifiedTime",
-              "addressId":"addressId","doorNo":"doorNo","houseNo":"houseNo","streetName":"streetName",
-              "addressLine1":"addressLine1","landmark":"landmark","city":"city",
-              "cityCode":"cityCode","locality":"locality","localityCode":"localityCode",
-              "pincode":"pincode",
-              "bookingSlotDetails":"bookingSlotDetails",
-              "workflow":"workflow","owners":"owners",
+              "bookingId":"bookingId","tenantId":"tenantId","bookingNo":"bookingNo","bookingStatus":"bookingStatus",
+              "lastModifiedBy":"lastModifiedBy","lastModifiedTime":"lastModifiedTime",
               "workflowStatusId":"","workflowApplicationStatus":"","workflowAssigneeUuids":[],"history":{}
             }}
             fieldMapping:
-              - inJsonPath: $.hallsBookingApplication.bookingId
+              - inJsonPath: $.bookingId
                 outJsonPath: $.Data.bookingId
-              - inJsonPath: $.hallsBookingApplication.tenantId
+              - inJsonPath: $.tenantId
                 outJsonPath: $.Data.tenantId
-              - inJsonPath: $.hallsBookingApplication.bookingNo
+              - inJsonPath: $.bookingNo
                 outJsonPath: $.Data.bookingNo
-              - inJsonPath: $.hallsBookingApplication.applicationDate
-                outJsonPath: $.Data.applicationDate
-              - inJsonPath: $.hallsBookingApplication.paymentDate
-                outJsonPath: $.Data.paymentDate
-              - inJsonPath: $.hallsBookingApplication.receiptNo
-                outJsonPath: $.Data.receiptNo
-              - inJsonPath: $.hallsBookingApplication.permissionLetterFilestoreId
-                outJsonPath: $.Data.permissionLetterFilestoreId
-              - inJsonPath: $.hallsBookingApplication.paymentReceiptFilestoreId
-                outJsonPath: $.Data.paymentReceiptFilestoreId
-              - inJsonPath: $.hallsBookingApplication.bookingStatus
+              - inJsonPath: $.status
                 outJsonPath: $.Data.bookingStatus
-              - inJsonPath: $.hallsBookingApplication.communityHallCode
-                outJsonPath: $.Data.communityHallCode
-              - inJsonPath: $.hallsBookingApplication.communityHallName
-                outJsonPath: $.Data.communityHallName
-              - inJsonPath: $.hallsBookingApplication.purpose.purpose
-                outJsonPath: $.Data.purpose
-              - inJsonPath: $.hallsBookingApplication.purposeDescription
-                outJsonPath: $.Data.purposeDescription
-              - inJsonPath: $.hallsBookingApplication.specialCategory.category
-                outJsonPath: $.Data.specialCategory
-              - inJsonPath: $.hallsBookingApplication.auditDetails.createdBy
-                outJsonPath: $.Data.createdBy
-              - inJsonPath: $.hallsBookingApplication.auditDetails.lastModifiedBy
+              - inJsonPath: $.lastModifiedBy
                 outJsonPath: $.Data.lastModifiedBy
-              - inJsonPath: $.hallsBookingApplication.auditDetails.createdTime
-                outJsonPath: $.Data.createdTime
-              - inJsonPath: $.hallsBookingApplication.auditDetails.lastModifiedTime
+              - inJsonPath: $.lastModifiedTime
                 outJsonPath: $.Data.lastModifiedTime
-              - inJsonPath: $.hallsBookingApplication.applicantDetail.applicantDetailId
-                outJsonPath: $.Data.applicantDetailId
-              - inJsonPath: $.hallsBookingApplication.applicantDetail.applicantName
-                outJsonPath: $.Data.applicantName
-              - inJsonPath: $.hallsBookingApplication.applicantDetail.applicantMobileNo
-                outJsonPath: $.Data.applicantMobileNo
-              - inJsonPath: $.hallsBookingApplication.applicantDetail.applicantAlternateMobileNo
-                outJsonPath: $.Data.applicantAlternateMobileNo
-              - inJsonPath: $.hallsBookingApplication.applicantDetail.applicantEmailId
-                outJsonPath: $.Data.applicantEmailId
-              - inJsonPath: $.hallsBookingApplication.address.addressId
-                outJsonPath: $.Data.addressId
-              - inJsonPath: $.hallsBookingApplication.address.doorNo
-                outJsonPath: $.Data.doorNo
-              - inJsonPath: $.hallsBookingApplication.address.houseNo
-                outJsonPath: $.Data.houseNo
-              - inJsonPath: $.hallsBookingApplication.address.streetName
-                outJsonPath: $.Data.streetName
-              - inJsonPath: $.hallsBookingApplication.address.addressLine1
-                outJsonPath: $.Data.addressLine1
-              - inJsonPath: $.hallsBookingApplication.address.landmark
-                outJsonPath: $.Data.landmark
-              - inJsonPath: $.hallsBookingApplication.address.city
-                outJsonPath: $.Data.city
-              - inJsonPath: $.hallsBookingApplication.address.cityCode
-                outJsonPath: $.Data.cityCode
-              - inJsonPath: $.hallsBookingApplication.address.locality
-                outJsonPath: $.Data.locality
-              - inJsonPath: $.hallsBookingApplication.address.localityCode
-                outJsonPath: $.Data.localityCode
-              - inJsonPath: $.hallsBookingApplication.address.pincode
-                outJsonPath: $.Data.pincode
-              - inJsonPath: $.hallsBookingApplication.bookingSlotDetails
-                outJsonPath: $.Data.bookingSlotDetails
-              - inJsonPath: $.hallsBookingApplication.workflow
-                outJsonPath: $.Data.workflow
-              - inJsonPath: $.hallsBookingApplication.owners
-                outJsonPath: $.Data.owners
             externalUriMapping:
               - path: http://egov-workflow-v2.egov:8080/egov-workflow-v2/egov-wf/process/_search
-                queryParam: businessIds=$.hallsBookingApplication.bookingNo,history=true,tenantId=$.hallsBookingApplication.tenantId
+                queryParam: businessIds=$.bookingNo,history=true,tenantId=$.tenantId
                 apiRequest: {"RequestInfo":{"apiId":"org.egov.pt","ver":"1.0","ts":1502890899493,"action":"asd","did":"4354648646","key":"xyz","msgId":"654654","requesterId":"61","authToken":"d9994555-7656-4a67-ab3a-a952a0d4dfc8","userInfo":{"id":1,"uuid":"1fec8102-0e02-4d0a-b283-cd80d5dab067","type":"EMPLOYEE","tenantId":"pb.amritsar","roles":[{"name":"Employee","code":"EMPLOYEE","tenantId":"pb.amritsar"}]}}}
                 uriResponseMapping:
                   - inJsonPath: $.ProcessInstances
@@ -507,110 +429,37 @@ ServiceMaps:
       indexes:
         - name: chb-booking-application-index
           type: general
-          jsonPath: $
-          id: $.hallsBookingApplication.bookingId
+          jsonPath: $.bookingSyncUpdate
+          id: $.bookingId
           isBulk: false
-          timeStampField: $.hallsBookingApplication.auditDetails.lastModifiedTime
+          timeStampField: $.lastModifiedTime
           customJsonMapping:
             indexMapping: {"Data":{
-              "bookingId":"bookingId","tenantId":"tenantId","bookingNo":"bookingNo",
-              "applicationDate":"applicationDate","paymentDate":"paymentDate",
-              "receiptNo":"receiptNo","permissionLetterFilestoreId":"permissionLetterFilestoreId",
-              "paymentReceiptFilestoreId":"paymentReceiptFilestoreId","bookingStatus":"bookingStatus",
-              "communityHallCode":"communityHallCode","communityHallName":"communityHallName",
-              "purpose":"purpose","purposeDescription":"purposeDescription",
-              "specialCategory":"specialCategory",
-              "applicantDetailId":"applicantDetailId","applicantName":"applicantName",
-              "applicantMobileNo":"applicantMobileNo","applicantAlternateMobileNo":"applicantAlternateMobileNo",
-              "applicantEmailId":"applicantEmailId",
-              "createdBy":"createdBy","lastModifiedBy":"lastModifiedBy",
-              "createdTime":"createdTime","lastModifiedTime":"lastModifiedTime",
-              "addressId":"addressId","doorNo":"doorNo","houseNo":"houseNo","streetName":"streetName",
-              "addressLine1":"addressLine1","landmark":"landmark","city":"city",
-              "cityCode":"cityCode","locality":"locality","localityCode":"localityCode",
-              "pincode":"pincode",
-              "bookingSlotDetails":"bookingSlotDetails",
-              "workflow":"workflow","owners":"owners",
+              "bookingId":"bookingId","tenantId":"tenantId","bookingNo":"bookingNo","bookingStatus":"bookingStatus",
+              "receiptNo":"receiptNo","paymentDate":"paymentDate",
+              "lastModifiedBy":"lastModifiedBy","lastModifiedTime":"lastModifiedTime",
               "workflowStatusId":"","workflowApplicationStatus":"","workflowAssigneeUuids":[],"history":{}
             }}
             fieldMapping:
-              - inJsonPath: $.hallsBookingApplication.bookingId
+              - inJsonPath: $.bookingId
                 outJsonPath: $.Data.bookingId
-              - inJsonPath: $.hallsBookingApplication.tenantId
+              - inJsonPath: $.tenantId
                 outJsonPath: $.Data.tenantId
-              - inJsonPath: $.hallsBookingApplication.bookingNo
+              - inJsonPath: $.bookingNo
                 outJsonPath: $.Data.bookingNo
-              - inJsonPath: $.hallsBookingApplication.applicationDate
-                outJsonPath: $.Data.applicationDate
-              - inJsonPath: $.hallsBookingApplication.paymentDate
+              - inJsonPath: $.paymentDate
                 outJsonPath: $.Data.paymentDate
-              - inJsonPath: $.hallsBookingApplication.receiptNo
+              - inJsonPath: $.receiptNo
                 outJsonPath: $.Data.receiptNo
-              - inJsonPath: $.hallsBookingApplication.permissionLetterFilestoreId
-                outJsonPath: $.Data.permissionLetterFilestoreId
-              - inJsonPath: $.hallsBookingApplication.paymentReceiptFilestoreId
-                outJsonPath: $.Data.paymentReceiptFilestoreId
-              - inJsonPath: $.hallsBookingApplication.bookingStatus
+              - inJsonPath: $.status
                 outJsonPath: $.Data.bookingStatus
-              - inJsonPath: $.hallsBookingApplication.communityHallCode
-                outJsonPath: $.Data.communityHallCode
-              - inJsonPath: $.hallsBookingApplication.communityHallName
-                outJsonPath: $.Data.communityHallName
-              - inJsonPath: $.hallsBookingApplication.purpose.purpose
-                outJsonPath: $.Data.purpose
-              - inJsonPath: $.hallsBookingApplication.purposeDescription
-                outJsonPath: $.Data.purposeDescription
-              - inJsonPath: $.hallsBookingApplication.specialCategory.category
-                outJsonPath: $.Data.specialCategory
-              - inJsonPath: $.hallsBookingApplication.auditDetails.createdBy
-                outJsonPath: $.Data.createdBy
-              - inJsonPath: $.hallsBookingApplication.auditDetails.lastModifiedBy
+              - inJsonPath: $.lastModifiedBy
                 outJsonPath: $.Data.lastModifiedBy
-              - inJsonPath: $.hallsBookingApplication.auditDetails.createdTime
-                outJsonPath: $.Data.createdTime
-              - inJsonPath: $.hallsBookingApplication.auditDetails.lastModifiedTime
+              - inJsonPath: $.lastModifiedTime
                 outJsonPath: $.Data.lastModifiedTime
-              - inJsonPath: $.hallsBookingApplication.applicantDetail.applicantDetailId
-                outJsonPath: $.Data.applicantDetailId
-              - inJsonPath: $.hallsBookingApplication.applicantDetail.applicantName
-                outJsonPath: $.Data.applicantName
-              - inJsonPath: $.hallsBookingApplication.applicantDetail.applicantMobileNo
-                outJsonPath: $.Data.applicantMobileNo
-              - inJsonPath: $.hallsBookingApplication.applicantDetail.applicantAlternateMobileNo
-                outJsonPath: $.Data.applicantAlternateMobileNo
-              - inJsonPath: $.hallsBookingApplication.applicantDetail.applicantEmailId
-                outJsonPath: $.Data.applicantEmailId
-              - inJsonPath: $.hallsBookingApplication.address.addressId
-                outJsonPath: $.Data.addressId
-              - inJsonPath: $.hallsBookingApplication.address.doorNo
-                outJsonPath: $.Data.doorNo
-              - inJsonPath: $.hallsBookingApplication.address.houseNo
-                outJsonPath: $.Data.houseNo
-              - inJsonPath: $.hallsBookingApplication.address.streetName
-                outJsonPath: $.Data.streetName
-              - inJsonPath: $.hallsBookingApplication.address.addressLine1
-                outJsonPath: $.Data.addressLine1
-              - inJsonPath: $.hallsBookingApplication.address.landmark
-                outJsonPath: $.Data.landmark
-              - inJsonPath: $.hallsBookingApplication.address.city
-                outJsonPath: $.Data.city
-              - inJsonPath: $.hallsBookingApplication.address.cityCode
-                outJsonPath: $.Data.cityCode
-              - inJsonPath: $.hallsBookingApplication.address.locality
-                outJsonPath: $.Data.locality
-              - inJsonPath: $.hallsBookingApplication.address.localityCode
-                outJsonPath: $.Data.localityCode
-              - inJsonPath: $.hallsBookingApplication.address.pincode
-                outJsonPath: $.Data.pincode
-              - inJsonPath: $.hallsBookingApplication.bookingSlotDetails
-                outJsonPath: $.Data.bookingSlotDetails
-              - inJsonPath: $.hallsBookingApplication.workflow
-                outJsonPath: $.Data.workflow
-              - inJsonPath: $.hallsBookingApplication.owners
-                outJsonPath: $.Data.owners
             externalUriMapping:
               - path: http://egov-workflow-v2.egov:8080/egov-workflow-v2/egov-wf/process/_search
-                queryParam: businessIds=$.hallsBookingApplication.bookingNo,history=true,tenantId=$.hallsBookingApplication.tenantId
+                queryParam: businessIds=$.bookingNo,history=true,tenantId=$.tenantId
                 apiRequest: {"RequestInfo":{"apiId":"org.egov.pt","ver":"1.0","ts":1502890899493,"action":"asd","did":"4354648646","key":"xyz","msgId":"654654","requesterId":"61","authToken":"d9994555-7656-4a67-ab3a-a952a0d4dfc8","userInfo":{"id":1,"uuid":"1fec8102-0e02-4d0a-b283-cd80d5dab067","type":"EMPLOYEE","tenantId":"pb.amritsar","roles":[{"name":"Employee","code":"EMPLOYEE","tenantId":"pb.amritsar"}]}}}
                 uriResponseMapping:
                   - inJsonPath: $.ProcessInstances
