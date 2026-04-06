@@ -357,7 +357,7 @@ ReportDefinitions:
              SELECT
                 uuid,
                 MAX(CASE WHEN applicationstatus = 'FIELDINSPECTION_INPROGRESS' THEN createdtime END) AS docverify_time,
-                MAX(CASE WHEN applicationstatus IN ('APPROVED','REJECTED','PENDING_SANC_FEE_PAYMENT','BLOCKED') THEN lastmodifiedtime END) AS final_time
+                MAX(CASE WHEN applicationstatus IN ('E-SIGNED','APPROVED','REJECTED','PENDING_SANC_FEE_PAYMENT','BLOCKED') THEN lastmodifiedtime END) AS final_time
               FROM wf_detailed
               GROUP BY uuid
              ),
@@ -427,7 +427,7 @@ ReportDefinitions:
             JOIN sla_data sla ON sla.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
             
             LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
-            WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')             
+            WHERE UPPER(ls.applicationstatus) NOT IN  ('CITIZEN_APPROVAL_INPROCESS','PENDING_APPL_FEE','INITIATED')           
   orderby:  ORDER BY n.applicationno,n.createdtime DESC, tenantid, final_status
 
 - reportName: ReceiptRegisterbpa
