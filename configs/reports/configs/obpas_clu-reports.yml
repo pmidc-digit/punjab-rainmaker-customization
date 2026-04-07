@@ -1,101 +1,953 @@
 ---
 ReportDefinitions:
 - reportName: ApplicationDetailReportCLU
-  decryptionPathId: LAYOUTREPORTS
-  summary: Details of applicant in CLU service
+  summary: Details of file for CLU  per ULB
+  version: 1.0.0
+  moduleName: rainmaker-obpas_clu
+  sourceColumns:
+  - name: tenantid
+    label: tenantId
+    type: string
+    source: obpas_clu
+    total: false
+  - name: applicationno
+    label: Application Number
+    type: string
+    source: obpas_clu
+    total: false
+  - name: applicationstatus
+    label: Application Status
+    type: string
+    source: obpas_clu
+    total: false
+  - name: vasikadate
+    label: Vasika Date
+    type: string
+    source: obpas_clu
+    total: false
+  - name: vasikanumber
+    label: Vasika Number
+    type: string
+    source: obpas_clu
+    total: false
+  - name: plot_no
+    label: Plot Number
+    type: string
+    source: obpas_clu
+    total: false
+  - name: zone_name
+    label: Zone Name
+    type: string
+    source: obpas_clu
+    total: false
+  - name: ward_no
+    label: Ward Number
+    type: string
+    source: obpas_clu
+    total: false
+  - name: businessservice
+    label: Businessservice
+    type: string
+    source: obpas_clu
+    total: false
+  - name: ULB_Type
+    label: ULB Type
+    type: string
+    source: obpas_clu
+    total: false
+  - name: site_address
+    label: Site Address
+    type: string
+    source: obpas_clu
+    total: false
+  - name: layoutNonSchemeType
+    label: layout Non Scheme Type
+    type: number
+    source: obpas_clu
+    total: false
+  - name: district_name
+    label: District Name
+    type: number
+    source: obpas_clu
+    total: false
+  - name: building_status
+    label: Building Status
+    type: string
+    source: obpas_clu
+    total: false
+  - name: net_plot_area
+    label: Net Plot Area
+    type: number
+    source: obpas_clu
+    total: false
+  - name: road_widening_area
+    label: Area Left For Road Widening
+    type: number
+    source: obpas_clu
+    total: false
+  - name: road_width
+    label: Road Width At Site
+    type: number
+    source: obpas_clu
+    total: false
+  - name: building_category
+    label: Building Category
+    type: string
+    source: obpas_clu
+    total: false
+  - name: applicant_name
+    label: Applicant Name
+    type: string
+    source: obpas_clu
+    total: false
+  - name: applicant_mobile
+    label: Applicant Mobile
+    type: string
+    source: obpas_clu
+    total: false
+  - name: professional_name
+    label: Professional Name
+    type: string
+    source: obpas_clu
+    total: false
+  - name: professional_reg_id
+    label: Professional Registration ID
+    type: string
+    source: obpas_clu
+    total: false
+  - name: professional_mobile
+    label: Professional Mobile
+    type: string
+    source: obpas_clu
+    total: false
+  searchParams:
+  - name: fromDate
+    label: From Date
+    type: epoch
+    source: obpas_clu
+    isMandatory: false
+    searchClause: c.createdtime >= $fromDate
+  - name: toDate
+    label: To Date
+    type: epoch
+    source: obpas_clu
+    isMandatory: false
+    searchClause: c.createdtime <= $toDate
+  - name: ulb
+    label: ULB
+    type: singlevaluelist 
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_clu
+    wrapper: true
+    isMandatory: false
+    searchClause: AND c.tenantid = $ulb
+  - name: ULB_Type
+    label: ULB Type
+    type: singlevaluelist
+    pattern: list://Municipal Council:Municipal Council,Municipal Corporation:Municipal Corporation,Nagar Panchayat:Nagar Panchayat
+    source: obpas_clu 
+    wrapper: true
+    isMandatory: false
+    searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails'-> 'ulbName' ->'city' ->> 'ulbType' = $ULB_Type
+  - name: district_name
+    label: District
+    type: singlevaluelist
+    pattern: list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,:Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib
+    source: obpas_clu
+    wrapper: true
+    isMandatory: false
+    searchClause: AND u.district  = $district_name
+  - name: applicationstatus
+    label: Application status
+    type: singlevaluelist
+    pattern: list://DOCUMENTVERIFY_JC:Dodumentverify JC,PROFESSIONALACTIONREQUIRED:Professional Action Required,ATP_VERIFICATION_PENDING:ATP Verification Pending,DOCUMENTVERIFY_MTP/ME:Document Verify MTP/ME, E-SIGNED:E-SIGNED,FIELDINSPECTION_INPROGRESS:Field Inspection InProgress,ATPHQ_APPROVAL_PENDING:ATPHQ Approval Pending,PENDINGPAYMENT:Pending Payment,APPROVAL_PENDING:Approval Pending,MTP_VERIFICATION_PENDING:MTP Verification Pending,DOCUMENTVERIFY_DM:Document Verify DM,DOCUMENTVERIFY_JE/BI:Document Verify JE/BI,INITIATED:Initiated,DOCUMENTVERIFY_EO:Document Verify EO,PENDINGAPPROVAL:Pending Approval,PENDINGSANCTIONPAYMENT:Pendoing Snaction Paymnet,CANCELLED:Cancelled,REJECTED:Rejected,APPROVED:Approved,ADC_VERIFICATION_PENDING:ADC Verification Pending,DOC_VERIFICATION_PENDING:Document Verification Pending,EO_VERIFICATION_PENDING:EO Verification Pending,STP_VERIFICATION_PENDING:STP Verification Pending,PENDINGAPPLICATIONPAYMENT:Application Payment Pending,INSPECTION_REPORT_PENDING:Inspection Report Pending
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND LOWER(c.applicationstatus) = LOWER($applicationstatus)
+  query: >
+        Select 
+          c.applicationno,
+          split_part(c.tenantid,'.',2) AS tenantid,
+          c.applicationstatus,c.vasikanumber,c.vasikadate,
+          ad.additionaldetails::jsonb -> 'siteDetails' -> 'zone' ->> 'name' AS zone_name,
+          ad.additionaldetails::jsonb -> 'siteDetails' ->> 'plotNo' AS plot_no,
+          ad.additionaldetails::jsonb -> 'siteDetails' ->> 'wardNo' AS ward_no,
+          ad.additionaldetails::jsonb -> 'siteDetails' ->> 'businessService' AS businessservice,
+          ad.additionaldetails::jsonb -> 'siteDetails' ->> 'hadbastNo' AS hadbast_no,
+          ad.additionaldetails::jsonb -> 'siteDetails' -> 'ulbName' ->'city' ->> 'ddrName'  AS DDR_Name,
+          ad.additionaldetails::jsonb -> 'siteDetails'->> 'ulbType'  AS ULB_Type,
+          ad.additionaldetails::jsonb -> 'siteDetails' -> 'ulbName' ->'city'->> 'ulbGrade'  AS ULB_Grade,
+          ad.additionaldetails::jsonb -> 'siteDetails' -> 'ulbName'->'city'->> 'regionName'  AS Region_Name,
+          ad.additionaldetails::jsonb -> 'siteDetails' -> 'roadType' ->> 'name' AS road_type,
+          ad.additionaldetails::jsonb -> 'siteDetails' ->> 'proposedSiteAddress' AS site_address,
+          ad.additionaldetails::jsonb -> 'siteDetails' -> 'layoutNonSchemeType' ->> 'name' AS layoutNonSchemeType,
+          ad.additionaldetails::jsonb -> 'siteDetails' -> 'ulbName' ->'city'->>'districtName'  AS district_name,
+          ad.additionaldetails::jsonb -> 'siteDetails' ->> 'specificationPlotArea' AS specification_plot_area,
+          ad.additionaldetails::jsonb -> 'siteDetails' ->> 'netPlotAreaAfterWidening' AS net_plot_area,
+          ad.additionaldetails::jsonb -> 'siteDetails' ->> 'areaLeftForRoadWidening' AS road_widening_area,
+          ad.additionaldetails::jsonb -> 'siteDetails' ->> 'roadWidthAtSite' AS road_width,
+          ad.additionaldetails::jsonb -> 'siteDetails' -> 'buildingCategory' ->> 'name' AS building_category,
+          ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'applicantOwnerOrFirmName' AS applicant_name,
+          ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'applicantMobileNumber' AS applicant_mobile,
+          ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'professionalName' AS professional_name,
+          ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'professionalRegId' AS professional_reg_id,
+          ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'professionalMobileNumber' AS professional_mobile 
+          from eg_clu c
+         inner join eg_clu_details ad on c.id = ad.cluid
+         inner join ulb_data u on u.ulb_code=c.tenantid
+  groupby: GROUP BY c.applicationno,c.applicationstatus, c.vasikadate, c.vasikanumber,ad.additionaldetails
+  orderby: ORDER BY c.vasikadate;      
+
+- reportName: officers_with_highest_pendency
+  summary: Top 7 officers with Highest Pendency
+  version: 1.0.0
+  moduleName: rainmaker-obpas_clu
+  additionalConfig:
+    print:
+       pdfPageSize: A1
+  sourceColumns:
+  - name: ulb_name
+    label: ULB Name
+    type: string
+    source: obpas_clu
+    total: false
+  - name: Officer_Designation
+    label: Officer Designation
+    type: string
+    source: obpas_clu
+    total: false
+  - name: pending_files
+    label: Pending Files
+    type: string
+    source: obpas_clu
+    total: true
+  searchParams:
+  - name: businessservice
+    label: Business Service
+    type: singlevaluelist
+    pattern: list://CLU_MC:MC,CLU_MC_HIGH:MC High,CLU_MC_OTH:MC Others,CLU_NP:Nagar Panchayat,CLU_NP_HIGH:NP High,CLU_NP_OTH:NP Others
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND businessservice = $businessservice
+  - name: ulb
+    label: ULB
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND tenantid = $ulb
+  - name: district_name
+    label: District
+    type: singlevaluelist
+    pattern: list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,:Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib
+    source: obpas_clu
+    wrapper: true
+    isMandatory: false
+    searchClause: AND u.district  = $district_name
+  query: >
+      WITH latest_assignee AS (
+        SELECT DISTINCT ON (wf.businessid)
+          wf.businessid,st.applicationstatus,
+          wf.tenantid,
+          wf.businessservice,
+          d.name AS designation_code
+        FROM eg_wf_processinstance_v2 wf
+        JOIN eg_wf_state_v2 st    ON wf.status = st.uuid
+        LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+        LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+        inner JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
+        inner join designation d on a.designation = d.code
+         WHERE wf.businessservice in ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH')
+        ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+      ),    
+      pending_files AS (
+        SELECT
+          id::text AS clu_id,
+          applicationno,
+          tenantid,
+          status
+        FROM eg_clu
+        WHERE status NOT IN (
+            'INITIATED',
+            'CANCELLED'
+          )
+      ),    
+      merged AS (
+        SELECT
+          la.tenantid, 
+          INITCAP(REPLACE(la.tenantid, 'pb.', '')) AS ulb_name,
+          la.designation_code,
+          la.businessservice,
+          COUNT(DISTINCT p.clu_id) AS pending_files
+        FROM latest_assignee la
+        LEFT JOIN pending_files p
+          ON (
+               p.clu_id = la.businessid
+            OR p.applicationno = la.businessid
+          )
+        GROUP BY la.tenantid, INITCAP(REPLACE(la.tenantid, 'pb.', '')), la.designation_code, la.businessservice
+      )      
+
+      SELECT
+        ROW_NUMBER() OVER (ORDER BY pending_files DESC) AS Serial_No,
+        ulb_name ,businessservice,
+        designation_code as Officer_Designation,
+        pending_files 
+      FROM merged  m
+
+      inner join ulb_data u on u.name_of_ulb=m.ulb_name
+
+      where  designation_code <> 'Clerk' and designation_code <> 'Accountant'
+  orderby: ORDER BY pending_files DESC limit 7
+    
+- reportName: BeyondTimelineSummary
+  summary: Summary of district-ulb wise application which breached its SLA
   version: 1.0.0
   moduleName: rainmaker-obpas_clu
   additionalConfig:
     print:
       pdfPageSize: A1
   sourceColumns:
-  - name: name
-    label: name
+  - name: district
+    label: District
     type: string
     source: obpas_clu
     total: false
-  - name: mobilenumber
-    label: mobilenumber
+  - name: name_of_ulb
+    label: ULB Name
+    type: string 
+    source: obpas_clu
+    total: false
+  - name: beyond_timeline_count
+    label: Beyond Timeline Count
+    type: string
+    source: obpas_clu
+    total: false
+  searchParams:
+  - name: district
+    label: District
+    type: singlevaluelist
+    pattern: list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND u.district = $district
+  - name: ulb_name
+    label: ULB
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND u.ulb_code= $ulb_name
+  - name: businessservice
+    label: Businesservice
+    type: singlevaluelist
+    pattern: list://CLU_MC:MC,CLU_MC_HIGH:MC High,CLU_MC_OTH:MC Others,CLU_NP:Nagar Panchayat,CLU_NP_HIGH:NP High,CLU_NP_OTH:NP Others
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND sc.businessservice = $businessservice
+  query: >
+      WITH wf_detailed AS (
+         SELECT
+           wf.businessid AS uuid,
+           wf.businessservice,UPPER(st.applicationstatus) AS applicationstatus,
+           wf.tenantid,
+           wf.createdtime,
+           wf.lastmodifiedtime,
+           st.state,
+           st.sla AS state_sla
+           FROM eg_wf_processinstance_v2 wf
+           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+           WHERE wf.businessservice IN ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH')
+           and st.applicationstatus not in ('CANCELLED')         
+       ),
+      inspection_time AS (
+          SELECT
+           uuid,
+             MAX(CASE  WHEN applicationstatus = 'FIELDINSPECTION_INPROGRESS'  THEN createdtime  END
+              ) AS inspection_start
+           FROM wf_detailed
+          GROUP BY uuid
+          ), 
+      latest_status AS (
+         SELECT DISTINCT ON (uuid)
+           uuid,
+           businessservice,
+           tenantid,
+           applicationstatus ,
+           state AS current_state,
+           lastmodifiedtime
+           FROM wf_detailed
+           ORDER BY uuid, lastmodifiedtime DESC
+           ),
+      sla_data AS (
+         SELECT
+           businessservice, businessservicesla
+           FROM eg_wf_businessservice_v2
+           WHERE businessservice IN ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH')
+           ),
+      sla_calc AS (
+         SELECT
+           ls.uuid,
+           ls.tenantid,
+           ls.businessservice,
+           it.inspection_start,
+           ls.lastmodifiedtime,
+           sla.businessservicesla,
+           CASE WHEN(ls.lastmodifiedtime - it.inspection_start) > sla.businessservicesla  THEN 'BREACHED' ELSE 'MET'
+           END AS timeline_status
+           FROM latest_status ls
+           JOIN inspection_time it ON ls.uuid = it.uuid
+           JOIN sla_data sla  ON sla.businessservice = ls.businessservice
+           WHERE it.inspection_start IS NOT NULL
+           )
+       SELECT
+          u.district,
+          u.name_of_ulb,
+          COUNT(CASE WHEN sc.timeline_status = 'MET' THEN 1 END) AS met_count,
+          COUNT(CASE WHEN sc.timeline_status = 'BREACHED' THEN 1 END) AS beyond_timeline_count
+          FROM sla_calc sc
+          JOIN ulb_data u ON sc.tenantid = u.ulb_code
+          WHERE 1=1
+  groupby: GROUP BY u.district, u.name_of_ulb
+  orderby: ORDER BY u.district, u.name_of_ulb DESC
+
+- reportName: DetailedListBeyondTimelineSummary
+  summary: Summary of district-ulb wise application which breached its SLA
+  version: 1.0.0
+  moduleName: rainmaker-obpas_clu
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: district
+    label: District
+    type: string
+    source: obpas_clu
+    total: false
+  - name: name_of_ulb
+    label: ULB Name
+    type: string
+    source: obpas_clu
+    total: false
+  - name: modulename
+    label: Module Name
     type: string
     source: obpas_clu
     total: false
   - name: applicationstatus
-    label: applicationstatus
+    label: Application Status
     type: string
     source: obpas_clu
     total: false
+  - name: fileno
+    label: File No
+    type: string
+    source: obpas_clu
+    total: false
+  searchParams:
+  - name: district
+    label: District
+    type: singlevaluelist
+    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND u.district = $district
+  - name: ulb
+    label: ULB
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND u.ulb_code= $ulb 
+  - name: applicationstatus
+    label: Application Status
+    type: singlevaluelist
+    pattern: list://DOCUMENTVERIFY_JC:Dodumentverify JC,PROFESSIONALACTIONREQUIRED:Professional Action Required,ATP_VERIFICATION_PENDING:ATP Verification Pending,DOCUMENTVERIFY_MTP/ME:Document Verify MTP/ME, E-SIGNED:E-SIGNED,FIELDINSPECTION_INPROGRESS:Field Inspection InProgress,ATPHQ_APPROVAL_PENDING:ATPHQ Approval Pending,PENDINGPAYMENT:Pending Payment,APPROVAL_PENDING:Approval Pending,MTP_VERIFICATION_PENDING:MTP Verification Pending,DOCUMENTVERIFY_DM:Document Verify DM,DOCUMENTVERIFY_JE/BI:Document Verify JE/BI,INITIATED:Initiated,DOCUMENTVERIFY_EO:Document Verify EO,PENDINGAPPROVAL:Pending Approval,PENDINGSANCTIONPAYMENT:Pendoing Snaction Paymnet,CANCELLED:Cancelled,REJECTED:Rejected,APPROVED:Approved,ADC_VERIFICATION_PENDING:ADC Verification Pending,DOC_VERIFICATION_PENDING:Document Verification Pending,EO_VERIFICATION_PENDING:EO Verification Pending,STP_VERIFICATION_PENDING:STP Verification Pending,PENDINGAPPLICATIONPAYMENT:Application Payment Pending,INSPECTION_REPORT_PENDING:Inspection Report Pending
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND sc.applicationstatus = $applicationstatus
   - name: businessservice
-    label: businessservice
+    label: Businesservice
+    type: singlevaluelist
+    pattern: list://CLU_MC:MC,CLU_MC_HIGH:MC High,CLU_MC_OTH:MC Others,CLU_NP:Nagar Panchayat,CLU_NP_HIGH:NP High,CLU_NP_OTH:NP Others
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND sc.businessservice = $businessservice
+  query: |
+    WITH wf_history AS (
+         SELECT
+           wf.businessid AS uuid,
+           wf.businessservice,
+           wf.tenantid,
+           wf.createdtime,
+           wf.lastmodifiedtime,
+           st.applicationstatus,
+           st.state,
+           st.sla AS state_sla
+           FROM eg_wf_processinstance_v2 wf
+           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+           WHERE wf.businessservice IN ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH')
+           and st.applicationstatus not in ('CANCELLED','CITIZENACTIONREQUIRED')
+           ),
+      inspection_time AS (
+        SELECT
+           uuid,
+           MAX(CASE  WHEN applicationstatus = 'FIELDINSPECTION_INPROGRESS'  THEN createdtime  END
+           ) AS inspection_start
+          FROM wf_history
+          GROUP BY uuid
+           ),
+      latest_status AS (
+         SELECT DISTINCT ON (uuid)
+           uuid,
+           businessservice,
+           tenantid,state AS current_state,
+           applicationstatus ,
+           lastmodifiedtime
+           FROM wf_history
+           ORDER BY uuid, lastmodifiedtime DESC
+           ),
+      sla_data AS (
+         SELECT
+           businessservice, businessservicesla
+           FROM eg_wf_businessservice_v2
+           WHERE businessservice IN ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH')
+           ),
+      sla_calc AS (
+         SELECT
+           ls.uuid,
+           ls.tenantid,
+           ls.businessservice,ls.applicationstatus,
+           it.inspection_start,
+           ls.lastmodifiedtime,
+           sla.businessservicesla,
+           CASE WHEN(ls.lastmodifiedtime - it.inspection_start) > sla.businessservicesla  THEN 'BREACHED' ELSE 'MET'
+           END AS timeline_status
+           FROM latest_status ls
+           JOIN inspection_time it ON ls.uuid = it.uuid
+           JOIN sla_data sla  ON sla.businessservice = ls.businessservice
+           WHERE it.inspection_start IS NOT NULL AND ls.applicationstatus NOT IN ( 'E-SIGNED', 'CITIZENACTIONREQUIRED', 'APPROVED','REJECTED','CANCELLED','INITIATED','PENDINGPAYMENT','BLOCKED')
+           )
+       SELECT
+          u.district,
+          u.name_of_ulb,
+          sc.applicationstatus,
+          sc.uuid as fileno,
+          'CLU' as modulename
+          FROM sla_calc sc
+          JOIN ulb_data u ON sc.tenantid = u.ulb_code
+          WHERE sc.timeline_status = 'BREACHED'     
+  groupby: GROUP BY u.district, u.name_of_ulb ,sc.applicationstatus,sc.uuid
+  orderby: ORDER BY u.district, u.name_of_ulb,sc.applicationstatus,sc.uuid DESC  
+
+- reportName: officers_wise_pendency
+  summary: officers wise  Pendency Trend Analysis - Last 7 Days
+  version: 1.0.0
+  moduleName: rainmaker-obpas_clu
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: Officer_Designation
+    label: Officer Designation
     type: string
     source: obpas_clu
     total: false
-  - name: applicationno
-    label: applicationno
+  - name: day0
+    label: Day 0
+    type: string
+    source: obpas_clu
+    total: true
+  - name: day1
+    label: Day 1
+    type: string
+    source: obpas_clu
+    total: true
+  - name: day2
+    label: Day 2
+    type: string
+    source: obpas_clu
+    total: true
+  - name: day3
+    label: Day 3
+    type: string
+    source: obpas_clu
+    total: true
+  - name: day4
+    label: Day 4
+    type: string
+    source: obpas_clu
+    total: true
+  - name: day5
+    label: Day 5
+    type: string
+    source: obpas_clu
+    total: true
+  - name: day6
+    label: Day 6
+    type: string
+    source: obpas_clu
+    total: true                     
+  searchParams:
+  - name: fromDate
+    label: Date
+    type: epoch
+    source: obpas_clu
+    isMandatory: true
+    searchClause: AND 1=1     
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND tenantid = $ulb
+  query: |
+    WITH params AS (
+        SELECT
+          to_timestamp($fromDate / 1000.0) AT TIME ZONE 'Asia/Kolkata' AS base_ts,
+          (to_timestamp($fromDate / 1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS base_dt
+      ),
+      
+      latest_assignee AS (
+        SELECT DISTINCT ON (wf.businessid)
+          wf.businessid,
+          wf.tenantid,
+          d.name AS designation_code
+        FROM eg_wf_processinstance_v2 wf
+        LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+        LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+        INNER JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
+        INNER JOIN designation d ON d.code = a.designation
+        WHERE wf.businessservice in ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH')
+        ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+      ),
+      
+      wf_data AS (
+        SELECT
+          la.tenantid,
+          la.designation_code,
+          (to_timestamp(p.lastmodifiedtime/1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS created_date
+        FROM latest_assignee la
+        JOIN eg_clu p
+          ON p.id::text = la.businessid OR p.applicationno = la.businessid
+        WHERE p.applicationstatus not in ('PROFESSIONALACTIONREQUIRED','E-SIGNED','PENDINGPAYMENT', 'INITIATED','CANCELLED','REJECTED', 'APPROVED', 'PENDINGAPPLICATIONPAYMENT')
+      ),
+      
+      date_list AS (
+        SELECT (base_dt - offs) AS dt
+        FROM params, generate_series(0,7) AS g(offs)  
+      ),
+      
+      agg AS (
+        SELECT
+          d.dt,
+          w.tenantid,
+          w.designation_code,
+          COUNT(w.created_date) AS cnt
+        FROM date_list d
+        LEFT JOIN wf_data w ON w.created_date = d.dt
+        GROUP BY d.dt,w.tenantid, w.designation_code
+      )
+      
+      SELECT
+        COALESCE(designation_code, 'UNASSIGNED') AS officer_designation,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params)     THEN cnt END),0) AS day0,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 1 THEN cnt END),0) AS day1,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 2 THEN cnt END),0) AS day2,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 3 THEN cnt END),0) AS day3,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 4 THEN cnt END),0) AS day4,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 5 THEN cnt END),0) AS day5,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 6 THEN cnt END),0) AS day6,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 7 THEN cnt END),0) AS day7
+      FROM agg where 1=1
+  groupby:  GROUP BY designation_code
+  orderby:  ORDER BY officer_designation
+    
+- reportName: FilesNearTimelineBreachSummary
+  summary: Summary list of district-ulb wise application upcoming  breached its SLA for next 7 days 
+  version: 1.0.0
+  moduleName: rainmaker-obpas_clu
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: district
+    label: District
     type: string
     source: obpas_clu
     total: false
-  - name: employee_name
-    label: employee_name
+  - name: name_of_ulb
+    label: ULB Name
     type: string
     source: obpas_clu
     total: false
-  - name: employee_code
-    label: employee_code
+  - name: day0
+    label: Day 0
+    type: string
+    source: obpas_clu
+    total: true
+  - name: day1
+    label: Day 1
+    type: string
+    source: obpas_clu
+    total: true 
+  - name: day2
+    label: Day 2
+    type: string
+    source: obpas_clu
+    total: true
+  - name: day3
+    label: Day 3
+    type: string
+    source: obpas_clu
+    total: true
+  - name: day4
+    label: Day 4
+    type: string
+    source: obpas_clu
+    total: true
+  - name: day5
+    label: Day 5
+    type: string
+    source: obpas_clu
+    total: true
+  - name: day6
+    label: Day 6
+    type: string
+    source: obpas_clu
+    total: true
+  - name: total_upcoming_breaches
+    label: Total Upcoming Breaches 
+    type: string
+    source: obpas_clu
+    total: true
+  searchParams:
+  - name: fromDate
+    label: From Date
+    type: epoch
+    source: obpas_clu
+    isMandatory: true
+    searchClause: AND 1=1
+  - name: district
+    label: District
+    type: singlevaluelist
+    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND u.district = $district
+  - name: tenant
+    label: tenant
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND u.ulb_code= $tenant
+  query: |
+      WITH params AS (
+        SELECT
+            (to_timestamp($fromDate / 1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS report_dt
+        ),
+       wf_detailed AS (
+        SELECT
+           wf.businessid AS applicationno,
+           wf.tenantid,
+           wf.businessservice,
+           UPPER(st.applicationstatus) AS applicationstatus,
+           wf.createdtime,
+           wf.lastmodifiedtime
+           FROM eg_wf_processinstance_v2 wf
+           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+           WHERE wf.businessservice in ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH') AND st.applicationstatus not in ('INITIATED','CANCELLED')
+        ),
+       status_times AS (
+        SELECT
+          applicationno,
+          tenantid,
+          businessservice,
+          MIN(createdtime) FILTER ( WHERE applicationstatus = 'FIELDINSPECTION_INPROGRESS' ) AS sla_start_time,
+          MAX(lastmodifiedtime) FILTER ( WHERE applicationstatus IN ( 'APPROVED','REJECTED','PENDINGPAYMENT','BLOCKED')) AS final_time
+          FROM wf_detailed
+          GROUP BY applicationno, tenantid, businessservice
+          ), 
+       sla_master AS (
+        SELECT
+          businessservice,
+          businessservicesla
+          FROM eg_wf_businessservice_v2
+          ),
+       sla_calc AS (
+        SELECT
+          st.applicationno,
+          st.tenantid,
+          st.businessservice,
+          st.sla_start_time,
+          st.final_time,
+          (to_timestamp( (st.sla_start_time + sm.businessservicesla) / 1000.0) AT TIME ZONE 'Asia/Kolkata') AS sla_breach_ts
+          FROM status_times st
+          JOIN sla_master sm ON sm.businessservice = st.businessservice
+          WHERE st.sla_start_time IS NOT NULL
+           ),
+       upcoming_breaches AS (
+        SELECT
+         tenantid,
+         businessservice,
+         sla_breach_ts::date AS breach_date
+         FROM sla_calc sc
+         JOIN params p ON TRUE
+         WHERE sc.final_time IS NULL 
+          AND sc.sla_breach_ts::date
+          BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
+           )
+        SELECT
+          u.district,
+          u.name_of_ulb,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt)   AS day0,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '1 day') AS day1,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '2 day') AS day2,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '3 day') AS day3,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '4 day') AS day4,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '5 day') AS day5,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '6 day') AS day6,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '7 day') AS day7,
+          COUNT(*) AS total_upcoming_breaches
+          FROM upcoming_breaches ub
+          JOIN ulb_data u ON ub.tenantid = u.ulb_code
+          JOIN params p ON TRUE    
+             WHERE 1=1 
+  groupby: GROUP BY u.district, u.name_of_ulb
+  orderby: ORDER BY u.district, u.name_of_ulb DESC  
+    
+- reportName: DetailedFilesNearTimelineBreach
+  summary: Detailed file list of district-ulb wise application upcoming  breached its SLA for next 7 days 
+  version: 1.0.0
+  moduleName: rainmaker-obpas_clu
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+  - name: district
+    label: District 
+    type: string
+    source: obpas_clu
+    total: false
+  - name: name_of_ulb
+    label: ULB Name
+    type: string
+    source: obpas_clu
+    total: false
+  - name: applicationstatus
+    label: application status
+    type: string
+    source: obpas_clu
+    total: false
+  - name: fileno
+    label: File No
+    type: string
+    source: obpas_clu
+    total: false
+  - name: modulename
+    label: Module Name
     type: string
     source: obpas_clu
     total: false
   searchParams:
   - name: fromDate
-    label: fromDate
+    label: From Date
     type: epoch
     source: obpas_clu
-    isMandatory: false
-    searchClause: AND a.createdtime >= $fromDate
-  - name: toDate
-    label: toDate
-    type: epoch
-    source: obpas_clu
-    isMandatory: false
-    searchClause: AND a.createdtime <= $toDate
-  - name: applicationstatus
-    label: Application status
+    isMandatory: true
+    searchClause: AND 1=1
+  - name: district
+    label: District
     type: singlevaluelist
-    pattern: list://INITIATED:INITIATED,PENDINGPAYMENT:PENDINGPAYMENT,DOCUMENTVERIFY:DOCUMENTVERIFY,APPROVED:APPROVED, REJECTED:REJECTED,TL-VERIFICATION:TL-VERIFICATION,WS-SW-VERIFICATION:WS-SW-VERIFICATION ,CITIZENACTIONREQUIRED-DV:CITIZENACTIONREQUIRED-DV,BPA-VERIFICATION:BPA-VERIFICATION,PENDINGAPPROVAL:PENDINGAPPROVAL,CANCELLED:CANCELLED,PT-VERIFICATION:PT-VERIFICATION,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
+    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
     source: obpas_clu
     isMandatory: false
-    searchClause: AND LOWER(a.applicationstatus) = LOWER($applicationstatus)
+    searchClause: AND u.district = $district
+  - name: tenant_name
+    label: ULB
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND u.ulb_code= $tenant_name
   query: |
-      WITH current_holder AS (
-        SELECT DISTINCT ON (wf.businessid)
-          wf.businessid AS applicationno,
-          u.name AS assignee_name,
-          e.code AS assignee_code,
-          UPPER(st.applicationstatus) AS current_stage
-        FROM eg_wf_processinstance_v2 wf
-        JOIN eg_wf_state_v2 st    ON wf.status = st.uuid
-        LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
-        LEFT JOIN eg_user u       ON u.uuid = wa.assignee
-        LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        WHERE wf.tenantid = $tenantid
-          AND wf.businessservice in ('clu_mcl','clu_mco')    -- adjust if your workflow uses a different businessservice string
-        ORDER BY wf.businessid, wf.lastmodifiedtime DESC
-      )
-      
-      SELECT
-        u.name,
-        u.mobilenumber,
-        a.applicationstatus,
-        'CLU' AS businessservice,
-        a.applicationno,
-        ch.assignee_name  AS employee_name,
-        ch.assignee_code  AS employee_code
-      FROM eg_clu a
-      JOIN eg_clu_owner o   ON a.id = o.cluid            -- owner.nocid references eg_noc.id
-      JOIN eg_user u        ON u.uuid = o.uuid           -- owner.uuid references eg_user.uuid
-      JOIN eg_clu_details d ON d.cluid = o.cluid         -- details.nocid references the same noc id
-      LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno
-      WHERE a.tenantid = $tenantid 
-
+      WITH params AS (
+        SELECT
+            (to_timestamp($fromDate / 1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS report_dt
+        ),
+      wf_detailed AS (
+        SELECT
+           wf.businessid AS uuid,
+           wf.businessservice,
+           wf.tenantid,
+           UPPER(st.applicationstatus) AS applicationstatus,
+           wf.createdtime,
+           wf.lastmodifiedtime
+           FROM eg_wf_processinstance_v2 wf
+           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+           WHERE wf.businessservice in ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH') AND st.applicationstatus not in ('INITIATED','CANCELLED')
+        ),
+      latest_status AS (
+        SELECT DISTINCT ON (uuid)
+           uuid,
+           applicationstatus
+           FROM wf_detailed
+           ORDER BY uuid, lastmodifiedtime DESC
+        ),
+      status_times AS (
+          SELECT
+           uuid,
+           tenantid,
+           businessservice,
+           MIN(createdtime) FILTER (
+            WHERE applicationstatus = 'FIELDINSPECTION_INPROGRESS') AS sla_start_time,
+           MAX(lastmodifiedtime) FILTER ( WHERE applicationstatus IN ( 'APPROVED','REJECTED','PENDINGPAYMENT')) AS final_time
+           FROM wf_detailed
+           GROUP BY uuid, tenantid, businessservice
+         ),
+      sla_master AS (
+        SELECT
+           businessservice,
+           businessservicesla
+          FROM eg_wf_businessservice_v2
+          ),
+      sla_calc AS (
+         SELECT
+           st.uuid,
+           st.tenantid,
+           st.businessservice,
+           ls.applicationstatus,
+           (to_timestamp((st.sla_start_time + sm.businessservicesla) / 1000.0) AT TIME ZONE 'Asia/Kolkata') AS sla_breach_ts
+           FROM status_times st
+           JOIN sla_master sm ON sm.businessservice = st.businessservice
+           JOIN latest_status ls ON ls.uuid = st.uuid
+           WHERE st.sla_start_time IS NOT NULL
+           AND st.final_time IS NULL
+           ),
+      upcoming_breaches AS (
+        SELECT
+           sc.uuid,
+           sc.tenantid,
+           sc.businessservice,
+           sc.applicationstatus,
+           sc.sla_breach_ts::date AS breach_date
+           FROM sla_calc sc
+           JOIN params p ON TRUE
+           WHERE sc.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
+        )
+       SELECT
+         u.district,
+         u.name_of_ulb,
+         ub.applicationstatus,
+         ub.uuid as fileno,
+         'CLU' as modulename
+         FROM upcoming_breaches ub
+         JOIN ulb_data u ON ub.tenantid = u.ulb_code
+         WHERE 1=1 
+  groupby: GROUP BY u.district, u.name_of_ulb,ub.applicationstatus,ub.uuid
+  orderby: ORDER BY u.district, u.name_of_ulb ,ub.applicationstatus,ub.uuid DESC      
 - reportName: CollectionsReportCLU
   decryptionPathId: LAYOUTREPORTS
   summary: Collections
@@ -211,8 +1063,7 @@ ReportDefinitions:
         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
         LEFT JOIN eg_user u ON u.uuid = wa.assignee
         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        WHERE wf.tenantid = $tenantid
-          AND wf.businessservice in ('clu_mcl','clu_mco')
+        WHERE  wf.businessservice in ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH')
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       ),
       
@@ -252,7 +1103,7 @@ ReportDefinitions:
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno OR ch.applicationno = a.id::text
         WHERE pd.businessservice = 'clu'
           AND upper(p.paymentstatus) != 'CANCELLED'
-          AND p.tenantid = $tenantid
+          
       )
       
       SELECT
@@ -348,14 +1199,13 @@ ReportDefinitions:
            wf.id AS processinstanceid
           FROM eg_wf_processinstance_v2 wf
           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-          WHERE wf.tenantid = $tenantid
-         AND wf.businessservice in ('clu_mcl','clu_mco')                   
+          WHERE wf.businessservice in ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH')                   
           ),
         status_times AS (
              SELECT
                 uuid,
-                MAX(CASE WHEN applicationstatus = 'DOCUMENTVERIFY_JE/BI' THEN createdtime END) AS docverify_time,
-                MAX(CASE WHEN applicationstatus IN ('APPROVED','REJECTED') THEN lastmodifiedtime END) AS final_time
+                MAX(CASE WHEN applicationstatus = 'FIELDINSPECTION_INPROGRESS' THEN createdtime END) AS docverify_time,
+                MAX(CASE WHEN applicationstatus IN ('APPROVED','REJECTED','E-SIGNED','BLOCKED') THEN lastmodifiedtime END) AS final_time
               FROM wf_detailed
               GROUP BY uuid
              ),
@@ -370,7 +1220,7 @@ ReportDefinitions:
         sla_data AS (
             SELECT businessservice,businessservicesla
             FROM eg_wf_businessservice_v2
-            WHERE businessservice in ('clu_mcl','clu_mco')
+            WHERE businessservice in ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH') 
            ),
         assignee_details AS (
              SELECT DISTINCT ON (wf.businessid)
@@ -381,8 +1231,7 @@ ReportDefinitions:
               JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
               JOIN eg_hrms_employee e ON e.uuid = wa.assignee
               JOIN eg_user u ON e.uuid = u.uuid
-               WHERE wf.tenantid = $tenantid
-               AND wf.businessservice in ('clu_mcl','clu_mco')
+               WHERE wf.businessservice in ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH') 
               ORDER BY wf.businessid,wf.lastmodifiedtime DESC
                )
          SELECT
@@ -411,7 +1260,7 @@ ReportDefinitions:
             FROM eg_clu n
             LEFT JOIN status_times st ON n.applicationno = st.uuid
             LEFT JOIN latest_status ls ON n.applicationno = ls.uuid
-            JOIN sla_data sla ON sla.businessservice in ('clu_mcl','clu_mco')
+            JOIN sla_data sla ON sla.businessservice in ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH') 
             LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
             WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')             
   orderby:  ORDER BY n.createdtime DESC, tenantid, final_status
@@ -546,7 +1395,6 @@ ReportDefinitions:
       FROM egcl_paymentdetail pd
       INNER JOIN egcl_bill bill 
           ON bill.id = pd.billid 
-          AND pd.tenantid = $tenantid
       INNER JOIN egcl_payment payment 
           ON payment.id = pd.paymentid
       LEFT JOIN eg_clu a 
@@ -558,7 +1406,6 @@ ReportDefinitions:
       LEFT JOIN eg_user usr 
           ON usr.id = payment.createdby::integer
       WHERE
-          bill.tenantid = $tenantid
-          AND pd.businessservice = 'clu'
+           pd.businessservice = 'clu'
           AND payment.paymentstatus != 'CANCELLED'
   orderby: ORDER BY pd.receiptdate DESC;
