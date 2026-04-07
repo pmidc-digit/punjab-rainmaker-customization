@@ -331,13 +331,13 @@ ReportDefinitions:
     source: obpas_clu
     isMandatory: false
     searchClause: AND u.district = $district
-  - name: ulb
+  - name: ulb_name
     label: ULB
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $ulb
+    searchClause: AND u.name_of_ulb= $ulb_name
   - name: businessservice
     label: Businesservice
     type: singlevaluelist
@@ -537,8 +537,8 @@ ReportDefinitions:
           FROM sla_calc sc
           JOIN ulb_data u ON sc.tenantid = u.ulb_code
           WHERE sc.timeline_status = 'BREACHED'     
-    groupby: GROUP BY u.district, u.name_of_ulb ,sc.applicationstatus,sc.uuid
-    orderby: ORDER BY u.district, u.name_of_ulb,sc.applicationstatus,sc.uuid DESC  
+  groupby: GROUP BY u.district, u.name_of_ulb ,sc.applicationstatus,sc.uuid
+  orderby: ORDER BY u.district, u.name_of_ulb,sc.applicationstatus,sc.uuid DESC  
 
 - reportName: officers_wise_pendency
   summary: officers wise  Pendency Trend Analysis - Last 7 Days
@@ -661,8 +661,8 @@ ReportDefinitions:
         COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 6 THEN cnt END),0) AS day6,
         COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 7 THEN cnt END),0) AS day7
       FROM agg where 1=1
-    groupby:  GROUP BY designation_code
-    orderby:  ORDER BY officer_designation
+  groupby:  GROUP BY designation_code
+  orderby:  ORDER BY officer_designation
     
 - reportName: FilesNearTimelineBreachSummary
   summary: Summary list of district-ulb wise application upcoming  breached its SLA for next 7 days 
@@ -865,13 +865,13 @@ ReportDefinitions:
     source: obpas_clu
     isMandatory: false
     searchClause: AND u.district = $district
-  - name: tenant
+  - name: tenant_name
     label: ULB
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $tenant 
+    searchClause: AND u.name_of_ulb= $tenant_name
   query: |
       WITH params AS (
         SELECT
@@ -1063,8 +1063,7 @@ ReportDefinitions:
         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
         LEFT JOIN eg_user u ON u.uuid = wa.assignee
         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        WHERE wf.tenantid = $tenantid
-          AND wf.businessservice in ('clu_mcl','clu_mco')
+        WHERE  wf.businessservice in ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH')
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       ),
       
@@ -1104,7 +1103,7 @@ ReportDefinitions:
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno OR ch.applicationno = a.id::text
         WHERE pd.businessservice = 'clu'
           AND upper(p.paymentstatus) != 'CANCELLED'
-          AND p.tenantid = $tenantid
+          
       )
       
       SELECT
