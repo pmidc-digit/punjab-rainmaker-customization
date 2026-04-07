@@ -126,13 +126,13 @@ ReportDefinitions:
     type: epoch
     source: obpas_clu
     isMandatory: false
-    searchClause: a.createdtime >= $fromDate
+    searchClause: c.createdtime >= $fromDate
   - name: toDate
     label: To Date
     type: epoch
     source: obpas_clu
     isMandatory: false
-    searchClause: a.createdtime <= $toDate
+    searchClause: c.createdtime <= $toDate
   - name: ulb
     label: ULB
     type: singlevaluelist 
@@ -337,7 +337,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $ulb_name
+    searchClause: AND u.ulb_code= $ulb_name
   - name: businessservice
     label: Businesservice
     type: singlevaluelist
@@ -458,7 +458,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $ulb 
+    searchClause: AND u.ulb_code= $ulb 
   - name: applicationstatus
     label: Application Status
     type: singlevaluelist
@@ -742,7 +742,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $tenant
+    searchClause: AND u.ulb_code= $tenant
   query: |
       WITH params AS (
         SELECT
@@ -871,7 +871,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $tenant_name
+    searchClause: AND u.ulb_code= $tenant_name
   query: |
       WITH params AS (
         SELECT
