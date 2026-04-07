@@ -141,13 +141,6 @@ ReportDefinitions:
     wrapper: true
     isMandatory: false
     searchClause: AND c.tenantid = $ulb
-  - name: applicationstatus 
-    label: Application Status
-    type: singlevaluelist
-    pattern: list://INITIATED:INITIATED,PENDINGPAYMENT:PENDINGPAYMENT,DOCUMENTVERIFY:DOCUMENTVERIFY,APPROVED:APPROVED, REJECTED:REJECTED,TL-VERIFICATION:TL-VERIFICATION,WS-SW-VERIFICATION:WS-SW-VERIFICATION ,CITIZENACTIONREQUIRED-DV:CITIZENACTIONREQUIRED-DV,BPA-VERIFICATION:BPA-VERIFICATION,PENDINGAPPROVAL:PENDINGAPPROVAL,CANCELLED:CANCELLED,PT-VERIFICATION:PT-VERIFICATION,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
-    source: obpas_clu
-    isMandatory: false
-    searchClause: AND LOWER(a.applicationstatus) = LOWER($applicationstatus)
   - name: ULB_Type
     label: ULB Type
     type: singlevaluelist
