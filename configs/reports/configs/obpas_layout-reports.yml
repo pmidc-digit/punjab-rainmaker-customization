@@ -10,7 +10,7 @@ ReportDefinitions:
       pdfPageSize: A1
   sourceColumns:
   - name: tenant
-    label: TennatId
+    label: TenantId
     type: string
     source: obpas_layout
     total: false
@@ -170,7 +170,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND u.district  = $district_name 
   query: >
-      select n.applicationno,n.applicationstatus,n.vasikadate,n.vasikanumber,
+      select n.applicationno,n.applicationstatus,n.vasikadate,n.vasikanumber,split_part(n.tenantid,'.',2) as tenant,
              ad.additionaldetails::jsonb -> 'siteDetails' -> 'zone' ->> 'name' AS zone_name,
              ad.additionaldetails::jsonb -> 'siteDetails' ->> 'plotNo' AS plot_no,
              ad.additionaldetails::jsonb -> 'siteDetails' ->> 'wardNo' AS ward_no,
