@@ -1497,12 +1497,6 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
 
-  - name: eg_username
-    label: eg_username
-    type: string
-    source: obpas_bpa
-    total: false
-
   - name: bpa_building
     label: bpa_building
     type: string
@@ -1574,23 +1568,6 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-
-  searchParams:
-  - name: fromDate
-    label: fromDate
-    type: epoch
-    source: obpas_bpa
-    isMandatory: false
-    searchClause: AND u.login_time >= $fromDate
-
-  - name: toDate
-    label: toDate
-    type: epoch
-    source: obpas_bpa
-    isMandatory: false
-    searchClause: AND u.login_time <= $toDate
-
-
   query: |
       SELECT DISTINCT ON (u.user_id)
               u.user_uuid,
