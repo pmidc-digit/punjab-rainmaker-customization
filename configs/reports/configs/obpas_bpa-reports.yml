@@ -1590,39 +1590,27 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND u.login_time <= $toDate
 
-  - name: role_code
-    label: Role
-    type: singlevaluelist
-    source: obpas_bpa
-    isMandatory: false
-    searchClause: AND us.role_code = $role_code
+
   query: |
       SELECT DISTINCT ON (u.user_id)
               u.user_uuid,
               u.user_id,
               u.username,
-      
-              /* Cast login / logout time to text */
               u.login_time::text  AS login_time,
               u.logout_time::text AS logout_time,
-      
               us.role_code,
               eu.name,
               eu.username AS eg_username,
-      
-              /* Application flags - cast boolean to text */
               (bpa.accountid IS NOT NULL)::text AS bpa_building,
               (clu.accountid IS NOT NULL)::text AS clu,
               (lay.accountid IS NOT NULL)::text AS layout,
               (noc.accountid IS NOT NULL)::text AS noc,
       
-              /* Tenant IDs */
               bpa.tenantid    AS bpa_tenantid,
               clu.tenantid    AS clu_tenantid,
               lay.tenantid    AS layout_tenantid,
               noc.tenantid    AS noc_tenantid,
       
-              /* Application Numbers */
               bpa.applicationno AS bpa_applicationno,
               clu.applicationno AS clu_applicationno,
               lay.applicationno AS layout_applicationno,
@@ -1634,47 +1622,51 @@ ReportDefinitions:
           INNER JOIN eg_user eu
               ON eu.id = us.user_id
       
-          /* BPA Building Plan */
           LEFT JOIN (
               SELECT
                   accountid,
                   MIN(tenantid) AS tenantid,
                   MIN(applicationno) AS applicationno
               FROM public.eg_bpa_buildingplan
-              WHERE tenantid &lt;&gt; 'pb.testing'
+              WHERE tenantid <> 'pb.testing'
               GROUP BY accountid
           ) bpa ON bpa.accountid = eu.uuid
       
-          /* CLU */
           LEFT JOIN (
               SELECT
                   accountid,
                   MIN(tenantid) AS tenantid,
                   MIN(applicationno) AS applicationno
               FROM public.eg_clu
-              WHERE tenantid &lt;&gt; 'pb.testing'
+              WHERE tenantid <> 'pb.testing'
               GROUP BY accountid
           ) clu ON clu.accountid = eu.uuid
       
-          /* Layout */
           LEFT JOIN (
               SELECT
                   accountid,
                   MIN(tenantid) AS tenantid,
                   MIN(applicationno) AS applicationno
               FROM public.eg_layout
-              WHERE tenantid &lt;&gt; 'pb.testing'
+              WHERE tenantid <> 'pb.testing'
               GROUP BY accountid
           ) lay ON lay.accountid = eu.uuid
-      
-          /* NOC */
           LEFT JOIN (
               SELECT
                   accountid,
                   MIN(tenantid) AS tenantid,
                   MIN(applicationno) AS applicationno
               FROM public.eg_noc
-              WHERE tenantid &lt;&gt; 'pb.testing'
+              WHERE tenantid <> 'pb.testing'
               GROUP BY accountid
           ) noc ON noc.accountid = eu.uuid
+             WHERE eu.active = true
+      AND us.role_code IN (
+          'BPA_ARCHITECT',
+          'BPA_ENGINEER',
+          'BPA_SUPERVISOR',
+          'BPA_TOWNPLANNER'
+      )
+      AND u.login_time > (now() - INTERVAL '2 days')
+          
   orderby: ORDER BY u.user_id, u.login_time DESC          
