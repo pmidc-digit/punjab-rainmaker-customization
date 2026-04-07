@@ -121,13 +121,13 @@ ReportDefinitions:
         type: epoch
         source: obpas_noc
         isMandatory: false
-        searchClause: n.createdtime >= $fromDate
+        searchClause: and n.createdtime >= $fromDate
       - name: toDate
         label: To Date
         type: epoch
         source: obpas_noc
         isMandatory: false
-        searchClause: n.createdtime <= $toDate
+        searchClause: and n.createdtime <= $toDate
       - name: ulb
         label: ULB
         type: singlevaluelist
@@ -514,7 +514,7 @@ ReportDefinitions:
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: obpas_noc
         isMandatory: false
-        searchClause: AND u.name_of_ulb= $ulb
+        searchClause: AND u.ulb_code= $ulb
       - name: businessservice
         label: Businesservice
         type: singlevaluelist
@@ -635,7 +635,7 @@ ReportDefinitions:
       pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
       source: obpas_noc
       isMandatory: false
-      searchClause: AND u.name_of_ulb= $ulb 
+      searchClause: AND u.ulb_code= $ulb 
     - name: applicationstatus
       label: Application Status
       type: singlevaluelist
@@ -919,7 +919,7 @@ ReportDefinitions:
       pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
       source: obpas_noc
       isMandatory: false
-      searchClause: AND u.name_of_ulb= $tenant
+      searchClause: AND u.ulb_code= $tenant
     query: |
       WITH params AS (
         SELECT
@@ -1048,7 +1048,7 @@ ReportDefinitions:
       pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
       source: obpas_noc
       isMandatory: false
-      searchClause: AND u.name_of_ulb= $tenant 
+      searchClause: AND u.ulb_code= $tenant 
     query: |
       WITH params AS (
         SELECT
@@ -1279,7 +1279,7 @@ ReportDefinitions:
         LEFT JOIN eg_user u ON u.id::text = p.createdby::text
         LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno OR ch.applicationno = a.id::text
-        WHERE pd.businessservice in ('NOC_MC','NOC_NP')
+        WHERE pd.businessservice = 'obpas_noc'
           AND upper(p.paymentstatus) != 'CANCELLED'
          
       )
@@ -1441,6 +1441,6 @@ ReportDefinitions:
       LEFT JOIN eg_user usr 
           ON usr.id = payment.createdby::integer
       WHERE
-          pd.businessservice in  ('NOC_MC','NOC_NP')
+          pd.businessservice = 'obpas_noc'
           AND payment.paymentstatus != 'CANCELLED'
     orderby: ORDER BY pd.receiptdate DESC;
