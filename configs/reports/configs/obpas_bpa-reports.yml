@@ -1442,3 +1442,159 @@ ReportDefinitions:
          WHERE 1=1 
   groupby: GROUP BY u.district, u.name_of_ulb,ub.applicationstatus,ub.uuid
   orderby: ORDER BY u.district, u.name_of_ulb ,ub.applicationstatus,ub.uuid DESC        
+
+
+  ReportDefinitions:
+- reportName: UserLoginDetailReportBPA
+  decryptionPathId: LAYOUTREPORTS
+  summary: User login details with BPA, CLU, Layout & NOC
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+
+  sourceColumns:
+  - name: user_uuid
+    label: user_uuid
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: user_id
+    label: user_id
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: username
+    label: username
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: login_time
+    label: login_time
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: logout_time
+    label: logout_time
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: role_code
+    label: role_code
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: name
+    label: name
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: eg_username
+    label: eg_username
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: bpa_building
+    label: bpa_building
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: clu
+    label: clu
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: layout
+    label: layout
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: noc
+    label: noc
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: bpa_tenantid
+    label: bpa_tenantid
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: clu_tenantid
+    label: clu_tenantid
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: layout_tenantid
+    label: layout_tenantid
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: noc_tenantid
+    label: noc_tenantid
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: bpa_applicationno
+    label: bpa_applicationno
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: clu_applicationno
+    label: clu_applicationno
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: layout_applicationno
+    label: layout_applicationno
+    type: string
+    source: obpas_bpa
+    total: false
+
+  - name: noc_applicationno
+    label: noc_applicationno
+    type: string
+    source: obpas_bpa
+    total: false
+
+  searchParams:
+  - name: fromDate
+    label: fromDate
+    type: epoch
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND u.login_time >= $fromDate
+
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND u.login_time <= $toDate
+
+  - name: role_code
+    label: Role
+    type: singlevaluelist
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND us.role_code = $role_code
+
+  orderby: ORDER BY u.user_id, u.login_time DESC
