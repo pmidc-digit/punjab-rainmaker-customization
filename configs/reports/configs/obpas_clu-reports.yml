@@ -1135,7 +1135,7 @@ ReportDefinitions:
     source: obpas_clu
     wrapper: true
     isMandatory: true
-    searchClause: AND ulb.name_of_ulb = $ulb
+    searchClause: AND ulb.ulb_code = $ulb
   
   query: |
       WITH current_holder AS (
@@ -1211,7 +1211,7 @@ ReportDefinitions:
         ut.online_amount, 
         ut.amountpaid
         FROM unique_transactions ut
-        JOIN ulb_data ulb ON ulb.ulb_code = ut.payment_tenant
+        LEFT JOIN ulb_data ulb ON ulb.ulb_code = ut.payment_tenant
        where 1=1
   orderby: ORDER BY createdtime DESC 
   
