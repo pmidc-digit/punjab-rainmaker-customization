@@ -1376,7 +1376,7 @@ ReportDefinitions:
             LEFT JOIN sla_data sla ON sla.businessservice = (d.additionaldetails::jsonb -> 'applicationDetails' ->> 'businessService')
             LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
             WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')             
-  orderby:  ORDER BY n.createdtime DESC, tenantid, final_status
+  orderby:  ORDER BY n.applicationno,n.createdtime DESC, tenantid, final_status
       
 - reportName: ReceiptRegisterCLU
   decryptionPathId: LAYOUTREPORTS
