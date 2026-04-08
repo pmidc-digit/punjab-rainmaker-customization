@@ -564,7 +564,7 @@ ReportDefinitions:
            JOIN sla_data sla  ON sla.businessservice = ls.businessservice
            INNER JOIN eg_clu c ON (c.applicationno = ls.uuid OR c.id::text = ls.uuid)
            INNER JOIN eg_clu_details ad ON c.id = ad.cluid
-           WHERE it.inspection_start IS NOT NULL AND ls.applicationstatus NOT IN ( 'E-SIGNED', 'CITIZENACTIONREQUIRED', 'APPROVED','REJECTED','CANCELLED','INITIATED','PENDINGPAYMENT','BLOCKED')
+           WHERE it.inspection_start IS NOT NULL 
            )
        SELECT
           u.district,
@@ -599,12 +599,13 @@ ReportDefinitions:
            ELSE sc.applicationstatus
            END AS localized_status,
           sc.uuid as fileno,sc.ulb_type,
-          'CLU' as modulename
+          'CLU' as modulename,
+          FLOOR((sc.lastmodifiedtime - sc.inspection_start) / 86400000) AS days_taken,
           FROM sla_calc sc
           JOIN ulb_data u ON sc.tenantid = u.ulb_code
           WHERE sc.timeline_status = 'BREACHED'     
-  groupby: GROUP BY u.district, u.name_of_ulb ,sc.applicationstatus,sc.uuid,sc.ulb_type
-  orderby: ORDER BY u.district, u.name_of_ulb,sc.applicationstatus,sc.uuid,sc.ulb_type DESC  
+  groupby: GROUP BY u.district, u.name_of_ulb ,sc.applicationstatus,sc.uuid,sc.ulb_type,sc.lastmodifiedtime,sc.inspection_start
+  orderby: ORDER BY days_taken,u.district, u.name_of_ulb,sc.applicationstatus,sc.uuid,sc.ulb_type DESC  
 
 - reportName: officers_wise_pendency
   summary: officers wise  Pendency Trend Analysis - Last 7 Days
