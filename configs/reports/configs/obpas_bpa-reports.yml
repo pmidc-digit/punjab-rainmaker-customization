@@ -1690,15 +1690,10 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
 
-  - name: role_code
-    label: role_code
-    type: string
-    source: obpas_bpa
-    total: false
   query: |
       SELECT ulb_schema,
           applicationdate,
           status,
           applicant_name,
-          mobilenumber,
-          role_code from edcr_cross_ulb_result
+          mobilenumber
+          from edcr_cross_ulb_result
