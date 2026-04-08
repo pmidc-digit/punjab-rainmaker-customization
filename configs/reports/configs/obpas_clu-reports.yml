@@ -742,8 +742,8 @@ ReportDefinitions:
         COALESCE(NULLIF(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 5 THEN cnt END), 0)::TEXT, '') AS day6,
         COALESCE(NULLIF(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 6 THEN cnt END), 0)::TEXT, '') AS day7
       FROM agg where 1=1
-      GROUP BY designation_code
-      HAVING SUM(cnt) > 0
+      
+  groupby:  GROUP BY designation_code    
   orderby:  ORDER BY officer_designation
     
 - reportName: FilesNearTimelineBreachSummary
