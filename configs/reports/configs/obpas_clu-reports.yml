@@ -600,7 +600,7 @@ ReportDefinitions:
            END AS localized_status,
           sc.uuid as fileno,sc.ulb_type,
           'CLU' as modulename,
-          FLOOR((sc.lastmodifiedtime - sc.inspection_start) / 86400000) AS days_taken,
+          FLOOR((sc.lastmodifiedtime - sc.inspection_start) / 86400000) AS days_taken
           FROM sla_calc sc
           JOIN ulb_data u ON sc.tenantid = u.ulb_code
           WHERE sc.timeline_status = 'BREACHED'     
