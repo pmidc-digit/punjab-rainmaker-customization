@@ -6,7 +6,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_clu
   sourceColumns:
   - name: tenantid
-    label: tenantId
+    label: ULB Name
     type: string
     source: obpas_clu
     total: false
@@ -15,7 +15,7 @@ ReportDefinitions:
     type: string
     source: obpas_clu
     total: false
-  - name: applicationstatus
+  - name: localized_status
     label: Application Status
     type: string
     source: obpas_clu
@@ -46,7 +46,7 @@ ReportDefinitions:
     source: obpas_clu
     total: false
   - name: businessservice
-    label: Businessservice
+    label: Service
     type: string
     source: obpas_clu
     total: false
@@ -134,7 +134,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: and c.createdtime <= $toDate
   - name: ulb
-    label: ULB
+    label: ULB Name
     type: singlevaluelist 
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
@@ -148,27 +148,56 @@ ReportDefinitions:
     source: obpas_clu 
     wrapper: true
     isMandatory: false
-    searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails'-> 'ulbName' ->'city' ->> 'ulbType' = $ULB_Type
+    searchClause: AND ad.additionaldetails::jsonb -> 'siteDetails'->> 'ulbType' = $ULB_Type
   - name: district_name
     label: District
     type: singlevaluelist
-    pattern: list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,:Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
     source: obpas_clu
     wrapper: true
     isMandatory: false
     searchClause: AND u.district  = $district_name
   - name: applicationstatus
-    label: Application status
+    label: Application Status
     type: singlevaluelist
-    pattern: list://DOCUMENTVERIFY_JC:Dodumentverify JC,PROFESSIONALACTIONREQUIRED:Professional Action Required,ATP_VERIFICATION_PENDING:ATP Verification Pending,DOCUMENTVERIFY_MTP/ME:Document Verify MTP/ME, E-SIGNED:E-SIGNED,FIELDINSPECTION_INPROGRESS:Field Inspection InProgress,ATPHQ_APPROVAL_PENDING:ATPHQ Approval Pending,PENDINGPAYMENT:Pending Payment,APPROVAL_PENDING:Approval Pending,MTP_VERIFICATION_PENDING:MTP Verification Pending,DOCUMENTVERIFY_DM:Document Verify DM,DOCUMENTVERIFY_JE/BI:Document Verify JE/BI,INITIATED:Initiated,DOCUMENTVERIFY_EO:Document Verify EO,PENDINGAPPROVAL:Pending Approval,PENDINGSANCTIONPAYMENT:Pendoing Snaction Paymnet,CANCELLED:Cancelled,REJECTED:Rejected,APPROVED:Approved,ADC_VERIFICATION_PENDING:ADC Verification Pending,DOC_VERIFICATION_PENDING:Document Verification Pending,EO_VERIFICATION_PENDING:EO Verification Pending,STP_VERIFICATION_PENDING:STP Verification Pending,PENDINGAPPLICATIONPAYMENT:Application Payment Pending,INSPECTION_REPORT_PENDING:Inspection Report Pending
+    pattern: 'list://DOCUMENTVERIFY_JC:Document Verify JC,PROFESSIONALACTIONREQUIRED:Professional Action Required,ATP_VERIFICATION_PENDING:ATP Verification Pending,DOCUMENTVERIFY_MTP/ME:Document Verify MTP/ME, E-SIGNED:E-Signed,FIELDINSPECTION_INPROGRESS:Field Inspection InProgress,ATPHQ_APPROVAL_PENDING:ATPHQ Approval Pending,PENDINGPAYMENT:Pending Payment,APPROVAL_PENDING:Approval Pending,MTP_VERIFICATION_PENDING:MTP Verification Pending,DOCUMENTVERIFY_DM:Document Verify DM,DOCUMENTVERIFY_JE/BI:Document Verify JE/BI,INITIATED:Initiated,DOCUMENTVERIFY_EO:Document Verify EO,PENDINGAPPROVAL:Pending Approval,PENDINGSANCTIONPAYMENT:Pending Snaction Paymnet,CANCELLED:Cancelled,REJECTED:Rejected,APPROVED:Approved,ADC_VERIFICATION_PENDING:ADC Verification Pending,DOC_VERIFICATION_PENDING:Document Verification Pending,EO_VERIFICATION_PENDING:EO Verification Pending,STP_VERIFICATION_PENDING:STP Verification Pending,PENDINGAPPLICATIONPAYMENT:Application Payment Pending,INSPECTION_REPORT_PENDING:Inspection Report Pending'
     source: obpas_clu
     isMandatory: false
-    searchClause: AND LOWER(c.applicationstatus) = LOWER($applicationstatus)
+    searchClause: AND c.applicationstatus = LOWER($applicationstatus)
   query: >
         Select 
-          c.applicationno,
+          c.applicationno,c.createdtime,
           split_part(c.tenantid,'.',2) AS tenantid,
-          c.applicationstatus,c.vasikanumber,c.vasikadate,
+          c.vasikanumber,c.vasikadate,
+          CASE 
+            WHEN c.applicationstatus = 'DOCUMENTVERIFY_JC' THEN 'Document Verify JC'
+            WHEN c.applicationstatus = 'PROFESSIONALACTIONREQUIRED' THEN 'Professional Action Required'
+            WHEN c.applicationstatus = 'ATP_VERIFICATION_PENDING' THEN 'ATP Verification Pending'
+            WHEN c.applicationstatus = 'DOCUMENTVERIFY_MTP/ME' THEN 'Document Verify MTP/ME'
+            WHEN c.applicationstatus = 'E-SIGNED' THEN 'E-Signed'
+            WHEN c.applicationstatus = 'REJECTED' THEN 'Rejected'
+            WHEN c.applicationstatus = 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In Progress'
+            WHEN c.applicationstatus = 'ATPHQ_APPROVAL_PENDING' THEN 'ATPHQ Approval Pending'
+            WHEN c.applicationstatus = 'PENDINGPAYMENT' THEN 'Pending Payment'
+            WHEN c.applicationstatus = 'ATP_VERIFICATION_PENDING' THEN 'ATP Verification Pending'
+            WHEN c.applicationstatus = 'APPROVAL_PENDING' THEN 'Approval Pending'
+            WHEN c.applicationstatus = 'MTP_VERIFICATION_PENDING' THEN 'MTP Verification Pending'
+            WHEN c.applicationstatus = 'DOCUMENTVERIFY_JE/BI' THEN 'Document Verify JE/BI'
+            WHEN c.applicationstatus = 'INITIATED' THEN 'Initiated'
+            WHEN c.applicationstatus = 'INSPECTION_REPORT_PENDING' THEN 'Inspection Report Pending'
+            WHEN c.applicationstatus = 'PENDINGAPPLICATIONPAYMENT' THEN 'Application Payment Pending'
+            WHEN c.applicationstatus = 'STP_VERIFICATION_PENDING' THEN 'STP Verification Pending'
+            WHEN c.applicationstatus = 'EO_VERIFICATION_PENDING' THEN 'EO Verification Pending'
+            WHEN c.applicationstatus = 'DOC_VERIFICATION_PENDING' THEN 'Document Verification Pending'
+            WHEN c.applicationstatus = 'ADC_VERIFICATION_PENDING' THEN 'ADC Verification Pending'
+            WHEN c.applicationstatus = 'APPROVED' THEN 'Approved'
+            WHEN c.applicationstatus = 'REJECTED' THEN 'Rejected'
+            WHEN c.applicationstatus = 'CANCELLED' THEN 'Cancelled'
+            WHEN c.applicationstatus = 'PENDINGSANCTIONPAYMENT' THEN 'Sanction Payment Pending'
+            WHEN c.applicationstatus = 'PENDINGAPPROVAL' THEN 'Pending Approval'
+            WHEN c.applicationstatus = 'DOCUMENTVERIFY_EO' THEN 'EO Document Verification'
+           ELSE c.applicationstatus
+           END AS localized_status,
           ad.additionaldetails::jsonb -> 'siteDetails' -> 'zone' ->> 'name' AS zone_name,
           ad.additionaldetails::jsonb -> 'siteDetails' ->> 'plotNo' AS plot_no,
           ad.additionaldetails::jsonb -> 'siteDetails' ->> 'wardNo' AS ward_no,
@@ -180,23 +209,23 @@ ReportDefinitions:
           ad.additionaldetails::jsonb -> 'siteDetails' -> 'ulbName'->'city'->> 'regionName'  AS Region_Name,
           ad.additionaldetails::jsonb -> 'siteDetails' -> 'roadType' ->> 'name' AS road_type,
           ad.additionaldetails::jsonb -> 'siteDetails' ->> 'proposedSiteAddress' AS site_address,
-          ad.additionaldetails::jsonb -> 'siteDetails' -> 'layoutNonSchemeType' ->> 'name' AS layoutNonSchemeType,
           ad.additionaldetails::jsonb -> 'siteDetails' -> 'ulbName' ->'city'->>'districtName'  AS district_name,
           ad.additionaldetails::jsonb -> 'siteDetails' ->> 'specificationPlotArea' AS specification_plot_area,
           ad.additionaldetails::jsonb -> 'siteDetails' ->> 'netPlotAreaAfterWidening' AS net_plot_area,
           ad.additionaldetails::jsonb -> 'siteDetails' ->> 'areaLeftForRoadWidening' AS road_widening_area,
           ad.additionaldetails::jsonb -> 'siteDetails' ->> 'roadWidthAtSite' AS road_width,
-          ad.additionaldetails::jsonb -> 'siteDetails' -> 'buildingCategory' ->> 'name' AS building_category,
-          ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'applicantOwnerOrFirmName' AS applicant_name,
-          ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'applicantMobileNumber' AS applicant_mobile,
+          ad.additionaldetails::jsonb -> 'siteDetails' -> 'appliedCluCategory' ->> 'name' AS building_category,
+          ad.additionaldetails::jsonb -> 'applicationDetails' -> 'owners' -> 0 ->> 'ownerOrFirmName' AS applicant_name,
+          ad.additionaldetails::jsonb -> 'applicationDetails' -> 'owners' -> 0 ->> 'mobileNumber' AS applicant_mobile,
           ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'professionalName' AS professional_name,
           ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'professionalRegId' AS professional_reg_id,
           ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'professionalMobileNumber' AS professional_mobile 
           from eg_clu c
          inner join eg_clu_details ad on c.id = ad.cluid
          inner join ulb_data u on u.ulb_code=c.tenantid
-  groupby: GROUP BY c.applicationno,c.applicationstatus, c.vasikadate, c.vasikanumber,ad.additionaldetails,c.tenantid
-  orderby: ORDER BY c.vasikadate;      
+         where 1=1
+  groupby: GROUP BY c.applicationno,c.applicationstatus, c.vasikadate, c.vasikanumber,ad.additionaldetails,c.createdtime,c.tenantid
+  orderby: ORDER BY c.createdtime ;      
 
 - reportName: officers_with_highest_pendency
   summary: Top 7 officers with Highest Pendency
@@ -206,6 +235,11 @@ ReportDefinitions:
     print:
        pdfPageSize: A1
   sourceColumns:
+  - name: ulb_type
+    label: ULB Type
+    type: string
+    source: obpas_clu
+    total: false
   - name: ulb_name
     label: ULB Name
     type: string
@@ -222,15 +256,8 @@ ReportDefinitions:
     source: obpas_clu
     total: true
   searchParams:
-  - name: businessservice
-    label: Business Service
-    type: singlevaluelist
-    pattern: list://CLU_MC:MC,CLU_MC_HIGH:MC High,CLU_MC_OTH:MC Others,CLU_NP:Nagar Panchayat,CLU_NP_HIGH:NP High,CLU_NP_OTH:NP Others
-    source: obpas_clu
-    isMandatory: false
-    searchClause: AND businessservice = $businessservice
   - name: ulb
-    label: ULB
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
@@ -239,11 +266,19 @@ ReportDefinitions:
   - name: district_name
     label: District
     type: singlevaluelist
-    pattern: list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,:Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
     source: obpas_clu
     wrapper: true
     isMandatory: false
     searchClause: AND u.district  = $district_name
+  - name: ULB_Type
+    label: ULB Type
+    type: singlevaluelist
+    pattern: list://Municipal Council:Municipal Council,Municipal Corporation:Municipal Corporation,Nagar Panchayat:Nagar Panchayat
+    source: obpas_clu 
+    wrapper: true
+    isMandatory: false
+    searchClause: AND m.ulb_type = $ULB_Type
   query: >
       WITH latest_assignee AS (
         SELECT DISTINCT ON (wf.businessid)
@@ -262,19 +297,18 @@ ReportDefinitions:
       ),    
       pending_files AS (
         SELECT
-          id::text AS clu_id,
-          applicationno,
-          tenantid,
-          status
-        FROM eg_clu
-        WHERE status NOT IN (
-            'INITIATED',
-            'CANCELLED'
-          )
+          c.id::text AS clu_id,
+          c.applicationno,
+          c.tenantid,
+          c.status,
+          ad.additionaldetails::jsonb -> 'siteDetails' ->> 'ulbType' AS ulb_type
+         FROM eg_clu c
+         INNER JOIN eg_clu_details ad ON c.id = ad.cluid
+         WHERE c.status NOT IN ('INITIATED', 'CANCELLED')
       ),    
       merged AS (
         SELECT
-          la.tenantid, 
+          la.tenantid, p.ulb_type,
           INITCAP(REPLACE(la.tenantid, 'pb.', '')) AS ulb_name,
           la.designation_code,
           la.businessservice,
@@ -285,18 +319,16 @@ ReportDefinitions:
                p.clu_id = la.businessid
             OR p.applicationno = la.businessid
           )
-        GROUP BY la.tenantid, INITCAP(REPLACE(la.tenantid, 'pb.', '')), la.designation_code, la.businessservice
+        GROUP BY la.tenantid, INITCAP(REPLACE(la.tenantid, 'pb.', '')), la.designation_code, la.businessservice,p.ulb_type
       )      
 
       SELECT
         ROW_NUMBER() OVER (ORDER BY pending_files DESC) AS Serial_No,
-        ulb_name ,businessservice,
+        ulb_name ,businessservice,m.ulb_type,
         designation_code as Officer_Designation,
         pending_files 
       FROM merged  m
-
       inner join ulb_data u on u.name_of_ulb=m.ulb_name
-
       where  designation_code <> 'Clerk' and designation_code <> 'Accountant'
   orderby: ORDER BY pending_files DESC limit 7
     
@@ -308,6 +340,11 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
+  - name: ulb_type
+    label: ULB Type
+    type: string
+    source: obpas_clu
+    total: false
   - name: district
     label: District
     type: string
@@ -327,24 +364,25 @@ ReportDefinitions:
   - name: district
     label: District
     type: singlevaluelist
-    pattern: list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
     source: obpas_clu
     isMandatory: false
     searchClause: AND u.district = $district
   - name: ulb_name
-    label: ULB
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
     isMandatory: false
     searchClause: AND u.ulb_code= $ulb_name
-  - name: businessservice
-    label: Businesservice
+  - name: ULB_Type
+    label: ULB Type
     type: singlevaluelist
-    pattern: list://CLU_MC:MC,CLU_MC_HIGH:MC High,CLU_MC_OTH:MC Others,CLU_NP:Nagar Panchayat,CLU_NP_HIGH:NP High,CLU_NP_OTH:NP Others
-    source: obpas_clu
+    pattern: list://Municipal Council:Municipal Council,Municipal Corporation:Municipal Corporation,Nagar Panchayat:Nagar Panchayat
+    source: obpas_clu 
+    wrapper: true
     isMandatory: false
-    searchClause: AND sc.businessservice = $businessservice
+    searchClause: AND sc.ulb_type = $ULB_Type
   query: >
       WITH wf_detailed AS (
          SELECT
@@ -392,24 +430,26 @@ ReportDefinitions:
            ls.businessservice,
            it.inspection_start,
            ls.lastmodifiedtime,
-           sla.businessservicesla,
+           sla.businessservicesla,ad.additionaldetails::jsonb -> 'siteDetails' ->> 'ulbType' AS ulb_type,
            CASE WHEN(ls.lastmodifiedtime - it.inspection_start) > sla.businessservicesla  THEN 'BREACHED' ELSE 'MET'
            END AS timeline_status
            FROM latest_status ls
            JOIN inspection_time it ON ls.uuid = it.uuid
            JOIN sla_data sla  ON sla.businessservice = ls.businessservice
+           INNER JOIN eg_clu c ON c.applicationno = ls.uuid OR c.id::text = ls.uuid
+           INNER JOIN eg_clu_details ad ON c.id = ad.cluid
            WHERE it.inspection_start IS NOT NULL
            )
        SELECT
           u.district,
-          u.name_of_ulb,
+          u.name_of_ulb,sc.ulb_type, 
           COUNT(CASE WHEN sc.timeline_status = 'MET' THEN 1 END) AS met_count,
           COUNT(CASE WHEN sc.timeline_status = 'BREACHED' THEN 1 END) AS beyond_timeline_count
           FROM sla_calc sc
           JOIN ulb_data u ON sc.tenantid = u.ulb_code
           WHERE 1=1
-  groupby: GROUP BY u.district, u.name_of_ulb
-  orderby: ORDER BY u.district, u.name_of_ulb DESC
+  groupby: GROUP BY u.district, u.name_of_ulb,sc.ulb_type
+  orderby: ORDER BY u.district, u.name_of_ulb ,sc.ulb_type DESC
 
 - reportName: DetailedListBeyondTimelineSummary
   summary: Summary of district-ulb wise application which breached its SLA
@@ -419,6 +459,11 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
+  - name: district
+    label: ULB Type
+    type: string
+    source: obpas_clu
+    total: false
   - name: district
     label: District
     type: string
@@ -440,7 +485,7 @@ ReportDefinitions:
     source: obpas_clu
     total: false
   - name: fileno
-    label: File No
+    label: File Number
     type: string
     source: obpas_clu
     total: false
@@ -448,12 +493,12 @@ ReportDefinitions:
   - name: district
     label: District
     type: singlevaluelist
-    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
     source: obpas_clu
     isMandatory: false
     searchClause: AND u.district = $district
   - name: ulb
-    label: ULB
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
@@ -466,13 +511,14 @@ ReportDefinitions:
     source: obpas_clu
     isMandatory: false
     searchClause: AND sc.applicationstatus = $applicationstatus
-  - name: businessservice
-    label: Businesservice
+  - name: ULB_Type
+    label: ULB Type
     type: singlevaluelist
-    pattern: list://CLU_MC:MC,CLU_MC_HIGH:MC High,CLU_MC_OTH:MC Others,CLU_NP:Nagar Panchayat,CLU_NP_HIGH:NP High,CLU_NP_OTH:NP Others
-    source: obpas_clu
+    pattern: list://Municipal Council:Municipal Council,Municipal Corporation:Municipal Corporation,Nagar Panchayat:Nagar Panchayat
+    source: obpas_clu 
+    wrapper: true
     isMandatory: false
-    searchClause: AND sc.businessservice = $businessservice
+    searchClause: AND sc.ulb_type = $ULB_Type
   query: |
     WITH wf_history AS (
          SELECT
@@ -520,25 +566,55 @@ ReportDefinitions:
            ls.businessservice,ls.applicationstatus,
            it.inspection_start,
            ls.lastmodifiedtime,
-           sla.businessservicesla,
+           sla.businessservicesla,ad.additionaldetails::jsonb -> 'siteDetails' ->> 'ulbType' AS ulb_type,
            CASE WHEN(ls.lastmodifiedtime - it.inspection_start) > sla.businessservicesla  THEN 'BREACHED' ELSE 'MET'
            END AS timeline_status
            FROM latest_status ls
            JOIN inspection_time it ON ls.uuid = it.uuid
            JOIN sla_data sla  ON sla.businessservice = ls.businessservice
+           INNER JOIN eg_clu c ON (c.applicationno = ls.uuid OR c.id::text = ls.uuid)
+           INNER JOIN eg_clu_details ad ON c.id = ad.cluid
            WHERE it.inspection_start IS NOT NULL AND ls.applicationstatus NOT IN ( 'E-SIGNED', 'CITIZENACTIONREQUIRED', 'APPROVED','REJECTED','CANCELLED','INITIATED','PENDINGPAYMENT','BLOCKED')
            )
        SELECT
           u.district,
           u.name_of_ulb,
-          sc.applicationstatus,
-          sc.uuid as fileno,
+          CASE 
+            WHEN sc.applicationstatus = 'DOCUMENTVERIFY_JC' THEN 'Document Verify JC'
+            WHEN sc.applicationstatus = 'PROFESSIONALACTIONREQUIRED' THEN 'Professional Action Required'
+            WHEN sc.applicationstatus = 'ATP_VERIFICATION_PENDING' THEN 'ATP Verification Pending'
+            WHEN sc.applicationstatus = 'DOCUMENTVERIFY_MTP/ME' THEN 'Document Verify MTP/ME'
+            WHEN sc.applicationstatus = 'E-SIGNED' THEN 'E-Signed'
+            WHEN sc.applicationstatus = 'REJECTED' THEN 'Rejected'
+            WHEN sc.applicationstatus = 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In Progress'
+            WHEN sc.applicationstatus = 'ATPHQ_APPROVAL_PENDING' THEN 'ATPHQ Approval Pending'
+            WHEN sc.applicationstatus = 'PENDINGPAYMENT' THEN 'Pending Payment'
+            WHEN sc.applicationstatus = 'ATP_VERIFICATION_PENDING' THEN 'ATP Verification Pending'
+            WHEN sc.applicationstatus = 'APPROVAL_PENDING' THEN 'Approval Pending'
+            WHEN sc.applicationstatus = 'MTP_VERIFICATION_PENDING' THEN 'MTP Verification Pending'
+            WHEN sc.applicationstatus = 'DOCUMENTVERIFY_JE/BI' THEN 'Document Verify JE/BI'
+            WHEN sc.applicationstatus = 'INITIATED' THEN 'Initiated'
+            WHEN sc.applicationstatus = 'INSPECTION_REPORT_PENDING' THEN 'Inspection Report Pending'
+            WHEN sc.applicationstatus = 'PENDINGAPPLICATIONPAYMENT' THEN 'Application Payment Pending'
+            WHEN sc.applicationstatus = 'STP_VERIFICATION_PENDING' THEN 'STP Verification Pending'
+            WHEN sc.applicationstatus = 'EO_VERIFICATION_PENDING' THEN 'EO Verification Pending'
+            WHEN sc.applicationstatus = 'DOC_VERIFICATION_PENDING' THEN 'Document Verification Pending'
+            WHEN sc.applicationstatus = 'ADC_VERIFICATION_PENDING' THEN 'ADC Verification Pending'
+            WHEN sc.applicationstatus = 'APPROVED' THEN 'Approved'
+            WHEN sc.applicationstatus = 'REJECTED' THEN 'Rejected'
+            WHEN sc.applicationstatus = 'CANCELLED' THEN 'Cancelled'
+            WHEN sc.applicationstatus = 'PENDINGSANCTIONPAYMENT' THEN 'Sanction Payment Pending'
+            WHEN sc.applicationstatus = 'PENDINGAPPROVAL' THEN 'Pending Approval'
+            WHEN sc.applicationstatus = 'DOCUMENTVERIFY_EO' THEN 'EO Document Verification'
+           ELSE sc.applicationstatus
+           END AS localized_status,
+          sc.uuid as fileno,sc.ulb_type,
           'CLU' as modulename
           FROM sla_calc sc
           JOIN ulb_data u ON sc.tenantid = u.ulb_code
           WHERE sc.timeline_status = 'BREACHED'     
-  groupby: GROUP BY u.district, u.name_of_ulb ,sc.applicationstatus,sc.uuid
-  orderby: ORDER BY u.district, u.name_of_ulb,sc.applicationstatus,sc.uuid DESC  
+  groupby: GROUP BY u.district, u.name_of_ulb ,sc.applicationstatus,sc.uuid,sc.ulb_type
+  orderby: ORDER BY u.district, u.name_of_ulb,sc.applicationstatus,sc.uuid,sc.ulb_type DESC  
 
 - reportName: officers_wise_pendency
   summary: officers wise  Pendency Trend Analysis - Last 7 Days
@@ -596,12 +672,27 @@ ReportDefinitions:
     isMandatory: true
     searchClause: AND 1=1     
   - name: ulb
-    label: ulb
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
     isMandatory: false
     searchClause: AND tenantid = $ulb
+  - name: ULB_Type
+    label: ULB Type
+    type: singlevaluelist
+    pattern: list://Municipal Council:Municipal Council,Municipal Corporation:Municipal Corporation,Nagar Panchayat:Nagar Panchayat
+    source: obpas_clu 
+    wrapper: true
+    isMandatory: false
+    searchClause: AND ulb_type = $ULB_Type
+  - name: district
+    label: District
+    type: singlevaluelist
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND district = $district
   query: |
     WITH params AS (
         SELECT
@@ -626,11 +717,15 @@ ReportDefinitions:
       wf_data AS (
         SELECT
           la.tenantid,
+          u.district, 
+          ad.additionaldetails::jsonb -> 'siteDetails' ->> 'ulbType' AS ulb_type, 
           la.designation_code,
           (to_timestamp(p.lastmodifiedtime/1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS created_date
         FROM latest_assignee la
         JOIN eg_clu p
           ON p.id::text = la.businessid OR p.applicationno = la.businessid
+        INNER JOIN eg_clu_details ad ON p.id = ad.cluid -- JSON table join
+        INNER JOIN ulb_data u ON u.ulb_code = la.tenantid
         WHERE p.applicationstatus not in ('PROFESSIONALACTIONREQUIRED','E-SIGNED','PENDINGPAYMENT', 'INITIATED','CANCELLED','REJECTED', 'APPROVED', 'PENDINGAPPLICATIONPAYMENT')
       ),
       
@@ -642,26 +737,28 @@ ReportDefinitions:
       agg AS (
         SELECT
           d.dt,
-          w.tenantid,
+          w.tenantid,w.district,
+          w.ulb_type,
           w.designation_code,
           COUNT(w.created_date) AS cnt
         FROM date_list d
-        LEFT JOIN wf_data w ON w.created_date = d.dt
-        GROUP BY d.dt,w.tenantid, w.designation_code
+        INNER JOIN wf_data w ON w.created_date = d.dt
+        GROUP BY d.dt,w.tenantid, w.designation_code, w.district, w.ulb_type
       )
       
       SELECT
         COALESCE(designation_code, 'UNASSIGNED') AS officer_designation,
-        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params)     THEN cnt END),0) AS day0,
-        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 1 THEN cnt END),0) AS day1,
-        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 2 THEN cnt END),0) AS day2,
-        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 3 THEN cnt END),0) AS day3,
-        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 4 THEN cnt END),0) AS day4,
-        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 5 THEN cnt END),0) AS day5,
-        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 6 THEN cnt END),0) AS day6,
-        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 7 THEN cnt END),0) AS day7
+        COALESCE(NULLIF(MAX(CASE WHEN dt = (SELECT base_dt FROM params)     THEN cnt END), 0)::TEXT, '') AS day0,
+        COALESCE(NULLIF(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 1 THEN cnt END), 0)::TEXT, '') AS day1,
+        COALESCE(NULLIF(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 2 THEN cnt END), 0)::TEXT, '') AS day2,
+        COALESCE(NULLIF(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 3 THEN cnt END), 0)::TEXT, '') AS day3,
+        COALESCE(NULLIF(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 4 THEN cnt END), 0)::TEXT, '') AS day4,
+        COALESCE(NULLIF(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 5 THEN cnt END), 0)::TEXT, '') AS day5,
+        COALESCE(NULLIF(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 6 THEN cnt END), 0)::TEXT, '') AS day6,
+        COALESCE(NULLIF(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 7 THEN cnt END), 0)::TEXT, '') AS day7
       FROM agg where 1=1
-  groupby:  GROUP BY designation_code
+      GROUP BY designation_code
+      HAVING SUM(cnt) > 0
   orderby:  ORDER BY officer_designation
     
 - reportName: FilesNearTimelineBreachSummary
@@ -732,12 +829,12 @@ ReportDefinitions:
   - name: district
     label: District
     type: singlevaluelist
-    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
     source: obpas_clu
     isMandatory: false
     searchClause: AND u.district = $district
   - name: tenant
-    label: tenant
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
@@ -861,12 +958,12 @@ ReportDefinitions:
   - name: district
     label: District
     type: singlevaluelist
-    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
     source: obpas_clu
     isMandatory: false
     searchClause: AND u.district = $district
   - name: tenant_name
-    label: ULB
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
@@ -947,7 +1044,8 @@ ReportDefinitions:
          JOIN ulb_data u ON ub.tenantid = u.ulb_code
          WHERE 1=1 
   groupby: GROUP BY u.district, u.name_of_ulb,ub.applicationstatus,ub.uuid
-  orderby: ORDER BY u.district, u.name_of_ulb ,ub.applicationstatus,ub.uuid DESC      
+  orderby: ORDER BY u.district, u.name_of_ulb ,ub.applicationstatus,ub.uuid DESC 
+  
 - reportName: CollectionsReportCLU
   decryptionPathId: LAYOUTREPORTS
   summary: Collections
@@ -958,72 +1056,72 @@ ReportDefinitions:
       pdfPageSize: A1
   sourceColumns:
   - name: applicationno
-    label: applicationno
+    label: Application Number
     type: string
     source: obpas_clu
     total: false
   - name: name
-    label: name
+    label: Name
     type: string
     source: obpas_clu
     total: false
   - name: mobilenumber
-    label: mobilenumber
+    label: Mobile Number
     type: string
     source: obpas_clu
     total: false
   - name: businessservice
-    label: businessservice
+    label: Service
     type: string
     source: obpas_clu
     total: false
   - name: applicationstatus
-    label: applicationstatus
+    label: Application Status
     type: string
     source: obpas_clu
     total: false
   - name: collector_code
-    label: collector_code
+    label: Collector Code
     type: string
     source: obpas_clu
     total: false
   - name: cash_amount
-    label: cash_amount
+    label: Cash Amount
     type: string
     source: obpas_clu
     total: true
   - name: cheque_amount
-    label: cheque_amount
+    label: Cheque Amount
     type: string
     source: obpas_clu
     total: true
   - name: card_amount
-    label: card_amount
+    label: Card Amount
     type: string
     source: obpas_clu
     total: true
   - name: dd_amount
-    label: dd_amount
+    label: DD Amount
     type: string
     source: obpas_clu
     total: true
   - name: neft_amount
-    label: neft_amount
+    label: NEFT Amount
     type: string
     source: obpas_clu
     total: true
   - name: rtgs_amount
-    label: rtgs_amount
+    label: RTGS Amount
     type: string
     source: obpas_clu
     total: true
   - name: online_amount
-    label: online_amount
+    label: Online Amount
     type: string
     source: obpas_clu
     total: true
   - name: amountpaid
-    label: amountpaid
+    label: Amount Paid
     type: string
     source: obpas_clu
     total: true
@@ -1034,19 +1132,19 @@ ReportDefinitions:
     total: false
   searchParams:
   - name: fromDate
-    label: fromDate
+    label: From Date
     type: epoch
     source: obpas_clu
     isMandatory: false
     searchClause: AND createdtime >= $fromDate
   - name: toDate
-    label: toDate
+    label: To Date
     type: epoch
     source: obpas_clu
     isMandatory: false
     searchClause: AND createdtime <= $toDate
   - name: collector_code
-    label: collector_code
+    label: Collector Code
     type: string
     source: obpas_clu
     isMandatory: false
@@ -1129,7 +1227,7 @@ ReportDefinitions:
       pdfPageSize: A1
   sourceColumns:
   - name: tenantid
-    label: tenantid
+    label: ULB Name
     type: string
     source: obpas_clu
     total: false
@@ -1154,7 +1252,7 @@ ReportDefinitions:
     source: obpas_clu
     total: false
   - name: sla_status
-    label: sla status
+    label: Sla Status
     type: string
     source: obpas_clu
     total: false
@@ -1164,7 +1262,7 @@ ReportDefinitions:
     source: obpas_clu
     total: false
   - name: employee_name
-    label: employee_name
+    label: Employee Name
     type: string
     source: obpas_clu
     total: false
@@ -1275,96 +1373,91 @@ ReportDefinitions:
       pdfPageSize: A1
   sourceColumns:
   - name: receiptno
-    label: receiptno
+    label: Receipt Number
     type: string
     source: obpas_clu
     total: false
   - name: connectionno
-    label: connectionno
+    label: Application Number
     type: string
     source: obpas_clu
     total: false
   - name: receiptdate
-    label: receiptdate
+    label: Receipt Date
     type: string
     source: obpas_clu
     total: false
   - name: service
-    label: service
+    label: Service
     type: string
     source: obpas_clu
     total: false
   - name: collectorname
-    label: collectorname
+    label: Collector Name
     type: string
     source: obpas_clu
     total: false
   - name: transactiondate
-    label: transactiondate
+    label: Transaction Date
     type: string
     source: obpas_clu
     total: false
   - name: instrumentnumber
-    label: instrumentnumber
+    label: Instrument Number
     type: string
     source: obpas_clu
     total: false
   - name: ownername1
-    label: ownername1
+    label: Owner Name
     type: string
     source: obpas_clu
     total: false
   - name: amountpaid
-    label: amountpaid
+    label: Amount Paid
     type: string
     source: obpas_clu
     total: false
   - name: paymentmode
-    label: paymentmode
+    label: Payment Mode
     type: string
     source: obpas_clu
     total: false
   - name: paymentstatus
-    label: paymentstatus
-    type: string
-    source: obpas_clu
-    total: false
-  - name: user
-    label: user
+    label: Payment Status
     type: string
     source: obpas_clu
     total: false
   - name: manualreceiptnumber
-    label: manualreceiptnumber
+    label: Manual Receipt Number
     type: string
     source: obpas_clu
     total: false
   - name: manualreceiptdate
-    label: manualreceiptdate
+    label: Manual receipt date
     type: string
     source: obpas_clu
     total: false
   searchParams:
   - name: fromDate
-    label: fromDate
+    label: From Date
     type: epoch
     source: obpas_clu
     isMandatory: false
     searchClause: AND pd.receiptdate >= $fromDate
   - name: toDate
-    label: toDate
+    label: To Date
     type: epoch
     source: obpas_clu
     isMandatory: false
     searchClause: AND pd.receiptdate <= $toDate
   - name: receiptNumber
-    label: receiptNumber
+    label: Receipt Number
     type: string
     source: obpas_clu
     isMandatory: false
     searchClause: AND pd.receiptnumber like $receiptNumber
   - name: paymentMode
-    label: paymentMode
+    label: Payment Mode
     type: singlevaluelist
     pattern: 'list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT'
     source: obpas_clu
