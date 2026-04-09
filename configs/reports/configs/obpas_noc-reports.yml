@@ -1236,6 +1236,13 @@ ReportDefinitions:
         source: obpas_noc
         isMandatory: false
         searchClause: AND createdtime <= $toDate
+      - name: tenant
+        label: ULB Name
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: obpas_noc
+        isMandatory: false
+        searchClause: AND tenantid = $tenant      
       - name: collector_code
         label: Collector code
         type: string
@@ -1275,6 +1282,7 @@ ReportDefinitions:
           a.id AS noc_id,
           a.applicationno,
           a.applicationstatus,
+          a.tenantid,
           u_applicant.name,
           u_applicant.mobilenumber,
           ch.employee_name AS assignee_employee,
