@@ -1675,40 +1675,45 @@ ReportDefinitions:
       pdfPageSize: A1
 
   sourceColumns:
+  - name: employee_name
+    label: Name of Professional
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: mobilenumber
+    label: Mobile Number
+    type: string
+    source: obpas_bpa
+    total: false    
   - name: ulb_schema
     label: ULB Name
     type: string
     source: obpas_bpa
     total: false
 
-  - name: applicationdate
-    label: Application Date
+  - name: total_count
+    label: Total Files
     type: epoch
     source: obpas_bpa
     total: false
 
-  - name: status
-    label: status
+  - name: accepted_count
+    label: Approved Files Count
     type: string
     source: obpas_bpa
     total: false
-
-  - name: employee_name
-    label: Name of Professional
+  - name: not_accepted_count
+    label: Returned Files Count
     type: string
     source: obpas_bpa
-    total: false
-
-  - name: mobilenumber
-    label: mobilenumber
-    type: string
-    source: obpas_bpa
-    total: false
+    total: false    
 
   query: |
-      SELECT ulb_schema,
-          applicationdate,
-          status,
-          applicant_name as employee_name,
-          mobilenumber
+      SELECT initcap(ulb_schema) AS ulb_schema,
+          applicant_name AS employee_name,mobilenumber,
+          COUNT(*) FILTER (WHERE status = 'Accepted')     AS accepted_count,
+          COUNT(*) FILTER (WHERE status = 'Not Accepted') AS not_accepted_count,
+          COUNT(*)                                        AS total_count
           from edcr_cross_ulb_result
+  groupby: GROUP BY ulb_schema,applicant_name,mobilenumber          
+  orderby: ORDER BY employee_name       
