@@ -1297,112 +1297,109 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
+      - name: tenant
+        label: ULB Name
+        type: string
+        source: obpas_noc
+        total: false
       - name: receiptno
-        label: receiptno
+        label: Receipt Number
         type: string
         source: obpas_noc
         total: false
       - name: connectionno
-        label: connectionno
+        label: Application Number
         type: string
         source: obpas_noc
         total: false
       - name: receiptdate
-        label: receiptdate
+        label: Receipt Date
         type: string
         source: obpas_noc
         total: false
       - name: service
-        label: service
+        label: Service
         type: string
         source: obpas_noc
         total: false
       - name: collectorname
-        label: collectorname
+        label: Collector  Name
         type: string
         source: obpas_noc
         total: false
       - name: transactiondate
-        label: transactiondate
+        label: Transaction Date
         type: string
         source: obpas_noc
         total: false
       - name: instrumentnumber
-        label: instrumentnumber
+        label: Transaction Id
         type: string
         source: obpas_noc
         total: false
       - name: ownername1
-        label: ownername1
+        label: Owner Name
         type: string
         source: obpas_noc
         total: false
       - name: amountpaid
-        label: amountpaid
+        label: Amount Paid
         type: string
         source: obpas_noc
         total: false
       - name: paymentmode
-        label: paymentmode
+        label: Payment Mode
         type: string
         source: obpas_noc
         total: false
       - name: paymentstatus
-        label: paymentstatus
-        type: string
-        source: obpas_noc
-        total: false
-      - name: user
-        label: user
-        type: string
-        source: obpas_noc
-        total: false
-      - name: manualreceiptnumber
-        label: manualreceiptnumber
-        type: string
-        source: obpas_noc
-        total: false
-      - name: manualreceiptdate
-        label: manualreceiptdate
+        label: Payment Status
         type: string
         source: obpas_noc
         total: false
     searchParams:
       - name: fromDate
-        label: fromDate
+        label: From Date
         type: epoch
         source: obpas_noc
         isMandatory: false
         searchClause: AND pd.receiptdate >= $fromDate
       - name: toDate
-        label: toDate
+        label: To Date
         type: epoch
         source: obpas_noc
         isMandatory: false
         searchClause: AND pd.receiptdate <= $toDate
       - name: receiptNumber
-        label: receiptNumber
+        label: Receipt Number
         type: string
         source: obpas_noc
         isMandatory: false
         searchClause: AND pd.receiptnumber like $receiptNumber
       - name: paymentMode
-        label: paymentMode
+        label: Payment Mode
         type: singlevaluelist
-        pattern: list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE
-          NEFT
+        pattern: list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT
         source: obpas_noc
         isMandatory: false
         searchClause: AND payment.paymentmode like $paymentMode
+      - name: ulb
+        label: ULB Name
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: obpas_noc
+        wrapper: true
+        isMandatory: false
+        searchClause: AND a.tenantid = $ulb
     query: >
       SELECT
-          pd.receiptnumber AS receiptno,
+          pd.receiptnumber AS receiptno, split_part(a.tenantid,'.',2) as tenant,
           bill.consumercode AS connectionno,
           TO_CHAR(
               TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata',
               'DD-MM-YYYY'
           ) AS receiptdate,
-          pd.businessservice AS service,
+          'NOC' AS service,
           usr.name AS collectorname,
           TO_CHAR(
               TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata',
