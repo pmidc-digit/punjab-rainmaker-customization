@@ -725,7 +725,7 @@ ReportDefinitions:
   query: |
        SELECT 
            ulb_data.district,
-		       eg_bpa_buildingplan.createdtime,
+           eg_bpa_buildingplan.createdtime,
            INITCAP(REPLACE(eg_bpa_buildingplan.tenantid, 'pb.', '')) AS ulb_name,
            COUNT(*) AS Pending_Files
        FROM eg_bpa_buildingplan inner join ulb_data on eg_bpa_buildingplan.tenantid = ulb_data.ulb_code
