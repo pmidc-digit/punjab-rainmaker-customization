@@ -636,12 +636,12 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: status
+  - name: localized_status
     label: Status
     type: string
     source: obpas_bpa
     total: false
-  - name: tenantid
+  - name: tenant
     label: ULB Name
     type: string
     source: obpas_bpa
@@ -671,11 +671,46 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: and  bpa.tenantid = $ulb   
+    searchClause: and  bpa.tenantid = $ulb 
+  - name: businessservice
+    label: Service
+    type: singlevaluelist
+    pattern: 'list://BPA_LOW:Self Certification'
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND bpa.businessservice = = $businessservice
   query: |
-       select ulb_data.district,bpa.applicationno,bpa.edcrnumber,bpa.status,bpa.tenantid,'Building_Plan' as
-       businessservice from eg_bpa_buildingplan bpa inner join ulb_data on bpa.tenantid = ulb_data.ulb_code where businessservice = 'BPA_LOW' 
-  orderby : ORDER BY ulb_data.district,bpa.tenantid, bpa.applicationno;
+      SELECT 
+         ulb_data.district,
+         bpa.applicationno,
+         bpa.edcrnumber,
+         CASE 
+           WHEN UPPER(bpa.status) = 'PENDING_APPL_FEE' THEN 'Pending Application Fees'
+           WHEN UPPER(bpa.status) = 'CITIZEN_APPROVAL_PENDING' THEN 'Pending Citizen Approval'
+           WHEN UPPER(bpa.status) = 'SEND_TO_CITIZEN' THEN 'Sent back to Citizen'
+           WHEN UPPER(bpa.status) = 'INPROGRESS' THEN 'In Progress'
+           WHEN UPPER(bpa.status) = 'PENDING_APPL_FEE_PAYMENT' THEN 'Application Fee Pending'
+           WHEN UPPER(bpa.status) = 'DOC_VERIFICATION_PENDING' THEN 'Document Verification Pending'
+           WHEN UPPER(bpa.status) = 'FIELDINSPECTION_PENDING' THEN 'Field Inspection Pending'
+           WHEN UPPER(bpa.status) = 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In-Progress'
+           WHEN UPPER(bpa.status) = 'NOC_VERIFICATION_PENDING' THEN 'NOC Verification Pending'
+           WHEN UPPER(bpa.status) = 'PENDING_SANC_FEE_PAYMENT' THEN 'Sanction Fee Pending'
+           WHEN UPPER(bpa.status) = 'APPROVED' THEN 'Approved'
+           WHEN UPPER(bpa.status) = 'REJECTED' THEN 'Rejected'
+           WHEN UPPER(bpa.status) = 'LEVEL3_VERIFICATION_PENDING' THEN 'L3 Verification Pending'
+           WHEN UPPER(bpa.status) = 'LEVEL4_VERIFICATION_PENDING' THEN 'L4 Verification Pending'
+           WHEN UPPER(bpa.status) = 'JC_VERIFICATION_PENDING' THEN 'JC Verification Pending'
+           WHEN UPPER(bpa.status) = 'MC_VERIFICATION_PENDING' THEN 'MC Verification Pending'
+           WHEN UPPER(bpa.status) = 'ATPHQ_APPROVAL_PENDING' THEN 'ATP HQ Approval Pending'
+           WHEN UPPER(bpa.status) = 'PENDINGINITIALVERIFICATION' THEN 'Pending Initial Verification'
+           ELSE REPLACE(INITCAP(REPLACE(bpa.status, '_', ' ')), ' ', ' ')
+          END AS localized_status,
+          split_part(bpa.tenantid, '.', 2) AS tenant,
+          'Building Plan' AS businessservice 
+          FROM eg_bpa_buildingplan bpa 
+          INNER JOIN ulb_data ON bpa.tenantid = ulb_data.ulb_code 
+          WHERE 1=1 
+  orderby : ORDER BY ulb_data.district, bpa.tenantid, bpa.applicationno;
 
 - reportName: Pending_Files_Summary
   summary: Pending Files Summary - ulb wise and distt wise
