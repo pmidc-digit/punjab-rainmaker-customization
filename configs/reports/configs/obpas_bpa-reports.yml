@@ -9,93 +9,108 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
-  - name: Tenant
-    label: tenant
+  - name: tenant
+    label: ULB Name
     type: string
     source: obpas_bpa
     total: false
-  - name: name
-    label: name
+  - name: applicant_name
+    label: Name
     type: string
     source: obpas_bpa
     total: false
-  - name: mobilenumber
-    label: mobilenumber
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: applicationstatus
-    label: applicationstatus
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: businessservice
-    label: businessservice
+  - name: application_status
+    label: Application Status
     type: string
     source: obpas_bpa
     total: false
   - name: applicationno
-    label: applicationno
+    label: Application Number
     type: string
     source: obpas_bpa
     total: false
-  - name: employee_name
-    label: employee_name
+  - name: building_usage
+    label: Building Usagecategory
     type: string
     source: obpas_bpa
     total: false
+  - name: district
+    label: District
+    type: string
+    source: obpas_bpa
+    total: false  
+  - name: plot_area
+    label: plot Area
+    type: string
+    source: obpas_bpa
+    total: false 
+  - name: ulb_type
+    label: ULB Type
+    type: string
+    source: obpas_bpa
+    total: false     
   searchParams:
   - name: fromDate
     label: fromDate
     type: epoch
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND a.createdtime >= $fromDate
+    searchClause: AND createdtime >= $fromDate
   - name: toDate
     label: toDate
     type: epoch
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND a.createdtime <= $toDate
+    searchClause: AND createdtime <= $toDate
   - name: businessservice
     label: Business Service
     type: singlevaluelist
     pattern: "list://BPA_LOW:Self_Certification"
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND ch.businessservice = $businessservice 
+    searchClause: AND businessservice = $businessservice 
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: and  tenantid = $ulb     
   query: |
-      WITH current_holder AS (
-        SELECT DISTINCT ON (wf.businessid)
-          wf.businessid AS applicationno,
-          split_part(wf.tenantid, '.', 2) AS tenant, 
-          u.name AS assignee_name,
-          e.code AS assignee_code,
-          wf.businessservice,
-          UPPER(st.applicationstatus) AS current_stage
-        FROM eg_wf_processinstance_v2 wf
-        JOIN eg_wf_state_v2 st    ON wf.status = st.uuid
-        LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
-        LEFT JOIN eg_user u       ON u.uuid = wa.assignee
-        LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        WHERE wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
-        ORDER BY wf.businessid, wf.lastmodifiedtime DESC
-      )
-      SELECT DISTINCT ON (o.applicationno)
-        u.name,
-        u.mobilenumber,
-        o.status as applicationstatus,
-        ch.tenant,
-        'BPA' as businessservice,
-        o.applicationno,
-        ch.assignee_name  AS employee_name
-      FROM  eg_bpa_document  a
-      JOIN eg_bpa_buildingplan o   ON a.buildingplanid = o.id            
-      JOIN eg_user u        ON u.uuid = o.accountid           
-      LEFT JOIN current_holder ch ON ch.applicationno = o.applicationno
-      WHERE 1=1
-  orderby:  ORDER BY o.applicationno;
-
+      SELECT 
+          applicationno,
+          split_part(tenantid, '.', 2) AS tenant,
+          -- Status Mapping Logic
+          CASE 
+              WHEN status = 'PENDING_APPL_FEE' THEN 'Pending Application Fee'
+              WHEN status = 'CITIZEN_APPROVAL_PENDING' THEN 'Pending Citizen Approval'
+              WHEN status = 'SEND_TO_CITIZEN' THEN 'Sent back to Citizen'
+              WHEN status = 'INPROGRESS' THEN 'In Progress'
+              WHEN status = 'PENDING_APPL_FEE_PAYMENT' THEN 'Pending Application Fee Payment'
+              WHEN status = 'DOC_VERIFICATION_PENDING' THEN 'Document Verification Pending'
+              WHEN status = 'FIELDINSPECTION_PENDING' THEN 'Field Inspection Pending'
+              WHEN status = 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In-Progress'
+              WHEN status = 'NOC_VERIFICATION_PENDING' THEN 'NOC Verification Pending'
+              WHEN status = 'PENDINGAPPROVAL' THEN 'Pending Final Approval'
+              WHEN status = 'PENDING_SANC_FEE_PAYMENT' THEN 'Pending Sanction Fee Payment'
+              WHEN status = 'APPROVED' THEN 'Approved'
+              WHEN status = 'REJECTED' THEN 'Rejected'
+              WHEN status = 'LEVEL3_VERIFICATION_PENDING' THEN 'L3 Verification Pending'
+              WHEN status = 'LEVEL4_VERIFICATION_PENDING' THEN 'L4 Verification Pending'
+              WHEN status = 'JC_VERIFICATION_PENDING' THEN 'JC Verification Pending'
+              WHEN status = 'MC_VERIFICATION_PENDING' THEN 'MC Verification Pending'
+              WHEN status = 'ATPHQ_APPROVAL_PENDING' THEN 'ATP HQ Approval Pending'
+              WHEN status = 'PENDINGINITIALVERIFICATION' THEN 'Pending Initial Verification'
+              ELSE REPLACE(INITCAP(REPLACE(status, '_', ' ')), ' ', ' ')
+          END AS application_status,
+          (additionaldetails::jsonb)->>'usage' AS building_usage,
+          (additionaldetails::jsonb)->>'stakeholderName' AS applicant_name,
+          (additionaldetails::jsonb)->>'District' AS district,
+          (additionaldetails::jsonb)->>'area' AS plot_area,
+          (additionaldetails::jsonb)->>'architectName' AS architect_name,
+          (additionaldetails::jsonb)->> 'Ulblisttype' AS ulb_type
+      FROM eg_bpa_buildingplan  where 1=1
+  orderby:  ORDER BY createdtime DESC;
 - reportName: CollectionsReportBPA
   decryptionPathId: LAYOUTREPORTS
   summary: Collections
