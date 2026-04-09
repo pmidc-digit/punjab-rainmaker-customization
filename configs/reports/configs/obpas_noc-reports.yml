@@ -664,68 +664,88 @@ ReportDefinitions:
       searchClause: AND sc.businessservice = $businessservice
     query: |
       WITH wf_history AS (
-         SELECT
-           wf.businessid AS uuid,
-           wf.businessservice,
-           wf.tenantid,
-           wf.createdtime,
-           wf.lastmodifiedtime,
-           st.applicationstatus,
-           st.state,
-           st.sla AS state_sla
-           FROM eg_wf_processinstance_v2 wf
-           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-           WHERE wf.businessservice IN ('NOC_MC','NOC_NP')
-           and st.applicationstatus not in ('CANCELLED','CITIZENACTIONREQUIRED')
-           ),
-      inspection_time AS (
-        SELECT
-           uuid,
-           MAX(CASE  WHEN applicationstatus = 'FIELDINSPECTION_INPROGRESS'  THEN createdtime  END
-           ) AS inspection_start
-          FROM wf_history
-          GROUP BY uuid
-           ),
-      latest_status AS (
-         SELECT DISTINCT ON (uuid)
-           uuid,
-           businessservice,
-           tenantid,state AS current_state,
-           applicationstatus ,
-           lastmodifiedtime
-           FROM wf_history
-           ORDER BY uuid, lastmodifiedtime DESC
-           ),
-      sla_data AS (
-         SELECT
-           businessservice, businessservicesla
-           FROM eg_wf_businessservice_v2
-           WHERE businessservice IN ('NOC_MC','NOC_NP')
-           ),
-      sla_calc AS (
-         SELECT
-           ls.uuid,
-           ls.tenantid,
-           ls.businessservice,ls.applicationstatus,
-           it.inspection_start,
-           ls.lastmodifiedtime,
-           sla.businessservicesla,
-           CASE WHEN(ls.lastmodifiedtime - it.inspection_start) > sla.businessservicesla  THEN 'BREACHED' ELSE 'MET'
-           END AS timeline_status
-           FROM latest_status ls
-           JOIN inspection_time it ON ls.uuid = it.uuid
-           JOIN sla_data sla  ON sla.businessservice = ls.businessservice
-           WHERE it.inspection_start IS NOT NULL AND ls.applicationstatus NOT IN ( 'E-SIGNED', 'CITIZENACTIONREQUIRED', 'APPROVED','REJECTED','CANCELLED','INITIATED','PENDINGPAYMENT')
-           )
-       SELECT
-          u.district,
-          u.name_of_ulb,
-          sc.applicationstatus,
-          sc.uuid as fileno,
-          'NOC' as modulename
-          FROM sla_calc sc
-          JOIN ulb_data u ON sc.tenantid = u.ulb_code
-          WHERE sc.timeline_status = 'BREACHED'     
+               SELECT
+                 wf.businessid AS uuid,
+                 wf.businessservice,
+                 wf.tenantid,
+                 wf.createdtime,
+                 wf.lastmodifiedtime,
+                 st.applicationstatus,
+                 st.state,
+                 st.sla AS state_sla
+                 FROM eg_wf_processinstance_v2 wf
+                 JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+                 WHERE wf.businessservice IN ('NOC_MC','NOC_NP')
+                 and st.applicationstatus not in ('CANCELLED','CITIZENACTIONREQUIRED')
+                 ),
+            first_stage_time AS (
+               SELECT
+                 uuid,
+                 MIN(createdtime) AS first_stage_start
+                 FROM wf_history
+                 WHERE applicationstatus NOT IN ('INITIATED', 'PENDINGPAYMENT')
+                 GROUP BY uuid
+                 ),
+            latest_status AS (
+               SELECT DISTINCT ON (uuid)
+                 uuid,
+                 businessservice,
+                 tenantid,
+                 state AS current_state,
+                 applicationstatus,
+                 lastmodifiedtime
+                 FROM wf_history
+                 ORDER BY uuid, lastmodifiedtime DESC
+                 ),
+            sla_data AS (
+               SELECT
+                 businessservice, businessservicesla
+                 FROM eg_wf_businessservice_v2
+                 WHERE businessservice IN ('NOC_MC','NOC_NP')
+                 ),
+            sla_calc AS (
+               SELECT
+                 ls.uuid,
+                 ls.tenantid,
+                 ls.businessservice,
+                 ls.applicationstatus,
+                 fs.first_stage_start,
+                 ls.lastmodifiedtime,
+                 sla.businessservicesla,
+                 CASE WHEN sla.businessservicesla IS NOT NULL AND (ls.lastmodifiedtime - fs.first_stage_start) > sla.businessservicesla THEN 'BREACHED' ELSE 'MET'
+                 END AS timeline_status
+                 FROM latest_status ls
+                 JOIN first_stage_time fs ON ls.uuid = fs.uuid
+                 JOIN sla_data sla ON sla.businessservice = ls.businessservice
+                 --WHERE ls.applicationstatus NOT IN ('E-SIGNED', 'CITIZENACTIONREQUIRED', 'APPROVED', 'REJECTED', 'CANCELLED', 'INITIATED', 'PENDINGPAYMENT')
+                 )
+             SELECT
+                u.district,
+                u.name_of_ulb,
+                CASE sc.applicationstatus
+                   WHEN 'INITIATED' THEN 'Application Initiated'
+                   WHEN 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In-Progress'
+                   WHEN 'DOCUMENTVERIFY' THEN 'Document Verification'
+                   WHEN 'LEVEL2_DOCUMENTVERIFY' THEN 'Level 2 Document Verification'
+                   WHEN 'ATP_VERIFICATION_PENDING' THEN 'Pending ATP Verification'
+                   WHEN 'MTP_VERIFICATION_PENDING' THEN 'Pending MTP Verification'
+                   WHEN 'JC_VERIFICATION_PENDING' THEN 'Pending JC Verification'
+                   WHEN 'EO_VERIFICATION_PENDING' THEN 'Pending EO Verification'
+                   WHEN 'PENDINGAPPROVAL' THEN 'Pending Approval'
+                   WHEN 'CITIZENACTIONREQUIRED' THEN 'Citizen Action Required'
+                   WHEN 'PENDINGPAYMENT' THEN 'Pending Payment'
+                   WHEN 'APPROVED' THEN 'Approved'
+                   WHEN 'REJECTED' THEN 'Rejected'
+                   WHEN 'CANCELLED' THEN 'Cancelled'
+                   WHEN 'INSPECTION_REPORT_PENDING' THEN 'Inspection Report Pending'
+                   WHEN 'E-SIGNED' THEN 'E-Signed'
+                   ELSE sc.applicationstatus 
+                END AS applicationstatus,
+                sc.uuid as fileno,
+                'NOC' as modulename
+                FROM sla_calc sc
+                JOIN ulb_data u ON sc.tenantid = u.ulb_code
+                WHERE sc.timeline_status = 'BREACHED'     
     groupby: GROUP BY u.district, u.name_of_ulb ,sc.applicationstatus,sc.uuid
     orderby: ORDER BY u.district, u.name_of_ulb,sc.applicationstatus,sc.uuid DESC  
 
