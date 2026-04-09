@@ -1134,39 +1134,56 @@ ReportDefinitions:
     label: District
     type: string
     source: obpas_bpa
+    total: false
   - name: name_of_ulb
     label: ULB Name
     type: string
     source: obpas_bpa
+    total: false
   - name: modulename
     label: Module Name
     type: string
     source: obpas_bpa
+    total: false
   - name: applicationstatus
     label: Application Status
     type: string
     source: obpas_bpa
+    total: false
   - name: fileno
-    label: File Number
+    label: File No
     type: string
     source: obpas_bpa
+    total: false
   searchParams:
+  - name: fromDate
+    label: fromDate
+    type: epoch
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND receiptdate >= $fromDate
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND receiptdate <= $toDate 
   - name: district
-    label: District
+    label: district
     type: singlevaluelist
-    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
+    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
   - name: ulb
-    label: ULB Name
+    label: ulb
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
-    isMandatory: true
-    searchClause: AND u.ulb_code= $ulb 
+    isMandatory: false
+    searchClause: AND u.name_of_ulb= $ulb 
   - name: businessservice
-    label: Service
+    label: Business Service
     type: singlevaluelist
     pattern: "list://BPA_LOW:Self Certification"
     source: obpas_bpa
@@ -1174,80 +1191,63 @@ ReportDefinitions:
     searchClause: AND sc.businessservice = $businessservice 
   query: |
       WITH wf_history AS (
-          SELECT
-              wf.businessid AS uuid,
-              wf.businessservice,
-              wf.tenantid,
-              wf.createdtime,
-              wf.lastmodifiedtime,
-              st.applicationstatus,
-              st.state,
-              st.sla AS state_sla
-          FROM eg_wf_processinstance_v2 wf
-          JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-          WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
-      ),
+         SELECT
+           wf.businessid AS uuid,
+           wf.businessservice,
+           wf.tenantid,
+           wf.createdtime,
+           wf.lastmodifiedtime,
+           st.applicationstatus,
+           st.state,
+           st.sla AS state_sla
+           FROM eg_wf_processinstance_v2 wf
+           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+           WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+           ),
       latest_status AS (
-          SELECT DISTINCT ON (uuid)
-              uuid,
-              businessservice,
-              tenantid,
-              applicationstatus,
-              lastmodifiedtime
-          FROM wf_history
-          ORDER BY uuid, lastmodifiedtime DESC
-      ),
+         SELECT DISTINCT ON (uuid)
+           uuid,
+           businessservice,
+           tenantid,
+           applicationstatus,
+           createdtime,
+           lastmodifiedtime
+           FROM wf_history
+           ORDER BY uuid, lastmodifiedtime DESC
+           ),
       sla_entry AS (
-          SELECT
-              uuid,
-              MIN(CASE 
-                  WHEN businessservice = 'BPA_LOW' AND state = 'PENDINGINITIALVERIFICATION' THEN createdtime
-                  WHEN businessservice != 'BPA_LOW' AND state = 'FIELDINSPECTION_INPROGRESS' THEN createdtime
-                  ELSE NULL 
-              END) AS sla_start_time,
-              MAX(state_sla) AS sla_duration
-          FROM wf_history
-          GROUP BY uuid
-      ),
+         SELECT
+           uuid,
+           MIN(createdtime) AS sla_start_time,
+           MAX(state_sla) AS sla_duration
+           FROM wf_history
+           WHERE state = 'DOC_VERIFICATION_PENDING'
+           GROUP BY uuid
+           ),
       sla_calculation AS (
-          SELECT
-              ls.uuid,
-              ls.tenantid,
-              ls.businessservice,
-              -- Status Mapping (Localization)
-              CASE 
-                  WHEN ls.applicationstatus = 'CITIZEN_APPROVAL_PENDING' THEN 'Pending Citizen Approval'
-                  WHEN ls.applicationstatus = 'SEND_TO_CITIZEN' THEN 'Sent back to Citizen'
-                  WHEN ls.applicationstatus = 'INPROGRESS' THEN 'In Progress'
-                  WHEN ls.applicationstatus = 'PENDING_APPL_FEE_PAYMENT' THEN 'Pending Application Fee Payment'
-                  WHEN ls.applicationstatus = 'DOC_VERIFICATION_PENDING' THEN 'Document Verification Pending'
-                  WHEN ls.applicationstatus = 'FIELDINSPECTION_PENDING' THEN 'Field Inspection Pending'
-                  WHEN ls.applicationstatus = 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In-Progress'
-                  WHEN ls.applicationstatus = 'PENDING_SANC_FEE_PAYMENT' THEN 'Pending Sanction Fee Payment'
-                  WHEN ls.applicationstatus = 'APPROVED' THEN 'Approved'
-                  WHEN ls.applicationstatus = 'REJECTED' THEN 'Rejected'
-                  WHEN ls.applicationstatus = 'PENDINGINITIALVERIFICATION' THEN 'Pending Initial Verification'
-                  ELSE REPLACE(INITCAP(REPLACE(ls.applicationstatus, '_', ' ')), ' ', ' ')
-              END AS applicationstatus,
-              CASE 
-                  WHEN se.sla_start_time IS NULL THEN 'NOT_STARTED'
-                  WHEN (ls.lastmodifiedtime - se.sla_start_time) > se.sla_duration THEN 'BREACHED'
-                  WHEN ls.applicationstatus = 'APPROVED' THEN 'MET' 
-                  ELSE 'WITHIN_SLA'
-              END AS sla_status
-          FROM latest_status ls
-          LEFT JOIN sla_entry se ON ls.uuid = se.uuid
-          WHERE ls.applicationstatus NOT IN ('INITIATED', 'PENDING_APPL_FEE', 'CITIZEN_APPROVAL_INPROCESS')
-      )
-      SELECT
+         SELECT
+           ls.uuid,
+           ls.tenantid,
+           ls.businessservice,
+           ls.applicationstatus,
+           ls.createdtime,
+           CASE WHEN se.sla_start_time IS NULL THEN 'NOT_STARTED'
+                WHEN (ls.lastmodifiedtime - se.sla_start_time) > se.sla_duration THEN 'BREACHED'
+                WHEN ls.applicationstatus = 'APPROVED' THEN 'MET' ELSE 'WITHIN_SLA'
+           END AS sla_status
+           FROM latest_status ls
+           LEFT JOIN sla_entry se ON ls.uuid = se.uuid
+           WHERE ls.applicationstatus NOT IN ( 'INITIATED', 'PENDING_APPL_FEE', 'CITIZEN_APPROVAL_INPROCESS')
+           )
+       SELECT
           u.district,
           u.name_of_ulb,
           sc.applicationstatus,
-          sc.uuid AS fileno,
-          'Building_Plan' AS modulename
-      FROM sla_calculation sc
-      JOIN ulb_data u ON sc.tenantid = u.ulb_code
-      WHERE sc.sla_status = 'BREACHED'
+          sc.uuid as fileno,
+          'Building_Plan' as modulename
+          FROM sla_calculation sc
+          JOIN ulb_data u ON sc.tenantid = u.ulb_code
+          WHERE sc.sla_status = 'BREACHED'
   orderby: ORDER BY u.district, u.name_of_ulb,sc.applicationstatus,sc.uuid DESC      
 
 - reportName: FilesNearTimelineBreachSummary
