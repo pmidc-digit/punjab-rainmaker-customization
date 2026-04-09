@@ -562,7 +562,7 @@ ReportDefinitions:
     isMandatory: true
     searchClause: AND pd.receiptdate <= $toDate
   - name: ulb
-    label: ulb
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
@@ -624,7 +624,7 @@ ReportDefinitions:
       pdfPageSize: A1
   sourceColumns:
   - name: applicationno
-    label: Application No
+    label: Application Number
     type: string
     source: obpas_bpa
     total: false
@@ -663,7 +663,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND ulb_data.district = $district 
   - name: ulb
-    label: ulb
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
@@ -701,7 +701,7 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND ulb_data.district = $district 
   - name: tenant_name
-    label: tenant_name
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
@@ -745,14 +745,14 @@ ReportDefinitions:
     total: true  
   searchParams:    
   - name: businessservice
-    label: Business Service
+    label: Service
     type: singlevaluelist
-    pattern: 'list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH'
+    pattern: 'list://BPA_LOW:Self Certification'
     source: obpas_bpa
     isMandatory: false
     searchClause: AND businessservice = $businessservice
   - name: ulb
-    label: ulb
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
@@ -831,37 +831,37 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: day0
-    label: Day1
+    label: Day 1
     type: string
     source: obpas_bpa
     total: true
   - name: day1
-    label: Day2
+    label: Day 2
     type: string
     source: obpas_bpa
     total: true
   - name: day2
-    label: Day3
+    label: Day 3
     type: string
     source: obpas_bpa
     total: true
   - name: day3
-    label: Day4
+    label: Day 4
     type: string
     source: obpas_bpa
     total: true
   - name: day4
-    label: Day5
+    label: Day 5
     type: string
     source: obpas_bpa
     total: true
   - name: day5
-    label: Day6
+    label: Day 6
     type: string
     source: obpas_bpa
     total: true
   - name: day6
-    label: Day7
+    label: Day 7
     type: string
     source: obpas_bpa
     total: true                     
@@ -873,14 +873,14 @@ ReportDefinitions:
     isMandatory: true
     searchClause: AND 1=1     
   - name: businessservice
-    label: Business Service
+    label: Service
     type: singlevaluelist
-    pattern: list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH
+    pattern: list://BPA_LOW:Self Certification
     source: obpas_bpa
     isMandatory: false
     searchClause: AND businessservice = $businessservice
   - name: ulb
-    label: ulb
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
@@ -1104,7 +1104,7 @@ ReportDefinitions:
     source: obpas_bpa
   searchParams:
   - name: district
-    label: district
+    label: District
     type: singlevaluelist
     pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
     source: obpas_bpa
