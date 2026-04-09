@@ -1067,6 +1067,18 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   searchParams:
+   - name: fromDate
+    label: fromDate
+    type: epoch
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND receiptdate >= $fromDate
+  - name: toDate
+    label: toDate
+    type: epoch
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND receiptdate <= $toDate 
   - name: district
     label: district
     type: singlevaluelist
@@ -1109,6 +1121,7 @@ ReportDefinitions:
            businessservice,
            tenantid,
            applicationstatus ,
+		   createdtime,
            lastmodifiedtime
            FROM wf_history
            ORDER BY uuid, lastmodifiedtime DESC
@@ -1128,6 +1141,7 @@ ReportDefinitions:
            ls.tenantid,
            ls.businessservice,
            ls.applicationstatus,
+		   ls.createdtime,
            CASE WHEN se.sla_start_time IS NULL THEN 'NOT_STARTED'
                 WHEN (ls.lastmodifiedtime - se.sla_start_time) > se.sla_duration THEN 'BREACHED'
                 WHEN ls.applicationstatus = 'APPROVED' THEN 'MET' ELSE 'WITHIN_SLA'
