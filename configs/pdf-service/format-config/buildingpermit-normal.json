@@ -1,10 +1,11 @@
 {
-  "key": "buildingpermit",
+  "key": "buildingpermit-normal",
   "config": {
     "defaultStyle": {
       "font": "Roboto",
-      "fontSize":8
+      "fontSize": 8
     },
+    "footer": "function(currentPage, pageCount) { return { stack: [ { columns: [ { width: '*', text: 'Page ' + currentPage + ' of ' + pageCount, alignment: 'center', fontSize: 9 } ], margin: [40, 0, 40, 10] } ] }; }",
     "content": [
       {
         "columns": [
@@ -19,41 +20,33 @@
               {
                 "text": "{{ulbType}}, {{ulbName}} ",
                 "style": "sub-header",
-                "alignment":"center",
-                "margin":[0,3,0,0],
-                "fontSize":12,
-                "bold":true  
+                "alignment": "center",
+                "margin": [0, 3, 0, 0],
+                "fontSize": 12,
+                "bold": true
               },
               {
-                "text": "Building Permit",
+                "text": "Building Permit/ Sanction Letter",
                 "style": "header",
-                "alignment":"center",
-                "fontSize":10,
-                "margin":[0,-1,0,0],
-                "bold":true
-              } ,
-              {
-                "text": "Under Self Certification",
-                "style": "header",
-                "alignment":"center",
-                "fontSize":10,
-                
-                "bold":true
-              } 
+                "alignment": "center",
+                "fontSize": 10,
+                "margin": [0, -1, 0, 0],
+                "bold": true
+              }
             ],
-            "margin":[0, -10, 0, 0],
-            "width":"*",
-            "alignment":"center"
+            "margin": [0, -10, 0, 0],
+            "width": "*",
+            "alignment": "center"
           },
           {
             "image": "{{qrCode}}",
             "alignment": "right",
             "width": 60,
-            "height":70,
-            "margin":[0, -10, 0,0]
+            "height": 70,
+            "margin": [0, -10, 0, 0]
           }
         ],
-        "margin":[0, -10, 0,0]
+        "margin": [0, -10, 0, 0]
       },
       {
         "columns": [
@@ -66,28 +59,26 @@
               {
                 "text": " {{applicationNo}}",
                 "bold": false,
-                "font":"Roboto" 
+                "font": "Roboto"
               }
-            ] 
+            ]
           },
           {
             "text": [
-              
               {
                 "text": " Date: ",
                 "bold": true,
-                "alignment":"right" 
+                "alignment": "right"
               },
               {
-                "text": " {{submissionDate}}",
+                "text": " {{approvalDate}}",
                 "bold": false,
-                "alignment":"right"  
+                "alignment": "right"
               }
-            ] 
-           
-          } 
+            ]
+          }
         ],
-        "margin":[0, 5, 0, 0],
+        "margin": [0, 5, 0, 0],
         "style": "top-margin"
       },
       {
@@ -102,50 +93,29 @@
                 "text": "{{#var_owners}}{{ownerName}} , {{ownerAddress}},{{/var_owners}}",
                 "bold": false
               }
-            ] 
+            ]
           }
         ],
         "style": "top-margin"
       },
       {
-        "text": [
-          {
-            "text": "Name Of  ",
-            "bold": true
-          },
-          {
-            "text": "{{profession}} :  ",
-            "bold": true
-          },
-          {
-            "text": "{{stakeholderName}}, ",
-            "bold": false
-          },
-          {
-            "text": "{{stakeholderAddress}}",
-            "bold": false
-          }
-        ],
-        "style": "top-margin"
-      },
-     {
-        "columns":[
+        "columns": [
           {
             "text": "Subject :  ",
             "bold": true,
-            "width":"auto"
+            "width": "auto"
           },
           {
-            "text": "{{subjectLine}} {{ulbType}} and as per the provisions of clause 3.14.1 (b) of PMBBL",
-            "decoration":"underline",
-            "width":"auto",
+            "text": "{{subjectLine}} {{ulbType}}",
+            "decoration": "underline",
+            "width": "auto",
             "bold": true,
-            "margin":[5,0,0,0],
-            "font":"Roboto"
+            "margin": [5, 0, 0, 0],
+            "font": "Roboto"
           }
         ],
-        "margin":[0,5,0,0],
-        "alignment":"justify",
+        "margin": [0, 5, 0, 0],
+        "alignment": "justify",
         "style": "top-margin"
       },
       {
@@ -154,811 +124,187 @@
             "text": "Dear Sir or Madam , "
           }
         ],
-        "margin":[0,0,0,10]
-        
+        "margin": [0, 0, 0, 10]
       },
       {
-        "columns":[
+        "columns": [
           {
-            "stack":[
+            "stack": [
               {
-                "text":" - ",
-                "margin":[15,0,0,0]
+                "text": "  ",
+                "margin": [15, 0, 0, 0]
               }
             ]
           },
           {
-            "text":[
-                {  
-                  "text":"This is with reference to your application dated " 
-                },
-                {
-                  "text": "{{submissionDate}} at time {{submissionDateEpochIST}} ",
-                  "bold":true
-                },
-                {
-                  "text": "for the grant of sanction to erect of"
-                },
-                {
-                  "text": " {{RESIDENTIAL_PLOTTED}} ",
-                  "bold":true
-                },
-                {
-                  "text":" Building having  :"
-                },
-                {
-                  "text":" Plot Size :",
-                  "bold":true
-                  
-                },
-                {
-                  "text":" {{plotArea}} sq.meters, ",
-                  "bold":true
-                },
-                {
-                  "text":" {{PLOT_NO}} :",
-                  "bold":true
-                },
-                {
-                  "text":" {{plotNo}}, ",
-                  "bold":true,
-                  "font": "Roboto"
-                },
-                {
-                  "text":" Khasra No :",
-                  "bold":true
-                },
-                {
-                  "text":" {{khasraNumber}}, ",
-                  "bold":true
-                },
-                 {
-                  "text":"Ward No : ",
-                  "bold":true
-                },
-                 {
-                  "text":" {{wardNo}}, ",
-                  "bold":true
-                },
-                {
-                  "text":" situated in/at"
-                },
-                {
-                  "text":" {{locality}} , {{pincode}}. ",
-                  "bold":true,
-                  "font" :"Roboto"
-                },
-                {
-                  "text":"This Building plan has been self-certified under self-certification on"
-                },
-                {
-                  "text":" {{submissionDate}}."
-                }
+            "text": [
+              {
+                "text": "With reference to your application dated "
+              },
+              {
+                "text": "{{submissionDate}} at time {{submissionDateEpochIST}} ",
+                "bold": true
+              },
+              {
+                "text": "submitted through "
+              },
+              {
+                "text": "{{profession}}, {{stakeholderName}} ",
+                "bold": true
+              },
+              {
+                "text": "for the grant of sanction to erect/re-erect/add to/alteration of "
+              },
+              {
+                "text": " {{RESIDENTIAL_PLOTTED}} ",
+                "bold": true
+              },
+              {
+                "text": " Building having  :"
+              },
+              {
+                "text": " Plot Size :",
+                "bold": true
+              },
+              {
+                "text": " {{plotArea}} sq.meters, ",
+                "bold": true
+              },
+              {
+                "text": " {{PLOT_NO}} :",
+                "bold": true
+              },
+              {
+                "text": " {{plotNo}}, ",
+                "bold": true,
+                "font": "Roboto"
+              },
+              {
+                "text": "Ward No : ",
+                "bold": true
+              },
+              {
+                "text": " {{wardNo}}, ",
+                "bold": true
+              },
+              {
+                "text": " situated in/at"
+              },
+              {
+                "text": " {{locality}} , {{pincode}}. ",
+                "bold": true,
+                "font": "Roboto"
+              },
+              {
+                "text": "Approval is subject to the following conditions and corrections done in the plans has sanctioned the same on"
+              },
+              {
+                "text": " {{approvalDate}}."
+              }
             ],
-            "margin":[-230,-1,0,0],
-            "alignment":"justify"
-            
-         }
+            "margin": [-230, -1, 0, 0],
+            "alignment": "justify"
+          }
         ]
       },
-      
-     {
-      "columns":[
-        {
-          "stack":[
-            {
-              "text": " -  ",
-              "margin":[15,0,0,0]
-            }
+
+      {
+        "columns": [
+          {
+            "stack": [
+              {
+                "text": "   ",
+                "margin": [15, 0, 0, 0]
+              }
+            ]
+          },
+          {
+            "text": [
+              {
+                "text": " The plans are valid up to "
+              },
+              {
+                "text": "{{newValidityDate}}.",
+                "bold": true
+              }
+            ],
+
+            "margin": [-230, 0, 0, 0],
+            "alignment": "justify",
+            "style": "top-margin"
+          }
+        ]
+      },
+
+      {
+        "ol": [
+          { "text": "{{BPA_NORMAL_TERMS_1}}", "margin": [0, 2, 0, 2] },
+          { "text": "{{BPA_NORMAL_TERMS_2}}", "margin": [0, 2, 0, 2] },
+          { "text": "{{BPA_NORMAL_TERMS_3}}", "margin": [0, 2, 0, 2] },
+          { "text": "{{BPA_NORMAL_TERMS_4}}", "margin": [0, 2, 0, 2] },
+          { "text": "{{BPA_NORMAL_TERMS_5}}", "margin": [0, 2, 0, 2] },
+          { "text": "{{BPA_NORMAL_TERMS_6}}", "margin": [0, 2, 0, 2] },
+          { "text": "{{BPA_NORMAL_TERMS_7}}", "margin": [0, 2, 0, 2] },
+          { "text": "{{BPA_NORMAL_TERMS_8}}", "margin": [0, 2, 0, 2] },
+          { "text": "{{BPA_NORMAL_TERMS_9}}", "margin": [0, 2, 0, 2] },
+          { "text": "{{BPA_NORMAL_TERMS_10}}", "margin": [0, 2, 0, 2] },
+          { "text": "{{BPA_NORMAL_TERMS_11}}", "margin": [0, 2, 0, 2] },
+          { "text": "{{BPA_NORMAL_TERMS_12}}", "margin": [0, 2, 0, 2] },
+          { "text": "{{BPA_NORMAL_TERMS_13}}", "margin": [0, 2, 0, 2] },
+          { "text": "{{BPA_NORMAL_TERMS_14}}", "margin": [0, 2, 0, 2] },
+          { "text": "{{BPA_NORMAL_TERMS_15}}", "margin": [0, 2, 0, 2] },
+          { "text": "{{BPA_NORMAL_TERMS_16}}", "margin": [0, 2, 0, 2] }
+        ],
+
+        "margin": [40, 0, 0, 0]
+      },
+      {
+        "style": "next-noc-table",
+        "table": {
+          "widths": ["3%", "97%"],
+          "body": [
+            "[{\"text\":\"\",\"style\":\"receipt-table-value-down\",\"alignment\":\"left\",\"margin\":[3,2,0,2]},{\"text\":\"{{approverComment}}\",\"style\":\"receipt-table-value-down\",\"alignment\":\"justify\",\"margin\":[3,2,0,2]}]"
           ]
         },
-        {
-          "text":[
-            
-            {
-              "text": " The plans are valid up to "
-            },
-            {
-              "text": "{{newValidityDate}}.",
-              "bold":true
-            }
-          
-          ],
-         
-          "margin":[-230,0,0,0],
-          "alignment":"justify",
-          "style": "top-margin"
-         
-        }
-
-      ]
-     },
-     {
-      "columns":[
-        {
-          "stack":[
-            {
-              "text": " -  ",
-              "margin":[15,0,0,0]
-            }
-          ]
-        },
-        {
-          "text":[
-              
-            {
-              "text": "The entire responsibility regarding authenticity of details and documents furnished by you "
-    
-            },
-            {
-              "text":" ({{#var_owners}}{{ownerName}}, {{/var_owners}})/",
-              "bold":true
-            },
-            {
-              "text":" your professional:"
-            },
-            {
-              "text":" ({{stakeholderName}})",
-              "bold":true
-            },
-            {
-              "text":" rests upon you as well as your professional. "
-            }
-          
-          ],
-          "margin":[-230,0,0,0],
-          "alignment":"justify",
-          "style": "top-margin"
-        }
-      ]
-     }, 
-      {
-        "columns":[
-          {
-            "stack":[
-              {
-                "text": " -  ",
-                "margin":[15,0,0,0]
-              }
-            
-            
-            ]
-          },
-          {
-            "text":[
-              {
-                "text": "Regarding this self-certified building plan; your professional is responsible for compliance of all the provisions of the Punjab Municipal Building Bye Laws, Master Plan as well as instructions issued by the government from time to time. "
-                
-              }
-            ],
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-
-          }
-        ]      
-      },
-      
-      {
-        "columns":[
-          {
-            "stack":[
-              {
-                "text":" - ",
-                "margin":[15,0,0,0]
-                
-              }
-              
-            ]
-          },
-          {
-            "text":[
-              {
-                "text":"The"
-                
-                
-              },
-              {
-                "text":" {{stakeholderName}}",
-                "bold":true
-              },
-              {
-                "text":" ({{profession}})",
-                "bold":true
-              },
-              {
-                "text":" shall also ensure the correctness of ownership documents and the technical parameters furnished for approval of the building plan under self-certification, failing which, penal action against the concerned architect shall be initiated. "
-              }
-            ],
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-           
-          }
-        ]
+        "layout": "noBorders",
+        "margin": [30, 0, 5, 0]
       },
       {
-        "columns":[
+        "stack": [
           {
-            "stack":[
-              
-                {
-                  "text": " -  ",
-                  
-                  "margin":[15,0,0,0]
-                }
-             
-            ]
+            "text": "Yours Faithfully"
           },
           {
-           "text":[
-  {
-    "text": "In case any information furnished is found to be incorrect, the building plans approved under self-certification shall be void ab-initio and Applicant will be liable for punishment which includes levy of penalty, demolition or sealing of the property as per the provisions of The Punjab Municipal Act, 1911/The Punjab Municipal Corporation Act, 1976 / Punjab Town Improvement Act, 1922/ Punjab Municipal Building Bye laws as applicable."
-  }
-],
-
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-          }
-          
-        ]
-      },
-      {
-        "columns":[
-          {
-            "stack":[
-              
-                {
-                  "text": " -  ",
-                  
-                  "margin":[15,0,0,0]
-                }
-             
-            ]
-          },
-          {
-            "text":[
-              {
-                "text":"{{COLONY_TEXT}}. "
-                
-              }
-            ],
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-          }
-          
-        ]
-      },
-     
-      {
-        "columns":[
-          {
-            "stack":[
-              
-                {
-                  "text": " 1. ",
-                  
-                  "margin":[15,0,0,0]
-                }
-            ]
-          },
-          {
-            "text":[
-              {
-                "text":" {{BPA_TERMS}} "
-                
-              }
-            ],
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-          }
-          
-        ]
-      },
-      {
-        "columns":[
-          {
-            "stack":[
-              
-                {
-                  "text": " 2.  ",
-                  
-                  "margin":[15,0,0,0]
-                }
-             
-            ]
-          },
-          {
-            "text":[
-              {
-                "text":" {{BPA_TERMS2}} "
-                
-              }
-            ],
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-          }
-          
-        ]
-      },
-      {
-        "columns":[
-          {
-            "stack":[
-              
-                {
-                  "text": " 3.  ",
-                  
-                  "margin":[15,0,0,0]
-                }
-             
-            ]
-          },
-          {
-            "text":[
-              {
-                "text":" {{BPA_TERMS3}} "
-                
-              }
-            ],
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-          }
-          
-        ]
-      },
-      {
-        "columns":[
-          {
-            "stack":[
-                {
-                  "text": " 4.  ",
-                  "margin":[15,0,0,0]
-                }
-            ]
-          },
-          {
-            "text":[
-              {
-                "text":" {{BPA_TERMS4}} " 
-              }
-            ],
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-          }
-          
-        ]
-      },
-      {
-        "columns":[
-          {
-            "stack":[
-              
-                {
-                  "text": " 5.  ",
-                  
-                  "margin":[15,0,0,0]
-                }
-             
-            ]
-          },
-          {
-            "text":[
-              {
-                "text":" {{BPA_TERMS5}} "
-                
-              }
-            ],
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-          }
-          
-        ]
-      },
-      {
-        "columns":[
-          {
-            "stack":[
-              
-                {
-                  "text": " 6.  ",
-                  
-                  "margin":[15,0,0,0]
-                }
-             
-            ]
-          },
-          {
-            "text":[
-              {
-                "text":" {{BPA_TERMS6}} "
-                
-              }
-            ],
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-          }
-          
-        ]
-      },
-      {
-        "columns":[
-          {
-            "stack":[
-              
-                {
-                  "text": " 7.  ",
-                  
-                  "margin":[15,0,0,0]
-                }
-             
-            ]
-          },
-          {
-            "text":[
-              {
-                "text":" {{BPA_TERMS7}} "
-                
-              }
-            ],
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-          }
-          
-        ]
-      },
-      {
-        "columns":[
-          {
-            "stack":[
-              
-                {
-                  "text": " 8.  ",
-                  
-                  "margin":[15,0,0,0]
-                }
-             
-            ]
-          },
-          {
-            "text":[
-              {
-                "text":" {{BPA_TERMS8}} "
-                
-              }
-            ],
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-          }
-          
-        ]
-      },
-      {
-        "columns":[
-          {
-            "stack":[
-              
-                {
-                  "text": " 9.  ",
-                  
-                  "margin":[15,0,0,0]
-                }
-             
-            ]
-          },
-          {
-            "text":[
-              {
-                "text":" {{BPA_TERMS9}} "
-                
-              }
-            ],
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-          }
-          
-        ]
-      },
-      {
-        "columns":[
-          {
-            "stack":[
-              
-                {
-                  "text": " 10.  ",
-                  
-                  "margin":[15,0,0,0]
-                }
-             
-            ]
-          },
-          {
-            "text":[
-              {
-                "text":" {{BPA_TERMS10}} "
-                
-              }
-            ],
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-          }
-          
-        ]
-      },
-      {
-        "columns":[
-          {
-            "stack":[
-              
-                {
-                  "text": " 11.  ",
-                  
-                  "margin":[15,0,0,0]
-                }
-             
-            ]
-          },
-          {
-            "text":[
-              {
-                "text":" {{BPA_TERMS11}} "
-                
-              }
-            ],
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-          }
-          
-        ]
-      },
-      
-      {
-        "columns":[
-          {
-            "stack":[
-              {
-                "text": " 12.  ",
-                "margin":[15,0,0,0]
-              }
-            
-            
-            ]
-          },
-          {
-            "text":[
-              {
-                "text": "The owner will ensure collective insurance of all workers working at site during construction."
-                
-              }
-              
-            ],
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-
-          }
-        ]      
-      },
-      {
-        "columns":[
-          {
-            "stack":[
-              {
-                "text": " 13.  ",
-                "margin":[15,0,0,0]
-              }
-            
-            
-            ]
-          },
-          {
-            "text":[
-              {
-                "text": "The Plan has been sanctioned based on self-certification by"
-                
-              },
-              {
-                "text":" {{stakeholderName}}({{profession}}).",
-                "bold":true
-              },
-              {
-                "text":"Furthermore, the"
-              },
-              {
-                "text":" {{ulbType}} {{tenantName}} ",
-                "bold":true
-              },
-              {
-                "text":" reserves the right to verify the plan."
-              }
-              
-            ],
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-
-          }
-        ]      
-      },
-      {
-        "columns":[
-          {
-            "stack":[
-              {
-                "text": " 14. ",
-                "margin":[15,0,0,0]
-              }
-            
-            
-            ]
-          },
-          {
-            "text":[
-              {
-                "text": "Any shortfall in the PAY2 fees, the concern"
-                
-              },
-              {
-                "text":" {{#var_owners}}{{ownerName}}, {{/var_owners}} / {{stakeholderName}} ({{profession}}) ",
-                "bold":true
-              },
-              {
-                "text":" is liable to pay the balance payment."
-              }
-              
-            ],
-            "margin":[-230,0,0,0],
-            "alignment":"justify",
-            "style": "top-margin"
-
-          }
-        ]      
-      },
-      
-      {
-        "columns":[
-          {
-            "stack":[
-              {
-                "text": "Counter Signed:"
-              },
-              {
-                "text": "{{designation}}"
-              },
-              {
-                "text": "{{ulbType}}"
-              },
-              {
-                "text": "{{ulbName}}"
-              },
-              {
-                "text": [
-                  {
-                    "text": "Date and Time:"
-                  },
-                  {
-                    "text": " {{nowIST}}"
-                  }
-                ]
-              }
-            ],
-            "style": "top-margin",
-            "alignment":"left"
-          },
-          {
-            "stack":[
-              {
-                "image": "{{base64Image}}",
-                "width": 80,
-                "height": 80,
-                "margin": [0, -8, 0, 5]
-              },
-              {
-                "text": [
-                  {
-                    "text": " Self-Certified By:"
-                  },
-                  {
-                    "text": " {{stakeholderName}}"
-                  },
-                  {
-                    "text": " ({{profession}})"
-                  }
-                ]
-              },
-
-              {
-                "text": [
-                  {
-                    "text": " Registration Number:"
-                  },
-                  {
-                    "text": " {{stakeholderRegistrationNumber}}",
-                    "font": "Roboto"
-                  }
-                ]
-              },
-              {
-                "text": [
-                  {
-                    "text": "Address:"
-                  },
-                  {
-                    "text": " {{stakeholderAddress}}"
-                  }
-                ]
-              },
-              {
-                "text": [
-                  {
-                    "text": "Date"
-                  },
-                  {
-                    "text": " {{submissionDate}}"
-                  }
-                ]
-              }
-            ],
-            "alignment":"right"
+            "text": "Encl: A set of sanctioned plan."
           }
         ],
-        
-        "bold":true,
-        "margin":[20,10,20,0]
+        "alignment": "right"
       },
       {
-        "text":[
+        "text": [
           {
-            "text":"{{COMPUTER_GENERATED_STATEMENT}}"
+            "text": "{{COMPUTER_GENERATED_STATEMENT}}"
           }
         ],
-        "alignment":"center",
-        "margin":[0,50,0,0]
-      } 
-],
-  
-	"styles": {
+        "alignment": "center",
+        "margin": [0, 100, 0, 0]
+      }
+    ],
+
+    "styles": {
       "header": {
         "bold": true,
         "alignment": "center"
       },
       "sub-header": {
         "alignment": "center",
-        "margin": [
-          0,
-          2,
-          0,
-          5
-        ]
+        "margin": [0, 2, 0, 5]
       },
       "top-margin": {
-        "margin": [
-          0,
-          2,
-          0,
-          0
-        ]
+        "margin": [0, 2, 0, 0]
       },
       "top-high-margin": {
-        "margin": [
-          0,
-          0,
-          0,
-          0
-        ]
+        "margin": [0, 0, 0, 0]
       }
     }
   }
