@@ -15,7 +15,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: applicant_name
-    label: Name
+    label: Applicant Name
     type: string
     source: obpas_bpa
     total: false
@@ -30,7 +30,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: building_usage
-    label: Building Usagecategory
+    label: Building Category
     type: string
     source: obpas_bpa
     total: false
@@ -51,26 +51,26 @@ ReportDefinitions:
     total: false     
   searchParams:
   - name: fromDate
-    label: fromDate
+    label: From Date
     type: epoch
     source: obpas_bpa
     isMandatory: true
     searchClause: AND createdtime >= $fromDate
   - name: toDate
-    label: toDate
+    label: To Date
     type: epoch
     source: obpas_bpa
     isMandatory: true
     searchClause: AND createdtime <= $toDate
   - name: businessservice
-    label: Business Service
+    label: Service
     type: singlevaluelist
     pattern: "list://BPA_LOW:Self_Certification"
     source: obpas_bpa
     isMandatory: false
     searchClause: AND businessservice = $businessservice 
   - name: ulb
-    label: ulb
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
@@ -127,7 +127,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: applicationno
-    label: Application No
+    label: Application Number
     type: string
     source: obpas_bpa
     total: false
@@ -142,7 +142,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: businessservice
-    label: Business Service
+    label: Service
     type: string
     source: obpas_bpa
     total: false
@@ -156,11 +156,6 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: cash_amount
-    label: Cash Amount
-    type: string
-    source: obpas_bpa
-    total: true
   - name: cheque_amount
     label: Cheque Amount
     type: string
@@ -215,19 +210,19 @@ ReportDefinitions:
     isMandatory: true
     searchClause: AND createdtime <= $toDate
   - name: businessservice
-    label: Business Service
+    label: Service
     type: singlevaluelist
-    pattern: list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH
+    pattern: list://BPA_LOW:Self Certification
     source: obpas_bpa
     isMandatory: false
     searchClause: AND businessservice = $businessservice
   - name: ulb
-    label: ulb
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: and  p.tenantid = $ulb    
+    searchClause: and  p.tenantid = $ulb     
   - name: collector_code
     label: Collector Code
     type: string
@@ -334,7 +329,6 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-    total: false
   - name: sla_status
     label: SLA status
     type: string
@@ -371,17 +365,17 @@ ReportDefinitions:
   - name: businessservice
     label: Business Service
     type: singlevaluelist
-    pattern: list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH
+    pattern: list://BPA_LOW:Self Certification
     source: obpas_bpa
     isMandatory: false
     searchClause: AND sla.businessservice = $businessservice 
   - name: ulb
-    label: ulb
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: and  wf.tenantid = $ulb    
+    searchClause: and  wf.tenantid = $ulb      
   query: |
       WITH wf_detailed AS (
           SELECT 
@@ -508,12 +502,12 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: receiptno
-    label: Receipt No
+    label: Receipt Number
     type: string
     source: obpas_bpa
     total: false
   - name: applicationno
-    label: Application No
+    label: Application Number
     type: string
     source: obpas_bpa
     total: false
@@ -523,7 +517,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: businessservice
-    label: Business Service
+    label: Service
     type: string
     source: obpas_bpa
     total: false
@@ -543,7 +537,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: ownername1
-    label: Ownername
+    label: Owner Name
     type: string
     source: obpas_bpa
     total: false
@@ -706,7 +700,7 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: true
-  searchParams: 
+  searchParams:
   - name: fromDate
     label: From Date
     type: epoch
@@ -718,7 +712,7 @@ ReportDefinitions:
     type: epoch
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND createdtime <= $todate    
+    searchClause: AND createdtime <= $todate     
   - name: district
     label: District
     type: singlevaluelist
@@ -1148,7 +1142,6 @@ ReportDefinitions:
     source: obpas_bpa
     isMandatory: false
     searchClause: AND sc.businessservice = $businessservice 
-  query: |
   query: |
       WITH wf_history AS (
           SELECT
