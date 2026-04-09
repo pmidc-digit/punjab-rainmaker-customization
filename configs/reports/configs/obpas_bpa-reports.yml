@@ -1150,74 +1150,69 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: day0
-    label: Day 0
-    type: string
-    source: obpas_bpa
-    total: false
   - name: day1
     label: Day 1
     type: string
     source: obpas_bpa
-    total: false
+    total: true
   - name: day2
     label: Day 2
     type: string
     source: obpas_bpa
-    total: false
+    total: true
   - name: day3
     label: Day 3
     type: string
     source: obpas_bpa
-    total: false
+    total: true
   - name: day4
     label: Day 4
     type: string
     source: obpas_bpa
-    total: false
+    total: true
   - name: day5
     label: Day 5
     type: string
     source: obpas_bpa
-    total: false
+    total: true
   - name: day6
     label: Day 6
     type: string
     source: obpas_bpa
-    total: false
+    total: true
   - name: day7
     label: Day 7
     type: string
     source: obpas_bpa
-    total: false
+    total: true
   - name: total_upcoming_breaches
     label: Total Upcoming Breaches 
     type: string
     source: obpas_bpa
-    total: false
+    total: true
   searchParams:
   - name: fromDate
-    label: fromDate
+    label: From Date
     type: epoch
     source: obpas_bpa
     isMandatory: true
     searchClause: AND 1=1
   - name: district
-    label: district
+    label: District
     type: singlevaluelist
-    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
   - name: tenant
-    label: tenant
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.name_of_ulb= $tenant
   - name: businessservice
-    label: Business Service
+    label: Service
     type: singlevaluelist
     pattern: "list://BPA_LOW:Self Certification"
     source: obpas_bpa
@@ -1280,19 +1275,18 @@ ReportDefinitions:
          JOIN params p ON TRUE
          WHERE sc.final_time IS NULL 
           AND sc.sla_breach_ts::date
-          BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
+          BETWEEN p.report_dt AND p.report_dt + INTERVAL '6 day'
            )
         SELECT
           u.district,
           u.name_of_ulb,
-          COUNT(*) FILTER (WHERE breach_date = p.report_dt)   AS day0,
-          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '1 day') AS day1,
-          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '2 day') AS day2,
-          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '3 day') AS day3,
-          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '4 day') AS day4,
-          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '5 day') AS day5,
-          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '6 day') AS day6,
-          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '7 day') AS day7,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt)   AS day1,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '1 day') AS day2,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '2 day') AS day3,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '3 day') AS day4,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '4 day') AS day5,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '5 day') AS day6,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '6 day') AS day7
           COUNT(*) AS total_upcoming_breaches
           FROM upcoming_breaches ub
           JOIN ulb_data u ON ub.tenantid = u.ulb_code
@@ -1302,7 +1296,7 @@ ReportDefinitions:
   orderby: ORDER BY u.district, u.name_of_ulb DESC   
 
 - reportName: DetailedFilesNearTimelineBreach
-  summary: Detailed file list of district-ulb wise application upcoming  breached its SLA for next 7 days 
+  summary: Detailed File List of District-ULB wise Application Upcoming  Breached its SLA for next 7 days 
   version: 1.0.0
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
@@ -1320,12 +1314,12 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: applicationstatus
-    label: application status
+    label: Application Status
     type: string
     source: obpas_bpa
     total: false
   - name: fileno
-    label: File No
+    label: File Number
     type: string
     source: obpas_bpa
     total: false
@@ -1336,27 +1330,27 @@ ReportDefinitions:
     total: false
   searchParams:
   - name: fromDate
-    label: fromDate
+    label: From Date
     type: epoch
     source: obpas_bpa
     isMandatory: true
     searchClause: AND 1=1
   - name: district
-    label: district
+    label: District
     type: singlevaluelist
-    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
   - name: tenant
-    label: tenant
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.name_of_ulb= $tenant 
   - name: businessservice
-    label: Business Service
+    label: Service
     type: singlevaluelist
     pattern: "list://BPA_LOW:Self Certification"
     source: obpas_bpa
@@ -1429,7 +1423,7 @@ ReportDefinitions:
            sc.sla_breach_ts::date AS breach_date
            FROM sla_calc sc
            JOIN params p ON TRUE
-           WHERE sc.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
+           WHERE sc.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '6 day'
         )
        SELECT
          u.district,
