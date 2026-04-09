@@ -211,7 +211,7 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
       - name: tenantid
-        label: Tenant ID
+        label: ULB Name 
         type: string
         source: obpas_noc
         total: false
@@ -271,13 +271,13 @@ ReportDefinitions:
       - name: district_name
         label: District
         type: singlevaluelist
-        pattern: list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,:Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib
+        pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
         source: obpas_noc
         wrapper: true
         isMandatory: false
         searchClause: AND u.district  = $district_name
       - name: ulb
-        label: ULB
+        label: ULB Name
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: obpas_noc
@@ -336,7 +336,26 @@ ReportDefinitions:
          SELECT
             split_part(n.tenantid,'.',2) AS tenantid,
              n.applicationno AS noc_application_no,                 
-             UPPER(ls.applicationstatus) AS final_status,
+             CASE UPPER(ls.applicationstatus)
+               WHEN 'INITIATED' THEN 'Initiated'
+               WHEN 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In-Progress'
+               WHEN 'DOCUMENTVERIFY' THEN 'Document Verification'
+               WHEN 'ATP_VERIFICATION_PENDING' THEN 'Pending ATP Verification'
+               WHEN 'MTP_VERIFICATION_PENDING' THEN 'Pending MTP Verification'
+               WHEN 'JC_VERIFICATION_PENDING' THEN 'Pending JC Verification'
+               WHEN 'EO_VERIFICATION_PENDING' THEN 'Pending EO Verification'
+               WHEN 'PENDINGAPPROVAL' THEN 'Pending Approval'
+               WHEN 'CITIZENACTIONREQUIRED' THEN 'Citizen Action Required'
+               WHEN 'PENDINGPAYMENT' THEN 'Pending Payment'
+               WHEN 'APPROVED' THEN 'Approved'
+               WHEN 'REJECTED' THEN 'Rejected'
+               WHEN 'CANCELLED' THEN 'Cancelled'
+               WHEN 'INSPECTION_REPORT_PENDING' THEN 'Inspection Report Pending'
+               WHEN 'E-SIGNED' THEN 'E-Signed'
+               ELSE ls.applicationstatus 
+              END AS final_status_localized,
+             ad.additionaldetails::jsonb -> 'applicationDetails' -> 'owners' -> 0 ->> 'ownerOrFirmName' AS applicant_name,
+             ad.additionaldetails::jsonb -> 'applicationDetails' -> 'owners' -> 0 ->> 'mobileNumber' AS applicant_mobile,
             TO_CHAR(TO_TIMESTAMP(st.docverify_time/1000),'DD-MM-YYYY') AS field_inspection_on,
             TO_CHAR(TO_TIMESTAMP(st.final_time/1000),'DD-MM-YYYY') AS finalstatus_on,   
             CASE
@@ -351,19 +370,22 @@ ReportDefinitions:
             CASE WHEN (st.final_time-st.docverify_time) > sla.businessservicesla THEN 'Breached'
                  ELSE 'Met' END
                 WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
-                THEN 'In-Progress'
+                THEN  
+            CASE WHEN (EXTRACT(EPOCH FROM NOW()) * 1000 - st.docverify_time) > sla.businessservicesla THEN 'Breached'
+            ELSE 'In-Progress' END
                ELSE 'Awaiting Field Inspection'
             END AS sla_status,
-            ad.employee_name AS employee_name,
-            ad.employee_code AS employee_code
+            asn.employee_name AS employee_name,
+            asn.employee_code AS employee_code
             FROM eg_noc n
+            INNER JOIN eg_noc_details ad ON ad.nocid = n.id
             LEFT JOIN status_times st ON n.applicationno = st.uuid
             LEFT JOIN latest_status ls ON n.applicationno = ls.uuid
             inner join ulb_data u on u.ulb_code=n.tenantid
             JOIN sla_data sla ON sla.businessservice in ('NOC_MC','NOC_NP')
-            LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
+            LEFT JOIN assignee_details asn ON n.applicationno = asn.businessid
             WHERE UPPER(ls.applicationstatus) NOT IN ('INITIATED','CANCELLED')
-    orderby: ORDER BY n.createdtime DESC, tenantid, final_status
+    orderby: ORDER BY n.createdtime DESC
     
   - reportName: officers_with_highest_pendency
     summary: Top 7 officers with Highest Pendency
@@ -505,6 +527,13 @@ ReportDefinitions:
         source: obpas_noc
         isMandatory: false
         searchClause: AND u.ulb_code= $ulb
+      - name: businessservice
+        label: ULB Type
+        type: singlevaluelist
+        pattern: list://NOC_MC:Municipal Corporation,NOC_NP:Nagar Panchayat,NOC_NP:Municipal Council
+        source: obpas_noc
+        isMandatory: false
+        searchClause: AND sc.businessservice = $businessservice
     query: >
       WITH wf_detailed AS (
          SELECT
