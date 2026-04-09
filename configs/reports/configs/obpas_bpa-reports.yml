@@ -760,16 +760,15 @@ ReportDefinitions:
   query: |
        SELECT 
            ulb_data.district,
-           eg_bpa_buildingplan.createdtime,
            INITCAP(REPLACE(eg_bpa_buildingplan.tenantid, 'pb.', '')) AS ulb_name,
            COUNT(*) AS Pending_Files
-       FROM eg_bpa_buildingplan inner join ulb_data on eg_bpa_buildingplan.tenantid = ulb_data.ulb_code
-       WHERE businessservice = 'BPA_LOW' and status IN (
-           'VERIFICATION_INPROGRESS',
-           'FIELDINSPECTION_INPROGRESS',
-           'INSPECTION_REPORT_PENDING',
-           'DOC_VERIFICATION_INPROGRESS')
-  groupby: GROUP BY eg_bpa_buildingplan.tenantid,ulb_data.district,eg_bpa_buildingplan.createdtime
+          FROM eg_bpa_buildingplan inner join ulb_data on eg_bpa_buildingplan.tenantid = ulb_data.ulb_code
+          WHERE status IN (
+            'APPROVAL_PENDING','ATPHQ_APPROVAL_PENDING','DOC_VERIFICATION_PENDING','EO_VERIFICATION_PENDING','FIELDINSPECTION_INPROGRESS',
+             'INPROGRESS','INSPECTION_REPORT_PENDING','JC_VERIFICATION_PENDING','LEVEL3_VERIFICATION_PENDING',
+             'LEVEL4_VERIFICATION_PENDING','MC_VERIFICATION_PENDING','MTPHQ_APPROVAL_PENDING',
+             'PENDINGINITIALVERIFICATION','PENDINGVERIFICATION','STP_VERIFICATION_PENDING','STPHQ_APPROVAL_PENDING')
+  groupby: GROUP BY eg_bpa_buildingplan.tenantid,ulb_data.district
   
 - reportName: officers_with_highest_pendency
   summary: Top 7 officers with Highest Pendency
