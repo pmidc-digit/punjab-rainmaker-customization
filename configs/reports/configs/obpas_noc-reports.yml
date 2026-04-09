@@ -435,58 +435,38 @@ ReportDefinitions:
         searchClause: AND u.district  = $district_name
     query: >
       WITH latest_assignee AS (
-        SELECT DISTINCT ON (wf.businessid)
-          wf.businessid,st.applicationstatus,
-          wf.tenantid,
-          wf.businessservice,
-          d.name AS designation_code
-        FROM eg_wf_processinstance_v2 wf
-        JOIN eg_wf_state_v2 st    ON wf.status = st.uuid
-        LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
-        LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        inner JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
-        inner join designation d on a.designation = d.code
-         WHERE wf.businessservice in ('NOC_MC','NOC_NP')
-        ORDER BY wf.businessid, wf.lastmodifiedtime DESC
-      ),    
-      pending_files AS (
-        SELECT
-          id::text AS noc_id,
-          applicationno,
-          tenantid,
-          status
-        FROM eg_noc
-        WHERE status NOT IN (
-            'INITIATED',
-            'CANCELLED'
-          )
-      ),    
-      merged AS (
-        SELECT
-          la.tenantid, 
-          INITCAP(REPLACE(la.tenantid, 'pb.', '')) AS ulb_name,
-          la.designation_code,
-          la.businessservice,
-          COUNT(DISTINCT p.noc_id) AS pending_files
-        FROM latest_assignee la
-        LEFT JOIN pending_files p
-          ON (
-               p.noc_id = la.businessid
-            OR p.applicationno = la.businessid
-          )
-        GROUP BY la.tenantid, INITCAP(REPLACE(la.tenantid, 'pb.', '')), la.designation_code, la.businessservice
-      )      
-
-      SELECT
-        ROW_NUMBER() OVER (ORDER BY pending_files DESC) AS Serial_No,
-        ulb_name ,businessservice,
-        designation_code as Officer_Designation,
-        pending_files 
-      FROM merged  m
-
-      inner join ulb_data u on u.name_of_ulb=m.ulb_name
-
-      where  designation_code <> 'Clerk' and designation_code <> 'Accountant'
+              SELECT DISTINCT ON (wf.businessid)
+                wf.businessid,st.applicationstatus,
+                wf.tenantid,
+                wf.businessservice,
+                d.name AS designation_code
+              FROM eg_wf_processinstance_v2 wf
+              JOIN eg_wf_state_v2 st    ON wf.status = st.uuid
+              LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+              LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+              inner JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
+              inner join designation d on a.designation = d.code
+               WHERE wf.businessservice in ('NOC_MC','NOC_NP')
+              ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+            ),    
+            merged AS (
+              SELECT
+                la.tenantid, 
+                la.designation_code,
+                la.businessservice,
+      		  --la.businessid
+                COUNT(DISTINCT la.businessid) AS pending_files
+              FROM latest_assignee la
+              WHERE la.applicationstatus NOT IN ('E-SIGNED', 'CITIZENACTIONREQUIRED', 'APPROVED', 'REJECTED', 'CANCELLED', 'INITIATED', 'PENDINGPAYMENT')
+              GROUP BY la.tenantid, la.designation_code, la.businessservice
+            )      
+            SELECT
+               u.name_of_ulb as ulb_name,
+              m.designation_code as Officer_Designation,
+              m.pending_files
+            FROM merged m
+            inner join ulb_data u on u.ulb_code = m.tenantid
+            where m.designation_code <> 'Clerk' and m.designation_code <> 'Accountant' and m.designation_code <>'Additional Local Registrar'
     orderby: ORDER BY pending_files DESC limit 7
     
   - reportName: BeyondTimelineSummary
