@@ -220,7 +220,14 @@ ReportDefinitions:
     pattern: list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND businessservice = $businessservice    
+    searchClause: AND businessservice = $businessservice
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: and  p.tenantid = $ulb    
   - name: collector_code
     label: Collector Code
     type: string
@@ -367,7 +374,14 @@ ReportDefinitions:
     pattern: list://BPA_LOW:BPA_LOW,BPA_NP_HIGH_OTH:BPA_NP_HIGH_OTH,BPA_MC:BPA_MC,BPA_NP:BPA_NP,BPA_MC_HIGH_OTH:BPA_MC_HIGH_OTH,BPA_NP_HIGH:BPA_NP_HIG,BPA_MC_HIGH:BPA_MC_HIGH
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND sla.businessservice = $businessservice     
+    searchClause: AND sla.businessservice = $businessservice 
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: and  wf.tenantid = $ulb    
   query: |
       WITH wf_detailed AS (
           SELECT 
@@ -692,7 +706,19 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: true
-  searchParams:    
+  searchParams: 
+  - name: fromDate
+    label: From Date
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND createdtime <= $fromDate
+  - name: todate
+    label: To Date
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND createdtime <= $todate    
   - name: district
     label: District
     type: singlevaluelist
@@ -758,8 +784,6 @@ ReportDefinitions:
     source: obpas_bpa
     isMandatory: false
     searchClause: AND tenantid = $ulb
-
-
   query: |
        WITH latest_assignee AS (
          SELECT DISTINCT ON (wf.businessid)
