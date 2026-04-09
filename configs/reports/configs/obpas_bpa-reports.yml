@@ -375,7 +375,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: and  wf.tenantid = $ulb      
+    searchClause: and  n.tenantid = $ulb      
   query: |
       WITH wf_detailed AS (
           SELECT 
@@ -516,11 +516,6 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: businessservice
-    label: Service
-    type: string
-    source: obpas_bpa
-    total: false
   - name: service
     label: Module Name
     type: string
@@ -599,7 +594,7 @@ ReportDefinitions:
               'DD-MM-YYYY'
           ) AS receiptdate,
           pd.businessservice ,
-          'BPA' AS service,
+          'Building Plan' AS service,
           TO_CHAR(
               TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata',
               'DD-MM-YYYY'
@@ -666,7 +661,7 @@ ReportDefinitions:
   - name: district
     label: District
     type: singlevaluelist
-    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
     source: obpas_bpa
     isMandatory: false
     searchClause: AND ulb_data.district = $district 
@@ -706,17 +701,17 @@ ReportDefinitions:
     type: epoch
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND createdtime <= $fromDate
+    searchClause: AND eg_bpa_buildingplan.createdtime <= $fromDate
   - name: todate
     label: To Date
     type: epoch
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND createdtime <= $todate     
+    searchClause: AND eg_bpa_buildingplan.createdtime >= $todate     
   - name: district
     label: District
     type: singlevaluelist
-    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
     source: obpas_bpa
     isMandatory: false
     searchClause: AND ulb_data.district = $district 
@@ -730,6 +725,7 @@ ReportDefinitions:
   query: |
        SELECT 
            ulb_data.district,
+		       eg_bpa_buildingplan.createdtime,
            INITCAP(REPLACE(eg_bpa_buildingplan.tenantid, 'pb.', '')) AS ulb_name,
            COUNT(*) AS Pending_Files
        FROM eg_bpa_buildingplan inner join ulb_data on eg_bpa_buildingplan.tenantid = ulb_data.ulb_code
@@ -738,7 +734,7 @@ ReportDefinitions:
            'FIELDINSPECTION_INPROGRESS',
            'INSPECTION_REPORT_PENDING',
            'DOC_VERIFICATION_INPROGRESS')
-  groupby: GROUP BY eg_bpa_buildingplan.tenantid,ulb_data.district
+  groupby: GROUP BY eg_bpa_buildingplan.tenantid,ulb_data.district,eg_bpa_buildingplan.createdtime
   
 - reportName: officers_with_highest_pendency
   summary: Top 7 officers with Highest Pendency
@@ -1002,7 +998,7 @@ ReportDefinitions:
   - name: district
     label: District
     type: singlevaluelist
-    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
