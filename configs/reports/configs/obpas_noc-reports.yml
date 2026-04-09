@@ -124,7 +124,7 @@ ReportDefinitions:
       - name: applicationstatus
         label: Application Status
         type: singlevaluelist
-        pattern: list://INITIATED Initiated,FIELDINSPECTION_INPROGRESS:Field Inspection In Progress ,DOCUMENTVERIFY:Document Verify ,ATP_VERIFICATION_PENDING: ATP Verification Pending,MTP_VERIFICATION_PENDING: MTP Verification Pending,JC_VERIFICATION_PENDING:JC Verification Pending , INSPECTION_REPORT_PENDING:Inspection Report Pending , EO_VERIFICATION_PENDING: EO Verification Pending,LEVEL2_DOCUMENTVERIFY:Level 2 Document Verify,PENDINGAPPROVAL: Pending Approval,APPROVED:Approved,CANCELLED:Cancelled , REJECTED:Rejected,PENDINGPAYMENT:Pending Payment,CITIZENACTIONREQUIRED:Citizen Action Required,E-SIGNED:E-Signed
+        pattern: 'list://INITIATED Initiated,FIELDINSPECTION_INPROGRESS:Field Inspection In Progress ,DOCUMENTVERIFY:Document Verify ,ATP_VERIFICATION_PENDING: ATP Verification Pending,MTP_VERIFICATION_PENDING: MTP Verification Pending,JC_VERIFICATION_PENDING:JC Verification Pending , INSPECTION_REPORT_PENDING:Inspection Report Pending , EO_VERIFICATION_PENDING: EO Verification Pending,LEVEL2_DOCUMENTVERIFY:Level 2 Document Verify,PENDINGAPPROVAL: Pending Approval,APPROVED:Approved,CANCELLED:Cancelled , REJECTED:Rejected,PENDINGPAYMENT:Pending Payment,CITIZENACTIONREQUIRED:Citizen Action Required,E-SIGNED:E-Signed'
         source: obpas_noc
         wrapper: true
         isMandatory: false
@@ -651,7 +651,7 @@ ReportDefinitions:
     - name: applicationstatus
       label: Application Status
       type: singlevaluelist
-      pattern: list://INITIATED Initiated,FIELDINSPECTION_INPROGRESS:Field Inspection In Progress ,DOCUMENTVERIFY:Document Verify ,ATP_VERIFICATION_PENDING: ATP Verification Pending,MTP_VERIFICATION_PENDING: MTP Verification Pending,JC_VERIFICATION_PENDING:JC Verification Pending , INSPECTION_REPORT_PENDING:Inspection Report Pending , EO_VERIFICATION_PENDING: EO Verification Pending,LEVEL2_DOCUMENTVERIFY:Level 2 Document Verify,PENDINGAPPROVAL: Pending Approval,APPROVED:Approved,CANCELLED:Cancelled , REJECTED:Rejected,PENDINGPAYMENT:Pending Payment,CITIZENACTIONREQUIRED:Citizen Action Required,E-SIGNED:E-Signed
+      pattern: 'list://INITIATED Initiated,FIELDINSPECTION_INPROGRESS:Field Inspection In Progress ,DOCUMENTVERIFY:Document Verify ,ATP_VERIFICATION_PENDING: ATP Verification Pending,MTP_VERIFICATION_PENDING: MTP Verification Pending,JC_VERIFICATION_PENDING:JC Verification Pending , INSPECTION_REPORT_PENDING:Inspection Report Pending , EO_VERIFICATION_PENDING: EO Verification Pending,LEVEL2_DOCUMENTVERIFY:Level 2 Document Verify,PENDINGAPPROVAL: Pending Approval,APPROVED:Approved,CANCELLED:Cancelled , REJECTED:Rejected,PENDINGPAYMENT:Pending Payment,CITIZENACTIONREQUIRED:Citizen Action Required,E-SIGNED:E-Signed'
       source: obpas_noc
       isMandatory: false
       searchClause: AND sc.applicationstatus = $applicationstatus
@@ -1149,7 +1149,21 @@ ReportDefinitions:
        SELECT
          u.district,
          u.name_of_ulb,
-         ub.applicationstatus,
+         CASE UPPER(ub.applicationstatus)
+            WHEN 'E-SIGNED' THEN 'E-Signed'
+            WHEN 'LEVEL2_DOCUMENTVERIFY' THEN 'Level 2 Document Verify'
+            WHEN 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In-Progress'
+            WHEN 'DOCUMENTVERIFY' THEN 'Document Verification'
+            WHEN 'ATP_VERIFICATION_PENDING' THEN 'Pending ATP Verification'
+            WHEN 'MTP_VERIFICATION_PENDING' THEN 'Pending MTP Verification'
+            WHEN 'JC_VERIFICATION_PENDING' THEN 'Pending JC Verification'
+            WHEN 'EO_VERIFICATION_PENDING' THEN 'Pending EO Verification'
+            WHEN 'PENDINGAPPROVAL' THEN 'Pending Approval'
+            WHEN 'CITIZENACTIONREQUIRED' THEN 'Citizen Action Required'
+            WHEN 'PENDINGPAYMENT' THEN 'Pending Payment'
+            WHEN 'INSPECTION_REPORT_PENDING' THEN 'Inspection Report Pending'
+            ELSE ub.applicationstatus 
+          END AS applicationstatus_localized,
          ub.uuid as fileno,
          'NOC' as modulename
          FROM upcoming_breaches ub
