@@ -9,92 +9,108 @@ ReportDefinitions:
     print:
       pdfPageSize: A1
   sourceColumns:
-  - name: Tenant
+  - name: tenant
     label: ULB Name
     type: string
     source: obpas_bpa
     total: false
-  - name: name
+  - name: applicant_name
     label: Name
     type: string
     source: obpas_bpa
     total: false
-  - name: mobilenumber
-    label: Mobile Number
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: applicationstatus
+  - name: application_status
     label: Application Status
     type: string
     source: obpas_bpa
     total: false
-  - name: businessservice
-    label: Business Service
-    type: string
-    source: obpas_bpa
-    total: false
   - name: applicationno
-    label: Application no
+    label: Application Number
     type: string
     source: obpas_bpa
     total: false
-  - name: employee_name
-    label: Employee name
+  - name: building_usage
+    label: Building Usagecategory
     type: string
     source: obpas_bpa
     total: false
+  - name: district
+    label: District
+    type: string
+    source: obpas_bpa
+    total: false  
+  - name: plot_area
+    label: plot Area
+    type: string
+    source: obpas_bpa
+    total: false 
+  - name: ulb_type
+    label: ULB Type
+    type: string
+    source: obpas_bpa
+    total: false     
   searchParams:
   - name: fromDate
     label: fromDate
     type: epoch
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND a.createdtime >= $fromDate
+    searchClause: AND createdtime >= $fromDate
   - name: toDate
     label: toDate
     type: epoch
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND a.createdtime <= $toDate
+    searchClause: AND createdtime <= $toDate
   - name: businessservice
     label: Business Service
     type: singlevaluelist
     pattern: "list://BPA_LOW:Self_Certification"
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND ch.businessservice = $businessservice 
+    searchClause: AND businessservice = $businessservice 
+  - name: ulb
+    label: ulb
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: and  tenantid = $ulb     
   query: |
-      WITH current_holder AS (
-        SELECT DISTINCT ON (wf.businessid)
-          wf.businessid AS applicationno,
-          split_part(wf.tenantid, '.', 2) AS tenant, 
-          u.name AS assignee_name,
-          e.code AS assignee_code,
-          wf.businessservice,
-          UPPER(st.applicationstatus) AS current_stage
-        FROM eg_wf_processinstance_v2 wf
-        JOIN eg_wf_state_v2 st    ON wf.status = st.uuid
-        LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
-        LEFT JOIN eg_user u       ON u.uuid = wa.assignee
-        LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        WHERE wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
-        ORDER BY wf.businessid, wf.lastmodifiedtime DESC
-      )
-      SELECT DISTINCT ON (o.applicationno)
-        u.name,
-        u.mobilenumber,
-        o.status as applicationstatus,
-        ch.tenant,
-        'BPA' as businessservice,
-        o.applicationno,
-        ch.assignee_name  AS employee_name
-      FROM  eg_bpa_document  a
-      JOIN eg_bpa_buildingplan o   ON a.buildingplanid = o.id            
-      JOIN eg_user u        ON u.uuid = o.accountid           
-      LEFT JOIN current_holder ch ON ch.applicationno = o.applicationno
-      WHERE 1=1
-  orderby:  ORDER BY o.applicationno;
+      SELECT 
+          applicationno,
+          split_part(tenantid, '.', 2) AS tenant,
+          -- Status Mapping Logic
+          CASE 
+              WHEN status = 'PENDING_APPL_FEE' THEN 'Pending Application Fee'
+              WHEN status = 'CITIZEN_APPROVAL_PENDING' THEN 'Pending Citizen Approval'
+              WHEN status = 'SEND_TO_CITIZEN' THEN 'Sent back to Citizen'
+              WHEN status = 'INPROGRESS' THEN 'In Progress'
+              WHEN status = 'PENDING_APPL_FEE_PAYMENT' THEN 'Pending Application Fee Payment'
+              WHEN status = 'DOC_VERIFICATION_PENDING' THEN 'Document Verification Pending'
+              WHEN status = 'FIELDINSPECTION_PENDING' THEN 'Field Inspection Pending'
+              WHEN status = 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In-Progress'
+              WHEN status = 'NOC_VERIFICATION_PENDING' THEN 'NOC Verification Pending'
+              WHEN status = 'PENDINGAPPROVAL' THEN 'Pending Final Approval'
+              WHEN status = 'PENDING_SANC_FEE_PAYMENT' THEN 'Pending Sanction Fee Payment'
+              WHEN status = 'APPROVED' THEN 'Approved'
+              WHEN status = 'REJECTED' THEN 'Rejected'
+              WHEN status = 'LEVEL3_VERIFICATION_PENDING' THEN 'L3 Verification Pending'
+              WHEN status = 'LEVEL4_VERIFICATION_PENDING' THEN 'L4 Verification Pending'
+              WHEN status = 'JC_VERIFICATION_PENDING' THEN 'JC Verification Pending'
+              WHEN status = 'MC_VERIFICATION_PENDING' THEN 'MC Verification Pending'
+              WHEN status = 'ATPHQ_APPROVAL_PENDING' THEN 'ATP HQ Approval Pending'
+              WHEN status = 'PENDINGINITIALVERIFICATION' THEN 'Pending Initial Verification'
+              ELSE REPLACE(INITCAP(REPLACE(status, '_', ' ')), ' ', ' ')
+          END AS application_status,
+          (additionaldetails::jsonb)->>'usage' AS building_usage,
+          (additionaldetails::jsonb)->>'stakeholderName' AS applicant_name,
+          (additionaldetails::jsonb)->>'District' AS district,
+          (additionaldetails::jsonb)->>'area' AS plot_area,
+          (additionaldetails::jsonb)->>'architectName' AS architect_name,
+          (additionaldetails::jsonb)->> 'Ulblisttype' AS ulb_type
+      FROM eg_bpa_buildingplan  where 1=1
+  orderby:  ORDER BY createdtime DESC;
 
 - reportName: CollectionsReportBPA
   decryptionPathId: LAYOUTREPORTS
@@ -296,6 +312,11 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
+  - name: final_status
+    label: Application Status
+    type: string
+    source: obpas_bpa
+    total: false    
   - name: document_verify_on
     label: Document Verified On
     type: string
@@ -306,10 +327,6 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: final_status
-    label: Application status
-    type: string
-    source: obpas_bpa
     total: false
   - name: sla_status
     label: SLA status
@@ -352,95 +369,115 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND sla.businessservice = $businessservice     
   query: |
-       WITH wf_detailed AS (
-         SELECT 
-           wf.businessid AS uuid,                                 
-           UPPER(st.applicationstatus) AS applicationstatus,
-           wf.createdtime,
-           wf.lastmodifiedtime,
-           wf.businessservicesla,
-           wf.tenantid,
-           wf.id AS processinstanceid
+      WITH wf_detailed AS (
+          SELECT 
+              wf.businessid AS uuid,                                     
+              UPPER(st.applicationstatus) AS applicationstatus,
+              wf.createdtime,
+              wf.lastmodifiedtime,
+              wf.businessservice,
+              wf.tenantid,
+              wf.id AS processinstanceid
           FROM eg_wf_processinstance_v2 wf
           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-          WHERE  wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')                
-          ),
-        status_times AS (
-             SELECT
-                uuid,
-                MAX(CASE WHEN applicationstatus = 'FIELDINSPECTION_INPROGRESS' THEN createdtime END) AS docverify_time,
-                MAX(CASE WHEN applicationstatus IN ('E-SIGNED','APPROVED','REJECTED','PENDING_SANC_FEE_PAYMENT','BLOCKED') THEN lastmodifiedtime END) AS final_time
+          WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')                
+      ),
+      status_times AS (
+          SELECT
+              uuid,
+              MAX(CASE 
+                  WHEN businessservice = 'BPA_LOW' AND applicationstatus = 'PENDINGINITIALVERIFICATION' THEN createdtime 
+                  WHEN businessservice != 'BPA_LOW' AND applicationstatus = 'FIELDINSPECTION_INPROGRESS' THEN createdtime 
+                  ELSE NULL 
+              END) AS docverify_time,
+              
+              MAX(CASE 
+                  WHEN applicationstatus IN ('E-SIGNED','SANCTION_FEE_PENDING','APPROVED','REJECTED','PENDING_SANC_FEE_PAYMENT','BLOCKED') THEN lastmodifiedtime 
+              END) AS final_time
+          FROM wf_detailed
+          GROUP BY uuid
+      ),
+      latest_status AS (
+          SELECT uuid, applicationstatus
+          FROM (
+              SELECT uuid, applicationstatus, lastmodifiedtime,
+              ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY lastmodifiedtime DESC NULLS LAST) AS rn
               FROM wf_detailed
-              GROUP BY uuid
-             ),
-        latest_status AS (
-              SELECT uuid, applicationstatus
-                 FROM (
-                      SELECT uuid, applicationstatus, lastmodifiedtime,
-                         ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY lastmodifiedtime DESC NULLS LAST) AS rn
-                          FROM wf_detailed
-                        ) x WHERE rn = 1
-                     ),
-        sla_data AS (
-            SELECT businessservice,businessservicesla
-            FROM eg_wf_businessservice_v2
-            WHERE businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
-           ),
-        assignee_details AS (
-             SELECT DISTINCT ON (wf.businessid)
-                 wf.businessid,
-                 e.code AS employee_code,
-                 u.name AS employee_name
-              FROM eg_wf_processinstance_v2 wf
-              JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
-              JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-              JOIN eg_user u ON e.uuid = u.uuid
-               WHERE wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
-              ORDER BY wf.businessid,wf.lastmodifiedtime DESC
-               )
-         SELECT DISTINCT ON (n.applicationno)
-            split_part(n.tenantid,'.',2) AS tenantid,
-             n.applicationno AS bpa_application_no,                 
-             UPPER(ls.applicationstatus) AS final_status,
-            TO_CHAR(TO_TIMESTAMP(st.docverify_time/1000),'DD-MM-YYYY') AS document_verify_on,
-            TO_CHAR(TO_TIMESTAMP(st.final_time/1000),'DD-MM-YYYY') AS finalstatus_on,   
-            CASE
+          ) x WHERE rn = 1
+      ),
+      sla_data AS (
+          SELECT businessservice, businessservicesla
+          FROM eg_wf_businessservice_v2
+          WHERE businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+      ),
+      assignee_details AS (
+          SELECT DISTINCT ON (wf.businessid)
+              wf.businessid,
+              e.code AS employee_code,
+              u.name AS employee_name
+          FROM eg_wf_processinstance_v2 wf
+          JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+          JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+          JOIN eg_user u ON e.uuid = u.uuid
+          WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+          ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+      )
+      SELECT DISTINCT ON (n.applicationno)
+          split_part(n.tenantid,'.',2) AS tenantid,
+          n.applicationno AS bpa_application_no,                  
+          
+          -- Status Localization Mapping
+          CASE 
+              WHEN UPPER(ls.applicationstatus) = 'CITIZEN_APPROVAL_PENDING' THEN 'Pending Citizen Approval'
+              WHEN UPPER(ls.applicationstatus) = 'SEND_TO_CITIZEN' THEN 'Sent back to Citizen'
+              WHEN UPPER(ls.applicationstatus) = 'INPROGRESS' THEN 'In Progress'
+              WHEN UPPER(ls.applicationstatus) = 'PENDING_APPL_FEE_PAYMENT' THEN 'Application Fee Pending'
+              WHEN UPPER(ls.applicationstatus) = 'DOC_VERIFICATION_PENDING' THEN 'Doc Verification Pending'
+              WHEN UPPER(ls.applicationstatus) = 'FIELDINSPECTION_PENDING' THEN 'Field Inspection Pending'
+              WHEN UPPER(ls.applicationstatus) = 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In-Progress'
+              WHEN UPPER(ls.applicationstatus) = 'NOC_VERIFICATION_PENDING' THEN 'NOC Verification Pending'
+              WHEN UPPER(ls.applicationstatus) = 'PENDING_SANC_FEE_PAYMENT' THEN 'Sanction Fee Pending'
+              WHEN UPPER(ls.applicationstatus) = 'APPROVED' THEN 'Approved'
+              WHEN UPPER(ls.applicationstatus) = 'REJECTED' THEN 'Rejected'
+              WHEN UPPER(ls.applicationstatus) = 'LEVEL3_VERIFICATION_PENDING' THEN 'L3 Verification Pending'
+              WHEN UPPER(ls.applicationstatus) = 'LEVEL4_VERIFICATION_PENDING' THEN 'L4 Verification Pending'
+              WHEN UPPER(ls.applicationstatus) = 'JC_VERIFICATION_PENDING' THEN 'JC Verification Pending'
+              WHEN UPPER(ls.applicationstatus) = 'MC_VERIFICATION_PENDING' THEN 'MC Verification Pending'
+              WHEN UPPER(ls.applicationstatus) = 'ATPHQ_APPROVAL_PENDING' THEN 'ATP HQ Approval Pending'
+              WHEN UPPER(ls.applicationstatus) = 'PENDINGINITIALVERIFICATION' THEN 'Pending Initial Verification'
+              ELSE REPLACE(INITCAP(REPLACE(ls.applicationstatus, '_', ' ')), ' ', ' ')
+          END AS final_status,
+          
+          TO_CHAR(TO_TIMESTAMP(st.docverify_time/1000),'DD-MM-YYYY') AS document_verify_on,
+          TO_CHAR(TO_TIMESTAMP(st.final_time/1000),'DD-MM-YYYY') AS finalstatus_on,   
+          
+          -- SLA Days Calculation
+          CASE
               WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL
-               THEN FLOOR((st.final_time-st.docverify_time)/86400000)
+                  THEN FLOOR((st.final_time - st.docverify_time)/86400000)
               WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
-               THEN FLOOR((EXTRACT(EPOCH FROM NOW())*1000-st.docverify_time)/86400000)
-             ELSE NULL
-            END AS sla_days,
-            CASE
-        WHEN st.docverify_time IS NOT NULL
-             AND st.final_time IS NOT NULL THEN
-            CASE
-                WHEN (st.final_time - st.docverify_time)
-                     > sla.businessservicesla
-                THEN 'BREACHED'
-                ELSE 'MET'
-            END
-        WHEN st.docverify_time IS NOT NULL
-             AND st.final_time IS NULL THEN
-            CASE
-                WHEN (EXTRACT(EPOCH FROM NOW()) * 1000 - st.docverify_time)
-                     > sla.businessservicesla
-                THEN 'BREACHED'
-                ELSE 'IN-PROGRESS'
-            END
-
-        ELSE 'AWAITING DOCVERIFY'
-        END AS sla_status,
-            ad.employee_name AS employee_name,
-            ad.employee_code AS employee_code
-            FROM eg_bpa_buildingplan n
-            LEFT JOIN status_times st ON n.applicationno = st.uuid
-            LEFT JOIN latest_status ls ON n.applicationno = ls.uuid
-            JOIN sla_data sla ON sla.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
-            
-            LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
-            WHERE UPPER(ls.applicationstatus) NOT IN  ('CITIZEN_APPROVAL_INPROCESS','PENDING_APPL_FEE','INITIATED')           
-  orderby:  ORDER BY n.applicationno,n.createdtime DESC, tenantid, final_status
+                  THEN FLOOR((EXTRACT(EPOCH FROM NOW())*1000 - st.docverify_time)/86400000)
+              ELSE NULL
+          END AS sla_days,
+          
+          -- SLA Status Breach Logic
+          CASE
+              WHEN st.docverify_time IS NOT NULL AND st.final_time IS NOT NULL THEN
+                  CASE WHEN (st.final_time - st.docverify_time) > sla.businessservicesla THEN 'BREACHED' ELSE 'MET' END
+              WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL THEN
+                  CASE WHEN (EXTRACT(EPOCH FROM NOW()) * 1000 - st.docverify_time) > sla.businessservicesla THEN 'BREACHED' ELSE 'IN-PROGRESS' END
+              ELSE 'AWAITING START'
+          END AS sla_status,
+          
+          ad.employee_name,
+          ad.employee_code
+      FROM eg_bpa_buildingplan n
+      LEFT JOIN status_times st ON n.applicationno = st.uuid
+      LEFT JOIN latest_status ls ON n.applicationno = ls.uuid
+      JOIN sla_data sla ON n.businessservice = sla.businessservice
+      LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
+      WHERE UPPER(COALESCE(ls.applicationstatus, '')) NOT IN ('CITIZEN_APPROVAL_INPROCESS','PENDING_APPL_FEE','INITIATED')
+  orderby:  ORDER BY n.applicationno,n.createdtime DESC
 
 - reportName: ReceiptRegisterbpa
   decryptionPathId: LAYOUTREPORTS
@@ -942,29 +979,24 @@ ReportDefinitions:
     label: Breached Count
     type: string
     source: obpas_bpa
-    total: false
-  - name: total_met_count
-    label: Met Count
-    type: string
-    source: obpas_bpa
-    total: false    
+    total: false  
   searchParams:
   - name: district
-    label: district
+    label: District
     type: singlevaluelist
     pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
   - name: ulb
-    label: ulb
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.name_of_ulb= $ulb  
   - name: businessservice
-    label: businesservice
+    label: Service
     type: singlevaluelist
     pattern: "list://BPA_LOW:Self Certification"
     source: obpas_bpa
@@ -1084,7 +1116,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND u.name_of_ulb= $ulb 
+    searchClause: AND u.ulb_code= $ulb 
   - name: businessservice
     label: Service
     type: singlevaluelist
@@ -1768,7 +1800,7 @@ ReportDefinitions:
 
   - name: total_count
     label: Total Files
-    type: epoch
+    type: string
     source: obpas_bpa
     total: false
 
