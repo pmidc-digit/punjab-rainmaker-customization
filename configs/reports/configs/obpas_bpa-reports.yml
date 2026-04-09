@@ -1308,7 +1308,7 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: applicationstatus
+  - name: localized_status
     label: Application Status
     type: string
     source: obpas_bpa
@@ -1353,82 +1353,121 @@ ReportDefinitions:
     searchClause: AND ub.businessservice = $businessservice 
   query: |
       WITH params AS (
-        SELECT
-            (to_timestamp($fromDate / 1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS report_dt
-        ),
-      wf_detailed AS (
-        SELECT
-           wf.businessid AS uuid,
-           wf.businessservice,
-           wf.tenantid,
-           UPPER(st.applicationstatus) AS applicationstatus,
-           wf.createdtime,
-           wf.lastmodifiedtime
-           FROM eg_wf_processinstance_v2 wf
-           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-           WHERE wf.businessservice IN (
-          'BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP',
-          'BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH'
-           )
-        ),
-      latest_status AS (
-        SELECT DISTINCT ON (uuid)
-           uuid,
-           applicationstatus
-           FROM wf_detailed
-           ORDER BY uuid, lastmodifiedtime DESC
-        ),
-      status_times AS (
           SELECT
-           uuid,
-           tenantid,
-           businessservice,
-           MIN(createdtime) FILTER (
-            WHERE applicationstatus = 'FIELDINSPECTION_INPROGRESS') AS sla_start_time,
-           MAX(lastmodifiedtime) FILTER (  WHERE applicationstatus IN (  'APPROVED','REJECTED','BLOCKED','PENDING_SANC_FEE_PAYMENT'
-            ) ) AS final_time
-           FROM wf_detailed
-           GROUP BY uuid, tenantid, businessservice
-         ),
-      sla_master AS (
-        SELECT
-           businessservice,
-           businessservicesla
-          FROM eg_wf_businessservice_v2
+              (to_timestamp(1769904000000 / 1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS report_dt
           ),
-      sla_calc AS (
-         SELECT
-           st.uuid,
-           st.tenantid,
-           st.businessservice,
-           ls.applicationstatus,
-           (to_timestamp((st.sla_start_time + sm.businessservicesla) / 1000.0) AT TIME ZONE 'Asia/Kolkata') AS sla_breach_ts
-           FROM status_times st
-           JOIN sla_master sm ON sm.businessservice = st.businessservice
-           JOIN latest_status ls ON ls.uuid = st.uuid
-           WHERE st.sla_start_time IS NOT NULL
-           AND st.final_time IS NULL
-           ),
-      upcoming_breaches AS (
-        SELECT
-           sc.uuid,
-           sc.tenantid,
-           sc.businessservice,
-           sc.applicationstatus,
-           sc.sla_breach_ts::date AS breach_date
-           FROM sla_calc sc
-           JOIN params p ON TRUE
-           WHERE sc.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '6 day'
-        )
-       SELECT
-         u.district,
-         u.name_of_ulb,
-         ub.applicationstatus,
-         ub.uuid as fileno,
-         'Building_Plan' as modulename
-         FROM upcoming_breaches ub
-         JOIN ulb_data u ON ub.tenantid = u.ulb_code
-         WHERE 1=1 
+          wf_detailed AS (
+          SELECT
+              wf.businessid AS uuid,
+              wf.businessservice,
+              wf.tenantid,
+              UPPER(st.applicationstatus) AS applicationstatus,
+              wf.createdtime,
+              wf.lastmodifiedtime
+              FROM eg_wf_processinstance_v2 wf
+              JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+              WHERE wf.businessservice IN (
+                  'BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP',
+                  'BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH'
+              )
+          ),
+          latest_status AS (
+          SELECT DISTINCT ON (uuid)
+              uuid,
+              applicationstatus
+              FROM wf_detailed
+              ORDER BY uuid, lastmodifiedtime DESC
+          ),
+          status_times AS (
+              SELECT
+                  uuid,
+                  tenantid,
+                  businessservice,
+                  -- Logic for BPA_LOW vs Others
+                  MIN(CASE 
+                      WHEN businessservice = 'BPA_LOW' AND applicationstatus = 'PENDINGINITIALVERIFICATION' 
+                          THEN createdtime 
+                      WHEN businessservice != 'BPA_LOW' AND applicationstatus = 'FIELDINSPECTION_INPROGRESS' 
+                          THEN createdtime
+                      ELSE NULL 
+                  END) AS sla_start_time,
+                  MAX(lastmodifiedtime) FILTER (  
+                      WHERE applicationstatus IN ('APPROVED','REJECTED','BLOCKED','PENDING_SANC_FEE_PAYMENT') 
+                  ) AS final_time
+              FROM wf_detailed
+              GROUP BY uuid, tenantid, businessservice
+          ),
+          sla_master AS (
+          SELECT
+              businessservice,
+              businessservicesla
+              FROM eg_wf_businessservice_v2
+          ),
+          sla_calc AS (
+              SELECT
+                  st.uuid,
+                  st.tenantid,
+                  st.businessservice,
+                  ls.applicationstatus,
+                  (to_timestamp((st.sla_start_time + sm.businessservicesla) / 1000.0) AT TIME ZONE 'Asia/Kolkata') AS sla_breach_ts
+              FROM status_times st
+              JOIN sla_master sm ON sm.businessservice = st.businessservice
+              JOIN latest_status ls ON ls.uuid = st.uuid
+              WHERE st.sla_start_time IS NOT NULL
+              AND st.final_time IS NULL
+          ),
+          upcoming_breaches AS (
+          SELECT
+              sc.uuid,
+              sc.tenantid,
+              sc.businessservice,
+              sc.applicationstatus,
+              sc.sla_breach_ts::date AS breach_date
+              FROM sla_calc sc
+              JOIN params p ON TRUE
+              WHERE sc.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '6 day'
+          )
+          SELECT
+              u.district,
+              u.name_of_ulb,
+              -- Comprehensive Localization Mapping
+              CASE 
+                  WHEN ub.applicationstatus = 'CITIZEN_APPROVAL_PENDING' THEN 'Pending Citizen Approval'
+                  WHEN ub.applicationstatus = 'SEND_TO_CITIZEN' THEN 'Sent back to Citizen'
+                  WHEN ub.applicationstatus = 'INPROGRESS' THEN 'In Progress'
+                  WHEN ub.applicationstatus = 'PENDING_APPL_FEE_PAYMENT' THEN 'Pending Application Fee Payment'
+                  WHEN ub.applicationstatus = 'DOC_VERIFICATION_PENDING' THEN 'Document Verification Pending'
+                  WHEN ub.applicationstatus = 'FIELDINSPECTION_PENDING' THEN 'Field Inspection Pending'
+                  WHEN ub.applicationstatus = 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In-Progress'
+                  WHEN ub.applicationstatus = 'NOC_VERIFICATION_PENDING' THEN 'NOC Verification Pending'
+                  WHEN ub.applicationstatus = 'PENDINGAPPROVAL' THEN 'Pending Final Approval'
+                  WHEN ub.applicationstatus = 'PENDING_SANC_FEE_PAYMENT' THEN 'Pending Sanction Fee Payment'
+                  WHEN ub.applicationstatus = 'APPROVED' THEN 'Approved'
+                  WHEN ub.applicationstatus = 'REJECTED' THEN 'Rejected'
+                  WHEN ub.applicationstatus = 'BACK_FROM_DOC_VERIFICATION' THEN 'Sent Back from Doc Verification'
+                  WHEN ub.applicationstatus = 'BACK_FROM_FI_VERIFICATION' THEN 'Sent Back from FI'
+                  WHEN ub.applicationstatus = 'POST_PAYMENT_CITIZEN_APPROVAL_PENDING' THEN 'Pending Citizen Approval (Post-Payment)'
+                  WHEN ub.applicationstatus = 'SENT_TO_ARCHITECT' THEN 'Sent to Architect'
+                  WHEN ub.applicationstatus = 'INSPECTION_REPORT_PENDING' THEN 'Inspection Report Pending'
+                  WHEN ub.applicationstatus = 'LEVEL3_VERIFICATION_PENDING' THEN 'L3 Verification Pending'
+                  WHEN ub.applicationstatus = 'LEVEL4_VERIFICATION_PENDING' THEN 'L4 Verification Pending'
+                  WHEN ub.applicationstatus = 'JC_VERIFICATION_PENDING' THEN 'JC Verification Pending'
+                  WHEN ub.applicationstatus = 'MC_VERIFICATION_PENDING' THEN 'MC Verification Pending'
+                  WHEN ub.applicationstatus = 'EO_VERIFICATION_PENDING' THEN 'EO Verification Pending'
+                  WHEN ub.applicationstatus = 'PROFESSIONAL_ACTION_REQUIRED' THEN 'Professional Action Required'
+                  WHEN ub.applicationstatus = 'ESIGN_PENDING' THEN 'E-Sign Pending'
+                  WHEN ub.applicationstatus = 'ATPHQ_APPROVAL_PENDING' THEN 'ATP HQ Approval Pending'
+                  WHEN ub.applicationstatus = 'MTPHQ_APPROVAL_PENDING' THEN 'MTP HQ Approval Pending'
+                  WHEN ub.applicationstatus = 'STPHQ_APPROVAL_PENDING' THEN 'STP HQ Approval Pending'
+                  WHEN ub.applicationstatus = 'APPROVAL_PENDING' THEN 'Approval Pending'
+                  WHEN ub.applicationstatus = 'PENDINGINITIALVERIFICATION' THEN 'Pending Initial Verification'
+                  WHEN ub.applicationstatus = 'BLOCKED' THEN 'Application Blocked'
+                  ELSE REPLACE(INITCAP(REPLACE(ub.applicationstatus, '_', ' ')), ' ', ' ')
+              END AS localized_status,
+              ub.uuid as fileno,
+              'Building Plan' as modulename
+          FROM upcoming_breaches ub 
+          JOIN ulb_data u ON ub.tenantid = u.ulb_code where 1=1
   groupby: GROUP BY u.district, u.name_of_ulb,ub.applicationstatus,ub.uuid
   orderby: ORDER BY u.district, u.name_of_ulb ,ub.applicationstatus,ub.uuid DESC        
 
