@@ -516,7 +516,7 @@ ReportDefinitions:
       - name: district
         label: District
         type: singlevaluelist
-        pattern: list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib
+        pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
         source: obpas_noc
         isMandatory: false
         searchClause: AND u.district = $district
@@ -762,11 +762,6 @@ ReportDefinitions:
       type: string
       source: obpas_noc
       total: false
-    - name: day0
-      label: Day 0
-      type: string
-      source: obpas_noc
-      total: true
     - name: day1
       label: Day 1
       type: string
@@ -794,6 +789,11 @@ ReportDefinitions:
       total: true
     - name: day6
       label: Day 6
+      type: string
+      source: obpas_noc
+      total: true  
+    - name: day7
+      label: Day 7
       type: string
       source: obpas_noc
       total: true                     
@@ -861,14 +861,13 @@ ReportDefinitions:
       
       SELECT
         COALESCE(designation_code, 'UNASSIGNED') AS officer_designation,
-        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params)     THEN cnt END),0) AS day0,
-        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 1 THEN cnt END),0) AS day1,
-        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 2 THEN cnt END),0) AS day2,
-        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 3 THEN cnt END),0) AS day3,
-        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 4 THEN cnt END),0) AS day4,
-        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 5 THEN cnt END),0) AS day5,
-        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 6 THEN cnt END),0) AS day6,
-        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 7 THEN cnt END),0) AS day7
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params)     THEN cnt END),0) AS day1,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 1 THEN cnt END),0) AS day2,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 2 THEN cnt END),0) AS day3,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 3 THEN cnt END),0) AS day4,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 4 THEN cnt END),0) AS day5,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 5 THEN cnt END),0) AS day6,
+        COALESCE(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 6 THEN cnt END),0) AS day7
       FROM agg where 1=1
     groupby:  GROUP BY designation_code
     orderby:  ORDER BY officer_designation
@@ -891,11 +890,6 @@ ReportDefinitions:
       type: string
       source: obpas_noc
       total: false
-    - name: day0
-      label: Day 0
-      type: string
-      source: obpas_noc
-      total: true
     - name: day1
       label: Day 1
       type: string
@@ -941,7 +935,7 @@ ReportDefinitions:
     - name: district
       label: District
       type: singlevaluelist
-      pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+      pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
       source: obpas_noc
       isMandatory: false
       searchClause: AND u.district = $district
@@ -1011,14 +1005,13 @@ ReportDefinitions:
         SELECT
           u.district,
           u.name_of_ulb,
-          COUNT(*) FILTER (WHERE breach_date = p.report_dt)   AS day0,
-          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '1 day') AS day1,
-          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '2 day') AS day2,
-          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '3 day') AS day3,
-          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '4 day') AS day4,
-          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '5 day') AS day5,
-          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '6 day') AS day6,
-          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '7 day') AS day7,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt)   AS day1,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '1 day') AS day2,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '2 day') AS day3,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '3 day') AS day4,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '4 day') AS day5,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '5 day') AS day6,
+          COUNT(*) FILTER (WHERE breach_date = p.report_dt + INTERVAL '6 day') AS day7,
           COUNT(*) AS total_upcoming_breaches
           FROM upcoming_breaches ub
           JOIN ulb_data u ON ub.tenantid = u.ulb_code
