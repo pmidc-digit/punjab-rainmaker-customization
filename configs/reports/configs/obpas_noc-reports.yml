@@ -397,7 +397,7 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND businessservice = $businessservice
       - name: ulb
-        label: ULB
+        label: ULB Name
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: obpas_noc
@@ -499,19 +499,12 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND u.district = $district
       - name: ulb
-        label: ULB
+        label: ULB Name
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: obpas_noc
         isMandatory: false
         searchClause: AND u.ulb_code= $ulb
-      - name: businessservice
-        label: Businesservice
-        type: singlevaluelist
-        pattern: list://NOC_MC:Municipal Corporation,NOC_NP:Nagar Panchayat,NOC_NP:Municipal Council
-        source: obpas_noc
-        isMandatory: false
-        searchClause: AND sc.businessservice = $businessservice
     query: >
       WITH wf_detailed AS (
          SELECT
