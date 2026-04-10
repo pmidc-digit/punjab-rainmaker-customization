@@ -195,7 +195,7 @@ ReportDefinitions:
           LEFT JOIN eg_layout_details ad ON ad.layoutid = n.id
           inner join ulb_data u on u.ulb_code=n.tenantid
          WHERE n.applicationstatus not in ('INITIATED', 'CANCELLED','CITIZENACTIONREQUIRED')
-  groupby: GROUP BY n.applicationno,n.applicationstatus, n.vasikadate, n.vasikanumber,ad.additionaldetails
+  groupby: GROUP BY n.applicationno,n.applicationstatus, n.vasikadate, n.vasikanumber,ad.additionaldetails,n.tenantid
   orderby: ORDER BY n.vasikadate;
   
 - reportName: CollectionsReportlayout
