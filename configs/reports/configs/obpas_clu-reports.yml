@@ -1299,84 +1299,208 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND u_data.district  = $district_name
   query: |
-      -- Use CTE to force query plan, compute & use CTE later     
-       WITH wf_detailed AS (
-         SELECT 
-           wf.businessid AS uuid,                                 
-           UPPER(st.applicationstatus) AS applicationstatus,
-           wf.createdtime,
-           wf.lastmodifiedtime,
-           wf.businessservicesla,
-           wf.tenantid,
-           wf.id AS processinstanceid
+      WITH wf_detailed AS (
+          SELECT 
+              wf.businessid AS uuid,                                 
+              UPPER(TRIM(st.applicationstatus)) AS applicationstatus,
+              wf.createdtime,
+              wf.lastmodifiedtime,
+              wf.businessservicesla,
+              wf.tenantid,
+              wf.id AS processinstanceid
           FROM eg_wf_processinstance_v2 wf
           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-          WHERE wf.businessservice in ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH')                   
-          ),
-        status_times AS (
-             SELECT
-                uuid,
-                MAX(CASE WHEN applicationstatus = 'FIELDINSPECTION_INPROGRESS' THEN createdtime END) AS docverify_time,
-                MAX(CASE WHEN applicationstatus IN ('APPROVED','REJECTED','E-SIGNED','BLOCKED') THEN lastmodifiedtime END) AS final_time
+          WHERE wf.businessservice IN (
+              'CLU_MC','CLU_MC_HIGH','CLU_MC_OTH',
+              'CLU_NP','CLU_NP_HIGH','CLU_NP_OTH'
+          )
+      ),
+      status_times AS (
+          SELECT
+              uuid,
+              MAX(CASE WHEN applicationstatus = 'FIELDINSPECTION_INPROGRESS' THEN createdtime END) AS docverify_time,
+              MAX(CASE WHEN applicationstatus IN ('APPROVED','REJECTED','E-SIGNED','BLOCKED') THEN lastmodifiedtime END) AS final_time
+          FROM wf_detailed
+          GROUP BY uuid
+      ),
+      latest_status AS (
+          SELECT uuid, applicationstatus
+          FROM (
+              SELECT
+                  uuid,
+                  applicationstatus,
+                  lastmodifiedtime,
+                  ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY lastmodifiedtime DESC NULLS LAST) AS rn
               FROM wf_detailed
-              GROUP BY uuid
-             ),
-        latest_status AS (
-              SELECT uuid, applicationstatus
-                 FROM (
-                      SELECT uuid, applicationstatus, lastmodifiedtime,
-                         ROW_NUMBER() OVER (PARTITION BY uuid ORDER BY lastmodifiedtime DESC NULLS LAST) AS rn
-                          FROM wf_detailed
-                        ) x WHERE rn = 1
-                     ),
-        sla_data AS (
-            SELECT businessservice,businessservicesla
-            FROM eg_wf_businessservice_v2
-            WHERE businessservice in ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH') 
-           ),
-        assignee_details AS (
-             SELECT DISTINCT ON (wf.businessid)
-                 wf.businessid,
-                 e.code AS employee_code,
-                 u.name AS employee_name
-              FROM eg_wf_processinstance_v2 wf
-              JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
-              JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-              JOIN eg_user u ON e.uuid = u.uuid
-               WHERE wf.businessservice in ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH') 
-              ORDER BY wf.businessid,wf.lastmodifiedtime DESC
-               )
-         SELECT DISTINCT ON (n.applicationno)
-            split_part(n.tenantid,'.',2) AS tenantid,
-             n.applicationno AS clu_application_no,                 
-             UPPER(ls.applicationstatus) AS final_status,
-            TO_CHAR(TO_TIMESTAMP(st.docverify_time/1000),'DD-MM-YYYY') AS document_verify_on,
-            TO_CHAR(TO_TIMESTAMP(st.final_time/1000),'DD-MM-YYYY') AS finalstatus_on,   
-            CASE
+          ) x
+          WHERE rn = 1
+      ),
+      sla_data AS (
+          SELECT businessservice, businessservicesla
+          FROM eg_wf_businessservice_v2
+          WHERE businessservice IN (
+              'CLU_MC','CLU_MC_HIGH','CLU_MC_OTH',
+              'CLU_NP','CLU_NP_HIGH','CLU_NP_OTH'
+          )
+      ),
+      assignee_details AS (
+          SELECT DISTINCT ON (wf.businessid)
+              wf.businessid,
+              e.code AS employee_code,
+              u.name AS employee_name
+          FROM eg_wf_processinstance_v2 wf
+          JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+          JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+          JOIN eg_user u ON e.uuid = u.uuid
+          WHERE wf.businessservice IN (
+              'CLU_MC','CLU_MC_HIGH','CLU_MC_OTH',
+              'CLU_NP','CLU_NP_HIGH','CLU_NP_OTH'
+          )
+          ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+      )
+      SELECT DISTINCT ON (n.applicationno)
+          split_part(n.tenantid, '.', 2) AS tenantid,
+          n.applicationno AS clu_application_no,
+      
+          CASE
+              WHEN UPPER(TRIM(ls.applicationstatus)) IN (
+                  'PENDINGAPPLICATIONPAYMENT','PENDINGFORPAYMENT','PENDING_PAYMENT',
+                  'PENDINGPAYMENT','PENDING_FOR_PAYMENT','PENDING_PAYMENT_FOR_DEMAND',
+                  'PENDING_FOR_DEMAND_PAYMENT','PENDING_PAYMENT_FOR_APPLICATION',
+                  'PENDING_APPL_FEE','PENDING_FOR_APPLICATION_FEE',
+                  'PENDING_SANC_FEE_PAYMENT','PENDINGSANCTIONPAYMENT'
+              ) THEN 'Payment Pending'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) IN ('PAYMENT_DONE','POST_PAYMENT_INPROGRESS')
+              THEN 'Payment Completed'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) IN (
+                  'VERIFICATION_PENDING','PENDINGVERIFICATION','PENDING_FOR_VERIFICATION',
+                  'LEVEL2_DOCUMENTVERIFY','LEVEL3_VERIFICATION_PENDING','LEVEL4_VERIFICATION_PENDING',
+                  'ATP_VERIFICATION_PENDING','EO_VERIFICATION_PENDING','JC_VERIFICATION_PENDING',
+                  'MTP_VERIFICATION_PENDING','ADC_VERIFICATION_PENDING','MC_VERIFICATION_PENDING',
+                  'STP_VERIFICATION_PENDING'
+              ) THEN 'Verification Pending'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) IN (
+                  'VERIFICATION_INPROGRESS','DOC_VERIFICATION_INPROGRESS',
+                  'NOC_VERIFICATION_INPROGRESS'
+              ) THEN 'Verification In Progress'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) IN (
+                  'PENDING_FOR_DOCUMENT_VERIFICATION','PENDING_FOR_DOCUMENT_VERIFY',
+                  'PENDINGDOCVERIFICATION','DOC_VERIFICATION_PENDING',
+                  'DOCUMENTVERIFY','DOCUMENTVERIFY_MTP/ME','DOCUMENTVERIFY_ATP_HQ',
+                  'DOCUMENTVERIFY_ATP/AME','DOCUMENTVERIFY_JC','DOCUMENTVERIFY_JE/BI',
+                  'DOCUMENTVERIFY_DM','DOCUMENTVERIFY_EO','DOCUMENTVERIFY_STP_HQ',
+                  'DOCUMENTVERIFY_STP(FIELD)'
+              ) THEN 'Document Verification Pending'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) IN (
+                  'PENDING_FOR_FIELD_INSPECTION','PENDING_FOR_FIELDINSPECTION',
+                  'FIELDINSPECTION_INPROGRESS','FIELDINSPECTION',
+                  'PENDING_FOR_INSPECTION','INSPECTION_REPORT_PENDING',
+                  'VENUE_INSPECTION'
+              ) THEN 'Field Inspection'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) IN (
+                  'PENDINGFORAPPROVAL','PENDINGAPPROVAL','APPROVAL_PENDING',
+                  'PENDING_FOR_APPROVAL','PENDING_APPROVAL_FOR_CONNECTION',
+                  'ATPHQ_APPROVAL_PENDING','MTPHQ_APPROVAL_PENDING',
+                  'STPHQ_APPROVAL_PENDING','CTPHQ_APPROVAL_PENDING'
+              ) THEN 'Approval Pending'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) IN ('APPROVAL_INPROGRESS')
+              THEN 'Approval In Progress'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) IN (
+                  'CITIZEN_ACTION_REQUIRED','CITIZENACTIONREQUIRED',
+                  'PENDING_FOR_CITIZEN_ACTION','CITIZENACTIONREQUIRED-DV',
+                  'CITIZEN_ACTION_PENDING_AT_DOC_VERIF',
+                  'CITIZEN_ACTION_PENDING_AT_FI_VERIF',
+                  'CITIZEN_ACTION_PENDING_AT_NOC_VERIF'
+              ) THEN 'Citizen Action Required'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) IN (
+                  'CITIZEN_APPROVAL_INPROCESS',
+                  'POST_PAYMENT_CITIZEN_APPROVAL_INPROCESS'
+              ) THEN 'Citizen Approval In Process'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) = 'PENDING_FOR_CONNECTION_ACTIVATION'
+              THEN 'Connection Activation Pending'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) = 'CONNECTION_ACTIVATED'
+              THEN 'Connection Activated'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) IN (
+                  'PENDING_REQUEST_FOR_DISCONNECTION',
+                  'PENDING_DISCONNECTION_FIELD_INSPECTION'
+              ) THEN 'Disconnection Process'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) IN (
+                  'PENDINGFORASSIGNMENT','PENDINGFORREASSIGNMENT'
+              ) THEN 'Pending Assignment'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) IN (
+                  'PENDING_FOR_SETTLEMENT','PENDING_FOT_SETLEMENT','FORWARD_FOT_SETLEMENT'
+              ) THEN 'Settlement Pending'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) = 'ESIGN_PENDING'
+              THEN 'E-Sign Pending'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) = 'E-SIGNED'
+              THEN 'E-Signed'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) = 'CHALLAN_GENERATED'
+              THEN 'Challan Generated'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) = 'REFUND_COMPLETED'
+              THEN 'Refund Completed'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) = 'PULLED_BACK'
+              THEN 'Pulled Back'
+      
+              WHEN UPPER(TRIM(ls.applicationstatus)) IN (
+                  'CLOSEDAFTERRESOLUTION','CLOSEDAFTERREJECTION','RL_CLOSED'
+              ) THEN 'Closed'
+      
+              ELSE UPPER(TRIM(ls.applicationstatus))
+          END AS final_status,
+      
+          TO_CHAR(TO_TIMESTAMP(st.docverify_time / 1000), 'DD-MM-YYYY') AS document_verify_on,
+          TO_CHAR(TO_TIMESTAMP(st.final_time / 1000), 'DD-MM-YYYY') AS finalstatus_on,
+      
+          CASE
               WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL
-               THEN FLOOR((st.final_time-st.docverify_time)/86400000)
+                  THEN FLOOR((st.final_time - st.docverify_time) / 86400000)
               WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
-               THEN FLOOR((EXTRACT(EPOCH FROM NOW())*1000-st.docverify_time)/86400000)
-             ELSE NULL
-            END AS sla_days,
-            CASE
-               WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL THEN
-            CASE WHEN (st.final_time-st.docverify_time) > sla.businessservicesla THEN 'BREACHED'
-                 ELSE 'MET' END
-                WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL
-                THEN 'IN-PROGRESS'
-               ELSE 'AWAITING DOCVERIFY'
-            END AS sla_status,
-            ad.employee_name AS employee_name,
-            ad.employee_code AS employee_code
-            FROM eg_clu n
-            INNER JOIN eg_clu_details d ON n.id = d.cluid 
-            INNER JOIN ulb_data u_data ON u_data.ulb_code = n.tenantid
-            LEFT JOIN status_times st ON n.applicationno = st.uuid
-            LEFT JOIN latest_status ls ON n.applicationno = ls.uuid
-            LEFT JOIN sla_data sla ON sla.businessservice = (d.additionaldetails::jsonb -> 'applicationDetails' ->> 'businessService')
-            LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
-            WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')             
+                  THEN FLOOR((EXTRACT(EPOCH FROM NOW()) * 1000 - st.docverify_time) / 86400000)
+              ELSE NULL
+          END AS sla_days,
+      
+          CASE
+              WHEN st.final_time IS NOT NULL AND st.docverify_time IS NOT NULL THEN
+                  CASE
+                      WHEN (st.final_time - st.docverify_time) > sla.businessservicesla THEN 'BREACHED'
+                      ELSE 'MET'
+                  END
+              WHEN st.docverify_time IS NOT NULL AND st.final_time IS NULL THEN 'IN-PROGRESS'
+              ELSE 'AWAITING DOCVERIFY'
+          END AS sla_status,
+      
+          ad.employee_name AS employee_name,
+          ad.employee_code AS employee_code
+      
+      FROM eg_clu n
+      INNER JOIN eg_clu_details d ON n.id = d.cluid
+      INNER JOIN ulb_data u_data ON u_data.ulb_code = n.tenantid
+      LEFT JOIN status_times st ON n.applicationno = st.uuid
+      LEFT JOIN latest_status ls ON n.applicationno = ls.uuid
+      LEFT JOIN sla_data sla
+          ON sla.businessservice = (d.additionaldetails::jsonb -> 'applicationDetails' ->> 'businessService')
+      LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
+      
+      WHERE UPPER(TRIM(ls.applicationstatus)) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')
   orderby:  ORDER BY n.applicationno,n.createdtime DESC, tenantid, final_status
       
 - reportName: ReceiptRegisterCLU
