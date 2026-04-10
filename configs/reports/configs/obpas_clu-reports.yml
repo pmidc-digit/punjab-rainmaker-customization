@@ -251,7 +251,7 @@ ReportDefinitions:
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
-    isMandatory: true
+    isMandatory: false
     searchClause: AND tenantid = $ulb
   - name: district_name
     label: District
@@ -363,7 +363,7 @@ ReportDefinitions:
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
-    isMandatory: true
+    isMandatory: false
     searchClause: AND u.ulb_code= $ulb_name
   - name: ULB_Type
     label: ULB Type
@@ -492,7 +492,7 @@ ReportDefinitions:
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
-    isMandatory: true
+    isMandatory: false
     searchClause: AND u.ulb_code= $ulb 
   - name: applicationstatus
     label: Application Status
@@ -662,7 +662,7 @@ ReportDefinitions:
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
-    isMandatory: true
+    isMandatory: false
     searchClause: AND tenantid = $ulb
   - name: ULB_Type
     label: ULB Type
@@ -818,7 +818,7 @@ ReportDefinitions:
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
-    isMandatory: true
+    isMandatory: false
     searchClause: AND u.ulb_code= $tenant
   query: |
       WITH params AS (
@@ -946,7 +946,7 @@ ReportDefinitions:
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
-    isMandatory: true
+    isMandatory: false
     searchClause: AND u.ulb_code= $tenant_name
   query: |
       WITH params AS (
@@ -1134,7 +1134,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
     wrapper: true
-    isMandatory: true
+    isMandatory: false
     searchClause: AND ulb.ulb_code = $ulb
   
   query: |
@@ -1288,7 +1288,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
     wrapper: true
-    isMandatory: true
+    isMandatory: false
     searchClause: AND u_data.ulb_code = $ulb
   - name: district_name
     label: District
@@ -1485,7 +1485,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_clu
     wrapper: true
-    isMandatory: true
+    isMandatory: false
     searchClause: AND pd.tenantid = $ulb
   query: |
       SELECT
