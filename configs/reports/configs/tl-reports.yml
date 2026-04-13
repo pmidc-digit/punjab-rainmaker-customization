@@ -2506,6 +2506,11 @@ ReportDefinitions:
     type: string
     source: tl
     total: false
+  - name: address
+    label: address
+    type: string
+    source: tl
+    total: false    
   - name: mobilenumber
     label: report.tl.mobilenumber
     type: string
@@ -2523,6 +2528,7 @@ ReportDefinitions:
       tradename,
       zonename,
       blockname,
+      concat_ws(', ', tla.doorno, tla.buildingname, tla.street) as address,
       split_part(name,',',1) as ownername,
       split_part(mobilenumber,',',1) as mobilenumber
     from eg_tl_tradelicense tl
