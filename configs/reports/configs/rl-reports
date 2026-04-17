@@ -1,0 +1,195 @@
+---
+ReportDefinitions:
+  - reportName: RENT&LEASEDETAILSReport
+    decryptionPathId: RLREPORTS
+    summary: Details of application in Rent & Lease service
+    version: 1.0.0
+    moduleName: rainmaker-rl
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: application_number
+        label: Application Number
+        type: string
+        source: rl
+        total: false
+      - name: name
+        label: Name
+        type: string
+        source: rl
+        total: false
+      - name: mobilenumber
+        label: Mobilen Number
+        type: string
+        source: rl
+        total: false
+      - name: status
+        label: Application Status
+        type: string
+        source: rl
+        total: false
+      - name: property_id
+        label: Property Id
+        type: string
+        source: rl
+        total: false
+      - name: start_date
+        label: Start Date
+        type: string
+        source: rl
+        total: false
+      - name: end_date
+        label: End Date
+        type: string
+        source: rl
+        total: false
+      - name: amount_tobe_deducted
+        label: Amount To Be Deducted
+        type: string
+        source: rl
+        total: false
+      - name: amount_to_be_refund
+        label: Amount To Be Refund
+        type: string
+        source: rl
+        total: false
+    searchParams:
+      - name: status
+        label: Application Status
+        type: singlevaluelist
+        pattern: 'list://INITIATED:Initiated,FORWARD_FOT_SETLEMENT:Forward For Settlement,CLOSED:Closed, APPROVED:Approved,PENDINGFORAPPROVAL:Pending For Approval , PENDING_FOR_DOCUMENT_VERIFY:Pending For Document Verify,PENDING_FOR_PAYMENT:Pending For Payment,PENDING_REQUEST_FOR_DISCONNECTION:Pending Request For Disconnection'
+        source: rl
+        isMandatory: true
+        searchClause: AND r.status = $status
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: rl
+        isMandatory: true
+        searchClause: AND r.created_time >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: rl
+        isMandatory: true
+        searchClause: AND r.created_time<=$toDate
+    query: |
+      -- Use CTE to force query plan, compute & use CTE later
+       SELECT
+          r.application_number, 
+          r.status, 
+          r.property_id, 
+          TO_CHAR(TO_TIMESTAMP(r.start_date / 1000), 'DD-MM-YYYY') AS start_date,
+          TO_CHAR(TO_TIMESTAMP(r.end_date / 1000), 'DD-MM-YYYY') AS end_date,
+          r.amount_tobe_deducted,
+          r.amount_to_be_refund, 
+          u.mobilenumber, 
+          u.name
+         FROM eg_rl_allotment AS r
+         LEFT JOIN eg_rl_owner_info AS o ON o.allotment_id = r.id
+         LEFT JOIN eg_user AS u ON u.uuid = o.user_uuid
+         WHERE r.tenantid = $tenantid
+
+  - reportName: STATERENT&LEASEDETAILSReport
+    decryptionPathId: RLREPORTS
+    summary: Details of application in Rent & Lease service
+    version: 1.0.0
+    moduleName: rainmaker-rl
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      -  name: tenant_id
+        label: ULB Name
+        type: string
+        source: rl
+        total: false
+      - name: application_number
+        label: Application Number
+        type: string
+        source: rl
+        total: false
+      - name: name
+        label: Name
+        type: string
+        source: rl
+        total: false
+      - name: mobilenumber
+        label: Mobilen Number
+        type: string
+        source: rl
+        total: false
+      - name: status
+        label: Application Status
+        type: string
+        source: rl
+        total: false
+      - name: property_id
+        label: Property Id
+        type: string
+        source: rl
+        total: false
+      - name: start_date
+        label: Start Date
+        type: string
+        source: rl
+        total: false
+      - name: end_date
+        label: End Date
+        type: string
+        source: rl
+        total: false
+      - name: amount_tobe_deducted
+        label: Amount To Be Deducted
+        type: string
+        source: rl
+        total: false
+      - name: amount_to_be_refund
+        label: Amount To Be Refund
+        type: string
+        source: rl
+        total: false
+    searchParams:
+      - name: status
+        label: Application Status
+        type: singlevaluelist
+        pattern: 'list://INITIATED:Initiated,FORWARD_FOT_SETLEMENT:Forward For Settlement,CLOSED:Closed, APPROVED:Approved,PENDINGFORAPPROVAL:Pending For Approval , PENDING_FOR_DOCUMENT_VERIFY:Pending For Document Verify,PENDING_FOR_PAYMENT:Pending For Payment,PENDING_REQUEST_FOR_DISCONNECTION:Pending Request For Disconnection'
+        source: rl
+        isMandatory: true
+        searchClause: AND r.status = $status
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: rl
+        isMandatory: true
+        searchClause: AND r.created_time >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: rl
+        isMandatory: true
+        searchClause: AND r.created_time<=$toDate
+      - name: ulb
+        label: ULB Name
+        type: string
+        source: rl
+        isMandatory: true
+        searchClause: AND r.tenant_id<=$ulb
+
+    query: |
+      -- Use CTE to force query plan, compute & use CTE later
+       SELECT
+          r.application_number, 
+          r.status, 
+          r.property_id, 
+          TO_CHAR(TO_TIMESTAMP(r.start_date / 1000), 'DD-MM-YYYY') AS start_date,
+          TO_CHAR(TO_TIMESTAMP(r.end_date / 1000), 'DD-MM-YYYY') AS end_date,
+          r.amount_tobe_deducted,
+          r.amount_to_be_refund, 
+          u.mobilenumber, 
+          u.name
+         FROM eg_rl_allotment AS r
+         LEFT JOIN eg_rl_owner_info AS o ON o.allotment_id = r.id
+         LEFT JOIN eg_user AS u ON u.uuid = o.user_uuid
+         WHERE r.tenantid = $tenantid
