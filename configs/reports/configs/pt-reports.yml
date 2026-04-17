@@ -6232,6 +6232,11 @@ ReportDefinitions:
     type: string
     source: pt
     total: true
+  - name: assessmentyears
+    label: financial year
+    type: string
+    source: pt
+    total: true    
   - name: propertytax
     label: reports.pt.propertyTax
     type: string
@@ -6314,7 +6319,7 @@ ReportDefinitions:
     type: epoch
     source: pt
     isMandatory: false
-    searchClause: AND rp.receiptdate <= $toDate
+    searchClause: AND rp.receiptdate <= $toDate     
   - name: paymentMode
     label: Payment Mode
     type: singlevaluelist
@@ -6326,7 +6331,7 @@ ReportDefinitions:
       with assessments as
       (
         select
-          billid,
+          billid,string_agg(DISTINCT ra.assessmentyears, ',') AS assessmentyears,
           sum(ra.propertytax) as propertytax,
           sum(ra.paidpropertytax) as paidpropertytax,
           sum(ra.firecess) as firecess,
@@ -6347,7 +6352,7 @@ ReportDefinitions:
         rp.propertyid as consumercode,
         to_char((To_timestamp(rp.receiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') as "receiptdate",
         to_char((To_timestamp(rp.transactiondate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY')  as  "transactiondate",
-        rp.paymentmode,
+        rp.paymentmode,asmt.assessmentyears,
         rp.g8_issuedate as g8issuedate,
         rp.g8_receiptnumber as g8receiptno,
         rp.amoutpaid as amount,
