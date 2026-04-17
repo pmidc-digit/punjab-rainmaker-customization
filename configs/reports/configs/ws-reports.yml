@@ -3969,7 +3969,7 @@ ReportDefinitions:
         type: singlevaluelist
         pattern: list://WS%:Water,SW%:Sewerage
         source: ws
-        isMandatory: false
+        isMandatory: true
         searchClause: AND businessservice = $sevicetype                                                                   
     query:
        WITH bill_data AS (
@@ -3985,7 +3985,7 @@ ReportDefinitions:
          bd.consumercode,
            bd.billno,
          (TO_TIMESTAMP(bill.createddate/1000) AT TIME ZONE 'Asia/Kolkata') AS billdate,
-         SUM(CASE WHEN bd.totalamount > 0 THEN bd.totalamount ELSE 0 END) AS billamount,  -- ✅ Only positive values summed
+         SUM(CASE WHEN bd.totalamount > 0 THEN bd.totalamount ELSE 0 END) AS billamount, 
          bd.businessservice,
          bill.payername AS OwnerName,
            bill.mobilenumber,
@@ -4015,4 +4015,4 @@ ReportDefinitions:
            FROM bill_data
            ) t
        WHERE rn = 1 
-    orderby: ORDER BY consumercode        
+    orderby: ORDER BY consumercode     
