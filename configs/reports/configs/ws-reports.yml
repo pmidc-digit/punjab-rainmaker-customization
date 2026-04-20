@@ -3957,20 +3957,20 @@ ReportDefinitions:
         type: epoch
         source: ws
         isMandatory: false
-        searchClause: AND createddate >= $fromDate
+        searchClause: AND 1=1
       - name: toDate
         label: To Date
         type: epoch
         source: ws
         isMandatory: false
-        searchClause: AND  createddate <= $toDate
+        searchClause: AND  1=1
       - name: sevicetype
         label: Sevice Type
         type: singlevaluelist
         pattern: list://WS:Water,SW:Sewerage
         source: ws
         isMandatory: true
-        searchClause: AND businessservice = $sevicetype                                                                   
+        searchClause: AND 1=1                                                                 
     query:
        WITH bill_data AS (
        SELECT  
@@ -3995,7 +3995,7 @@ ReportDefinitions:
        JOIN egbs_billdetail_v1 bd 
             ON bd.billid = bill.id
             WHERE bd.businessservice = $sevicetype
-       AND bill.tenantid = $tenantid
+       AND bill.tenantid = $tenantid  AND bill.createddate >= $fromDate AND  bill.createddate <= $fromDate
        GROUP BY 
            bd.billno,
            bill.status,
