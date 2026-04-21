@@ -2469,7 +2469,7 @@ ReportDefinitions:
       adhocpenalty as adhocpenalty,interest as interest,exemption as exemption,adjustment as adjustment,
       pendingamount as pendingamount,consumercode as consumercode,usagetype as usagetype,
       instrumenttype as instrumenttype,transactionnumber as transactionnumber,transactiondate as transactiondate, 
-      bankname as bankname, collectorname as collectorname,financialyear as financialyear from public.mv_pt_receipt_regiester_new 
+      bankname as bankname, collectorname as collectorname,financialyear as financialyear from public.mv_pt_receipt_regiester 
       where tenantid=$tenantid
   orderby: ORDER BY receiptnumber DESC;
   
@@ -4726,7 +4726,7 @@ ReportDefinitions:
   - name: finYear
     label: Financial Year
     type: singlevaluelist
-    pattern: 'list://2015-16:2015-16,2016-17:2016-17,2017-18:2017-18,2017-18:2017-18,2018-19:2018-19,2019-20:2019-20,2020-21:2020-21,2021-22:2021-22,2022-23:2022-23,2023-24:2023-24,2024-25:2024-25,2025-26:2025-26'
+    pattern: 'list://2015-16:2015-16,2016-17:2016-17,2017-18:2017-18,2017-18:2017-18,2018-19:2018-19,2019-20:2019-20,2020-21:2020-21,2021-22:2021-22,2022-23:2022-23,2023-24:2023-24,2024-25:2024-25,2025-26:2025-26,2026-27:2026-27'
     source: pt
     isMandatory: true
     searchClause: AND 1=1
@@ -5028,6 +5028,46 @@ ReportDefinitions:
     type: string
     source: pt
     total: true  
+  - name: 2023_24PTR
+    label: reports.pt.2023_24_PTR
+    type: string
+    source: pt
+    total: true  
+  - name: 2023_24Collection
+    label: reports.pt.2023_24Collection
+    type: string
+    source: pt
+    total: true      
+  - name: 2024_25PTR
+    label: reports.pt.2024_25_PTR
+    type: string
+    source: pt
+    total: true  
+  - name: 2024_25Collection
+    label: reports.pt.2024_25Collection
+    type: string
+    source: pt
+    total: true      
+  - name: 2025_26PTR
+    label: reports.pt.2025_26_PTR
+    type: string
+    source: pt
+    total: true  
+  - name: 2025_26Collection
+    label: reports.pt.2025_26Collection
+    type: string
+    source: pt
+    total: true 
+  - name: 2026_27PTR
+    label: reports.pt.2026_27_PTR
+    type: string
+    source: pt
+    total: true  
+  - name: 2026_27Collection
+    label: reports.pt.2026_27Collection
+    type: string
+    source: pt
+    total: true     
   - name: totalptr
     label: reports.pt.totalptr
     type: string
@@ -5262,6 +5302,22 @@ ReportDefinitions:
       and pd.receiptdate>=$fromDate and pd.receiptdate<=$toDate
       GROUP BY financialyear,zonecode
     ),
+        fy2026 as
+    (
+      SELECT 
+        zonecode,
+        sum(payment.totalamountpaid) as amount,
+        count(payment.totalamountpaid) as totalcount,
+        concat(to_char((To_timestamp(get_fromperiod(pd.billid)/1000) at time Zone 'Asia/Kolkata'),'YYYY'),'-', to_char((To_timestamp(get_toperiod(pd.billid)/1000) at time Zone 'Asia/Kolkata'),'YY')) as financialyear
+      FROM egcl_paymentdetail pd Left outer join eg_user on eg_user.id = pd.createdby::INTEGER, egcl_payment payment, eg_pt_property as pt, egcl_bill bill,
+      (select string_agg(distinct propertyid,',') as propertyid, string_agg(distinct locality,',') as locality from eg_pt_address where tenantid=$tenantid group by propertyid ) pt_addr
+      INNER JOIN eg_bndry_mohalla on eg_bndry_mohalla.localitycode= pt_addr.locality and eg_bndry_mohalla.tenantid=$tenantid
+      where pd.paymentid=payment.id and bill.id=pd.billid and payment.paymentstatus != 'CANCELLED' and pd.businessservice='PT' and payment.tenantid=$tenantid
+      and pt.propertyid = bill.consumercode and pt.status!='INACTIVE' and pt_addr.propertyid=pt.id
+      and concat(to_char((To_timestamp(get_fromperiod(pd.billid)/1000) at time Zone 'Asia/Kolkata'),'YYYY'),'-', to_char((To_timestamp(get_toperiod(pd.billid)/1000) at time Zone 'Asia/Kolkata'),'YY'))='2025-26'
+      and pd.receiptdate>=$fromDate and pd.receiptdate<=$toDate
+      GROUP BY financialyear,zonecode
+    ),    
     zones as
     (
     select zonecode,string_agg(distinct zonename,',') as zname from eg_bndry_mohalla where tenantid=$tenantid group by zonecode
@@ -5294,9 +5350,11 @@ ReportDefinitions:
       coalesce(fy2024.totalcount,0) as "2024_25PTR",
       coalesce(fy2024.amount,0) as "2024_25Collection",      
       coalesce(fy2025.totalcount,0) as "2025_26PTR",
-      coalesce(fy2025.amount,0) as "2025_26Collection",       
+      coalesce(fy2025.amount,0) as "2025_26Collection",      
+      coalesce(fy2026.totalcount,0) as "2026_27PTR",
+      coalesce(fy2026.amount,0) as "2026_27Collection",
       coalesce(fy2013.totalcount,0)+coalesce(fy2014.totalcount,0)+coalesce(fy2015.totalcount,0)+coalesce(fy2016.totalcount,0)+coalesce(fy2017.totalcount,0)+coalesce(fy2018.totalcount,0)+coalesce(fy2019.totalcount,0)+coalesce(fy2020.totalcount,0)+coalesce(fy2021.totalcount,0)+coalesce(fy2022.totalcount,0)+coalesce(fy2023.totalcount,0)+coalesce(fy2024.totalcount,0)+coalesce(fy2025.totalcount,0) as "totalptr",
-      coalesce(fy2013.amount,0)+coalesce(fy2014.amount,0)+coalesce(fy2015.amount,0)+coalesce(fy2016.amount,0)+coalesce(fy2017.amount,0)+coalesce(fy2018.amount,0)+coalesce(fy2019.amount,0)+coalesce(fy2020.amount,0)+coalesce(fy2021.amount,0)+coalesce(fy2022.amount,0)+coalesce(fy2023.amount,0)+coalesce(fy2024.amount,0)+coalesce(fy2025.amount,0) as "totalcollection"
+      coalesce(fy2013.amount,0)+coalesce(fy2014.amount,0)+coalesce(fy2015.amount,0)+coalesce(fy2016.amount,0)+coalesce(fy2017.amount,0)+coalesce(fy2018.amount,0)+coalesce(fy2019.amount,0)+coalesce(fy2020.amount,0)+coalesce(fy2021.amount,0)+coalesce(fy2022.amount,0)+coalesce(fy2023.amount,0)+coalesce(fy2024.amount,0)+coalesce(fy2025.amount,0)+coalesce(fy2026.amount,0) as "totalcollection"
     from  zones
     left outer join fy2013 on fy2013.zonecode=zones.zonecode
     left outer join fy2014 on fy2014.zonecode=zones.zonecode
@@ -5311,6 +5369,7 @@ ReportDefinitions:
     left outer join fy2023 on fy2023.zonecode=zones.zonecode
     left outer join fy2024 on fy2024.zonecode=zones.zonecode
     left outer join fy2025 on fy2025.zonecode=zones.zonecode
+    left outer join fy2026 on fy2026.zonecode=zones.zonecode
     where 1=1
   orderby: order by zonename
   
@@ -5420,7 +5479,7 @@ ReportDefinitions:
     type: string
     source: pt
     total: true  
-  - name: 2021_22Collection
+  - name: 2022_23Collection
     label: reports.pt.2022_23Collection
     type: string
     source: pt
@@ -6232,6 +6291,11 @@ ReportDefinitions:
     type: string
     source: pt
     total: true
+  - name: assessmentyears
+    label: financial year
+    type: string
+    source: pt
+    total: true    
   - name: propertytax
     label: reports.pt.propertyTax
     type: string
@@ -6314,7 +6378,7 @@ ReportDefinitions:
     type: epoch
     source: pt
     isMandatory: false
-    searchClause: AND rp.receiptdate <= $toDate
+    searchClause: AND rp.receiptdate <= $toDate     
   - name: paymentMode
     label: Payment Mode
     type: singlevaluelist
@@ -6326,7 +6390,7 @@ ReportDefinitions:
       with assessments as
       (
         select
-          billid,
+          billid,string_agg(DISTINCT ra.assessmentyears, ',') AS assessmentyears,
           sum(ra.propertytax) as propertytax,
           sum(ra.paidpropertytax) as paidpropertytax,
           sum(ra.firecess) as firecess,
@@ -6347,7 +6411,7 @@ ReportDefinitions:
         rp.propertyid as consumercode,
         to_char((To_timestamp(rp.receiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') as "receiptdate",
         to_char((To_timestamp(rp.transactiondate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY')  as  "transactiondate",
-        rp.paymentmode,
+        rp.paymentmode,asmt.assessmentyears,
         rp.g8_issuedate as g8issuedate,
         rp.g8_receiptnumber as g8receiptno,
         rp.amoutpaid as amount,
@@ -9464,7 +9528,7 @@ ReportDefinitions:
   - name: finYear
     label: Financial Year
     type: singlevaluelist
-    pattern: 'list://2015-16:2015-16,2016-17:2016-17,2017-18:2017-18,2017-18:2017-18,2018-19:2018-19,2019-20:2019-20,2020-21:2020-21,2021-22:2021-22,2022-23:2022-23,2023-24:2023-24,2024-25:2024-25,2025-26:2025-26'
+    pattern: 'list://2015-16:2015-16,2016-17:2016-17,2017-18:2017-18,2017-18:2017-18,2018-19:2018-19,2019-20:2019-20,2020-21:2020-21,2021-22:2021-22,2022-23:2022-23,2023-24:2023-24,2024-25:2024-25,2025-26:2025-26,2026-27:2026-27'
     source: pt
     isMandatory: false
     searchClause: AND 1=1
