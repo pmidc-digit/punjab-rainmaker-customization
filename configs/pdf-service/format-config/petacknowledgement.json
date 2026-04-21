@@ -1,0 +1,251 @@
+{
+  "key": "petacknowledgement",
+  "config": {
+    "defaultStyle": {
+      "font": "Roboto",
+      "fontSize": 10
+    },
+    "content": [
+      {
+        "style": "noc-head",
+        "table": {
+          "widths": ["*", "auto", "*"],
+          "body": [
+            [
+              {
+                "image": "{{logoImage}}",
+                "width": 60,
+                "height": 60,
+                "alignment": "left"
+              },
+              {
+                "stack": [
+                  {
+                    "text": "{{ulbType}} {{logo-header}}",
+                    "style": "receipt-logo-header",
+                    "alignment": "center",
+                    "margin": [0, 0, 0, 0]
+                  },
+                  {
+                    "stack": [
+                      { "text": "Veterinary Services- Health Branch" },
+                      { "text": "Pet Registration Certificate", "bold": true },
+                      { "text": "(U/S 399 (1)(E) of PMC Act,1976)" }
+                    ],
+                    "alignment": "center",
+                    "color": "#484848",
+                    "margin": [0, 2, 0, 2]
+                  }
+                ],
+                "margin": [20, 0, 0, 0],
+                "alignment": "center"
+              },
+              ""
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      },
+      {
+        "canvas": [
+          {
+            "type": "line",
+            "x1": 0,
+            "y1": 0,
+            "x2": 500,
+            "y2": 0,
+            "lineColor": "#000000",
+            "lineWidth": 2
+          }
+        ],
+        "margin": [0, 5, 0, 10]
+      },
+      {
+        "stack": [
+          {
+            "text": "This is to acknowledge that we have received your application for pet registration. Your application has been processed and the details are as follows:",
+            "alignment": "center",
+            "margin": [0, 20, 0, 2]
+          }
+        ]
+      },
+      {
+        "style": "noc-table",
+        "table": {
+          "widths": ["auto", "*"],
+          "body": [
+            [
+              { "text": "Application Number", "style": "receipt-table-value" },
+              { "text": "{{consumerID}}", "style": "receipt-table" }
+            ],
+            [
+              { "text": "Application Date", "style": "receipt-table-value" },
+              { "text": "{{issueDate}}", "style": "receipt-table" }
+            ],
+            [
+              { "text": "Pet Name", "style": "receipt-table-value" },
+              { "text": "{{petName}}", "style": "receipt-table" }
+            ],
+            [
+              { "text": "Pet Type", "style": "receipt-table-value" },
+              {
+                "text": "{{petType}}",
+                "style": "receipt-table",
+                "fontSize": 10
+              }
+            ],
+            [
+              { "text": "Breed", "style": "receipt-table-value" },
+              { "text": "{{breedType}}", "style": "receipt-table" }
+            ],
+            [
+              { "text": "Owner Name", "style": "receipt-table-value" },
+              { "text": "{{petOwner}}", "style": "receipt-table" }
+            ],
+            [
+              { "text": "Contact", "style": "receipt-table-value" },
+              { "text": "{{payerContact}}", "style": "receipt-table" }
+            ],
+            [
+              { "text": "Email", "style": "receipt-table-value" },
+              { "text": "{{payerEmailId}}", "style": "receipt-table" }
+            ],
+            [
+              { "text": "Application Status", "style": "receipt-table-value" },
+              {
+                "text": "{{status}}",
+                "style": "receipt-table",
+                "color": "green"
+              }
+            ]
+          ]
+        },
+        "layout": {},
+        "margin": [20, 20, 20, 0]
+      },
+
+      {
+        "stack": [
+          {
+            "text": "Please keep this acknowledgement for your records. You will be notified once your application is processed and approved. For any queries, please contact the Municipal Corporation office with your application number.",
+            "alignment": "center",
+            "margin": [0, 5, 0, 2]
+          }
+        ]
+      },
+
+      
+      {
+        "style": "noc-head",
+        "table": {
+          "widths": ["*"],
+          "body": [
+            [
+              {
+                "stack": [
+                  {
+                    "text": "",
+                    "style": "receipt-logo-header",
+                    "alignment": "center",
+                    "margin": [0, 0, 0, 0]
+                  },
+                  {
+                    "stack": [
+                      { "text": "Generated On: {{issueDate}}" },
+                      { "text": "{{ulbType}} {{logo-header}}" },
+                      { "text": "This is a computer-generated document and does not require a signature." },
+                      {
+                        "text": "https://mseva.lgpunjab.gov.in/digit-ui/citizen/ptr-home"
+                      }
+                    ],
+                    "alignment": "center",
+                    "color": "#484848",
+                    "margin": [0, 2, 0, 2]
+                  }
+                ],
+                "margin": [20, 120, 0, 0],
+                "alignment": "center"
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
+      }
+    ],
+    "styles": {
+      "noc-head": {
+        "margin": [-30, -30, 0, 1]
+      },
+      "receipt-logo-header": {
+        "color": "#000000",
+        "fontSize": 16,
+        "bold": true,
+        "letterSpacing": 0.74,
+        "margin": [0, -30, 0, 5]
+      },
+      "receipt-logo-sub-header": {
+        "color": "#000000",
+        "fontSize": 12,
+        "letterSpacing": 0.6
+      },
+      "noc-table": {
+        "fontSize": 12,
+        "color": "#000000",
+        "margin": [-25, 10, -22, -8]
+      },
+      "receipt-table-value-total-Qr": {
+        "alignment": "right",
+        "margin": [0, 3, 10, 0]
+      },
+      "receipt-table-value-down": {
+        "color": "#000000",
+        "bold": false,
+        "fontSize": 12,
+        "fontWeight": 400,
+        "alignment": "left",
+        "margin": [3, 5, 0, 5]
+      },
+      "next-noc-table": {
+        "fontSize": 12,
+        "color": "#000000",
+        "margin": [-25, 28, -22, -8]
+      },
+      "receipt-table-value": {
+        "color": "#000000",
+        "bold": true,
+        "fontSize": 12,
+        "fontWeight": 500,
+        "margin": [0, 5, 0, 5],
+        "fillColor": "#f2f2f2"
+      },
+      "receipt-table": {
+        "color": "#000000",
+        "bold": false,
+        "fontSize": 12,
+        "fontWeight": 400,
+        "margin": [0, 5, 0, 5]
+      },
+      "receipt-approver": {
+        "fontSize": 12,
+        "bold": true,
+        "margin": [-27, 50, -10, 0],
+        "color": "#484848"
+      },
+      "no-signature": {
+        "fontSize": 12,
+        "margin": [-27, 35, -10, 0],
+        "color": "#484848"
+      },
+      "pt-disclaimer": {
+        "fontSize": 12,
+        "margin": [-27, 30, -10, 0],
+        "color": "#484848"
+      },
+      "pt-disclaimer-value": {
+        "fontSize": 12,
+        "margin": [2, 3, 0, 0],
+        "color": "#484848"
+      }
+    }
+  }
+}
