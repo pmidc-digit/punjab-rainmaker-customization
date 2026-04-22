@@ -124,6 +124,12 @@
                 }
               },
               {
+                "variable": "receiptDateEpoch", 
+                "value": {
+                  "path": "$.paymentDetails[0].receiptDate"
+                }
+              },
+              {
                 "variable": "serviceType", 
                 "value": {
                   "path": "$.paymentDetails[0].businessService"
@@ -186,7 +192,7 @@
               {
                 "variable": "payerAddress", 
                 "value": {
-                   "path": "$.payerAddress"
+                   "path": "$.application.address.addressLine1"
                 }
               },
               {
@@ -225,13 +231,7 @@
                 },
                 "type": "date"
               },
-              {
-                "variable": "ReceiptDate",
-                "value": {
-                  "path": "$.paymentDetails[0].receiptDate"
-                },
-                "type": "date"
-              }, {
+               {
                 "variable": "bankName",
                 "value": {
                   "path": "$.additionalDetails[0].bankName"
@@ -592,6 +592,13 @@
                   "variable": "pendingAmount",
                   "formula": "{{dueAmount}}-{{paidAmount}}"
                },
+               {
+                "variable": "receiptDate",
+                "type": "date",
+                "formula": "{{receiptDateEpoch}}",
+                "timezone": "Asia/Kolkata",
+                "format": "DD MMMM, YYYY"
+              },
                {
                 "variable": "ServiceCharge",
                 "formula": "{{ServiceCharge}}>0?{{ServiceCharge}}:0"
