@@ -1889,26 +1889,31 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
+  - name: Application Status
+    label: Application Status
+    type: string
+    source: obpas_bpa
+    total: false  
   - name: Building Plan
     label: Building Plan
     type: string
     source: obpas_bpa
-    total: false
+    total: true
   - name: NOC
     label: NOC
     type: string
     source: obpas_bpa
-    total: false
+    total: true
   - name: CLU
     label: CLU
     type: string
     source: obpas_bpa
-    total: false
+    total: true
   - name: Layout
     label: Layout
     type: string
     source: obpas_bpa
-    total: false        
+    total: true        
   searchParams:
   - name: district
     label: District
@@ -2027,5 +2032,4 @@ ReportDefinitions:
         WHERE 
         (g.grp_level = 0) 
         OR (g.grp_level = 1 AND s.distinct_statuses > 1) 
-    
   orderby: ORDER BY g.ulb_type, g.ulb_district, g.name_of_ulb, g.grp_level, g.applicationstatus;
