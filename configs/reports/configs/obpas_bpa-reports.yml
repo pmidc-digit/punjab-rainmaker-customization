@@ -2015,19 +2015,16 @@ ReportDefinitions:
         WHEN UPPER(g.applicationstatus) = 'E_SIGNED' OR g.applicationstatus = 'E-Signed' THEN 'E-Signed'
         WHEN UPPER(g.applicationstatus) = 'INITIATED' THEN 'Initiated'
         -- Fallback: Underscore hatao aur Proper Case karo
-        ELSE INITCAP(REPLACE(g.applicationstatus, '_', ' '))
-    END AS "Application Status",
-
-    -- 6. Metrics (Counts)
-    NULLIF(g.bpa_count, 0) AS "Building Plan",
-    NULLIF(g.noc_count, 0) AS "NOC",
-    NULLIF(g.clu_count, 0) AS "CLU",
-    NULLIF(g.layout_count, 0) AS "Layout"
-
-    FROM final_grouping g
-    LEFT JOIN ulb_stats s ON g.name_of_ulb = s.name_of_ulb 
-    
-    WHERE 
+        ELSE INITCAP(REPLACE(g.applicationstatus, '_', ' ')) 
+        END AS "Application Status",
+        -- 6. Metrics (Counts
+        NULLIF(g.bpa_count, 0) AS "Building Plan",
+        NULLIF(g.noc_count, 0) AS "NOC",
+        NULLIF(g.clu_count, 0) AS "CLU",
+        NULLIF(g.layout_count, 0) AS "Layout"
+        FROM final_grouping g
+        LEFT JOIN ulb_stats s ON g.name_of_ulb = s.name_of_ulb 
+        WHERE 
         (g.grp_level = 0) 
         OR (g.grp_level = 1 AND s.distinct_statuses > 1) 
     
