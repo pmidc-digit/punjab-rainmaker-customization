@@ -284,9 +284,9 @@ ReportDefinitions:
       businessservice,
       designation_code AS Officer_Designation,
       COUNT(DISTINCT businessid) AS pending_files
-    FROM latest_assignee
-    GROUP BY tenantid,businessservice,designation_code
-    ORDER BY pending_files DESC
+    FROM latest_assignee 
+  groupby:  group by tenantid,businessservice,designation_code
+  orderby:  order by pending_files DESC
 
 
 - reportName: officers_wise_pendency_professional
@@ -366,5 +366,6 @@ ReportDefinitions:
       SUM(CASE WHEN created_date = base_dt - 6 THEN 1 ELSE 0 END) AS day6,
       SUM(CASE WHEN created_date = base_dt - 7 THEN 1 ELSE 0 END) AS day7
     FROM latest_assignee, params
-    GROUP BY designation_code
+    
+  groupby:  GROUP BY designation_code
 
