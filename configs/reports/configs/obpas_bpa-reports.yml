@@ -1884,8 +1884,8 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: #
-    label: #
+  - name: Sno
+    label: Serial No
     type: string
     source: obpas_bpa
     total: false  
@@ -2010,7 +2010,7 @@ ReportDefinitions:
       
           -- 3. Serial Number (#)
           CASE WHEN g.name_row_num = 1 AND g.grp_level = 0 THEN 
-              DENSE_RANK() OVER(ORDER BY g.ulb_type, g.ulb_district, g.name_of_ulb)::text ELSE '' END AS "#",
+              DENSE_RANK() OVER(ORDER BY g.ulb_type, g.ulb_district, g.name_of_ulb)::text ELSE '' END AS "Sno",
       
           -- 4. ULB Name
           CASE WHEN g.name_row_num = 1 AND g.grp_level = 0 THEN g.name_of_ulb ELSE '' END AS "ULB Name",
