@@ -342,7 +342,7 @@ ReportDefinitions:
   query: >
     WITH params AS (
       SELECT
-        (to_timestamp($fromDate / 1000) AT TIME ZONE 'Asia/Kolkata')::date AS base_dt
+        (to_timestamp($fromDate / 1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS base_dt
     ),
     latest_assignee AS (
       SELECT DISTINCT ON (wf.businessid)
@@ -366,7 +366,7 @@ ReportDefinitions:
       SUM(CASE WHEN created_date = base_dt - 5 THEN 1 ELSE 0 END) AS day5,
       SUM(CASE WHEN created_date = base_dt - 6 THEN 1 ELSE 0 END) AS day6,
       SUM(CASE WHEN created_date = base_dt - 7 THEN 1 ELSE 0 END) AS day7
-    FROM latest_assignee, params
+    FROM latest_assignee, params where 1 = 1
     
   groupby:  GROUP BY designation_code
 
