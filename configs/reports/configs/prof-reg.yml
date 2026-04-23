@@ -336,12 +336,12 @@ ReportDefinitions:
     label: Date
     type: epoch
     source: obpas
-    isMandatory: true
+    isMandatory: false
 
   query: >
     WITH params AS (
       SELECT
-        to_timestamp($fromDate/1000)::date AS base_dt
+        to_timestamp(1776734070000/1000)::date AS base_dt
     ),
     latest_assignee AS (
       SELECT DISTINCT ON (wf.businessid)
