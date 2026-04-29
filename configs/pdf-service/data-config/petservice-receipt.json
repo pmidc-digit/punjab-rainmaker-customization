@@ -191,6 +191,12 @@
                 }
               },
               {
+                "variable": "receiptDateEpoch", 
+                "value": {
+                  "path": "$.paymentDetails[0].receiptDate"
+                }
+              },
+              {
                 "variable": "G8ReceiptNo",
                 "value": {
                   "path": "$.paymentDetails[0].manualReceiptNumber"
@@ -571,6 +577,13 @@
               {
                 "variable": "pendingAmount",
                 "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"
+              },
+              {
+                "variable": "receiptDate",
+                "type": "date",
+                "formula": "{{receiptDateEpoch}}",
+                "timezone": "Asia/Kolkata",
+                "format": "DD MMMM, YYYY"
               },
               {
                 "variable": "excessAmountPaid",
