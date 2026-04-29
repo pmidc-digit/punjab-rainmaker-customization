@@ -553,6 +553,31 @@
                 }
               },
               {
+                "variable": "var_billDetails",
+                "value": {
+                  "path": "$.billDetails[*].billAccountDetails[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "object",
+                  "scema": [
+                    {
+                      "variable": "billTaxHeadCode",
+                      "value": "taxHeadCode",
+                      "localisation": {
+                        "required": true,
+                        "prefix": null,
+                        "module": "rainmaker-common"
+                      }
+                    },
+                    {
+                      "variable": "billAmount",
+                      "value": "amount"
+                    }
+                  ]
+                }
+              },
+              {
                 "variable": "tenant",
                 "value": {
                   "path": "$.tenantId"
