@@ -7,7 +7,7 @@ ReportDefinitions:
     moduleName: rainmaker-ch
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: challanno
         label: Challan Number
@@ -150,7 +150,7 @@ ReportDefinitions:
     moduleName: rainmaker-ch
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: receiptno
         label: Receipt Number
@@ -290,7 +290,7 @@ ReportDefinitions:
     moduleName: rainmaker-ch
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: tenant_name
         label: Tenant Id
@@ -444,7 +444,7 @@ ReportDefinitions:
     moduleName: rainmaker-ch
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: tenantid
         label: Tenant Id
@@ -589,7 +589,7 @@ ReportDefinitions:
     moduleName: rainmaker-ch
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: challanno
         label: Challan Number
@@ -689,11 +689,11 @@ ReportDefinitions:
     query: >
       SELECT c.challanno , c.businessservice , c.applicationstatus , c.receiptnumber ,
          c.challanstatus , c.offence_type_name , c.offence_category_name , c.offence_subcategory_name , 
-         c.challan_amount , c.tenantid , ca.addressline1 , u.name , u.mobilenumber 
+         c.challan_amount , split_part(c.tenantid, '.', 2) as tenantid , ca.addressline1 , u.name , u.mobilenumber 
          from eg_challan c
          LEFT JOIN eg_challanaddress ca on ca.challanid = c.id
          LEFT JOIN eg_user u on u.uuid = c.accountid
-         WHERE 1=1
+         WHERE c.tenantid = $tenantid
   - reportName: StateCategoryWiseChallanDetailReport
     decryptionPathId: STATECHALLANREPORTS
     summary: Challan wise detail report per tenant
@@ -701,7 +701,7 @@ ReportDefinitions:
     moduleName: rainmaker-ch
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: tenantid
         label: Tenant Id
@@ -821,7 +821,7 @@ ReportDefinitions:
     moduleName: rainmaker-ch
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: tenantid
         label: Tenant Id
@@ -950,7 +950,7 @@ ReportDefinitions:
     moduleName: rainmaker-ch
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: tenantid
         label: Tenant Id
@@ -1085,7 +1085,7 @@ ReportDefinitions:
     moduleName: rainmaker-ch
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: ulb
         label: Tenant Id
@@ -1171,7 +1171,7 @@ ReportDefinitions:
     moduleName: rainmaker-ch
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: ulb
         label: Tenant Id
