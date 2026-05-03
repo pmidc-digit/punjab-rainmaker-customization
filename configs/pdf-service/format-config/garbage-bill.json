@@ -64,7 +64,7 @@
           "body": [
             [
               {
-                "text": "{{serviceType}} Bill for Period {{fromPeriod}} - {{toPeriod}}",
+                "text": "{{serviceType}} Bill for Period {{billIssueDate}} - {{billDueDate}}",
                 "border": [false, false, false, false],
                 "style": "receipt-table-value2",
                 "alignment": "center"
@@ -249,7 +249,7 @@
                 {
                   "table": {
                     "widths": ["*", "*"],
-                    "body": "[{{#var_billDetails}}[{\"text\":\"{{billTaxHeadCode}}\",\"alignment\":\"left\",\"border\":[true,false,false,true], \"style\":\"receipt-table2\"},{\"text\":\"{{billAmount}}\",\"alignment\":\"left\",\"style\":\"receipt-table2\",\"border\":[false,false,true,true]}]{{/var_billDetails}}]"
+                    "body": "[{{#var_billDetails}}[{\"text\":\"{{billTaxHeadCode}}\",\"alignment\":\"left\",\"border\":[true,true,false,true], \"style\":\"receipt-table2\"},{\"text\":\"{{billAmount}}\",\"alignment\":\"left\",\"style\":\"receipt-table2\",\"border\":[false,true,true,true]}]{{/var_billDetails}}]"
                   },
                   "border": [true, true, true, true]
                 }
