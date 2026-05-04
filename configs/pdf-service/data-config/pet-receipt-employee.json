@@ -25,6 +25,18 @@
                   "path": "$.paidBy"
                 }
               },
+              {
+                "variable": "issueDateEpoch",
+                "value": {
+                  "path": "$.application.auditDetails.createdTime"
+                }
+              },
+              {
+                "variable": "validityDateEpoch",
+                "value": {
+                  "path": "$.application.validityDate"
+                }
+              },
                {
                 "variable": "service_charge",
                 "value": {
@@ -588,18 +600,36 @@
           },
           {
             "derived": [
-               {
-                  "variable": "pendingAmount",
-                  "formula": "{{dueAmount}}-{{paidAmount}}"
-               },
-               {
+              {
+                "variable": "pendingAmount",
+                "formula": "{{dueAmount}}-{{paidAmount}}"
+              },
+              {
+                "variable": "issueDate",
+                "type": "date",
+                "formula": "{{issueDateEpoch}}",
+                "timezone": "Asia/Kolkata",
+                "format": "DD MMMM, YYYY"
+              },
+              {
+                "variable": "validityDateFixedEpoch",
+                "formula": "{{validityDateEpoch}}*1000"
+              },
+              {
+                "variable": "validityDate",
+                "type": "date",
+                "formula": "{{validityDateFixedEpoch}}",
+                "timezone": "Asia/Kolkata",
+                "format": "DD MMMM, YYYY"
+              },
+              {
                 "variable": "receiptDate",
                 "type": "date",
                 "formula": "{{receiptDateEpoch}}",
                 "timezone": "Asia/Kolkata",
                 "format": "DD MMMM, YYYY"
               },
-               {
+              {
                 "variable": "ServiceCharge",
                 "formula": "{{ServiceCharge}}>0?{{ServiceCharge}}:0"
               },

@@ -191,6 +191,18 @@
                 }
               },
               {
+                "variable": "issueDateEpoch",
+                "value": {
+                  "path": "$.application.auditDetails.createdTime"
+                }
+              },
+              {
+                "variable": "validityDateEpoch",
+                "value": {
+                  "path": "$.application.validityDate"
+                }
+              },
+              {
                 "variable": "receiptDateEpoch", 
                 "value": {
                   "path": "$.paymentDetails[0].receiptDate"
@@ -582,6 +594,24 @@
                 "variable": "receiptDate",
                 "type": "date",
                 "formula": "{{receiptDateEpoch}}",
+                "timezone": "Asia/Kolkata",
+                "format": "DD MMMM, YYYY"
+              },
+              {
+                "variable": "issueDate",
+                "type": "date",
+                "formula": "{{issueDateEpoch}}",
+                "timezone": "Asia/Kolkata",
+                "format": "DD MMMM, YYYY"
+              },
+              {
+                "variable": "validityDateFixedEpoch",
+                "formula": "{{validityDateEpoch}}*1000"
+              },
+              {
+                "variable": "validityDate",
+                "type": "date",
+                "formula": "{{validityDateFixedEpoch}}",
                 "timezone": "Asia/Kolkata",
                 "format": "DD MMMM, YYYY"
               },
