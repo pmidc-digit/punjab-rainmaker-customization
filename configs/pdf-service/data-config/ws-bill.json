@@ -253,6 +253,18 @@
                                 }
                             },
                             {
+                                "variable": "discharge_charges_label",
+                                "value": {
+                                    "path": "PDF_STATIC_LABEL_CONSOLIDATED_BILL_DISCHARGE_CHARGES"
+                                },
+                                "type": "label",
+                                "localisation": {
+                                    "required": true,
+                                    "prefix": null,
+                                    "module": "rainmaker-common"
+                                }
+                            },
+                            {
                                 "variable": "total_label",
                                 "value": {
                                     "path": "PDF_STATIC_LABEL_CONSOLIDATED_BILL_TOTAL"
@@ -600,6 +612,18 @@
                                 }
                             },
                             {
+                                "variable": "breakdownPenaltyCharge",
+                                "value": {
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_BREAKDOWN_PENALTY' || @.taxHeadCode == 'TL_BREAKDOWN_PENALTY' || @.taxHeadCode == 'FIRENOC_BREAKDOWN_PENALTY' || @.taxHeadCode == 'WS_BREAKDOWN_PENALTY' || @.taxHeadCode == 'SW_BREAKDOWN_PENALTY' )].amount"
+                                }
+                            },
+                            {
+                                "variable": "waterDischargeCharge",
+                                "value": {
+                                    "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_DISCHARGE_CHARGES')].amount"
+                                }
+                            },
+                            {
                                 "variable": "timeRebate",
                                 "value": {
                                     "path": "$.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_TIME_REBATE' || @.taxHeadCode == 'WS_TIME_REBATE' || @.taxHeadCode == 'SW_TIME_REBATE')].amount"
@@ -781,7 +805,7 @@
                             },
                             {
                                 "variable": "penalty",
-                                "formula": "{{timePenalty}}+{{adhocPenalty}}"
+                                "formula": "{{timePenalty}}+{{adhocPenalty}} + {{breakdownPenaltyCharge}}"
                             },
                             {
                                 "variable": "rebate",
@@ -813,7 +837,7 @@
                             },
                             {
                                 "variable": "others",
-                                "formula": "({{ws_roundoff}}+{{ws_water_cess}}+{{ws_time_interest}}).toFixed(2)"
+                                "formula": "({{ws_roundoff}}+{{ws_water_cess}}+{{ws_time_interest}}+{{waterDischargeCharge}}).toFixed(2)"
                             },
                             {
                                 "variable": "calculatedTotal",
