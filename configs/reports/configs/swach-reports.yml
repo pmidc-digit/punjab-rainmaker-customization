@@ -768,7 +768,7 @@ ReportDefinitions:
       source: rainmaker-swach
       total: false
 
-    - name: Complaintid
+    - name: complaintid
       label: Complaint ID
       type: string
       source: rainmaker-swach
@@ -807,7 +807,7 @@ ReportDefinitions:
     query: >
       SELECT
         servicecode AS event,
-        servicerequestid AS Complaintid,
+        servicerequestid AS complaintid,
         INITCAP(split_part(tenantid,'.',2)) AS ulb,
         to_char(
             to_timestamp(createdtime / 1000),
