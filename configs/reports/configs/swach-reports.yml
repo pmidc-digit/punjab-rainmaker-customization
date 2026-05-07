@@ -793,3 +793,80 @@ ReportDefinitions:
       employee_counts
       WHERE 1=1 
     orderby: ORDER BY employee_code
+
+
+  - reportName: SwachEventReport
+    decryptionPathId: STATEPETREPORTS
+    summary: Swach Event Complaint Report
+    version: 1.0.0
+    moduleName: rainmaker-swach
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+    - name: event
+      label: Event
+      type: string
+      source: rainmaker-swach
+      total: false
+
+    - name: complaintid
+      label: Complaint ID
+      type: string
+      source: rainmaker-swach
+      total: false
+
+    - name: ulb
+      label: ULB
+      type: string
+      source: rainmaker-swach
+      total: false
+    - name: date
+      label: Date
+      type: string
+      source: rainmaker-swach
+      total: false
+
+    - name: mediaurl
+      label: MediaURL
+      type: string
+      source: rainmaker-swach
+      total: false
+    searchParams:
+    - name: ulb
+      label: ULB
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: pt
+      wrapper: true
+      isMandatory: false
+      searchClause: AND tenantid = $ulb    
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND createdtime >= $fromDate
+    - name: toDate
+      label: To Date
+      type: epoch
+      source: rainmaker-swach
+      isMandatory: false
+      searchClause: AND createdtime <= $toDate
+    query: >
+      SELECT
+        servicecode AS event,
+        servicerequestid AS complaintid,
+        tenantid as tenantid,
+        INITCAP(split_part(tenantid,'.',2)) AS ulb,
+        to_char(
+            to_timestamp(createdtime / 1000),
+            'DD-MM-YYYY'
+        ) AS date,
+        additionaldetails ->> 'mediaURL' AS mediaurl
+      FROM eg_swach_service_v2
+      WHERE createdby = 'af2af7bb-9482-4667-a2ef-a7d8fd29181c'
+      AND 1 = 1
+    orderby: ORDER BY date
+
+    
