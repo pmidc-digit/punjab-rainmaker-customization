@@ -780,6 +780,11 @@ ReportDefinitions:
       source: rainmaker-swach
       total: false
 
+    - name: tenantid
+      label: tenantid
+      type: string
+      source: rainmaker-swach
+      total: false
     - name: date
       label: Date
       type: string
@@ -792,6 +797,14 @@ ReportDefinitions:
       source: rainmaker-swach
       total: false
     searchParams:
+    - name: ulb
+      label: ULB
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: pt
+      wrapper: true
+      isMandatory: false
+      searchClause: AND tenantid = $ulb    
     - name: fromDate
       label: From Date
       type: epoch
@@ -808,6 +821,7 @@ ReportDefinitions:
       SELECT
         servicecode AS event,
         servicerequestid AS complaintid,
+        tenantid as tenantid,
         INITCAP(split_part(tenantid,'.',2)) AS ulb,
         to_char(
             to_timestamp(createdtime / 1000),
