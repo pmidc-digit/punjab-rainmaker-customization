@@ -762,31 +762,31 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-    - name: Event
+    - name: event
       label: Event
       type: string
       source: rainmaker-swach
       total: false
 
-    - name: Complaint ID
+    - name: Complaintid
       label: Complaint ID
       type: string
       source: rainmaker-swach
       total: false
 
-    - name: ULB
+    - name: ulb
       label: ULB
       type: string
       source: rainmaker-swach
       total: false
 
-    - name: Date
+    - name: date
       label: Date
       type: string
       source: rainmaker-swach
       total: false
 
-    - name: MediaURL
+    - name: mediaurl
       label: MediaURL
       type: string
       source: rainmaker-swach
@@ -806,15 +806,15 @@ ReportDefinitions:
       searchClause: AND createdtime <= $toDate
     query: >
       SELECT
-        servicecode AS "Event",
-        servicerequestid AS "Complaint ID",
-        INITCAP(split_part(tenantid,'.',2)) AS "ULB",
+        servicecode AS event,
+        servicerequestid AS Complaintid,
+        INITCAP(split_part(tenantid,'.',2)) AS ulb,
         to_char(
             to_timestamp(createdtime / 1000),
             'DD-MM-YYYY'
-        ) AS "Date",
-        additionaldetails ->> 'mediaURL' AS "MediaURL"
+        ) AS date,
+        additionaldetails ->> 'mediaURL' AS mediaurl
       FROM eg_swach_service_v2
       WHERE createdby = 'af2af7bb-9482-4667-a2ef-a7d8fd29181c'
       AND 1 = 1
-    orderby: ORDER BY "Date"
+    orderby: ORDER BY date
