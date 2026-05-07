@@ -221,7 +221,7 @@
       {
         "style": "fee-summary-table",
         "table": {
-          "widths": ["10%", "39%", "51%"],
+          "widths": ["10%", "39%", "25.5%","25.5%"],
           "body": [
             [
               { "text": "S. No", "style": "receipt-header", "bold": true },
@@ -232,143 +232,17 @@
                 "alignment": "right",
                 "margin": [0, 0, 4, 0],
                 "bold": true
-              }
-            ],
-            [
-              { "text": "1", "style": "receipt-fee-label" },
-              { "text": " Labour Cess ", "style": "receipt-fee-label" },
-              { "text": "{{bpaLabourCess}}", "style": "receipt-fee-value" }
-            ],
-            [
-              { "text": "2", "style": "receipt-fee-label" },
-              {
-                "text": " Gaushala Charges Cess ",
-                "style": "receipt-fee-label"
               },
               {
-                "text": "{{bpaGaushalaChargesCess}}",
-                "style": "receipt-fee-value"
+                "text": "Adjusted Amount (In ₹)",
+                "style": "receipt-header",
+                "alignment": "right",
+                "margin": [0, 0, 4, 0],
+                "bold": true
               }
             ],
-            [
-              { "text": "3", "style": "receipt-fee-label" },
-              { "text": " Mining Charges ", "style": "receipt-fee-label" },
-              { "text": " {{bpaMiningCharges}}", "style": "receipt-fee-value" }
-            ],
-            [
-              { "text": "4", "style": "receipt-fee-label" },
-              {
-                "text": " Sub-Division Charges ",
-                "style": "receipt-fee-label"
-              },
-              {
-                "text": " {{bpaSubDivisionCharges}}",
-                "style": "receipt-fee-value"
-              }
-            ],
-            [
-              { "text": "5", "style": "receipt-fee-label" },
-              {
-                "text": " Development Charges ",
-                "style": "receipt-fee-label"
-              },
-              {
-                "text": " {{bpaDevelopmentCharges}}",
-                "style": "receipt-fee-value"
-              }
-            ],
-            [
-              { "text": "6", "style": "receipt-fee-label" },
-              { "text": " Other Charges ", "style": "receipt-fee-label" },
-              { "text": " {{bpaOtherCharges}}", "style": "receipt-fee-value" }
-            ],
-            [
-              { "text": "7", "style": "receipt-fee-label" },
-              { "text": " Clubbing Charges ", "style": "receipt-fee-label" },
-              {
-                "text": " {{bpaClubbingCharges}}",
-                "style": "receipt-fee-value"
-              }
-            ],
-            [
-              { "text": "8", "style": "receipt-fee-label" },
-              { "text": " Malba Charges ", "style": "receipt-fee-label" },
-              { "text": " {{bpaMalbaCharges}}", "style": "receipt-fee-value" }
-            ],
-            [
-              { "text": "9", "style": "receipt-fee-label" },
-              {
-                "text": " Less Adjustment Plot ",
-                "style": "receipt-fee-label"
-              },
-              {
-                "text": " {{bpaLessAdjustmentPlot}}",
-                "style": "receipt-fee-value"
-              }
-            ],
-            [
-              { "text": "10", "style": "receipt-fee-label" },
-              {
-                "text": " Rain Water Harvesting Charges ",
-                "style": "receipt-fee-label"
-              },
-              {
-                "text": " {{bpaRainWaterHarvestingCharges}}",
-                "style": "receipt-fee-value"
-              }
-            ],
-            [
-              { "text": "11", "style": "receipt-fee-label" },
-              {
-                "text": " External Development Charges ",
-                "style": "receipt-fee-label"
-              },
-              {
-                "text": " {{bpaExternalDevelopmentCharges}}",
-                "style": "receipt-fee-value"
-              }
-            ],
-            [
-              { "text": "12", "style": "receipt-fee-label" },
-              { "text": " CLU Charges ", "style": "receipt-fee-label" },
-              { "text": " {{bpaCluCharges}}", "style": "receipt-fee-value" }
-            ],
-            [
-              { "text": "13", "style": "receipt-fee-label" },
-              { "text": " Water Charges ", "style": "receipt-fee-label" },
-              { "text": " {{bpaWaterCharges}}", "style": "receipt-fee-value" }
-            ],
-            [
-              { "text": "14", "style": "receipt-fee-label" },
-              { "text": " Processing Fees ", "style": "receipt-fee-label" },
-              {
-                "text": " {{bpaProcessingFees}}",
-                "style": "receipt-fee-value"
-              }
-            ],
-            [
-              { "text": "15", "style": "receipt-fee-label" },
-              {
-                "text": " Urban Development Cess ",
-                "style": "receipt-fee-label"
-              },
-              {
-                "text": " {{bpaUrbanDevelopmentCess}}",
-                "style": "receipt-fee-value"
-              }
-            ],
-            [
-              { "text": "16", "style": "receipt-fee-label" },
-              {
-                "text": " Purchasable FAR Charges ",
-                "style": "receipt-fee-label"
-              },
-              {
-                "text": " {{bpaPurchasableFarCharges}}",
-                "style": "receipt-fee-value"
-              }
-            ],
-            [
+            "{{#var_paymentData}}[{ \"text\": \"{{index}}\", \"style\": \"receipt-table-value\", \"alignment\": \"left\",\"border\": [true, true, true,true], \"margin\": [5, 0, 0, 0] },{ \"text\": \"{{title}}\", \"style\": \"receipt-table-value\", \"alignment\": \"left\",\"border\": [true, true, true,true], \"margin\": [5, 0, 0, 0] },{ \"text\": \"{{amount}}\", \"style\": \"receipt-table-value\", \"alignment\": \"left\",\"border\": [true, true, true,true], \"margin\": [5, 0, 0, 0] },{ \"text\": \"{{adjustedAmount}}\", \"style\": \"receipt-table-value\",\"border\": [true, true, true,true], \"alignment\": \"left\", \"margin\": [5, 0, 0, 0] }]{{/var_paymentData}}",
+             [
               {
                 "text": " ",
                 "style": "receipt-total-label",
@@ -382,7 +256,11 @@
               {
                 "text": " {{totalAmount}}",
                 "style": "receipt-total-value",
-                "fillColor": "#f2f2f2"
+                "fillColor": "#f2f2f2",
+                "alignment": "right",
+                "colSpan":2,
+                "margin": [0, 0, 4, 0],
+                "bold": true
               }
             ],
             [
@@ -399,7 +277,8 @@
               {
                 "text": " {{Amountinwords}} only.",
                 "style": "receipt-total-value",
-                "fillColor": "#f2f2f2"
+                "fillColor": "#f2f2f2",
+                "colSpan": 2
               }
             ]
           ]
