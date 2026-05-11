@@ -521,11 +521,6 @@
                   "prefix": null,
                   "module":"rainmaker-common"
                }
-              },
-              {
-                "variable": "footerLogoImage",
-                "url": "https://pb-egov-assets.s3.ap-south-1.amazonaws.com/mseva-logo-colored.png",
-                "type": "image"
               }
             ]
           },
@@ -539,47 +534,59 @@
          },
           {
             "externalAPI": [     
-              { 
+              {
                 "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
                 "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}')%5D",
-                  "apiRequest": null,
-                  "responseMapping":[
-                    {             
-                      "variable":"address",
-                      "value":"$.MdmsRes.tenant.tenants[0].address"
-                    },
-                    {
-                      "variable":"phoneNumber",
-                      "value":"$.MdmsRes.tenant.tenants[0].contactNumber"
-                    },
-                    {
-                      "variable":"website",
-                      "value":"$.MdmsRes.tenant.tenants[0].domainUrl"
-                    },
-                    {
-                      "variable":"mcGrade",
-                      "value":"$.MdmsRes.tenant.tenants[0].city.ulbType"
-                    },
-                    {
-                      "variable":"email",
-                      "value":"$.MdmsRes.tenant.tenants[0].emailId"
-                    },
-                    {
-                      "variable": "logoImage",                        
-                      "value":"$.MdmsRes.tenant.tenants[0].logoId",
-                      "type":"image"      
-                    },
-                    {
-                      "variable": "logo-header",
-                      "value":"$.MdmsRes.tenant.tenants[0].code",
-                      "localisation":{
-                        "required":true,
-                        "prefix": "TENANT_TENANTS",
-                        "module":"rainmaker-common"
-                        }
+                "apiRequest": null,
+                "responseMapping": [
+                  {
+                    "variable": "address",
+                    "value": "$.MdmsRes.tenant.tenants[0].address"
+                  },
+                  {
+                    "variable": "phoneNumber",
+                    "value": "$.MdmsRes.tenant.tenants[0].contactNumber"
+                  },
+                  {
+                    "variable": "website",
+                    "value": "$.MdmsRes.tenant.tenants[0].domainUrl"
+                  },
+                  {
+                    "variable": "mcGrade",
+                    "value": "$.MdmsRes.tenant.tenants[0].city.ulbType"
+                  },
+                  {
+                    "variable": "email",
+                    "value": "$.MdmsRes.tenant.tenants[0].emailId"
+                  },
+                  {
+                    "variable": "logoImage",
+                    "value": "$.MdmsRes.tenant.tenants[0].logoId",
+                    "type": "image"
+                  },
+                  {
+                    "variable": "logo-header",
+                    "value": "$.MdmsRes.tenant.tenants[0].code",
+                    "localisation": {
+                      "required": true,
+                      "prefix": "TENANT_TENANTS",
+                      "module": "rainmaker-common"
                     }
-                  ]
-}
+                  }
+                ]
+              },
+              {
+                "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
+                "queryParam": "moduleName=tenant&masterName=msevaLogo&tenantId=pb",
+                "apiRequest": null,
+                "responseMapping": [
+                  {
+                    "variable": "footerLogoImage",
+                    "value": "$.MdmsRes.tenant.msevaLogo[0].logoUrl",
+                    "type": "image"
+                  }
+                ]
+              }
             ]
           }
         ]
