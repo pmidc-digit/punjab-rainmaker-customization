@@ -198,6 +198,7 @@ ReportDefinitions:
             FROM eg_noc n
             LEFT JOIN eg_noc_details ad ON ad.nocid = n.id
             INNER JOIN ulb_data u ON u.ulb_code = n.tenantid
+            Where n.tenantid !='pb.testing'
     groupby: GROUP BY n.createdtime,n.applicationno,n.applicationstatus, n.vasikadate, n.vasikanumber,ad.additionaldetails
     orderby: ORDER BY n.createdtime desc;
     
@@ -208,7 +209,7 @@ ReportDefinitions:
     moduleName: rainmaker-obpas_noc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: tenantid
         label: ULB Name 
@@ -384,7 +385,7 @@ ReportDefinitions:
             inner join ulb_data u on u.ulb_code=n.tenantid
             JOIN sla_data sla ON sla.businessservice in ('NOC_MC','NOC_NP')
             LEFT JOIN assignee_details asn ON n.applicationno = asn.businessid
-            WHERE UPPER(ls.applicationstatus) NOT IN ('INITIATED','CANCELLED')
+            WHERE UPPER(ls.applicationstatus) NOT IN ('INITIATED','CANCELLED') and n.tenantid !='pb.testing'
     orderby: ORDER BY n.createdtime DESC
     
   - reportName: officers_with_highest_pendency
@@ -393,7 +394,7 @@ ReportDefinitions:
     moduleName: rainmaker-obpas_noc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: ulb_name
         label: ULB Name
@@ -475,7 +476,7 @@ ReportDefinitions:
     moduleName: rainmaker-obpas_noc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: district
         label: District
@@ -576,7 +577,7 @@ ReportDefinitions:
           COUNT(CASE WHEN sc.timeline_status = 'BREACHED' THEN 1 END) AS beyond_timeline_count
           FROM sla_calc sc
           JOIN ulb_data u ON sc.tenantid = u.ulb_code
-          WHERE 1=1
+          WHERE 1=1 
     groupby: GROUP BY u.district, u.name_of_ulb
     orderby: ORDER BY u.district, u.name_of_ulb DESC
 
@@ -586,7 +587,7 @@ ReportDefinitions:
     moduleName: rainmaker-obpas_noc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
     - name: district
       label: District
@@ -735,7 +736,7 @@ ReportDefinitions:
     moduleName: rainmaker-obpas_noc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
     - name: Officer_Designation
       label: Officer Designation
@@ -858,7 +859,7 @@ ReportDefinitions:
     moduleName: rainmaker-obpas_noc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
     - name: district
       label: District
@@ -1006,7 +1007,7 @@ ReportDefinitions:
     moduleName: rainmaker-obpas_noc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
     - name: district
       label: District 
@@ -1151,7 +1152,7 @@ ReportDefinitions:
     moduleName: rainmaker-obpas_noc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: applicationno
         label: Application Number
@@ -1327,7 +1328,7 @@ ReportDefinitions:
     moduleName: rainmaker-obpas_noc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: tenant
         label: ULB Name
