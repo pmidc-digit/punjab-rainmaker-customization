@@ -307,3 +307,108 @@ serviceMaps:
            - jsonPath: $.hallsBookingApplication.auditDetails.lastModifiedTime
            - jsonPath: $.hallsBookingApplication.bookingId
            - jsonPath: $.hallsBookingApplication.owners.*.uuid
+
+ - version: 1.0
+   description: Creates booking payment timer rows
+   fromTopic: create-community-hall-booking-timer
+   isTransaction: true
+   queryMaps:
+       - query: INSERT INTO public.eg_chb_payment_timer(booking_id, createdby, createdtime, status, booking_no, community_hall_code, hall_code, booking_date, tenant_id, lastmodifiedby, lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?::DATE, ?, ?, ?);
+         basePath: paymentTimer
+         jsonMaps:
+           - jsonPath: $.paymentTimer.bookingId
+           - jsonPath: $.paymentTimer.createdBy
+           - jsonPath: $.paymentTimer.createdTime
+           - jsonPath: $.paymentTimer.status
+           - jsonPath: $.paymentTimer.bookingNo
+           - jsonPath: $.paymentTimer.communityHallCode
+           - jsonPath: $.paymentTimer.hallCode
+           - jsonPath: $.paymentTimer.bookingDate
+           - jsonPath: $.paymentTimer.tenantId
+           - jsonPath: $.paymentTimer.lastModifiedBy
+           - jsonPath: $.paymentTimer.lastModifiedTime
+
+ - version: 1.0
+   description: Deletes booking payment timer rows
+   fromTopic: delete-community-hall-booking-timer
+   isTransaction: true
+   queryMaps:
+       - query: DELETE FROM public.eg_chb_payment_timer WHERE booking_id = ?;
+         basePath: paymentTimerDelete
+         jsonMaps:
+           - jsonPath: $.paymentTimerDelete.bookingId
+
+ - version: 1.0
+   description: Updates booking status and slot status synchronously without payment details
+   fromTopic: update-community-hall-booking-sync
+   isTransaction: true
+   queryMaps:
+       - query: UPDATE public.eg_chb_booking_detail SET booking_status = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE booking_id = ?;
+         basePath: bookingSyncUpdate
+         jsonMaps:
+           - jsonPath: $.bookingSyncUpdate.status
+           - jsonPath: $.bookingSyncUpdate.lastModifiedBy
+           - jsonPath: $.bookingSyncUpdate.lastModifiedTime
+           - jsonPath: $.bookingSyncUpdate.bookingId
+
+       - query: UPDATE public.eg_chb_slot_detail SET status = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE booking_id = ?;
+         basePath: bookingSyncUpdate
+         jsonMaps:
+           - jsonPath: $.bookingSyncUpdate.status
+           - jsonPath: $.bookingSyncUpdate.lastModifiedBy
+           - jsonPath: $.bookingSyncUpdate.lastModifiedTime
+           - jsonPath: $.bookingSyncUpdate.bookingId
+
+       - query: INSERT INTO public.eg_chb_booking_detail_audit SELECT * FROM public.eg_chb_booking_detail WHERE booking_id = ?;
+         basePath: bookingSyncUpdate
+         jsonMaps:
+           - jsonPath: $.bookingSyncUpdate.bookingId
+
+       - query: INSERT INTO public.eg_chb_slot_detail_audit SELECT * FROM public.eg_chb_slot_detail WHERE booking_id = ?;
+         basePath: bookingSyncUpdate
+         jsonMaps:
+           - jsonPath: $.bookingSyncUpdate.bookingId
+
+ - version: 1.0
+   description: Updates booking status and slot status synchronously with payment details
+   fromTopic: update-community-hall-booking-sync-payment
+   isTransaction: true
+   queryMaps:
+       - query: UPDATE public.eg_chb_booking_detail SET booking_status = ?, lastmodifiedby = ?, lastmodifiedtime = ?, receipt_no = ?, payment_date = ? WHERE booking_id = ?;
+         basePath: bookingSyncUpdate
+         jsonMaps:
+           - jsonPath: $.bookingSyncUpdate.status
+           - jsonPath: $.bookingSyncUpdate.lastModifiedBy
+           - jsonPath: $.bookingSyncUpdate.lastModifiedTime
+           - jsonPath: $.bookingSyncUpdate.receiptNo
+           - jsonPath: $.bookingSyncUpdate.paymentDate
+           - jsonPath: $.bookingSyncUpdate.bookingId
+
+       - query: UPDATE public.eg_chb_slot_detail SET status = ?, lastmodifiedby = ?, lastmodifiedtime = ? WHERE booking_id = ?;
+         basePath: bookingSyncUpdate
+         jsonMaps:
+           - jsonPath: $.bookingSyncUpdate.status
+           - jsonPath: $.bookingSyncUpdate.lastModifiedBy
+           - jsonPath: $.bookingSyncUpdate.lastModifiedTime
+           - jsonPath: $.bookingSyncUpdate.bookingId
+
+       - query: INSERT INTO public.eg_chb_booking_detail_audit SELECT * FROM public.eg_chb_booking_detail WHERE booking_id = ?;
+         basePath: bookingSyncUpdate
+         jsonMaps:
+           - jsonPath: $.bookingSyncUpdate.bookingId
+
+       - query: INSERT INTO public.eg_chb_slot_detail_audit SELECT * FROM public.eg_chb_slot_detail WHERE booking_id = ?;
+         basePath: bookingSyncUpdate
+         jsonMaps:
+           - jsonPath: $.bookingSyncUpdate.bookingId
+
+ - version: 1.0
+   description: Updates timer status for booking
+   fromTopic: update-community-hall-booking-timer
+   isTransaction: true
+   queryMaps:
+       - query: UPDATE public.eg_chb_payment_timer SET status = ? WHERE booking_id = ?;
+         basePath: paymentTimerUpdate
+         jsonMaps:
+           - jsonPath: $.paymentTimerUpdate.status
+           - jsonPath: $.paymentTimerUpdate.bookingId
