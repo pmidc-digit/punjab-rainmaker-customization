@@ -109,7 +109,7 @@ ReportDefinitions:
           (additionaldetails::jsonb)->>'area' AS plot_area,
           (additionaldetails::jsonb)->>'architectName' AS architect_name,
           (additionaldetails::jsonb)->> 'Ulblisttype' AS ulb_type
-      FROM eg_bpa_buildingplan  where 1=1
+      FROM eg_bpa_buildingplan  where 1=1 AND tenantid != 'pb.testing'
   orderby:  ORDER BY createdtime DESC;
 
 - reportName: CollectionsReportBPA
@@ -119,7 +119,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: Tenant
     label: ULB Name
@@ -278,7 +278,7 @@ ReportDefinitions:
         LEFT JOIN eg_user u ON u.id::text = p.createdby::text
         LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno OR ch.applicationno = a.id::text
-        WHERE pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG')
+        WHERE pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE')
           AND upper(p.paymentstatus) != 'CANCELLED'
       )
       
@@ -292,7 +292,7 @@ ReportDefinitions:
          status,
         collector_code,
         cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
-      FROM unique_transactions where 1=1
+      FROM unique_transactions where 1=1 and tenant != 'testing'
   orderby: ORDER BY applicationno,createdtime DESC 
   
 - reportName: SLAReportbpa
@@ -302,7 +302,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: tenantid
     label: ULB Name
@@ -484,7 +484,7 @@ ReportDefinitions:
       LEFT JOIN latest_status ls ON n.applicationno = ls.uuid
       JOIN sla_data sla ON n.businessservice = sla.businessservice
       LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
-      WHERE UPPER(COALESCE(ls.applicationstatus, '')) NOT IN ('CITIZEN_APPROVAL_INPROCESS','PENDING_APPL_FEE','INITIATED')
+      WHERE UPPER(COALESCE(ls.applicationstatus, '')) NOT IN ('CITIZEN_APPROVAL_INPROCESS','PENDING_APPL_FEE','INITIATED') and n.tenantid != 'pb.testing'
   orderby:  ORDER BY n.applicationno,n.createdtime DESC
 
 - reportName: ReceiptRegisterbpa
@@ -494,7 +494,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: Tenant
     label: ULB Name
@@ -614,8 +614,8 @@ ReportDefinitions:
       LEFT JOIN eg_user usr 
           ON usr.id = payment.createdby::integer
       WHERE
-          pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG')
-          AND payment.paymentstatus != 'CANCELLED'
+          pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE')
+          AND payment.paymentstatus != 'CANCELLED' and pd.tenantid != 'pb.testing'
   orderby: ORDER BY pd.receiptdate DESC;
 
 - reportName: Detailed_File_List
@@ -624,7 +624,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: applicationno
     label: Application Number
@@ -718,7 +718,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: ulb_name
     label: ULB Name
@@ -770,7 +770,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: ulb_name
     label: ULB Name
@@ -865,7 +865,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: Officer_Designation
     label: Officer Designation
@@ -1005,7 +1005,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: district
     label: District
@@ -1122,7 +1122,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: district
     label: District
@@ -1250,7 +1250,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: district
     label: District
@@ -1413,7 +1413,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: district
     label: District
@@ -1598,7 +1598,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
 
   sourceColumns:
   - name: user_uuid
@@ -1820,7 +1820,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
 
   sourceColumns:
   - name: employee_name
@@ -1872,7 +1872,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: ULB Type
     label: ULB Type
@@ -1948,7 +1948,7 @@ ReportDefinitions:
           FROM eg_noc 
           WHERE tenantid != 'pb.testing' 
             AND createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
-            AND applicationno not LIKE 'PB/%'
+            AND applicationno not LIKE 'PB/%' AND (nd.additionaldetails::text not LIKE '%sanctionLetter%'  OR nd.additionaldetails IS NULL)
           
           UNION ALL
           
@@ -2020,8 +2020,8 @@ ReportDefinitions:
               WHEN g.grp_level = 1 THEN 'Sub Total'
               -- Specific mappings for localization
               WHEN UPPER(g.applicationstatus) = 'PENDINGAPPLICATIONPAYMENT' THEN 'Pending Application Payment'
-              WHEN UPPER(g.applicationstatus) = 'FIELDINSPECTION_INPROGRESS' OR g.applicationstatus = 'Fieldinspection Inprogress' THEN 'Field Inspection In       Progress'
-              WHEN UPPER(g.applicationstatus) = 'CITIZEN_APPROVAL_INPROCESS' OR g.applicationstatus = 'Citizen Approval Inprocess' THEN 'Citizen Approval In       Process'
+              WHEN UPPER(g.applicationstatus) = 'FIELDINSPECTION_INPROGRESS' OR g.applicationstatus = 'Fieldinspection Inprogress' THEN 'Field Inspection In Progress'
+              WHEN UPPER(g.applicationstatus) = 'CITIZEN_APPROVAL_INPROCESS' OR g.applicationstatus = 'Citizen Approval Inprocess' THEN 'Citizen Approval In Process'
         WHEN UPPER(g.applicationstatus) = 'E_SIGNED' OR g.applicationstatus = 'E-Signed' THEN 'E-Signed'
         WHEN UPPER(g.applicationstatus) = 'INITIATED' THEN 'Initiated'
         -- Fallback: Underscore hatao aur Proper Case karo
