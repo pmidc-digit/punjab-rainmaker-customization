@@ -216,45 +216,39 @@
       {
         "style": "next-noc-table",
         "table": {
-          "widths": ["70%", "30%"],
+          "widths": ["100%"],
           "body": [
             [
               {
-                "text": "{{garbage_security_deposit}}",
-                "border": [true, true, false, false],
-                "style": "receipt-table-value-down"
-              },
-              {
-                "text": "{{SecurityDeposit}}",
-                "border": [false, true, true, false],
-                "style": "receipt-table-value-down"
+                "table": {
+                  "widths": ["*", "*"],
+                  "body": "[{{#var_billDetails}}[{\"text\":\"{{billTaxHeadCode}}\",\"alignment\":\"left\",\"border\":[true,true,false,true], \"style\":\"receipt-table2\"},{\"text\":\"{{billAmount}}\",\"alignment\":\"left\",\"style\":\"receipt-table2\",\"border\":[false,true,true,true]}]{{/var_billDetails}}]"
+                },
+                "border": [true, true, true, true]
               }
             ],
             [
               {
-                "text": "Connection Fees",
-                "border": [true, false, false, false],
-                "style": "receipt-table-value-down"
-              },
-              {
-                "text": "{{ConnectionFee}}",
-                "border": [false, false, true, false],
-                "style": "receipt-table-value-down"
-              }
-            ],
-
-            [
-              {
-                "text": "{{total_amount}}",
-                "border": [true, false, false, true],
-                "bold": true,
-                "style": "receipt-table-value-down"
-              },
-              {
-                "text": "{{totalAmount}}",
-                "border": [false, false, true, true],
-                "bold": true,
-                "style": "receipt-table-value-down"
+                "table": {
+                  "widths": ["*", "*"],
+                  "body": [
+                    [
+                      {
+                        "text": "Total Amount:",
+                        "border": [false, false, false, false],
+                        "style": "receipt-table-value"
+                      },
+                      {
+                        "text": "{{totalAmount}}",
+                        "border": [false, false, false, false],
+                        "style": "receipt-table-value",
+                        "margin-left": 3,
+                        "bold":false
+                      }
+                    ]
+                  ]
+                },
+                "border": [true, true, true, true]
               }
             ]
           ]

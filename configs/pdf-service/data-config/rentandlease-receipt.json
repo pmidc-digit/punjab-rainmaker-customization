@@ -4,8 +4,8 @@
   "DataConfigs": {
     "moduleName": "rainmaker-rentAndLease",
     "version": "1.0.0",
-    "baseKeyPath": "$.Payments.*",
-    "entityIdPath": "$.id",
+    "baseKeyPath": "$.Payments[0].billDetails.*",
+    "entityIdPath": "$.tenantId",
     "isCommonTableBorderRequired": true,
     "mappings": [
       {
@@ -16,7 +16,7 @@
               {
                 "variable": "payerName",
                 "value": {
-                  "path": "$.payerName"
+                  "path": "$.billRootData.rlSearchData.OwnerInfo[0].name"
                 }
               },
 
@@ -43,7 +43,7 @@
               {
                 "variable": "payerContact",
                 "value": {
-                  "path": "$.mobileNumber"
+                  "path": "$.billRootData.rlSearchData.OwnerInfo[0].mobileNo"
                 }
               },
               {
@@ -74,7 +74,7 @@
               {
                 "variable": "receiptNo",
                 "value": {
-                  "path": "$.paymentDetails[0].receiptNumber"
+                  "path": "$.billRootData.paymentDetails[0].receiptNumber"
                 }
               },
               {
@@ -92,7 +92,7 @@
               {
                 "variable": "totalAmount",
                 "value": {
-                  "path": "$.totalAmountPaid"
+                  "path": "$.amount"
                 }
               },
               {
@@ -117,7 +117,32 @@
               {
                 "variable": "paidAmount",
                 "value": {
-                  "path": "$.paymentDetails[0].totalAmountPaid"
+                  "path": "$.amount"
+                }
+              },
+              {
+                "variable": "var_billDetails",
+                "value": {
+                  "path": "$.billAccountDetails[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "object",
+                  "scema": [
+                    {
+                      "variable": "billTaxHeadCode",
+                      "value": "taxHeadCode",
+                      "localisation": {
+                        "required": true,
+                        "prefix": null,
+                        "module": "rainmaker-common"
+                      }
+                    },
+                    {
+                      "variable": "billAmount",
+                      "value": "amount"
+                    }
+                  ]
                 }
               },
               {
@@ -135,7 +160,7 @@
               {
                 "variable": "CluCharge",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_CLU_CHARGES')].adjustedAmount"
+                  "path": "$.billRootData.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_CLU_CHARGES')].adjustedAmount"
                 }
               },
               {
@@ -153,7 +178,7 @@
               {
                 "variable": "CluProcessingFee",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_PROCESSING_FEES')].adjustedAmount"
+                  "path": "$.billRootData.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_PROCESSING_FEES')].adjustedAmount"
                 }
               },
               {
@@ -171,7 +196,7 @@
               {
                 "variable": "CluExternalDevelopmentCharges",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_EXTERNAL_DEVELOPMENT_CHARGES')].adjustedAmount"
+                  "path": "$.billRootData.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_EXTERNAL_DEVELOPMENT_CHARGES')].adjustedAmount"
                 }
               },
               {
@@ -189,76 +214,34 @@
               {
                 "variable": "CluUrbanDevelopmentCess",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_URBAN_DEVELOPMENT_CESS')].adjustedAmount"
+                  "path": "$.billRootData.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_URBAN_DEVELOPMENT_CESS')].adjustedAmount"
                 }
               },
 
               {
                 "variable": "fromPeriod",
                 "value": {
-                  "path": "$.AllotmentDetails[0].startDate"
+                  "path": "$.billRootData.rlSearchData.startDate"
                 },
                 "type": "date"
               },
               {
                 "variable": "toPeriod",
                 "value": {
-                  "path": "$.AllotmentDetails[0].endDate"
+                  "path": "$.billRootData.rlSearchData.endDate"
                 },
                 "type": "date"
               },
               {
                 "variable": "stakeholderType",
                 "value": {
-                  "path": "$.paymentDetails[0].additionalDetails.stakeholderType"
-                }
-              },
-              {
-                "variable": "SecurityDeposit",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'RL_SECURITY_DEPOSIT_FEE')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "rentAndLeaseFee",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'RENT_LEASE_FEE')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "penaltyFee",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'RL_PENALTY_FEE')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "rentSgst",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'RL_SGST_FEE')].adjustedAmount"
-                }
-              },
-               {
-                "variable": "rentArrears",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[1].billAccountDetails[?(@.taxHeadCode == 'RL_ARREAR_FEE')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "rentCgst",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'RL_CGST_FEE')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "rentCowcess",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'RL_COWCESS_FEE')].adjustedAmount"
+                  "path": "$.billRootData.paymentDetails[0].additionalDetails.stakeholderType"
                 }
               },
               {
                 "variable": "paymentMode",
                 "value": {
-                  "path": "$.paymentMode"
+                  "path": "$.billRootData.paymentMode"
                 },
                 "localisation": {
                   "required": true,
@@ -269,39 +252,39 @@
               {
                 "variable": "G8ReceiptNo",
                 "value": {
-                  "path": "$.paymentDetails[0].manualReceiptNumber"
+                  "path": "$.billRootData.paymentDetails[0].manualReceiptNumber"
                 }
               },
               {
                 "variable": "G8ReceiptDate",
                 "value": {
-                  "path": "$.paymentDetails[0].manualReceiptDate"
+                  "path": "$.billRootData.paymentDetails[0].manualReceiptDate"
                 },
                 "type": "date"
               },
               {
                 "variable": "paymentDate",
                 "value": {
-                  "path": "$.transactionDate"
+                  "path": "$.fromPeriod"
                 },
                 "type": "date"
               },
               {
                 "variable": "consumerID",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.consumerCode"
+                  "path": "$.billRootData.identifier"
                 }
               },
               {
                 "variable": "transactionID",
                 "value": {
-                  "path": "$.transactionNumber"
+                  "path": "$.billRootData.transactionNumber"
                 }
               },
               {
                 "variable": "dueAmount",
                 "value": {
-                  "path": "$.paymentDetails[0].totalDue"
+                  "path": "$.billRootData.paymentDetails[0].totalDue"
                 }
               },
               {
@@ -509,18 +492,6 @@
                 }
               },
               {
-                "variable": "commissioner/eo",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_COMMISSIONER_EO"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-rentAndLease"
-                }
-              },
-              {
                 "variable": "no_signature",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_NO_SIGNATURE"
@@ -531,166 +502,6 @@
                   "prefix": null,
                   "module": "rainmaker-rentAndLease"
                 }
-              },
-              {
-                "variable": "disclamer",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-rentAndLease"
-                }
-              },
-              {
-                "variable": "disclamer_1",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_FIRST_LINE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-rentAndLease"
-                }
-              },
-              {
-                "variable": "rl_security_deposit",
-                "value": {
-                  "path": "ADV_SECURITY_DEPOSIT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "disclamer_2",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_SECOND_LINE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-rentAndLease"
-                }
-              },
-              {
-                "variable": "disclamer_3",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_THIRD_LINE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-rentAndLease"
-                }
-              },
-              {
-                "variable": "disclamer_4",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_4"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-rentAndLease"
-                }
-              },
-              {
-                "variable": "disclamer_5",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_FIFTH_LINE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-rentAndLease"
-                }
-              },
-              {
-                "variable": "to",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_TO"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-rentAndLease"
-                }
-              },
-              {
-                "variable": "Municipal_Corporation",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_MDMS_MUNICIPAL_CORPORATION"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-rentAndLease"
-                }
-              },
-              {
-                "variable": "total_bill_amount",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_TOTAL_BILL_AMOUNT"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-rentAndLease"
-                }
-              }
-            ]
-          },
-          {
-            "derived": [
-              {
-                "variable": "pendingAmount",
-                "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"
-              },
-              {
-                "variable": "excessAmountPaid",
-                "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
-              },
-               {
-                "variable": "SecurityDeposit",
-                "formula": "{{SecurityDeposit}}>0?{{SecurityDeposit}}:0"
-              },
-              {
-                "variable": "rentSgst",
-                "formula": "{{rentSgst}}>0?{{rentSgst}}:0"
-              },
-              {
-                "variable": "rentCgst",
-                "formula": "{{rentCgst}}>0?{{rentCgst}}:0"
-              },
-              {
-                "variable": "rentCowcess",
-                "formula": "{{rentCowcess}}>0?{{rentCowcess}}:0"
-              },
-              {
-                "variable": "rentArrears",
-                "formula": "{{rentArrears}}>0?{{rentArrears}}:0"
-              },
-               {
-                "variable": "rentAndLeaseFee",
-                "formula": "{{rentAndLeaseFee}}>0?{{rentAndLeaseFee}}:0"
-              },
-              {
-                "variable": "penaltyFee",
-                "formula": "{{penaltyFee}}>0?{{penaltyFee}}:0"
               }
             ]
           },
@@ -733,33 +544,6 @@
                       "required": true,
                       "prefix": "TENANT_TENANTS",
                       "module": "rainmaker-rentAndLease"
-                    }
-                  }
-                ]
-              },
-              {
-                "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
-                "queryParam": "moduleName=tenant&masterName=footer&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}' %26%26 @.service=='{$.paymentDetails[0].businessService}')%5D",
-                "apiRequest": null,
-                "responseMapping": [
-                  {
-                    "variable": "variable11",
-                    "value": "$.MdmsRes.tenant.footer[0].receiptFooterContent.*",
-                    "type": "array",
-                    "format": {
-                      "type": "string",
-                      "scema": [
-                        {
-                          "variable": "disclaimerContent",
-                          "value": "disclaimer",
-                          "type": "string",
-                          "localisation": {
-                            "required": true,
-                            "prefix": null,
-                            "module": "rainmaker-rentAndLease"
-                          }
-                        }
-                      ]
                     }
                   }
                 ]

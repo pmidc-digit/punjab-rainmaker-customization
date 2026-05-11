@@ -4,8 +4,8 @@
   "DataConfigs": {
     "moduleName": "rainmaker-common",
     "version": "1.0.0",
-    "baseKeyPath": "$.Payments.*",
-    "entityIdPath": "$.id",
+    "baseKeyPath": "$.Payments[0].billDetails.*",
+    "entityIdPath": "$.tenantId",
     "isCommonTableBorderRequired": true,
     "mappings": [
       {
@@ -16,7 +16,7 @@
               {
                 "variable": "payerName",
                 "value": {
-                  "path": "$.payerName"
+                  "path": "$.billRootData.gcSearchData.connectionHolders[0].name"
                 }
               },
               {
@@ -35,7 +35,7 @@
               {
                 "variable": "payerContact",
                 "value": {
-                  "path": "$.mobileNumber"
+                  "path": "$.billRootData.gcSearchData.connectionHolders[0].mobileNumber"
                 }
               },
               {
@@ -48,7 +48,7 @@
               {
                 "variable": "receiptNo",
                 "value": {
-                  "path": "$.paymentDetails[0].receiptNumber"
+                  "path": "$.billRootData.paymentDetails[0].receiptNumber"
                 }
               },
               {
@@ -78,7 +78,7 @@
               {
                 "variable": "totalAmount",
                 "value": {
-                  "path": "$.totalAmountPaid"
+                  "path": "$.amount"
                 }
               },
               {
@@ -96,16 +96,41 @@
               {
                 "variable": "SecurityDeposit",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'GC_SECURITY_DEPOSIT')].adjustedAmount"
+                  "path": "$.billRootData.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'GC_SECURITY_DEPOSIT')].adjustedAmount"
                 }
               },
               {
                 "variable": "ConnectionFee",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'GC_CONNECTION_FEE')].adjustedAmount"
+                  "path": "$.billRootData.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'GC_CONNECTION_FEE')].adjustedAmount"
                 }
               },
               
+              {
+                "variable": "var_billDetails",
+                "value": {
+                  "path": "$.billAccountDetails[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "object",
+                  "scema": [
+                    {
+                      "variable": "billTaxHeadCode",
+                      "value": "taxHeadCode",
+                      "localisation": {
+                        "required": true,
+                        "prefix": null,
+                        "module": "rainmaker-common"
+                      }
+                    },
+                    {
+                      "variable": "billAmount",
+                      "value": "amount"
+                    }
+                  ]
+                }
+              },
 
               {
                 "variable": "tenantid",
@@ -116,7 +141,7 @@
               {
                 "variable": "serviceType",
                 "value": {
-                  "path": "$.paymentDetails[0].businessService"
+                  "path": "$.billRootData.paymentDetails[0].businessService"
                 },
                 "localisation": {
                   "required": true,
@@ -127,27 +152,27 @@
               {
                 "variable": "paidAmount",
                 "value": {
-                  "path": "$.paymentDetails[0].totalAmountPaid"
+                  "path": "$.amount"
                 }
               },
               {
                 "variable": "fromPeriod",
                 "value": {
-                  "path": "$.transactionDate"
+                  "path": "$.fromPeriod"
                 },
                 "type": "date"
               },
               {
                 "variable": "toPeriod",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].toPeriod"
+                  "path": "$.toPeriod"
                 },
                 "type": "date"
               },
               {
                 "variable": "paymentMode",
                 "value": {
-                  "path": "$.paymentMode"
+                  "path": "$.billRootData.paymentMode"
                 },
                 "localisation": {
                   "required": true,
@@ -158,39 +183,39 @@
               {
                 "variable": "G8ReceiptNo",
                 "value": {
-                  "path": "$.paymentDetails[0].manualReceiptNumber"
+                  "path": "$.billRootData.paymentDetails[0].manualReceiptNumber"
                 }
               },
               {
                 "variable": "G8ReceiptDate",
                 "value": {
-                  "path": "$.paymentDetails[0].manualReceiptDate"
+                  "path": "$.billRootData.paymentDetails[0].manualReceiptDate"
                 },
                 "type": "date"
               },
               {
                 "variable": "paymentDate",
                 "value": {
-                  "path": "$.transactionDate"
+                  "path": "$.fromPeriod"
                 },
                 "type": "date"
               },
               {
                 "variable": "consumerID",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.consumerCode"
+                  "path": "$.billRootData.identifier"
                 }
               },
               {
                 "variable": "transactionID",
                 "value": {
-                  "path": "$.transactionNumber"
+                  "path": "$.billRootData.transactionNumber"
                 }
               },
               {
                 "variable": "dueAmount",
                 "value": {
-                  "path": "$.paymentDetails[0].totalDue"
+                  "path": "$.billRootData.paymentDetails[0].totalDue"
                 }
               },
               {
@@ -412,7 +437,7 @@
               {
                 "variable": "no_signature",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_NO_SIGNATURE"
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_NO_SIGNATURE_GC"
                 },
                 "type": "label",
                 "localisation": {
@@ -532,26 +557,6 @@
             ]
           },
           {
-            "derived": [
-              {
-                "variable": "pendingAmount",
-                "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"
-              },
-              {
-                "variable": "SecurityDeposit",
-                "formula": "{{SecurityDeposit}}>0?{{SecurityDeposit}}:0"
-              },
-              {
-                "variable": "ConnectionFee",
-                "formula": "{{ConnectionFee}}>0?{{ConnectionFee}}:0"
-              },
-              {
-                "variable": "excessAmountPaid",
-                "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
-              }
-            ]
-          },
-          {
             "externalAPI": [
               {
                 "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
@@ -590,33 +595,6 @@
                       "required": true,
                       "prefix": "TENANT_TENANTS",
                       "module": "rainmaker-common"
-                    }
-                  }
-                ]
-              },
-              {
-                "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
-                "queryParam": "moduleName=tenant&masterName=footer&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}' %26%26 @.service=='{$.paymentDetails[0].businessService}')%5D",
-                "apiRequest": null,
-                "responseMapping": [
-                  {
-                    "variable": "variable11",
-                    "value": "$.MdmsRes.tenant.footer[0].receiptFooterContent.*",
-                    "type": "array",
-                    "format": {
-                      "type": "string",
-                      "scema": [
-                        {
-                          "variable": "disclaimerContent",
-                          "value": "disclaimer",
-                          "type": "string",
-                          "localisation": {
-                            "required": true,
-                            "prefix": null,
-                            "module": "rainmaker-common"
-                          }
-                        }
-                      ]
                     }
                   }
                 ]
