@@ -4096,7 +4096,7 @@ ReportDefinitions:
        ((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') as finyear,
        d.status as demandstatus, (To_timestamp(dd.createdtime/1000) at time Zone 'Asia/Kolkata') ddupdated, 
        dd.taxheadcode, dd.taxamount as taxamt, dd.collectionamount as taxcoll, (dd.taxamount - dd.collectionamount) balance, 
-       d.ispaymentcompleted , dd.additionaldetails
+       CASE WHEN d.ispaymentcompleted = true THEN 'True'ELSE 'False'END AS ispaymentcompleted,dd.additionaldetails
        from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_ws_connection wc , eg_pt_property ep
        where dd.demandid=d.id 
        and d.consumercode = wc.connectionno and wc.status = 'Active' and wc.tenantid = $tenantid
@@ -4114,8 +4114,6 @@ ReportDefinitions:
                )
          and d.tenantid = $tenantid
     orderby: order by d.taxperiodfrom desc 
-  
-  
   
   - reportName: sewerage_demand_status_report
     summary: Sewerage - Demand status report 
@@ -4196,7 +4194,7 @@ ReportDefinitions:
        ((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') as finyear,
        d.status as demandstatus, (To_timestamp(dd.createdtime/1000) at time Zone 'Asia/Kolkata') ddupdated, 
        dd.taxheadcode, dd.taxamount as taxamt, dd.collectionamount as taxcoll, (dd.taxamount - dd.collectionamount) balance, 
-       d.ispaymentcompleted , dd.additionaldetails
+       CASE WHEN d.ispaymentcompleted = true THEN 'True'ELSE 'False'END AS ispaymentcompleted,dd.additionaldetails
        from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_sw_connection wc , eg_pt_property ep
        where dd.demandid=d.id 
        and d.consumercode = wc.connectionno and wc.status = 'Active' and wc.tenantid = $tenantid
