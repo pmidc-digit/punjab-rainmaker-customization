@@ -213,7 +213,7 @@ ReportDefinitions:
           from eg_clu c
          inner join eg_clu_details ad on c.id = ad.cluid
          inner join ulb_data u on u.ulb_code=c.tenantid
-         where 1=1
+         where 1=1 and c.tenantid != 'pb.testing'
   groupby: GROUP BY c.applicationno,c.applicationstatus, c.vasikadate, c.vasikanumber,ad.additionaldetails,c.createdtime,c.tenantid
   orderby: ORDER BY c.createdtime ;      
 
@@ -437,7 +437,7 @@ ReportDefinitions:
           COUNT(CASE WHEN sc.timeline_status = 'BREACHED' THEN 1 END) AS beyond_timeline_count
           FROM sla_calc sc
           JOIN ulb_data u ON sc.tenantid = u.ulb_code
-          WHERE 1=1
+          WHERE 1=1 
   groupby: GROUP BY u.district, u.name_of_ulb,sc.ulb_type
   orderby: ORDER BY u.district, u.name_of_ulb ,sc.ulb_type DESC
 
@@ -741,7 +741,7 @@ ReportDefinitions:
         COALESCE(NULLIF(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 4 THEN cnt END), 0)::TEXT, '') AS day5,
         COALESCE(NULLIF(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 5 THEN cnt END), 0)::TEXT, '') AS day6,
         COALESCE(NULLIF(MAX(CASE WHEN dt = (SELECT base_dt FROM params) - 6 THEN cnt END), 0)::TEXT, '') AS day7
-      FROM agg where 1=1
+      FROM agg where 1=1 
       
   groupby:  GROUP BY designation_code    
   orderby:  ORDER BY officer_designation
@@ -890,7 +890,7 @@ ReportDefinitions:
           FROM upcoming_breaches ub
           JOIN ulb_data u ON ub.tenantid = u.ulb_code
           JOIN params p ON TRUE    
-             WHERE 1=1 
+             WHERE 1=1  
   groupby: GROUP BY u.district, u.name_of_ulb
   orderby: ORDER BY u.district, u.name_of_ulb DESC  
     
@@ -1212,7 +1212,7 @@ ReportDefinitions:
         ut.amountpaid
         FROM unique_transactions ut
         LEFT JOIN ulb_data ulb ON ulb.ulb_code = ut.payment_tenant
-       where 1=1
+       where 1=1 
   orderby: ORDER BY createdtime DESC 
   
 - reportName: SLAReportCLU
