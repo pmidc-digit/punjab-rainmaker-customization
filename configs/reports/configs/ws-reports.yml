@@ -4099,7 +4099,7 @@ ReportDefinitions:
        d.ispaymentcompleted , dd.additionaldetails
        from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_ws_connection wc , eg_pt_property ep
        where dd.demandid=d.id 
-       and d.consumercode = wc.connectionno and wc.status = 'Active' and wc.tenantid = 'pb.jandialaguru'
+       and d.consumercode = wc.connectionno and wc.status = 'Active' and wc.tenantid = $tenantid
        and wc.property_id = ep.propertyid and ep.tenantid = $tenantid
        and d.status!='CANCELLED' 
        and d.businessservice='WS' 
@@ -4200,7 +4200,7 @@ ReportDefinitions:
        from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_sw_connection wc , eg_pt_property ep
        where dd.demandid=d.id 
        and d.consumercode = wc.connectionno and wc.status = 'Active' and wc.tenantid = $tenantid
-       and wc.property_id = ep.propertyid and ep.tenantid = 'pb.jandialaguru'
+       and wc.property_id = ep.propertyid and ep.tenantid = $tenantid
        and d.status!='CANCELLED' 
        and d.businessservice='SW' 
        and dd.taxheadcode = 'SW_CHARGE'
