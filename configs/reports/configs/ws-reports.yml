@@ -4015,4 +4015,202 @@ ReportDefinitions:
            FROM bill_data
            ) t
        WHERE rn = 1 
-    orderby: ORDER BY consumercode     
+    orderby: ORDER BY consumercode
+
+  - reportName: water_demand-report
+    summary: Water - Demand status report 
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A4
+    sourceColumns:
+      - name: consumercode
+        label: Consumercode
+        type: string
+        source: ws
+        total: false
+      - name: status
+        label: Status
+        type: string
+        source: ws
+        total: false
+      - name: propertyid
+        label: Property Id
+        type: string
+        source: ws
+        total: false
+      - name: landarea
+        label: Landarea
+        type: string
+        source: ws
+        total: false     
+      - name: usagecategory
+        label: Usage Category
+        type: string
+        source: ws
+        total: false
+      - name: finyear
+        label: Financialyear
+        type: string
+        source: ws
+        total: true
+      - name: demandstatus
+        label: Demand Status
+        type: string
+        source: ws
+        total: false    
+      - name: ddupdated
+        label: ddupdated
+        type: string
+        source: ws
+        total: false 
+      - name: taxheadcode
+        label: Taxheadcode
+        type: string
+        source: ws
+        total: false 
+      - name: taxamt
+        label: Taxamt
+        type: string
+        source: ws
+        total: false
+      - name: taxcoll
+        label: Taxcoll
+        type: string
+        source: ws
+        total: false 
+      - name: balance
+        label: Balance
+        type: string
+        source: ws
+        total: false
+      - name: ispaymentcompleted
+        label: ispaymentcompleted
+        type: string
+        source: ws
+        total: false                                                                                   
+    query:
+       select  d.consumercode , wc.status, ep.propertyid , ep.landarea , ep.usagecategory , 
+       to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') ||'-'|| to_char
+       ((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') as finyear,
+       d.status as demandstatus, (To_timestamp(dd.createdtime/1000) at time Zone 'Asia/Kolkata') ddupdated, 
+       dd.taxheadcode, dd.taxamount as taxamt, dd.collectionamount as taxcoll, (dd.taxamount - dd.collectionamount) balance, 
+       d.ispaymentcompleted , dd.additionaldetails
+       from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_ws_connection wc , eg_pt_property ep
+       where dd.demandid=d.id 
+       and d.consumercode = wc.connectionno and wc.status = 'Active' and wc.tenantid = 'pb.jandialaguru'
+       and wc.property_id = ep.propertyid and ep.tenantid = $tenantid
+       and d.status!='CANCELLED' 
+       and d.businessservice='WS' 
+       and dd.taxheadcode = 'WS_CHARGE'
+       AND d.taxperiodfrom = (
+             SELECT MAX(d2.taxperiodfrom)
+             FROM   egbs_demand_v1 d2
+             WHERE  d2.consumercode    = d.consumercode
+               AND  d2.tenantid        = d.tenantid
+               AND  d2.businessservice = 'WS'
+               AND  d2.status         != 'CANCELLED'
+               )
+         and d.tenantid = $tenantid
+    orderby: order by d.taxperiodfrom desc 
+  
+  
+  
+  - reportName: sewerage_demand-report
+    summary: Sewerage - Demand status report 
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A4
+    sourceColumns:
+      - name: consumercode
+        label: Consumercode
+        type: string
+        source: ws
+        total: false
+      - name: status
+        label: Status
+        type: string
+        source: ws
+        total: false
+      - name: propertyid
+        label: Property Id
+        type: string
+        source: ws
+        total: false
+      - name: landarea
+        label: Landarea
+        type: string
+        source: ws
+        total: false     
+      - name: usagecategory
+        label: Usage Category
+        type: string
+        source: ws
+        total: false
+      - name: finyear
+        label: Financialyear
+        type: string
+        source: ws
+        total: true
+      - name: demandstatus
+        label: Demand Status
+        type: string
+        source: ws
+        total: false    
+      - name: ddupdated
+        label: ddupdated
+        type: string
+        source: ws
+        total: false 
+      - name: taxheadcode
+        label: Taxheadcode
+        type: string
+        source: ws
+        total: false 
+      - name: taxamt
+        label: Taxamt
+        type: string
+        source: ws
+        total: false
+      - name: taxcoll
+        label: Taxcoll
+        type: string
+        source: ws
+        total: false 
+      - name: balance
+        label: Balance
+        type: string
+        source: ws
+        total: false
+      - name: ispaymentcompleted
+        label: ispaymentcompleted
+        type: string
+        source: ws
+        total: false                                                                                   
+    query:
+       select  d.consumercode , wc.status, ep.propertyid , ep.landarea , ep.usagecategory , 
+       to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') ||'-'|| to_char
+       ((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') as finyear,
+       d.status as demandstatus, (To_timestamp(dd.createdtime/1000) at time Zone 'Asia/Kolkata') ddupdated, 
+       dd.taxheadcode, dd.taxamount as taxamt, dd.collectionamount as taxcoll, (dd.taxamount - dd.collectionamount) balance, 
+       d.ispaymentcompleted , dd.additionaldetails
+       from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_sw_connection wc , eg_pt_property ep
+       where dd.demandid=d.id 
+       and d.consumercode = wc.connectionno and wc.status = 'Active' and wc.tenantid = $tenantid
+       and wc.property_id = ep.propertyid and ep.tenantid = 'pb.jandialaguru'
+       and d.status!='CANCELLED' 
+       and d.businessservice='SW' 
+       and dd.taxheadcode = 'SW_CHARGE'
+       AND d.taxperiodfrom = (
+             SELECT MAX(d2.taxperiodfrom)
+             FROM   egbs_demand_v1 d2
+             WHERE  d2.consumercode    = d.consumercode
+               AND  d2.tenantid        = d.tenantid
+               AND  d2.businessservice = 'SW'
+               AND  d2.status         != 'CANCELLED'
+               )
+         and d.tenantid = $tenantid
+    orderby: order by d.taxperiodfrom desc 
