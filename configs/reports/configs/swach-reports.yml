@@ -913,7 +913,8 @@ ReportDefinitions:
       servicecode AS complaint_type,
       COUNT(servicerequestid) AS total_requests
       FROM eg_swach_service_v2
-      WHERE createdby = 'af2af7bb-9482-4667-a2ef-a7d8fd29181c'
+      WHERE createdby = 'af2af7bb-9482-4667-a2ef-a7d8fd29181c' 
+      AND 1 = 1
     groupby: GROUP BY tenantid, servicecode
     orderby: ORDER BY ulb, complaint_type    
 
