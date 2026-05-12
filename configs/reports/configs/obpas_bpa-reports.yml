@@ -1878,27 +1878,22 @@ ReportDefinitions:
     label: ULB Type
     type: string
     source: obpas_bpa
-    total: false
   - name: District
     label: District
     type: string
     source: obpas_bpa
-    total: false
   - name: Sno
     label: Serial No
     type: string
     source: obpas_bpa
-    total: false  
   - name: ULB Name
     label: ULB Name
     type: string
     source: obpas_bpa
-    total: false
   - name: Application Status
     label: Application Status
     type: string
     source: obpas_bpa
-    total: false  
   - name: Building Plan
     label: Building Plan
     type: string
@@ -1908,17 +1903,14 @@ ReportDefinitions:
     label: NOC
     type: string
     source: obpas_bpa
-    total: true
   - name: CLU
     label: CLU
     type: string
     source: obpas_bpa
-    total: true
   - name: Layout
     label: Layout
     type: string
     source: obpas_bpa
-    total: true        
   searchParams:
   - name: district
     label: District
@@ -2020,8 +2012,8 @@ ReportDefinitions:
               WHEN g.grp_level = 1 THEN 'Sub Total'
               -- Specific mappings for localization
               WHEN UPPER(g.applicationstatus) = 'PENDINGAPPLICATIONPAYMENT' THEN 'Pending Application Payment'
-              WHEN UPPER(g.applicationstatus) = 'FIELDINSPECTION_INPROGRESS' OR g.applicationstatus = 'Fieldinspection Inprogress' THEN 'Field Inspection In Progress'
-              WHEN UPPER(g.applicationstatus) = 'CITIZEN_APPROVAL_INPROCESS' OR g.applicationstatus = 'Citizen Approval Inprocess' THEN 'Citizen Approval In Process'
+              WHEN UPPER(g.applicationstatus) = 'FIELDINSPECTION_INPROGRESS' OR g.applicationstatus = 'Field Inspection Inprogress' THEN 'Field Inspection In Progress'
+              WHEN UPPER(g.applicationstatus) = 'CITIZEN_APPROVAL_INPROCESS' OR g.applicationstatus = 'Citizen Approval In Process' THEN 'Citizen Approval In Process'
         WHEN UPPER(g.applicationstatus) = 'E_SIGNED' OR g.applicationstatus = 'E-Signed' THEN 'E-Signed'
         WHEN UPPER(g.applicationstatus) = 'INITIATED' THEN 'Initiated'
         -- Fallback: Underscore hatao aur Proper Case karo
