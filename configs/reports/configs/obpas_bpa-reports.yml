@@ -1938,7 +1938,7 @@ ReportDefinitions:
           
           SELECT n.tenantid, n.applicationstatus, 'NOC' as module 
           FROM eg_noc n 
-		  inner join eg_noc_details nd on nd.nocid = n.id
+          inner join eg_noc_details nd on nd.nocid = n.id
           WHERE n.tenantid != 'pb.testing' 
             AND n.createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
             AND n.applicationno not LIKE 'PB/%' AND (nd.additionaldetails::text not LIKE '%sanctionLetter%'  OR nd.additionaldetails IS NULL)
