@@ -7,7 +7,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: tenant
     label: ULB Name
@@ -109,7 +109,7 @@ ReportDefinitions:
           (additionaldetails::jsonb)->>'area' AS plot_area,
           (additionaldetails::jsonb)->>'architectName' AS architect_name,
           (additionaldetails::jsonb)->> 'Ulblisttype' AS ulb_type
-      FROM eg_bpa_buildingplan  where 1=1
+      FROM eg_bpa_buildingplan  where 1=1 AND tenantid != 'pb.testing'
   orderby:  ORDER BY createdtime DESC;
 
 - reportName: CollectionsReportBPA
@@ -119,7 +119,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: Tenant
     label: ULB Name
@@ -278,7 +278,7 @@ ReportDefinitions:
         LEFT JOIN eg_user u ON u.id::text = p.createdby::text
         LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno OR ch.applicationno = a.id::text
-        WHERE pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG')
+        WHERE pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE')
           AND upper(p.paymentstatus) != 'CANCELLED'
       )
       
@@ -292,7 +292,7 @@ ReportDefinitions:
          status,
         collector_code,
         cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
-      FROM unique_transactions where 1=1
+      FROM unique_transactions where 1=1 and tenant != 'testing'
   orderby: ORDER BY applicationno,createdtime DESC 
   
 - reportName: SLAReportbpa
@@ -302,7 +302,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: tenantid
     label: ULB Name
@@ -484,7 +484,7 @@ ReportDefinitions:
       LEFT JOIN latest_status ls ON n.applicationno = ls.uuid
       JOIN sla_data sla ON n.businessservice = sla.businessservice
       LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
-      WHERE UPPER(COALESCE(ls.applicationstatus, '')) NOT IN ('CITIZEN_APPROVAL_INPROCESS','PENDING_APPL_FEE','INITIATED')
+      WHERE UPPER(COALESCE(ls.applicationstatus, '')) NOT IN ('CITIZEN_APPROVAL_INPROCESS','PENDING_APPL_FEE','INITIATED') and n.tenantid != 'pb.testing'
   orderby:  ORDER BY n.applicationno,n.createdtime DESC
 
 - reportName: ReceiptRegisterbpa
@@ -494,7 +494,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: Tenant
     label: ULB Name
@@ -614,8 +614,8 @@ ReportDefinitions:
       LEFT JOIN eg_user usr 
           ON usr.id = payment.createdby::integer
       WHERE
-          pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG')
-          AND payment.paymentstatus != 'CANCELLED'
+          pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE')
+          AND payment.paymentstatus != 'CANCELLED' and pd.tenantid != 'pb.testing'
   orderby: ORDER BY pd.receiptdate DESC;
 
 - reportName: Detailed_File_List
@@ -624,7 +624,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: applicationno
     label: Application Number
@@ -718,7 +718,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: ulb_name
     label: ULB Name
@@ -770,7 +770,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: ulb_name
     label: ULB Name
@@ -865,7 +865,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: Officer_Designation
     label: Officer Designation
@@ -1005,7 +1005,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: district
     label: District
@@ -1122,7 +1122,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: district
     label: District
@@ -1250,7 +1250,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: district
     label: District
@@ -1413,7 +1413,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: district
     label: District
@@ -1598,7 +1598,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
 
   sourceColumns:
   - name: user_uuid
@@ -1820,7 +1820,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
 
   sourceColumns:
   - name: employee_name
@@ -1864,5 +1864,171 @@ ReportDefinitions:
           COUNT(*)                                        AS total_count
           from edcr_cross_ulb_result
   groupby: GROUP BY ulb_schema,applicant_name,mobilenumber          
-  orderby: ORDER BY employee_name        
+  orderby: ORDER BY employee_name
+
+- reportName: Filesubmissionsummaryreport
+  summary: File Submission Count Summary Report
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A4
+  sourceColumns:
+  - name: ULB Type
+    label: ULB Type
+    type: string
+    source: obpas_bpa
+  - name: District
+    label: District
+    type: string
+    source: obpas_bpa
+  - name: Sno
+    label: Serial No
+    type: string
+    source: obpas_bpa
+  - name: ULB Name
+    label: ULB Name
+    type: string
+    source: obpas_bpa
+  - name: Application Status
+    label: Application Status
+    type: string
+    source: obpas_bpa
+  - name: Building Plan
+    label: Building Plan
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: NOC
+    label: NOC
+    type: string
+    source: obpas_bpa
+  - name: CLU
+    label: CLU
+    type: string
+    source: obpas_bpa
+  - name: Layout
+    label: Layout
+    type: string
+    source: obpas_bpa
+  searchParams:
+  - name: district
+    label: District
+    type: singlevaluelist
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND g.ulb_district = $district
+  - name: tenant
+    label: ULB Name
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND tenantid = $tenant
+  query: |
+      WITH combined_modules AS (
+          -- 1. Modules Stack with Filters
+          SELECT tenantid, status as applicationstatus, 'Building Plan' as module 
+          FROM eg_bpa_buildingplan 
+          WHERE tenantid != 'pb.testing' 
+            AND createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
           
+          UNION ALL
+          
+          SELECT n.tenantid, n.applicationstatus, 'NOC' as module 
+          FROM eg_noc n 
+		  inner join eg_noc_details nd on nd.nocid = n.id
+          WHERE n.tenantid != 'pb.testing' 
+            AND n.createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
+            AND n.applicationno not LIKE 'PB/%' AND (nd.additionaldetails::text not LIKE '%sanctionLetter%'  OR nd.additionaldetails IS NULL)
+          
+          UNION ALL
+          
+          SELECT tenantid, applicationstatus, 'CLU' as module 
+          FROM eg_clu 
+          WHERE tenantid != 'pb.testing' 
+            AND createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
+          
+          UNION ALL
+          
+          SELECT tenantid, applicationstatus, 'Layout' as module 
+          FROM eg_layout 
+          WHERE tenantid != 'pb.testing' 
+            AND createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
+      ),
+      ulb_metadata AS (
+          -- 2. Metadata Join
+          SELECT 
+              m.*,
+              u.type as ulb_type,
+              u.district as ulb_district,
+              u.name_of_ulb
+          FROM combined_modules m
+          LEFT JOIN ulb_data u ON m.tenantid = u.ulb_code 
+      ),
+      ulb_stats AS (
+          -- 3. Diversity Check for Subtotals
+          SELECT name_of_ulb, COUNT(DISTINCT applicationstatus) as distinct_statuses
+          FROM ulb_metadata
+          GROUP BY name_of_ulb
+      ),
+      final_grouping AS (
+          -- 4. Rollup Aggregation logic
+          SELECT 
+              ulb_type,
+              ulb_district,
+              name_of_ulb,
+              applicationstatus,
+              COUNT(*) FILTER (WHERE module = 'Building Plan') as bpa_count,
+              COUNT(*) FILTER (WHERE module = 'NOC') as noc_count,
+              COUNT(*) FILTER (WHERE module = 'CLU') as clu_count,
+              COUNT(*) FILTER (WHERE module = 'Layout') as layout_count,
+              GROUPING(ulb_type, ulb_district, name_of_ulb, applicationstatus) as grp_level,
+              
+              -- Partitioning logic to hide duplicate labels
+              ROW_NUMBER() OVER(PARTITION BY ulb_type ORDER BY ulb_district, name_of_ulb, applicationstatus) as type_row_num,
+              ROW_NUMBER() OVER(PARTITION BY ulb_type, ulb_district ORDER BY name_of_ulb, applicationstatus) as dist_row_num,
+              ROW_NUMBER() OVER(PARTITION BY name_of_ulb ORDER BY applicationstatus) as name_row_num
+              
+          FROM ulb_metadata
+          GROUP BY ROLLUP(ulb_type, ulb_district, name_of_ulb, applicationstatus)
+      )
+      SELECT 
+          -- 1. ULB Type (Sirf tab dikhe jab naya block shuru ho)
+          CASE WHEN g.type_row_num = 1 AND g.grp_level = 0 THEN g.ulb_type ELSE '' END AS "ULB Type",
+          
+          -- 2. District (Sirf tab dikhe jab block badle)
+          CASE WHEN g.dist_row_num = 1 AND g.grp_level = 0 THEN g.ulb_district ELSE '' END AS "District",
+      
+          -- 3. Serial Number (#)
+          CASE WHEN g.name_row_num = 1 AND g.grp_level = 0 THEN 
+              DENSE_RANK() OVER(ORDER BY g.ulb_type, g.ulb_district, g.name_of_ulb)::text ELSE '' END AS "Sno",
+      
+          -- 4. ULB Name
+          CASE WHEN g.name_row_num = 1 AND g.grp_level = 0 THEN g.name_of_ulb ELSE '' END AS "ULB Name",
+      
+          -- 5. Application Status: Manual Mapping using CASE
+          CASE 
+              WHEN g.grp_level = 15 THEN 'GRAND TOTAL' 
+              WHEN g.grp_level = 1 THEN 'Sub Total'
+              -- Specific mappings for localization
+              WHEN UPPER(g.applicationstatus) = 'PENDINGAPPLICATIONPAYMENT' THEN 'Pending Application Payment'
+              WHEN UPPER(g.applicationstatus) = 'FIELDINSPECTION_INPROGRESS' OR g.applicationstatus = 'Field Inspection Inprogress' THEN 'Field Inspection In Progress'
+              WHEN UPPER(g.applicationstatus) = 'CITIZEN_APPROVAL_INPROCESS' OR g.applicationstatus = 'Citizen Approval In Process' THEN 'Citizen Approval In Process'
+        WHEN UPPER(g.applicationstatus) = 'E_SIGNED' OR g.applicationstatus = 'E-Signed' THEN 'E-Signed'
+        WHEN UPPER(g.applicationstatus) = 'INITIATED' THEN 'Initiated'
+        -- Fallback: Underscore hatao aur Proper Case karo
+        ELSE INITCAP(REPLACE(g.applicationstatus, '_', ' ')) 
+        END AS "Application Status",
+        -- 6. Metrics (Counts
+        NULLIF(g.bpa_count, 0) AS "Building Plan",
+        NULLIF(g.noc_count, 0) AS "NOC",
+        NULLIF(g.clu_count, 0) AS "CLU",
+        NULLIF(g.layout_count, 0) AS "Layout"
+        FROM final_grouping g
+        LEFT JOIN ulb_stats s ON g.name_of_ulb = s.name_of_ulb 
+        WHERE 
+        (g.grp_level = 0) 
+        OR (g.grp_level = 1 AND s.distinct_statuses > 1) OR (g.grp_level = 15)
+  orderby: ORDER BY g.ulb_type, g.ulb_district, g.name_of_ulb, g.grp_level, g.applicationstatus;
