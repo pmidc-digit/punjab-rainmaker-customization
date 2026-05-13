@@ -7,7 +7,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_layout
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: tenant
     label: TenantId
@@ -194,7 +194,7 @@ ReportDefinitions:
           FROM eg_layout n
           LEFT JOIN eg_layout_details ad ON ad.layoutid = n.id
           inner join ulb_data u on u.ulb_code=n.tenantid
-         WHERE n.applicationstatus not in ('INITIATED', 'CANCELLED','CITIZENACTIONREQUIRED')
+         WHERE n.applicationstatus not in ('INITIATED', 'CANCELLED','CITIZENACTIONREQUIRED') and n.tenantid != 'pb.testing'
   groupby: GROUP BY n.applicationno,n.applicationstatus, n.vasikadate, n.vasikanumber,ad.additionaldetails,n.tenantid
   orderby: ORDER BY n.vasikadate;
   
@@ -205,7 +205,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_layout
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: tenant
     label: TenantId
@@ -370,7 +370,7 @@ ReportDefinitions:
         applicationstatus,
         collector_code,
         cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
-      FROM unique_transactions where 1=1 
+      FROM unique_transactions where tenant != 'testing'
   orderby: ORDER BY createdtime DESC 
   
 - reportName: SLAReportlayout
@@ -380,7 +380,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_layout
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: tenantid
     label: tenantid
@@ -583,7 +583,7 @@ ReportDefinitions:
       LEFT JOIN latest_status ls ON n.applicationno = ls.uuid
       JOIN sla_data sla ON sla.businessservice IN ('Layout_mcl_up','Layout_mcl_abv','Layout_mco_abv','Layout_mcUp')
       LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
-      WHERE UPPER(TRIM(ls.applicationstatus)) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT')        
+      WHERE UPPER(TRIM(ls.applicationstatus)) NOT IN ('APPLY','INITIATED','PENDINGPAYMENT') and n.tenantid != 'pb.testing'
   orderby:  ORDER BY n.createdtime DESC, tenantid, final_status          
   
 - reportName: ReceiptRegisterlayout
@@ -593,7 +593,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_layout
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: tenant
     label: TenantId
@@ -729,7 +729,7 @@ ReportDefinitions:
           ON usr.id = payment.createdby::integer
       WHERE
           pd.businessservice = 'layout'
-          AND payment.paymentstatus != 'CANCELLED'
+          AND payment.paymentstatus != 'CANCELLED'  and pd.tenantid != 'pb.testing'
   orderby: ORDER BY pd.receiptdate DESC;
 - reportName: officers_with_highest_pendency
   summary: Top 7 officers with Highest Pendency
@@ -737,7 +737,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_layout
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: ulb_name
     label: ULB Name
@@ -839,7 +839,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_layout
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: district
     label: District
@@ -950,7 +950,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_layout
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: district
     label: District
@@ -1079,7 +1079,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_layout
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: Officer_Designation
     label: Officer Designation
@@ -1203,7 +1203,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_layout
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: district
     label: District
@@ -1357,7 +1357,7 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_layout
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
   - name: district
     label: District 
