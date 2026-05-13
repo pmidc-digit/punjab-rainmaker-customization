@@ -1393,7 +1393,7 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: tenantid
+      - name: tenant_name
         label: ULB Name
         type: string
         source: ndc
@@ -1435,7 +1435,7 @@ ReportDefinitions:
         total: true
     query: >
       SELECT 
-          t.tenantid,
+          CASE WHEN t.tenantid = 'pb' THEN 'Punjab' ELSE INITCAP(SPLIT_PART(t.tenantid, '.', 2)) END AS tenant_name,
       
           COALESCE(chb.count, 0) AS chb,
           COALESCE(ndc.count, 0) AS ndc,
