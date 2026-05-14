@@ -1253,6 +1253,11 @@ ReportDefinitions:
     type: string
     source: tl
     total: false
+  - name: licensetype
+    label: licensetype
+    type: string
+    source: tl
+    total: false    
   - name: name
     label: report.tl.user.name
     type: string
@@ -1337,6 +1342,7 @@ ReportDefinitions:
   query: |  
     SELECT 
       licensenumber,
+      (case when oldlicensenumber is null then 'New' else 'Renewal' end) AS licensetype,
       to_char((To_timestamp(issueddate / 1000) at time Zone 'Asia/Kolkata'), 'DD/MM/YYYY') as formattedIssuedDate,
       tl.tradeName,
       initcap(tl.status) as status,
