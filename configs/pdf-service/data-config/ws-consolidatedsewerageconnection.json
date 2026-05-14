@@ -536,11 +536,6 @@
                   "prefix": null,
                   "module": "rainmaker-common"
                 }
-              },
-              {
-                "variable": "footerLogoImage",
-                "url": "https://pb-egov-assets.s3.ap-south-1.amazonaws.com/mseva-logo-colored.png",
-                "type": "image"
               }
             ]
           },
@@ -570,6 +565,18 @@
                       }
                     }
                   ]
+              },
+              {
+                "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
+                "queryParam": "moduleName=tenant&masterName=msevaLogo&tenantId=pb",
+                "apiRequest": null,
+                "responseMapping": [
+                  {
+                    "variable": "footerLogoImage",
+                    "value": "$.MdmsRes.tenant.msevaLogo[0].logoUrl",
+                    "type": "image"
+                  }
+                ]
               }
             ]
           }
