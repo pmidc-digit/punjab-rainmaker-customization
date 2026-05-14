@@ -113,13 +113,13 @@ ReportDefinitions:
       LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
       LEFT JOIN eg_user u ON u.uuid = wa.assignee
       LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-      WHERE wf.businessservice IN ('ENGINEER','ARCHITECT','TOWNPLANNER','SUPERVISOR')
+      WHERE wf.businessservice IN ('ENGINEER','ARCHITECT','TOWNPLANNER','SUPERVISOR','BPAREG_UPGRADE','ARCHITECT_UPGRADE')
       ORDER BY wf.businessid, wf.lastmodifiedtime DESC
     ),
     unique_transactions AS (
       SELECT
         p.createdtime,
-        split_part(p.tenantid,'.',2) AS tenant,
+        INITCAP(split_part(p.tenantid,'.',2)) AS tenant,
         pd.amountpaid,
         CASE WHEN upper(p.paymentmode) IN ('CASH','OFFLINE_CASH') THEN pd.amountpaid ELSE 0 END AS cash_amount,
         CASE WHEN upper(p.paymentmode) = 'CHEQUE' THEN pd.amountpaid ELSE 0 END AS cheque_amount,
@@ -130,7 +130,15 @@ ReportDefinitions:
         CASE WHEN upper(p.paymentmode) = 'ONLINE' THEN pd.amountpaid ELSE 0 END AS online_amount,
         COALESCE(emp.code,'SELF') AS collector_code,
         a.applicationnumber,
-        a.status,
+        CASE 
+                  WHEN a.status = 'APPROVED' THEN 'Approved'
+                  WHEN a.status = 'PENDINGDOCVERIFICATION' THEN 'Pending Document Verification'
+                  WHEN a.status = 'PENDINGAPPROVAL' THEN 'Pending Approval'
+                  WHEN a.status = 'INITIATED' THEN 'Initiated'
+                  WHEN a.status = 'REJECTED' THEN 'Rejected'
+                  WHEN a.status = 'CITIZENACTIONREQUIRED' THEN 'Citizen Action Required'
+                  ELSE REPLACE(INITCAP(REPLACE(a.status, '_', ' ')), 'Doc', 'Document')
+                END AS formatted_status,
         u_applicant.name,
         u_applicant.mobilenumber
       FROM egcl_paymentdetail pd
@@ -150,11 +158,11 @@ ReportDefinitions:
       name,
       mobilenumber,
       'Professional Registration' AS businessservice,
-      status,
+      formatted_status AS status,
       collector_code,
       cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
     FROM unique_transactions
-    WHERE tenant != 'testing'
+    WHERE lower(tenant) != 'testing'
 
   orderby: ORDER BY payment_date DESC
 
@@ -169,42 +177,52 @@ ReportDefinitions:
     label: Receipt Number
     type: string
     source: obpas
+    total: false
   - name: applicationno
     label: Application Number
     type: string
     source: obpas
+    total: false
   - name: tenant
     label: ULB Name
     type: string
     source: obpas
+    total: false
   - name: receiptdate
     label: Receipt Date
     type: string
     source: obpas
+    total: false
   - name: transactiondate
     label: Transaction Date
     type: string
     source: obpas
+    total: false
   - name: transaction_id
     label: Transaction Id
     type: string
     source: obpas
+    total: false
   - name: ownername1
     label: Owner Name
     type: string
     source: obpas
+    total: false
   - name: amountpaid
     label: Amount Paid
     type: string
     source: obpas
+    total: true
   - name: paymentmode
     label: Payment Mode
     type: string
     source: obpas
+    total: false
   - name: paymentstatus
     label: Payment Status
     type: string
     source: obpas
+    total: false
 
   searchParams:
   - name: fromDate
@@ -231,7 +249,7 @@ ReportDefinitions:
     SELECT
       pd.receiptnumber AS receiptno,
       bill.consumercode AS applicationno,
-      split_part(pd.tenantid,'.',2) AS tenant,
+      INITCAP(split_part(pd.tenantid, '.', 2)) AS tenant,
       TO_CHAR(TO_TIMESTAMP(pd.receiptdate/1000),'DD-MM-YYYY') AS receiptdate,
       TO_CHAR(TO_TIMESTAMP(payment.instrumentdate/1000),'DD-MM-YYYY') AS transactiondate,
       payment.instrumentnumber AS transaction_id,
@@ -283,7 +301,7 @@ ReportDefinitions:
       LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
       INNER JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
       INNER JOIN designation d ON a.designation = d.code
-      WHERE wf.businessservice IN ('ENGINEER','ARCHITECT','TOWNPLANNER','SUPERVISOR')
+      WHERE wf.businessservice IN ('ENGINEER','ARCHITECT','TOWNPLANNER','SUPERVISOR','BPAREG_UPGRADE','ARCHITECT_UPGRADE')
       ORDER BY wf.businessid, wf.lastmodifiedtime DESC
     )
     SELECT
@@ -292,9 +310,9 @@ ReportDefinitions:
       designation_code AS Officer_Designation,
       COUNT(DISTINCT businessid) AS pending_files
     FROM latest_assignee
+    Where tenantid != 'pb.testing'
   groupby:  group by tenantid,businessservice,designation_code
   orderby:  order by pending_files DESC
-
 
 - reportName: officers_wise_pendency_professional
   summary: Officers wise pendency trend – Professional Registration
@@ -361,6 +379,7 @@ ReportDefinitions:
       LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
       INNER JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
       INNER JOIN designation d ON d.code = a.designation
+      Where wf.tenantid != 'pb.testing' and wf.businessservice IN ('ENGINEER','ARCHITECT','TOWNPLANNER','SUPERVISOR','BPAEG_UPGRADE')
       ORDER BY wf.businessid, wf.lastmodifiedtime DESC
     )
     SELECT
