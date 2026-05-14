@@ -668,6 +668,7 @@
                       "variable":"mcGrade",
                       "value":"$.MdmsRes.tenant.tenants[0].city.pwssbGrade"
                     },
+                    
                     {
                       "variable": "logo_header",
                       "value":"$.MdmsRes.tenant.tenants[0].code",
@@ -678,10 +679,23 @@
                       }
                     }
                   ]
+              },
+              {
+                "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
+                "queryParam": "moduleName=tenant&masterName=msevaLogo&tenantId=pb",
+                "apiRequest": null,
+                "responseMapping": [
+                  {
+                    "variable": "footerLogoImage",
+                    "value": "$.MdmsRes.tenant.msevaLogo[0].logoUrl",
+                    "type": "image"
+                  }
+                ]
               }
             ]
           }
         ]
       }
     ]
-  }}
+  }
+}
