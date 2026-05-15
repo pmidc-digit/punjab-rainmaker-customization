@@ -3967,7 +3967,7 @@ ReportDefinitions:
       - name: sevicetype
         label: Sevice Type
         type: singlevaluelist
-        pattern: list://WS%:Water,SW%:Sewerage
+        pattern: list://WS:Water,SW:Sewerage
         source: ws
         isMandatory: true
         searchClause: AND 1=1                                                                 
@@ -3995,7 +3995,7 @@ ReportDefinitions:
        JOIN egbs_billdetail_v1 bd 
             ON bd.billid = bill.id
             WHERE bd.businessservice = $sevicetype
-       AND bill.tenantid = $tenantid  AND bill.createddate >= $fromDate AND  bill.createddate <= $fromDate
+       AND bill.tenantid = $tenantid  AND bill.createddate >= $fromDate AND  bill.createddate <= $toDate
        GROUP BY 
            bd.billno,
            bill.status,
