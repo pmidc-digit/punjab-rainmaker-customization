@@ -6951,3 +6951,133 @@ ReportDefinitions:
              )
        and d.tenantid = $tenantid
   orderby: order by d.taxperiodfrom desc 
+
+- reportName: DailyBillGenerate
+  summary: Daily Bill Generate report
+  version: 1.0.0
+  moduleName: rainmaker-ws
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+    - name: bill_fromperiod
+      label: Bill From period
+      type: string
+      source: ws
+      total: false
+    - name: bill_toperiod
+      label: Bill To period
+      type: string
+      source: ws
+      total: false
+    - name: consumercode
+      label: Consumer Code
+      type: string
+      source: ws
+      total: false
+    - name: billno
+      label: Bill No
+      type: string
+      source: ws
+      total: false     
+    - name: billdate
+      label: Bill date
+      type: string
+      source: ws
+      total: false
+    - name: billamount
+      label: Bill Amount
+      type: string
+      source: ws
+      total: true
+    - name: businessservice
+      label: Business Service
+      type: string
+      source: ws
+      total: false    
+    - name: OwnerName
+      label: Owner Name
+      type: string
+      source: ws
+      total: false 
+    - name: mobilenumber
+      label: Mobile Number
+      type: string
+      source: ws
+      total: false 
+    - name: status
+      label: status
+      type: string
+      source: ws
+      total: false
+    - name: createddate
+      label: Created Date
+      type: string
+      source: ws
+      total: false         
+  searchParams:
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: ws
+      isMandatory: true
+      searchClause: AND 1=1
+    - name: toDate
+      label: To Date
+      type: epoch
+      source: ws
+      isMandatory: true
+      searchClause: AND  1=1
+    - name: sevicetype
+      label: Sevice Type
+      type: singlevaluelist
+      pattern: list://WS:Water,SW:Sewerage
+      source: ws
+      isMandatory: true
+      searchClause: AND 1=1                                                                 
+  query:
+     WITH bill_data AS (
+     SELECT  
+         TO_CHAR(
+             (TO_TIMESTAMP(MIN(bd.fromperiod)/1000) AT TIME ZONE 'Asia/Kolkata'),
+             'YYYY-MM'
+         ) AS bill_fromperiod,
+         TO_CHAR(
+             (TO_TIMESTAMP(MAX(bd.toperiod)/1000) AT TIME ZONE 'Asia/Kolkata'),
+             'YYYY-MM'
+         ) AS bill_toperiod,
+       bd.consumercode,
+         bd.billno,
+       (TO_TIMESTAMP(bill.createddate/1000) AT TIME ZONE 'Asia/Kolkata') AS billdate,
+       SUM(CASE WHEN bd.totalamount > 0 THEN bd.totalamount ELSE 0 END) AS billamount, 
+       bd.businessservice,
+       bill.payername AS OwnerName,
+         bill.mobilenumber,
+         bill.status, 
+         bill.createddate
+         FROM egbs_bill_v1 bill
+     JOIN egbs_billdetail_v1 bd 
+          ON bd.billid = bill.id
+          WHERE bd.businessservice = $sevicetype
+     AND bill.tenantid = $tenantid  AND bill.createddate >= $fromDate AND  bill.createddate <= $toDate
+     GROUP BY 
+         bd.billno,
+         bill.status,
+         bd.consumercode,
+         bill.createddate,
+       bill.payername,
+         bill.mobilenumber,
+       bd.businessservice
+       )
+     SELECT *
+     FROM (
+         SELECT *,
+                ROW_NUMBER() OVER (
+                    PARTITION BY consumercode
+                    ORDER BY createddate DESC
+                ) AS rn
+         FROM bill_data
+         ) t
+     WHERE rn = 1 
+  orderby: ORDER BY consumercode
+
