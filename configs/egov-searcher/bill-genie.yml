@@ -767,7 +767,7 @@ SearchDefinitions:
           ad_isactualdemand, ad.purpose AS ad_purpose, ad.additionaldetails as
           ad_additionaldetails, NULL as ptadd_doorNo, NULL as ptadd_landmark, NULL as ptadd_city, NULL as ptadd_pincode, NULL as ptadd_locality, NULL as ptadd_street, NULL as ptadd_region, NULL as ptadd_plotno, NULL as ptadd_buildingname, NULL as ptadd_district, NULL as ptadd_state, NULL as ptadd_latitude, NULL as ptadd_longitude, usr.uuid as ptown_userid
 
-          FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid INNER JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid INNER JOIN eg_rl_allotment allot ON bd.consumercode = allot.application_number INNER JOIN eg_rl_owner_info owner ON owner.allotment_id = allot.id INNER JOIN eg_user usr ON owner.user_uuid = usr.uuid $where and allot.status='PENDING_FOR_PAYMENT,APPROVED')
+          FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid INNER JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid INNER JOIN eg_rl_allotment allot ON bd.consumercode = allot.application_number INNER JOIN eg_rl_owner_info owner ON owner.allotment_id = allot.id INNER JOIN eg_user usr ON owner.user_uuid = usr.uuid $where and allot.status IN ('PENDING_FOR_PAYMENT','APPROVED'))
           select * from bill_data inner join (select max(b_createddate) as maxcreateddate, bd_consumercode from bill_data group by bd_consumercode) as max ON max.maxcreateddate=b_createddate
       searchParams:
         condition: AND
