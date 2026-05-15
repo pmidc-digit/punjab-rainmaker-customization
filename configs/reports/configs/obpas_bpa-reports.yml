@@ -1898,7 +1898,6 @@ ReportDefinitions:
     label: Building Plan
     type: string
     source: obpas_bpa
-    total: true
   - name: NOC
     label: NOC
     type: string
@@ -1936,11 +1935,12 @@ ReportDefinitions:
           
           UNION ALL
           
-          SELECT tenantid, applicationstatus, 'NOC' as module 
-          FROM eg_noc 
-          WHERE tenantid != 'pb.testing' 
-            AND createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
-            AND applicationno not LIKE 'PB/%' AND (nd.additionaldetails::text not LIKE '%sanctionLetter%'  OR nd.additionaldetails IS NULL)
+          SELECT n.tenantid, n.applicationstatus, 'NOC' as module 
+          FROM eg_noc n 
+          inner join eg_noc_details nd on nd.nocid = n.id
+          WHERE n.tenantid != 'pb.testing' 
+            AND n.createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
+            AND n.applicationno not LIKE 'PB/%' AND (nd.additionaldetails::text not LIKE '%sanctionLetter%'  OR nd.additionaldetails IS NULL)
           
           UNION ALL
           
@@ -2009,6 +2009,7 @@ ReportDefinitions:
       
           -- 5. Application Status: Manual Mapping using CASE
           CASE 
+              WHEN g.grp_level = 15 THEN 'GRAND TOTAL' 
               WHEN g.grp_level = 1 THEN 'Sub Total'
               -- Specific mappings for localization
               WHEN UPPER(g.applicationstatus) = 'PENDINGAPPLICATIONPAYMENT' THEN 'Pending Application Payment'
@@ -2028,5 +2029,5 @@ ReportDefinitions:
         LEFT JOIN ulb_stats s ON g.name_of_ulb = s.name_of_ulb 
         WHERE 
         (g.grp_level = 0) 
-        OR (g.grp_level = 1 AND s.distinct_statuses > 1) 
+        OR (g.grp_level = 1 AND s.distinct_statuses > 1) OR (g.grp_level = 15)
   orderby: ORDER BY g.ulb_type, g.ulb_district, g.name_of_ulb, g.grp_level, g.applicationstatus;
