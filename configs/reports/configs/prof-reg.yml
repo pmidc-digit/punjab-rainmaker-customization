@@ -141,7 +141,7 @@ ReportDefinitions:
       LEFT JOIN eg_user u ON u.id::text = p.createdby::text
       LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
       WHERE pd.businessservice = 'BPAREG'
-      AND upper(p.paymentstatus) != 'CANCELLED'
+      AND upper(p.paymentstatus) != 'CANCELLED'  and pd.amountpaid != '0'
     )
     SELECT
       to_char(to_timestamp(createdtime/1000),'DD-MM-YYYY HH24:MI:SS') AS payment_date,
@@ -150,7 +150,11 @@ ReportDefinitions:
       name,
       mobilenumber,
       'Professional Registration' AS businessservice,
-      status,
+      CASE 
+        WHEN status = 'APPROVED' THEN 'Approved'
+        WHEN status = 'PENDINGDOCVERIFICATION' THEN 'Pending Document Verification'
+        ELSE INITCAP(status) 
+      END AS status,
       collector_code,
       cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
     FROM unique_transactions
@@ -238,7 +242,7 @@ ReportDefinitions:
     LEFT JOIN eg_tl_tradelicense a ON bill.consumercode = a.applicationnumber
     LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
     WHERE pd.businessservice = 'BPAREG'
-    AND payment.paymentstatus != 'CANCELLED'
+    AND payment.paymentstatus != 'CANCELLED' and pd.tenantid != 'pb.testing' and pd.amountpaid != 0
 
   orderby: ORDER BY pd.receiptdate DESC
 
@@ -285,6 +289,7 @@ ReportDefinitions:
       designation_code AS Officer_Designation,
       COUNT(DISTINCT businessid) AS pending_files
     FROM latest_assignee 
+    where tenantid != 'pb.testing'
   groupby:  group by tenantid,businessservice,designation_code
   orderby:  order by pending_files DESC
 
