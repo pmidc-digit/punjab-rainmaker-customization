@@ -6738,6 +6738,16 @@ ReportDefinitions:
     type: string
     source: pt
     total: true    
+  - name: 2026_27PTR
+    label: reports.pt.2026_27_PTR
+    type: string
+    source: pt
+    total: true      
+  - name: 2026_27Collection
+    label: reports.pt.2026_27Collection
+    type: string
+    source: pt
+    total: true       
   - name: totalptr
     label: reports.pt.totalptr
     type: string
@@ -6805,7 +6815,9 @@ ReportDefinitions:
       sum(case when assessmentyears='2024-25' then amount else 0 end) as "2024_25Collection",
       sum(case when assessmentyears='2024-25' then totalcount else 0 end) as "2024_25PTR",
       sum(case when assessmentyears='2025-26' then amount else 0 end) as "2025_26Collection",      
-      sum(case when assessmentyears='2025-26' then totalcount else 0 end) as "2025_26PTR",      
+      sum(case when assessmentyears='2025-26' then totalcount else 0 end) as "2025_26PTR",  
+      sum(case when assessmentyears='2026-27' then amount else 0 end) as "2026_27Collection",      
+      sum(case when assessmentyears='2026-27' then totalcount else 0 end) as "2026_27PTR",  
       sum(amount) as totalcollection,
       sum(totalcount) as totalptr
     from summary
