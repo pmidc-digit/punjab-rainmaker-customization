@@ -55,11 +55,39 @@
                   ]
                 }
               },
+              {
+                "variable": "var_buildings",
+                "value": {
+                  "path": "$.Noc[0].fireNOCDetails.buildings[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "string",
+                  "scema": [
+                    {
+                      "variable": "buildingName",
+                      "value": "name"
+                    }
+                  ]
+                }
+              },
+              {
+                "variable": "noOfBasements",
+                "value": {
+                  "path": "$.Noc[0].noOfBasements"
+                }
+              },
+              {
+                "variable": "noOfFloors",
+                "value": {
+                  "path": "$.Noc[0].noOfFloors"
+                }
+              },
 
               {
                 "variable": "nocType",
                 "value": {
-                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.specificationNocType"
+                  "path": "$.Noc[0].fireNOCDetails.fireNOCType"
                 }
               },
               {
@@ -112,15 +140,16 @@
                   "type": "string",
                   "scema": [
                     { "variable": "number", "value": "number" },
-                    { "variable": "text", "value": "text" }
+                    {
+                      "variable": "text",
+                      "value": "text",
+                      "localisation": {
+                        "required": true,
+                        "prefix": null,
+                        "module": "rainmaker-common"
+                      }
+                    }
                   ]
-                }
-              },
-
-              {
-                "variable": "ulbName",
-                "value": {
-                  "path": "$.Noc[0].nocDetails.additionalDetails.siteDetails.ulbName"
                 }
               },
               {
@@ -150,7 +179,38 @@
               {
                 "variable": "submittedOn",
                 "value": {
-                  "path": "$.Noc[0].nocDetails.additionalDetails.SubmittedOn"
+                  "path": "$.Noc[0].fireNOCDetails.issuedDate"
+                },
+                "type": "date"
+              },
+              {
+                "variable": "doorNo",
+                "value": {
+                  "path": "$.Noc[0].fireNOCDetails.propertyDetails.address.doorNo"
+                }
+              },
+              {
+                "variable": "landmark",
+                "value": {
+                  "path": "$.Noc[0].fireNOCDetails.propertyDetails.address.landmark"
+                }
+              },
+              {
+                "variable": "street",
+                "value": {
+                  "path": "$.Noc[0].fireNOCDetails.propertyDetails.address.street"
+                }
+              },
+              {
+                "variable": "pincode",
+                "value": {
+                  "path": "$.Noc[0].fireNOCDetails.propertyDetails.address.pincode"
+                }
+              },
+              {
+                "variable": "locality",
+                "value": {
+                  "path": "$.Noc[0].fireNOCDetails.propertyDetails.address.locality.code"
                 }
               },
 
@@ -311,6 +371,12 @@
                 "variable": "sanctionFilestoreID",
                 "value": {
                   "path": "$.Noc[0].nocDetails.additionalDetails.sanctionLetterFilestoreId"
+                }
+              },
+              {
+                "variable": "fireNOCNumber",
+                "value": {
+                  "path": "$.Noc[0].fireNOCNumber"
                 }
               },
               {
@@ -927,6 +993,10 @@
                   {
                     "variable": "address",
                     "value": "$.MdmsRes.tenant.tenants[0].address"
+                  },
+                  {
+                    "variable": "ulbName",
+                    "value": "$.MdmsRes.tenant.tenants[0].ulbName"
                   },
                   {
                     "variable": "ulbType",
