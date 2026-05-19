@@ -2,18 +2,19 @@
   "key": "ws-bill",
   "config": {
     "defaultStyle": {
-      "font": "Cambay"
+      "font": "Cambay",
+      "fontSize": 11
     },
     "content": [
       {
         "style": "noc-head",
         "table": {
-          "widths": [60, "*", 120],
+          "widths": [120, "*", 120],
           "body": [
             [
               {
                 "image": "{{logoImage}}",
-                "width": 45,
+                "width": 50,
                 "height": 50
               },
               {
@@ -29,14 +30,18 @@
                         "style": "receipt-logo-sub-header"
                       },
                       {
-                        "text": "{{website}} {{email}}",
+                        "text": "{{website}}",
+                        "style": "receipt-logo-sub-header"
+                      },
+                      {
+                        "text": "{{email}}",
                         "style": "receipt-logo-sub-header"
                       }
                     ]
                   }
                 ],
                 "alignment": "center",
-                "margin": [0, 1, 0, 0]
+                "margin": [0, 10, 0, 0]
               },
               {
                 "stack": [
@@ -50,7 +55,7 @@
                 ],
                 "alignment": "right",
                 "color": "#484848",
-                "margin": [-150, 1, -20, 0]
+                "margin": [-150, 10, -20, 0]
               }
             ]
           ]
@@ -67,11 +72,12 @@
                 "text": "{{serviceType}} Bill for Period {{fromPeriod}} - {{toPeriod}}",
                 "border": [false, false, false, false],
                 "style": "receipt-table-value2",
+                "margin": [-25, -8, -8, 8],
                 "alignment": "center"
               }
             ]
           ],
-          "margin": [-25, 0, -8, -8]
+          "margin": [-25, -8, -8, 4]
         },
         "layout": {}
       },
@@ -332,6 +338,7 @@
             ]
           ]
         },
+        "margin": [-25, -4, -8, -8],
         "layout": {}
       },
       {
@@ -350,13 +357,13 @@
               {
                 "table": {
                   "widths": [
-                    "12%",
-                    "19%",
-                    "12%",
+                    "10%",
+                    "15%",
                     "10%",
                     "10%",
                     "10%",
-                    "17%",
+                    "10%",
+                    "25%",
                     "*"
                   ],
                   "body": [
@@ -734,13 +741,13 @@
         "alignment": "right"
       },
       "footer-header": {
-        "margin": [0, 2, 0, -40],
+        "margin": [0, -20, 0, -40],
         "bold": true,
         "color": "#000000",
         "alignment": "center"
       },
       "footer-bottom": {
-        "margin": [0, 10, 0, 0],
+        "margin": [0, 10, 0, 5],
         "bold": true,
         "color": "#000000",
         "alignment": "right"
