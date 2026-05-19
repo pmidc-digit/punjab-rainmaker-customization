@@ -1486,6 +1486,7 @@ ReportDefinitions:
       ) rl ON t.tenantid = rl.tenant_id;
   - reportName: ApplicationSearchByID
     decryptionPathId: NDCAPPLICATION
+    encryptionPathId: User
     summary: Application details of No Due Certificate by search Application ID
     version: 1.0.0
     moduleName: rainmaker-ndc
@@ -1525,12 +1526,12 @@ ReportDefinitions:
         source: ndc
         isMandatory: true
         searchClause: and n.applicationno = $applicationno
-      - name: mobilenumber
+      - name: mobileNumber
         label: Mobile Number
         type: string
         source: ndc
         isMandatory: true
-        searchClause: and u.mobilenumber = $mobilenumber
+        searchClause: and u.mobilenumber = $mobileNumber
     query: |
       -- Use CTE to force query plan, compute & use CTE later
       select n.applicationstatus,n.applicationno,u.name , u.mobilenumber ,
