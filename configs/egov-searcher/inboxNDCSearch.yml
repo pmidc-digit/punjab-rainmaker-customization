@@ -220,6 +220,7 @@ SearchDefinitions:
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
             ORDER BY a_createdtime DESC
+            $pagination
           ) result
       searchParams:
         condition: AND
