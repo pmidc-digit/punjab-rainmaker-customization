@@ -1486,7 +1486,7 @@ ReportDefinitions:
       ) rl ON t.tenantid = rl.tenant_id;
   - reportName: ApplicationSearchByID
     decryptionPathId: NDCAPPLICATION
-    encryptionPathId: User
+    encryptionPathId: UserSearchCriteria
     summary: Application details of No Due Certificate by search Application ID
     version: 1.0.0
     moduleName: rainmaker-ndc
@@ -1539,5 +1539,4 @@ ReportDefinitions:
       from eg_ndc_application n
       join eg_ndc_owner o on o.ndcapplicationuuid = n.uuid
       join eg_user u on u.uuid = o.uuid
-      where n.tenantid != 'pb.testing'
-      and n.tenantid = $tenantid
+      where n.tenantid = $tenantid
