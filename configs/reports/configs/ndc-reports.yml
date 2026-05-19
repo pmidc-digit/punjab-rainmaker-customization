@@ -1484,9 +1484,9 @@ ReportDefinitions:
       LEFT JOIN (
           SELECT tenant_id, COUNT(*) AS count FROM eg_rl_allotment GROUP BY tenant_id
       ) rl ON t.tenantid = rl.tenant_id;
-  - reportName: ApplicationDetailReport
+  - reportName: ApplicationSearchByID
     decryptionPathId: NDCAPPLICATION
-    summary: Details of applicant in ndc service
+    summary: Application details of No Due Certificate by search Application ID
     version: 1.0.0
     moduleName: rainmaker-ndc
     additionalConfig:
