@@ -113,7 +113,8 @@ ReportDefinitions:
       LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
       LEFT JOIN eg_user u ON u.uuid = wa.assignee
       LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-      WHERE wf.businessservice IN ('ENGINEER','ARCHITECT','TOWNPLANNER','SUPERVISOR','BPAREG_UPGRADE','ARCHITECT_UPGRADE')
+      WHERE wf.tenantid != 'pb.testing' AND 
+       wf.businessservice IN ('ENGINEER','ARCHITECT','TOWNPLANNER','SUPERVISOR','BPAREG_UPGRADE','ARCHITECT_UPGRADE')
       ORDER BY wf.businessid, wf.lastmodifiedtime DESC
     ),
     unique_transactions AS (
@@ -162,7 +163,7 @@ ReportDefinitions:
       collector_code,
       cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
     FROM unique_transactions
-    WHERE lower(tenant) != 'testing'
+    WHERE lower(tenant) != 'testing' and amountpaid != '0'
 
   orderby: ORDER BY payment_date DESC
 
@@ -263,7 +264,7 @@ ReportDefinitions:
     LEFT JOIN eg_tl_tradelicense a ON bill.consumercode = a.applicationnumber
     LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
     WHERE pd.businessservice = 'BPAREG' AND pd.tenantid != 'pb.testing'
-    AND payment.paymentstatus != 'CANCELLED'
+    AND payment.paymentstatus != 'CANCELLED' and pd.amountpaid != '0'
 
   orderby: ORDER BY pd.receiptdate DESC
 

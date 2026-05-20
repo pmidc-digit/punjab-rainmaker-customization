@@ -7,7 +7,7 @@ ReportDefinitions:
     moduleName: rainmaker-ndc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: name
         label: Name
@@ -104,7 +104,7 @@ ReportDefinitions:
     moduleName: rainmaker-ndc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: applicationno
         label: Application Number
@@ -276,10 +276,10 @@ ReportDefinitions:
     moduleName: rainmaker-ndc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: tenantid
-        label: Tenantid
+        label: ULB Name
         type: string
         source: ndc
         total: false
@@ -304,7 +304,7 @@ ReportDefinitions:
         source: ndc
         total: false
       - name: sla_status
-        label: Sla Status
+        label: SLA Status
         type: string
         source: ndc
         total: false
@@ -423,7 +423,7 @@ ReportDefinitions:
     moduleName: rainmaker-ndc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: receiptno
         label: Receipt Number
@@ -456,7 +456,7 @@ ReportDefinitions:
         source: ndc
         total: false
       - name: instrumentnumber
-        label: Instrument Number
+        label: Transaction ID
         type: string
         source: ndc
         total: false
@@ -567,7 +567,7 @@ ReportDefinitions:
     moduleName: rainmaker-ndc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: name
         label: Name
@@ -575,7 +575,7 @@ ReportDefinitions:
         source: ndc
         total: false
       - name: tenantid
-        label: Tenantid
+        label: ULB Name
         type: string
         source: ndc
         total: false
@@ -677,10 +677,10 @@ ReportDefinitions:
     moduleName: rainmaker-ndc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: tenantid
-        label: Tenantid
+        label: ULB Name
         type: string
         source: ndc
         total: false
@@ -779,7 +779,7 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND collector_code = $collector_code
       - name: ulb
-        label: ULB
+        label: ULB Name
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: ndc
@@ -861,10 +861,10 @@ ReportDefinitions:
     moduleName: rainmaker-ndc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: tenantid
-        label: Tenantid
+        label: ULB Name
         type: string
         source: ndc
         total: false
@@ -889,7 +889,7 @@ ReportDefinitions:
         source: ndc
         total: false
       - name: sla_status
-        label: sla status
+        label: SLA Status
         type: string
         source: ndc
         total: false
@@ -922,7 +922,7 @@ ReportDefinitions:
         isMandatory: true
         searchClause: AND n.createdtime <= $toDate
       - name: ulb
-        label: ULB
+        label: ULB Name
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: ndc
@@ -1013,10 +1013,10 @@ ReportDefinitions:
     moduleName: rainmaker-ndc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: tenantid
-        label: tenantid
+        label: ULB Name
         type: string
         source: ndc
         total: false
@@ -1051,7 +1051,7 @@ ReportDefinitions:
         source: ndc
         total: false
       - name: instrumentnumber
-        label: Instrument Number
+        label: Transaction ID
         type: string
         source: ndc
         total: false
@@ -1118,7 +1118,7 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND payment.paymentmode like $paymentMode
       - name: ulb
-        label: ULB
+        label: ULB Name
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: ndc
@@ -1169,7 +1169,7 @@ ReportDefinitions:
     moduleName: rainmaker-ndc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: tenant_name
         label: ULB Name
@@ -1282,55 +1282,55 @@ ReportDefinitions:
     moduleName: rainmaker-ndc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: tenant_name
-        label: tenant_name
+        label: ULB Name
         type: string
         source: ndc
         total: false
       - name: service
-        label: service
+        label: Service
         type: string
         source: ndc
         total: false
       - name: application_status
-        label: application_status
+        label: Application Status
         type: string
         source: ndc
         total: false
       - name: application_count
-        label: application_count
+        label: Application Count
         type: string
         source: ndc
         total: false
       - name: pending_with_employee
-        label: pending_with_employee
+        label: Pending With Employee
         type: string
         source: ndc
         total: false
     searchParams:
       - name: fromDate
-        label: fromDate
+        label: From Date
         type: epoch
         source: ndc
         isMandatory: true
         searchClause: AND createdtime >= $fromDate
       - name: toDate
-        label: toDate
+        label: To Date
         type: epoch
         source: ndc
         isMandatory: true
         searchClause: AND  createdtime <= $toDate
       - name: ulb
-        label: ulb
+        label: ULB Name
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: ndc
         isMandatory: false
         searchClause: and tenantid =  $ulb
       - name: service
-        label: service
+        label: Service
         type: singlevaluelist
         pattern: list://NDC:No Due Certficate,PTR:Pet Registration
         source: ndc
@@ -1391,7 +1391,7 @@ ReportDefinitions:
     moduleName: rainmaker-ndc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
       - name: tenantid
         label: ULB Name
@@ -1487,4 +1487,54 @@ ReportDefinitions:
       
       LEFT JOIN (
           SELECT tenant_id, COUNT(*) AS count FROM eg_rl_allotment GROUP BY tenant_id
-      ) rl ON t.tenantid = rl.tenant_id;    
+      ) rl ON t.tenantid = rl.tenant_id; 
+
+  - reportName: ApplicationSearchByID
+    decryptionPathId: NDCAPPLICATION
+    summary: Application details of No Due Certificate by search Application ID
+    version: 1.0.0
+    moduleName: rainmaker-ndc
+    additionalConfig:
+        print:
+          pdfPageSize: A4
+    sourceColumns:
+    - name: ulb_name
+      label: ULB Name
+      type: string
+      source: ndc
+      total: false
+    - name: name
+      label: Name
+      type: string
+      source: ndc
+      total: false
+    - name: mobilenumber
+      label: Mobile Number
+      type: string
+      source: ndc
+      total: false
+    - name: applicationno
+      label: Application ID
+      type: string
+      source: ndc
+      total: false
+    - name: applicationstatus
+      label: Application Status
+      type: string
+      source: ndc
+      total: false
+    searchParams:
+    - name: applicationno
+      label: Application Number
+      type: string
+      source: ndc
+      isMandatory: false
+      searchClause: and n.applicationno = $applicationno
+    query: |
+        -- Use CTE to force query plan, compute & use CTE later
+        select n.applicationstatus,n.applicationno,u.name , u.mobilenumber ,
+        INITCAP(REPLACE(n.tenantid, 'pb.', '')) AS ulb_name
+        from eg_ndc_application n
+        join eg_ndc_owner o on o.ndcapplicationuuid = n.uuid
+        join eg_user u on u.uuid = o.uuid
+        where n.tenantid = $tenantid
