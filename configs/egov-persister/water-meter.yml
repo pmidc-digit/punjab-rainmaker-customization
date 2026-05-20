@@ -9,9 +9,9 @@ serviceMaps:
       queryMaps:
         - query: >
             INSERT INTO eg_ws_meterreading (id, tenantid, connectionNo, billingPeriod, meterStatus,
-                                            lastReading, lastReadingDate, currentReading, currentReadingDate,consumption,
+                                            lastReading, lastReadingDate, currentReading, currentReadingDate,
                                             createdby, lastmodifiedby, createdtime, lastmodifiedtime)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
           basePath: $.meterReadings
           jsonMaps:
             - jsonPath: $.meterReadings.id
@@ -23,7 +23,6 @@ serviceMaps:
             - jsonPath: $.meterReadings.lastReadingDate
             - jsonPath: $.meterReadings.currentReading
             - jsonPath: $.meterReadings.currentReadingDate
-            - jsonPath: $.meterReadings.consumption
             - jsonPath: $.meterReadings.auditDetails.createdBy
             - jsonPath: $.meterReadings.auditDetails.lastModifiedBy
             - jsonPath: $.meterReadings.auditDetails.createdTime
