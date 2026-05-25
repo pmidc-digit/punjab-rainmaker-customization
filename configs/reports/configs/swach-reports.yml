@@ -758,6 +758,11 @@ ReportDefinitions:
     summary: Swach Event Complaint Report
     version: 1.0.0
     moduleName: rainmaker-swach
+    externalService:
+    - entity: $.MdmsRes.SwachReform.SwachBharatCategory
+      apiURL: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?moduleName=SwachReform&masterName=SwachBharatCategory&tenantId=$tenantId
+      keyOrder: serviceCode,keywords,department
+      tableName: tbl_dept1        
     additionalConfig:
       print:
         pdfPageSize: A1
@@ -813,17 +818,20 @@ ReportDefinitions:
       searchClause: AND createdtime <= $toDate
     query: >
       SELECT
-        servicecode AS event,
-        servicerequestid AS complaintid,
-        tenantid as tenantid,
-        INITCAP(split_part(tenantid,'.',2)) AS ulb,
+        s.servicecode AS event,
+        m.keywords AS complaint_type,
+        s.servicerequestid AS complaintid,
+        s.tenantid as tenantid,
+        INITCAP(split_part(s.tenantid,'.',2)) AS ulb,
         to_char(
             to_timestamp(createdtime / 1000),
             'DD-MM-YYYY'
         ) AS date,
-        additionaldetails ->> 'mediaURL' AS mediaurl
-      FROM eg_swach_service_v2
-      WHERE createdby = 'af2af7bb-9482-4667-a2ef-a7d8fd29181c'
+        s.additionaldetails ->> 'mediaURL' AS mediaurl
+      FROM eg_swach_service_v2 s
+      LEFT JOIN (VALUES tbl_dept1) AS m(servicecode, keywords, department)
+      ON m.servicecode = s.servicecode
+      WHERE s.createdby = 'af2af7bb-9482-4667-a2ef-a7d8fd29181c'
       AND 1 = 1
     orderby: ORDER BY date
 
