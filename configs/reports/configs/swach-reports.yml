@@ -877,7 +877,7 @@ ReportDefinitions:
       COUNT(s.servicerequestid) AS total_requests
       FROM eg_swach_service_v2 s
       LEFT JOIN tbl_dept m
-      ON s.servicecode = m.serviceCode
+      ON s.servicecode = m.servicecode
       WHERE createdby = 'af2af7bb-9482-4667-a2ef-a7d8fd29181c'
     groupby: GROUP BY s.tenantid, m.keywords
     orderby: ORDER BY ulb, complaint_type
