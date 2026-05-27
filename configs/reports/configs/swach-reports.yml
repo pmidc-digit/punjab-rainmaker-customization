@@ -818,8 +818,7 @@ ReportDefinitions:
       searchClause: AND createdtime <= $toDate
     query: >
       SELECT
-        s.servicecode AS event,
-        m.keywords AS complaint_type,
+        m.keywords AS event,
         s.servicerequestid AS complaintid,
         s.tenantid as tenantid,
         INITCAP(split_part(s.tenantid,'.',2)) AS ulb,
