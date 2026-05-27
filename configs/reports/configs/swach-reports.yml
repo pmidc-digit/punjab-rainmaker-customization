@@ -767,8 +767,8 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-    - name: event
-      label: Event
+    - name: complaint_type
+      label: Complaint Type
       type: string
       source: rainmaker-swach
       total: false
@@ -818,7 +818,7 @@ ReportDefinitions:
       searchClause: AND createdtime <= $toDate
     query: >
       SELECT
-        m.keywords AS event,
+        m.keywords AS complaint_type,
         s.servicerequestid AS complaintid,
         s.tenantid as tenantid,
         INITCAP(split_part(s.tenantid,'.',2)) AS ulb,
