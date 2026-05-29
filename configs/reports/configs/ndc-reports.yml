@@ -1495,46 +1495,79 @@ ReportDefinitions:
     version: 1.0.0
     moduleName: rainmaker-ndc
     additionalConfig:
-        print:
-          pdfPageSize: A4
+      print:
+        pdfPageSize: A1
     sourceColumns:
-    - name: ulb_name
-      label: ULB Name
-      type: string
-      source: ndc
-      total: false
-    - name: name
-      label: Name
-      type: string
-      source: ndc
-      total: false
-    - name: mobilenumber
-      label: Mobile Number
-      type: string
-      source: ndc
-      total: false
-    - name: applicationno
-      label: Application ID
-      type: string
-      source: ndc
-      total: false
-    - name: applicationstatus
-      label: Application Status
-      type: string
-      source: ndc
-      total: false
+      - name: ulb_name
+        label: ULB Name
+        type: string
+        source: ndc
+        total: false
+      - name: name
+        label: Owner Name
+        type: string
+        source: ndc
+        total: false
+      - name: mobilenumber
+        label: Owner Mobile Number
+        type: string
+        source: ndc
+        total: false
+      - name: applicationno
+        label: Application ID
+        type: string
+        source: ndc
+        total: false
+      - name: applicationstatus
+        label: Application Status
+        type: string
+        source: ndc
+        total: false
+      - name: assignee_employee
+        label: Previous Action Taken By
+        type: string
+        source: ndc
+        total: false
+      - name: employee_name
+        label: Pending with Employee
+        type: string
+        source: ndc
+        total: false
     searchParams:
-    - name: applicationno
-      label: Application Number
-      type: string
-      source: ndc
-      isMandatory: false
-      searchClause: and n.applicationno = $applicationno
+      - name: applicationno
+        label: Application Number
+        type: string
+        source: ndc
+        isMandatory: false
+        searchClause: and n.applicationno = $applicationno
     query: |
-        -- Use CTE to force query plan, compute & use CTE later
-        select n.applicationstatus,n.applicationno,u.name , u.mobilenumber ,
-        INITCAP(REPLACE(n.tenantid, 'pb.', '')) AS ulb_name
-        from eg_ndc_application n
-        join eg_ndc_owner o on o.ndcapplicationuuid = n.uuid
-        join eg_user u on u.uuid = o.uuid
-        where n.tenantid = $tenantid
+      -- Use CTE to force query plan, compute & use CTE later
+      WITH workflow_history AS (
+      SELECT 
+        wf.businessid,
+        ws.applicationstatus,
+        COALESCE(wf.assignee, wfa.assignee) AS current_employee_uuid,
+        LEAD(COALESCE(wf.assignee, wfa.assignee)) OVER (PARTITION BY wf.businessid ORDER BY wf.lastmodifiedtime DESC, wf.createdtime DESC) AS previous_employee_uuid,
+        LEAD(wf.action) OVER (PARTITION BY wf.businessid ORDER BY wf.lastmodifiedtime DESC, wf.createdtime DESC) AS previous_action,
+        ROW_NUMBER() OVER (PARTITION BY wf.businessid ORDER BY wf.lastmodifiedtime DESC, wf.createdtime DESC) AS rn
+        FROM eg_wf_processinstance_v2 wf
+        LEFT JOIN eg_wf_assignee_v2 wfa ON wfa.processinstanceid = wf.id
+        LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = wf.status
+        WHERE wf.businessservice = 'ndc-services' and wf.tenantid = $tenantid
+         )
+       SELECT 
+       n.applicationstatus,
+       n.applicationno,
+       u.name , 
+       u.mobilenumber ,
+       INITCAP(REPLACE(n.tenantid, 'pb.', '')) AS ulb_name,
+       emp_curr.name AS employee_name,
+       emp_appr.name AS assignee_employee,
+       wh.previous_action AS last_action_performed
+       FROM eg_ndc_application n
+       JOIN eg_ndc_owner o ON o.ndcapplicationuuid = n.uuid
+       JOIN eg_user u ON u.uuid = o.uuid
+       LEFT JOIN workflow_history wh ON wh.businessid = n.applicationno AND wh.rn = 1
+       LEFT JOIN eg_user emp_curr ON emp_curr.uuid = wh.current_employee_uuid
+       LEFT JOIN eg_user emp_appr ON emp_appr.uuid = wh.previous_employee_uuid
+       WHERE n.tenantid = $tenantid and o.isprimaryowner = 'true'
