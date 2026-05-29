@@ -1486,7 +1486,6 @@ ReportDefinitions:
       ) rl ON t.tenantid = rl.tenant_id;
   - reportName: ApplicationSearchByID
     decryptionPathId: NDCAPPLICATION
-    encryptionPathId: UserSearchCriteria
     summary: Application details of No Due Certificate by search Application ID
     version: 1.0.0
     moduleName: rainmaker-ndc
@@ -1499,13 +1498,13 @@ ReportDefinitions:
         type: string
         source: ndc
         total: false
-      - name: name
-        label: Name
+      - name: owner_name
+        label: Owner Name
         type: string
         source: ndc
         total: false
-      - name: mobilenumber
-        label: Mobile Number
+      - name: owner_mobile
+        label: Owner Mobile Number
         type: string
         source: ndc
         total: false
@@ -1519,12 +1518,12 @@ ReportDefinitions:
         type: string
         source: ndc
         total: false
-      - name: previously_action_by
+      - name: assignee_employee
         label: Previous Action Taken By
         type: string
         source: ndc
         total: false 
-      - name: pending_with_employee
+      - name: employee_name
         label: Pending with Employee
         type: string
         source: ndc
@@ -1557,8 +1556,8 @@ ReportDefinitions:
        u.name AS owner_name, 
        u.mobilenumber AS owner_mobile,
        INITCAP(REPLACE(n.tenantid, 'pb.', '')) AS ulb_name,
-       emp_curr.name AS pending_with_employee,
-       emp_appr.name AS previously_action_by,
+       emp_curr.name AS employee_name,
+       emp_appr.name AS assignee_employee,
        wh.previous_action AS last_action_performed
        FROM eg_ndc_application n
        JOIN eg_ndc_owner o ON o.ndcapplicationuuid = n.uuid
