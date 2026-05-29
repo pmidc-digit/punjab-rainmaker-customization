@@ -1549,7 +1549,7 @@ ReportDefinitions:
         FROM eg_wf_processinstance_v2 wf
         LEFT JOIN eg_wf_assignee_v2 wfa ON wfa.processinstanceid = wf.id
         LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = wf.status
-        WHERE wf.businessservice = 'ndc-services' and tenantid = $tenantid
+        WHERE wf.businessservice = 'ndc-services' and wf.tenantid = $tenantid
          )
        SELECT 
        n.applicationstatus,
