@@ -1519,6 +1519,16 @@ ReportDefinitions:
         type: string
         source: ndc
         total: false
+      - name: previously_action_by
+        label: Previous Action Taken By
+        type: string
+        source: ndc
+        total: false 
+      - name: pending_with_employee
+        label: Pending with Employee
+        type: string
+        source: ndc
+        total: false         
     searchParams:
       - name: applicationno
         label: Application Number
@@ -1526,17 +1536,34 @@ ReportDefinitions:
         source: ndc
         isMandatory: false
         searchClause: and n.applicationno = $applicationno
-      - name: mobileNumber
-        label: Mobile Number
-        type: string
-        source: ndc
-        isMandatory: false
-        searchClause: and u.mobilenumber = $mobileNumber
     query: |
       -- Use CTE to force query plan, compute & use CTE later
-      select n.applicationstatus,n.applicationno,u.name , u.mobilenumber ,
-      INITCAP(REPLACE(n.tenantid, 'pb.', '')) AS ulb_name
-      from eg_ndc_application n
-      join eg_ndc_owner o on o.ndcapplicationuuid = n.uuid
-      join eg_user u on u.uuid = o.uuid
-      where n.tenantid = $tenantid
+      WITH workflow_history AS (
+      SELECT 
+        wf.businessid,
+        ws.applicationstatus,
+        COALESCE(wf.assignee, wfa.assignee) AS current_employee_uuid,
+        LEAD(COALESCE(wf.assignee, wfa.assignee)) OVER (PARTITION BY wf.businessid ORDER BY wf.lastmodifiedtime DESC, wf.createdtime DESC) AS previous_employee_uuid,
+        LEAD(wf.action) OVER (PARTITION BY wf.businessid ORDER BY wf.lastmodifiedtime DESC, wf.createdtime DESC) AS previous_action,
+        ROW_NUMBER() OVER (PARTITION BY wf.businessid ORDER BY wf.lastmodifiedtime DESC, wf.createdtime DESC) AS rn
+        FROM eg_wf_processinstance_v2 wf
+        LEFT JOIN eg_wf_assignee_v2 wfa ON wfa.processinstanceid = wf.id
+        LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = wf.status
+        WHERE wf.businessservice = 'ndc-services' and tenantid = $tenantid
+         )
+       SELECT 
+       n.applicationstatus,
+       n.applicationno,
+       u.name AS owner_name, 
+       u.mobilenumber AS owner_mobile,
+       INITCAP(REPLACE(n.tenantid, 'pb.', '')) AS ulb_name,
+       emp_curr.name AS pending_with_employee,
+       emp_appr.name AS previously_action_by,
+       wh.previous_action AS last_action_performed
+       FROM eg_ndc_application n
+       JOIN eg_ndc_owner o ON o.ndcapplicationuuid = n.uuid
+       JOIN eg_user u ON u.uuid = o.uuid
+       LEFT JOIN workflow_history wh ON wh.businessid = n.applicationno AND wh.rn = 1
+       LEFT JOIN eg_user emp_curr ON emp_curr.uuid = wh.current_employee_uuid
+       LEFT JOIN eg_user emp_appr ON emp_appr.uuid = wh.previous_employee_uuid
+       WHERE n.tenantid = $tenantid and o.isprimaryowner = 'true'
