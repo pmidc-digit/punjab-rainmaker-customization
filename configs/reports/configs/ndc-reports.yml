@@ -1498,12 +1498,12 @@ ReportDefinitions:
         type: string
         source: ndc
         total: false
-      - name: owner_name
+      - name: name
         label: Owner Name
         type: string
         source: ndc
         total: false
-      - name: owner_mobile
+      - name: mobilenumber
         label: Owner Mobile Number
         type: string
         source: ndc
@@ -1553,8 +1553,8 @@ ReportDefinitions:
        SELECT 
        n.applicationstatus,
        n.applicationno,
-       u.name AS owner_name, 
-       u.mobilenumber AS owner_mobile,
+       u.name , 
+       u.mobilenumber ,
        INITCAP(REPLACE(n.tenantid, 'pb.', '')) AS ulb_name,
        emp_curr.name AS employee_name,
        emp_appr.name AS assignee_employee,
