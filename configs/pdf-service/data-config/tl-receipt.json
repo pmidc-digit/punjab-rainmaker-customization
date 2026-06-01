@@ -146,12 +146,7 @@
                                  "key":"mobileNumber"
                                }]
                         } 
-                     } ,
-                     {
-                       "variable": "footerLogoImage",
-                       "url": "https://pb-egov-assets.s3.ap-south-1.amazonaws.com/mseva-logo-colored.png",
-                       "type": "image"
-                     }
+                     } 
                    ]
                 },
                 {
@@ -231,6 +226,18 @@
                               "value":"$.Receipt[0].Bill[0].billDetails[0].billAccountDetails[?(@.taxHeadCode=='TL_ADHOC_REBATE')].amount"
                            }
                         ]  
+                      },
+                      {
+                        "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
+                        "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}')%5D",
+                        "apiRequest": null,
+                        "responseMapping": [
+                          {
+                            "variable": "footerLogoImage",
+                            "value": "$.MdmsRes.tenant.tenants[0].footerLogo",
+                            "type": "image"
+                          }
+                        ]
                       }
                    ]
                 }
