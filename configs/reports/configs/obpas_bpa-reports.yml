@@ -279,7 +279,7 @@ ReportDefinitions:
         LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno OR ch.applicationno = a.id::text
         WHERE pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE')
-          AND upper(p.paymentstatus) != 'CANCELLED'
+          AND upper(p.paymentstatus) != 'CANCELLED' and pd.tenantid != 'pb.testing'
       )
       
       SELECT  
