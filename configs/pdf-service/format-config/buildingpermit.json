@@ -8,11 +8,11 @@
     "content": [
       {
         "columns": [
-          {
-            "image": "{{newlogoImage}}",
+          {   
+            "image":"{{newlogoImage}}",
             "width": 60,
-            "height": 60,
-            "margin":[0,-8,0,0]
+            "height": 70,
+            "margin": [0, -8, 0, 0]
           },
           {
             "stack": [
@@ -99,7 +99,7 @@
                 "bold": true
               },
               {
-                "text": "{{#var_owners}}{{ownerName}} , {{ownerAddress}},{{/var_owners}}",
+                "text": " {{combinedOwnersName}}, {{#var_owners}}{{ownerAddress}},{{permanentPinCode}},{{/var_owners}}",
                 "bold": false
               }
             ] 
@@ -118,7 +118,7 @@
             "bold": true
           },
           {
-            "text": "{{stakeholderName}}, ",
+            "text": "({{stakeholderName}}), ",
             "bold": false
           },
           {
@@ -291,7 +291,7 @@
     
             },
             {
-              "text":" ({{#var_owners}}{{ownerName}}, {{/var_owners}})/",
+              "text":" ({{combinedOwnersName}})/",
               "bold":true
             },
             {
@@ -359,11 +359,11 @@
                 
               },
               {
-                "text":" {{stakeholderName}}",
+                "text":" {{profession}}",
                 "bold":true
               },
               {
-                "text":" ({{profession}})",
+                "text":" {{stakeholderName}}",
                 "bold":true
               },
               {
@@ -812,7 +812,7 @@
                 
               },
               {
-                "text":" {{#var_owners}}{{ownerName}}, {{/var_owners}} / {{stakeholderName}} ({{profession}}) ",
+                "text":" {{combinedOwnersName}} / {{stakeholderName}} ({{profession}}) ",
                 "bold":true
               },
               {
@@ -826,108 +826,7 @@
 
           }
         ]      
-      },
-      
-      {
-        "columns":[
-          {
-            "stack":[
-              {
-                "text": "Counter Signed:"
-              },
-              {
-                "text": "{{designation}}"
-              },
-              {
-                "text": "{{ulbType}}"
-              },
-              {
-                "text": "{{ulbName}}"
-              },
-              {
-                "text": [
-                  {
-                    "text": "Date and Time:"
-                  },
-                  {
-                    "text": " {{nowIST}}"
-                  }
-                ]
-              }
-            ],
-            "style": "top-margin",
-            "alignment":"left"
-          },
-          {
-            "stack":[
-              {
-                "image": "{{base64Image}}",
-                "width": 80,
-                "height": 80,
-                "margin": [0, -8, 0, 5]
-              },
-              {
-                "text": [
-                  {
-                    "text": " Self-Certified By:"
-                  },
-                  {
-                    "text": " {{stakeholderName}}"
-                  },
-                  {
-                    "text": " ({{profession}})"
-                  }
-                ]
-              },
-
-              {
-                "text": [
-                  {
-                    "text": " Registration Number:"
-                  },
-                  {
-                    "text": " {{stakeholderRegistrationNumber}}",
-                    "font": "Roboto"
-                  }
-                ]
-              },
-              {
-                "text": [
-                  {
-                    "text": "Address:"
-                  },
-                  {
-                    "text": " {{stakeholderAddress}}"
-                  }
-                ]
-              },
-              {
-                "text": [
-                  {
-                    "text": "Date"
-                  },
-                  {
-                    "text": " {{submissionDate}}"
-                  }
-                ]
-              }
-            ],
-            "alignment":"right"
-          }
-        ],
-        
-        "bold":true,
-        "margin":[20,10,20,0]
-      },
-      {
-        "text":[
-          {
-            "text":"{{COMPUTER_GENERATED_STATEMENT}}"
-          }
-        ],
-        "alignment":"center",
-        "margin":[0,50,0,0]
-      } 
+      }
 ],
   
 	"styles": {
