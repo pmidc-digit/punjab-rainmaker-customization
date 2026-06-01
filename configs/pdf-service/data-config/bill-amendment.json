@@ -378,11 +378,6 @@
                   "prefix": null,
                   "module":"rainmaker-common"
                 }
-              },
-              {
-                "variable": "footerLogoImage",
-                "url": "https://pb-egov-assets.s3.ap-south-1.amazonaws.com/mseva-logo-colored.png",
-                "type": "image"
               }
             ]
           },
@@ -402,37 +397,42 @@
                 "apiRequest": null,
                 "responseMapping":[
                   {
-                    "variable":"address",
-                    "value":"$.MdmsRes.tenant.tenants[0].address"
+                    "variable": "address",
+                    "value": "$.MdmsRes.tenant.tenants[0].address"
                   },
                   {
-                    "variable":"phoneNumber",
-                    "value":"$.MdmsRes.tenant.tenants[0].contactNumber"
+                    "variable": "footerLogoImage",
+                    "value": "$.MdmsRes.tenant.tenants[0].footerLogo",
+                    "type": "image"
                   },
                   {
-                    "variable":"mcGrade",
-                    "value":"$.MdmsRes.tenant.tenants[0].city.pwssbGrade"
+                    "variable": "phoneNumber",
+                    "value": "$.MdmsRes.tenant.tenants[0].contactNumber"
                   },
                   {
-                    "variable":"website",
-                    "value":"$.MdmsRes.tenant.tenants[0].domainUrl"
+                    "variable": "mcGrade",
+                    "value": "$.MdmsRes.tenant.tenants[0].city.pwssbGrade"
                   },
                   {
-                    "variable":"email",
-                    "value":"$.MdmsRes.tenant.tenants[0].emailId"
+                    "variable": "website",
+                    "value": "$.MdmsRes.tenant.tenants[0].domainUrl"
+                  },
+                  {
+                    "variable": "email",
+                    "value": "$.MdmsRes.tenant.tenants[0].emailId"
                   },
                   {
                     "variable": "logoImage",
-                    "value":"$.MdmsRes.tenant.tenants[0].logoId",
-                    "type":"image"
+                    "value": "$.MdmsRes.tenant.tenants[0].logoId",
+                    "type": "image"
                   },
                   {
                     "variable": "logo-header",
-                    "value":"$.MdmsRes.tenant.tenants[0].code",
-                    "localisation":{
-                      "required":true,
+                    "value": "$.MdmsRes.tenant.tenants[0].code",
+                    "localisation": {
+                      "required": true,
                       "prefix": "TENANT_TENANTS",
-                      "module":"rainmaker-common"
+                      "module": "rainmaker-common"
                     }
                   }
                 ]

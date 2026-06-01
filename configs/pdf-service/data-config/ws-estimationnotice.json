@@ -493,11 +493,6 @@
                                     "prefix": null,
                                     "module": "rainmaker-common"
                                 }
-                            },
-                            {
-                                "variable": "footerLogoImage",
-                                "url": "https://pb-egov-assets.s3.ap-south-1.amazonaws.com/mseva-logo-colored.png",
-                                "type": "image"
                             }
                         ]
                     },
@@ -508,24 +503,29 @@
                                 "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.property.tenantId}')%5D",
                                 "apiRequest": null,
                                 "responseMapping": [
-                                    {
-                                        "variable": "logoImage",
-                                        "value": "$.MdmsRes.tenant.tenants[0].logoId",
-                                        "type": "image"
-                                    },
-                                    {
-                                        "variable":"mcGrade",
-                                        "value":"$.MdmsRes.tenant.tenants[0].city.pwssbGrade"
-                                      },
-                                    {
-                                        "variable": "logo_header",
-                                        "value": "$.MdmsRes.tenant.tenants[0].code",
-                                        "localisation": {
-                                            "required": true,
-                                            "prefix": "TENANT_TENANTS",
-                                            "module": "rainmaker-common"
-                                        }
+                                  {
+                                    "variable": "logoImage",
+                                    "value": "$.MdmsRes.tenant.tenants[0].logoId",
+                                    "type": "image"
+                                  },
+                                  {
+                                    "variable": "footerLogoImage",
+                                    "value": "$.MdmsRes.tenant.tenants[0].footerLogo",
+                                    "type": "image"
+                                  },
+                                  {
+                                    "variable": "mcGrade",
+                                    "value": "$.MdmsRes.tenant.tenants[0].city.pwssbGrade"
+                                  },
+                                  {
+                                    "variable": "logo_header",
+                                    "value": "$.MdmsRes.tenant.tenants[0].code",
+                                    "localisation": {
+                                      "required": true,
+                                      "prefix": "TENANT_TENANTS",
+                                      "module": "rainmaker-common"
                                     }
+                                  }
                                 ]
                             }
                         ]
