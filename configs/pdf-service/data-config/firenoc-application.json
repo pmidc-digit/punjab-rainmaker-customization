@@ -122,6 +122,31 @@
                 }
               },
               {
+                "variable": "var_documents",
+                "value": {
+                  "path": "$.Noc[0].fireNOCDetails.additionalDetail.documents[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "string",
+                  "scema": [
+                    {
+                      "variable": "docTitle",
+                      "value": "title",
+                      "localisation": {
+                        "required": true,
+                        "prefix": null,
+                        "module": "rainmaker-common"
+                      }
+                    },
+                    {
+                      "variable": "docName",
+                      "value": "name"
+                    }
+                  ]
+                }
+              },
+              {
                 "variable": "user-name",
                 "value": {
                   "path": "$.userInfo.name"
