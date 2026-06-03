@@ -116,6 +116,12 @@
                   ]
                 }
               },
+              {
+                "variable": "appIndex",
+                "value": {
+                  "path": "$.Noc[0].sanctionTerms[(@.length-1)].number"
+                }
+              },
 
               {
                 "variable": "ulbName",
@@ -914,6 +920,10 @@
               {
                 "variable": "excessAmountPaid",
                 "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
+              },
+              {
+                "variable": "appIndexDerived",
+                "formula": "{{appIndex}} + 1"
               }
             ]
           },
