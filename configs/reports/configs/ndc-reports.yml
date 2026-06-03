@@ -1486,6 +1486,7 @@ ReportDefinitions:
       ) rl ON t.tenantid = rl.tenant_id;
   - reportName: ApplicationSearchByID
     decryptionPathId: NDCAPPLICATION
+    encryptionPathId: UserSearchCriteria
     summary: Application details of No Due Certificate by search Application ID
     version: 1.0.0
     moduleName: rainmaker-ndc
@@ -1535,6 +1536,12 @@ ReportDefinitions:
         source: ndc
         isMandatory: false
         searchClause: and n.applicationno = $applicationno
+      - name: mobileNumber
+        label: Mobile Number
+        type: string
+        source: ndc
+        isMandatory: false
+        searchClause: and u.mobilenumber = $mobileNumber
     query: |
       -- Use CTE to force query plan, compute & use CTE later
       WITH workflow_history AS (
