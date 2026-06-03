@@ -3636,7 +3636,22 @@ ReportDefinitions:
         label: localityname
         type: string
         source: ws
+        total: false
+      - name: localitycode
+        label: localitycode
+        type: string
+        source: ws
         total: false 
+      - name: zonecode
+        label: zonecode
+        type: string
+        source: ws
+        total: false 
+      - name: blockcode
+        label: blockcode
+        type: string
+        source: ws
+        total: false       
       - name: wc_status
         label: wc_status
         type: string
@@ -3651,7 +3666,14 @@ ReportDefinitions:
         label: bill_status
         type: string
         source: ws
-        total: false                                                
+        total: false
+    searchParams:
+      - name: localityArray
+        label: zoneList
+        type: boundarylist
+        source: pt
+        isMandatory: false
+        searchClause: AND bm.localitycode IN ($localityArray)    
     query:
       WITH latest_bill AS (
           SELECT 
@@ -3679,7 +3701,7 @@ ReportDefinitions:
           lb.billid,
           lb.totalamount,
           lb.consumercode,
-        bm.localityname,
+        bm.localityname,bm.localitycode,bm.zonecode,bm.blockcode,
           wc.status AS wc_status,
           pt.landarea,
           b.status AS bill_status
@@ -3740,7 +3762,22 @@ ReportDefinitions:
         label: localityname
         type: string
         source: ws
+        total: false
+      - name: localitycode
+        label: localitycode
+        type: string
+        source: ws
         total: false 
+      - name: zonecode
+        label: zonecode
+        type: string
+        source: ws
+        total: false 
+      - name: blockcode
+        label: blockcode
+        type: string
+        source: ws
+        total: false        
       - name: wc_status
         label: wc_status
         type: string
@@ -3755,7 +3792,14 @@ ReportDefinitions:
         label: bill_status
         type: string
         source: ws
-        total: false                                                
+        total: false
+    searchParams:
+      - name: localityArray
+        label: zoneList
+        type: boundarylist
+        source: pt
+        isMandatory: false
+        searchClause: AND bm.localitycode IN ($localityArray)         
     query:
       WITH latest_bill AS (
           SELECT 
@@ -3783,7 +3827,7 @@ ReportDefinitions:
           lb.billid,
           lb.totalamount,
           lb.consumercode,
-        bm.localityname,
+        bm.localityname,bm.localitycode,bm.zonecode,bm.blockcode,
           wc.status AS wc_status,
           pt.landarea,
           b.status AS bill_status
