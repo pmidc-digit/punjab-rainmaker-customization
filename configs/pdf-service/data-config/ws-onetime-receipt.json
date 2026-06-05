@@ -130,6 +130,12 @@
                 }
               },
               {
+                "variable": "breakdownPenaltyCharge",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_BREAKDOWN_PENALTY' )].amount"
+                }
+              },
+              {
                 "variable": "serviceType",
                 "value": {
                   "path": "$.paymentDetails[0].businessService"
@@ -463,6 +469,18 @@
                 "variable": "generated_by",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_GENERATED_BY"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "ws_breakdown_penalty",
+                "value": {
+                  "path": "WS_BREAKDOWN_PENALTY"
                 },
                 "type": "label",
                 "localisation": {
