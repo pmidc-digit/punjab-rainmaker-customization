@@ -720,7 +720,11 @@
           "responseMapping":[
             {            
               "variable":"approvedBy",
-              "value":"$.ProcessInstances[?(@.action == 'APPROVE')].assigner.name"
+              "value":"$.ProcessInstances[?(@.action == 'APPROVE' || @.action == 'PAY')].assigner.name"
+            },
+            {            
+              "variable":"approvedStatus",
+              "value":"$.ProcessInstances[?(@.action == 'APPROVE' || @.action == 'PAY')].state.applicationStatus"
             }
 
           ]
