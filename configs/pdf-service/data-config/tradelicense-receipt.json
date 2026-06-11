@@ -36,6 +36,21 @@
                 "value": {
                   "path": "$.additionalDetails.collectedBy"
                 } 
+              },{
+                "variable": "ifsc", 
+                "value": {
+                  "path": "$.ifscCode"
+                }
+              },{
+                "variable": "bank", 
+                "value": {
+                  "path": "$.additionalDetails[0].bankName"
+                }
+              },{
+                "variable": "branch", 
+                "value": {
+                  "path": "$.additionalDetails[0].branchName"
+                }
               },
               {
                 "variable": "payerContact", 
@@ -47,24 +62,6 @@
                 "variable": "receiptNo", 
                 "value": {
                   "path": "$.paymentDetails[0].receiptNumber"
-                }
-              },
-              {
-                "variable": "ifsc", 
-                "value": {
-                  "path": "$.ifscCode"
-                }
-              },
-              {
-                "variable": "bank", 
-                "value": {
-                  "path": "$.additionalDetails[0].bankName"
-                }
-              },
-              {
-                "variable": "branch", 
-                "value": {
-                  "path": "$.additionalDetails[0].branchName"
                 }
               },
               {
@@ -119,20 +116,6 @@
                 "value": {
                   "path": "$.paymentDetails[0].totalAmountPaid"
                 }
-              },
-              {
-                "variable": "fromPeriod", 
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].fromPeriod"
-                },
-                "type": "date"
-              },
-              {
-                "variable": "toPeriod", 
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].toPeriod"
-                },
-                "type": "date"
               },
                {
                 "variable": "chequeNo", 
@@ -486,6 +469,11 @@
                       "value":"$.MdmsRes.tenant.tenants[0].domainUrl"
                     },
                     {
+                    "variable": "footerLogoImage",
+                    "value": "$.MdmsRes.tenant.tenants[0].footerLogo",
+                    "type": "image"
+                  },
+                    {
                       "variable":"email",
                       "value":"$.MdmsRes.tenant.tenants[0].emailId"
                     },
@@ -562,6 +550,16 @@
                         "variable":"financialYear",
                         "value":"$.Licenses[0].financialYear"
                       },
+                      {
+                        "variable": "fromPeriod", 
+                        "value": "$.Licenses[0].validFrom",
+                        "type": "date"
+                      },
+                      {
+                        "variable": "toPeriod", 
+                        "value": "$.Licenses[0].validTo",
+                        "type": "date"
+                      },
                       {            
                         "variable":"tradeName",
                         "value":"$.Licenses[0].tradeName"
@@ -574,6 +572,10 @@
                       },{            
                         "variable":"tradeStreet",
                         "value":"$.Licenses[0].tradeLicenseDetail.address.street"
+                      },
+                      {            
+                        "variable":"tradeLocality",
+                        "value":"$.Licenses[0].tradeLicenseDetail.address.locality.name"
                       },
                       {
                         "variable":"adhocRebateReason",
