@@ -259,21 +259,26 @@
       {
         "style": "next-noc-table",
         "table": {
-          "widths": ["50%", "50%"],
+          "widths": ["auto", "*", "*"],
           "body": [
             [
               {
                 "text": "Sr. No.",
-                "border": [true, true, false, true],
+                "border": [true, true, true, true],
                 "style": "receipt-table-value"
               },
               {
                 "text": "Document Name",
                 "border": [false, true, true, true],
                 "style": "receipt-table-value"
+              },
+              {
+                "text": "Document Type",
+                "border": [false, true, true, true],
+                "style": "receipt-table-value"
               }
             ],
-            "{{#var_documents}}[{\"text\":\"{{docName}}\",\"style\":\"receipt-table-value-temp\",\"border\":[true,false,false,true]},{\"text\":\"{{docTitle}}\",\"style\":\"receipt-table-value-temp\",\"border\":[false,false,true,true]}]{{/var_documents}}"
+            "{{#var_documents}}[{\"text\":\"{{index}}\",\"style\":\"receipt-table-value-temp\",\"border\":[true,false,true,true]},{\"text\":\"{{documentType}}\",\"style\":\"receipt-table-value-temp\",\"border\":[false,false,true,true]}, {\"text\":\"{{dropdownValue}}\",\"style\":\"receipt-table-value-temp\",\"border\":[false,false,true,true]}]{{/var_documents}}"
           ]
         },
         "layout": {}
