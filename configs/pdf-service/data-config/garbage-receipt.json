@@ -1,8 +1,8 @@
 {
-  "key": "rentandlease-receipt",
-  "documentType": "RENT_AND_LEASE_RECEIPT",
+  "key": "garbage-receipt",
+  "documentType": "GARBAGE_RECEIPT",
   "DataConfigs": {
-    "moduleName": "rainmaker-rentAndLease",
+    "moduleName": "rainmaker-common",
     "version": "1.0.0",
     "baseKeyPath": "$.Payments[0].billDetails.*",
     "entityIdPath": "$.tenantId",
@@ -16,10 +16,9 @@
               {
                 "variable": "payerName",
                 "value": {
-                  "path": "$.billRootData.rlSearchData.OwnerInfo[0].name"
+                  "path": "$.billRootData.gcSearchData.connectionHolders[0].name"
                 }
               },
-
               {
                 "variable": "designation",
                 "value": {
@@ -34,47 +33,34 @@
                 "type": "selectFromRequestInfo"
               },
               {
-                "variable": "generator_mobileno",
-                "value": {
-                  "path": "$.userInfo.mobileNumber"
-                },
-                "type": "selectFromRequestInfo"
-              },
-              {
                 "variable": "payerContact",
                 "value": {
-                  "path": "$.billRootData.rlSearchData.OwnerInfo[0].mobileNo"
+                  "path": "$.billRootData.gcSearchData.connectionHolders[0].mobileNumber"
                 }
               },
               {
-                "variable": "Category",
+                "variable": "payerAddress",
                 "value": {
-                  "path": "$.usage"
+                  "path": "$.payerAddress"
                 }
               },
 
               {
-                "variable": "Amountinwords",
+                "variable": "receiptNo",
                 "value": {
-                  "path": "$.amountinwords"
+                  "path": "$.billRootData.paymentDetails[0].receiptNumber"
                 }
               },
               {
-                "variable": "paymentType",
+                "variable": "garbage_security_deposit",
                 "value": {
-                  "path": "BPA_PAYMENT_TYPE1"
+                  "path": "ADV_SECURITY_DEPOSIT"
                 },
                 "type": "label",
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
-                }
-              },
-              {
-                "variable": "receiptNo",
-                "value": {
-                  "path": "$.billRootData.paymentDetails[0].receiptNumber"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -86,7 +72,7 @@
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -96,30 +82,30 @@
                 }
               },
               {
-                "variable": "tenantid",
+                "variable": "service_charge",
                 "value": {
-                  "path": "$.tenantId"
-                }
-              },
-             {
-                "variable": "serviceType",
-                "value": {
-                  "path": "ACTION_TEST_CLU_HOME"
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_SERVICE_CHARGE"
                 },
                 "type": "label",
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
-
               {
-                "variable": "paidAmount",
+                "variable": "SecurityDeposit",
                 "value": {
-                  "path": "$.amount"
+                  "path": "$.billRootData.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'GC_SECURITY_DEPOSIT')].adjustedAmount"
                 }
               },
+              {
+                "variable": "ConnectionFee",
+                "value": {
+                  "path": "$.billRootData.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'GC_CONNECTION_FEE')].adjustedAmount"
+                }
+              },
+              
               {
                 "variable": "var_billDetails",
                 "value": {
@@ -145,98 +131,43 @@
                   ]
                 }
               },
-              {
-                "variable": "clu_charge",
-                "value": {
-                  "path": "BPA_CLU_CHARGES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-rentAndLease"
-                }
-              },
-              {
-                "variable": "CluCharge",
-                "value": {
-                  "path": "$.billRootData.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_CLU_CHARGES')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "clu_processing_fee",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_NOC_PROCESSING_FEES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-rentAndLease"
-                }
-              },
-              {
-                "variable": "CluProcessingFee",
-                "value": {
-                  "path": "$.billRootData.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_PROCESSING_FEES')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "clu_external_development_charges",
-                "value": {
-                  "path": "BILLINGSERVICE_BUSINESSSERVICE_NKS_EXTERNAL_DEVELOPMENT_CHARGES"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-rentAndLease"
-                }
-              },
-              {
-                "variable": "CluExternalDevelopmentCharges",
-                "value": {
-                  "path": "$.billRootData.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_EXTERNAL_DEVELOPMENT_CHARGES')].adjustedAmount"
-                }
-              },
-              {
-                "variable": "clu_urban_development_cess",
-                "value": {
-                  "path": "BPA_URBAN_DEVELOPMENT_CESS"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-rentAndLease"
-                }
-              },
-              {
-                "variable": "CluUrbanDevelopmentCess",
-                "value": {
-                  "path": "$.billRootData.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_URBAN_DEVELOPMENT_CESS')].adjustedAmount"
-                }
-              },
 
+              {
+                "variable": "tenantid",
+                "value": {
+                  "path": "$.tenantId"
+                }
+              },
+              {
+                "variable": "serviceType",
+                "value": {
+                  "path": "$.billRootData.paymentDetails[0].businessService"
+                },
+                "localisation": {
+                  "required": true,
+                  "prefix": "MODULE",
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "paidAmount",
+                "value": {
+                  "path": "$.amount"
+                }
+              },
               {
                 "variable": "fromPeriod",
                 "value": {
-                  "path": "$.billRootData.rlSearchData.startDate"
+                  "path": "$.fromPeriod"
                 },
                 "type": "date"
               },
               {
                 "variable": "toPeriod",
                 "value": {
-                  "path": "$.billRootData.rlSearchData.endDate"
+                  "path": "$.toPeriod"
                 },
                 "type": "date"
-              },
-              {
-                "variable": "stakeholderType",
-                "value": {
-                  "path": "$.billRootData.paymentDetails[0].additionalDetails.stakeholderType"
-                }
               },
               {
                 "variable": "paymentMode",
@@ -246,7 +177,7 @@
                 "localisation": {
                   "required": true,
                   "prefix": "COMMON_MASTERS_PAYMENTMODE",
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -296,7 +227,7 @@
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -308,7 +239,7 @@
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -332,7 +263,7 @@
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -344,7 +275,7 @@
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -356,7 +287,7 @@
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -368,7 +299,7 @@
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -380,7 +311,7 @@
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -392,7 +323,7 @@
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -404,7 +335,7 @@
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -416,7 +347,7 @@
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -428,7 +359,7 @@
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -440,7 +371,7 @@
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -452,7 +383,7 @@
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -464,7 +395,7 @@
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -476,7 +407,7 @@
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
@@ -488,19 +419,139 @@
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
                 }
               },
               {
-                "variable": "no_signature",
+                "variable": "commissioner/eo",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_NO_SIGNATURE"
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_COMMISSIONER_EO"
                 },
                 "type": "label",
                 "localisation": {
                   "required": true,
                   "prefix": null,
-                  "module": "rainmaker-rentAndLease"
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "no_signature",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_NO_SIGNATURE_GC"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "disclamer",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "disclamer_1",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_FIRST_LINE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "disclamer_2",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_SECOND_LINE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "disclamer_3",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_THIRD_LINE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "disclamer_4",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_4"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "disclamer_5",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_DISCLAIMER_FIFTH_LINE"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "to",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_TO"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "Municipal_Corporation",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_MDMS_MUNICIPAL_CORPORATION"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "total_bill_amount",
+                "value": {
+                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_TOTAL_BILL_AMOUNT"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
                 }
               }
             ]
@@ -525,12 +576,12 @@
                     "value": "$.MdmsRes.tenant.tenants[0].domainUrl"
                   },
                   {
-                    "variable": "email",
-                    "value": "$.MdmsRes.tenant.tenants[0].emailId"
-                  },
-                  {
                     "variable": "ulbType",
                     "value": "$.MdmsRes.tenant.tenants[0].city.ulbType"
+                  },
+                  {
+                    "variable": "email",
+                    "value": "$.MdmsRes.tenant.tenants[0].emailId"
                   },
                   {
                     "variable": "logoImage",
@@ -543,7 +594,7 @@
                     "localisation": {
                       "required": true,
                       "prefix": "TENANT_TENANTS",
-                      "module": "rainmaker-rentAndLease"
+                      "module": "rainmaker-common"
                     }
                   }
                 ]
