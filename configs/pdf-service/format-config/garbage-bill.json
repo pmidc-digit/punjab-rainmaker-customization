@@ -1,5 +1,5 @@
 {
-  "key": "rentandlease-bill",
+  "key": "garbage-bill",
   "config": {
     "defaultStyle": {
       "font": "Cambay"
@@ -44,7 +44,7 @@
                     "text": "Total Amount {{testing billWS}}"
                   },
                   {
-                    "text": "₹ {{total}}",
+                    "text": "₹ {{totalAmountDue}}",
                     "style": "amount-due"
                   }
                 ],
@@ -64,7 +64,7 @@
           "body": [
             [
               {
-                "text": "{{serviceType}} Bill for Period {{fromPeriod}} - {{toPeriod}}",
+                "text": "{{serviceType}} Bill for Period {{billIssueDate}} - {{toPeriod}}",
                 "border": [false, false, false, false],
                 "style": "receipt-table-value2",
                 "alignment": "center"
@@ -133,11 +133,16 @@
             [
               {
                 "table": {
-                  "widths": ["25%", "25%", "25%", "25%"],
+                  "widths": ["23%", "25%", "23%", "*"],
                   "body": [
                     [
                       {
-                        "text": "{{consumer_no}}",
+                        "text": "{{connection_no}}",
+                        "border": [false, false, false, false],
+                        "style": "receipt-table-value2"
+                      },
+                      {
+                        "text": "Plot Size",
                         "border": [false, false, false, false],
                         "style": "receipt-table-value2"
                       },
@@ -147,12 +152,7 @@
                         "style": "receipt-table-value2"
                       },
                       {
-                        "text": "Mobile Number",
-                        "border": [false, false, false, false],
-                        "style": "receipt-table-value2"
-                      },
-                      {
-                        "text": "Property ID",
+                        "text": "Locality",
                         "border": [false, false, false, false],
                         "style": "receipt-table-value2"
                       }
@@ -164,7 +164,46 @@
                         "style": "receipt-table2"
                       },
                       {
+                        "text": "{{gcPlotSize}}",
+                        "border": [false, false, false, false],
+                        "style": "receipt-table2"
+                      },
+                      {
                         "text": "{{billOwnerName}}",
+                        "border": [false, false, false, false],
+                        "style": "receipt-table2"
+                      },
+                      {
+                        "text": "{{locality}}",
+                        "border": [false, false, false, false],
+                        "style": "receipt-table2"
+                      }
+                    ],
+                    [
+                      {
+                        "text": "Usage Type",
+                        "border": [false, false, false, false],
+                        "style": "receipt-table-value2"
+                      },
+                      {
+                        "text": "Mobile Number",
+                        "border": [false, false, false, false],
+                        "style": "receipt-table-value2"
+                      },
+                      {
+                        "text": " ",
+                        "border": [false, false, false, false],
+                        "style": "receipt-table-value2"
+                      },
+                      {
+                        "text": " ",
+                        "border": [false, false, false, false],
+                        "style": "receipt-table-value2"
+                      }
+                    ],
+                    [
+                      {
+                        "text": "{{usageType}}",
                         "border": [false, false, false, false],
                         "style": "receipt-table2"
                       },
@@ -174,9 +213,14 @@
                         "style": "receipt-table2"
                       },
                       {
-                        "text": "{{propertyID}}",
+                        "text": " ",
                         "border": [false, false, false, false],
-                        "style": "receipt-table-value2"
+                        "style": "receipt-table2"
+                      },
+                      {
+                        "text": " ",
+                        "border": [false, false, false, false],
+                        "style": "receipt-table2"
                       }
                     ]
                   ]
@@ -310,7 +354,7 @@
         "margin": [-30, -9.8, 0, 0]
       },
       {
-        "text": "{{acknowledgement_for}}",
+        "text": "Acknowledgement (For Official use only)",
         "style": "footer-header"
       },
       {
@@ -325,7 +369,7 @@
                 "style": "receipt-table-value"
               },
               {
-                "text": "{{billdate}}",
+                "text": "{{billIssueDate}}",
                 "border": [false, false, false, false],
                 "style": "receipt-table"
               },
@@ -342,7 +386,7 @@
             ],
             [
               {
-                "text": "{{consumer_no}}",
+                "text": "{{connection_no}}",
                 "border": [false, false, false, false],
                 "style": "receipt-table-value"
               },
@@ -369,7 +413,7 @@
                 "style": "receipt-table-value"
               },
               {
-                "text": "{{billOwnerName}}, {{nameAddress}} , {{Addresspincode}}",
+                "text": "{{billOwnerName}}, {{nameAddress}}, {{nameAddressPincode}}",
                 "border": [false, false, false, false],
                 "style": "receipt-table"
               },

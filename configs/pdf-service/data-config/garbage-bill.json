@@ -1,6 +1,6 @@
 {
-  "key": "rentandlease-bill",
-  "documentType": "RENTANDLEASE_BILL",
+  "key": "garbage-bill",
+  "documentType": "GARBAGE_BILL",
   "DataConfigs": {
     "serviceName": "rainmaker-common",
     "version": "1.0.0",
@@ -38,18 +38,6 @@
                 }
               },
               {
-                "variable": "Municipal_Corporation",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_MDMS_MUNICIPAL_CORPORATION"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
                 "variable": "bill_no",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_BILL_BILL_NO"
@@ -62,69 +50,9 @@
                 }
               },
               {
-                "variable": "Rs",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_RUPEE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "mobile_no",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_BILL_MOBILE_NO"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "bill_period",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_BILL_BILL_PERIOD"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "payer_address",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_BILL_PAYER_ADDRESS"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
                 "variable": "bill_issue_date",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_BILL_ISSUE_DATE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "bill_due_date",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_BILL_BILL_DUE_DATE"
                 },
                 "type": "label",
                 "localisation": {
@@ -169,57 +97,9 @@
                 }
               },
               {
-                "variable": "charge_label",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_BILL_CHARGE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "total_label",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_BILL_TOTAL"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
                 "variable": "important_message",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_BILL_IMPORTANT_MESSAGE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "payment_received",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_WS_BILL_PAYMENT_RECEIVED"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-ws"
-                }
-              },
-              {
-                "variable": "acknowledgement_for",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_BILL_ACKNOWLEDGEMENT"
                 },
                 "type": "label",
                 "localisation": {
@@ -277,6 +157,18 @@
                 }
               },
               {
+                "variable": "connection_no",
+                "value": {
+                  "path": "PDF_BILL_GC_CONNECTION_NO"
+                },
+                "type": "label",
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
                 "variable": "receivers_signature",
                 "value": {
                   "path": "PDF_STATIC_LABEL_CONSOLIDATED_BILL_RECEIVERS_SIGNATURE"
@@ -291,7 +183,7 @@
               {
                 "variable": "totalAmountDue",
                 "value": {
-                  "path": "$.totalAmount"
+                  "path": "$.amount"
                 }
               },
               {
@@ -303,25 +195,31 @@
               {
                 "variable": "payerName",
                 "value": {
-                  "path": "$.payerName"
+                  "path": "$.billRootData.gcSearchData.connectionHolders[0].name"
+                }
+              },
+              {
+                "variable": "gcPlotSize",
+                "value": {
+                  "path": "$.billRootData.gcSearchData.plotSize"
                 }
               },
               {
                 "variable": "mobileNo",
                 "value": {
-                  "path": "$.billRootData.rlSearchData.OwnerInfo[0].mobileNo"
+                  "path": "$.billRootData.gcSearchData.connectionHolders[0].mobileNumber"
                 }
               },
               {
                 "variable": "propertyID",
                 "value": {
-                  "path": "$.billRootData.rlSearchData.propertyId"
+                  "path": "$.billRootData.connection.propertyId"
                 }
               },
               {
                 "variable": "oldConnectionNo",
                 "value": {
-                  "path": "$.billRootData.oldConnectionNo"
+                  "path": "$.billRootData.connection.oldConnectionNo"
                 }
               },
               {
@@ -333,7 +231,7 @@
               {
                 "variable": "ledgerId",
                 "value": {
-                  "path": "$.billRootData.additionalDetails.value.ledgerId"
+                  "path": "$.billRootData.connection.additionalDetails.value.ledgerId"
                 }
               },
               {
@@ -345,19 +243,19 @@
               {
                 "variable": "ledgerId",
                 "value": {
-                  "path": "$.billRootData.additionalDetails.value.ledgerId"
+                  "path": "$.billRootData.connection.additionalDetails.value.ledgerId"
                 }
               },
               {
                 "variable": "groupId",
                 "value": {
-                  "path": "$.billRootData.additionalDetails.value.groups"
+                  "path": "$.billRootData.connection.additionalDetails.value.groups"
                 }
               },
               {
                 "variable": "billOwnerName",
                 "value": {
-                  "path": "$.billRootData.rlSearchData.OwnerInfo[0].name"
+                  "path": "$.billRootData.gcSearchData.connectionHolders[0].name"
                 }
               },
               {
@@ -369,7 +267,7 @@
               {
                 "variable": "Addresspincode",
                 "value": {
-                  "path": "$.billRootData.rlSearchData.OwnerInfo[0].permanentAddress.pincode"
+                  "path": "$.billRootData.address.pincode"
                 }
               },
               {
@@ -397,15 +295,46 @@
                 }
               },
               {
+                "variable": "var_billDetails",
+                "value": {
+                  "path": "$.billAccountDetails[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "object",
+                  "scema": [
+                    {
+                      "variable": "billTaxHeadCode",
+                      "value": "taxHeadCode",
+                      "localisation": {
+                        "required": true,
+                        "prefix": null,
+                        "module": "rainmaker-common"
+                      }
+                    },
+                    {
+                      "variable": "billAmount",
+                      "value": "amount"
+                    }
+                  ]
+                }
+              },
+              {
                 "variable": "tenant",
                 "value": {
-                  "path": "$.tenantId"
+                  "path": "$.billRootData.tenantId"
                 }
               },
               {
                 "variable": "nameAddress",
                 "value": {
-                  "path": "$.billRootData.rlSearchData.OwnerInfo[0].permanentAddress.addressId"
+                  "path": "$.billRootData.gcSearchData.connectionHolders[0].permanentAddress"
+                }
+              },
+              {
+                "variable": "nameAddressPincode",
+                "value": {
+                  "path": "$.billRootData.gcSearchData.connectionHolders[0].permanentPinCode"
                 }
               },
               {
@@ -436,31 +365,6 @@
                 "type": "date"
               },
               {
-                "variable": "var_billDetails",
-                "value": {
-                  "path": "$.billAccountDetails[*]"
-                },
-                "type": "array",
-                "format": {
-                  "type": "object",
-                  "scema": [
-                    {
-                      "variable": "billTaxHeadCode",
-                      "value": "taxHeadCode",
-                      "localisation": {
-                        "required": true,
-                        "prefix": null,
-                        "module": "rainmaker-common"
-                      }
-                    },
-                    {
-                      "variable": "billAmount",
-                      "value": "amount"
-                    }
-                  ]
-                }
-              },
-              {
                 "variable": "billDueDate",
                 "value": {
                   "path": "$.expiryDate"
@@ -470,14 +374,14 @@
               {
                 "variable": "billdate",
                 "value": {
-                  "path": "$.fromPeriod"
+                  "path": "$.billDate"
                 },
                 "type": "date"
               },
               {
                 "variable": "consumerCode",
                 "value": {
-                  "path": "$.billRootData.rlSearchData.applicationNumber"
+                  "path": "$.billRootData.identifier"
                 }
               },
               {
@@ -579,7 +483,7 @@
               {
                 "variable": "consumerID",
                 "value": {
-                  "path": "$.billRootData.rlSearchData.applicationNumber"
+                  "path": "$.billRootData.identifier"
                 }
               },
               {
@@ -618,7 +522,7 @@
             "externalAPI": [
               {
                 "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
-                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}')%5D",
+                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.billRootData.tenantId}')%5D",
                 "apiRequest": null,
                 "responseMapping": [
                   {
@@ -654,6 +558,55 @@
                       "prefix": "TENANT_TENANTS",
                       "module": "rainmaker-common"
                     }
+                  }
+                ]
+              },
+              {
+                "path": "http://property-services.egov:8080/property-services/property/_search",
+                "queryParam": "tenantId=$.billRootData.tenantId,propertyIds=$.billRootData.connection.propertyId",
+                "apiRequest": null,
+                "responseMapping": [
+                  {
+                    "variable": "usageType",
+                    "value": "$.Properties[0].usageCategory",
+                    "type": "label",
+                    "localisation": {
+                      "required": true,
+                      "prefix": "PROPERTYTAX_BILLING_SLAB",
+                      "module": "rainmaker-common"
+                    }
+                  },
+                  {
+                    "variable": "plotSize",
+                    "value": "$.Properties[0].units[0].constructionDetail.builtUpArea"
+                  },
+                  {
+                    "variable": "houseNo",
+                    "value": "$.Properties[0].address.doorNo"
+                  },
+                  {
+                    "variable": "buildingName",
+                    "value": "$.Properties[0].address.buildingName"
+                  },
+                  {
+                    "variable": "streetName",
+                    "value": "$.Properties[0].address.street"
+                  },
+                  {
+                    "variable": "locality",
+                    "value": "$.Properties[0].address.locality.name"
+                  },
+                  {
+                    "variable": "landmark",
+                    "value": "$.Properties[0].address.landmark"
+                  },
+                  {
+                    "variable": "ownerName",
+                    "value": "$.Properties[0].owners[0].name"
+                  },
+                  {
+                    "variable": "guardianName",
+                    "value": "$.Properties[0].owners[0].fatherOrHusbandName"
                   }
                 ]
               }
