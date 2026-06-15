@@ -20,6 +20,17 @@
                 }
               },
               {
+                "variable": "bookingStatus",
+                "value": {
+                  "path": "$.hallsBookingApplication[0].bookingStatus"
+                },
+                "localisation": {
+                  "required": true,
+                  "prefix": null,
+                  "module": "rainmaker-common"
+                }
+              },
+              {
                 "variable": "designation",
                 "value": {
                   "path": "$.additionalDetails.designation"
@@ -120,24 +131,6 @@
                 }
               },
               {
-                "variable": "chb_service_charge",
-                "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_TLAPP_SERVICE_CHARGE"
-                },
-                "type": "label",
-                "localisation": {
-                  "required": true,
-                  "prefix": null,
-                  "module": "rainmaker-common"
-                }
-              },
-              {
-                "variable": "chbSecurityDeposit",
-                "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_SECURITY_DEPOSIT')].adjustedAmount"
-                }
-              },
-              {
                 "variable": "chb_security_deposit",
                 "value": {
                   "path": "SECURITY_DEPOSIT"
@@ -150,9 +143,9 @@
                 }
               },
               {
-                "variable": "chbServiceCharge",
+                "variable": "chbSecurityDeposit",
                 "value": {
-                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_SERVICE_CHARGE')].adjustedAmount"
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CHB_SECURITY_DEPOSIT')].adjustedAmount"
                 }
               },
 
@@ -670,46 +663,6 @@
                   "prefix": null,
                   "module": "rainmaker-common"
                 }
-              }
-            ]
-          },
-          {
-            "derived": [
-              {
-                "variable": "pendingAmount",
-                "formula": "{{dueAmount}}>{{paidAmount}}?{{dueAmount}}-{{paidAmount}}:0"
-              },
-              {
-                "variable": "chbServiceCharge",
-                "formula": "{{chbServiceCharge}}>0?{{chbServiceCharge}}:0"
-              },
-              {
-                "variable": "chbSecurityDeposit",
-                "formula": "{{chbSecurityDeposit}}>0?{{chbSecurityDeposit}}:0"
-              },
-              {
-                "variable": "chbBookingFees",
-                "formula": "{{chbBookingFees}}>0?{{chbBookingFees}}:0"
-              },
-              {
-                "variable": "chbSgst",
-                "formula": "{{chbSgst}}>0?{{chbSgst}}:0"
-              },
-              {
-                "variable": "chbCgst",
-                "formula": "{{chbCgst}}>0?{{chbCgst}}:0"
-              },
-              {
-                "variable": "chbCowCessCharge",
-                "formula": "{{chbCowCessCharge}}>0?{{chbCowCessCharge}}:0"
-              },
-              {
-                "variable": "chbDiscountPositive",
-                "formula": "{{chbDiscount}} < 0 ? -{{chbDiscount}} : {{chbDiscount}}"
-              },
-              {
-                "variable": "chbDiscountPositive",
-                "formula": "{{chbDiscountPositive}}>0?{{chbDiscountPositive}}:0"
               }
             ]
           },

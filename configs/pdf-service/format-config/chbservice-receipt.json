@@ -46,11 +46,7 @@
                 "alignment": "center"
               },
               {
-                "image": "{{qrcodeimage}}",
-                "width": 72,
-                "height": 72,
-                "alignment": "right",
-                "margin": [0, 0, 0, 0]
+               
               }
             ]
           ]
@@ -125,7 +121,7 @@
                 "style": "receipt-table-value"
               },
               {
-                "text": "{{paymentStatus}}",
+                "text": "{{bookingStatus}}",
                 "border": [false, false, true, true],
                 "style": "receipt-table"
               }
@@ -156,7 +152,7 @@
                 "style": "receipt-table-value"
               },
               {
-                "text": "{{#var_bookingSlots}}{{bookingDate}}, {{/var_bookingSlots}} (0:00 AM to 23:59 PM)",
+                "text": "{{#var_bookingSlots}}{{bookingDate}}, {{/var_bookingSlots}} (0:00 AM to 11:59 PM)",
                 "border": [false, true, true, false],
                 "style": "receipt-table"
               }
@@ -168,7 +164,7 @@
                 "style": "receipt-table-value"
               },
               {
-                "text": "₹ {{dueAmount}}",
+                "text": "₹ {{paidAmount}}",
                 "border": [false, false, false, false],
                 "style": "receipt-table"
               },
@@ -314,7 +310,7 @@
                 "style": "receipt-table-value-down"
               },
               {
-                "text": "₹ {{chbServiceCharge}}",
+                "text": "₹ {{chbSecurityDeposit}}",
                 "border": [false, false, true, false],
                 "style": "receipt-table-value-down"
               }
@@ -326,7 +322,7 @@
                 "style": "receipt-table-value-down"
               },
               {
-                "text": "₹ {{chbDiscountPositive}}",
+                "text": "₹ {{chbDiscount}}",
                 "border": [false, false, true, false],
                 "style": "receipt-table-value-down"
               }
@@ -334,7 +330,7 @@
 
             [
               {
-                "text": "{{total_amount}} (in Rs)",
+                "text": "{{total_amount}} (in ₹)",
                 "border": [true, false, false, true],
                 "bold": true,
                 "style": "receipt-table-value-down"
