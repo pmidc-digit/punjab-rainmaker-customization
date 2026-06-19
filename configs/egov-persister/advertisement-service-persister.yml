@@ -23,7 +23,7 @@ serviceMaps:
             - jsonPath: $.bookingApplication.advertisementId
 
             
-        - query: INSERT INTO public.eg_adv_cart_detail(cart_id, booking_id, add_type, location, face_area, night_light, booking_date, booking_from_time, booking_to_time, status, createdby, createdtime, lastmodifiedby, lastmodifiedtime, advertisementId) VALUES (?, ?, ?, ?, ?, ?, ?::DATE, ?::TIME, ?::TIME, ?, ?, ?, ?, ?, ?);
+        - query: INSERT INTO public.eg_adv_cart_detail(cart_id, booking_id, add_type, location, face_area, night_light, booking_date, booking_end_date, booking_from_time, booking_to_time, status, createdby, createdtime, lastmodifiedby, lastmodifiedtime, advertisementId) VALUES (?, ?, ?, ?, ?, ?, ?::DATE, ?::DATE, ?::TIME, ?::TIME, ?, ?, ?, ?, ?, ?);
           basePath: bookingApplication.cartDetails.*
           jsonMaps:
             - jsonPath: $.bookingApplication.cartDetails.*.cartId
@@ -33,6 +33,7 @@ serviceMaps:
             - jsonPath: $.bookingApplication.cartDetails.*.faceArea
             - jsonPath: $.bookingApplication.cartDetails.*.nightLight
             - jsonPath: $.bookingApplication.cartDetails.*.bookingDate
+            - jsonPath: $.bookingApplication.cartDetails.*.bookingEndDate
             - jsonPath: $.bookingApplication.cartDetails.*.bookingFromTime
             - jsonPath: $.bookingApplication.cartDetails.*.bookingToTime
             - jsonPath: $.bookingApplication.cartDetails.*.status
@@ -139,7 +140,7 @@ serviceMaps:
             - jsonPath: $.bookingApplication.bookingId
             
 
-        - query: INSERT INTO public.eg_adv_cart_detail(cart_id, booking_id, add_type, location, face_area, night_light, booking_date, booking_from_time, booking_to_time, status, createdby, createdtime, lastmodifiedby, lastmodifiedtime, advertisementid) VALUES (?, ?, ?, ?, ?, ?, ?::DATE, ?::TIME, ?::TIME, ?, ?, ?, ?, ?, ?) ON CONFLICT (cart_id) DO UPDATE SET booking_id = EXCLUDED.booking_id, add_type = EXCLUDED.add_type, location = EXCLUDED.location, face_area = EXCLUDED.face_area, night_light = EXCLUDED.night_light, booking_date = EXCLUDED.booking_date, booking_from_time = EXCLUDED.booking_from_time, booking_to_time = EXCLUDED.booking_to_time, status = EXCLUDED.status, lastmodifiedby = EXCLUDED.lastmodifiedby, lastmodifiedtime = EXCLUDED.lastmodifiedtime, advertisementid = EXCLUDED.advertisementid;
+        - query: INSERT INTO public.eg_adv_cart_detail(cart_id, booking_id, add_type, location, face_area, night_light, booking_date, booking_end_date, booking_from_time, booking_to_time, status, createdby, createdtime, lastmodifiedby, lastmodifiedtime, advertisementid) VALUES (?, ?, ?, ?, ?, ?, ?::DATE, ?::DATE, ?::TIME, ?::TIME, ?, ?, ?, ?, ?, ?) ON CONFLICT (cart_id) DO UPDATE SET booking_id = EXCLUDED.booking_id, add_type = EXCLUDED.add_type, location = EXCLUDED.location, face_area = EXCLUDED.face_area, night_light = EXCLUDED.night_light, booking_date = EXCLUDED.booking_date, booking_end_date = EXCLUDED.booking_end_date, booking_from_time = EXCLUDED.booking_from_time, booking_to_time = EXCLUDED.booking_to_time, status = EXCLUDED.status, lastmodifiedby = EXCLUDED.lastmodifiedby, lastmodifiedtime = EXCLUDED.lastmodifiedtime, advertisementid = EXCLUDED.advertisementid;
           basePath: bookingApplication.cartDetails.*
           jsonMaps:
             - jsonPath: $.bookingApplication.cartDetails.*.cartId
@@ -149,6 +150,7 @@ serviceMaps:
             - jsonPath: $.bookingApplication.cartDetails.*.faceArea
             - jsonPath: $.bookingApplication.cartDetails.*.nightLight
             - jsonPath: $.bookingApplication.cartDetails.*.bookingDate
+            - jsonPath: $.bookingApplication.cartDetails.*.bookingEndDate
             - jsonPath: $.bookingApplication.cartDetails.*.bookingFromTime
             - jsonPath: $.bookingApplication.cartDetails.*.bookingToTime
             - jsonPath: $.bookingApplication.cartDetails.*.status
