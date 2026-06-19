@@ -221,7 +221,7 @@
       {
         "style": "fee-summary-table",
         "table": {
-          "widths": ["10%", "39%", "25.5%","25.5%"],
+          "widths": ["10%", "39%", "20.5%","30.5%"],
           "body": [
             [
               { "text": "S. No", "style": "receipt-header", "bold": true },
@@ -234,7 +234,7 @@
                 "bold": true
               },
               {
-                "text": "Adjusted Amount (In ₹)",
+                "text": "Amount Raised by ULB (In ₹)",
                 "style": "receipt-header",
                 "alignment": "right",
                 "margin": [0, 0, 4, 0],
@@ -242,7 +242,25 @@
               }
             ],
             "{{#var_paymentData}}[{ \"text\": \"{{index}}\", \"style\": \"receipt-table-value\", \"alignment\": \"left\",\"border\": [true, true, true,true], \"margin\": [5, 0, 0, 0] },{ \"text\": \"{{title}}\", \"style\": \"receipt-table-value\", \"alignment\": \"left\",\"border\": [true, true, true,true], \"margin\": [5, 0, 0, 0] },{ \"text\": \"{{amount}}\", \"style\": \"receipt-table-value\", \"alignment\": \"left\",\"border\": [true, true, true,true], \"margin\": [5, 0, 0, 0] },{ \"text\": \"{{adjustedAmount}}\", \"style\": \"receipt-table-value\",\"border\": [true, true, true,true], \"alignment\": \"left\", \"margin\": [5, 0, 0, 0] }]{{/var_paymentData}}",
-             [
+            [
+              {
+                "text": " ",
+                "style": "receipt-total-label"
+              },
+              {
+                "text": "Total",
+                "style": "receipt-total-label"
+              },
+              {
+                "text": "{{totalULBAmount}}",
+                "style": "receipt-total-label"
+              },
+              {
+                "text": "{{totalAdjustedAmount}}",
+                "style": "receipt-total-label"
+              }
+            ], 
+            [
               {
                 "text": " ",
                 "style": "receipt-total-label",
