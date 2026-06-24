@@ -231,7 +231,28 @@ SearchDefinitions:
       rowMapperKey: billsearch
       query:
         baseQuery: >-
-          WITH latest_meter AS (
+          WITH all_connections AS (
+            SELECT 
+              connectionno, 
+              tenantid, 
+              status, 
+              property_id, 
+              oldconnectionno, 
+              additionaldetails
+            FROM eg_ws_connection
+      
+            UNION ALL
+      
+            SELECT 
+              connectionno, 
+              tenantid, 
+              status, 
+              property_id, 
+              oldconnectionno, 
+              additionaldetails
+            FROM eg_sw_connection
+          ),
+          latest_meter AS (
             SELECT DISTINCT ON (mr.connectionno)
               mr.connectionno                     AS mr_connectionno,
               mr.lastreading                      AS mr_lastreading,
@@ -329,7 +350,7 @@ SearchDefinitions:
             INNER JOIN egbs_billaccountdetail_v1 ad
               ON bd.id = ad.billdetail
             AND bd.tenantid = ad.tenantid
-            INNER JOIN eg_ws_connection conn
+            INNER JOIN all_connections conn
               ON bd.consumercode = conn.connectionno
             LEFT JOIN latest_meter lm
               ON lm.mr_connectionno = conn.connectionno
