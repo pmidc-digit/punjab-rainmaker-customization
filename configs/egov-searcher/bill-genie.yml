@@ -240,7 +240,7 @@ SearchDefinitions:
               oldconnectionno, 
               additionaldetails
             FROM eg_ws_connection
-            where tenantid = :b.tenantid
+            WHERE tenantid = :b.tenantid
       
             UNION ALL
       
@@ -252,7 +252,7 @@ SearchDefinitions:
               oldconnectionno, 
               additionaldetails
             FROM eg_sw_connection
-            where tenantid = :b.tenantid
+            WHERE tenantid = :b.tenantid
           ),
           latest_meter AS (
             SELECT DISTINCT ON (mr.connectionno)
@@ -265,6 +265,7 @@ SearchDefinitions:
               mr.meterstatus                      AS mr_meterstatus,
               mr.billingperiod                    AS mr_billingperiod
             FROM eg_ws_meterreading mr
+            WHERE tenantid = :b.tenantid
             ORDER BY mr.connectionno, mr.currentreadingdate DESC
           ),
           bill_data AS (
