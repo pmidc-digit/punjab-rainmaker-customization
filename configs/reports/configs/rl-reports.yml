@@ -88,7 +88,7 @@ ReportDefinitions:
          FROM eg_rl_allotment AS r
          LEFT JOIN eg_rl_owner_info AS o ON o.allotment_id = r.id
          LEFT JOIN eg_user AS u ON u.uuid = o.user_uuid
-         WHERE r.tenantid = $tenantid
+         WHERE r.tenant_id = $tenantid
 
   - reportName: STATERENT&LEASEDETAILSReport
     decryptionPathId: RLREPORTS
