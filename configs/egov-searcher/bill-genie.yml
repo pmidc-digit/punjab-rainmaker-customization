@@ -192,7 +192,30 @@ SearchDefinitions:
    rowMapperKey: billsearch
    query:
      baseQuery: >-
-       WITH latest_meter AS (
+       WITH all_connections AS (
+            SELECT 
+              connectionno, 
+              tenantid, 
+              status, 
+              property_id, 
+              oldconnectionno, 
+              additionaldetails
+            FROM eg_ws_connection
+            WHERE tenantid = :b.tenantid
+      
+            UNION ALL
+      
+            SELECT 
+              connectionno, 
+              tenantid, 
+              status, 
+              property_id, 
+              oldconnectionno, 
+              additionaldetails
+            FROM eg_sw_connection
+            WHERE tenantid = :b.tenantid
+        ),
+       latest_meter AS (
             SELECT DISTINCT ON (mr.connectionno)
               mr.connectionno                     AS mr_connectionno,
               mr.lastreading                      AS mr_lastreading,
@@ -203,6 +226,7 @@ SearchDefinitions:
               mr.meterstatus                      AS mr_meterstatus,
               mr.billingperiod                    AS mr_billingperiod
             FROM eg_ws_meterreading mr
+            WHERE tenantid = :b.tenantid
             ORDER BY mr.connectionno, mr.currentreadingdate DESC
           ),
           bill_data AS (
@@ -290,7 +314,7 @@ SearchDefinitions:
             INNER JOIN egbs_billaccountdetail_v1 ad
               ON bd.id = ad.billdetail
             AND bd.tenantid = ad.tenantid
-            INNER JOIN eg_ws_connection conn
+            INNER JOIN all_connections conn
               ON bd.consumercode = conn.connectionno
             LEFT JOIN latest_meter lm
               ON lm.mr_connectionno = conn.connectionno
