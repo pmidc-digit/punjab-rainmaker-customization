@@ -1,0 +1,114 @@
+---
+SearchDefinitions:
+  moduleName: meter-search
+  summary: Search configs for metered connections
+  version: 1.0.0
+  definitions:
+    - name: meteredconnections
+      isCustomerRowMapEnabled: true
+      rowMapperKey: meterreadingsearch
+
+      query:
+        baseQuery: >
+          SELECT 
+              mr.id,
+              mr.connectionno,
+              mr.billingperiod,
+              mr.meterstatus,
+              mr.lastreading,
+              mr.lastreadingdate,
+              mr.currentreading,
+              mr.currentreadingdate,
+
+              conn.property_id as propertyid,
+              conn.applicationno,
+              conn.status as connectionstatus,
+              conn.applicationstatus,
+              conn.additionaldetails as additionaldetails,
+
+              epp.usagecategory,
+
+              ebm.zonecode,
+              ebm.blockcode,
+              ebm.localitycode,
+
+              epo.userid as owner_userid,
+
+              epa.doorno,
+              epa.street,
+              epa.city,
+              epa.pincode,
+              epa.landmark,
+
+              conn.additionaldetails->>'groups' as groups
+
+          FROM eg_ws_meterreading mr
+
+          INNER JOIN eg_ws_connection conn
+              ON mr.connectionno = conn.connectionno
+             AND mr.tenantid = conn.tenantid
+
+          INNER JOIN eg_ws_service ews
+              ON conn.id = ews.connection_id
+
+          INNER JOIN eg_pt_property epp
+              ON conn.property_id = epp.propertyid
+
+          INNER JOIN eg_pt_address epa
+              ON epa.propertyid = epp.id
+
+          INNER JOIN eg_pt_owner epo
+              ON epo.propertyid = epp.id
+              AND epo.status = 'ACTIVE'
+
+          INNER JOIN eg_bndry_mohalla ebm
+              ON ebm.tenantid = conn.tenantid
+             AND ebm.localitycode = epa.locality
+
+          $where
+          AND ews.connectiontype = 'Metered'
+          AND conn.status = 'Active'
+          AND conn.applicationstatus IN ('CONNECTION_ACTIVATED','APPROVED')
+
+          ORDER BY mr.connectionno, mr.currentreadingdate DESC
+
+      searchParams:
+        condition: AND
+        params:
+          - name: mr.tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+
+          - name: ebm.localitycode
+            isMandatory: false
+            jsonPath: $.searchCriteria.locality
+
+          - name: ebm.blockcode
+            isMandatory: false
+            jsonPath: $.searchCriteria.block
+
+          - name: ebm.zonecode
+            isMandatory: false
+            jsonPath: $.searchCriteria.zone
+
+          - name: conn.additionaldetails->>'groups'
+            isMandatory: false
+            jsonPath: $.searchCriteria.group
+
+          - name: mr.connectionno
+            isMandatory: false
+            jsonPath: $.searchCriteria.connectionNo
+            operator: =
+
+          - name: conn.property_id
+            isMandatory: false
+            jsonPath: $.searchCriteria.propertyId
+            operator: =
+
+      output:
+        jsonFormat:
+          ResponseInfo: {}
+          MeterReadings: []
+
+        outJsonPath: $.MeterReadings
+        responseInfoPath: $.ResponseInfo
