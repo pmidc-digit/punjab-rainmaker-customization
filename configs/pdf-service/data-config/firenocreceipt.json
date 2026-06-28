@@ -122,15 +122,15 @@
                 }
               }, 
               {
-                "variable": "oldComments", 
-                "value": {
-                   "path": "$.additionalDetails.comment"
-                }
-              },
-              {
                 "variable": "validityYears", 
                 "value": {
                    "path": "$.validityYears"
+                }
+              }, 
+              {
+                "variable": "oldComments", 
+                "value": {
+                   "path": "$.additionalDetails.comment"
                 }
               },
               {
@@ -534,47 +534,52 @@
          },
           {
             "externalAPI": [     
-              { 
+              {
                 "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
                 "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}')%5D",
-                  "apiRequest": null,
-                  "responseMapping":[
-                    {             
-                      "variable":"address",
-                      "value":"$.MdmsRes.tenant.tenants[0].address"
-                    },
-                    {
-                      "variable":"phoneNumber",
-                      "value":"$.MdmsRes.tenant.tenants[0].contactNumber"
-                    },
-                    {
-                      "variable":"website",
-                      "value":"$.MdmsRes.tenant.tenants[0].domainUrl"
-                    },
-                    {
-                      "variable":"mcGrade",
-                      "value":"$.MdmsRes.tenant.tenants[0].city.ulbType"
-                    },
-                    {
-                      "variable":"email",
-                      "value":"$.MdmsRes.tenant.tenants[0].emailId"
-                    },
-                    {
-                      "variable": "logoImage",                        
-                      "value":"$.MdmsRes.tenant.tenants[0].logoId",
-                      "type":"image"      
-                    },
-                    {
-                      "variable": "logo-header",
-                      "value":"$.MdmsRes.tenant.tenants[0].code",
-                      "localisation":{
-                        "required":true,
-                        "prefix": "TENANT_TENANTS",
-                        "module":"rainmaker-common"
-                        }
+                "apiRequest": null,
+                "responseMapping": [
+                  {
+                    "variable": "address",
+                    "value": "$.MdmsRes.tenant.tenants[0].address"
+                  },
+                  {
+                    "variable": "phoneNumber",
+                    "value": "$.MdmsRes.tenant.tenants[0].contactNumber"
+                  },
+                  {
+                    "variable": "website",
+                    "value": "$.MdmsRes.tenant.tenants[0].domainUrl"
+                  },
+                  {
+                    "variable": "mcGrade",
+                    "value": "$.MdmsRes.tenant.tenants[0].city.ulbType"
+                  },
+                  {
+                    "variable": "email",
+                    "value": "$.MdmsRes.tenant.tenants[0].emailId"
+                  },
+                  {
+                    "variable": "logoImage",
+                    "value": "$.MdmsRes.tenant.tenants[0].logoId",
+                    "type": "image"
+                  },
+                  {
+                      "variable": "footerLogoImage",
+                      "value":"$.MdmsRes.tenant.tenants[0].footerLogo",
+                      "type": "image"
+                  },
+                  {
+                    "variable": "logo-header",
+                    "value": "$.MdmsRes.tenant.tenants[0].code",
+                    "localisation": {
+                      "required": true,
+                      "prefix": "TENANT_TENANTS",
+                      "module": "rainmaker-common"
                     }
-                  ]
-}
+                  }
+                ]
+              }
             ]
           }
         ]
