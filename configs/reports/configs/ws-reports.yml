@@ -7125,3 +7125,146 @@ ReportDefinitions:
      WHERE rn = 1 
   orderby: ORDER BY consumercode
 
+- reportName: WS_Word_wise_Quaterly_Bill_report
+  summary: Water Word Wise Quaterly Bill Report
+  version: 1.0.0
+  moduleName: rainmaker-ws
+  additionalConfig:
+    print:
+      pdfPageSize: A4
+  sourceColumns:
+    - name: Ward No
+      label: Ward No
+      type: string
+      source: ws
+      total: false
+    - name: Total Connection Ward Wise
+      label: Total Connection Ward Wise
+      type: string
+      source: ws
+      total: true
+    - name: Bill Count Ward Wise
+      label: Bill Count Ward Wise
+      type: string
+      source: ws
+      total: true
+    - name: Total Amount Ward Wise
+      label: Total Amount Ward Wise
+      type: string
+      source: ws
+      total: true
+  searchParams:
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: ws
+      isMandatory: false
+      searchClause: AND fromperiod >= $fromDate
+    - name: toDate
+      label: To Date
+      type: epoch
+      source: ws
+      isMandatory: false
+      searchClause: AND toperiod <= $toDate       
+    - name: usagecategory
+      label: Category
+      type: singlevaluelist
+      pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIOL,NRES  IDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+      source: ws
+      isMandatory: false
+      searchClause: AND usagecategory = $usagecategory
+    - name: landareafrom
+      label: landarea From
+      type: string
+      source: pt
+      isMandatory: false
+      searchClause: AND AND landarea >= $landareafrom     
+    - name: landareato
+      label: landarea To
+      type: boundarylist
+      source: ws
+      isMandatory: false
+      searchClause: AND landarea >= $landareato                                                                                        
+  query:
+    SELECT 
+        blockname                          AS "Ward No",
+        COUNT(DISTINCT consumercode)       AS "Total Connection Ward Wise",
+        COUNT(DISTINCT billno)             AS "Bill Count Ward Wise",
+        SUM(amtpaid)                       AS "Total Amount Ward Wise"
+    
+    FROM public.ws_quaterly_bill_generate
+    WHERE tenantid = $tenantid
+  groupby: GROUP BY blockname
+  orderby: ORDER BY blockname;
+
+- reportName: SW_Word_wise_Quaterly_Bill_report
+  summary: Sewerage Word Wise Quaterly Bill Report
+  version: 1.0.0
+  moduleName: rainmaker-ws
+  additionalConfig:
+    print:
+      pdfPageSize: A4
+  sourceColumns:
+    - name: Ward No
+      label: Ward No
+      type: string
+      source: ws
+      total: false
+    - name: Total Connection Ward Wise
+      label: Total Connection Ward Wise
+      type: string
+      source: ws
+      total: true
+    - name: Bill Count Ward Wise
+      label: Bill Count Ward Wise
+      type: string
+      source: ws
+      total: true
+    - name: Total Amount Ward Wise
+      label: Total Amount Ward Wise
+      type: string
+      source: ws
+      total: true
+  searchParams:
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: ws
+      isMandatory: false
+      searchClause: AND fromperiod >= $fromDate
+    - name: toDate
+      label: To Date
+      type: epoch
+      source: ws
+      isMandatory: false
+      searchClause: AND toperiod <= $toDate       
+    - name: usagecategory
+      label: Category
+      type: singlevaluelist
+      pattern: 'list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIOL,NRES  IDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED'
+      source: ws
+      isMandatory: false
+      searchClause: AND usagecategory = $usagecategory
+    - name: landareafrom
+      label: landarea From
+      type: string
+      source: pt
+      isMandatory: false
+      searchClause: AND AND landarea >= $landareafrom     
+    - name: landareato
+      label: landarea To
+      type: boundarylist
+      source: ws
+      isMandatory: false
+      searchClause: AND landarea >= $landareato                                                                                        
+  query:
+    SELECT 
+        blockname                          AS "Ward No",
+        COUNT(DISTINCT consumercode)       AS "Total Connection Ward Wise",
+        COUNT(DISTINCT billno)             AS "Bill Count Ward Wise",
+        SUM(amtpaid)                       AS "Total Amount Ward Wise"
+    
+    FROM public.sw_quaterly_bill_generate
+    WHERE tenantid = $tenantid
+  groupby: GROUP BY blockname
+  orderby: ORDER BY blockname;  

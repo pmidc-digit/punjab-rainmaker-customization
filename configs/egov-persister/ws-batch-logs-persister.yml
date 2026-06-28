@@ -1,0 +1,36 @@
+serviceMaps:
+ serviceName: ws-calculator-batch-logs
+ mappings:
+ - version: 1.0
+   name: ws-calculator-batch-demand-log
+   description: Persists tenant batch demand execution status logs for water service
+   fromTopic: save-ws-demand-log-v2
+   isTransaction: true
+   queryMaps:
+    - query: INSERT INTO eg_ws_batch_demand_log(id, tenantid, taxperiodfrom, taxperiodto, insertiontime, totalconnectioncount, isdemandexecuted) VALUES (?, ?, ?, ?, ?, ?, ?);
+      basePath: $
+      jsonMaps:
+       - jsonPath: $.id
+       - jsonPath: $.tenantId
+       - jsonPath: $.taxPeriodFrom
+       - jsonPath: $.taxPeriodTo
+       - jsonPath: $.insertionTime
+       - jsonPath: $.totalConnectionCount
+       - jsonPath: $.isDemandExecuted
+
+ - version: 1.0
+   name: ws-calculator-connection-log
+   description: Persists connection-level batch demand calculation logs for water service
+   fromTopic: save-ws-connection-log-v2
+   isTransaction: true
+   queryMaps:
+    - query: INSERT INTO eg_ws_batch_connection_log(id, connectionno, taxperiodfrom, taxperiodto, insertiondate, taxamount, tenantid) VALUES (?, ?, ?, ?, ?, ?, ?);
+      basePath: $
+      jsonMaps:
+       - jsonPath: $.id
+       - jsonPath: $.connectionNo
+       - jsonPath: $.taxPeriodFrom
+       - jsonPath: $.taxPeriodTo
+       - jsonPath: $.insertionDate
+       - jsonPath: $.taxAmount
+       - jsonPath: $.tenantId
