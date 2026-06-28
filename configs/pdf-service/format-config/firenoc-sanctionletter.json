@@ -1,0 +1,234 @@
+{
+  "key": "firenoc-sanctionletter",
+  "config": {
+    "defaultStyle": {
+      "font": "Roboto",
+      "fontSize": 10
+    },
+    "content": [
+      {
+        "style": "noc-head",
+        "table": {
+          "widths": [90, "*", 90],
+          "body": [
+            [
+              {
+                "image": "{{logoImage}}",
+                "width": 60,
+                "height": 60,
+                "alignment": "left"
+              },
+              {
+                "stack": [
+                  {
+                    "text": "{{ulbType}} {{ulbName}}",
+                    "style": "receipt-logo-header",
+                    "alignment": "center",
+                    "margin": [20, 0, 0, 2]
+                  },
+                  {
+                    "text": "FIRE SAFETY CERTIFICATE",
+                    "style": "receipt-logo-sub-header",
+                    "alignment": "center",
+                    "margin": [20, 0, 0, 0]
+                  },
+                  {
+                    "text": "ਫਾਇਰ ਸੇਫਟੀ ਪਮਾਣ ਪੱਤਰ",
+                    "style": "receipt-logo-sub-header",
+                    "alignment": "center",
+                    "margin": [20, 0, 0, 0]
+                  }
+                ],
+                "alignment": "center"
+              },
+              {
+                "image": "{{qrcodeimage}}",
+                "width": 60,
+                "height": 60,
+                "alignment": "right",
+                "margin": [10, 0, -10, 0]
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders",
+        "margin": [5, 0 , 5 , 0]
+      },
+      {
+        "style": "noc-table",
+        "table": {
+          "widths": ["40%","*", "40%"],
+          "body": [
+            [
+              {
+                "stack": [
+                  { "text": "NOC No: {{fireNOCNumber}}", "margin": [0, 0, 0, 0] }
+                ],
+                "style": "receipt-table",
+                "alignment": "left",
+                "border": [false, false, false, false],
+                "margin": [0, 0, 0, 0]
+              },
+              {
+                "stack": [
+                  { "text": "NOC Type: {{nocType}}", "margin": [0, 0, 0, 0] }
+                ],
+                "style": "receipt-table",
+                "alignment": "center",
+                "border": [false, false, false, false],
+                "margin": [0, 0, 0, 0]
+              },
+              {
+                "text": "Dated: {{submittedOn}}",
+                "style": "receipt-table-value",
+                "alignment": "right",
+                "border": [false, false, false, false],
+                "margin": [0, 0, 10, 0],
+                "font": "Roboto"
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders",
+        "margin": [5, 0 , 5 , 0]
+      },
+      {
+        "style": "noc-table",
+        "table": {
+          "widths": ["100%"],
+          "body": [
+            [
+              {
+                "stack": [
+                  {
+                    "text": "Certified that the {{#var_buildings}}{{buildingName}}, {{/var_buildings}} at {{doorNo}}, {{street}}, {{locality}}, {{landmark}} landmark, {{ulbName}}, {{pincode}}, has been inspected by the fire officer. This site is vacant/under-construction and is accessible to fire brigade. As per proposed drawing, building is to be constructed with {{noOfBasements}}, basements and {{noOfFloors}} (Upper floor). Fire department has examined the fire safety layout plan/drawing and found it fit for occupancy of Zone 4 subdivision (1) (as per NBC).",
+                    "style": "receipt-table",
+                    "alignment": "left",
+                    "margin": [0, 5, 0, 5]
+                  },
+                  {
+                    "text": "Issued on {{submittedOn}} at {{ulbName}}, {{ulbType}}",
+                    "style": "receipt-table",
+                    "alignment": "left",
+                    "margin": [0, 5, 0, 5]
+                  },
+                  {
+                    "text": "ਤਸਦੀਕ ਕੀਤਾ ਜਾਂਦਾ ਹੈ ਕਿ {{#var_buildings}}{{buildingName}}, {{/var_buildings}} {{doorNo}}, {{street}}, {{locality}}, {{landmark}}, {{ulbName}}, {{pincode}}, ਦੀ ਫਾਇਰ ਅਫਸਰ ਵੱਲੋਂ ਪੜਤਾਲ ਕੀਤੀ ਗਈ। ਇਸ ਸਮੇਂ ਇਹ ਜਗਾ ਖਾਲੀ/ਉਸਾਰੀ ਅਧੀਨ ਹੈ ਅਤੇ ਫਾਇਰ ਬ੍ਰਿਗੇਡ ਦੀ ਪਹੁੰਚ ਦੇ ਅੰਦਰ ਹੈ। ਲੇਆਊਟ ਪਲਾਨ/ਡਰਾਇੰਗ ਮੁਤਾਬਕ {{noOfBasements}}, ਬੇਸਮਟ ਅਤੇ {{noOfFloors}} ਮੰਜ਼ਿਲ ਹਨ। ਫਾਇਰ ਵਿਭਾਗ ਵਲੋਂ ਜਮਾ ਕਰਵਾਏ ਗਏ ਫਾਇਰ ਸੇਫਟੀ ਲੇਆਊਟ ਪਲਾਨ/ਡਰਾਇੰਗ ਨੂੰ ਘੌਖਿਆ ਗਿਆ ਅਤੇ ਬਿਲਡਿੰਗ ਕੋਡ ਅਨੁਸਾਰ ਇਮਾਰਤ/ਬਿਲਡਿੰਗ ਨੂੰ Zone 4 subdivision (1) (ਐਨ. ਬੀ. ਸੀ. ਦੇ ਅਨੁਸਾਰ) ਦੀ ਆਬਾਦੀ ਲਈ ਯੋਗ ਪਾਇਆ ਗਿਆ।",
+                    "style": "receipt-table",
+                    "alignment": "left",
+                    "margin": [0, 5, 0, 5]
+                  },
+                  {
+                    "text": "{{ulbName}}, {{ulbType}} ਵਿਖੇ ਜਾਰੀ ਕਰਨ ਦੀ ਮਿਤੀ {{submittedOn}}.",
+                    "style": "receipt-table",
+                    "alignment": "left",
+                    "margin": [0, 5, 0, 5]
+                  },
+                  {
+                    "text": "{{nocType}} NOC is issued subject to following conditions:",
+                    "style": "receipt-table",
+                    "alignment": "left",
+                    "margin": [0, 5, 0, 5]
+                  }
+                ],
+                "border": [false, false, false, false],
+                "margin": [0, 0, 0, 0]
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders",
+        "margin": [5, 0 , 5 , 0]
+      },
+      {
+        "style": "next-noc-table",
+        "table": {
+          "widths": ["3%", "97%"],
+          "body": [
+            "{{#var_sanctionTerms}}[{\"text\":\"{{number}}\",\"style\":\"receipt-table-value-down\",\"alignment\":\"left\",\"margin\":[3,0,0,0]},{\"text\":\"{{text}}\",\"style\":\"receipt-table-value-down\",\"alignment\":\"justify\",\"margin\":[3,0,0,0]}]{{/var_sanctionTerms}}",
+            "[{\"text\":\"\",\"style\":\"receipt-table-value-down\",\"alignment\":\"left\",\"margin\":[3,0,0,0]},{\"text\":\"* Above Details cannot be used as ownership proof.\",\"style\":\"receipt-table-value-down\",\"alignment\":\"justify\",\"color\":\"red\",\"margin\":[3,0,0,0], \"bold\":true}]",
+            "[{\"text\":\"\",\"style\":\"receipt-table-value-down\",\"alignment\":\"left\",\"margin\":[3,0,0,0]}, {\"text\":\"ਉਪਰੋਕਤ ਦਰਸਾਈ ਗਈ ਜਾਣਕਾਰੀ ਨੂੰ ਮਾਲਕਾਨਾ ਦੇ ਸਬੂਤ ਵਜੋਂ ਨਹੀਂ ਵਰਤਿਆ ਜਾਵੇਗਾ।\",\"style\":\"receipt-table-value-down\",\"alignment\":\"justify\",\"margin\":[3,0,0,0]}]",
+            "[{\"text\":\"\",\"style\":\"receipt-table-value-down\",\"alignment\":\"left\",\"margin\":[3,0,0,0]},{\"text\":\"This is digitaly created cerificate, no signatue are needed\",\"style\":\"receipt-table-value-down\",\"alignment\":\"justify\",\"margin\":[3,0,0,0], \"bold\":true}]",
+            "[{\"text\":\"\",\"style\":\"receipt-table-value-down\",\"alignment\":\"left\",\"margin\":[3,0,0,0]}, {\"text\":\"ਇਹ ਡਿਜੀਟਲੀ (ਕੰਪਿਊਟਰਾਈਜ਼ਡ) ਤਿਆਰ ਕੀਤਾ ਗਿਆ ਸਰਟੀਫਿਕੇਟ ਹੈ, ਜਿਸ ਵਿੱਚ ਦਸਤਖਤ ਦੀ ਕੋਈ ਲੋੜ ਨਹੀਂ ਹੈ।\",\"style\":\"receipt-table-value-down\",\"alignment\":\"justify\",\"margin\":[3,0,0,0]}]"
+          ]
+        },
+        "layout": "noBorders",
+        "margin": [0, -2, 0, -2]
+      }
+    ],
+    "styles": {
+      "noc-head": {
+        "margin": [-30, -30, 0, 5]
+      },
+      "receipt-logo-header": {
+        "color": "#000000",
+        "fontSize": 12,
+        "bold": true,
+        "letterSpacing": 0.74,
+        "margin": [0, 0, 0, 2]
+      },
+      "receipt-logo-sub-header": {
+        "color": "#000000",
+        "fontSize": 11,
+        "letterSpacing": 0.6
+      },
+      "noc-table": {
+        "fontSize": 11,
+        "color": "#000000",
+        "margin": [-25, 0, -22, 0]
+      },
+      "receipt-table-value-total-Qr": {
+        "alignment": "right",
+        "margin": [0, 3, 10, 0]
+      },
+      "receipt-table-value-down": {
+        "color": "#000000",
+        "bold": false,
+        "fontSize": 9,
+        "fontWeight": 400,
+        "alignment": "left",
+        "margin": [3, 2, 0, 2]
+      },
+      "next-noc-table": {
+        "fontSize": 10,
+        "color": "#000000",
+        "margin": [-30, 10, -22, 0]
+      },
+      "receipt-table-value": {
+        "color": "#000000",
+        "bold": true,
+        "fontSize": 9,
+        "fontWeight": 500,
+        "margin": [0, 0, 0, 0]
+      },
+      "receipt-table": {
+        "color": "#000000",
+        "bold": false,
+        "fontSize": 9,
+        "fontWeight": 400,
+        "margin": [0, 2, 0, 2]
+      },
+      "receipt-approver": {
+        "fontSize": 9,
+        "bold": true,
+        "margin": [-27, 0, -10, 0],
+        "color": "#484848"
+      },
+      "no-signature": {
+        "fontSize": 9,
+        "margin": [-27, 30, -10, 0],
+        "color": "#000000"
+      },
+      "pt-disclaimer": {
+        "fontSize": 10,
+        "margin": [-27, 0, -10, 0],
+        "color": "#484848"
+      },
+      "pt-disclaimer-value": {
+        "fontSize": 9,
+        "margin": [2, 0, 0, 0],
+        "color": "#484848"
+      }
+    }
+  }
+}
