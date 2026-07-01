@@ -995,17 +995,11 @@ SearchDefinitions:
           INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id
           INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id
           LEFT JOIN (
-          SELECT *
-          FROM (
-            SELECT mr.*,
-                    ROW_NUMBER() OVER (
-                      PARTITION BY mr.connectionno
-                      ORDER BY mr.createdtime DESC
-                    ) rn
-            FROM eg_ws_meterreading mr
-          ) t
-          WHERE rn = 1
-         ) lm ON lm.connectionno = conn.connectionno
+          SELECT DISTINCT ON (connectionno)
+          * FROM eg_ws_meterreading
+            ORDER BY connectionno, createdtime DESC
+                    ) lm
+                      ON lm.connectionno = conn.connectionno
           $where
           AND conn.status = 'Active'
           ),
@@ -1067,7 +1061,7 @@ SearchDefinitions:
           FROM filtered_conn fc
           INNER JOIN egbs_bill_v1 b
           ON fc.connectionno = b.consumercode
-          AND b.tenantid = fc.tenantid
+          AND b.tenantid = fc.tenantid 
           INNER JOIN egbs_billdetail_v1 bd
           ON b.id = bd.billid
           AND b.tenantid = bd.tenantid
