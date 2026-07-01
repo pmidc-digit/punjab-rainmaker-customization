@@ -65,6 +65,20 @@ serviceMaps:
       - jsonPath: $.AllotmentDetails.*.Document.*.auditDetails.createdBy
       - jsonPath: $.AllotmentDetails.*.Document.*.auditDetails.createdTime
       
+    - query: INSERT INTO eg_rl_rent_revision(id, allotment_id, revised_rent, revision_date, next_revision_date, increment_percentage, tenant_id, active, created_time, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+      basePath: AllotmentDetails.*.rentRevisions.*
+      jsonMaps:
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.id
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.allotmentId
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.revisedRent
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.revisionDate
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.nextRevisionDate
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.incrementPercentage
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.tenantId
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.active
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.auditDetails.createdTime
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.auditDetails.createdBy
+      
   - version: 1.0
     description: Update Allotment and Applicant Details
     fromTopic: update-rl-allotment
@@ -131,3 +145,27 @@ serviceMaps:
       - jsonPath: $.AllotmentDetails.*.Document.*.auditDetails.createdTime
       - jsonPath: $.AllotmentDetails.*.Document.*.auditDetails.lastModifiedBy
       - jsonPath: $.AllotmentDetails.*.Document.*.auditDetails.lastModifiedTime
+      
+    - query: INSERT INTO eg_rl_rent_revision(id, allotment_id, revised_rent, revision_date, next_revision_date, increment_percentage, tenant_id, active, created_time, created_by, lastmodified_time, lastmodified_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             ON CONFLICT (id) DO UPDATE SET
+        revised_rent = EXCLUDED.revised_rent,
+        revision_date = EXCLUDED.revision_date,
+        next_revision_date = EXCLUDED.next_revision_date,
+        increment_percentage = EXCLUDED.increment_percentage,
+        active = EXCLUDED.active,
+        lastmodified_by = EXCLUDED.lastmodified_by,
+        lastmodified_time = EXCLUDED.lastmodified_time;
+      basePath: AllotmentDetails.*.rentRevisions.*
+      jsonMaps:
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.id
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.allotmentId
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.revisedRent
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.revisionDate
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.nextRevisionDate
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.incrementPercentage
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.tenantId
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.active
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.auditDetails.createdTime
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.auditDetails.createdBy
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.auditDetails.lastModifiedTime
+      - jsonPath: $.AllotmentDetails.*.rentRevisions.*.auditDetails.lastModifiedBy
