@@ -1959,16 +1959,52 @@ ReportDefinitions:
       ulb_metadata AS (
           -- 2. Metadata Join
           SELECT 
-              m.*,
+              m.tenantid,m.module,
               u.type as ulb_type,
               u.district as ulb_district,
-              u.name_of_ulb
+              u.name_of_ulb,
+              CASE WHEN UPPER(TRIM(m.applicationstatus)) = 'APPROVED' THEN 'Approved'
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'REJECTED' THEN 'Rejected'
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'CANCELLED' THEN 'Cancelled' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('E-SIGNED', 'E_SIGNED') THEN 'E- Signed'
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'INITIATED' THEN 'Initiated'
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'BLOCKED' THEN 'Blocked' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'PULLED_BACK' THEN 'Pulled Back'
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('PENDINGAPPROVAL', 'APPROVAL_PENDING') THEN 'Approval Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('ATP_VERIFICATION_PENDING', 'DOCUMENTVERIFY_ATP/AME') THEN 'ATP Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('MTP_VERIFICATION_PENDING', 'DOCUMENTVERIFY_MTP/ME') THEN 'MTP Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('EO_VERIFICATION_PENDING', 'DOCUMENTVERIFY_EO') THEN 'EO Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('JC_VERIFICATION_PENDING', 'DOCUMENTVERIFY_JC') THEN 'JC Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('CITIZENACTIONREQUIRED', 'CITIZEN_APPROVAL_INPROCESS', 'PROFESSIONAL_ACTION_REQUIRED', 'PROFESSIONALACTIONREQUIRED', 'CITIZEN APPROVAL IN PROCESS') THEN 'Citizen Action Required' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('FIELDINSPECTION_INPROGRESS', 'FIELD INSPECTION INPROGRESS') THEN 'Field Inspection In Progress' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'JE_VERIFICATION_PENDING' THEN 'JE Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'STP_VERIFICATION_PENDING' THEN 'STP Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'ADC_VERIFICATION_PENDING' THEN 'ADC Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'CTPHQ_APPROVAL_PENDING' THEN 'CTPHQ Approval Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('STPHQ_APPROVAL_PENDING', 'DOCUMENTVERIFY_STP_HQ') THEN 'STP(HQ) Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'MTPHQ_APPROVAL_PENDING' THEN 'MTP(HQ) Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('ATPHQ_APPROVAL_PENDING', 'DOCUMENTVERIFY_ATP_HQ') THEN 'ATP(HQ) Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'MC_VERIFICATION_PENDING' THEN 'MC Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('DOCUMENTVERIFY', 'DOC_VERIFICATION_PENDING', 'DOC_VERIFICATION_INPROGRESS') THEN 'Document Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'INSPECTION_REPORT_PENDING' THEN 'Inspection Report Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('PENDINGAPPLICATIONPAYMENT', 'PENDING_APPL_FEE', 'PENDINGPAYMENT') THEN 'Pending Application Payment' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('PENDINGSANCTIONPAYMENT', 'PENDING_SANC_FEE_PAYMENT') THEN 'Pending Sanction Payment' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'DOCUMENTVERIFY_DM' THEN 'DM Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'DOCUMENTVERIFY_STP(FIELD)' THEN 'STP Field Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'DRAWING_ESIGN_PENDING' THEN 'Drawing E-Sign Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'SANCTION_LETTER_ESIGN_PENDING' THEN 'Sanction Letter E-Sign Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'LEVEL3_VERIFICATION_PENDING' THEN 'Level 3 Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'LEVEL4_VERIFICATION_PENDING' THEN 'Level 4 Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'INPROGRESS' THEN 'In Progress' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'VERIFICATION_INPROGRESS' THEN 'Verification In Progress'
+            ELSE INITCAP(REPLACE(m.applicationstatus, '_', ' ')) 
+        END as localized_status
           FROM combined_modules m
           LEFT JOIN ulb_data u ON m.tenantid = u.ulb_code 
       ),
       ulb_stats AS (
           -- 3. Diversity Check for Subtotals
-          SELECT name_of_ulb, COUNT(DISTINCT applicationstatus) as distinct_statuses
+          SELECT name_of_ulb, COUNT(DISTINCT localized_status) as distinct_statuses
           FROM ulb_metadata
           GROUP BY name_of_ulb
       ),
@@ -1978,24 +2014,24 @@ ReportDefinitions:
               ulb_type,
               ulb_district,
               name_of_ulb,
-              applicationstatus,
+              localized_status,
               COUNT(*) FILTER (WHERE module = 'Building Plan') as bpa_count,
               COUNT(*) FILTER (WHERE module = 'NOC') as noc_count,
               COUNT(*) FILTER (WHERE module = 'CLU') as clu_count,
               COUNT(*) FILTER (WHERE module = 'Layout') as layout_count,
-              GROUPING(ulb_type, ulb_district, name_of_ulb, applicationstatus) as grp_level,
+              GROUPING(ulb_type, ulb_district, name_of_ulb, localized_status) as grp_level,
               
               -- Partitioning logic to hide duplicate labels
-              ROW_NUMBER() OVER(PARTITION BY ulb_type ORDER BY ulb_district, name_of_ulb, applicationstatus) as type_row_num,
-              ROW_NUMBER() OVER(PARTITION BY ulb_type, ulb_district ORDER BY name_of_ulb, applicationstatus) as dist_row_num,
-              ROW_NUMBER() OVER(PARTITION BY name_of_ulb ORDER BY applicationstatus) as name_row_num
+              ROW_NUMBER() OVER(PARTITION BY ulb_type ORDER BY ulb_district, name_of_ulb, localized_status) as type_row_num,
+              ROW_NUMBER() OVER(PARTITION BY ulb_type, ulb_district ORDER BY name_of_ulb, localized_status) as dist_row_num,
+              ROW_NUMBER() OVER(PARTITION BY name_of_ulb ORDER BY localized_status) as name_row_num
               
           FROM ulb_metadata
-          GROUP BY ROLLUP(ulb_type, ulb_district, name_of_ulb, applicationstatus)
+          GROUP BY ROLLUP(ulb_type, ulb_district, name_of_ulb, localized_status)
       )
       SELECT 
           -- 1. ULB Type (Sirf tab dikhe jab naya block shuru ho)
-          CASE WHEN g.type_row_num = 1 AND g.grp_level = 0 THEN g.ulb_type ELSE '' END AS "ULB Type",
+          CASE WHEN g.type_row_num = 1 AND g.grp_level = 0 THEN CASE WHEN UPPER(g.ulb_type) = 'NP' THEN 'Nagar Panchayat' ELSE g.ulb_type END ELSE '' END AS "ULB Type",
           
           -- 2. District (Sirf tab dikhe jab block badle)
           CASE WHEN g.dist_row_num = 1 AND g.grp_level = 0 THEN g.ulb_district ELSE '' END AS "District",
@@ -2011,16 +2047,9 @@ ReportDefinitions:
           CASE 
               WHEN g.grp_level = 15 THEN 'GRAND TOTAL' 
               WHEN g.grp_level = 1 THEN 'Sub Total'
-              -- Specific mappings for localization
-              WHEN UPPER(g.applicationstatus) = 'PENDINGAPPLICATIONPAYMENT' THEN 'Pending Application Payment'
-              WHEN UPPER(g.applicationstatus) = 'FIELDINSPECTION_INPROGRESS' OR g.applicationstatus = 'Field Inspection Inprogress' THEN 'Field Inspection In Progress'
-              WHEN UPPER(g.applicationstatus) = 'CITIZEN_APPROVAL_INPROCESS' OR g.applicationstatus = 'Citizen Approval In Process' THEN 'Citizen Approval In Process'
-        WHEN UPPER(g.applicationstatus) = 'E_SIGNED' OR g.applicationstatus = 'E-Signed' THEN 'E-Signed'
-        WHEN UPPER(g.applicationstatus) = 'INITIATED' THEN 'Initiated'
-        -- Fallback: Underscore hatao aur Proper Case karo
-        ELSE INITCAP(REPLACE(g.applicationstatus, '_', ' ')) 
+              ELSE g.localized_status
         END AS "Application Status",
-        -- 6. Metrics (Counts
+        -- 6. Metrics (Counts)
         NULLIF(g.bpa_count, 0) AS "Building Plan",
         NULLIF(g.noc_count, 0) AS "NOC",
         NULLIF(g.clu_count, 0) AS "CLU",
@@ -2030,4 +2059,4 @@ ReportDefinitions:
         WHERE 
         (g.grp_level = 0) 
         OR (g.grp_level = 1 AND s.distinct_statuses > 1) OR (g.grp_level = 15)
-  orderby: ORDER BY g.ulb_type, g.ulb_district, g.name_of_ulb, g.grp_level, g.applicationstatus;
+  orderby: ORDER BY g.ulb_type, g.ulb_district, g.name_of_ulb, g.grp_level, g.localized_status;
