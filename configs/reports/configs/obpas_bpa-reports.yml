@@ -1963,14 +1963,41 @@ ReportDefinitions:
               u.type as ulb_type,
               u.district as ulb_district,
               u.name_of_ulb,
-              CASE 
-               WHEN UPPER(m.applicationstatus) = 'PENDINGAPPLICATIONPAYMENT' THEN 'Pending Application Payment'
-               WHEN UPPER(m.applicationstatus) = 'PENDINGAPPROVAL' THEN 'Pending Approval'
-               WHEN UPPER(m.applicationstatus) IN ('FIELDINSPECTION_INPROGRESS', 'FIELD INSPECTION INPROGRESS') THEN 'Field Inspection In Progress'
-               WHEN UPPER(m.applicationstatus) IN ('CITIZEN_APPROVAL_INPROCESS', 'CITIZEN APPROVAL IN PROCESS') THEN 'Citizen Approval In Process'
-               WHEN UPPER(m.applicationstatus) IN ('E_SIGNED', 'E-SIGNED') THEN 'E-Signed'
-               WHEN UPPER(m.applicationstatus) = 'INITIATED' THEN 'Initiated'
-              ELSE INITCAP(REPLACE(m.applicationstatus, '_', ' ')) 
+              CASE WHEN UPPER(TRIM(m.applicationstatus)) = 'APPROVED' THEN 'Approved'
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'REJECTED' THEN 'Rejected'
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'CANCELLED' THEN 'Cancelled' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('E-SIGNED', 'E_SIGNED') THEN 'E- Signed'
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'INITIATED' THEN 'Initiated'
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'BLOCKED' THEN 'Blocked' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'PULLED_BACK' THEN 'Pulled Back'
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('PENDINGAPPROVAL', 'APPROVAL_PENDING') THEN 'Approval Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('ATP_VERIFICATION_PENDING', 'DOCUMENTVERIFY_ATP/AME') THEN 'ATP Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('MTP_VERIFICATION_PENDING', 'DOCUMENTVERIFY_MTP/ME') THEN 'MTP Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('EO_VERIFICATION_PENDING', 'DOCUMENTVERIFY_EO') THEN 'EO Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('JC_VERIFICATION_PENDING', 'DOCUMENTVERIFY_JC') THEN 'JC Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('CITIZENACTIONREQUIRED', 'CITIZEN_APPROVAL_INPROCESS', 'PROFESSIONAL_ACTION_REQUIRED', 'PROFESSIONALACTIONREQUIRED', 'CITIZEN APPROVAL IN PROCESS') THEN 'Citizen Action Required' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('FIELDINSPECTION_INPROGRESS', 'FIELD INSPECTION INPROGRESS') THEN 'Field Inspection In Progress' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'JE_VERIFICATION_PENDING' THEN 'JE Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'STP_VERIFICATION_PENDING' THEN 'STP Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'ADC_VERIFICATION_PENDING' THEN 'ADC Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'CTPHQ_APPROVAL_PENDING' THEN 'CTPHQ Approval Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('STPHQ_APPROVAL_PENDING', 'DOCUMENTVERIFY_STP_HQ') THEN 'STP(HQ) Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'MTPHQ_APPROVAL_PENDING' THEN 'MTP(HQ) Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('ATPHQ_APPROVAL_PENDING', 'DOCUMENTVERIFY_ATP_HQ') THEN 'ATP(HQ) Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'MC_VERIFICATION_PENDING' THEN 'MC Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('DOCUMENTVERIFY', 'DOC_VERIFICATION_PENDING', 'DOC_VERIFICATION_INPROGRESS') THEN 'Document Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'INSPECTION_REPORT_PENDING' THEN 'Inspection Report Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('PENDINGAPPLICATIONPAYMENT', 'PENDING_APPL_FEE', 'PENDINGPAYMENT') THEN 'Pending Application Payment' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('PENDINGSANCTIONPAYMENT', 'PENDING_SANC_FEE_PAYMENT') THEN 'Pending Sanction Payment' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'DOCUMENTVERIFY_DM' THEN 'DM Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'DOCUMENTVERIFY_STP(FIELD)' THEN 'STP Field Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'DRAWING_ESIGN_PENDING' THEN 'Drawing E-Sign Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'SANCTION_LETTER_ESIGN_PENDING' THEN 'Sanction Letter E-Sign Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'LEVEL3_VERIFICATION_PENDING' THEN 'Level 3 Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'LEVEL4_VERIFICATION_PENDING' THEN 'Level 4 Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'INPROGRESS' THEN 'In Progress' 
+              WHEN UPPER(TRIM(m.applicationstatus)) = 'VERIFICATION_INPROGRESS' THEN 'Verification In Progress'
+            ELSE INITCAP(REPLACE(m.applicationstatus, '_', ' ')) 
         END as localized_status
           FROM combined_modules m
           LEFT JOIN ulb_data u ON m.tenantid = u.ulb_code 
