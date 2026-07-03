@@ -982,7 +982,7 @@ ReportDefinitions:
          JOIN params p ON TRUE
          WHERE sc.final_time IS NULL 
           AND sc.sla_breach_ts::date
-          BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
+          BETWEEN p.report_dt AND p.report_dt + INTERVAL '6 day'
            )
         SELECT
           u.district,
@@ -1119,7 +1119,7 @@ ReportDefinitions:
            sc.sla_breach_ts::date AS breach_date
            FROM sla_calc sc
            JOIN params p ON TRUE
-           WHERE sc.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
+           WHERE sc.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '6 day'
         )
        SELECT
          u.district,
@@ -1304,7 +1304,7 @@ ReportDefinitions:
         LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno OR ch.applicationno = a.id::text
         WHERE pd.businessservice = 'obpas_noc'
-          AND upper(p.paymentstatus) != 'CANCELLED'
+          AND upper(p.paymentstatus) != 'CANCELLED' AND 
           a.applicationno not like 'PB/%' AND (d.additionaldetails::text not LIKE '%isMigrationTrue%'  OR d.additionaldetails IS NULL)         
       )
 
