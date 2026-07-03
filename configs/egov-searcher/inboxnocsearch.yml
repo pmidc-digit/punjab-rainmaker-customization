@@ -196,3 +196,39 @@ SearchDefinitions:
         jsonFormat: {"ResponseInfo": {},"Noc": []}
         outJsonPath: $.Noc
         responseInfoPath: $.ResponseInfo
+
+    - name: inboxnoccitizentenantwiseapplnsearch
+      query:
+        baseQuery: |
+          Select row_to_json(result) from (
+            select noc.tenantid, noc.applicationno, pi.status as status_id
+            from eg_noc as noc
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = noc.applicationno
+            INNER JOIN eg_noc_owner ownerinfo ON ownerinfo.nocid = noc.id
+            $where
+            AND pi.latest = TRUE
+            GROUP BY noc.tenantid, noc.applicationno, pi.status
+          ) result
+        groupBy:
+        orderBy:
+      searchParams:
+        condition: AND
+        params:
+          - name: noc.tenantid
+            isMandatory: true
+            operator: ILIKE
+            jsonPath: $.searchCriteria.tenantId
+          - name: ownerinfo.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
+          - name: pi.businessservice
+            isMandatory: false
+            jsonPath: $.searchCriteria.businessservice
+          - name: pi.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.status
+            operator: IN
+      output:
+        jsonFormat: {"ResponseInfo": {},"Noc": []}
+        outJsonPath: $.Noc
+        responseInfoPath: $.ResponseInfo

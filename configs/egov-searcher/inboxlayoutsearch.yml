@@ -96,12 +96,7 @@ SearchDefinitions:
             LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
-            AND pi.createdtime IN (
-              select max(createdtime) 
-              from eg_wf_processinstance_v2 wf 
-              where wf.businessid = layout.applicationno 
-              GROUP BY wf.businessid
-            )
+            AND pi.latest = TRUE
             $pagination
           ) result
         groupBy:
@@ -230,6 +225,42 @@ SearchDefinitions:
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
+      output:
+        jsonFormat: {"ResponseInfo": {},"layoutApplication": []}
+        outJsonPath: $.layoutApplication
+        responseInfoPath: $.ResponseInfo
+
+    - name: inboxlayoutcitizentenantwiseapplnsearch
+      query:
+        baseQuery: |
+          Select row_to_json(result) from (
+            select layout.tenantId, layout.applicationno, pi.status as status_id
+            from eg_layout as layout
+            LEFT JOIN eg_layout_owner owner ON owner.layoutid = layout.id AND owner.isprimaryowner = true
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = layout.applicationno
+            $where
+            AND pi.latest = TRUE
+            GROUP BY layout.tenantId, layout.applicationno, pi.status
+          ) result
+        groupBy:
+        orderBy:
+      searchParams:
+        condition: AND
+        params:
+          - name: layout.tenantid
+            isMandatory: true
+            operator: ILIKE
+            jsonPath: $.searchCriteria.tenantId
+          - name: owner.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
+          - name: pi.businessservice
+            isMandatory: false
+            jsonPath: $.searchCriteria.businessservice
+          - name: pi.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.status
+            operator: IN
       output:
         jsonFormat: {"ResponseInfo": {},"layoutApplication": []}
         outJsonPath: $.layoutApplication
