@@ -124,7 +124,7 @@ ReportDefinitions:
       - name: applicationstatus
         label: Application Status
         type: singlevaluelist
-        pattern: 'list://INITIATED :Initiated,FIELDINSPECTION_INPROGRESS:Field Inspection In Progress ,DOCUMENTVERIFY:Document Verify ,ATP_VERIFICATION_PENDING: ATP Verification Pending,MTP_VERIFICATION_PENDING: MTP Verification Pending,JC_VERIFICATION_PENDING:JC Verification Pending , INSPECTION_REPORT_PENDING:Inspection Report Pending , EO_VERIFICATION_PENDING: EO Verification Pending,LEVEL2_DOCUMENTVERIFY:Level 2 Document Verify,PENDINGAPPROVAL: Pending Approval,APPROVED:Approved,CANCELLED:Cancelled , REJECTED:Rejected,PENDINGPAYMENT:Pending Payment,CITIZENACTIONREQUIRED:Citizen Action Required,E-SIGNED:E-Signed'
+        pattern: 'list://INITIATED:Initiated,FIELDINSPECTION_INPROGRESS:Field Inspection In Progress ,DOCUMENTVERIFY:Document Verify ,ATP_VERIFICATION_PENDING: ATP Verification Pending,MTP_VERIFICATION_PENDING: MTP Verification Pending,JC_VERIFICATION_PENDING:JC Verification Pending ,INSPECTION_REPORT_PENDING:Inspection Report Pending ,EO_VERIFICATION_PENDING: EO Verification Pending,LEVEL2_DOCUMENTVERIFY:Level 2 Document Verify,PENDINGAPPROVAL: Pending Approval,APPROVED:Approved,CANCELLED:Cancelled ,REJECTED:Rejected,PENDINGPAYMENT:Pending Payment,CITIZENACTIONREQUIRED:Citizen Action Required,E-SIGNED:E-Signed'
         source: obpas_noc
         wrapper: true
         isMandatory: false
@@ -140,7 +140,7 @@ ReportDefinitions:
       - name: district_name
         label: District
         type: singlevaluelist
-        pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
+        pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
         source: obpas_noc
         wrapper: true
         isMandatory: false
@@ -196,12 +196,12 @@ ReportDefinitions:
              ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'professionalRegId' AS professional_reg_id,
              ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'professionalMobileNumber' AS professional_mobile
             FROM eg_noc n
-            LEFT JOIN eg_noc_details ad ON ad.nocid = n.id
+            INNER JOIN eg_noc_details ad ON ad.nocid = n.id
             INNER JOIN ulb_data u ON u.ulb_code = n.tenantid
-            Where n.tenantid !='pb.testing'
+            Where n.tenantid !='pb.testing' and n.applicationno not like 'PB/%' AND (ad.additionaldetails::text not LIKE '%isMigrationTrue%'  OR ad.additionaldetails IS NULL)
     groupby: GROUP BY n.createdtime,n.applicationno,n.applicationstatus, n.vasikadate, n.vasikanumber,ad.additionaldetails
     orderby: ORDER BY n.createdtime desc;
-    
+
   - reportName: SLAReportNOC
     decryptionPathId: LAYOUTREPORTS
     summary: SLA report for noc service
@@ -212,7 +212,7 @@ ReportDefinitions:
         pdfPageSize: A4
     sourceColumns:
       - name: tenantid
-        label: ULB Name 
+        label: ULB Name
         type: string
         source: obpas_noc
         total: false
@@ -272,7 +272,7 @@ ReportDefinitions:
       - name: district_name
         label: District
         type: singlevaluelist
-        pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
+        pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
         source: obpas_noc
         wrapper: true
         isMandatory: false
@@ -385,9 +385,10 @@ ReportDefinitions:
             inner join ulb_data u on u.ulb_code=n.tenantid
             JOIN sla_data sla ON sla.businessservice in ('NOC_MC','NOC_NP')
             LEFT JOIN assignee_details asn ON n.applicationno = asn.businessid
-            WHERE UPPER(ls.applicationstatus) NOT IN ('INITIATED','CANCELLED')  and n.tenantid !='pb.testing'
+            WHERE UPPER(ls.applicationstatus) NOT IN ('INITIATED','CANCELLED') and n.tenantid !='pb.testing'
+       			and n.applicationno not like 'PB/%' AND (ad.additionaldetails::text not LIKE '%isMigrationTrue%'  OR ad.additionaldetails IS NULL)
     orderby: ORDER BY n.createdtime DESC
-    
+
   - reportName: officers_with_highest_pendency
     summary: Top 7 officers with Highest Pendency
     version: 1.0.0
@@ -429,7 +430,7 @@ ReportDefinitions:
       - name: district_name
         label: District
         type: singlevaluelist
-        pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
+        pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
         source: obpas_noc
         wrapper: true
         isMandatory: false
@@ -469,7 +470,7 @@ ReportDefinitions:
             inner join ulb_data u on u.ulb_code = m.tenantid
             where m.designation_code <> 'Clerk' and m.designation_code <> 'Accountant' and m.designation_code <>'Additional Local Registrar'
     orderby: ORDER BY pending_files DESC limit 7
-    
+
   - reportName: BeyondTimelineSummary
     summary: Summary of district-ulb wise application which breached its SLA
     version: 1.0.0
@@ -497,7 +498,7 @@ ReportDefinitions:
       - name: district
         label: District
         type: singlevaluelist
-        pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
+        pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
         source: obpas_noc
         isMandatory: false
         searchClause: AND u.district = $district
@@ -618,7 +619,7 @@ ReportDefinitions:
     - name: district
       label: District
       type: singlevaluelist
-      pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
+      pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
       source: obpas_noc
       isMandatory: false
       searchClause: AND u.district = $district
@@ -628,7 +629,7 @@ ReportDefinitions:
       pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
       source: obpas_noc
       isMandatory: false
-      searchClause: AND u.ulb_code= $ulb 
+      searchClause: AND u.ulb_code= $ulb
     - name: applicationstatus
       label: Application Status
       type: singlevaluelist
@@ -726,9 +727,9 @@ ReportDefinitions:
                 'NOC' as modulename
                 FROM sla_calc sc
                 JOIN ulb_data u ON sc.tenantid = u.ulb_code
-                WHERE sc.timeline_status = 'BREACHED'     
+                WHERE sc.timeline_status = 'BREACHED'  and sc.uuid not like 'PB/%'
     groupby: GROUP BY u.district, u.name_of_ulb ,sc.applicationstatus,sc.uuid
-    orderby: ORDER BY u.district, u.name_of_ulb,sc.applicationstatus,sc.uuid DESC  
+    orderby: ORDER BY u.district, u.name_of_ulb,sc.applicationstatus,sc.uuid DESC
 
   - reportName: officers_wise_pendency
     summary: officers wise  Pendency Trend Analysis - Last 7 Days
@@ -772,19 +773,19 @@ ReportDefinitions:
       label: Day 6
       type: string
       source: obpas_noc
-      total: true  
+      total: true
     - name: day7
       label: Day 7
       type: string
       source: obpas_noc
-      total: true                     
+      total: true
     searchParams:
     - name: fromDate
       label: Date
       type: epoch
       source: obpas_noc
       isMandatory: true
-      searchClause: AND 1=1     
+      searchClause: AND 1=1
     - name: ulb
       label: ULB Name
       type: singlevaluelist
@@ -852,9 +853,9 @@ ReportDefinitions:
       FROM agg where 1=1
     groupby:  GROUP BY designation_code
     orderby:  ORDER BY officer_designation
-    
+
   - reportName: FilesNearTimelineBreachSummary
-    summary: Summary list of district-ulb wise application upcoming  breached its SLA for next 7 days 
+    summary: Summary list of district-ulb wise application upcoming  breached its SLA for next 7 days
     version: 1.0.0
     moduleName: rainmaker-obpas_noc
     additionalConfig:
@@ -875,7 +876,7 @@ ReportDefinitions:
       label: Day 1
       type: string
       source: obpas_noc
-      total: true 
+      total: true
     - name: day2
       label: Day 2
       type: string
@@ -902,7 +903,7 @@ ReportDefinitions:
       source: obpas_noc
       total: true
     - name: total_upcoming_breaches
-      label: Total Upcoming Breaches 
+      label: Total Upcoming Breaches
       type: string
       source: obpas_noc
       total: true
@@ -916,7 +917,7 @@ ReportDefinitions:
     - name: district
       label: District
       type: singlevaluelist
-      pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
+      pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
       source: obpas_noc
       isMandatory: false
       searchClause: AND u.district = $district
@@ -981,7 +982,7 @@ ReportDefinitions:
          JOIN params p ON TRUE
          WHERE sc.final_time IS NULL 
           AND sc.sla_breach_ts::date
-          BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
+          BETWEEN p.report_dt AND p.report_dt + INTERVAL '6 day'
            )
         SELECT
           u.district,
@@ -997,12 +998,12 @@ ReportDefinitions:
           FROM upcoming_breaches ub
           JOIN ulb_data u ON ub.tenantid = u.ulb_code
           JOIN params p ON TRUE    
-             WHERE 1=1 
+             WHERE 1=1
     groupby: GROUP BY u.district, u.name_of_ulb
-    orderby: ORDER BY u.district, u.name_of_ulb DESC  
-    
+    orderby: ORDER BY u.district, u.name_of_ulb DESC
+
   - reportName: DetailedFilesNearTimelineBreach
-    summary: Detailed file list of district-ulb wise application upcoming  breached its SLA for next 7 days 
+    summary: Detailed file list of district-ulb wise application upcoming  breached its SLA for next 7 days
     version: 1.0.0
     moduleName: rainmaker-obpas_noc
     additionalConfig:
@@ -1010,7 +1011,7 @@ ReportDefinitions:
         pdfPageSize: A4
     sourceColumns:
     - name: district
-      label: District 
+      label: District
       type: string
       source: obpas_noc
       total: false
@@ -1019,7 +1020,7 @@ ReportDefinitions:
       type: string
       source: obpas_noc
       total: false
-    - name: applicationstatus
+    - name: applicationstatus_localized
       label: Application Status
       type: string
       source: obpas_noc
@@ -1054,7 +1055,7 @@ ReportDefinitions:
       pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
       source: obpas_noc
       isMandatory: false
-      searchClause: AND u.ulb_code= $tenant 
+      searchClause: AND u.ulb_code= $tenant
     query: |
       WITH params AS (
         SELECT
@@ -1118,7 +1119,7 @@ ReportDefinitions:
            sc.sla_breach_ts::date AS breach_date
            FROM sla_calc sc
            JOIN params p ON TRUE
-           WHERE sc.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '7 day'
+           WHERE sc.sla_breach_ts::date BETWEEN p.report_dt AND p.report_dt + INTERVAL '6 day'
         )
        SELECT
          u.district,
@@ -1142,9 +1143,9 @@ ReportDefinitions:
          'NOC' as modulename
          FROM upcoming_breaches ub
          JOIN ulb_data u ON ub.tenantid = u.ulb_code
-         WHERE 1=1 
+         WHERE 1=1
     groupby: GROUP BY u.district, u.name_of_ulb,ub.applicationstatus,ub.uuid
-    orderby: ORDER BY u.district, u.name_of_ulb ,ub.applicationstatus,ub.uuid DESC          
+    orderby: ORDER BY u.district, u.name_of_ulb ,ub.applicationstatus,ub.uuid DESC
   - reportName: CollectionsReportNOC
     decryptionPathId: LAYOUTREPORTS
     summary: Collections
@@ -1243,7 +1244,7 @@ ReportDefinitions:
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: obpas_noc
         isMandatory: false
-        searchClause: AND tenantid = $tenant      
+        searchClause: AND tenantid = $tenant
       - name: collector_code
         label: Collector code
         type: string
@@ -1262,7 +1263,7 @@ ReportDefinitions:
         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
         LEFT JOIN eg_user u ON u.uuid = wa.assignee
         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        WHERE  wf.businessservice in ('NOC_MC','NOC_NP')
+        WHERE  wf.businessservice in ('NOC_MC','NOC_NP') and wf.businessid not like 'PB/%'
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       ),
 
@@ -1303,8 +1304,8 @@ ReportDefinitions:
         LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno OR ch.applicationno = a.id::text
         WHERE pd.businessservice = 'obpas_noc'
-          AND upper(p.paymentstatus) != 'CANCELLED'
-         
+          AND upper(p.paymentstatus) != 'CANCELLED' AND 
+          a.applicationno not like 'PB/%' AND (d.additionaldetails::text not LIKE '%isMigrationTrue%'  OR d.additionaldetails IS NULL)         
       )
 
 
@@ -1320,7 +1321,7 @@ ReportDefinitions:
         cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
       FROM unique_transactions where 1=1
     orderby: ORDER BY createdtime DESC
-    
+
   - reportName: ReceiptRegisterNOC
     decryptionPathId: LAYOUTREPORTS
     summary: Details of collector register in noc service
@@ -1462,5 +1463,5 @@ ReportDefinitions:
           ON usr.id = payment.createdby::integer
       WHERE
           pd.businessservice = 'obpas_noc'
-          AND payment.paymentstatus != 'CANCELLED'
+          AND payment.paymentstatus != 'CANCELLED' AND bill.consumercode not like 'PB/%' AND pd.tenantid != 'pb.testing'
     orderby: ORDER BY pd.receiptdate DESC;
