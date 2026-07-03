@@ -196,9 +196,9 @@ ReportDefinitions:
              ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'professionalRegId' AS professional_reg_id,
              ad.additionaldetails::jsonb -> 'applicationDetails' ->> 'professionalMobileNumber' AS professional_mobile
             FROM eg_noc n
-            LEFT JOIN eg_noc_details ad ON ad.nocid = n.id
+            INNER JOIN eg_noc_details ad ON ad.nocid = n.id
             INNER JOIN ulb_data u ON u.ulb_code = n.tenantid
-            Where n.tenantid !='pb.testing'
+            Where n.tenantid !='pb.testing' and n.applicationno not like 'PB/%' AND (ad.additionaldetails::text not LIKE '%isMigrationTrue%'  OR ad.additionaldetails IS NULL)
     groupby: GROUP BY n.createdtime,n.applicationno,n.applicationstatus, n.vasikadate, n.vasikanumber,ad.additionaldetails
     orderby: ORDER BY n.createdtime desc;
     
@@ -386,6 +386,7 @@ ReportDefinitions:
             JOIN sla_data sla ON sla.businessservice in ('NOC_MC','NOC_NP')
             LEFT JOIN assignee_details asn ON n.applicationno = asn.businessid
             WHERE UPPER(ls.applicationstatus) NOT IN ('INITIATED','CANCELLED') and n.tenantid !='pb.testing'
+       			and n.applicationno not like 'PB/%' AND (ad.additionaldetails::text not LIKE '%isMigrationTrue%'  OR ad.additionaldetails IS NULL)
     orderby: ORDER BY n.createdtime DESC
     
   - reportName: officers_with_highest_pendency
@@ -726,7 +727,7 @@ ReportDefinitions:
                 'NOC' as modulename
                 FROM sla_calc sc
                 JOIN ulb_data u ON sc.tenantid = u.ulb_code
-                WHERE sc.timeline_status = 'BREACHED'     
+                WHERE sc.timeline_status = 'BREACHED'  and sc.uuid not like 'PB/%'    
     groupby: GROUP BY u.district, u.name_of_ulb ,sc.applicationstatus,sc.uuid
     orderby: ORDER BY u.district, u.name_of_ulb,sc.applicationstatus,sc.uuid DESC  
 
@@ -1262,7 +1263,7 @@ ReportDefinitions:
         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
         LEFT JOIN eg_user u ON u.uuid = wa.assignee
         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        WHERE  wf.businessservice in ('NOC_MC','NOC_NP')
+        WHERE  wf.businessservice in ('NOC_MC','NOC_NP') and wf.businessid not like 'PB/%'
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       ),
 
@@ -1304,7 +1305,7 @@ ReportDefinitions:
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno OR ch.applicationno = a.id::text
         WHERE pd.businessservice = 'obpas_noc'
           AND upper(p.paymentstatus) != 'CANCELLED'
-         
+          a.applicationno not like 'PB/%' AND (d.additionaldetails::text not LIKE '%isMigrationTrue%'  OR d.additionaldetails IS NULL)         
       )
 
 
@@ -1462,5 +1463,5 @@ ReportDefinitions:
           ON usr.id = payment.createdby::integer
       WHERE
           pd.businessservice = 'obpas_noc'
-          AND payment.paymentstatus != 'CANCELLED'
+          AND payment.paymentstatus != 'CANCELLED' AND bill.consumercode not like 'PB/%' AND pd.tenantid != 'pb.testing'
     orderby: ORDER BY pd.receiptdate DESC;
