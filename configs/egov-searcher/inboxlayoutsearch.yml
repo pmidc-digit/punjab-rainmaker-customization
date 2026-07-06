@@ -24,6 +24,11 @@ SearchDefinitions:
                    owner.ownershippercentage
             from eg_layout as layout
             LEFT JOIN eg_layout_owner owner ON owner.layoutid = layout.id AND owner.isprimaryowner = true
+            INNER JOIN (
+              SELECT layoutid, uuid as user_id FROM eg_layout_owner
+              UNION
+              SELECT id as layoutid, createdby as user_id FROM eg_layout
+            ) layout_user ON layout_user.layoutid = layout.id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = layout.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where 
@@ -73,7 +78,7 @@ SearchDefinitions:
           - name: owner.ownertype
             isMandatory: false
             jsonPath: $.searchCriteria.ownerType
-          - name: owner.uuid
+          - name: layout_user.user_id
             isMandatory: false
             jsonPath: $.searchCriteria.userid
         pagination:
@@ -92,12 +97,16 @@ SearchDefinitions:
             from eg_layout as layout
             LEFT JOIN eg_layout_details details ON details.layoutid = layout.id
             LEFT JOIN eg_layout_owner owner ON owner.layoutid = layout.id AND owner.isprimaryowner = true
+            INNER JOIN (
+              SELECT layoutid, uuid as user_id FROM eg_layout_owner
+              UNION
+              SELECT id as layoutid, createdby as user_id FROM eg_layout
+            ) layout_user ON layout_user.layoutid = layout.id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = layout.applicationno
             LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
             AND pi.latest = TRUE
-            $pagination
           ) result
         groupBy:
         orderBy:
@@ -141,9 +150,10 @@ SearchDefinitions:
           - name: owner.ownertype
             isMandatory: false
             jsonPath: $.searchCriteria.ownerType
-        pagination:
-          noOfRecords: $.searchCriteria.noOfRecords
-          offset: $.searchCriteria.offset
+          - name: layout_user.user_id
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
+
       output:
         jsonFormat: {"ResponseInfo": {},"totalCount": []}
         outJsonPath: $.totalCount
@@ -170,6 +180,11 @@ SearchDefinitions:
                    owner.ownershippercentage
             from eg_layout as layout
             LEFT JOIN eg_layout_owner owner ON owner.layoutid = layout.id AND owner.isprimaryowner = true
+            INNER JOIN (
+              SELECT layoutid, uuid as user_id FROM eg_layout_owner
+              UNION
+              SELECT id as layoutid, createdby as user_id FROM eg_layout
+            ) layout_user ON layout_user.layoutid = layout.id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = layout.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             $where
@@ -219,7 +234,7 @@ SearchDefinitions:
           - name: owner.ownertype
             isMandatory: false
             jsonPath: $.searchCriteria.ownerType
-          - name: owner.uuid
+          - name: layout_user.user_id
             isMandatory: false
             jsonPath: $.searchCriteria.userid
         pagination:
@@ -237,6 +252,11 @@ SearchDefinitions:
             select layout.tenantId, layout.applicationno, pi.status as status_id
             from eg_layout as layout
             LEFT JOIN eg_layout_owner owner ON owner.layoutid = layout.id AND owner.isprimaryowner = true
+            INNER JOIN (
+              SELECT layoutid, uuid as user_id FROM eg_layout_owner
+              UNION
+              SELECT id as layoutid, createdby as user_id FROM eg_layout
+            ) layout_user ON layout_user.layoutid = layout.id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = layout.applicationno
             $where
             AND pi.latest = TRUE
@@ -251,7 +271,7 @@ SearchDefinitions:
             isMandatory: true
             operator: ILIKE
             jsonPath: $.searchCriteria.tenantId
-          - name: owner.uuid
+          - name: layout_user.user_id
             isMandatory: false
             jsonPath: $.searchCriteria.userid
           - name: pi.businessservice

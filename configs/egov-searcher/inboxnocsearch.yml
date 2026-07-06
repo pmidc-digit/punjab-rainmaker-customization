@@ -22,7 +22,11 @@ SearchDefinitions:
             from eg_noc as noc
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = noc.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
-            INNER JOIN eg_noc_owner ownerinfo ON ownerinfo.nocid = noc.id
+            INNER JOIN (
+              SELECT nocid, uuid as user_id FROM eg_noc_owner
+              UNION
+              SELECT id as nocid, createdby as user_id FROM eg_noc
+            ) noc_user ON noc_user.nocid = noc.id
             $where 
             AND pi.latest = TRUE
             order by noc.createdtime asc
@@ -61,7 +65,7 @@ SearchDefinitions:
           - name: noc.accountid
             isMandatory: false
             jsonPath: $.searchCriteria.accountId
-          - name: ownerinfo.uuid
+          - name: noc_user.user_id
             isMandatory: false
             jsonPath: $.searchCriteria.userid
         pagination:
@@ -80,7 +84,11 @@ SearchDefinitions:
             from eg_noc as noc
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = noc.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
-            INNER JOIN eg_noc_owner ownerinfo ON ownerinfo.nocid = noc.id
+            INNER JOIN (
+              SELECT nocid, uuid as user_id FROM eg_noc_owner
+              UNION
+              SELECT id as nocid, createdby as user_id FROM eg_noc
+            ) noc_user ON noc_user.nocid = noc.id
             $where
             AND pi.latest = TRUE
           ) result
@@ -117,7 +125,7 @@ SearchDefinitions:
           - name: noc.accountid
             isMandatory: false
             jsonPath: $.searchCriteria.accountId
-          - name: ownerinfo.uuid
+          - name: noc_user.user_id
             isMandatory: false
             jsonPath: $.searchCriteria.userid
         pagination:
@@ -147,7 +155,11 @@ SearchDefinitions:
             from eg_noc as noc
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = noc.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
-            INNER JOIN eg_noc_owner ownerinfo ON ownerinfo.nocid = noc.id
+            INNER JOIN (
+              SELECT nocid, uuid as user_id FROM eg_noc_owner
+              UNION
+              SELECT id as nocid, createdby as user_id FROM eg_noc
+            ) noc_user ON noc_user.nocid = noc.id
             $where
             AND pi.latest = TRUE
             order by noc.createdtime desc
@@ -186,7 +198,7 @@ SearchDefinitions:
           - name: noc.accountid
             isMandatory: false
             jsonPath: $.searchCriteria.accountId
-          - name: ownerinfo.uuid
+          - name: noc_user.user_id
             isMandatory: false
             jsonPath: $.searchCriteria.userid
         pagination:
@@ -204,9 +216,11 @@ SearchDefinitions:
             select noc.tenantid, noc.applicationno, pi.status as status_id
             from eg_noc as noc
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = noc.applicationno
-            INNER JOIN eg_noc_owner ownerinfo ON ownerinfo.nocid = noc.id
-            $where
-            AND pi.latest = TRUE
+            INNER JOIN (
+              SELECT nocid, uuid as user_id FROM eg_noc_owner
+              UNION
+              SELECT id as nocid, createdby as user_id FROM eg_noc
+            ) noc_user ON noc_user.nocid = noc.id
             GROUP BY noc.tenantid, noc.applicationno, pi.status
           ) result
         groupBy:
@@ -218,7 +232,7 @@ SearchDefinitions:
             isMandatory: true
             operator: ILIKE
             jsonPath: $.searchCriteria.tenantId
-          - name: ownerinfo.uuid
+          - name: noc_user.user_id
             isMandatory: false
             jsonPath: $.searchCriteria.userid
           - name: pi.businessservice
