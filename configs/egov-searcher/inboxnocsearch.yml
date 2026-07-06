@@ -221,6 +221,8 @@ SearchDefinitions:
               UNION
               SELECT id as nocid, createdby as user_id FROM eg_noc
             ) noc_user ON noc_user.nocid = noc.id
+            $where
+            AND pi.latest = TRUE
             GROUP BY noc.tenantid, noc.applicationno, pi.status
           ) result
         groupBy:
