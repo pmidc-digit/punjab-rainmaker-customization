@@ -2068,3 +2068,93 @@ ReportDefinitions:
         (g.grp_level = 0) 
         OR (g.grp_level = 1 AND s.distinct_statuses > 1) OR (g.grp_level = 15)
   orderby: ORDER BY g.ulb_type, g.ulb_district, g.name_of_ulb, g.grp_level, g.localized_status;
+- reportName: Transactions_Summary_OBPS_REPORT
+  summary: Transaction detail for OBPS Module 
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A4
+
+  sourceColumns:
+  - name: service
+    label: Service
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: transaction_id
+    label: Transaction ID
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: transaction_amount
+    label: Transaction Amount
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: gateway
+    label: Gateway
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: transaction_status
+    label: Transaction Status
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: ulb_name
+    label: ULB Name
+    type: string
+    source: obpas_bpa
+    total: false 
+  - name: created_date
+    label: payment Created Date
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: application_number
+    label: Application Number
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: name
+    label: Name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: mobile_number
+    label: Mobile Number
+    type: string
+    source: obpas_bpa
+    total: false 
+  - name: ulb_type
+    label: ULB Type
+    type: string
+    source: obpas_bpa
+    total: false
+  searchParams:
+  - name: fromDate
+    label: From Date
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND pf.created_time >= $fromDate
+  - name: toDate
+    label: To Date
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND pg.created_time <= $toDate
+
+  query: |
+      select 
+        pg.txn_id as transaction_id , pg.txn_amount as transaction_amount,pg.gateway  , pg.txn_status as transaction_status ,
+        INITCAP(split_part(pg.tenant_id, '.', 2)) AS tenant_id  ,to_char(to_timestamp(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date,
+        pg.consumer_code as application_number , pg.name , pg.mobile_number , bd.businessservice as service,
+        pg.additional_details->>'ulbName' AS ulb_name,pg.additional_details->>'ulbType' AS ulb_type
+        from eg_pg_transactions pg 
+        inner join egbs_bill_v1 bill on bill.id = pg.bill_id
+        inner join egbs_billdetail_v1 bd on bd.billid = bill.id
+        where bd.businessservice in ('obpas_noc','BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG','CLU.PAY1','CLU.PAY2') AND txn_status = 'SUCCESS'
+        and pg.tenant_id != 'pb.testing' and pg.txn_amount != '0.00' and pg.txn_id != 'PB_PG_2025_12_17_663638_75' 
+  orderby: ORDER BY bd.businessservice , pg.created_time , pg.tenant_id
