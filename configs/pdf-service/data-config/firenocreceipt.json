@@ -120,13 +120,7 @@
                 "value": {
                    "path": "$.payerAddress"
                 }
-              }, 
-              {
-                "variable": "validityYears", 
-                "value": {
-                   "path": "$.validityYears"
-                }
-              }, 
+              },
               {
                 "variable": "oldComments", 
                 "value": {
@@ -577,6 +571,21 @@
                       "prefix": "TENANT_TENANTS",
                       "module": "rainmaker-common"
                     }
+                  }
+                ]
+              },
+              {
+                "path": "http://firenoc-services.egov:8080/firenoc-services/v1/_search",
+                "queryParam": "tenantId=$.tenantId,applicationNumber=$.paymentDetails[0].bill.consumerCode",
+                "apiRequest": null,
+                "responseMapping": [
+                  {
+                    "variable": "userAddress",
+                    "value": "$.FireNOCs[0].fireNOCDetails.propertyDetails.address"
+                  },
+                  {
+                    "variable": "validityYears",
+                    "value": "$.FireNOCs[0].fireNOCDetails.additionalDetails.validityYears"
                   }
                 ]
               }
