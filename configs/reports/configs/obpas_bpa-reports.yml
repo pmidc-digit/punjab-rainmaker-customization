@@ -249,7 +249,7 @@ ReportDefinitions:
       unique_transactions AS (
         SELECT
           p.id AS transaction_id,
-          p.createdtime,split_part(p.tenantid, '.', 2) AS tenant, 
+          p.createdtime,INITCAP(split_part(p.tenantid, '.', 2)) AS tenant, 
           pd.amountpaid,
           CASE WHEN upper(p.paymentmode) IN ('CASH','OFFLINE_CASH') THEN pd.amountpaid ELSE 0 END AS cash_amount,
           CASE WHEN upper(p.paymentmode) = 'CHEQUE' THEN pd.amountpaid ELSE 0 END AS cheque_amount,
@@ -261,7 +261,17 @@ ReportDefinitions:
           COALESCE(emp.code, 'SELF') AS collector_code,
           a.id AS bpa_id,
           a.applicationno,
-          a.status,
+          CASE 
+            WHEN UPPER(a.status) IN ('LEVEL3_VERIFICATION_PENDING', 'LEVEL_3_PENDING', 'FIELDINSPECTION_PENDING') THEN 'ATP Verification Pending'
+            WHEN UPPER(a.status) = 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In Progress' -- Naya rule yahan add kiya hai
+            WHEN UPPER(a.status) = 'CITIZEN_APPROVAL_INPROGRESS' THEN 'Citizen Approval In Progress'
+            WHEN UPPER(a.status) = 'PENDING_FOR_PAYMENT' THEN 'Pending for Payment'
+            WHEN UPPER(a.status) = 'DOC_VERIFICATION_PENDING' THEN 'Document Verification Pending'
+            WHEN UPPER(a.status) = 'VERIFICATION_INPROGRESS' THEN 'Verification In Progress'
+            WHEN UPPER(a.status) = 'APPROVED' THEN 'Approved'
+            WHEN UPPER(a.status) = 'REJECTED' THEN 'Rejected'
+            ELSE INITCAP(REPLACE(a.status, '_', ' ')) 
+          END AS localized_status,
           u_applicant.name,
           u_applicant.mobilenumber,
           ch.employee_name AS assignee_employee,
@@ -289,10 +299,10 @@ ReportDefinitions:
         name,
         mobilenumber,
         'BPA' AS businessservice,
-         status,
+         localized_status AS status,
         collector_code,
         cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
-      FROM unique_transactions where 1=1 and tenant != 'testing'
+      FROM unique_transactions where 1=1 AND LOWER(tenant) != 'testing'
   orderby: ORDER BY applicationno,createdtime DESC 
   
 - reportName: SLAReportbpa
