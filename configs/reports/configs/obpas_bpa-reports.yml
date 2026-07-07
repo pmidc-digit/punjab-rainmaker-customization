@@ -249,7 +249,7 @@ ReportDefinitions:
       unique_transactions AS (
         SELECT
           p.id AS transaction_id,
-          p.createdtime,split_part(p.tenantid, '.', 2) AS tenant, 
+          p.createdtime,INITCAP(split_part(p.tenantid, '.', 2)) AS tenant, 
           pd.amountpaid,
           CASE WHEN upper(p.paymentmode) IN ('CASH','OFFLINE_CASH') THEN pd.amountpaid ELSE 0 END AS cash_amount,
           CASE WHEN upper(p.paymentmode) = 'CHEQUE' THEN pd.amountpaid ELSE 0 END AS cheque_amount,
@@ -261,7 +261,17 @@ ReportDefinitions:
           COALESCE(emp.code, 'SELF') AS collector_code,
           a.id AS bpa_id,
           a.applicationno,
-          a.status,
+          CASE 
+            WHEN UPPER(a.status) IN ('LEVEL3_VERIFICATION_PENDING', 'LEVEL_3_PENDING', 'FIELDINSPECTION_PENDING') THEN 'ATP Verification Pending'
+            WHEN UPPER(a.status) = 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In Progress' -- Naya rule yahan add kiya hai
+            WHEN UPPER(a.status) = 'CITIZEN_APPROVAL_INPROGRESS' THEN 'Citizen Approval In Progress'
+            WHEN UPPER(a.status) = 'PENDING_FOR_PAYMENT' THEN 'Pending for Payment'
+            WHEN UPPER(a.status) = 'DOC_VERIFICATION_PENDING' THEN 'Document Verification Pending'
+            WHEN UPPER(a.status) = 'VERIFICATION_INPROGRESS' THEN 'Verification In Progress'
+            WHEN UPPER(a.status) = 'APPROVED' THEN 'Approved'
+            WHEN UPPER(a.status) = 'REJECTED' THEN 'Rejected'
+            ELSE INITCAP(REPLACE(a.status, '_', ' ')) 
+          END AS localized_status,
           u_applicant.name,
           u_applicant.mobilenumber,
           ch.employee_name AS assignee_employee,
@@ -279,7 +289,7 @@ ReportDefinitions:
         LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno OR ch.applicationno = a.id::text
         WHERE pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE')
-          AND upper(p.paymentstatus) != 'CANCELLED' and pd.tenantid != 'pb.testing'
+          AND upper(p.paymentstatus) != 'CANCELLED'
       )
       
       SELECT  
@@ -289,12 +299,12 @@ ReportDefinitions:
         name,
         mobilenumber,
         'BPA' AS businessservice,
-         status,
+         localized_status AS status,
         collector_code,
         cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
-      FROM unique_transactions where 1=1 and tenant != 'testing'
-  orderby: ORDER BY applicationno,createdtime DESC 
-  
+      FROM unique_transactions where 1=1 AND LOWER(tenant) != 'testing'
+  orderby: ORDER BY applicationno,createdtime DESC
+
 - reportName: SLAReportbpa
   decryptionPathId: LAYOUTREPORTS
   summary: SLA report for building_plan service
@@ -318,7 +328,7 @@ ReportDefinitions:
     label: Application Status
     type: string
     source: obpas_bpa
-    total: false    
+    total: false
   - name: document_verify_on
     label: Document Verified On
     type: string
@@ -335,7 +345,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: sla_days
-    label: SLA Days 
+    label: SLA Days
     type: string
     source: obpas_bpa
     total: false
@@ -368,14 +378,14 @@ ReportDefinitions:
     pattern: list://BPA_LOW:Self Certification
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND sla.businessservice = $businessservice 
+    searchClause: AND sla.businessservice = $businessservice
   - name: ulb
     label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: and  n.tenantid = $ulb      
+    searchClause: and  n.tenantid = $ulb
   query: |
       WITH wf_detailed AS (
           SELECT 
@@ -570,7 +580,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: and  pd.tenantid = $ulb      
+    searchClause: and  pd.tenantid = $ulb
   - name: receiptNumber
     label: Receipt Number
     type: string
@@ -583,7 +593,7 @@ ReportDefinitions:
     pattern: 'list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT'
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND payment.paymentmode like $paymentMode     
+    searchClause: AND payment.paymentmode like $paymentMode
   query: |
       SELECT
           pd.receiptnumber AS receiptno,
@@ -645,13 +655,13 @@ ReportDefinitions:
     label: ULB Name
     type: string
     source: obpas_bpa
-    total: false  
+    total: false
   - name: businessservice
     label: Module
     type: string
     source: obpas_bpa
     total: false
-  searchParams:    
+  searchParams:
   - name: fromDate
     label: Date
     type: epoch
@@ -661,17 +671,17 @@ ReportDefinitions:
   - name: district
     label: District
     type: singlevaluelist
-    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND ulb_data.district = $district 
+    searchClause: AND ulb_data.district = $district
   - name: ulb
     label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: and  bpa.tenantid = $ulb 
+    searchClause: and  bpa.tenantid = $ulb
   - name: businessservice
     label: Service
     type: singlevaluelist
@@ -709,7 +719,7 @@ ReportDefinitions:
           'Building Plan' AS businessservice 
           FROM eg_bpa_buildingplan bpa 
           INNER JOIN ulb_data ON bpa.tenantid = ulb_data.ulb_code 
-          WHERE 1=1 
+          WHERE 1=1
   orderby : ORDER BY ulb_data.district, bpa.tenantid, bpa.applicationno;
 
 - reportName: Pending_Files_Summary
@@ -724,7 +734,7 @@ ReportDefinitions:
     label: ULB Name
     type: string
     source: obpas_bpa
-    total: false  
+    total: false
   - name: Pending_Files
     label: Pending Files
     type: string
@@ -736,14 +746,14 @@ ReportDefinitions:
     type: epoch
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND eg_bpa_buildingplan.createdtime <= $fromDate     
+    searchClause: AND eg_bpa_buildingplan.createdtime <= $fromDate
   - name: district
     label: District
     type: singlevaluelist
-    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND ulb_data.district = $district 
+    searchClause: AND ulb_data.district = $district
   - name: tenant_name
     label: ULB Name
     type: singlevaluelist
@@ -763,7 +773,7 @@ ReportDefinitions:
              'LEVEL4_VERIFICATION_PENDING','MC_VERIFICATION_PENDING','MTPHQ_APPROVAL_PENDING',
              'PENDINGINITIALVERIFICATION','PENDINGVERIFICATION','STP_VERIFICATION_PENDING','STPHQ_APPROVAL_PENDING')
   groupby: GROUP BY eg_bpa_buildingplan.tenantid,ulb_data.district
-  
+
 - reportName: officers_with_highest_pendency
   summary: Top 7 officers with Highest Pendency
   version: 1.0.0
@@ -786,8 +796,8 @@ ReportDefinitions:
     label: Pending Files
     type: string
     source: obpas_bpa
-    total: true  
-  searchParams:    
+    total: true
+  searchParams:
   - name: businessservice
     label: Service
     type: singlevaluelist
@@ -906,14 +916,14 @@ ReportDefinitions:
     label: Day 7
     type: string
     source: obpas_bpa
-    total: true                     
+    total: true
   searchParams:
   - name: fromDate
     label: Date
     type: epoch
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND 1=1     
+    searchClause: AND 1=1
   - name: businessservice
     label: Service
     type: singlevaluelist
@@ -1021,12 +1031,12 @@ ReportDefinitions:
     label: Breached Count
     type: string
     source: obpas_bpa
-    total: false  
+    total: false
   searchParams:
   - name: district
     label: District
     type: singlevaluelist
-    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
@@ -1036,14 +1046,14 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $ulb  
+    searchClause: AND u.name_of_ulb= $ulb
   - name: businessservice
     label: Service
     type: singlevaluelist
     pattern: "list://BPA_LOW:Self Certification"
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND sc.businessservice = $businessservice 
+    searchClause: AND sc.businessservice = $businessservice
   query: |
       WITH wf_history AS (
           SELECT
@@ -1113,8 +1123,8 @@ ReportDefinitions:
       FROM sla_calculation sc
       JOIN ulb_data u ON sc.tenantid = u.ulb_code
       JOIN ulb_latest_activity ula ON u.ulb_code = ula.tenantid where 1=1
-  groupby: GROUP BY u.district, u.name_of_ulb , ula.current_status                
-  orderby: ORDER BY u.district, u.name_of_ulb DESC      
+  groupby: GROUP BY u.district, u.name_of_ulb , ula.current_status
+  orderby: ORDER BY u.district, u.name_of_ulb DESC
 
 - reportName: DetailedListBeyondTimelineSummary
   summary: Summary of district-ulb wise application which breached its SLA
@@ -1161,11 +1171,11 @@ ReportDefinitions:
     type: epoch
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND receiptdate <= $toDate 
+    searchClause: AND receiptdate <= $toDate
   - name: district
     label: District
     type: singlevaluelist
-    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
@@ -1175,14 +1185,14 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $ulb 
+    searchClause: AND u.name_of_ulb= $ulb
   - name: businessservice
     label: Service
     type: singlevaluelist
     pattern: "list://BPA_LOW:Self Certification"
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND sc.businessservice = $businessservice 
+    searchClause: AND sc.businessservice = $businessservice
   query: |
       WITH wf_history AS (
          SELECT
@@ -1242,10 +1252,10 @@ ReportDefinitions:
           FROM sla_calculation sc
           JOIN ulb_data u ON sc.tenantid = u.ulb_code
           WHERE sc.sla_status = 'BREACHED'
-  orderby: ORDER BY u.district, u.name_of_ulb,sc.applicationstatus,sc.uuid DESC      
+  orderby: ORDER BY u.district, u.name_of_ulb,sc.applicationstatus,sc.uuid DESC
 
 - reportName: FilesNearTimelineBreachSummary
-  summary: Summary list of district-ulb wise application upcoming  breached its SLA for next 7 days 
+  summary: Summary list of district-ulb wise application upcoming  breached its SLA for next 7 days
   version: 1.0.0
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
@@ -1298,7 +1308,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: true
   - name: total_upcoming_breaches
-    label: Total Upcoming Breaches 
+    label: Total Upcoming Breaches
     type: string
     source: obpas_bpa
     total: true
@@ -1312,7 +1322,7 @@ ReportDefinitions:
   - name: district
     label: District
     type: singlevaluelist
-    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
@@ -1329,7 +1339,7 @@ ReportDefinitions:
     pattern: "list://BPA_LOW:Self Certification"
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND ub.businessservice = $businessservice 
+    searchClause: AND ub.businessservice = $businessservice
   query: |
       WITH params AS (
         SELECT
@@ -1403,12 +1413,12 @@ ReportDefinitions:
           FROM upcoming_breaches ub
           JOIN ulb_data u ON ub.tenantid = u.ulb_code
           JOIN params p ON TRUE    
-             WHERE 1=1 
+             WHERE 1=1
   groupby: GROUP BY u.district, u.name_of_ulb
-  orderby: ORDER BY u.district, u.name_of_ulb DESC   
+  orderby: ORDER BY u.district, u.name_of_ulb DESC
 
 - reportName: DetailedFilesNearTimelineBreach
-  summary: Detailed File List of District-ULB wise Application Upcoming  Breached its SLA for next 7 days 
+  summary: Detailed File List of District-ULB wise Application Upcoming  Breached its SLA for next 7 days
   version: 1.0.0
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
@@ -1450,7 +1460,7 @@ ReportDefinitions:
   - name: district
     label: District
     type: singlevaluelist
-    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
@@ -1460,14 +1470,14 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND u.name_of_ulb= $tenant 
+    searchClause: AND u.name_of_ulb= $tenant
   - name: businessservice
     label: Service
     type: singlevaluelist
     pattern: "list://BPA_LOW:Self Certification"
     source: obpas_bpa
     isMandatory: false
-    searchClause: AND ub.businessservice = $businessservice 
+    searchClause: AND ub.businessservice = $businessservice
   query: |
       WITH params AS (
           SELECT
@@ -1586,7 +1596,7 @@ ReportDefinitions:
           FROM upcoming_breaches ub 
           JOIN ulb_data u ON ub.tenantid = u.ulb_code where 1=1
   groupby: GROUP BY u.district, u.name_of_ulb,ub.applicationstatus,ub.uuid
-  orderby: ORDER BY u.district, u.name_of_ulb ,ub.applicationstatus,ub.uuid DESC        
+  orderby: ORDER BY u.district, u.name_of_ulb ,ub.applicationstatus,ub.uuid DESC
 
 
 
@@ -1808,8 +1818,8 @@ ReportDefinitions:
           'BPA_TOWNPLANNER'
       )
       AND u.login_time > (now() - INTERVAL '2 days')
-          
-  orderby: ORDER BY u.user_id, u.login_time DESC          
+
+  orderby: ORDER BY u.user_id, u.login_time DESC
 
 
   ReportDefinitions:
@@ -1832,7 +1842,7 @@ ReportDefinitions:
     label: Mobile Number
     type: string
     source: obpas_bpa
-    total: false    
+    total: false
   - name: ulb_schema
     label: ULB Name
     type: string
@@ -1854,7 +1864,7 @@ ReportDefinitions:
     label: Returned Files Count
     type: string
     source: obpas_bpa
-    total: false    
+    total: false
 
   query: |
       SELECT initcap(ulb_schema) AS ulb_schema,
@@ -1863,7 +1873,7 @@ ReportDefinitions:
           COUNT(*) FILTER (WHERE status = 'Not Accepted') AS not_accepted_count,
           COUNT(*)                                        AS total_count
           from edcr_cross_ulb_result
-  groupby: GROUP BY ulb_schema,applicant_name,mobilenumber          
+  groupby: GROUP BY ulb_schema,applicant_name,mobilenumber
   orderby: ORDER BY employee_name
 
 - reportName: Filesubmissionsummaryreport
@@ -2060,3 +2070,94 @@ ReportDefinitions:
         (g.grp_level = 0) 
         OR (g.grp_level = 1 AND s.distinct_statuses > 1) OR (g.grp_level = 15)
   orderby: ORDER BY g.ulb_type, g.ulb_district, g.name_of_ulb, g.grp_level, g.localized_status;
+
+- reportName: Transactions_Summary_OBPS_Report
+  summary: Transaction detail for OBPS Module
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A4
+
+  sourceColumns:
+  - name: service
+    label: Service
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: transaction_id
+    label: Transaction ID
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: transaction_amount
+    label: Transaction Amount
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: gateway
+    label: Gateway
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: transaction_status
+    label: Transaction Status
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: ulb_name
+    label: ULB Name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: created_date
+    label: payment Created Date
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: application_number
+    label: Application Number
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: name
+    label: Name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: mobile_number
+    label: Mobile Number
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: ulb_type
+    label: ULB Type
+    type: string
+    source: obpas_bpa
+    total: false
+  searchParams:
+  - name: fromDate
+    label: From Date
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND pg.created_time >= $fromDate
+  - name: toDate
+    label: To Date
+    type: epoch
+    source: obpas_bpa
+    isMandatory: true
+    searchClause: AND pg.created_time <= $toDate
+
+  query: |
+      select 
+        pg.txn_id as transaction_id , pg.txn_amount as transaction_amount,pg.gateway  , pg.txn_status as transaction_status ,
+        INITCAP(split_part(pg.tenant_id, '.', 2)) AS tenant_id  ,to_char(to_timestamp(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date,
+        pg.consumer_code as application_number , pg.name , pg.mobile_number , bd.businessservice as service,
+        pg.additional_details->>'ulbName' AS ulb_name,pg.additional_details->>'ulbType' AS ulb_type
+        from eg_pg_transactions pg 
+        inner join egbs_bill_v1 bill on bill.id = pg.bill_id
+        inner join egbs_billdetail_v1 bd on bd.billid = bill.id
+        where bd.businessservice in ('obpas_noc','BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG','CLU.PAY1','CLU.PAY2') AND txn_status = 'SUCCESS'
+        and pg.tenant_id != 'pb.testing' and pg.txn_amount != '0.00' and pg.txn_id != 'PB_PG_2025_12_17_663638_75'
+  orderby: ORDER BY bd.businessservice , pg.created_time , pg.tenant_id
