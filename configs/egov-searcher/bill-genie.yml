@@ -130,7 +130,7 @@ SearchDefinitions:
             INNER JOIN eg_ws_connection conn ON bd.consumercode = conn.connectionno
             INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid and pt.status <> 'INACTIVE'
             INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id 
-            INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id
+            INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id and ptown.status <> 'INACTIVE'
             LEFT JOIN (
               SELECT *
               FROM (
