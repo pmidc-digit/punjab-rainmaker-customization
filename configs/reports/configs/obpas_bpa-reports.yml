@@ -2153,7 +2153,15 @@ ReportDefinitions:
       select 
         pg.txn_id as transaction_id , pg.txn_amount as transaction_amount,pg.gateway  , pg.txn_status as transaction_status ,
         INITCAP(split_part(pg.tenant_id, '.', 2)) AS tenant_id  ,to_char(to_timestamp(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date,
-        pg.consumer_code as application_number , pg.name , pg.mobile_number , bd.businessservice as service,
+        pg.consumer_code as application_number , pg.name , pg.mobile_number , 
+        CASE 
+        WHEN bd.businessservice = 'obpas_noc' THEN 'NOC'
+        WHEN bd.businessservice = 'CLU.PAY1' THEN 'CLU Pay 1'
+        WHEN bd.businessservice = 'CLU.PAY2' THEN 'CLU Pay 2'
+        WHEN bd.businessservice 'BPA.NC_APP_FEE' THEN 'BPA Application Fee'
+        WHEN bd.businessservice = 'BPA.NC_SAN_FEE' THEN 'BPA Sanction Fee'
+        WHEN bd.businessservice = 'BPAREG' THEN 'Professional Registration'
+        ELSE bd.businessservice ,
         pg.additional_details->>'ulbName' AS ulb_name,pg.additional_details->>'ulbType' AS ulb_type
         from eg_pg_transactions pg 
         inner join egbs_bill_v1 bill on bill.id = pg.bill_id
