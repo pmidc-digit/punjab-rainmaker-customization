@@ -6428,10 +6428,10 @@ ReportDefinitions:
         asmt.exemption as exemption,
         asmt.roundoff as adjustment,
         (case when rp.collectedby is null then '30048|21Fj+c3k2ldB0X3AzIh7atXB' else rp.collectedby end) as collectorname    --,
-        --p.ownershipcategory as ownershipcategory,
-        --p.propertyusagetype as usagetype,
-        --p.localityname as localityname,
-        --p.blockcode as block
+        p.ownershipcategory as ownershipcategory,
+        p.propertyusagetype as usagetype,
+        p.localityname as localityname,
+        p.blockcode as block
       from report_payments as rp
       inner join assessments as asmt on  asmt.billid = rp.billid -- asmt.billid like concat('%',rp.billid,'%')
       inner join report_properties p on (p.propertyid=rp.propertyid and p.propertystatus='ACTIVE')
