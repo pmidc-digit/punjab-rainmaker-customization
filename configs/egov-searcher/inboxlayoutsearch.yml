@@ -78,9 +78,14 @@ SearchDefinitions:
           - name: owner.ownertype
             isMandatory: false
             jsonPath: $.searchCriteria.ownerType
-          - name: layout_user.user_id
+          - name: layout.createdby
             isMandatory: false
             jsonPath: $.searchCriteria.userid
+            operator: IN
+          - name: owner.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.ownerUuid
+            operator: IN
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -96,12 +101,7 @@ SearchDefinitions:
             select COUNT(DISTINCT(layout.applicationno)) as totalCount
             from eg_layout as layout
             LEFT JOIN eg_layout_details details ON details.layoutid = layout.id
-            LEFT JOIN eg_layout_owner owner ON owner.layoutid = layout.id AND owner.isprimaryowner = true
-            INNER JOIN (
-              SELECT layoutid, uuid as user_id FROM eg_layout_owner
-              UNION
-              SELECT id as layoutid, createdby as user_id FROM eg_layout
-            ) layout_user ON layout_user.layoutid = layout.id
+            LEFT JOIN eg_layout_owner owner ON owner.layoutid = layout.id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = layout.applicationno
             LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
@@ -150,9 +150,14 @@ SearchDefinitions:
           - name: owner.ownertype
             isMandatory: false
             jsonPath: $.searchCriteria.ownerType
-          - name: layout_user.user_id
+          - name: layout.createdby
             isMandatory: false
             jsonPath: $.searchCriteria.userid
+            operator: IN
+          - name: owner.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.ownerUuid
+            operator: IN
 
       output:
         jsonFormat: {"ResponseInfo": {},"totalCount": []}
@@ -234,9 +239,14 @@ SearchDefinitions:
           - name: owner.ownertype
             isMandatory: false
             jsonPath: $.searchCriteria.ownerType
-          - name: layout_user.user_id
+          - name: layout.createdby
             isMandatory: false
             jsonPath: $.searchCriteria.userid
+            operator: IN
+          - name: owner.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.ownerUuid
+            operator: IN
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -251,12 +261,7 @@ SearchDefinitions:
           Select row_to_json(result) from (
             select layout.tenantId, layout.applicationno, pi.status as status_id
             from eg_layout as layout
-            LEFT JOIN eg_layout_owner owner ON owner.layoutid = layout.id AND owner.isprimaryowner = true
-            INNER JOIN (
-              SELECT layoutid, uuid as user_id FROM eg_layout_owner
-              UNION
-              SELECT id as layoutid, createdby as user_id FROM eg_layout
-            ) layout_user ON layout_user.layoutid = layout.id
+            LEFT JOIN eg_layout_owner owner ON owner.layoutid = layout.id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = layout.applicationno
             $where
             AND pi.latest = TRUE
@@ -271,9 +276,14 @@ SearchDefinitions:
             isMandatory: true
             operator: ILIKE
             jsonPath: $.searchCriteria.tenantId
-          - name: layout_user.user_id
+          - name: layout.createdby
             isMandatory: false
             jsonPath: $.searchCriteria.userid
+            operator: IN
+          - name: owner.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.ownerUuid
+            operator: IN
           - name: pi.businessservice
             isMandatory: false
             jsonPath: $.searchCriteria.businessservice

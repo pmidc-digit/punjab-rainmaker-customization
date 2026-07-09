@@ -77,9 +77,14 @@ SearchDefinitions:
           - name: owner.ownertype
             isMandatory: false
             jsonPath: $.searchCriteria.ownerType
-          - name: clu_user.user_id
+          - name: clu.createdby
             isMandatory: false
             jsonPath: $.searchCriteria.userid
+            operator: IN
+          - name: owner.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.ownerUuid
+            operator: IN
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -95,12 +100,7 @@ SearchDefinitions:
             select COUNT(DISTINCT(clu.applicationno)) as totalCount
             from eg_clu as clu
             LEFT JOIN eg_clu_details details ON details.cluid = clu.id
-            LEFT JOIN eg_clu_owner owner ON owner.cluid = clu.id AND owner.isprimaryowner = true
-            INNER JOIN (
-              SELECT cluid, uuid as user_id FROM eg_clu_owner
-              UNION
-              SELECT id as cluid, createdby as user_id FROM eg_clu
-            ) clu_user ON clu_user.cluid = clu.id
+            LEFT JOIN eg_clu_owner owner ON owner.cluid = clu.id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = clu.applicationno
             LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
@@ -154,9 +154,14 @@ SearchDefinitions:
           - name: owner.ownertype
             isMandatory: false
             jsonPath: $.searchCriteria.ownerType
-          - name: clu_user.user_id
+          - name: clu.createdby
             isMandatory: false
             jsonPath: $.searchCriteria.userid
+            operator: IN
+          - name: owner.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.ownerUuid
+            operator: IN
 
       output:
         jsonFormat: {"ResponseInfo": {},"totalCount": []}
@@ -238,9 +243,14 @@ SearchDefinitions:
           - name: owner.ownertype
             isMandatory: false
             jsonPath: $.searchCriteria.ownerType
-          - name: clu_user.user_id
+          - name: clu.createdby
             isMandatory: false
             jsonPath: $.searchCriteria.userid
+            operator: IN
+          - name: owner.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.ownerUuid
+            operator: IN
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -255,11 +265,6 @@ SearchDefinitions:
           Select row_to_json(result) from (
             select clu.tenantid, clu.applicationno, pi.status as status_id from eg_clu as clu
             LEFT JOIN eg_clu_owner owner ON owner.cluid = clu.id
-            INNER JOIN (
-              SELECT cluid, uuid as user_id FROM eg_clu_owner
-              UNION
-              SELECT id as cluid, createdby as user_id FROM eg_clu
-            ) clu_user ON clu_user.cluid = clu.id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = clu.applicationno
             $where 
             AND pi.latest = TRUE
@@ -271,9 +276,14 @@ SearchDefinitions:
           - name: clu.tenantid
             isMandatory: true
             jsonPath: $.searchCriteria.tenantId
-          - name: clu_user.user_id
+          - name: clu.createdby
             isMandatory: false
             jsonPath: $.searchCriteria.userid
+            operator: IN
+          - name: owner.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.ownerUuid
+            operator: IN
           - name: pi.businessservice
             isMandatory: false
             jsonPath: $.searchCriteria.businessservice
