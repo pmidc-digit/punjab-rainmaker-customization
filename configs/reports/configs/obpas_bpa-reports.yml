@@ -2158,10 +2158,10 @@ ReportDefinitions:
         WHEN bd.businessservice = 'obpas_noc' THEN 'NOC'
         WHEN bd.businessservice = 'CLU.PAY1' THEN 'CLU Pay 1'
         WHEN bd.businessservice = 'CLU.PAY2' THEN 'CLU Pay 2'
-        WHEN bd.businessservice 'BPA.NC_APP_FEE' THEN 'BPA Application Fee'
+        WHEN bd.businessservice = 'BPA.NC_APP_FEE' THEN 'BPA Application Fee'
         WHEN bd.businessservice = 'BPA.NC_SAN_FEE' THEN 'BPA Sanction Fee'
         WHEN bd.businessservice = 'BPAREG' THEN 'Professional Registration'
-        ELSE bd.businessservice ,
+        ELSE bd.businessservice  END AS businessservice,
         pg.additional_details->>'ulbName' AS ulb_name,pg.additional_details->>'ulbType' AS ulb_type
         from eg_pg_transactions pg 
         inner join egbs_bill_v1 bill on bill.id = pg.bill_id
