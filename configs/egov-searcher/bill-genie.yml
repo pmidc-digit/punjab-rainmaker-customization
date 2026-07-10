@@ -125,7 +125,7 @@ SearchDefinitions:
             ptadd.locality as ptadd_locality, ptadd.street as ptadd_street, ptadd.region as ptadd_region, ptadd.plotno as ptadd_plotno, ptadd.buildingname as ptadd_buildingname, ptadd.district as ptadd_district, ptadd.state as ptadd_state, ptadd.latitude as ptadd_latitude, ptadd.longitude as ptadd_longitude, ptown.userid as ptown_userid,
             lm.connectionno AS mr_connectionno,lm.lastreading AS mr_lastreading,lm.lastreadingdate AS mr_lastreadingdate,lm.currentreading AS mr_currentreading,lm.currentreadingdate AS mr_currentreadingdate,lm.consumption AS mr_consumption,lm.meterstatus AS mr_meterstatus,lm.billingperiod AS mr_billingperiod 
 
-           FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid 
+           FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid and bd.totalamount > 0 and b.status = 'ACTIVE'
             INNER JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid
             INNER JOIN eg_ws_connection conn ON bd.consumercode = conn.connectionno
             INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid and pt.status <> 'INACTIVE'
