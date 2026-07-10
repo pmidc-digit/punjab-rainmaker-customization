@@ -21,7 +21,8 @@ ServiceMaps:
                 "petRegistrationNumber":"petRegistrationNumber","propertyId":"propertyId","createdby":"createdby","lastmodifiedby":"lastmodifiedby",
                 "createdtime":"createdtime","lastmodifiedtime":"lastmodifiedtime","addressId":"addressId","addressLine1":"addressLine1","addressLine2":"addressLine2",
                 "city":"city","pincode":"pincode","petName":"petName","petType":"petType","breedType":"breedType",
-                "petAge":"petAge","petGender":"petGender","vaccinationNumber":"vaccinationNumber","petColor":"petColor","owner":"owner"
+                "petAge":"petAge","petGender":"petGender","vaccinationNumber":"vaccinationNumber","petColor":"petColor","owner":"owner",
+                "workflowStatusId":"","workflowApplicationStatus":"","workflowAssigneeUuids":[],"history":{}
               }
             }
             fieldMapping:
@@ -123,6 +124,19 @@ ServiceMaps:
                 outJsonPath: $.Data.documents
               - inJsonPath: $.owner.name
                 outJsonPath: $.Data.owner
+            externalUriMapping:
+              - path: http://egov-workflow-v2.egov:8080/egov-workflow-v2/egov-wf/process/_search
+                queryParam: businessIds=$.applicationNumber,latest=true,tenantId=$.tenantId
+                apiRequest: {"RequestInfo":{"apiId":"org.egov.pt","ver":"1.0","ts":1502890899493,"action":"asd","did":"4354648646","key":"xyz","msgId":"654654","requesterId":"61","authToken":"d9994555-7656-4a67-ab3a-a952a0d4dfc8","userInfo":{"id":1,"uuid":"1fec8102-0e02-4d0a-b283-cd80d5dab067","type":"EMPLOYEE","tenantId":"pb.amritsar","roles":[{"name":"Employee","code":"EMPLOYEE","tenantId":"pb.amritsar"}]}}}
+                uriResponseMapping:
+                  - inJsonPath: $.ProcessInstances
+                    outJsonPath: $.Data.history
+                  - inJsonPath: $.ProcessInstances[0].state.uuid
+                    outJsonPath: $.Data.workflowStatusId
+                  - inJsonPath: $.ProcessInstances[0].state.applicationStatus
+                    outJsonPath: $.Data.workflowApplicationStatus
+                  - inJsonPath: $.ProcessInstances[0].assignes.*.uuid
+                    outJsonPath: $.Data.workflowAssigneeUuids
 
     - topic: update-ptr-application
       configKey: INDEX
@@ -139,10 +153,11 @@ ServiceMaps:
               "applicantName":"applicantName","fatherName":"fatherName","mobileNumber":"mobileNumber",
               "emailId":"emailId","applicationType":"applicationType","validityDate":"validityDate",
               "status":"status","expireFlag":"expireFlag","petToken":"petToken","previousApplicationNumber":"previousApplicationNumber",
-              "petRegistrationNumber":"petRegistrationNumber","propertyId":"propertyId","lastmodifiedby":"lastmodifiedby","lastmodifiedtime":"lastmodifiedtime",
+              "petRegistrationNumber":"petRegistrationNumber","propertyId":"propertyId","createdby":"createdby","lastmodifiedby":"lastmodifiedby","lastmodifiedtime":"lastmodifiedtime",
               "addressId":"addressId","addressLine1":"addressLine1","addressLine2":"addressLine2","city":"city","pincode":"pincode",
               "petName":"petName","petType":"petType","breedType":"breedType","petAge":"petAge","petGender":"petGender",
-              "vaccinationNumber":"vaccinationNumber","petColor":"petColor"}}
+              "vaccinationNumber":"vaccinationNumber","petColor":"petColor",
+              "workflowStatusId":"","workflowApplicationStatus":"","workflowAssigneeUuids":[],"history":{}}}
             fieldMapping:
               - inJsonPath: $.id
                 outJsonPath: $.Data.id
@@ -202,6 +217,19 @@ ServiceMaps:
                 outJsonPath: $.Data.vaccinationNumber
               - inJsonPath: $.petDetails.petColor
                 outJsonPath: $.Data.petColor
+            externalUriMapping:
+              - path: http://egov-workflow-v2.egov:8080/egov-workflow-v2/egov-wf/process/_search
+                queryParam: businessIds=$.applicationNumber,latest=true,tenantId=$.tenantId
+                apiRequest: {"RequestInfo":{"apiId":"org.egov.pt","ver":"1.0","ts":1502890899493,"action":"asd","did":"4354648646","key":"xyz","msgId":"654654","requesterId":"61","authToken":"d9994555-7656-4a67-ab3a-a952a0d4dfc8","userInfo":{"id":1,"uuid":"1fec8102-0e02-4d0a-b283-cd80d5dab067","type":"EMPLOYEE","tenantId":"pb.amritsar","roles":[{"name":"Employee","code":"EMPLOYEE","tenantId":"pb.amritsar"}]}}}
+                uriResponseMapping:
+                  - inJsonPath: $.ProcessInstances
+                    outJsonPath: $.Data.history
+                  - inJsonPath: $.ProcessInstances[0].state.uuid
+                    outJsonPath: $.Data.workflowStatusId
+                  - inJsonPath: $.ProcessInstances[0].state.applicationStatus
+                    outJsonPath: $.Data.workflowApplicationStatus
+                  - inJsonPath: $.ProcessInstances[0].assignes.*.uuid
+                    outJsonPath: $.Data.workflowAssigneeUuids
 
     - topic: expire-ptr-application
       configKey: INDEX
@@ -246,7 +274,8 @@ ServiceMaps:
               "lastmodifiedby":"lastmodifiedby","createdtime":"createdtime","lastmodifiedtime":"lastmodifiedtime",
               "addressId":"addressId","addressLine1":"addressLine1","addressLine2":"addressLine2","city":"city",
               "pincode":"pincode","petName":"petName","petType":"petType","breedType":"breedType","petAge":"petAge",
-              "petGender":"petGender","vaccinationNumber":"vaccinationNumber","petColor":"petColor"}}
+              "petGender":"petGender","vaccinationNumber":"vaccinationNumber","petColor":"petColor",
+              "workflowStatusId":"","workflowApplicationStatus":"","workflowAssigneeUuids":[],"history":{}}}
             fieldMapping:
               - inJsonPath: $.id
                 outJsonPath: $.Data.id
@@ -310,6 +339,19 @@ ServiceMaps:
                 outJsonPath: $.Data.vaccinationNumber
               - inJsonPath: $.petDetails.petColor
                 outJsonPath: $.Data.petColor
+            externalUriMapping:
+              - path: http://egov-workflow-v2.egov:8080/egov-workflow-v2/egov-wf/process/_search
+                queryParam: businessIds=$.applicationNumber,latest=true,tenantId=$.tenantId
+                apiRequest: {"RequestInfo":{"apiId":"org.egov.pt","ver":"1.0","ts":1502890899493,"action":"asd","did":"4354648646","key":"xyz","msgId":"654654","requesterId":"61","authToken":"d9994555-7656-4a67-ab3a-a952a0d4dfc8","userInfo":{"id":1,"uuid":"1fec8102-0e02-4d0a-b283-cd80d5dab067","type":"EMPLOYEE","tenantId":"pb.amritsar","roles":[{"name":"Employee","code":"EMPLOYEE","tenantId":"pb.amritsar"}]}}}
+                uriResponseMapping:
+                  - inJsonPath: $.ProcessInstances
+                    outJsonPath: $.Data.history
+                  - inJsonPath: $.ProcessInstances[0].state.uuid
+                    outJsonPath: $.Data.workflowStatusId
+                  - inJsonPath: $.ProcessInstances[0].state.applicationStatus
+                    outJsonPath: $.Data.workflowApplicationStatus
+                  - inJsonPath: $.ProcessInstances[0].assignes.*.uuid
+                    outJsonPath: $.Data.workflowAssigneeUuids
 
     - topic: ptr-application-legacyIndex
       configKey: LEGACYINDEX
@@ -330,7 +372,8 @@ ServiceMaps:
                 "petRegistrationNumber": "petRegistrationNumber","propertyId": "propertyId","createdby": "createdby","lastmodifiedby": "lastmodifiedby",
                 "createdtime": "createdtime","lastmodifiedtime": "lastmodifiedtime","addressId": "addressId","addressLine1": "addressLine1","addressLine2": "addressLine2",
                 "city": "city","pincode": "pincode","petName": "petName","petType": "petType","breedType": "breedType",
-                "petAge": "petAge","petGender": "petGender","vaccinationNumber": "vaccinationNumber","petColor": "petColor","owner": "owner"
+                "petAge": "petAge","petGender": "petGender","vaccinationNumber": "vaccinationNumber","petColor": "petColor","owner": "owner",
+                "workflowStatusId":"","workflowApplicationStatus":"","workflowAssigneeUuids":[],"history":{}
               }
             }
             fieldMapping:
@@ -432,3 +475,44 @@ ServiceMaps:
                 outJsonPath: $.Data.documents
               - inJsonPath: $.owner.name
                 outJsonPath: $.Data.owner
+            externalUriMapping:
+              - path: http://egov-workflow-v2.egov:8080/egov-workflow-v2/egov-wf/process/_search
+                queryParam: businessIds=$.applicationNumber,latest=true,tenantId=$.tenantId
+                apiRequest: {"RequestInfo":{"apiId":"org.egov.pt","ver":"1.0","ts":1502890899493,"action":"asd","did":"4354648646","key":"xyz","msgId":"654654","requesterId":"61","authToken":"d9994555-7656-4a67-ab3a-a952a0d4dfc8","userInfo":{"id":1,"uuid":"1fec8102-0e02-4d0a-b283-cd80d5dab067","type":"EMPLOYEE","tenantId":"pb.amritsar","roles":[{"name":"Employee","code":"EMPLOYEE","tenantId":"pb.amritsar"}]}}}
+                uriResponseMapping:
+                  - inJsonPath: $.ProcessInstances
+                    outJsonPath: $.Data.history
+                  - inJsonPath: $.ProcessInstances[0].state.uuid
+                    outJsonPath: $.Data.workflowStatusId
+                  - inJsonPath: $.ProcessInstances[0].state.applicationStatus
+                    outJsonPath: $.Data.workflowApplicationStatus
+                  - inJsonPath: $.ProcessInstances[0].assignes.*.uuid
+                    outJsonPath: $.Data.workflowAssigneeUuids
+
+    - topic: ptr-application-reindex
+      configKey: REINDEX
+      indexes:
+        - name: ptr-application-index
+          type: general
+          id: $.Data.id
+          isBulk: true
+          jsonPath: $.hits
+          timeStampField: $.Data.lastmodifiedtime
+          customJsonMapping:
+            indexMapping: {"Data":{}}
+            fieldMapping:
+              - inJsonPath: $.Data
+                outJsonPath: $.Data
+            externalUriMapping:
+              - path: http://localhost:8280/egov-workflow-v2/egov-wf/process/_search
+                queryParam: businessIds=$.Data.applicationNumber,latest=true,tenantId=$.Data.tenantId
+                apiRequest: {"RequestInfo":{"apiId":"org.egov.pt","ver":"1.0","ts":1502890899493,"action":"asd","did":"4354648646","key":"xyz","msgId":"654654","requesterId":"61","authToken":"d9994555-7656-4a67-ab3a-a952a0d4dfc8","userInfo":{"id":1,"uuid":"1fec8102-0e02-4d0a-b283-cd80d5dab067","type":"EMPLOYEE","tenantId":"pb.amritsar","roles":[{"name":"Employee","code":"EMPLOYEE","tenantId":"pb.amritsar"}]}}}
+                uriResponseMapping:
+                  - inJsonPath: $.ProcessInstances
+                    outJsonPath: $.Data.history
+                  - inJsonPath: $.ProcessInstances[0].state.uuid
+                    outJsonPath: $.Data.workflowStatusId
+                  - inJsonPath: $.ProcessInstances[0].state.applicationStatus
+                    outJsonPath: $.Data.workflowApplicationStatus
+                  - inJsonPath: $.ProcessInstances[0].assignes.*.uuid
+                    outJsonPath: $.Data.workflowAssigneeUuids

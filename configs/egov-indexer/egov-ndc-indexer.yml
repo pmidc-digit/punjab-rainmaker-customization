@@ -15,7 +15,8 @@ ServiceMaps:
             indexMapping: {"Data":{"uuid":"uuid","tenantId":"tenantId","owners":[],"applicationno":"applicationno",
                                    "applicationStatus":"applicationStatus","active":"active",
                                    "createdby":"createdby","lastmodifiedby":"lastmodifiedby","createdtime":"createdtime",
-                                   "lastmodifiedtime":"lastmodifiedtime","action":"action","details":[],"documents:[]","reason":"reason"}}
+                                   "lastmodifiedtime":"lastmodifiedtime","action":"action","details":[],"documents":[],"reason":"reason",
+                                   "workflowStatusId":"","workflowApplicationStatus":"","workflowAssigneeUuids":[],"history":[]}}
             fieldMapping:
               - inJsonPath: $.uuid
                 outJsonPath: $.Data.uuid
@@ -45,6 +46,19 @@ ServiceMaps:
                 outJsonPath: $.Data.documents
               - inJsonPath: $.reason
                 outJsonPath: $.Data.reason
+            externalUriMapping:
+              - path: http://egov-workflow-v2.egov:8080/egov-workflow-v2/egov-wf/process/_search
+                queryParam: businessIds=$.applicationNo,latest=true,tenantId=$.tenantId
+                apiRequest: {"RequestInfo":{"apiId":"org.egov.pt","ver":"1.0","ts":1502890899493,"action":"asd","did":"4354648646","key":"xyz","msgId":"654654","requesterId":"61","authToken":"d9994555-7656-4a67-ab3a-a952a0d4dfc8","userInfo":{"id":1,"uuid":"1fec8102-0e02-4d0a-b283-cd80d5dab067","type":"EMPLOYEE","tenantId":"pb.amritsar","roles":[{"name":"Employee","code":"EMPLOYEE","tenantId":"pb.amritsar"}]}}}
+                uriResponseMapping:
+                  - inJsonPath: $.ProcessInstances
+                    outJsonPath: $.Data.history
+                  - inJsonPath: $.ProcessInstances[0].state.uuid
+                    outJsonPath: $.Data.workflowStatusId
+                  - inJsonPath: $.ProcessInstances[0].state.applicationStatus
+                    outJsonPath: $.Data.workflowApplicationStatus
+                  - inJsonPath: $.ProcessInstances[0].assignes.*.uuid
+                    outJsonPath: $.Data.workflowAssigneeUuids
 
     - topic: update-ndc-application
       configKey: INDEX
@@ -59,7 +73,8 @@ ServiceMaps:
             indexMapping: { "Data": { "uuid": "uuid","tenantId": "tenantId","owners": [ ],"applicationno": "applicationno",
                                       "applicationStatus": "applicationStatus","active": "active",
                                       "createdby": "createdby","lastmodifiedby": "lastmodifiedby","createdtime": "createdtime",
-                                      "lastmodifiedtime": "lastmodifiedtime","action": "action","details": [ ],"documents:[]","reason": "reason" } }
+                                      "lastmodifiedtime": "lastmodifiedtime","action": "action","details": [ ],"documents":[],"reason": "reason",
+                                      "workflowStatusId":"","workflowApplicationStatus":"","workflowAssigneeUuids":[],"history":[] } }
             fieldMapping:
               - inJsonPath: $.uuid
                 outJsonPath: $.Data.uuid
@@ -89,6 +104,19 @@ ServiceMaps:
                 outJsonPath: $.Data.documents
               - inJsonPath: $.reason
                 outJsonPath: $.Data.reason
+            externalUriMapping:
+              - path: http://egov-workflow-v2.egov:8080/egov-workflow-v2/egov-wf/process/_search
+                queryParam: businessIds=$.applicationNo,latest=true,tenantId=$.tenantId
+                apiRequest: {"RequestInfo":{"apiId":"org.egov.pt","ver":"1.0","ts":1502890899493,"action":"asd","did":"4354648646","key":"xyz","msgId":"654654","requesterId":"61","authToken":"d9994555-7656-4a67-ab3a-a952a0d4dfc8","userInfo":{"id":1,"uuid":"1fec8102-0e02-4d0a-b283-cd80d5dab067","type":"EMPLOYEE","tenantId":"pb.amritsar","roles":[{"name":"Employee","code":"EMPLOYEE","tenantId":"pb.amritsar"}]}}}
+                uriResponseMapping:
+                  - inJsonPath: $.ProcessInstances
+                    outJsonPath: $.Data.history
+                  - inJsonPath: $.ProcessInstances[0].state.uuid
+                    outJsonPath: $.Data.workflowStatusId
+                  - inJsonPath: $.ProcessInstances[0].state.applicationStatus
+                    outJsonPath: $.Data.workflowApplicationStatus
+                  - inJsonPath: $.ProcessInstances[0].assignes.*.uuid
+                    outJsonPath: $.Data.workflowAssigneeUuids
 
     - topic: delete-ndc-application
       configKey: INDEX
@@ -125,7 +153,8 @@ ServiceMaps:
             indexMapping: { "Data": { "uuid": "uuid","tenantId": "tenantId","owners": [ ],"applicationno": "applicationno",
                                       "applicationStatus": "applicationStatus","active": "active",
                                       "createdby": "createdby","lastmodifiedby": "lastmodifiedby","createdtime": "createdtime",
-                                      "lastmodifiedtime": "lastmodifiedtime","action": "action","details": [ ],"documents:[]","reason": "reason" } }
+                                      "lastmodifiedtime": "lastmodifiedtime","action": "action","details": [ ],"documents":[],"reason": "reason",
+                                      "workflowStatusId":"","workflowApplicationStatus":"","workflowAssigneeUuids":[],"history":[] } }
             fieldMapping:
               - inJsonPath: $.uuid
                 outJsonPath: $.Data.uuid
@@ -155,3 +184,44 @@ ServiceMaps:
                 outJsonPath: $.Data.documents
               - inJsonPath: $.reason
                 outJsonPath: $.Data.reason
+            externalUriMapping:
+              - path: http://egov-workflow-v2.egov:8080/egov-workflow-v2/egov-wf/process/_search
+                queryParam: businessIds=$.applicationNo,latest=true,tenantId=$.tenantId
+                apiRequest: {"RequestInfo":{"apiId":"org.egov.pt","ver":"1.0","ts":1502890899493,"action":"asd","did":"4354648646","key":"xyz","msgId":"654654","requesterId":"61","authToken":"d9994555-7656-4a67-ab3a-a952a0d4dfc8","userInfo":{"id":1,"uuid":"1fec8102-0e02-4d0a-b283-cd80d5dab067","type":"EMPLOYEE","tenantId":"pb.amritsar","roles":[{"name":"Employee","code":"EMPLOYEE","tenantId":"pb.amritsar"}]}}}
+                uriResponseMapping:
+                  - inJsonPath: $.ProcessInstances
+                    outJsonPath: $.Data.history
+                  - inJsonPath: $.ProcessInstances[0].state.uuid
+                    outJsonPath: $.Data.workflowStatusId
+                  - inJsonPath: $.ProcessInstances[0].state.applicationStatus
+                    outJsonPath: $.Data.workflowApplicationStatus
+                  - inJsonPath: $.ProcessInstances[0].assignes.*.uuid
+                    outJsonPath: $.Data.workflowAssigneeUuids
+
+    - topic: ndc-application-reindex
+      configKey: REINDEX
+      indexes:
+        - name: ndc-application
+          type: general
+          id: $.Data.uuid
+          isBulk: true
+          jsonPath: $.hits
+          timeStampField: $.Data.lastmodifiedtime
+          customJsonMapping:
+            indexMapping: {"Data":{}}
+            fieldMapping:
+              - inJsonPath: $.Data
+                outJsonPath: $.Data
+            externalUriMapping:
+              - path: http://egov-workflow-v2.egov:8080/egov-workflow-v2/egov-wf/process/_search
+                queryParam: businessIds=$.Data.applicationno,latest=true,tenantId=$.Data.tenantId
+                apiRequest: {"RequestInfo":{"apiId":"org.egov.pt","ver":"1.0","ts":1502890899493,"action":"asd","did":"4354648646","key":"xyz","msgId":"654654","requesterId":"61","authToken":"d9994555-7656-4a67-ab3a-a952a0d4dfc8","userInfo":{"id":1,"uuid":"1fec8102-0e02-4d0a-b283-cd80d5dab067","type":"EMPLOYEE","tenantId":"pb.amritsar","roles":[{"name":"Employee","code":"EMPLOYEE","tenantId":"pb.amritsar"}]}}}
+                uriResponseMapping:
+                  - inJsonPath: $.ProcessInstances
+                    outJsonPath: $.Data.history
+                  - inJsonPath: $.ProcessInstances[0].state.uuid
+                    outJsonPath: $.Data.workflowStatusId
+                  - inJsonPath: $.ProcessInstances[0].state.applicationStatus
+                    outJsonPath: $.Data.workflowApplicationStatus
+                  - inJsonPath: $.ProcessInstances[0].assignes.*.uuid
+                    outJsonPath: $.Data.workflowAssigneeUuids
