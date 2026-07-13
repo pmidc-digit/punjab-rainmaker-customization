@@ -10,108 +10,108 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
       - name: applicationnumber
-        label: applicationnumber
+        label: Application Number
         type: string
         source: ptr
         total: false
       - name: name
-        label: name
+        label: Name
         type: string
         source: ptr
         total: false
       - name: mobilenumber
-        label: mobilenumber
+        label: Mobile Number
         type: string
         source: ptr
         total: false
       - name: petname
-        label: petname
+        label: Pet Name
         type: string
         source: ptr
         total: false
       - name: pettype
-        label: pettype
+        label: Pet Type
         type: string
         source: ptr
         total: false
       - name: petgender
-        label: petgender
+        label: Pet Gender
         type: string
         source: ptr
         total: false
       - name: petage
-        label: petage
+        label: Pet Age
         type: string
         source: ptr
         total: false
       - name: petcolor
-        label: petcolor
+        label: Pet Color
         type: string
         source: ptr
         total: false
       - name: breedtype
-        label: breedtype
+        label: Breed Type
         type: string
         source: ptr
         total: false
       - name: identificationmark
-        label: identificationmark
+        label: Identification Mark
         type: string
         source: ptr
         total: false
       - name: vaccinationnumber
-        label: vaccinationnumber
+        label: Vaccination Number
         type: string
         source: ptr
         total: false
       - name: doctorname
-        label: doctorname
+        label: Doctor Name
         type: string
         source: ptr
         total: false
       - name: clinicname
-        label: clinicname
+        label: Clinic Name
         type: string
         source: ptr
         total: false
       - name: status
-        label: status
+        label: Status
         type: string
         source: ptr
         total: false
       - name: assignee_employee
-        label: assignee_employee
+        label: Assignee Employee
         type: string
         source: ptr
         total: false
       - name: assignee_code
-        label: assignee_code
+        label: Assignee Code
         type: string
         source: ptr
         total: false
     searchParams:
       - name: applicationtype
-        label: applicationtype
+        label: Application Type
         type: singlevaluelist
         pattern: list://NEWAPPLICATION:NEWAPPLICATION,RENEWAPPLICATION:RENEWAPPLICATION
         source: ptr
         isMandatory: true
         searchClause: AND r.applicationtype = $applicationtype
       - name: status
-        label: status
+        label: Status
         type: singlevaluelist
         pattern: list://INITIATED:INITIATED,DOCUMENTVERIFY:DOCUMENTVERIFY,PENDINGAPPROVAL:PENDINGAPPROVAL,PENDINGPAYMENT:PENDINGPAYMENT,APPROVED:APPROVED,REJECTED:REJECTED,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
         source: ptr
         isMandatory: false
         searchClause: AND r.status = $status
       - name: fromDate
-        label: fromDate
+        label: From Date
         type: epoch
         source: ptr
         isMandatory: true
         searchClause: AND r.createdtime >= $fromDate
       - name: toDate
-        label: toDate
+        label: To Date
         type: epoch
         source: ptr
         isMandatory: true
@@ -143,7 +143,7 @@ ReportDefinitions:
            LEFT JOIN eg_user AS u ON u.uuid = o.uuid
            LEFT JOIN current_holder ch ON ch.applicationnumber = r.applicationnumber
             WHERE  r.tenantid = $tenantid
-            
+
   - reportName: CollectionsReport
     decryptionPathId: PETREPORTS
     summary: Collections
@@ -154,95 +154,97 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
       - name: applicationno
-        label: applicationno
+        label: Application Number
         type: string
         source: ptr
         total: false
       - name: name
-        label: name
+        label: Name
         type: string
         source: ptr
         total: false
       - name: mobilenumber
-        label: mobilenumber
+        label: Mobile Number
         type: string
         source: ptr
         total: false
       - name: businessservice
-        label: businessservice
+        label: Business Service
         type: string
         source: ptr
         total: false
       - name: status
-        label: status
+        label: Status
         type: string
         source: ptr
         total: false
       - name: collector_code
-        label: collector_code
+        label: Collector Code
         type: string
         source: ptr
         total: false
       - name: cash_amount
-        label: cash_amount
+        label: Cash Amount
         type: string
         source: ptr
         total: true
       - name: cheque_amount
-        label: cheque_amount
+        label: Cheque Amount
         type: string
         source: ptr
         total: true
       - name: card_amount
-        label: card_amount
+        label: Card Amount
         type: string
         source: ptr
         total: true
       - name: dd_amount
-        label: dd_amount
+        label: DD Amount
         type: string
         source: ptr
         total: true
       - name: neft_amount
-        label: neft_amount
+        label: NEFT Amount
         type: string
         source: ptr
         total: true
       - name: rtgs_amount
-        label: rtgs_amount
+        label: RTGS Amount
         type: string
         source: ptr
         total: true
       - name: online_amount
-        label: online_amount
+        label: Online Amount
         type: string
         source: ptr
         total: true
       - name: amountpaid
-        label: amountpaid
+        label: Amount Paid
         type: string
         source: ptr
         total: true
       - name: PaymentDate
-        label: PaymentDate
+        label: Payment Date
         type: string
         source: ptr
         total: false
     searchParams:
-      - name: collector_code
-        label: collector_code
-        type: string
+      - name: collectorname
+        label: Collector Name
+        type: singlevaluelist
+        pattern: http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=PET_REG_EMPLOYEE|$.Employees[*].user.id|$.Employees[*].user.name
         source: ptr
+        wrapper: true
         isMandatory: false
-        searchClause: AND collector_code = $collector_code
+        searchClause: AND id = $collectorname::INTEGER
       - name: fromDate
-        label: fromDate
+        label: From Date
         type: epoch
         source: ptr
         isMandatory: true
         searchClause: AND createdtime >= $fromDate
       - name: toDate
-        label: toDate
+        label: To Date
         type: epoch
         source: ptr
         isMandatory: true
@@ -281,7 +283,7 @@ ReportDefinitions:
                  r.applicationnumber AS applicationno,
                  r.status,
                 'pet-services' AS businessservice,
-                 u_cust.name AS name,
+                 u_cust.name AS name,u.id,
                  u_cust.mobilenumber AS mobilenumber,
                  ch.employee_name AS assignee_employee,
                  ch.assignee_code AS assignee_code
@@ -300,13 +302,13 @@ ReportDefinitions:
               )
           SELECT 
              applicationno,name,mobilenumber,businessservice,status,collector_code,
-             assignee_code,cash_amount,cheque_amount,card_amount,
+             assignee_code,cash_amount,cheque_amount,card_amount,id,
              dd_amount,neft_amount,rtgs_amount,online_amount,amountpaid,
              TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS "PaymentDate"
            FROM unique_transactions
            WHERE 1 = 1
     orderby: ORDER BY createdtime DESC;
-    
+
   - reportName: SLAReport
     decryptionPathId: PETREPORTS
     summary: Sla report for ptr service
@@ -317,7 +319,7 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
       - name: tenantid
-        label: tenantid
+        label: ULB
         type: string
         source: ptr
         total: false
@@ -332,44 +334,44 @@ ReportDefinitions:
         source: ptr
         total: false
       - name: documentverify_on
-        label: documentverify_on
+        label: document verify on
         type: string
         source: ptr
         total: false
       - name: finalstatus_on
-        label: finalstatus_on
+        label: final status on
         type: string
         source: ptr
         total: false
       - name: sla_days
-        label: sla_days
+        label: SLA Days
         type: string
         source: ptr
         total: false
       - name: sla_status
-        label: sla_status
+        label: SLA Status
         type: string
         source: ptr
         total: false
       - name: assigned_employee_name
-        label: assigned_employee_name
+        label: Assigned Employee Name
         type: string
         source: ptr
         total: false
       - name: assigned_employee_code
-        label: assigned_employee_code
+        label: Assigned Employee Code
         type: string
         source: ptr
         total: false
     searchParams:
       - name: fromDate
-        label: fromDate
+        label: From Date
         type: epoch
         source: ptr
         isMandatory: true
         searchClause: AND ptr.createdtime >= $fromDate
       - name: toDate
-        label: toDate
+        label: To Date
         type: epoch
         source: ptr
         isMandatory: true
@@ -450,8 +452,8 @@ ReportDefinitions:
          JOIN sla_data sla ON 'ptr' = sla.businessservice
          LEFT JOIN assignee_details ae ON ptr.applicationnumber = ae.businessid
          WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY', 'INITIATED', 'PENDINGPAYMENT')
-    orderby: ORDER BY ptr.createdtime DESC, tenantid, ls.applicationstatus; 
-    
+    orderby: ORDER BY ptr.createdtime DESC, tenantid, ls.applicationstatus;
+
   - reportName: ReceiptRegisterPET
     decryptionPathId: PETREPORTS
     summary: Details of collector register in pet service
@@ -462,101 +464,96 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
     - name: receiptno
-      label: receiptno
+      label: Receipt Number
       type: string
       source: ptr
       total: false
     - name: connectionno
-      label: connectionno
+      label: Connection Number
       type: string
       source: ptr
       total: false
     - name: receiptdate1
-      label: receiptdate1
+      label: Receipt Date
       type: string
       source: ptr
       total: false
     - name: service
-      label: service
+      label: Service
       type: string
       source: ptr
       total: false
     - name: collectorname
-      label: collectorname
+      label: Collector Name
       type: string
       source: ptr
       total: false
     - name: transactiondate
-      label: transactiondate
+      label: Transaction date
       type: string
       source: ptr
       total: false
     - name: instrumentnumber
-      label: instrumentnumber
+      label: Instrument number
       type: string
       source: ptr
       total: false
     - name: payername
-      label: payername
+      label: Payer name
       type: string
       source: ptr
       total: false
     - name: amountpaid
-      label: amountpaid
+      label: Amount paid
       type: string
       source: ptr
       total: false
     - name: paymentmode
-      label: paymentmode
+      label: Payment mode
       type: string
       source: ptr
       total: false
     - name: paymentstatus
-      label: paymentstatus
+      label: Payment status
       type: string
       source: ptr
       total: false
     - name: ownername1
-      label: ownername1
-      type: string
-      source: ptr
-      total: false
-    - name: user
-      label: user
+      label: Owner name
       type: string
       source: ptr
       total: false
     - name: manualreceiptnumber
-      label: manualreceiptnumber
+      label: Manual receipt number
       type: string
       source: ptr
       total: false
     - name: manualreceiptdate
-      label: manualreceiptdate
+      label: Manual receipt date
       type: string
       source: ptr
       total: false
     searchParams:
     - name: fromDate
-      label: fromDate
+      label: From Date
       type: epoch
       source: ptr
       isMandatory: true
       searchClause: AND pd.receiptdate >= $fromDate
     - name: toDate
-      label: toDate
+      label: To Date
       type: epoch
       source: ptr
       isMandatory: true
       searchClause: AND pd.receiptdate <= $toDate
     - name: receiptno
-      label: receiptno
+      label: Receipt Number
       type: string
       source: ptr
       isMandatory: false
       searchClause: AND pd.receiptnumber like $receiptno
     - name: paymentMode
-      label: paymentMode
+      label: Payment Mode
       type: singlevaluelist
       pattern: 'list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT'
       source: ptr
@@ -592,7 +589,7 @@ ReportDefinitions:
               bill.tenantid = $tenantid
               AND pd.businessservice = 'pet-services'
               AND payment.paymentstatus != 'CANCELLED'
-    orderby: ORDER BY pd.receiptdate DESC;  
+    orderby: ORDER BY pd.receiptdate DESC;
 
   - reportName: DefaulterReport
     decryptionPathId: PETREPORTS
@@ -632,7 +629,7 @@ ReportDefinitions:
         label: breedtype
         type: string
         source: ptr
-        total: false 
+        total: false
       - name: validitydate
         label: validitydate
         type: string
@@ -843,7 +840,7 @@ ReportDefinitions:
            LEFT JOIN eg_user AS u ON u.uuid = o.uuid
            LEFT JOIN current_holder ch ON ch.applicationnumber = r.applicationnumber
             WHERE  1=1 and r.tenantid not in ('pb.testing')
-            
+
   - reportName: StateCollectionsReport
     decryptionPathId: STATEPETREPORTS
     summary: Collections
@@ -1015,7 +1012,7 @@ ReportDefinitions:
            FROM unique_transactions
            WHERE 1 = 1 and tenantid not in ('pb.testing')
     orderby: ORDER BY createdtime DESC;
-    
+
   - reportName: StateSLAReport
     decryptionPathId: STATEPETREPORTS
     summary: Sla report for ptr service
@@ -1165,8 +1162,8 @@ ReportDefinitions:
          LEFT JOIN assignee_details ae ON ptr.applicationnumber = ae.businessid
          WHERE UPPER(ls.applicationstatus) NOT IN ('APPLY', 'INITIATED', 'PENDINGPAYMENT')
           and tenantid not in ('pb.testing')
-    orderby: ORDER BY ptr.createdtime DESC, tenantid, ls.applicationstatus; 
-    
+    orderby: ORDER BY ptr.createdtime DESC, tenantid, ls.applicationstatus;
+
   - reportName: StateReceiptRegisterPET
     decryptionPathId: STATEPETREPORTS
     summary: Details of collector register in pet service
@@ -1320,7 +1317,7 @@ ReportDefinitions:
               pd.businessservice = 'pet-services'
               AND payment.paymentstatus != 'CANCELLED'
               and payment.tenantid not in ('pb.testing')
-    orderby: ORDER BY pd.receiptdate DESC;  
+    orderby: ORDER BY pd.receiptdate DESC;
 
   - reportName: StateDefaulterReport
     decryptionPathId: STATEPETREPORTS
@@ -1365,7 +1362,7 @@ ReportDefinitions:
         label: breedtype
         type: string
         source: ptr
-        total: false 
+        total: false
       - name: validitydate
         label: validitydate
         type: string
