@@ -1408,3 +1408,73 @@ SearchDefinitions:
           Bills: []
         outJsonPath: $.Bills
         responseInfoPath: $.ResponseInfo
+    - name: waterbillscount
+      isCustomerRowMapEnabled: true
+      rowMapperKey: billsearch
+      query:
+        baseQuery: >-
+          with bill_data as ( 
+           SELECT 
+              b.createddate AS b_createddate,
+              bd.consumercode AS bd_consumercode
+            FROM egbs_bill_v1 b 
+            INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid and bd.totalamount > 0 and b.status = 'ACTIVE'
+            INNER JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid
+            INNER JOIN eg_ws_connection conn ON bd.consumercode = conn.connectionno
+            INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid and pt.status <> 'INACTIVE'
+            INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id 
+            INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id and ptown.status <> 'INACTIVE'
+            LEFT JOIN ( SELECT connectionno, ROW_NUMBER() OVER (PARTITION BY connectionno ORDER BY createdtime DESC) rn FROM eg_ws_meterreading ) lm ON lm.connectionno = conn.connectionno AND lm.rn = 1
+            $where conn.status='Active'
+            ),
+           latest_bills as (
+            select bd_consumercode, max(b_createddate) as maxcreateddate 
+            from bill_data 
+            group by bd_consumercode
+            )
+            select COUNT(DISTINCT bd.bd_consumercode) as total_count 
+            from bill_data bd
+            inner join latest_bills lb ON lb.maxcreateddate = bd.b_createddate AND lb.bd_consumercode = bd.bd_consumercode
+      searchParams:
+        condition: AND
+        params:
+          - name: b.tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+          - name: bd.consumercode
+            isMandatory: false
+            jsonPath: $.searchCriteria.consumerCode
+            operator: =
+          - name: bd.businessservice
+            isMandatory: false
+            jsonPath: $.searchCriteria.businesService
+          - name: b.mobilenumber
+            isMandatory: false
+            jsonPath: $.searchCriteria.mobileNumber
+          - name: bd.billno
+            isMandatory: false
+            operator: =
+            jsonPath: $.searchCriteria.billNo
+          - name: ptadd.locality
+            isMandatory: false
+            jsonPath: $.searchCriteria.locality
+          - name: fromperiod
+            isMandatory: false
+            jsonPath: $.searchCriteria.fromPeriod
+            operator: LE
+          - name: toperiod
+            isMandatory: false
+            jsonPath: $.searchCriteria.toPeriod
+            operator: GE
+          - name: b.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.billActive
+          - name: conn.property_id
+            isMandatory: false
+            jsonPath: $.searchCriteria.propertyId
+      output:
+        jsonFormat:
+          ResponseInfo: {}
+          Bills: []
+        outJsonPath: $.Bills
+        responseInfoPath: $.ResponseInfo
