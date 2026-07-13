@@ -546,6 +546,14 @@ ReportDefinitions:
       source: ptr
       isMandatory: true
       searchClause: AND pd.receiptdate <= $toDate
+    - name: collectorname
+      label: Collector Name
+      type: singlevaluelist
+      pattern: http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=PET_REG_EMPLOYEE|$.Employees[*].user.id|$.Employees[*].user.name
+      source: ptr
+      wrapper: true
+      isMandatory: false
+      searchClause: AND usr.id = $collectorname::INTEGER
     - name: receiptno
       label: Receipt Number
       type: string
