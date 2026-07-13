@@ -1470,7 +1470,9 @@ ReportDefinitions:
       ) ndc ON t.tenantid = ndc.tenantid
       
       LEFT JOIN (
-          SELECT tenantid, COUNT(*) AS count FROM eg_ptr_registration GROUP BY tenantid
+          SELECT tenantid, COUNT(*) AS count FROM eg_ptr_registration 
+      where applicationnumber like 'PB-%'
+      GROUP BY tenantid
       ) ptr ON t.tenantid = ptr.tenantid
       
       LEFT JOIN (
@@ -1487,7 +1489,8 @@ ReportDefinitions:
       
       LEFT JOIN (
           SELECT tenant_id, COUNT(*) AS count FROM eg_rl_allotment GROUP BY tenant_id
-      ) rl ON t.tenantid = rl.tenant_id; 
+      ) rl ON t.tenantid = rl.tenant_id
+      WHERE t.tenantid != 'pb.testing'; 
 
   - reportName: ApplicationSearchByID
     decryptionPathId: NDCAPPLICATION
