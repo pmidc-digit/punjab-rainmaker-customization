@@ -22,7 +22,7 @@ SearchDefinitions:
             from eg_noc as noc
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = noc.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
-            INNER JOIN eg_noc_owner ownerinfo ON ownerinfo.nocid = noc.id
+            LEFT JOIN eg_noc_owner owner ON owner.nocid = noc.id
             $where 
             AND pi.latest = TRUE
             order by noc.createdtime asc
@@ -61,9 +61,14 @@ SearchDefinitions:
           - name: noc.accountid
             isMandatory: false
             jsonPath: $.searchCriteria.accountId
-          - name: ownerinfo.uuid
+          - name: noc.createdby
             isMandatory: false
             jsonPath: $.searchCriteria.userid
+            operator: IN
+          - name: owner.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.ownerUuid
+            operator: IN
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -80,7 +85,7 @@ SearchDefinitions:
             from eg_noc as noc
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = noc.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
-            INNER JOIN eg_noc_owner ownerinfo ON ownerinfo.nocid = noc.id
+            LEFT JOIN eg_noc_owner owner ON owner.nocid = noc.id
             $where
             AND pi.latest = TRUE
           ) result
@@ -117,9 +122,14 @@ SearchDefinitions:
           - name: noc.accountid
             isMandatory: false
             jsonPath: $.searchCriteria.accountId
-          - name: ownerinfo.uuid
+          - name: noc.createdby
             isMandatory: false
             jsonPath: $.searchCriteria.userid
+            operator: IN
+          - name: owner.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.ownerUuid
+            operator: IN
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -147,7 +157,7 @@ SearchDefinitions:
             from eg_noc as noc
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = noc.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
-            INNER JOIN eg_noc_owner ownerinfo ON ownerinfo.nocid = noc.id
+            LEFT JOIN eg_noc_owner owner ON owner.nocid = noc.id
             $where
             AND pi.latest = TRUE
             order by noc.createdtime desc
@@ -186,12 +196,58 @@ SearchDefinitions:
           - name: noc.accountid
             isMandatory: false
             jsonPath: $.searchCriteria.accountId
-          - name: ownerinfo.uuid
+          - name: noc.createdby
             isMandatory: false
             jsonPath: $.searchCriteria.userid
+            operator: IN
+          - name: owner.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.ownerUuid
+            operator: IN
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
+      output:
+        jsonFormat: {"ResponseInfo": {},"Noc": []}
+        outJsonPath: $.Noc
+        responseInfoPath: $.ResponseInfo
+
+    - name: inboxnoccitizentenantwiseapplnsearch
+      query:
+        baseQuery: |
+          Select row_to_json(result) from (
+            select noc.tenantid, noc.applicationno, pi.status as status_id
+            from eg_noc as noc
+            INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = noc.applicationno
+            LEFT JOIN eg_noc_owner owner ON owner.nocid = noc.id
+            $where
+            AND pi.latest = TRUE
+            GROUP BY noc.tenantid, noc.applicationno, pi.status
+          ) result
+        groupBy:
+        orderBy:
+      searchParams:
+        condition: AND
+        params:
+          - name: noc.tenantid
+            isMandatory: true
+            operator: ILIKE
+            jsonPath: $.searchCriteria.tenantId
+          - name: noc.createdby
+            isMandatory: false
+            jsonPath: $.searchCriteria.userid
+            operator: IN
+          - name: owner.uuid
+            isMandatory: false
+            jsonPath: $.searchCriteria.ownerUuid
+            operator: IN
+          - name: pi.businessservice
+            isMandatory: false
+            jsonPath: $.searchCriteria.businessservice
+          - name: pi.status
+            isMandatory: false
+            jsonPath: $.searchCriteria.status
+            operator: IN
       output:
         jsonFormat: {"ResponseInfo": {},"Noc": []}
         outJsonPath: $.Noc
