@@ -1481,3 +1481,254 @@ ReportDefinitions:
          WHERE 1=1 
   groupby: GROUP BY u.district, u.name_of_ulb,ub.applicationstatus,ub.uuid
   orderby: ORDER BY u.district, u.name_of_ulb ,ub.applicationstatus,ub.uuid DESC   
+  
+- reportName: Transactions_Summary_Layout_Report
+  summary: Transaction detail for Layout Module 
+  version: 1.0.0
+  moduleName: rainmaker-obpas_layout
+  additionalConfig:
+    print:
+      pdfPageSize: A4
+
+  sourceColumns:
+  - name: service_code
+    label: Service Code
+    type: string
+    source: obpas_layout
+    total: false
+  - name: module_name
+    label: Module Name
+    type: string
+    source: obpas_layout
+    total: false
+  - name: gateway
+    label: Gateway
+    type: string
+    source: obpas_layout
+    total: false
+  - name: bank_name
+    label: Bank Name
+    type: string
+    source: obpas_layout
+    total: false 
+  - name: ulb_name
+    label: ULB Name
+    type: string
+    source: obpas_layout
+    total: false
+  - name: ulb_type
+    label: ULB Type
+    type: string
+    source: obpas_layout
+    total: false
+  - name: application_number
+    label: Application Number
+    type: string
+    source: obpas_layout
+    total: false 
+  - name: applicant_name
+    label: Applicant Name
+    type: string
+    source: obpas_layout
+    total: false
+  - name: mobile_number
+    label: Mobile Number
+    type: string
+    source: obpas_layout
+    total: false
+  - name: service_label
+    label: Service Label
+    type: string
+    source: obpas_layout
+    total: false
+  - name: transaction_id
+    label: Transaction ID
+    type: string
+    source: obpas_layout
+    total: false
+  - name: transaction_amount
+    label: Transaction Amount
+    type: string
+    source: obpas_layout
+    total: true
+  - name: created_date
+    label: Created Date
+    type: string
+    source: obpas_layout
+    total: false  
+  - name: transaction_status
+    label: Transaction Status
+    type: string
+    source: obpas_layout
+    total: false
+  - name: year
+    label: Year
+    type: string
+    source: obpas_layout
+    total: false
+  - name: month
+    label: Month
+    type: string
+    source: obpas_layout
+    total: false
+  - name: financial_year
+    label: Financial Year
+    type: string
+    source: obpas_layout
+    total: false
+  - name: financial_month
+    label: Financial Month
+    type: string
+    source: obpas_layout
+    total: false
+  - name: status_of_application
+    label: Application Status
+    type: string
+    source: obpas_layout
+    total: false 
+  - name: pay1_layout_processing_fee
+    label: Processing Fees
+    type: string
+    source: obpas_layout
+    total: true
+  - name: pay1_layout_pf_fee
+    label: PF Fees
+    type: string
+    source: obpas_layout
+    total: true
+  - name: pay1_layout_scrutiny_fee
+    label: Scrutiny Fees
+    type: string
+    source: obpas_layout
+    total: true
+  - name: pay2_layout_layout_fee
+    label: Layout Fees
+    type: string
+    source: obpas_layout
+    total: true 
+  - name: pay2_layout_clu_fee
+    label: CLU Charges
+    type: string
+    source: obpas_layout
+    total: true
+  - name: pay2_layout_edc_fee
+    label: EDC Fees
+    type: string
+    source: obpas_layout
+    total: true
+  - name: pay2_layout_udc_fee
+    label: UDC 2 Fees
+    type: string
+    source: obpas_layout
+    total: true 
+  - name: layout_other_charges_1
+    label: Other 1 Charges
+    type: string
+    source: obpas_layout
+    total: true
+  - name: layout_other_charges_2
+    label: Other 2 Charges
+    type: string
+    source: obpas_layout
+    total: true     
+  searchParams:
+  - name: fromDate
+    label: From Date
+    type: epoch
+    source: obpas_layout
+    isMandatory: false
+    searchClause: AND pg.created_time >= $fromDate
+  - name: toDate
+    label: To Date
+    type: epoch
+    source: obpas_layout
+    isMandatory: false
+    searchClause: AND pg.created_time <= $toDate
+  - name: ulb
+    label: ULB Name
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_noc
+    wrapper: true
+    isMandatory: false
+    searchClause: AND bpa.tenantid = $ulb
+  - name: ulbtype
+    label: ULB Type
+    type: string
+    pattern: 'list://Municipal Corporation:Municipal Corporation,Nagar Panchayat:Nagar Panchayat,Municipal Council:Municipal Council,Improvement Trust: Improvement Trust'
+    source: obpas_layout
+    isMandatory: false
+    searchClause: AND pg.additional_details->>'ulbType' = $ulbtype
+
+  query: |
+      SELECT 
+      CASE 
+        WHEN bd.businessservice IN ('LAYOUT.PAY1', 'LAYOUT.PAY2') THEN '105'
+        ELSE bd.businessservice 
+        END AS service_code,
+      'Layout' AS module_name,
+       pg.txn_id AS transaction_id,pg.txn_amount AS transaction_amount,  pg.gateway, 'Axis' AS bank_name, 
+      CASE 
+        WHEN pg.txn_status = 'SUCCESS' THEN 'Success'
+        WHEN pg.txn_status = 'FAILURE' THEN 'Failure'
+        ELSE INITCAP(pg.txn_status) 
+      END AS transaction_status,
+      pg.tenant_id AS ulb_code,  INITCAP(SPLIT_PART(pg.tenant_id, '.', 2)) AS tenant_id, pg.additional_details->>'ulbName' AS ulb_name,
+      pg.additional_details->>'ulbType' AS ulb_type, pg.consumer_code AS application_number, pg.name AS applicant_name, pg.mobile_number, 
+      CASE 
+        WHEN bd.businessservice = 'LAYOUT.PAY1' THEN 'Layout Pay 1'
+        WHEN bd.businessservice = 'LAYOUT.PAY2' THEN 'Layout Pay 2'
+        ELSE bd.businessservice 
+       END AS service_label,
+      TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date,
+      TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') AS year,
+      TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'Month') AS month,
+      CASE 
+        WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000)) >= 4 
+        THEN TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) + INTERVAL '1 year', 'YY')
+        ELSE TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) - INTERVAL '1 year', 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YY')
+        END AS financial_year,
+      TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'MM') AS financial_month,
+      CASE lay.applicationstatus
+        WHEN 'PENDING_APPL_FEE' THEN 'Pending Application Fee'
+        WHEN 'CITIZEN_APPROVAL_PENDING' THEN 'Pending Citizen Approval'
+        WHEN 'SEND_TO_CITIZEN' THEN 'Sent back to Citizen'
+        WHEN 'INPROGRESS' THEN 'In Progress'
+        WHEN 'PENDING_APPL_FEE_PAYMENT' THEN 'Pending Application Fee Payment'
+        WHEN 'DOC_VERIFICATION_PENDING' THEN 'Document Verification Pending'
+        WHEN 'FIELDINSPECTION_PENDING' THEN 'Field Inspection Pending'
+        WHEN 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In-Progress'
+        WHEN 'NOC_VERIFICATION_PENDING' THEN 'NOC Verification Pending'
+        WHEN 'PENDINGAPPROVAL' THEN 'Pending Final Approval'
+        WHEN 'PENDING_SANC_FEE_PAYMENT' THEN 'Pending Sanction Fee Payment'
+        WHEN 'APPROVED' THEN 'Approved'
+        WHEN 'REJECTED' THEN 'Rejected'
+        WHEN 'LEVEL3_VERIFICATION_PENDING' THEN 'L3 Verification Pending'
+        WHEN 'LEVEL4_VERIFICATION_PENDING' THEN 'L4 Verification Pending'
+        WHEN 'JC_VERIFICATION_PENDING' THEN 'JC Verification Pending'
+        WHEN 'MC_VERIFICATION_PENDING' THEN 'MC Verification Pending'
+        WHEN 'ATPHQ_APPROVAL_PENDING' THEN 'ATP HQ Approval Pending'
+        WHEN 'PENDINGINITIALVERIFICATION' THEN 'Pending Initial Verification'
+        ELSE REPLACE(INITCAP(REPLACE(lay.status, '_', ' ')), ' ', ' ')
+      END AS status_of_application,
+      lay.applicationtype AS category,
+      CASE WHEN bd.businessservice = 'LAYOUT.PAY1' THEN pg.txn_id END AS pay1_transaction_id,
+      CASE WHEN bd.businessservice = 'LAYOUT.PAY1' THEN pg.txn_amount ELSE 0.00 END AS pay1_transaction_amount,
+      COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'LAYOUT.PAY1' AND dd_sub.taxheadcode = 'LAYOUT_PROCESSING_FEE'), 0) AS pay1_layout_processing_fee,
+      COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'LAYOUT.PAY1' AND dd_sub.taxheadcode = 'LAYOUT_PF_FEE'), 0) AS pay1_layout_pf_fee,
+      COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'LAYOUT.PAY1' AND dd_sub.taxheadcode = 'LAYOUT_SCRUTINY_FEE'), 0) AS pay1_layout_scrutiny_fee,
+      CASE WHEN bd.businessservice = 'LAYOUT.PAY2' THEN pg.txn_id END AS pay2_transaction_id,
+      CASE WHEN bd.businessservice = 'LAYOUT.PAY2' THEN pg.txn_amount ELSE 0.00 END AS pay2_transaction_amount,
+      COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'LAYOUT.PAY2' AND dd_sub.taxheadcode = 'LAYOUT_LAYOUT_FEE'), 0) AS pay2_layout_layout_fee,
+      COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'LAYOUT.PAY2' AND dd_sub.taxheadcode = 'LAYOUT_CLU_FEE'), 0) AS pay2_layout_clu_fee,
+      COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'LAYOUT.PAY2' AND dd_sub.taxheadcode = 'LAYOUT_EDC_FEE'), 0) AS pay2_layout_edc_fee,
+      COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'LAYOUT.PAY2' AND dd_sub.taxheadcode = 'LAYOUT_UDC_FEE'), 0) AS pay2_layout_udc_fee,
+      COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND dd_sub.taxheadcode = 'LAYOUT_OTHERCHARGES1_FEE'), 0) AS layout_other_charges_1,
+      COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND dd_sub.taxheadcode = 'LAYOUT_OTHERCHARGES2_FEE'), 0) AS layout_other_charges_2
+      FROM eg_pg_transactions pg 
+      INNER JOIN egbs_bill_v1 bill ON bill.id = pg.bill_id
+      INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
+      LEFT JOIN eg_layout lay ON pg.consumer_code = lay.applicationno AND pg.tenant_id = lay.tenantid
+      WHERE bd.businessservice IN ('LAYOUT.PAY1', 'LAYOUT.PAY2') 
+      AND pg.tenant_id != 'pb.testing'
+  orderby: ORDER BY application_number, created_date;
