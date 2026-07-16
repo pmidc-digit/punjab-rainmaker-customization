@@ -2190,10 +2190,10 @@ ReportDefinitions:
       SELECT 
       CASE 
         WHEN bd.businessservice = 'obpas_noc' THEN 102
-        WHEN bd.businessservice IN ('CLU.PAY1', 'CLU.PAY2') THEN 103
-        WHEN bd.businessservice = 'BPAREG' THEN 108
-        WHEN bd.businessservice LIKE '%LAYOUT%' THEN 105 
-        WHEN bd.businessservice LIKE 'BPA%' THEN 101
+        WHEN bd.businessservice IN ('CLU.PAY1', 'CLU.PAY2') THEN '103'
+        WHEN bd.businessservice = 'BPAREG' THEN '108'
+        WHEN bd.businessservice LIKE '%LAYOUT%' THEN '105' 
+        WHEN bd.businessservice LIKE 'BPA%' THEN '101'
         ELSE bd.businessservice 
       END AS service_code,
       CASE 
@@ -2479,8 +2479,8 @@ ReportDefinitions:
   query: |
       SELECT 
       CASE 
-        WHEN bd.businessservice = 'BPA.NC_APP_FEE' THEN 101
-        WHEN bd.businessservice = 'BPA.NC_SAN_FEE' THEN 101 
+        WHEN bd.businessservice = 'BPA.NC_APP_FEE' THEN '101'
+        WHEN bd.businessservice = 'BPA.NC_SAN_FEE' THEN '101'
         ELSE bd.businessservice 
       END AS service_code,
       'BPA' AS module_name, pg.txn_id AS transaction_id, pg.txn_amount AS transaction_amount,
