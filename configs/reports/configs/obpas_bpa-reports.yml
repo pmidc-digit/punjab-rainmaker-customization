@@ -2320,7 +2320,7 @@ ReportDefinitions:
     label: Transaction ID
     type: string
     source: obpas_bpa
-    total: true
+    total: false
   - name: transaction_amount
     label: Transaction Amount
     type: string
@@ -2340,7 +2340,7 @@ ReportDefinitions:
     label: Year
     type: string
     source: obpas_bpa
-    total: true
+    total: false
   - name: month
     label: Month
     type: string
@@ -2475,6 +2475,21 @@ ReportDefinitions:
     source: obpas_bpa
     isMandatory: false
     searchClause: AND pg.created_time <= $toDate
+  - name: ulb
+    label: ULB Name
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_noc
+    wrapper: true
+    isMandatory: false
+    searchClause: AND bpa.tenantid = $ulb
+  - name: ulbtype
+    label: ULB Type
+    type: string
+    pattern: 'list://Municipal Corporation:Municipal Corporation,Nagar Panchayat:Nagar Panchayat,Municipal Council:Municipal Council,Improvement Trust: Improvement Trust'
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND pg.additional_details->>'ulbType' = $ulbtype
 
   query: |
       SELECT 
