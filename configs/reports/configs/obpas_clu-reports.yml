@@ -1644,7 +1644,7 @@ ReportDefinitions:
 - reportName: Transactions_Summary_CLU_Report
   summary: Transaction detail for CLU Module 
   version: 1.0.0
-  moduleName: rainmaker-obpas_bpa
+  moduleName: rainmaker-obpas_clu
   additionalConfig:
     print:
       pdfPageSize: A1
@@ -1653,145 +1653,145 @@ ReportDefinitions:
   - name: service_code
     label: Service Code
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false
   - name: module_name
     label: Module Name
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false
   - name: gateway
     label: Gateway
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false
   - name: bank_name
     label: Bank Name
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false 
   - name: ulb_name
     label: ULB Name
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false
   - name: ulb_type
     label: ULB Type
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false
   - name: application_number
     label: Application Number
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false 
   - name: applicant_name
     label: Applicant Name
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false
   - name: mobile_number
     label: Mobile Number
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false
   - name: service_label
     label: Service Label
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false
   - name: transaction_id
     label: Transaction ID
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false
   - name: transaction_amount
     label: Transaction Amount
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: true
   - name: created_date
     label: Created Date
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false  
   - name: transaction_status
     label: Transaction Status
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false
   - name: year
     label: Year
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false
   - name: month
     label: Month
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false
   - name: financial_year
     label: Financial Year
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false
   - name: financial_month
     label: Financial Month
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false
   - name: status_of_application
     label: Application Status
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: false 
   - name: pay1_clu_application_fees
     label: CLU Application Fees
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: true
   - name: pay2_clu_Fee
     label: CLU Fees
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: true
   - name: pay2_edc_fees
     label: EDC Fees
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: true
   - name: pay2_udc_fees
     label: UDC Fees
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: true 
   - name: pay2_lf_charges
     label: LF Charges
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: true
   - name: pay2_other1_fees
     label: Other 1 Fees
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: true
   - name: pay2_other2_fees
     label: Other 2 Fees
     type: string
-    source: obpas_bpa
+    source: obpas_clu
     total: true 
     
   searchParams:
   - name: fromDate
     label: From Date
     type: epoch
-    source: obpas_bpa
+    source: obpas_clu
     isMandatory: false
     searchClause: AND pg.created_time >= $fromDate
   - name: toDate
     label: To Date
     type: epoch
-    source: obpas_bpa
+    source: obpas_clu
     isMandatory: false
     searchClause: AND pg.created_time <= $toDate
   - name: ulb
@@ -1806,7 +1806,7 @@ ReportDefinitions:
     label: ULB Type
     type: string
     pattern: 'list://Municipal Corporation:Municipal Corporation,Nagar Panchayat:Nagar Panchayat,Municipal Council:Municipal Council,Improvement Trust: Improvement Trust'
-    source: obpas_bpa
+    source: obpas_clu
     isMandatory: false
     searchClause: AND pg.additional_details->>'ulbType' = $ulbtype
 
