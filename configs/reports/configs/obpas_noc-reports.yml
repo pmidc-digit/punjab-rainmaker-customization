@@ -1505,6 +1505,11 @@ ReportDefinitions:
       type: string
       source: obpas_noc
       total: false
+    - name: district
+      label: Distrcit
+      type: string
+      source: obpas_bpa
+      total: false
     - name: application_number
       label: Application Number
       type: string
@@ -1521,7 +1526,7 @@ ReportDefinitions:
       source: obpas_noc
       total: false
     - name: service_label
-      label: Service Label
+      label: Service Type
       type: string
       source: obpas_noc
       total: false
@@ -1609,6 +1614,13 @@ ReportDefinitions:
       source: obpas_noc
       isMandatory: false
       searchClause: AND pg.additional_details->>'ulbType' = $ulbtype
+    - name: district
+      label: District
+      type: singlevaluelist
+      pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
+      source: obpas_noc
+      isMandatory: false
+      searchClause: AND ud.district = $district
 
     query: |
       SELECT 
@@ -1616,7 +1628,7 @@ ReportDefinitions:
         WHEN bd.businessservice = 'obpas_noc' THEN '102'
         ELSE bd.businessservice
        END AS service_code,
-      'NOC' AS module_name,
+      'NOC' AS module_name,ud.district,
       pg.txn_id AS transaction_id, pg.txn_amount AS transaction_amount,pg.gateway,'Axis' AS bank_name, 
        CASE 
         WHEN pg.txn_status = 'SUCCESS' THEN 'Success'
@@ -1633,7 +1645,10 @@ ReportDefinitions:
         THEN TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) + INTERVAL '1 year', 'YY')
         ELSE TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) - INTERVAL '1 year', 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YY')
         END AS financial_year,
-        TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'MM') AS financial_month,
+        TO_CHAR(
+        MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1, 
+        'FM00'
+      ) AS financial_month,
     
         CASE noc.applicationstatus
         WHEN 'INITIATED' THEN 'Application Initiated'
@@ -1660,6 +1675,7 @@ ReportDefinitions:
        INNER JOIN egbs_bill_v1 bill ON bill.id = pg.bill_id
        INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
        LEFT JOIN eg_noc noc ON pg.consumer_code = noc.applicationno AND pg.tenant_id = noc.tenantid
+       LEFT JOIN ulb_data ud ON pg.tenant_id = ud.ulb_code
        WHERE bd.businessservice = 'obpas_noc' 
        AND pg.tenant_id != 'pb.testing'
     orderby: ORDER BY application_number, created_date;

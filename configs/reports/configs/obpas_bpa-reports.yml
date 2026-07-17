@@ -2102,6 +2102,11 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
+  - name: district
+    label: Distrcit
+    type: string
+    source: obpas_bpa
+    total: false
   - name: ulb_type
     label: ULB Type
     type: string
@@ -2128,7 +2133,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: service_label
-    label: Service Label
+    label: Payment Type
     type: string
     source: obpas_bpa
     total: false
@@ -2143,7 +2148,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: true
   - name: created_date
-    label: Created Date
+    label: Payment Date
     type: string
     source: obpas_bpa
     total: false  
@@ -2200,6 +2205,13 @@ ReportDefinitions:
     source: obpas_bpa
     isMandatory: false
     searchClause: AND pg.additional_details->>'ulbType' = $ulbtype
+  - name: district
+    label: District
+    type: singlevaluelist
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND ud.district = $district
   - name: module
     label: Module Name
     type: singlevaluelist
@@ -2226,7 +2238,7 @@ ReportDefinitions:
         WHEN bd.businessservice LIKE 'LAYOUT%' THEN 'Layout'
         WHEN bd.businessservice = 'BPAREG' THEN 'Professional Registration'
         ELSE 'OBPAS'
-      END AS module_name,
+      END AS module_name,pg.name AS applicant_name,
       pg.txn_id AS transaction_id, 
       pg.txn_amount AS transaction_amount,
       pg.gateway,
@@ -2252,7 +2264,7 @@ ReportDefinitions:
         WHEN bd.businessservice = 'BPA.NC_SAN_FEE' THEN 'BPA Pay 2'
         WHEN bd.businessservice = 'BPAREG' THEN 'Professional Registration'
         ELSE bd.businessservice 
-        END AS service_label,
+        END AS service_label, ud.district,
         to_char(to_timestamp(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date,
         to_char(to_timestamp(pg.created_time / 1000), 'YYYY') AS year,
         to_char(to_timestamp(pg.created_time / 1000), 'Month') AS month,
@@ -2261,7 +2273,10 @@ ReportDefinitions:
            THEN to_char(to_timestamp(pg.created_time / 1000), 'YYYY') || '-' || to_char(to_timestamp(pg.created_time / 1000) + interval '1 year', 'YY')
            ELSE to_char(to_timestamp(pg.created_time / 1000) - interval '1 year', 'YYYY') || '-' || to_char(to_timestamp(pg.created_time / 1000), 'YY')
            END AS financial_year,
-        to_char(to_timestamp(pg.created_time / 1000), 'MM') AS financial_month,
+        TO_CHAR(
+        MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1, 
+        'FM00'
+      ) AS financial_month,
         CASE 
         -- 1. CLU Module Statuses
          WHEN bd.businessservice LIKE 'CLU%' THEN 
@@ -2392,6 +2407,7 @@ ReportDefinitions:
         LEFT JOIN eg_layout lay ON pg.consumer_code = lay.applicationno AND pg.tenant_id = lay.tenantid 
         LEFT JOIN eg_noc noc ON pg.consumer_code = noc.applicationno AND pg.tenant_id = noc.tenantid 
         LEFT JOIN eg_tl_tradelicense tl ON pg.consumer_code = tl.applicationnumber AND pg.tenant_id = tl.tenantid
+        LEFT JOIN ulb_data ud ON pg.tenant_id = ud.ulb_code 
         WHERE bd.businessservice IN ('obpas_noc','BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG','CLU.PAY1','CLU.PAY2','LAYOUT.PAY1','LAYOUT.PAY2') 
         AND pg.tenant_id != 'pb.testing' 
   orderby: ORDER BY bd.businessservice, pg.created_time, pg.tenant_id;
@@ -2435,6 +2451,11 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
+  - name: district
+    label: Distrcit
+    type: string
+    source: obpas_bpa
+    total: false
   - name: application_number
     label: Application Number
     type: string
@@ -2451,7 +2472,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: service_label
-    label: Service Type
+    label: Payment Type
     type: string
     source: obpas_bpa
     total: false
@@ -2466,7 +2487,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: true
   - name: created_date
-    label: Created Date
+    label: Payment Date
     type: string
     source: obpas_bpa
     total: false  
@@ -2501,7 +2522,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: false 
   - name: pay1_bpa_building_application_fees
-    label: Building  Fees
+    label: Building Fees
     type: string
     source: obpas_bpa
     total: true
@@ -2657,7 +2678,7 @@ ReportDefinitions:
         WHEN bd.businessservice = 'BPA.NC_APP_FEE' THEN 'Pay 1'
         WHEN bd.businessservice = 'BPA.NC_SAN_FEE' THEN 'Pay 2'
         ELSE bd.businessservice 
-      END AS service_label,
+      END AS service_label,ud.district,
       TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date, TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') AS year,
       TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'Month') AS month,
       CASE 
@@ -2665,7 +2686,10 @@ ReportDefinitions:
         THEN TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) + INTERVAL '1 year', 'YY')
         ELSE TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) - INTERVAL '1 year', 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YY')
       END AS financial_year,
-      TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'MM') AS financial_month,
+      TO_CHAR(
+        MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1, 
+        'FM00'
+      ) AS financial_month,
       CASE 
               WHEN bpa.status = 'PENDING_APPL_FEE' THEN 'Pending Application Fee'
               WHEN bpa.status = 'CITIZEN_APPROVAL_PENDING' THEN 'Pending Citizen Approval'

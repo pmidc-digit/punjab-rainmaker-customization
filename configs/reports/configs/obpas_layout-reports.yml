@@ -1521,6 +1521,11 @@ ReportDefinitions:
     type: string
     source: obpas_layout
     total: false
+  - name: district
+    label: Distrcit
+    type: string
+    source: obpas_layout
+    total: false
   - name: application_number
     label: Application Number
     type: string
@@ -1537,7 +1542,7 @@ ReportDefinitions:
     source: obpas_layout
     total: false
   - name: service_label
-    label: Service Label
+    label: Payment Type
     type: string
     source: obpas_layout
     total: false
@@ -1552,7 +1557,7 @@ ReportDefinitions:
     source: obpas_layout
     total: true
   - name: created_date
-    label: Created Date
+    label: Payment Date
     type: string
     source: obpas_layout
     total: false  
@@ -1648,7 +1653,7 @@ ReportDefinitions:
     label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-    source: obpas_noc
+    source: obpas_layout
     wrapper: true
     isMandatory: false
     searchClause: AND lay.tenantid = $ulb
@@ -1659,6 +1664,13 @@ ReportDefinitions:
     source: obpas_layout
     isMandatory: false
     searchClause: AND pg.additional_details->>'ulbType' = $ulbtype
+  - name: district
+    label: District
+    type: singlevaluelist
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
+    source: obpas_layout
+    isMandatory: false
+    searchClause: AND ud.district = $district
 
   query: |
       SELECT 
@@ -1688,7 +1700,10 @@ ReportDefinitions:
         THEN TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) + INTERVAL '1 year', 'YY')
         ELSE TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) - INTERVAL '1 year', 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YY')
         END AS financial_year,
-      TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'MM') AS financial_month,
+      TO_CHAR(
+        MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1, 
+        'FM00'
+      ) AS financial_month,
       CASE lay.applicationstatus
         WHEN 'PENDING_APPL_FEE' THEN 'Pending Application Fee'
         WHEN 'CITIZEN_APPROVAL_PENDING' THEN 'Pending Citizen Approval'
@@ -1710,7 +1725,7 @@ ReportDefinitions:
         WHEN 'ATPHQ_APPROVAL_PENDING' THEN 'ATP HQ Approval Pending'
         WHEN 'PENDINGINITIALVERIFICATION' THEN 'Pending Initial Verification'
         ELSE REPLACE(INITCAP(REPLACE(lay.status, '_', ' ')), ' ', ' ')
-      END AS status_of_application,
+      END AS status_of_application,ud.district,
       lay.applicationtype AS category,
       CASE WHEN bd.businessservice = 'LAYOUT.PAY1' THEN pg.txn_id END AS pay1_transaction_id,
       CASE WHEN bd.businessservice = 'LAYOUT.PAY1' THEN pg.txn_amount ELSE 0.00 END AS pay1_transaction_amount,
@@ -1729,6 +1744,7 @@ ReportDefinitions:
       INNER JOIN egbs_bill_v1 bill ON bill.id = pg.bill_id
       INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
       LEFT JOIN eg_layout lay ON pg.consumer_code = lay.applicationno AND pg.tenant_id = lay.tenantid
+      LEFT JOIN ulb_data ud ON pg.tenant_id = ud.ulb_code
       WHERE bd.businessservice IN ('LAYOUT.PAY1', 'LAYOUT.PAY2') 
       AND pg.tenant_id != 'pb.testing'
   orderby: ORDER BY application_number, created_date;
