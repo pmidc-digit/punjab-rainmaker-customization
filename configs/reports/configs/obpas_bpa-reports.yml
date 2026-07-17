@@ -2451,7 +2451,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: service_label
-    label: Service Label
+    label: Service Type
     type: string
     source: obpas_bpa
     total: false
@@ -2501,7 +2501,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: false 
   - name: pay1_bpa_building_application_fees
-    label: Building Application Fees
+    label: Building  Fees
     type: string
     source: obpas_bpa
     total: true
@@ -2516,7 +2516,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: true
   - name: pay1_bpa_other_charges
-    label: Other Charges
+    label: Pay 1 Other Charges
     type: string
     source: obpas_bpa
     total: true 
@@ -2531,7 +2531,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: true
   - name: pay2_bpa_external_development_charges
-    label: External Development Charges
+    label: EDC
     type: string
     source: obpas_bpa
     total: true
@@ -2581,17 +2581,17 @@ ReportDefinitions:
     source: obpas_bpa
     total: true
   - name: pay2_bpa_water_charges
-    label: Water Harvesting
+    label: Water Charges
     type: string
     source: obpas_bpa
     total: true
   - name: pay2_adj_bpa_external_development_charges
-    label: Adj Externl Development Charges
+    label: Adj EDC
     type: string
     source: obpas_bpa
     total: true
   - name: pay2_adj_bpa_other_charges
-    label: Adj BPA Other Charges
+    label: Adj  Other Charges
     type: string
     source: obpas_bpa
     total: true 
@@ -2629,6 +2629,13 @@ ReportDefinitions:
     source: obpas_bpa
     isMandatory: false
     searchClause: AND pg.additional_details->>'ulbType' = $ulbtype
+  - name: district
+    label: District
+    type: singlevaluelist
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'    
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND ud.district = $district 
 
   query: |
       SELECT 
@@ -2647,8 +2654,8 @@ ReportDefinitions:
       pg.tenant_id AS ulb_code, INITCAP(SPLIT_PART(pg.tenant_id, '.', 2)) AS tenant_id, pg.additional_details->>'ulbName' AS ulb_name,
       pg.additional_details->>'ulbType' AS ulb_type,pg.consumer_code AS application_number, pg.name AS applicant_name, pg.mobile_number, 
       CASE 
-        WHEN bd.businessservice = 'BPA.NC_APP_FEE' THEN 'BPA Pay 1'
-        WHEN bd.businessservice = 'BPA.NC_SAN_FEE' THEN 'BPA Pay 2'
+        WHEN bd.businessservice = 'BPA.NC_APP_FEE' THEN 'Pay 1'
+        WHEN bd.businessservice = 'BPA.NC_SAN_FEE' THEN 'Pay 2'
         ELSE bd.businessservice 
       END AS service_label,
       TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date, TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') AS year,
@@ -2708,6 +2715,7 @@ ReportDefinitions:
             INNER JOIN egbs_bill_v1 bill ON bill.id = pg.bill_id
             INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
             LEFT JOIN eg_bpa_buildingplan bpa ON pg.consumer_code = bpa.applicationno AND pg.tenant_id = bpa.tenantid
+            LEFT JOIN ulb_data ud ON pg.tenant_id = ud.ulb_code 
             WHERE bd.businessservice IN ('BPA.NC_APP_FEE', 'BPA.NC_SAN_FEE') 
             AND pg.tenant_id != 'pb.testing' 
   orderby: ORDER BY application_number, created_date;
