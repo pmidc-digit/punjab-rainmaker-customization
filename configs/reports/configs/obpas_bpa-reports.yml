@@ -2136,7 +2136,7 @@ ReportDefinitions:
     label: Transaction ID
     type: string
     source: obpas_bpa
-    total: true
+    total: false
   - name: transaction_amount
     label: Transaction Amount
     type: string
@@ -2156,7 +2156,7 @@ ReportDefinitions:
     label: Year
     type: string
     source: obpas_bpa
-    total: true
+    total: false
   - name: month
     label: Month
     type: string
@@ -2207,7 +2207,7 @@ ReportDefinitions:
     source: obpas_bpa
     wrapper: true
     isMandatory: false
-    searchClause: AND bd.businessservice like $module%  
+    searchClause: AND bd.businessservice like $module || '%' 
 
   query: |
       SELECT 
