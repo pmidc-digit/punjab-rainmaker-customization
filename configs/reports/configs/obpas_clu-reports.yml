@@ -1798,13 +1798,13 @@ ReportDefinitions:
     label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-    source: obpas_noc
+    source: obpas_clu
     wrapper: true
     isMandatory: false
-    searchClause: AND bpa.tenantid = $ulb
+    searchClause: AND clu.tenantid = $ulb
   - name: ulbtype
     label: ULB Type
-    type: string
+    type: singlevaluelist
     pattern: 'list://Municipal Corporation:Municipal Corporation,Nagar Panchayat:Nagar Panchayat,Municipal Council:Municipal Council,Improvement Trust: Improvement Trust'
     source: obpas_clu
     isMandatory: false
