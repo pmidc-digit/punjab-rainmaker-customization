@@ -994,12 +994,12 @@ SearchDefinitions:
           INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid
           INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id
           INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id
-          LEFT JOIN (
-          SELECT DISTINCT ON (connectionno)
-          * FROM eg_ws_meterreading
-            ORDER BY connectionno, createdtime DESC
-                    ) lm
-                      ON lm.connectionno = conn.connectionno
+          LEFT JOIN LATERAL ( 
+          SELECT mr.connectionno,mr.lastreading,mr.lastreadingdate,
+          mr.currentreading,mr.currentreadingdate,mr.consumption,mr.meterstatus,
+           mr.billingperiod FROM eg_ws_meterreading mr
+            WHERE mr.connectionno = conn.connectionno
+                ORDER BY mr.createdtime DESC LIMIT 1) lm ON TRUE 
           $where
           AND conn.status = 'Active'
           ),
