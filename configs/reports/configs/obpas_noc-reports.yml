@@ -1530,6 +1530,11 @@ ReportDefinitions:
       type: string
       source: obpas_noc
       total: false
+    - name: gateway_txn_id
+      label: Gateway Transaction ID
+      type: string
+      source: obpas_noc
+      total: false
     - name: transaction_id
       label: Transaction ID
       type: string
@@ -1641,7 +1646,7 @@ ReportDefinitions:
         WHEN pg.txn_status = 'SUCCESS' THEN 'Success'
         WHEN pg.txn_status = 'FAILURE' THEN 'Failure'
         ELSE INITCAP(pg.txn_status) 
-       END AS transaction_status,
+       END AS transaction_status,pg.gateway_txn_id,
          pg.tenant_id AS ulb_code,  INITCAP(SPLIT_PART(pg.tenant_id, '.', 2)) AS tenant_id,  pg.additional_details->>'ulbName' AS ulb_name,
          pg.additional_details->>'ulbType' AS ulb_type, pg.consumer_code AS application_number, pg.name AS applicant_name, pg.mobile_number, 
         'NOC' AS service_label, TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date,  TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') AS year,

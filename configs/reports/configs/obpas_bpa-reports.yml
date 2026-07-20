@@ -2137,6 +2137,11 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
+  - name: gateway_txn_id
+    label: Gateway Transaction ID
+    type: string
+    source: obpas_bpa
+    total: false
   - name: transaction_id
     label: Transaction ID
     type: string
@@ -2248,7 +2253,7 @@ ReportDefinitions:
       END AS module_name,pg.name AS applicant_name,
       pg.txn_id AS transaction_id, 
       pg.txn_amount AS transaction_amount,
-      pg.gateway,
+      pg.gateway,pg.gateway_txn_id,
       'Axis' AS bank_name, 
       Case
         WHEN pg.txn_status = 'SUCCESS' THEN 'Success'
@@ -2484,6 +2489,11 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
+  - name: gateway_txn_id
+    label: Gateway Transaction ID
+    type: string
+    source: obpas_bpa
+    total: false
   - name: transaction_id
     label: Transaction ID
     type: string
@@ -2679,7 +2689,7 @@ ReportDefinitions:
         WHEN bd.businessservice = 'BPA.NC_APP_FEE' THEN '101'
         WHEN bd.businessservice = 'BPA.NC_SAN_FEE' THEN '101'
         ELSE bd.businessservice 
-      END AS service_code,
+      END AS service_code,pg.gateway_txn_id,
       'BPA' AS module_name, pg.txn_id AS transaction_id, pg.txn_amount AS transaction_amount,
       pg.gateway, 'Axis' AS bank_name, 
       CASE 

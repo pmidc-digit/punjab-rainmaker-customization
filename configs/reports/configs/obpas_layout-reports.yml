@@ -1546,6 +1546,11 @@ ReportDefinitions:
     type: string
     source: obpas_layout
     total: false
+  - name: gateway_txn_id
+    label: Gateway Transaction ID
+    type: string
+    source: obpas_layout
+    total: false
   - name: transaction_id
     label: Transaction ID
     type: string
@@ -1697,7 +1702,7 @@ ReportDefinitions:
         WHEN bd.businessservice = 'LAYOUT.PAY1' THEN 'Pay 1'
         WHEN bd.businessservice = 'LAYOUT.PAY2' THEN 'Pay 2'
         ELSE bd.businessservice 
-       END AS service_label,
+       END AS service_label,pg.gateway_txn_id,
       TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date,
       TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') AS year,
       EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT AS month,
