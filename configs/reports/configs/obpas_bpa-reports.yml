@@ -2088,7 +2088,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: gateway
-    label: Gateway
+    label: Payment Gateway
     type: string
     source: obpas_bpa
     total: false
@@ -2197,7 +2197,7 @@ ReportDefinitions:
     source: obpas_bpa
     wrapper: true
     isMandatory: false
-    searchClause: AND pg.tenantid = $ulb
+    searchClause: AND pg.tenant_id = $ulb
   - name: ulbtype
     label: ULB Type
     type: singlevaluelist
@@ -2280,11 +2280,11 @@ ReportDefinitions:
            THEN to_char(to_timestamp(pg.created_time / 1000), 'YYYY') || '-' || to_char(to_timestamp(pg.created_time / 1000) + interval '1 year', 'YY')
            ELSE to_char(to_timestamp(pg.created_time / 1000) - interval '1 year', 'YYYY') || '-' || to_char(to_timestamp(pg.created_time / 1000), 'YY')
            END AS financial_year,
-        EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT AS month,
-        (MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1)::INT AS financial_month,
-  
-        (MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1)::TEXT || ' - ' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'FMMonth') AS month_name,
-
+        TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'MM') AS month,
+      
+      TO_CHAR((MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1), 'FM09') AS financial_month,
+      TO_CHAR((MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1), 'FM09') || ' - ' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'FMMonth') AS month_name,
+      
         CASE 
         -- 1. CLU Module Statuses
          WHEN bd.businessservice LIKE 'CLU%' THEN 
@@ -2440,7 +2440,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: gateway
-    label: Gateway
+    label: Payment Gateway
     type: string
     source: obpas_bpa
     total: false
@@ -2695,10 +2695,11 @@ ReportDefinitions:
         ELSE bd.businessservice 
       END AS service_label,ud.district,
       TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date, TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') AS year,
-      EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT AS month,
-        (MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1)::INT AS financial_month,
-        (MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1)::TEXT || ' - ' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'FMMonth') AS month_name,
-
+      TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'MM') AS month,
+      
+      TO_CHAR((MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1), 'FM09') AS financial_month,
+      TO_CHAR((MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1), 'FM09') || ' - ' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'FMMonth') AS month_name,
+      
       CASE 
         WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000)) >= 4 
         THEN TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) + INTERVAL '1 year', 'YY')

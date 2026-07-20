@@ -1502,7 +1502,7 @@ ReportDefinitions:
     source: obpas_layout
     total: false
   - name: gateway
-    label: Gateway
+    label: Payment Gateway
     type: string
     source: obpas_layout
     total: false
@@ -1700,10 +1700,11 @@ ReportDefinitions:
        END AS service_label,pg.gateway_txn_id,
       TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date,
       TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') AS year,
-      EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT AS month,
-      (MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1)::INT AS financial_month,
-      (MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1)::TEXT || ' - ' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'FMMonth') AS month_name,
-
+      TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'MM') AS month,
+      
+      TO_CHAR((MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1), 'FM09') AS financial_month,
+      TO_CHAR((MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1), 'FM09') || ' - ' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'FMMonth') AS month_name,
+      
       CASE 
         WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000)) >= 4 
         THEN TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) + INTERVAL '1 year', 'YY')

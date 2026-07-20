@@ -1486,7 +1486,7 @@ ReportDefinitions:
       source: obpas_noc
       total: false
     - name: gateway
-      label: Gateway
+      label: Payment Gateway
       type: string
       source: obpas_noc
       total: false
@@ -1645,10 +1645,11 @@ ReportDefinitions:
          pg.tenant_id AS ulb_code,  INITCAP(SPLIT_PART(pg.tenant_id, '.', 2)) AS tenant_id,  pg.additional_details->>'ulbName' AS ulb_name,
          pg.additional_details->>'ulbType' AS ulb_type, pg.consumer_code AS application_number, pg.name AS applicant_name, pg.mobile_number, 
         'NOC' AS service_label, TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date,  TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') AS year,
-        EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT AS month,
-        (MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1)::INT AS financial_month,
-        (MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1)::TEXT || ' - ' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'FMMonth') AS month_name,
-
+        TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'MM') AS month,
+      
+      TO_CHAR((MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1), 'FM09') AS financial_month,
+      TO_CHAR((MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1), 'FM09') || ' - ' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'FMMonth') AS month_name,
+      
 
         CASE 
         WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000)) >= 4 
