@@ -1465,3 +1465,224 @@ ReportDefinitions:
           pd.businessservice = 'obpas_noc'
           AND payment.paymentstatus != 'CANCELLED' AND bill.consumercode not like 'PB/%' AND pd.tenantid != 'pb.testing'
     orderby: ORDER BY pd.receiptdate DESC;
+
+  - reportName: NOC_Collection_Summary
+    summary: Transaction detail for NOC Module
+    version: 1.0.0
+    moduleName: rainmaker-obpas_noc
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+
+    sourceColumns:
+    - name: service_code
+      label: Service Code
+      type: string
+      source: obpas_noc
+      total: false
+    - name: module_name
+      label: Module Name
+      type: string
+      source: obpas_noc
+      total: false
+    - name: gateway
+      label: Payment Gateway
+      type: string
+      source: obpas_noc
+      total: false
+    - name: bank_name
+      label: Bank Name
+      type: string
+      source: obpas_noc
+      total: false
+    - name: ulb_name
+      label: ULB Name
+      type: string
+      source: obpas_noc
+      total: false
+    - name: ulb_type
+      label: ULB Type
+      type: string
+      source: obpas_noc
+      total: false
+    - name: district
+      label: District
+      type: string
+      source: obpas_bpa
+      total: false
+    - name: application_number
+      label: Application Number
+      type: string
+      source: obpas_noc
+      total: false
+    - name: applicant_name
+      label: Applicant Name
+      type: string
+      source: obpas_noc
+      total: false
+    - name: mobile_number
+      label: Mobile Number
+      type: string
+      source: obpas_noc
+      total: false
+    - name: service_label
+      label: Service Type
+      type: string
+      source: obpas_noc
+      total: false
+    - name: gateway_txn_id
+      label: Gateway Transaction ID
+      type: string
+      source: obpas_noc
+      total: false
+    - name: transaction_amount
+      label: Transaction Amount
+      type: string
+      source: obpas_noc
+      total: true
+    - name: created_date
+      label: Created Date
+      type: string
+      source: obpas_noc
+      total: false
+    - name: transaction_status
+      label: Transaction Status
+      type: string
+      source: obpas_noc
+      total: false
+    - name: year
+      label: Year
+      type: string
+      source: obpas_noc
+      total: false
+    - name: month
+      label: Month
+      type: string
+      source: obpas_noc
+      total: false
+    - name: financial_year
+      label: Financial Year
+      type: string
+      source: obpas_noc
+      total: false
+    - name: month_name
+      label: Financial Month
+      type: string
+      source: obpas_noc
+      total: false
+    - name: status_of_application
+      label: Application Status
+      type: string
+      source: obpas_noc
+      total: false
+    - name: noc_application_fees
+      label: NOC Application Fees
+      type: string
+      source: obpas_noc
+      total: true
+    - name: noc_compunding_fees
+      label: NOC Compounding Fees
+      type: string
+      source: obpas_noc
+      total: true
+
+    searchParams:
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: obpas_noc
+      isMandatory: false
+      searchClause: AND pg.created_time >= $fromDate
+    - name: toDate
+      label: To Date
+      type: epoch
+      source: obpas_noc
+      isMandatory: false
+      searchClause: AND pg.created_time <= $toDate
+    - name: ulb
+      label: ULB Name
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: obpas_noc
+      wrapper: true
+      isMandatory: false
+      searchClause: AND noc.tenantid = $ulb
+    - name: ulbtype
+      label: ULB Type
+      type: singlevaluelist
+      pattern: 'list://Municipal Corporation:Municipal Corporation,Nagar Panchayat:Nagar Panchayat,Municipal Council:Municipal Council,Improvement Trust: Improvement Trust'
+      source: obpas_noc
+      isMandatory: false
+      searchClause: AND pg.additional_details->>'ulbType' = $ulbtype
+    - name: district
+      label: District
+      type: singlevaluelist
+      pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
+      source: obpas_noc
+      isMandatory: false
+      searchClause: AND ud.district = $district
+    - name: transactionstatus
+      label: Transaction Status
+      type: singlevaluelist
+      pattern: 'list://SUCCESS:Success,FAILURE:Failure'
+      source: obpas_noc
+      isMandatory: false
+      searchClause: AND pg.txn_status = $transactionstatus
+
+    query: |
+      SELECT 
+      CASE 
+        WHEN bd.businessservice = 'obpas_noc' THEN '102'
+        ELSE bd.businessservice
+       END AS service_code,
+      'NOC' AS module_name,ud.district,
+      pg.txn_id AS transaction_id, pg.txn_amount AS transaction_amount,pg.gateway,'Axis' AS bank_name, 
+       CASE 
+        WHEN pg.txn_status = 'SUCCESS' THEN 'Success'
+        WHEN pg.txn_status = 'FAILURE' THEN 'Failure'
+        ELSE INITCAP(pg.txn_status) 
+       END AS transaction_status,pg.gateway_txn_id,
+         pg.tenant_id AS ulb_code,  INITCAP(SPLIT_PART(pg.tenant_id, '.', 2)) AS tenant_id,  pg.additional_details->>'ulbName' AS ulb_name,
+         pg.additional_details->>'ulbType' AS ulb_type, pg.consumer_code AS application_number, pg.name AS applicant_name, pg.mobile_number, 
+        'NOC' AS service_label, TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date,  TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') AS year,
+        TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'MM') AS month,
+      
+      TO_CHAR((MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1), 'FM09') AS financial_month,
+      TO_CHAR((MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1), 'FM09') || ' - ' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'FMMonth') AS month_name,
+      
+
+        CASE 
+        WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000)) >= 4 
+        THEN TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) + INTERVAL '1 year', 'YY')
+        ELSE TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) - INTERVAL '1 year', 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YY')
+        END AS financial_year,
+    
+        CASE noc.applicationstatus
+        WHEN 'INITIATED' THEN 'Application Initiated'
+        WHEN 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In-Progress'
+        WHEN 'DOCUMENTVERIFY' THEN 'Document Verification'
+        WHEN 'LEVEL2_DOCUMENTVERIFY' THEN 'Level 2 Document Verification'
+        WHEN 'ATP_VERIFICATION_PENDING' THEN 'Pending ATP Verification'
+        WHEN 'MTP_VERIFICATION_PENDING' THEN 'Pending MTP Verification'
+        WHEN 'JC_VERIFICATION_PENDING' THEN 'Pending JC Verification'
+        WHEN 'EO_VERIFICATION_PENDING' THEN 'Pending EO Verification'
+        WHEN 'PENDINGAPPROVAL' THEN 'Pending Approval'
+        WHEN 'CITIZENACTIONREQUIRED' THEN 'Citizen Action Required'
+        WHEN 'PENDINGPAYMENT' THEN 'Pending Payment'
+        WHEN 'APPROVED' THEN 'Approved'
+        WHEN 'REJECTED' THEN 'Rejected'
+        WHEN 'CANCELLED' THEN 'Cancelled'
+        WHEN 'INSPECTION_REPORT_PENDING' THEN 'Inspection Report Pending'
+        WHEN 'E-SIGNED' THEN 'E-Signed'
+        ELSE noc.applicationstatus 
+        END AS status_of_application,
+        COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'obpas_noc' AND dd_sub.taxheadcode = 'NOC_FEES'), 0) AS noc_application_fees,
+        COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'obpas_noc' AND dd_sub.taxheadcode = 'NOC_COMPOUNDING_FEES'), 0) AS noc_compunding_fees
+       FROM eg_pg_transactions pg 
+       INNER JOIN egbs_bill_v1 bill ON bill.id = pg.bill_id
+       INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
+       LEFT JOIN eg_noc noc ON pg.consumer_code = noc.applicationno AND pg.tenant_id = noc.tenantid
+       LEFT JOIN ulb_data ud ON pg.tenant_id = ud.ulb_code
+       WHERE bd.businessservice = 'obpas_noc' 
+       AND pg.tenant_id != 'pb.testing'
+    orderby: ORDER BY application_number, created_date;

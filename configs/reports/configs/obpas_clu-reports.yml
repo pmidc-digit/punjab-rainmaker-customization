@@ -1640,3 +1640,270 @@ ReportDefinitions:
            pd.businessservice = 'clu'
           AND payment.paymentstatus != 'CANCELLED'
   orderby: ORDER BY pd.receiptdate DESC;
+
+- reportName: CLU_Collection_Summary
+  summary: Transaction detail for CLU Module
+  version: 1.0.0
+  moduleName: rainmaker-obpas_clu
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+
+  sourceColumns:
+  - name: service_code
+    label: Service Code
+    type: string
+    source: obpas_clu
+    total: false
+  - name: module_name
+    label: Module Name
+    type: string
+    source: obpas_clu
+    total: false
+  - name: gateway
+    label: Payment Gateway
+    type: string
+    source: obpas_clu
+    total: false
+  - name: bank_name
+    label: Bank Name
+    type: string
+    source: obpas_clu
+    total: false
+  - name: ulb_name
+    label: ULB Name
+    type: string
+    source: obpas_clu
+    total: false
+  - name: ulb_type
+    label: ULB Type
+    type: string
+    source: obpas_clu
+    total: false
+  - name: district
+    label: District
+    type: string
+    source: obpas_clu
+    total: false
+  - name: application_number
+    label: Application Number
+    type: string
+    source: obpas_clu
+    total: false
+  - name: applicant_name
+    label: Applicant Name
+    type: string
+    source: obpas_clu
+    total: false
+  - name: mobile_number
+    label: Mobile Number
+    type: string
+    source: obpas_clu
+    total: false
+  - name: service_label
+    label: Payment Type
+    type: string
+    source: obpas_clu
+    total: false
+  - name: gateway_txn_id
+    label: Gateway Transaction ID
+    type: string
+    source: obpas_clu
+    total: false
+  - name: transaction_amount
+    label: Transaction Amount
+    type: string
+    source: obpas_clu
+    total: true
+  - name: created_date
+    label: Payment Date
+    type: string
+    source: obpas_clu
+    total: false
+  - name: transaction_status
+    label: Transaction Status
+    type: string
+    source: obpas_clu
+    total: false
+  - name: year
+    label: Year
+    type: string
+    source: obpas_clu
+    total: false
+  - name: month
+    label: Month
+    type: string
+    source: obpas_clu
+    total: false
+  - name: financial_year
+    label: Financial Year
+    type: string
+    source: obpas_clu
+    total: false
+  - name: month_name
+    label: Financial Month
+    type: string
+    source: obpas_clu
+    total: false
+  - name: status_of_application
+    label: Application Status
+    type: string
+    source: obpas_clu
+    total: false
+  - name: pay1_clu_application_fees
+    label: CLU Application Fees
+    type: string
+    source: obpas_clu
+    total: true
+  - name: pay2_clu_Fee
+    label: CLU Fees
+    type: string
+    source: obpas_clu
+    total: true
+  - name: pay2_edc_fees
+    label: EDC Fees
+    type: string
+    source: obpas_clu
+    total: true
+  - name: pay2_udc_fees
+    label: UDC Fees
+    type: string
+    source: obpas_clu
+    total: true
+  - name: pay2_lf_charges
+    label: LF Charges
+    type: string
+    source: obpas_clu
+    total: true
+  - name: pay2_other1_fees
+    label: Other 1 Fees
+    type: string
+    source: obpas_clu
+    total: true
+  - name: pay2_other2_fees
+    label: Other 2 Fees
+    type: string
+    source: obpas_clu
+    total: true
+
+  searchParams:
+  - name: fromDate
+    label: From Date
+    type: epoch
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND pg.created_time >= $fromDate
+  - name: toDate
+    label: To Date
+    type: epoch
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND pg.created_time <= $toDate
+  - name: ulb
+    label: ULB Name
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_clu
+    wrapper: true
+    isMandatory: false
+    searchClause: AND clu.tenantid = $ulb
+  - name: ulbtype
+    label: ULB Type
+    type: singlevaluelist
+    pattern: 'list://Municipal Corporation:Municipal Corporation,Nagar Panchayat:Nagar Panchayat,Municipal Council:Municipal Council,Improvement Trust: Improvement Trust'
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND pg.additional_details->>'ulbType' = $ulbtype
+  - name: district
+    label: District
+    type: singlevaluelist
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND ud.district = $district
+  - name: transactionstatus
+    label: Transaction Status
+    type: singlevaluelist
+    pattern: 'list://SUCCESS:Success,FAILURE:Failure'
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND pg.txn_status = $transactionstatus
+
+  query: |
+      SELECT 
+       CASE 
+        WHEN bd.businessservice IN ('CLU.PAY1', 'CLU.PAY2') THEN '103'
+        ELSE  bd.businessservice
+       END AS service_code,
+       'CLU' AS module_name,
+       pg.txn_id AS transaction_id, pg.txn_amount AS transaction_amount, pg.gateway,
+       'Axis' AS bank_name, 
+       CASE 
+        WHEN pg.txn_status = 'SUCCESS' THEN 'Success'
+        WHEN pg.txn_status = 'FAILURE' THEN 'Failure'
+        ELSE INITCAP(pg.txn_status) 
+       END AS transaction_status,
+       pg.tenant_id AS ulb_code,  INITCAP(SPLIT_PART(pg.tenant_id, '.', 2)) AS tenant_id, pg.additional_details->>'ulbName' AS ulb_name,
+       pg.additional_details->>'ulbType' AS ulb_type, pg.consumer_code AS application_number, pg.name AS applicant_name,   pg.mobile_number,   
+       CASE 
+        WHEN bd.businessservice = 'CLU.PAY1' THEN 'Pay 1'
+        WHEN bd.businessservice = 'CLU.PAY2' THEN 'Pay 2'
+        ELSE bd.businessservice 
+       END AS service_label,pg.gateway_txn_id,
+
+        TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date,
+        TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') AS year,
+        TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'MM') AS month,
+      
+        TO_CHAR((MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1), 'FM09') AS financial_month,
+        TO_CHAR((MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1), 'FM09') || ' - ' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'FMMonth') AS month_name,
+      
+        CASE 
+        WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000)) >= 4 
+        THEN TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) + INTERVAL '1 year', 'YY')
+        ELSE TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) - INTERVAL '1 year', 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YY')
+        END AS financial_year,
+        CASE 
+        WHEN clu.applicationstatus = 'DOCUMENTVERIFY_JC' THEN 'Document Verify JC'
+        WHEN clu.applicationstatus = 'PROFESSIONALACTIONREQUIRED' THEN 'Professional Action Required'
+        WHEN clu.applicationstatus = 'ATP_VERIFICATION_PENDING' THEN 'ATP Verification Pending'
+        WHEN clu.applicationstatus = 'DOCUMENTVERIFY_MTP/ME' THEN 'Document Verify MTP/ME'
+        WHEN clu.applicationstatus = 'E-SIGNED' THEN 'E-Signed'
+        WHEN clu.applicationstatus = 'REJECTED' THEN 'Rejected'
+        WHEN clu.applicationstatus = 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In Progress'
+        WHEN clu.applicationstatus = 'ATPHQ_APPROVAL_PENDING' THEN 'ATPHQ Approval Pending'
+        WHEN clu.applicationstatus = 'PENDINGPAYMENT' THEN 'Pending Payment'
+        WHEN clu.applicationstatus = 'APPROVAL_PENDING' THEN 'Approval Pending'
+        WHEN clu.applicationstatus = 'MTP_VERIFICATION_PENDING' THEN 'MTP Verification Pending'
+        WHEN clu.applicationstatus = 'DOCUMENTVERIFY_JE/BI' THEN 'Document Verify JE/BI'
+        WHEN clu.applicationstatus = 'INITIATED' THEN 'Initiated'
+        WHEN clu.applicationstatus = 'INSPECTION_REPORT_PENDING' THEN 'Inspection Report Pending'
+        WHEN clu.applicationstatus = 'PENDINGAPPLICATIONPAYMENT' THEN 'Application Payment Pending'
+        WHEN clu.applicationstatus = 'STP_VERIFICATION_PENDING' THEN 'STP Verification Pending'
+        WHEN clu.applicationstatus = 'EO_VERIFICATION_PENDING' THEN 'EO Verification Pending'
+        WHEN clu.applicationstatus = 'DOC_VERIFICATION_PENDING' THEN 'Document Verification Pending'
+        WHEN clu.applicationstatus = 'ADC_VERIFICATION_PENDING' THEN 'ADC Verification Pending'
+        WHEN clu.applicationstatus = 'APPROVED' THEN 'Approved'
+        WHEN clu.applicationstatus = 'CANCELLED' THEN 'Cancelled'
+        WHEN clu.applicationstatus = 'PENDINGSANCTIONPAYMENT' THEN 'Sanction Payment Pending'
+        WHEN clu.applicationstatus = 'PENDINGAPPROVAL' THEN 'Pending Approval'
+        WHEN clu.applicationstatus = 'DOCUMENTVERIFY_EO' THEN 'EO Document Verification'
+        ELSE clu.applicationstatus
+        END AS status_of_application,
+        clu.applicationtype AS category,ud.district,
+   
+       COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'CLU.PAY1' AND dd_sub.taxheadcode = 'CLU_PROCESSING_FEE'), 0) AS pay1_clu_application_fees,
+       COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'CLU.PAY2' AND dd_sub.taxheadcode = 'CLU_CLU_FEE'), 0) AS pay2_clu_Fee,
+       COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'CLU.PAY2' AND dd_sub.taxheadcode = 'CLU_EDC_FEE'), 0) AS pay2_edc_fees,
+       COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'CLU.PAY2' AND dd_sub.taxheadcode = 'CLU_UDC_FEE'), 0) AS pay2_udc_fees,
+       COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'CLU.PAY2' AND dd_sub.taxheadcode = 'CLU_LF_FEE'), 0) AS pay2_lf_charges,
+       COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'CLU.PAY2' AND dd_sub.taxheadcode = 'CLU_OTHER1_FEE'), 0) AS pay2_other1_fees,
+       COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'CLU.PAY2' AND dd_sub.taxheadcode = 'CLU_OTHER2_FEE'), 0) AS pay2_other2_fees
+       FROM eg_pg_transactions pg 
+       INNER JOIN egbs_bill_v1 bill ON bill.id = pg.bill_id
+       INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
+       LEFT JOIN eg_clu clu ON pg.consumer_code = clu.applicationno AND pg.tenant_id = clu.tenantid
+       LEFT JOIN ulb_data ud ON pg.tenant_id = ud.ulb_code
+       WHERE bd.businessservice IN ('CLU.PAY1', 'CLU.PAY2') 
+       AND pg.tenant_id != 'pb.testing'
+  orderby: ORDER BY application_number, created_date;
