@@ -1877,7 +1877,7 @@ ReportDefinitions:
   orderby: ORDER BY employee_name
 
 - reportName: Filesubmissionsummaryreport
-  summary: File Submission Count Summary Report
+  summary: File Submission Summary Report
   version: 1.0.0
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
@@ -1981,8 +1981,8 @@ ReportDefinitions:
               WHEN UPPER(TRIM(m.applicationstatus)) = 'BLOCKED' THEN 'Blocked' 
               WHEN UPPER(TRIM(m.applicationstatus)) = 'PULLED_BACK' THEN 'Pulled Back'
               WHEN UPPER(TRIM(m.applicationstatus)) IN ('PENDINGAPPROVAL', 'APPROVAL_PENDING') THEN 'Approval Pending' 
-              WHEN UPPER(TRIM(m.applicationstatus)) IN ('ATP_VERIFICATION_PENDING', 'DOCUMENTVERIFY_ATP/AME') THEN 'ATP Verification Pending' 
-              WHEN UPPER(TRIM(m.applicationstatus)) IN ('MTP_VERIFICATION_PENDING', 'DOCUMENTVERIFY_MTP/ME') THEN 'MTP Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('ATP_VERIFICATION_PENDING', 'DOCUMENTVERIFY_ATP/AME','LEVEL3_VERIFICATION_PENDING') THEN 'ATP Verification Pending' 
+              WHEN UPPER(TRIM(m.applicationstatus)) IN ('MTP_VERIFICATION_PENDING', 'DOCUMENTVERIFY_MTP/ME','LEVEL4_VERIFICATION_PENDING') THEN 'MTP Verification Pending' 
               WHEN UPPER(TRIM(m.applicationstatus)) IN ('EO_VERIFICATION_PENDING', 'DOCUMENTVERIFY_EO') THEN 'EO Verification Pending' 
               WHEN UPPER(TRIM(m.applicationstatus)) IN ('JC_VERIFICATION_PENDING', 'DOCUMENTVERIFY_JC') THEN 'JC Verification Pending' 
               WHEN UPPER(TRIM(m.applicationstatus)) IN ('CITIZENACTIONREQUIRED', 'CITIZEN_APPROVAL_INPROCESS', 'PROFESSIONAL_ACTION_REQUIRED', 'PROFESSIONALACTIONREQUIRED', 'CITIZEN APPROVAL IN PROCESS') THEN 'Citizen Action Required' 
@@ -2003,8 +2003,6 @@ ReportDefinitions:
               WHEN UPPER(TRIM(m.applicationstatus)) = 'DOCUMENTVERIFY_STP(FIELD)' THEN 'STP Field Verification Pending' 
               WHEN UPPER(TRIM(m.applicationstatus)) = 'DRAWING_ESIGN_PENDING' THEN 'Drawing E-Sign Pending' 
               WHEN UPPER(TRIM(m.applicationstatus)) = 'SANCTION_LETTER_ESIGN_PENDING' THEN 'Sanction Letter E-Sign Pending' 
-              WHEN UPPER(TRIM(m.applicationstatus)) = 'LEVEL3_VERIFICATION_PENDING' THEN 'Level 3 Verification Pending' 
-              WHEN UPPER(TRIM(m.applicationstatus)) = 'LEVEL4_VERIFICATION_PENDING' THEN 'Level 4 Verification Pending' 
               WHEN UPPER(TRIM(m.applicationstatus)) = 'INPROGRESS' THEN 'In Progress' 
               WHEN UPPER(TRIM(m.applicationstatus)) = 'VERIFICATION_INPROGRESS' THEN 'Verification In Progress'
             ELSE INITCAP(REPLACE(m.applicationstatus, '_', ' ')) 
@@ -2071,7 +2069,7 @@ ReportDefinitions:
         OR (g.grp_level = 1 AND s.distinct_statuses > 1) OR (g.grp_level = 15)
   orderby: ORDER BY g.ulb_type, g.ulb_district, g.name_of_ulb, g.grp_level, g.localized_status;
 
-- reportName: Transactions_Summary_OBPS_Report
+- reportName: OBPAS_Collection_Summary_Report
   summary: Transaction detail for OBPS Module
   version: 1.0.0
   moduleName: rainmaker-obpas_bpa
@@ -2080,28 +2078,23 @@ ReportDefinitions:
       pdfPageSize: A4
 
   sourceColumns:
-  - name: service
-    label: Service
+  - name: service_code
+    label: Service Code
     type: string
     source: obpas_bpa
     total: false
-  - name: transaction_id
-    label: Transaction ID
+  - name: module_name
+    label: Module Name
     type: string
     source: obpas_bpa
     total: false
-  - name: transaction_amount
-    label: Transaction Amount
-    type: string
-    source: obpas_bpa
-    total: true
   - name: gateway
-    label: Gateway
+    label: Payment Gateway
     type: string
     source: obpas_bpa
     total: false
-  - name: transaction_status
-    label: Transaction Status
+  - name: bank_name
+    label: Bank Name
     type: string
     source: obpas_bpa
     total: false
@@ -2110,23 +2103,8 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
-  - name: created_date
-    label: payment Created Date
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: application_number
-    label: Application Number
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: name
-    label: Name
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: mobile_number
-    label: Mobile Number
+  - name: district
+    label: District
     type: string
     source: obpas_bpa
     total: false
@@ -2135,37 +2113,649 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
+  - name: application_number
+    label: Application Number
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: status_of_application
+    label: Application Status
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: applicant_name
+    label: Applicant Name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: mobile_number
+    label: Mobile Number
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: service_label
+    label: Payment Type
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: gateway_txn_id
+    label: Gateway Transaction ID
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: transaction_amount
+    label: Transaction Amount
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: created_date
+    label: Payment Date
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: transaction_status
+    label: Transaction Status
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: year
+    label: Year
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: month
+    label: Month
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: financial_year
+    label: Financial Year
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: month_name
+    label: Financial Month
+    type: string
+    source: obpas_bpa
+    total: false
   searchParams:
   - name: fromDate
     label: From Date
     type: epoch
     source: obpas_bpa
-    isMandatory: true
+    isMandatory: false
     searchClause: AND pg.created_time >= $fromDate
   - name: toDate
     label: To Date
     type: epoch
     source: obpas_bpa
-    isMandatory: true
+    isMandatory: false
     searchClause: AND pg.created_time <= $toDate
+  - name: ulb
+    label: ULB Name
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_bpa
+    wrapper: true
+    isMandatory: false
+    searchClause: AND pg.tenant_id = $ulb
+  - name: ulbtype
+    label: ULB Type
+    type: singlevaluelist
+    pattern: 'list://Municipal Corporation:Municipal Corporation,Nagar Panchayat:Nagar Panchayat,Municipal Council:Municipal Council,Improvement Trust: Improvement Trust'
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND pg.additional_details->>'ulbType' = $ulbtype
+  - name: district
+    label: District
+    type: singlevaluelist
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND ud.district = $district
+  - name: transactionstatus
+    label: Transaction Status
+    type: singlevaluelist
+    pattern: 'list://SUCCESS:Success,FAILURE:Failure'
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND pg.txn_status = $transactionstatus
+  - name: module
+    label: Module Name
+    type: singlevaluelist
+    pattern: 'list://BPA.NC:Building Plan,CLU:CLU,LAYOUT:Layout,obpas_noc:NOC,BPAREG:Professional Registration'
+    source: obpas_bpa
+    wrapper: true
+    isMandatory: false
+    searchClause: AND bd.businessservice like $module || '%'
 
   query: |
-      select 
-        pg.txn_id as transaction_id , pg.txn_amount as transaction_amount,pg.gateway  , pg.txn_status as transaction_status ,
-        INITCAP(split_part(pg.tenant_id, '.', 2)) AS tenant_id  ,to_char(to_timestamp(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date,
-        pg.consumer_code as application_number , pg.name , pg.mobile_number , 
-        CASE 
+      SELECT 
+      CASE 
+        WHEN bd.businessservice = 'obpas_noc' THEN '102'
+        WHEN bd.businessservice IN ('CLU.PAY1', 'CLU.PAY2') THEN '103'
+        WHEN bd.businessservice = 'BPAREG' THEN '108'
+        WHEN bd.businessservice LIKE '%LAYOUT%' THEN '105' 
+        WHEN bd.businessservice LIKE 'BPA.NC%' THEN '101'
+        ELSE bd.businessservice 
+      END AS service_code,
+      CASE 
+        WHEN bd.businessservice LIKE 'BPA.NC%' THEN 'Building Plan'
+        WHEN bd.businessservice LIKE 'CLU%' THEN 'CLU'
         WHEN bd.businessservice = 'obpas_noc' THEN 'NOC'
-        WHEN bd.businessservice = 'CLU.PAY1' THEN 'CLU Pay 1'
-        WHEN bd.businessservice = 'CLU.PAY2' THEN 'CLU Pay 2'
-        WHEN bd.businessservice = 'BPA.NC_APP_FEE' THEN 'BPA Application Fee'
-        WHEN bd.businessservice = 'BPA.NC_SAN_FEE' THEN 'BPA Sanction Fee'
+        WHEN bd.businessservice LIKE 'LAYOUT%' THEN 'Layout'
         WHEN bd.businessservice = 'BPAREG' THEN 'Professional Registration'
-        ELSE bd.businessservice  END AS service,
-        pg.additional_details->>'ulbName' AS ulb_name,pg.additional_details->>'ulbType' AS ulb_type
-        from eg_pg_transactions pg 
-        inner join egbs_bill_v1 bill on bill.id = pg.bill_id
-        inner join egbs_billdetail_v1 bd on bd.billid = bill.id
-        where bd.businessservice in ('obpas_noc','BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG','CLU.PAY1','CLU.PAY2') AND txn_status = 'SUCCESS'
-        and pg.tenant_id != 'pb.testing' and pg.txn_amount != '0.00' and pg.txn_id != 'PB_PG_2025_12_17_663638_75'
-  orderby: ORDER BY bd.businessservice , pg.created_time , pg.tenant_id
+        ELSE 'OBPAS'
+      END AS module_name,pg.name AS applicant_name,
+      pg.txn_id AS transaction_id, 
+      pg.txn_amount AS transaction_amount,
+      pg.gateway,pg.gateway_txn_id,
+      'Axis' AS bank_name, 
+      Case
+        WHEN pg.txn_status = 'SUCCESS' THEN 'Success'
+        WHEN pg.txn_status = 'FAILURE' THEN 'Failure'
+        ELSE pg.txn_status
+        END AS transaction_status,
+        pg.tenant_id AS ulb_code, 
+       INITCAP(split_part(pg.tenant_id, '.', 2)) AS tenant_id,
+       pg.additional_details->>'ulbName' AS ulb_name,
+       pg.additional_details->>'ulbType' AS ulb_type,
+       pg.consumer_code AS application_number, 
+       pg.name, pg.mobile_number, 
+       CASE 
+        WHEN bd.businessservice = 'obpas_noc' THEN 'NOC'
+        WHEN bd.businessservice = 'CLU.PAY1' THEN 'Pay 1'
+        WHEN bd.businessservice = 'CLU.PAY2' THEN 'Pay 2'
+        WHEN bd.businessservice = 'LAYOUT.PAY1' THEN 'Pay 1'
+        WHEN bd.businessservice = 'LAYOUT.PAY2' THEN 'Pay 2'
+        WHEN bd.businessservice = 'BPA.NC_APP_FEE' THEN 'Pay 1'
+        WHEN bd.businessservice = 'BPA.NC_SAN_FEE' THEN 'Pay 2'
+        WHEN bd.businessservice = 'BPAREG' THEN 'Professional Registration'
+        ELSE bd.businessservice 
+        END AS service_label, ud.district,
+        to_char(to_timestamp(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date,
+        to_char(to_timestamp(pg.created_time / 1000), 'YYYY') AS year,
+        
+        CASE 
+           WHEN EXTRACT(MONTH FROM to_timestamp(pg.created_time / 1000)) >= 4 
+           THEN to_char(to_timestamp(pg.created_time / 1000), 'YYYY') || '-' || to_char(to_timestamp(pg.created_time / 1000) + interval '1 year', 'YY')
+           ELSE to_char(to_timestamp(pg.created_time / 1000) - interval '1 year', 'YYYY') || '-' || to_char(to_timestamp(pg.created_time / 1000), 'YY')
+           END AS financial_year,
+        TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'MM') AS month,
+      
+      TO_CHAR((MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1), 'FM09') AS financial_month,
+      TO_CHAR((MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1), 'FM09') || ' - ' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'FMMonth') AS month_name,
+      
+        CASE 
+        -- 1. CLU Module Statuses
+         WHEN bd.businessservice LIKE 'CLU%' THEN 
+          CASE clu.applicationstatus
+            WHEN 'DOCUMENTVERIFY_JC' THEN 'Document Verify JC'
+            WHEN 'PROFESSIONALACTIONREQUIRED' THEN 'Professional Action Required'
+            WHEN 'ATP_VERIFICATION_PENDING' THEN 'ATP Verification Pending'
+            WHEN 'DOCUMENTVERIFY_MTP/ME' THEN 'Document Verify MTP/ME'
+            WHEN 'E-SIGNED' THEN 'E-Signed'
+            WHEN 'REJECTED' THEN 'Rejected'
+            WHEN 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In Progress'
+            WHEN 'ATPHQ_APPROVAL_PENDING' THEN 'ATPHQ Approval Pending'
+            WHEN 'PENDINGPAYMENT' THEN 'Pending Payment'
+            WHEN 'APPROVAL_PENDING' THEN 'Approval Pending'
+            WHEN 'MTP_VERIFICATION_PENDING' THEN 'MTP Verification Pending'
+            WHEN 'DOCUMENTVERIFY_JE/BI' THEN 'Document Verify JE/BI'
+            WHEN 'INITIATED' THEN 'Initiated'
+            WHEN 'INSPECTION_REPORT_PENDING' THEN 'Inspection Report Pending'
+            WHEN 'PENDINGAPPLICATIONPAYMENT' THEN 'Application Payment Pending'
+            WHEN 'STP_VERIFICATION_PENDING' THEN 'STP Verification Pending'
+            WHEN 'EO_VERIFICATION_PENDING' THEN 'EO Verification Pending'
+            WHEN 'DOC_VERIFICATION_PENDING' THEN 'Document Verification Pending'
+            WHEN 'ADC_VERIFICATION_PENDING' THEN 'ADC Verification Pending'
+            WHEN 'APPROVED' THEN 'Approved'
+            WHEN 'CANCELLED' THEN 'Cancelled'
+            WHEN 'PENDINGSANCTIONPAYMENT' THEN 'Sanction Payment Pending'
+            WHEN 'PENDINGAPPROVAL' THEN 'Pending Approval'
+            WHEN 'DOCUMENTVERIFY_EO' THEN 'EO Document Verification'
+            ELSE clu.applicationstatus
+          END
+
+         -- 2. Layout Module Statuses
+         WHEN bd.businessservice LIKE '%LAYOUT%' THEN 
+          CASE lay.applicationstatus
+            WHEN 'PENDING_APPL_FEE' THEN 'Pending Application Fee'
+            WHEN 'CITIZEN_APPROVAL_PENDING' THEN 'Pending Citizen Approval'
+            WHEN 'SEND_TO_CITIZEN' THEN 'Sent back to Citizen'
+            WHEN 'INPROGRESS' THEN 'In Progress'
+            WHEN 'PENDING_APPL_FEE_PAYMENT' THEN 'Pending Application Fee Payment'
+            WHEN 'DOC_VERIFICATION_PENDING' THEN 'Document Verification Pending'
+            WHEN 'FIELDINSPECTION_PENDING' THEN 'Field Inspection Pending'
+            WHEN 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In-Progress'
+            WHEN 'NOC_VERIFICATION_PENDING' THEN 'NOC Verification Pending'
+            WHEN 'PENDINGAPPROVAL' THEN 'Pending Final Approval'
+            WHEN 'PENDING_SANC_FEE_PAYMENT' THEN 'Pending Sanction Fee Payment'
+            WHEN 'APPROVED' THEN 'Approved'
+            WHEN 'REJECTED' THEN 'Rejected'
+            WHEN 'LEVEL3_VERIFICATION_PENDING' THEN 'L3 Verification Pending'
+            WHEN 'LEVEL4_VERIFICATION_PENDING' THEN 'L4 Verification Pending'
+            WHEN 'JC_VERIFICATION_PENDING' THEN 'JC Verification Pending'
+            WHEN 'MC_VERIFICATION_PENDING' THEN 'MC Verification Pending'
+            WHEN 'ATPHQ_APPROVAL_PENDING' THEN 'ATP HQ Approval Pending'
+            WHEN 'PENDINGINITIALVERIFICATION' THEN 'Pending Initial Verification'
+            ELSE REPLACE(INITCAP(REPLACE(lay.applicationstatus, '_', ' ')), ' ', ' ')
+          END
+
+         -- 3. NOC Module Statuses
+         WHEN bd.businessservice = 'obpas_noc' THEN 
+          CASE noc.applicationstatus
+            WHEN 'INITIATED' THEN 'Application Initiated'
+            WHEN 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In-Progress'
+            WHEN 'DOCUMENTVERIFY' THEN 'Document Verification'
+            WHEN 'LEVEL2_DOCUMENTVERIFY' THEN 'Level 2 Document Verification'
+            WHEN 'ATP_VERIFICATION_PENDING' THEN 'Pending ATP Verification'
+            WHEN 'MTP_VERIFICATION_PENDING' THEN 'Pending MTP Verification'
+            WHEN 'JC_VERIFICATION_PENDING' THEN 'Pending JC Verification'
+            WHEN 'EO_VERIFICATION_PENDING' THEN 'Pending EO Verification'
+            WHEN 'PENDINGAPPROVAL' THEN 'Pending Approval'
+            WHEN 'CITIZENACTIONREQUIRED' THEN 'Citizen Action Required'
+            WHEN 'PENDINGPAYMENT' THEN 'Pending Payment'
+            WHEN 'APPROVED' THEN 'Approved'
+            WHEN 'REJECTED' THEN 'Rejected'
+            WHEN 'CANCELLED' THEN 'Cancelled'
+            WHEN 'INSPECTION_REPORT_PENDING' THEN 'Inspection Report Pending'
+            WHEN 'E-SIGNED' THEN 'E-Signed'
+            ELSE noc.applicationstatus 
+          END
+
+         WHEN bd.businessservice IN ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE') THEN 
+          CASE bpa.status
+            WHEN 'PENDING_APPL_FEE' THEN 'Pending Application Fee'
+            WHEN 'CITIZEN_APPROVAL_PENDING' THEN 'Pending Citizen Approval'
+            WHEN 'SEND_TO_CITIZEN' THEN 'Sent back to Citizen'
+            WHEN 'INPROGRESS' THEN 'In Progress'
+            WHEN 'PENDING_APPL_FEE_PAYMENT' THEN 'Pending Application Fee Payment'
+            WHEN 'DOC_VERIFICATION_PENDING' THEN 'Document Verification Pending'
+            WHEN 'FIELDINSPECTION_PENDING' THEN 'Field Inspection Pending'
+            WHEN 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In-Progress'
+            WHEN 'NOC_VERIFICATION_PENDING' THEN 'NOC Verification Pending'
+            WHEN 'PENDINGAPPROVAL' THEN 'Pending Final Approval'
+            WHEN 'PENDING_SANC_FEE_PAYMENT' THEN 'Pending Sanction Fee Payment'
+            WHEN 'APPROVED' THEN 'Approved'
+            WHEN 'REJECTED' THEN 'Rejected'
+            WHEN 'LEVEL3_VERIFICATION_PENDING' THEN 'L3 Verification Pending'
+            WHEN 'LEVEL4_VERIFICATION_PENDING' THEN 'L4 Verification Pending'
+            WHEN 'JC_VERIFICATION_PENDING' THEN 'JC Verification Pending'
+            WHEN 'MC_VERIFICATION_PENDING' THEN 'MC Verification Pending'
+            WHEN 'ATPHQ_APPROVAL_PENDING' THEN 'ATP HQ Approval Pending'
+            WHEN 'PENDINGINITIALVERIFICATION' THEN 'Pending Initial Verification'
+            ELSE REPLACE(INITCAP(REPLACE(bpa.status, '_', ' ')), ' ', ' ')
+          END
+        WHEN bd.businessservice = 'BPAREG' THEN
+          CASE COALESCE(tl.status, tl.status)
+            WHEN 'INITIATED' THEN 'Initiated'
+            WHEN 'PENDINGPAYMENT' THEN 'Pending Payment'
+            WHEN 'CITIZEN_ACTION_REQUIRED' THEN 'Citizen Action Required'
+            WHEN 'PENDINGAPPROVAL' THEN 'Pending Final Approval'
+            WHEN 'APPROVED' THEN 'Approved'
+            WHEN 'REJECTED' THEN 'Rejected'
+            WHEN 'CANCELLED' THEN 'Cancelled'
+            WHEN 'INACTIVE' THEN 'Inactive'
+            WHEN 'PENDINGDOCVERIFICATION' THEN 'Pending Document Verification'
+            WHEN 'PENDINGVERIFICATION' THEN 'Pending Verification'
+            WHEN 'PENDINGAPPROVAL' THEN 'Pending Final Approval'
+            WHEN 'BLACKLISTED' THEN 'Blacklisted'
+            WHEN 'EXPIRED' THEN 'Expired'
+            ELSE REPLACE(INITCAP(REPLACE(COALESCE(tl.status, tl.status), '_', ' ')), ' ', ' ')
+          END
+
+         -- 6. Fallback block agar koi service mapping missing ho
+         ELSE REPLACE(INITCAP(REPLACE(COALESCE(tl.status, bpa.status,clu.applicationstatus,noc.applicationstatus,lay.applicationstatus), '_', ' ')), ' ', ' ')
+       END AS status_of_application
+        FROM eg_pg_transactions pg 
+        INNER JOIN egbs_bill_v1 bill ON bill.id = pg.bill_id
+        INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
+        LEFT JOIN eg_bpa_buildingplan bpa ON pg.consumer_code = bpa.applicationno AND pg.tenant_id = bpa.tenantid 
+        LEFT JOIN eg_clu clu ON pg.consumer_code = clu.applicationno AND pg.tenant_id = clu.tenantid 
+        LEFT JOIN eg_layout lay ON pg.consumer_code = lay.applicationno AND pg.tenant_id = lay.tenantid 
+        LEFT JOIN eg_noc noc ON pg.consumer_code = noc.applicationno AND pg.tenant_id = noc.tenantid 
+        LEFT JOIN eg_tl_tradelicense tl ON pg.consumer_code = tl.applicationnumber AND pg.tenant_id = tl.tenantid
+        LEFT JOIN ulb_data ud ON pg.tenant_id = ud.ulb_code 
+        WHERE bd.businessservice IN ('obpas_noc','BPA.NC_APP_FEE','BPA.NC_SAN_FEE','BPAREG','CLU.PAY1','CLU.PAY2','LAYOUT.PAY1','LAYOUT.PAY2') 
+        AND pg.tenant_id != 'pb.testing'
+  orderby: ORDER BY bd.businessservice, pg.created_time, pg.tenant_id;
+
+- reportName: BPA_Collection_Summary
+  summary: Transaction detail for Building Plan Module
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+
+  sourceColumns:
+  - name: service_code
+    label: Service Code
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: module_name
+    label: Module Name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: gateway
+    label: Payment Gateway
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: bank_name
+    label: Bank Name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: ulb_name
+    label: ULB Name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: ulb_type
+    label: ULB Type
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: district
+    label: District
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: application_number
+    label: Application Number
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: applicant_name
+    label: Applicant Name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: mobile_number
+    label: Mobile Number
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: service_label
+    label: Payment Type
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: gateway_txn_id
+    label: Gateway Transaction ID
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: transaction_amount
+    label: Transaction Amount
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: created_date
+    label: Payment Date
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: transaction_status
+    label: Transaction Status
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: year
+    label: Year
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: month
+    label: Month
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: financial_year
+    label: Financial Year
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: month_name
+    label: Financial Month
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: status_of_application
+    label: Application Status
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: pay1_bpa_building_application_fees
+    label: Building Fees
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay1_bpa_processing_fees
+    label: BPA Processing Fees
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay1_bpa_boundary_wall_fees
+    label: Boundary Wall Fees
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay1_bpa_other_charges
+    label: Pay 1 Other Charges
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay2_bpa_clubbing_charges
+    label: Clubbing Charges
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay2_bpa_clu_charges
+    label: CLU Charges
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay2_bpa_external_development_charges
+    label: EDC
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay2_bpa_gaushala_charges_cess
+    label: Gaushala Charges Cess
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay2_bpa_labour_cess
+    label: Labour Cess
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay2_bpa_malba_charges
+    label: Malba Charges
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay2_bpa_mining_charges
+    label: Mining Charges
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay2_bpa_other_charges
+    label: Pay 2 Other Charges
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay2_bpa_purchasable_far_charges
+    label: Purchasable FAR Charges
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay2_bpa_rain_water_harvesting_charges
+    label: Rain Water Harvesting Charges
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay2_bpa_sub_division_charges
+    label: Sub Division Charges
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay2_bpa_urban_development_cess
+    label: Urban Development Cess
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay2_bpa_water_charges
+    label: Water Charges
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay2_adj_bpa_external_development_charges
+    label: Adj EDC
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay2_adj_bpa_other_charges
+    label: Adj  Other Charges
+    type: string
+    source: obpas_bpa
+    total: true
+  - name: pay2_adj_bpa_water_charges
+    label: Adj Water Charges
+    type: string
+    source: obpas_bpa
+    total: true
+
+  searchParams:
+  - name: fromDate
+    label: From Date
+    type: epoch
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND pg.created_time >= $fromDate
+  - name: toDate
+    label: To Date
+    type: epoch
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND pg.created_time <= $toDate
+  - name: ulb
+    label: ULB Name
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_bpa
+    wrapper: true
+    isMandatory: false
+    searchClause: AND bpa.tenantid = $ulb
+  - name: ulbtype
+    label: ULB Type
+    type: singlevaluelist
+    pattern: 'list://Municipal Corporation:Municipal Corporation,Nagar Panchayat:Nagar Panchayat,Municipal Council:Municipal Council,Improvement Trust: Improvement Trust'
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND pg.additional_details->>'ulbType' = $ulbtype
+  - name: district
+    label: District
+    type: singlevaluelist
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND ud.district = $district
+  - name: transactionstatus
+    label: Transaction Status
+    type: singlevaluelist
+    pattern: 'list://SUCCESS:Success,FAILURE:Failure'
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND pg.txn_status = $transactionstatus
+
+  query: |
+      SELECT 
+      CASE 
+        WHEN bd.businessservice = 'BPA.NC_APP_FEE' THEN '101'
+        WHEN bd.businessservice = 'BPA.NC_SAN_FEE' THEN '101'
+        ELSE bd.businessservice 
+      END AS service_code,pg.gateway_txn_id,
+      'BPA' AS module_name, pg.txn_id AS transaction_id, pg.txn_amount AS transaction_amount,
+      pg.gateway, 'Axis' AS bank_name, 
+      CASE 
+        WHEN pg.txn_status = 'SUCCESS' THEN 'Success'
+        WHEN pg.txn_status = 'FAILURE' THEN 'Failure'
+        ELSE pg.txn_status 
+      END AS transaction_status,
+      pg.tenant_id AS ulb_code, INITCAP(SPLIT_PART(pg.tenant_id, '.', 2)) AS tenant_id, pg.additional_details->>'ulbName' AS ulb_name,
+      pg.additional_details->>'ulbType' AS ulb_type,pg.consumer_code AS application_number, pg.name AS applicant_name, pg.mobile_number, 
+      CASE 
+        WHEN bd.businessservice = 'BPA.NC_APP_FEE' THEN 'Pay 1'
+        WHEN bd.businessservice = 'BPA.NC_SAN_FEE' THEN 'Pay 2'
+        ELSE bd.businessservice 
+      END AS service_label,ud.district,
+      TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date, TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') AS year,
+      TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'MM') AS month,
+      
+      TO_CHAR((MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1), 'FM09') AS financial_month,
+      TO_CHAR((MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1), 'FM09') || ' - ' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'FMMonth') AS month_name,
+      
+      CASE 
+        WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000)) >= 4 
+        THEN TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) + INTERVAL '1 year', 'YY')
+        ELSE TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) - INTERVAL '1 year', 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YY')
+      END AS financial_year,
+      CASE 
+              WHEN bpa.status = 'PENDING_APPL_FEE' THEN 'Pending Application Fee'
+              WHEN bpa.status = 'CITIZEN_APPROVAL_PENDING' THEN 'Pending Citizen Approval'
+              WHEN bpa.status = 'SEND_TO_CITIZEN' THEN 'Sent back to Citizen'
+              WHEN bpa.status = 'INPROGRESS' THEN 'In Progress'
+              WHEN bpa.status = 'PENDING_APPL_FEE_PAYMENT' THEN 'Pending Application Fee Payment'
+              WHEN bpa.status = 'DOC_VERIFICATION_PENDING' THEN 'Document Verification Pending'
+              WHEN bpa.status = 'FIELDINSPECTION_PENDING' THEN 'Field Inspection Pending'
+              WHEN bpa.status = 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In-Progress'
+              WHEN bpa.status = 'NOC_VERIFICATION_PENDING' THEN 'NOC Verification Pending'
+              WHEN bpa.status = 'PENDINGAPPROVAL' THEN 'Pending Final Approval'
+              WHEN bpa.status = 'PENDING_SANC_FEE_PAYMENT' THEN 'Pending Sanction Fee Payment'
+              WHEN bpa.status = 'APPROVED' THEN 'Approved'
+              WHEN bpa.status = 'REJECTED' THEN 'Rejected'
+              WHEN bpa.status = 'LEVEL3_VERIFICATION_PENDING' THEN 'L3 Verification Pending'
+              WHEN bpa.status = 'LEVEL4_VERIFICATION_PENDING' THEN 'L4 Verification Pending'
+              WHEN bpa.status = 'JC_VERIFICATION_PENDING' THEN 'JC Verification Pending'
+              WHEN bpa.status = 'MC_VERIFICATION_PENDING' THEN 'MC Verification Pending'
+              WHEN bpa.status = 'ATPHQ_APPROVAL_PENDING' THEN 'ATP HQ Approval Pending'
+              WHEN bpa.status = 'PENDINGINITIALVERIFICATION' THEN 'Pending Initial Verification'
+              ELSE REPLACE(INITCAP(REPLACE(bpa.status, '_', ' ')), ' ', ' ')
+            END AS status_of_application,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_APP_FEE' AND dd_sub.taxheadcode = 'BPA_BUILDING_APPLICATION_FEES'), 0) AS pay1_bpa_building_application_fees,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_APP_FEE' AND dd_sub.taxheadcode = 'BPA_PROCESSING_FEES'), 0) AS pay1_bpa_processing_fees,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_APP_FEE' AND dd_sub.taxheadcode = 'BPA_BOUNDARY_WALL_FEES'), 0) AS pay1_bpa_boundary_wall_fees,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_APP_FEE' AND dd_sub.taxheadcode = 'BPA_OTHER_CHARGES'), 0) AS pay1_bpa_other_charges,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'BPA_BUILDING_APPLICATION_FEES'), 0) AS pay2_bpa_building_application_fees,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'BPA_PROCESSING_FEES'), 0) AS pay2_bpa_processing_fees,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'BPA_BOUNDARY_WALL_FEES'), 0) AS pay2_bpa_boundary_wall_fees,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'BPA_CLUBBING_CHARGES'), 0) AS pay2_bpa_clubbing_charges,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'BPA_CLU_CHARGES'), 0) AS pay2_bpa_clu_charges,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'BPA_EXTERNAL_DEVELOPMENT_CHARGES'), 0) AS pay2_bpa_external_development_charges,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'BPA_GAUSHALA_CHARGES_CESS'), 0) AS pay2_bpa_gaushala_charges_cess,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'BPA_LABOUR_CESS'), 0) AS pay2_bpa_labour_cess,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'BPA_MALBA_CHARGES'), 0) AS pay2_bpa_malba_charges,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'BPA_MINING_CHARGES'), 0) AS pay2_bpa_mining_charges,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'BPA_OTHER_CHARGES'), 0) AS pay2_bpa_other_charges,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'BPA_PURCHASABLE_FAR_CHARGES'), 0) AS pay2_bpa_purchasable_far_charges,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'BPA_RAIN_WATER_HARVESTING_CHARGES'), 0) AS pay2_bpa_rain_water_harvesting_charges,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'BPA_SUB-DIVISION_CHARGES'), 0) AS pay2_bpa_sub_division_charges,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'BPA_URBAN_DEVELOPMENT_CESS'), 0) AS pay2_bpa_urban_development_cess,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'BPA_WATER_CHARGES'), 0) AS pay2_bpa_water_charges,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'ADJ_BPA_EXTERNAL_DEVELOPMENT_CHARGES'), 0) AS pay2_adj_bpa_external_development_charges,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'ADJ_BPA_OTHER_CHARGES'), 0) AS pay2_adj_bpa_other_charges,
+            COALESCE((SELECT SUM(dd_sub.taxamount) FROM egbs_demanddetail_v1 dd_sub WHERE dd_sub.demandid = bd.demandid AND bd.businessservice = 'BPA.NC_SAN_FEE' AND dd_sub.taxheadcode = 'ADJ_BPA_WATER_CHARGES'), 0) AS pay2_adj_bpa_water_charges
+            FROM eg_pg_transactions pg 
+            INNER JOIN egbs_bill_v1 bill ON bill.id = pg.bill_id
+            INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
+            LEFT JOIN eg_bpa_buildingplan bpa ON pg.consumer_code = bpa.applicationno AND pg.tenant_id = bpa.tenantid
+            LEFT JOIN ulb_data ud ON pg.tenant_id = ud.ulb_code 
+            WHERE bd.businessservice IN ('BPA.NC_APP_FEE', 'BPA.NC_SAN_FEE') 
+            AND pg.tenant_id != 'pb.testing'
+  orderby: ORDER BY application_number, created_date;
