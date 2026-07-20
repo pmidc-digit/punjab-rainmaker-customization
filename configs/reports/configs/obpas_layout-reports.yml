@@ -1581,7 +1581,7 @@ ReportDefinitions:
     type: string
     source: obpas_layout
     total: false
-  - name: financial_month
+  - name: month_name
     label: Financial Month
     type: string
     source: obpas_layout
@@ -1671,7 +1671,13 @@ ReportDefinitions:
     source: obpas_layout
     isMandatory: false
     searchClause: AND ud.district = $district
-
+  - name: transactionstatus
+    label: Transaction Status
+    type: singlevaluelist
+    pattern: 'list://SUCCESS:Success,FAILURE:Failure'
+    source: obpas_layout
+    isMandatory: false
+    searchClause: AND pg.txn_status = $transactionstatus
   query: |
       SELECT 
       CASE 
@@ -1688,22 +1694,21 @@ ReportDefinitions:
       pg.tenant_id AS ulb_code,  INITCAP(SPLIT_PART(pg.tenant_id, '.', 2)) AS tenant_id, pg.additional_details->>'ulbName' AS ulb_name,
       pg.additional_details->>'ulbType' AS ulb_type, pg.consumer_code AS application_number, pg.name AS applicant_name, pg.mobile_number, 
       CASE 
-        WHEN bd.businessservice = 'LAYOUT.PAY1' THEN 'Layout Pay 1'
-        WHEN bd.businessservice = 'LAYOUT.PAY2' THEN 'Layout Pay 2'
+        WHEN bd.businessservice = 'LAYOUT.PAY1' THEN 'Pay 1'
+        WHEN bd.businessservice = 'LAYOUT.PAY2' THEN 'Pay 2'
         ELSE bd.businessservice 
        END AS service_label,
       TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_date,
       TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') AS year,
-      TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'Month') AS month,
+      EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT AS month,
+      (MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1)::INT AS financial_month,
+      (MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1)::TEXT || ' - ' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'FMMonth') AS month_name,
+
       CASE 
         WHEN EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000)) >= 4 
         THEN TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) + INTERVAL '1 year', 'YY')
         ELSE TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000) - INTERVAL '1 year', 'YYYY') || '-' || TO_CHAR(TO_TIMESTAMP(pg.created_time / 1000), 'YY')
         END AS financial_year,
-      TO_CHAR(
-        MOD(EXTRACT(MONTH FROM TO_TIMESTAMP(pg.created_time / 1000))::INT - 4 + 12, 12) + 1, 
-        'FM00'
-      ) AS financial_month,
       CASE lay.applicationstatus
         WHEN 'PENDING_APPL_FEE' THEN 'Pending Application Fee'
         WHEN 'CITIZEN_APPROVAL_PENDING' THEN 'Pending Citizen Approval'
