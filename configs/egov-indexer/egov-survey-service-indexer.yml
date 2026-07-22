@@ -326,6 +326,7 @@ ServiceMaps:
           type: general
           id: $.surveyUuid, $.citizenId, $.tenantId
           isBulk: true
+          timeStampField: $.SurveyResponses[*].sectionResponses[*].questionResponses[*].answerResponse.auditDetails.lastModifiedTime
           jsonPath: $.SurveyResponses.*
           customJsonMapping:
             indexMapping: {
