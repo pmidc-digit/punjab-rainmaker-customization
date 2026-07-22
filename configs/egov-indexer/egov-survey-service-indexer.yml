@@ -293,18 +293,23 @@ ServiceMaps:
               "Data":{
                 "surveyResponseUuid": "uuid",
                 "surveyUuid": "surveyUuid",
+                "surveyName": "surveyName",
+                "surveyTitle": "surveyTitle",
                 "tenantId": "tenantId",
                 "citizenId": "citizenId",
                 "locality": "locality",
                 "coordinates": "coordinates",
                 "status": "status",
-                "comments": "comments",
                 "answers": [ ]}}
             fieldMapping:
               - inJsonPath: $.uuid
                 outJsonPath: $.Data.surveyResponseUuid
               - inJsonPath: $.surveyUuid
                 outJsonPath: $.Data.surveyUuid
+              - inJsonPath: $.surveyName
+                outJsonPath: $.Data.surveyName
+              - inJsonPath: $.surveyTitle
+                outJsonPath: $.Data.surveyTitle
               - inJsonPath: $.tenantId
                 outJsonPath: $.Data.tenantId
               - inJsonPath: $.citizenId
@@ -315,8 +320,6 @@ ServiceMaps:
                 outJsonPath: $.Data.coordinates
               - inJsonPath: $.status
                 outJsonPath: $.Data.status
-              - inJsonPath: $.comments
-                outJsonPath: $.Data.comments
               - inJsonPath: $.answers[*]
                 outJsonPath: $.Data.answers
 
@@ -327,23 +330,27 @@ ServiceMaps:
           type: general
           id: $.surveyUuid, $.citizenId, $.tenantId
           isBulk: true
-          timeStampField: $.surveyResponses[*].sectionResponses[*].questionResponses[*].answerResponse.auditDetails.lastModifiedTime
+          timeStampField: $.sectionResponses[0].questionResponses[0].answerResponse.auditDetails.lastModifiedTime
           jsonPath: $.SurveyResponses.*
           customJsonMapping:
             indexMapping: {
-              "Data": {
-                "surveyResponseUuid": "uuid",
+              "Data":{
                 "surveyUuid": "surveyUuid",
+                "surveyName": "surveyName",
+                "surveyTitle": "surveyTitle",
                 "tenantId": "tenantId",
                 "citizenId": "citizenId",
                 "locality": "locality",
                 "coordinates": "coordinates",
                 "status": "status",
-                "comments": "comments",
-                "answers": [ ] } }
+                "answers": [ ]}}
             fieldMapping:
               - inJsonPath: $.surveyUuid
                 outJsonPath: $.Data.surveyUuid
+              - inJsonPath: $.surveyName
+                outJsonPath: $.Data.surveyName
+              - inJsonPath: $.surveyTitle
+                outJsonPath: $.Data.surveyTitle
               - inJsonPath: $.tenantId
                 outJsonPath: $.Data.tenantId
               - inJsonPath: $.citizenId
@@ -354,7 +361,5 @@ ServiceMaps:
                 outJsonPath: $.Data.coordinates
               - inJsonPath: $.status
                 outJsonPath: $.Data.status
-              - inJsonPath: $.comments
-                outJsonPath: $.Data.comments
-              - inJsonPath: $.answers[*]
-                outJsonPath: $.Data.sectionResponses[*].questionResponses[*].answerResponse
+              - inJsonPath: $.sectionResponses
+                outJsonPath: $.Data.answers
