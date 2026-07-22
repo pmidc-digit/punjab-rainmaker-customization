@@ -326,11 +326,12 @@ ServiceMaps:
           type: general
           id: $.surveyUuid, $.citizenId, $.tenantId
           isBulk: true
-          timeStampField: $.SurveyResponses[*].sectionResponses[*].questionResponses[*].answerResponse.auditDetails.lastModifiedTime
+          timeStampField: $.sectionResponses[0].questionResponses[0].answerResponse.auditDetails.lastModifiedTime
           jsonPath: $.SurveyResponses.*
           customJsonMapping:
             indexMapping: {
-              "Data": {
+              "Data":{
+                "surveyResponseUuid": "uuid",
                 "surveyUuid": "surveyUuid",
                 "surveyName": "surveyName",
                 "surveyTitle": "surveyTitle",
@@ -339,9 +340,10 @@ ServiceMaps:
                 "locality": "locality",
                 "coordinates": "coordinates",
                 "status": "status",
-                "comments": "comments",
-                "sectionResponses": [ ] } }
+                "answers": [ ]}}
             fieldMapping:
+              - inJsonPath: $.uuid
+                outJsonPath: $.Data.surveyResponseUuid
               - inJsonPath: $.surveyUuid
                 outJsonPath: $.Data.surveyUuid
               - inJsonPath: $.surveyName
@@ -358,7 +360,5 @@ ServiceMaps:
                 outJsonPath: $.Data.coordinates
               - inJsonPath: $.status
                 outJsonPath: $.Data.status
-              - inJsonPath: $.comments
-                outJsonPath: $.Data.comments
               - inJsonPath: $.sectionResponses
-                outJsonPath: $.Data.sectionResponses
+                outJsonPath: $.Data.answers
