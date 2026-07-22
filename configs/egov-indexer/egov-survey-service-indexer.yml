@@ -219,7 +219,7 @@ ServiceMaps:
           timeStampField: $.lastModifiedTime
           jsonPath: $
           customJsonMapping:
-            indexMapping: {"Data":{"uuid": "uuid","tenantId": "tenantId","active": "active","lastModifiedBy": "lastModifiedBy","lastModifiedTime": "lastModifiedTime","auditDetails": {}}}
+            indexMapping: {"Data":{"uuid": "uuid","tenantId": "tenantId","active": "active","startDate": "startDate","endDate": "endDate","lastModifiedBy": "lastModifiedBy","lastModifiedTime": "lastModifiedTime","auditDetails": {}}}
             fieldMapping:
               - inJsonPath: $.uuid
                 outJsonPath: $.Data.uuid
@@ -227,6 +227,10 @@ ServiceMaps:
                 outJsonPath: $.Data.tenantId
               - inJsonPath: $.active
                 outJsonPath: $.Data.active
+              - inJsonPath: $.startDate
+                outJsonPath: $.Data.startDate
+              - inJsonPath: $.endDate
+                outJsonPath: $.Data.endDate
               - inJsonPath: $.lastModifiedBy
                 outJsonPath: $.Data.lastModifiedBy
               - inJsonPath: $.lastModifiedTime
@@ -320,7 +324,7 @@ ServiceMaps:
                 outJsonPath: $.Data.answers
 
     - topic: csc-answer-legacyIndex
-      configKey: LEGACYINDEX
+      configKey: INDEX
       indexes:
         - name: csc-answer
           type: general
