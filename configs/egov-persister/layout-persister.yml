@@ -228,15 +228,22 @@ serviceMaps:
             - jsonPath: $.Layout.layoutDetails.id
 
 
-        - query: > 
+        - query: >
             INSERT INTO eg_layout_owner (
               id, tenantid, layoutId, status, isprimaryowner,
               ownertype, ownershippercentage, institutionid, relationship,
-              createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails
-            ,uuid
-            ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+              createdby, createdtime, lastmodifiedby, lastmodifiedtime, additionaldetails, uuid
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (uuid, layoutId) DO UPDATE SET
-            status = EXCLUDED.status;
+            status = EXCLUDED.status,
+            isprimaryowner = EXCLUDED.isprimaryowner,
+            ownertype = EXCLUDED.ownertype,
+            ownershippercentage = EXCLUDED.ownershippercentage,
+            institutionid = EXCLUDED.institutionid,
+            relationship = EXCLUDED.relationship,
+            additionaldetails = EXCLUDED.additionaldetails,
+            lastmodifiedby = EXCLUDED.lastmodifiedby,
+            lastmodifiedtime = EXCLUDED.lastmodifiedtime;
           basePath: $.Layout.owners.*
 
           jsonMaps:
