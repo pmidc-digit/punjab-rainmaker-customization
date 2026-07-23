@@ -145,6 +145,31 @@
                 }
               },
               {
+                "variable": "var_billDetails",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "object",
+                  "scema": [
+                    {
+                      "variable": "billTaxHeadCode",
+                      "value": "taxHeadCode",
+                      "localisation": {
+                        "required": true,
+                        "prefix": "LAYOUT",
+                        "module": "rainmaker-common"
+                      }
+                    },
+                    {
+                      "variable": "billAmount",
+                      "value": "amount"
+                    }
+                  ]
+                }
+              },
+              {
                 "variable": "CluOther1Fee",
                 "value": {
                   "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'LAYOUT_OTHERCHARGES1_FEE')].adjustedAmount"

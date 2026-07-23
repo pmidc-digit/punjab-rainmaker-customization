@@ -60,6 +60,31 @@
                 }
               },
               {
+                "variable": "var_billDetails",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "object",
+                  "scema": [
+                    {
+                      "variable": "billTaxHeadCode",
+                      "value": "taxHeadCode",
+                      "localisation": {
+                        "required": true,
+                        "prefix": "CLU",
+                        "module": "rainmaker-common"
+                      }
+                    },
+                    {
+                      "variable": "billAmount",
+                      "value": "amount"
+                    }
+                  ]
+                }
+              },
+              {
                 "variable": "paymentType",
                 "value": {
                   "path": "BPA_PAYMENT_TYPE1"
