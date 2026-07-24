@@ -125,12 +125,12 @@ SearchDefinitions:
             ptadd.locality as ptadd_locality, ptadd.street as ptadd_street, ptadd.region as ptadd_region, ptadd.plotno as ptadd_plotno, ptadd.buildingname as ptadd_buildingname, ptadd.district as ptadd_district, ptadd.state as ptadd_state, ptadd.latitude as ptadd_latitude, ptadd.longitude as ptadd_longitude, ptown.userid as ptown_userid,
             lm.connectionno AS mr_connectionno,lm.lastreading AS mr_lastreading,lm.lastreadingdate AS mr_lastreadingdate,lm.currentreading AS mr_currentreading,lm.currentreadingdate AS mr_currentreadingdate,lm.consumption AS mr_consumption,lm.meterstatus AS mr_meterstatus,lm.billingperiod AS mr_billingperiod 
 
-           FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid 
+           FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid and bd.totalamount > 0 and b.status = 'ACTIVE'
             INNER JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid
             INNER JOIN eg_ws_connection conn ON bd.consumercode = conn.connectionno
             INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid and pt.status <> 'INACTIVE'
             INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id 
-            INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id
+            INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id and ptown.status <> 'INACTIVE'
             LEFT JOIN (
               SELECT *
               FROM (
@@ -994,18 +994,12 @@ SearchDefinitions:
           INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid
           INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id
           INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id
-          LEFT JOIN (
-          SELECT *
-          FROM (
-            SELECT mr.*,
-                    ROW_NUMBER() OVER (
-                      PARTITION BY mr.connectionno
-                      ORDER BY mr.createdtime DESC
-                    ) rn
-            FROM eg_ws_meterreading mr
-          ) t
-          WHERE rn = 1
-         ) lm ON lm.connectionno = conn.connectionno
+          LEFT JOIN LATERAL ( 
+          SELECT mr.connectionno,mr.lastreading,mr.lastreadingdate,
+          mr.currentreading,mr.currentreadingdate,mr.consumption,mr.meterstatus,
+           mr.billingperiod FROM eg_ws_meterreading mr
+            WHERE mr.connectionno = conn.connectionno
+                ORDER BY mr.createdtime DESC LIMIT 1) lm ON TRUE 
           $where
           AND conn.status = 'Active'
           ),
@@ -1067,7 +1061,7 @@ SearchDefinitions:
           FROM filtered_conn fc
           INNER JOIN egbs_bill_v1 b
           ON fc.connectionno = b.consumercode
-          AND b.tenantid = fc.tenantid
+          AND b.tenantid = fc.tenantid 
           INNER JOIN egbs_billdetail_v1 bd
           ON b.id = bd.billid
           AND b.tenantid = bd.tenantid

@@ -2185,7 +2185,9 @@ ReportDefinitions:
                     FROM egcl_billaccountdetail 
                     INNER JOIN egcl_billdetial as billd on billd.id = egcl_billaccountdetail.billdetailid
                     INNER JOIN egcl_bill as bill on bill.id=billd.billid
-                    WHERE  billd.tenantid=$tenantid AND businessservice not in ('PT','TL','FIRENOC','WS','SW','WS.ONE_TIME_FEE') 
+                    WHERE  billd.tenantid=$tenantid AND businessservice not in ('PT','TL','FIRENOC','WS','SW','WS.ONE_TIME_FEE',
+                    'obpas_noc','CLU.PAY1','CLU.PAY2','LAYOUT.PAY1','LAYOUT.PAY2','NDC','pet-services','chb-services','adv-services','rl-services',
+                    'Challan_Generation','BPA.NC_SAN_FEE','BPA.NC_APP_FEE','BPAREG') 
                     GROUP BY billdetailid,bill.id
                     )
         SELECT 
@@ -2217,7 +2219,9 @@ ReportDefinitions:
         LEFT OUTER JOIN eg_echallan as challan on challan.challanno=bill.consumercode
         JOIN eg_user ON payment.createdby::INTEGER=eg_user.id
         LEFT OUTER JOIN bank_branches on bank_branches.ifsc=payment.ifsccode 
-        WHERE  payment.tenantid=$tenantid AND bill.businessservice not in ('PT','TL','FIRENOC','WS','SW','WS.ONE_TIME_FEE') and payment.paymentstatus != 'CANCELLED'
+        WHERE  payment.tenantid=$tenantid AND bill.businessservice not in ('PT','TL','FIRENOC','WS','SW','WS.ONE_TIME_FEE',
+        'obpas_noc','CLU.PAY1','CLU.PAY2','LAYOUT.PAY1','LAYOUT.PAY2','NDC','pet-services','chb-services','adv-services','rl-services',
+        'Challan_Generation','BPA.NC_SAN_FEE','BPA.NC_APP_FEE','BPAREG') and payment.paymentstatus != 'CANCELLED'
     orderby: ORDER BY paydetail.receiptdate DESC
     
   - reportName: uc_7to10sept2020_receipts

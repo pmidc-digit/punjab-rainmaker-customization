@@ -6292,7 +6292,7 @@ ReportDefinitions:
     source: pt
     total: true
   - name: assessmentyears
-    label: report.pt.assessmentyears
+    label: assessmentyears
     type: string
     source: pt
     total: false    
@@ -6361,6 +6361,11 @@ ReportDefinitions:
     type: string
     source: pt
     total: false
+  - name: usagetype
+    label: usagetype
+    type: string
+    source: pt
+    total: false    
   - name: collectorname
     label: reports.pt.collectorname
     type: string
@@ -6427,11 +6432,11 @@ ReportDefinitions:
         asmt.interest as interest,
         asmt.exemption as exemption,
         asmt.roundoff as adjustment,
-        (case when rp.collectedby is null then '30048|21Fj+c3k2ldB0X3AzIh7atXB' else rp.collectedby end) as collectorname    --,
-        --p.ownershipcategory as ownershipcategory,
-        --p.propertyusagetype as usagetype,
-        --p.localityname as localityname,
-        --p.blockcode as block
+        (case when rp.collectedby is null then '30048|21Fj+c3k2ldB0X3AzIh7atXB' else rp.collectedby end) as collectorname,
+        p.ownershipcategory as ownershipcategory,
+        p.propertyusagetype as usagetype,
+        p.localityname as localityname,
+        p.blockcode as block
       from report_payments as rp
       inner join assessments as asmt on  asmt.billid = rp.billid -- asmt.billid like concat('%',rp.billid,'%')
       inner join report_properties p on (p.propertyid=rp.propertyid and p.propertystatus='ACTIVE')
@@ -6955,6 +6960,16 @@ ReportDefinitions:
     type: string
     source: pt
     total: true
+  - name: 2025_26PTR
+    label: 2025_26_PTR
+    type: string
+    source: pt
+    total: true  
+  - name: 2025_26Collection
+    label: 2025_26Collection
+    type: string
+    source: pt
+    total: true    
   - name: totalptr
     label: reports.pt.totalptr
     type: string
@@ -7037,7 +7052,9 @@ ReportDefinitions:
       sum(case when assessmentyears='2023-24' then amount else 0 end) as "2023_24Collection",
       sum(case when assessmentyears='2023-24' then totalcount else 0 end) as "2023_24PTR",  
       sum(case when assessmentyears='2024-25' then amount else 0 end) as "2024_25Collection",
-      sum(case when assessmentyears='2024-25' then totalcount else 0 end) as "2024_25PTR",  
+      sum(case when assessmentyears='2024-25' then totalcount else 0 end) as "2024_25PTR",
+      sum(case when assessmentyears='2025-26' then amount else 0 end) as "2025_26Collection",
+      sum(case when assessmentyears='2025-26' then totalcount else 0 end) as "2025_26PTR",
       sum(amount) as totalcollection,
       sum(totalcount) as totalptr
     from summary 

@@ -6,7 +6,7 @@ serviceMaps:
       fromTopic: save-advertisement-booking
       isTransaction: true
       queryMaps:
-        - query: INSERT INTO public.eg_adv_booking_detail(booking_id, booking_no, payment_date, application_date, tenant_id, booking_status, receipt_no, createdby, createdtime, lastmodifiedby, lastmodifiedtime, advertisementId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?);
+        - query: INSERT INTO public.eg_adv_booking_detail(booking_id, booking_no, payment_date, application_date, tenant_id, booking_status, receipt_no, booking_start_date, booking_end_date, createdby, createdtime, lastmodifiedby, lastmodifiedtime,advertisementId) VALUES (?, ?, ?, ?, ?, ?, ?, ?::DATE, ?::DATE, ?, ?, ?, ?, ?);
           basePath: bookingApplication
           jsonMaps:
             - jsonPath: $.bookingApplication.bookingId
@@ -16,6 +16,8 @@ serviceMaps:
             - jsonPath: $.bookingApplication.tenantId
             - jsonPath: $.bookingApplication.bookingStatus
             - jsonPath: $.bookingApplication.receiptNo
+            - jsonPath: $.bookingApplication.bookingStartDate
+            - jsonPath: $.bookingApplication.bookingEndDate
             - jsonPath: $.bookingApplication.auditDetails.createdBy
             - jsonPath: $.bookingApplication.auditDetails.createdTime
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedBy

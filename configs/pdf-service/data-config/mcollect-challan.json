@@ -3,7 +3,7 @@
     "DataConfigs": {
         "serviceName": "rainmaker-common",
         "version": "1.0.0",
-        "baseKeyPath": "$.Challan",
+        "baseKeyPath": "$.Challan.*",
         "entityIdPath": "$.id",
         "isCommonTableBorderRequired": true,
         "mappings": [
@@ -15,7 +15,7 @@
                             {
                                 "variable": "consumerName",
                                 "value": {
-                                    "path": "$.citizen.name"
+                                    "path": "$.challanDetails.citizen.name"
                                 }
                             },
                             {
@@ -27,7 +27,7 @@
                             {
                                 "variable": "challanNo",
                                 "value": {
-                                    "path": "$.challanNo"
+                                    "path": "$.consumerCode"
                                 }
                             },
                             {
@@ -44,7 +44,7 @@
                             {
                                 "variable": "serviceCategory",
                                 "value": {
-                                    "path": "$.serviceType"
+                                    "path": "$.businessService"
                                 },
                                 "localisation": {
                                     "required": true,
@@ -55,14 +55,14 @@
                             {
                                 "variable": "fromPeriod",
                                 "value": {
-                                    "path": "$.taxPeriodFrom"
+                                    "path": "$.challanDetails.taxPeriodFrom"
                                 },
                                 "type": "date"
                             },
                             {
                                 "variable": "billNo",
                                 "value": {
-                                    "path": "$.billNo"
+                                    "path": "$.billNumber"
                                 }
                             },
                             {
@@ -75,7 +75,7 @@
                             {
                                 "variable": "toPeriod",
                                 "value": {
-                                    "path": "$.taxPeriodTo"
+                                    "path": "$.challanDetails.taxPeriodTo"
                                 },
                                 "type": "date"
                             },
@@ -291,49 +291,49 @@
                             {
                                 "variable": "doorHouseNo",
                                 "value": {
-                                    "path": "$.address.doorNo"
+                                    "path": "$.challanDetails.address.doorNo"
                                 },
                                 "type": "setEmpty"
                             },
                             {
                                 "variable": "buildingColonyName",
                                 "value": {
-                                    "path": "$.address.buildingName"
+                                    "path": "$.challanDetails.address.buildingName"
                                 },
                                 "type": "setEmpty"
                             },
                             {
                                 "variable": "streetName",
                                 "value": {
-                                    "path": "$.address.street"
+                                    "path": "$.challanDetails.address.street"
                                 },
                                 "type": "setEmpty"
                             },
                             {
                                 "variable": "buildingName",
                                 "value": {
-                                    "path": "$.address.buildingName"
+                                    "path": "$.challanDetails.address.buildingName"
                                 },
                                 "type": "setEmpty"
                             },
                             {
                                 "variable": "pinCode",
                                 "value": {
-                                    "path": "$.address.pincode"
+                                    "path": "$.challanDetails.address.pincode"
                                 },
                                 "type": "setEmpty"
                             },
                             {
                                 "variable": "challanStatus",
                                 "value": {
-                                    "path": "$.applicationStatus"
+                                    "path": "$.challanDetails.applicationStatus"
                                 },
                                 "type": "challanStatus"
                             },
                             {
                                 "variable": "challanRemarks",
                                 "value": {
-                                    "path": "$.description"
+                                    "path": "$.challanDetails.description"
 
                                 }
                             },
@@ -642,7 +642,7 @@
                             {
                                 "variable": "variable10",
                                 "value": {
-                                    "path": "$.amount.*"
+                                    "path": "$.billDetails[0].billAccountDetails[*]"
                                 },
                                 "type": "array",
                                 "format": {
@@ -680,19 +680,24 @@
                                 "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}')%5D",
                                 "apiRequest": null,
                                 "responseMapping": [
-                                    {
-                                        "variable": "cb-name",
-                                        "value": "$.MdmsRes.tenant.tenants[0].code",
-                                        "localisation": {
-                                            "required": true,
-                                            "prefix": "TENANT_TENANTS",
-                                            "module": "rainmaker-common"
-                                        }
-                                    },
-                                    {
-                                        "variable":"mcGrade",
-                                        "value":"$.MdmsRes.tenant.tenants[0].city.ulbType"
-                                      }
+                                  {
+                                    "variable": "cb-name",
+                                    "value": "$.MdmsRes.tenant.tenants[0].code",
+                                    "localisation": {
+                                      "required": true,
+                                      "prefix": "TENANT_TENANTS",
+                                      "module": "rainmaker-common"
+                                    }
+                                  },
+                                  {
+                                    "variable": "footerLogoImage",
+                                    "value": "$.MdmsRes.tenant.tenants[0].footerLogo",
+                                    "type": "image"
+                                  },
+                                  {
+                                    "variable": "mcGrade",
+                                    "value": "$.MdmsRes.tenant.tenants[0].city.ulbType"
+                                  }
                                 ]
                             },
                             { 

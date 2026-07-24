@@ -219,7 +219,7 @@ ServiceMaps:
           timeStampField: $.lastModifiedTime
           jsonPath: $
           customJsonMapping:
-            indexMapping: {"Data":{"uuid": "uuid","tenantId": "tenantId","active": "active","lastModifiedBy": "lastModifiedBy","lastModifiedTime": "lastModifiedTime","auditDetails": {}}}
+            indexMapping: {"Data":{"uuid": "uuid","tenantId": "tenantId","active": "active","startDate": "startDate","endDate": "endDate","lastModifiedBy": "lastModifiedBy","lastModifiedTime": "lastModifiedTime","auditDetails": {}}}
             fieldMapping:
               - inJsonPath: $.uuid
                 outJsonPath: $.Data.uuid
@@ -227,6 +227,10 @@ ServiceMaps:
                 outJsonPath: $.Data.tenantId
               - inJsonPath: $.active
                 outJsonPath: $.Data.active
+              - inJsonPath: $.startDate
+                outJsonPath: $.Data.startDate
+              - inJsonPath: $.endDate
+                outJsonPath: $.Data.endDate
               - inJsonPath: $.lastModifiedBy
                 outJsonPath: $.Data.lastModifiedBy
               - inJsonPath: $.lastModifiedTime
@@ -289,6 +293,8 @@ ServiceMaps:
               "Data":{
                 "surveyResponseUuid": "uuid",
                 "surveyUuid": "surveyUuid",
+                "surveyName": "surveyName",
+                "surveyTitle": "surveyTitle",
                 "tenantId": "tenantId",
                 "citizenId": "citizenId",
                 "locality": "locality",
@@ -300,6 +306,10 @@ ServiceMaps:
                 outJsonPath: $.Data.surveyResponseUuid
               - inJsonPath: $.surveyUuid
                 outJsonPath: $.Data.surveyUuid
+              - inJsonPath: $.surveyName
+                outJsonPath: $.Data.surveyName
+              - inJsonPath: $.surveyTitle
+                outJsonPath: $.Data.surveyTitle
               - inJsonPath: $.tenantId
                 outJsonPath: $.Data.tenantId
               - inJsonPath: $.citizenId
@@ -314,28 +324,33 @@ ServiceMaps:
                 outJsonPath: $.Data.answers
 
     - topic: csc-answer-legacyIndex
-      configKey: LEGACYINDEX
+      configKey: INDEX
       indexes:
         - name: csc-answer
           type: general
           id: $.surveyUuid, $.citizenId, $.tenantId
           isBulk: true
-          timeStampField: $.surveyResponses[*].sectionResponses[*].questionResponses[*].answerResponse.auditDetails.lastModifiedTime
+          timeStampField: $.sectionResponses[0].questionResponses[0].answerResponse.auditDetails.lastModifiedTime
           jsonPath: $.SurveyResponses.*
           customJsonMapping:
             indexMapping: {
-              "Data": {
-                "surveyResponseUuid": "uuid",
+              "Data":{
                 "surveyUuid": "surveyUuid",
+                "surveyName": "surveyName",
+                "surveyTitle": "surveyTitle",
                 "tenantId": "tenantId",
                 "citizenId": "citizenId",
                 "locality": "locality",
                 "coordinates": "coordinates",
                 "status": "status",
-                "answers": [ ] } }
+                "answers": [ ]}}
             fieldMapping:
               - inJsonPath: $.surveyUuid
                 outJsonPath: $.Data.surveyUuid
+              - inJsonPath: $.surveyName
+                outJsonPath: $.Data.surveyName
+              - inJsonPath: $.surveyTitle
+                outJsonPath: $.Data.surveyTitle
               - inJsonPath: $.tenantId
                 outJsonPath: $.Data.tenantId
               - inJsonPath: $.citizenId
@@ -346,5 +361,5 @@ ServiceMaps:
                 outJsonPath: $.Data.coordinates
               - inJsonPath: $.status
                 outJsonPath: $.Data.status
-              - inJsonPath: $.answers[*]
-                outJsonPath: $.Data.sectionResponses[*].questionResponses[*].answerResponse
+              - inJsonPath: $.sectionResponses
+                outJsonPath: $.Data.answers

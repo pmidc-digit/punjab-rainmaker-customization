@@ -120,7 +120,7 @@ ReportDefinitions:
   - name: paymentMode
     label: paymentMode
     type: singlevaluelist
-    pattern: 'list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT'
+    pattern: 'list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT,BBPS:BBPS'
     source: pt
     isMandatory: false
     searchClause: AND payment.paymentmode like $paymentMode
@@ -6484,22 +6484,12 @@ ReportDefinitions:
       label: Property id
       type: string
       source: ws
-      total: false    
-    - name: billid
-      label: Bill Id
-      type: string
-      source: ws
       total: false
     - name: totalamount
       label: totalamount
       type: string
       source: ws
       total: true
-    - name: consumercode
-      label: consumercode
-      type: string
-      source: ws
-      total: false    
     - name: localityname
       label: localityname
       type: string
@@ -6529,9 +6519,19 @@ ReportDefinitions:
       label: landarea
       type: string
       source: ws
-      total: false    
+      total: false
+    - name: bill_no
+      label: bill_number
+      type: string
+      source: ws
+      total: false
     - name: bill_status
       label: bill_status
+      type: string
+      source: ws
+      total: false
+    - name: bill_date
+      label: bill_date
       type: string
       source: ws
       total: false
@@ -6567,9 +6567,11 @@ ReportDefinitions:
         wc.connectionno,
         wc.property_id,
         lb.billid,
+        bd.billno AS bill_no,
+        to_char((to_timestamp(bd.billdate / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD HH24:MI:SS') AS bill_date, 
         lb.totalamount,
         lb.consumercode,
-      bm.localityname,bm.localitycode,bm.zonecode,bm.blockcode,
+        bm.localityname,bm.localitycode,bm.zonecode,bm.blockcode,
         wc.status AS wc_status,
         pt.landarea,
         b.status AS bill_status
@@ -6579,6 +6581,7 @@ ReportDefinitions:
     JOIN latest_bill lb     ON lb.consumercode = wc.connectionno
         AND lb.rn = 1           
     JOIN egbs_bill_v1 b     ON lb.billid = b.id and b.tenantid = $tenantid
+    JOIN egbs_billdetail_v1 bd on bd.billid = b.id and bd.tenantid = $tenantid
     WHERE wc.tenantid = $tenantid
       AND wc.connectionno IS NOT NULL
       AND wc.status = 'Active' 
@@ -6610,8 +6613,8 @@ ReportDefinitions:
       type: string
       source: ws
       total: false     
-    - name: billid
-      label: Bill Id
+    - name: bill_no
+      label: bill_number
       type: string
       source: ws
       total: false
@@ -6620,11 +6623,6 @@ ReportDefinitions:
       type: string
       source: ws
       total: true
-    - name: consumercode
-      label: consumercode
-      type: string
-      source: ws
-      total: false    
     - name: localityname
       label: localityname
       type: string
@@ -6660,6 +6658,11 @@ ReportDefinitions:
       type: string
       source: ws
       total: false
+    - name: bill_date
+      label: bill_date
+      type: string
+      source: ws
+      total: false
   searchParams:
     - name: localityArray
       label: zoneList
@@ -6692,9 +6695,11 @@ ReportDefinitions:
         wc.connectionno,
         wc.property_id,
         lb.billid,
+        bd.billno AS bill_no,
+        to_char((to_timestamp(bd.billdate / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD HH24:MI:SS') AS bill_date,
         lb.totalamount,
         lb.consumercode,
-      bm.localityname,bm.localitycode,bm.zonecode,bm.blockcode,
+        bm.localityname,bm.localitycode,bm.zonecode,bm.blockcode,
         wc.status AS wc_status,
         pt.landarea,
         b.status AS bill_status
@@ -6704,6 +6709,7 @@ ReportDefinitions:
     JOIN latest_bill lb     ON lb.consumercode = wc.connectionno
         AND lb.rn = 1           
     JOIN egbs_bill_v1 b     ON lb.billid = b.id and b.tenantid = $tenantid
+    JOIN egbs_billdetail_v1 bd on bd.billid = b.id and bd.tenantid = $tenantid
     WHERE wc.tenantid = $tenantid
       AND wc.connectionno IS NOT NULL
       AND wc.status = 'Active'
@@ -7178,10 +7184,10 @@ ReportDefinitions:
       type: string
       source: pt
       isMandatory: false
-      searchClause: AND AND landarea >= $landareafrom     
+      searchClause: AND  landarea >= $landareafrom     
     - name: landareato
       label: landarea To
-      type: boundarylist
+      type: string
       source: ws
       isMandatory: false
       searchClause: AND landarea >= $landareato                                                                                        
@@ -7250,10 +7256,10 @@ ReportDefinitions:
       type: string
       source: pt
       isMandatory: false
-      searchClause: AND AND landarea >= $landareafrom     
+      searchClause: AND landarea >= $landareafrom     
     - name: landareato
       label: landarea To
-      type: boundarylist
+      type: string
       source: ws
       isMandatory: false
       searchClause: AND landarea >= $landareato                                                                                        
