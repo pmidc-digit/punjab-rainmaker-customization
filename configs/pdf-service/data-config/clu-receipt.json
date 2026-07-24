@@ -52,7 +52,6 @@
                   "path": "$.usage"
                 }
               },
-
               {
                 "variable": "Amountinwords",
                 "value": {
@@ -136,6 +135,32 @@
                 "variable": "CluCharge",
                 "value": {
                   "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'CLU_CLU_CHARGES')].adjustedAmount"
+                }
+              },
+
+              {
+                "variable": "var_billDetails",
+                "value": {
+                  "path": "$.paymentDetails[0].bill.billDetails[0].billAccountDetails[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "object",
+                  "scema": [
+                    {
+                      "variable": "billTaxHeadCode",
+                      "value": "taxHeadCode",
+                      "localisation": {
+                        "required": true,
+                        "prefix": "CLU",
+                        "module": "rainmaker-common"
+                      }
+                    },
+                    {
+                      "variable": "billAmount",
+                      "value": "amount"
+                    }
+                  ]
                 }
               },
               {
