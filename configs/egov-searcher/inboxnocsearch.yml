@@ -3,13 +3,6 @@ SearchDefinitions:
   summary: NOC Services Inbox API
   version: 1.0.0
   definitions:
-    # ─────────────────────────────────────────────────────────────────────────
-    # isMigrationTrue filtering:
-    #   Java always injects searchCriteria.isMigrationTrue = "false" (default)
-    #   or "true" (when moduleSearchCriteria.isMigrated = true).
-    #   COALESCE maps NULL (field absent) to 'false' so non-migrated records
-    #   are correctly included in the default view.
-    # ─────────────────────────────────────────────────────────────────────────
     - name: inboxnocsearch
       query:
         baseQuery: |
@@ -31,6 +24,9 @@ SearchDefinitions:
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             LEFT JOIN eg_noc_owner owner ON owner.nocid = noc.id
             LEFT JOIN eg_noc_details nd ON nd.nocid = noc.id
+            LEFT JOIN LATERAL (
+              SELECT COALESCE(nd.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+            ) mig ON TRUE
             $where 
             AND pi.latest = TRUE
             order by noc.createdtime asc
@@ -77,7 +73,7 @@ SearchDefinitions:
             isMandatory: false
             jsonPath: $.searchCriteria.ownerUuid
             operator: IN
-          - name: COALESCE(nd.additionaldetails->>'isMigrationTrue', 'false')
+          - name: mig.ismigrationtrue
             isMandatory: false
             jsonPath: $.searchCriteria.isMigrationTrue
         pagination:
@@ -98,6 +94,9 @@ SearchDefinitions:
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             LEFT JOIN eg_noc_owner owner ON owner.nocid = noc.id
             LEFT JOIN eg_noc_details nd ON nd.nocid = noc.id
+            LEFT JOIN LATERAL (
+              SELECT COALESCE(nd.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+            ) mig ON TRUE
             $where
             AND pi.latest = TRUE
           ) result
@@ -142,7 +141,7 @@ SearchDefinitions:
             isMandatory: false
             jsonPath: $.searchCriteria.ownerUuid
             operator: IN
-          - name: COALESCE(nd.additionaldetails->>'isMigrationTrue', 'false')
+          - name: mig.ismigrationtrue
             isMandatory: false
             jsonPath: $.searchCriteria.isMigrationTrue
         pagination:
@@ -174,6 +173,9 @@ SearchDefinitions:
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
             LEFT JOIN eg_noc_owner owner ON owner.nocid = noc.id
             LEFT JOIN eg_noc_details nd ON nd.nocid = noc.id
+            LEFT JOIN LATERAL (
+              SELECT COALESCE(nd.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+            ) mig ON TRUE
             $where
             AND pi.latest = TRUE
             order by noc.createdtime desc
@@ -220,7 +222,7 @@ SearchDefinitions:
             isMandatory: false
             jsonPath: $.searchCriteria.ownerUuid
             operator: IN
-          - name: COALESCE(nd.additionaldetails->>'isMigrationTrue', 'false')
+          - name: mig.ismigrationtrue
             isMandatory: false
             jsonPath: $.searchCriteria.isMigrationTrue
         pagination:
@@ -240,6 +242,9 @@ SearchDefinitions:
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = noc.applicationno
             LEFT JOIN eg_noc_owner owner ON owner.nocid = noc.id
             LEFT JOIN eg_noc_details nd ON nd.nocid = noc.id
+            LEFT JOIN LATERAL (
+              SELECT COALESCE(nd.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+            ) mig ON TRUE
             $where
             AND pi.latest = TRUE
             GROUP BY noc.tenantid, noc.applicationno, pi.status
@@ -268,7 +273,7 @@ SearchDefinitions:
             isMandatory: false
             jsonPath: $.searchCriteria.status
             operator: IN
-          - name: COALESCE(nd.additionaldetails->>'isMigrationTrue', 'false')
+          - name: mig.ismigrationtrue
             isMandatory: false
             jsonPath: $.searchCriteria.isMigrationTrue
       output:
