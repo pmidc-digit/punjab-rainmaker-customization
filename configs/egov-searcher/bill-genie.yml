@@ -806,8 +806,9 @@ SearchDefinitions:
           - name: bd.businessservice
             isMandatory: false
             jsonPath: $.searchCriteria.businesService
-          - name: b.mobilenumber
+          - name: (b.mobilenumber || ',' || COALESCE(allot.additional_details->>'alternateMobileNumber', ''))
             isMandatory: false
+            operator: LIKE
             jsonPath: $.searchCriteria.mobileNumber
           - name: bd.billno
             isMandatory: false
