@@ -1085,123 +1085,126 @@ SearchDefinitions:
           conn.connectionno,
           conn.status AS conn_status,
           conn.property_id AS pid,
-          conn.oldConnectionNo AS oldpid,
+          conn.oldconnectionno AS oldpid,
           conn.additionaldetails AS conn_add,
-          conn.tenantid AS tenantid,
+          conn.tenantid,
           pt.id AS pt_id,
-          ptadd.doorNo AS ptadd_doorNo,
-          ptadd.landmark AS ptadd_landmark,
-          ptadd.city AS ptadd_city,
-          ptadd.pincode AS ptadd_pincode,
-          ptadd.locality AS ptadd_locality,
-          ptadd.street AS ptadd_street,
-          ptadd.region AS ptadd_region,
-          ptadd.plotno AS ptadd_plotno,
-          ptadd.buildingname AS ptadd_buildingname,
-          ptadd.district AS ptadd_district,
-          ptadd.state AS ptadd_state,
-          ptadd.latitude AS ptadd_latitude,
-          ptadd.longitude AS ptadd_longitude,
-          ptown.userid AS ptown_userid,
-          lm.connectionno AS mr_connectionno,
-          lm.lastreading AS mr_lastreading,
-          lm.lastreadingdate AS mr_lastreadingdate,
-          lm.currentreading AS mr_currentreading,
-          lm.currentreadingdate AS mr_currentreadingdate,
-          lm.consumption AS mr_consumption,
-          lm.meterstatus AS mr_meterstatus,
-          lm.billingperiod AS mr_billingperiod
+          ptadd.doorno,
+          ptadd.landmark,
+          ptadd.city,
+          ptadd.pincode,
+          ptadd.locality,
+          ptadd.street,
+          ptadd.region,
+          ptadd.plotno,
+          ptadd.buildingname,
+          ptadd.district,
+          ptadd.state,
+          ptadd.latitude,
+          ptadd.longitude,
+          ptown.userid,
+          lm.connectionno       AS mr_connectionno,
+          lm.lastreading,
+          lm.lastreadingdate,
+          lm.currentreading,
+          lm.currentreadingdate,
+          lm.consumption,
+          lm.meterstatus,
+          lm.billingperiod
           FROM eg_ws_connection conn
-          INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid
-          INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id
-          INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id
-          LEFT JOIN (SELECT * FROM (SELECT mr.*, ROW_NUMBER() OVER (PARTITION BY mr.connectionno ORDER BY mr.createdtime DESC) rn
-          FROM eg_ws_meterreading mr) t WHERE rn = 1) lm ON lm.connectionno = conn.connectionno
+          INNER JOIN eg_pt_property pt
+          ON pt.propertyid = conn.property_id
+          INNER JOIN eg_pt_address ptadd
+          ON ptadd.propertyid = pt.id
+          INNER JOIN eg_pt_owner ptown
+          ON ptown.propertyid = pt.id
+          LEFT JOIN LATERAL (
+          SELECT
+              mr.connectionno,
+              mr.lastreading,
+              mr.lastreadingdate,
+              mr.currentreading,
+              mr.currentreadingdate,
+              mr.consumption,
+              mr.meterstatus,
+              mr.billingperiod
+          FROM eg_ws_meterreading mr
+          WHERE mr.connectionno = conn.connectionno
+          ORDER BY mr.createdtime DESC
+          LIMIT 1
+           ) lm ON TRUE
           $where
-          AND conn.status = 'Active'
-          ),
-
-          filtered_bills AS (
-          SELECT
-          fc.*,
-          b.id AS b_id,
-          b.mobilenumber,
-          b.tenantid AS b_tenantid,
-          b.payername AS b_payername,
-          b.payeraddress AS b_payeraddress,
-          b.payeremail AS b_payeremail,
-          b.isactive AS b_isactive,
-          b.iscancelled AS b_iscancelled,
-          b.createdby AS b_createdby,
-          b.status AS b_status,
-          b.filestoreid AS b_filestoreid,
-          b.createddate AS b_createddate,
-          b.lastmodifiedby AS b_lastmodifiedby,
-          b.lastmodifieddate AS b_lastmodifieddate,
-          b.additionaldetails AS b_additionaldetails,
-          bd.id AS bd_id,
-          bd.billid AS bd_billid,
-          bd.tenantid AS bd_tenantid,
-          bd.businessservice AS bd_businessservice,
-          bd.demandid,
-          bd.fromperiod,
-          bd.toperiod,
-          bd.billno AS bd_billno,
-          bd.billdate AS bd_billdate,
-          bd.consumercode AS bd_consumercode,
-          bd.consumertype AS bd_consumertype,
-          bd.billdescription AS bd_billdescription,
-          bd.displaymessage AS bd_displaymessage,
-          bd.minimumamount AS bd_minimumamount,
-          bd.totalamount AS bd_totalamount,
-          bd.callbackforapportioning AS bd_callbackforapportioning,
-          bd.expirydate AS bd_expirydate,
-          bd.partpaymentallowed AS bd_partpaymentallowed,
-          bd.isadvanceallowed AS bd_isadvanceallowed,
-          bd.collectionmodesnotallowed AS bd_collectionmodesnotallowed,
-          bd.createddate AS bd_createddate,
-          bd.additionaldetails AS bd_additionaldetails,
-          ad.id AS ad_id,
-          ad.tenantid AS ad_tenantid,
-          ad.billdetail AS ad_billdetail,
-          ad.glcode AS ad_glcode,
-          ad.orderno AS ad_orderno,
-          ad.accountdescription AS ad_accountdescription,
-          ceil(ad.amount) AS ad_amount,
-          ad.adjustedamount AS ad_adjustedamount,
-          ad.taxheadcode AS ad_taxheadcode,
-          ad.demanddetailid,
-          ad.isactualdemand AS ad_isactualdemand,
-          ad.purpose AS ad_purpose,
-          ad.additionaldetails AS ad_additionaldetails
-
-          FROM filtered_conn fc
-          INNER JOIN egbs_bill_v1 b
-          ON fc.connectionno = b.consumercode
-          AND b.tenantid = fc.tenantid
-          INNER JOIN egbs_billdetail_v1 bd
-          ON b.id = bd.billid
-          AND b.tenantid = bd.tenantid
-          AND bd.businessservice = 'WS'
-          INNER JOIN egbs_billaccountdetail_v1 ad
-          ON bd.id = ad.billdetail
-          AND bd.tenantid = ad.tenantid
-          AND ad.taxheadcode <> 'WS_Round_Off'
-          ),
-
-          latest_bills AS (
-          SELECT
-          bd_consumercode,
-          MAX(b_createddate) AS maxcreateddate
-          FROM filtered_bills
-          GROUP BY bd_consumercode
+            AND conn.status = 'Active'
           )
-
-          SELECT fb.*, lb.maxcreateddate b_additionaldetails, lb.bd_consumercode
-          FROM filtered_bills fb
-          JOIN latest_bills lb
-          ON fb.bd_consumercode = lb.bd_consumercode
-          AND fb.b_createddate = lb.maxcreateddate
+          SELECT
+              fc.*,
+              b.id                    AS b_id,
+              b.mobilenumber,
+              b.tenantid              AS b_tenantid,
+              b.payername,
+              b.payeraddress,
+              b.payeremail,
+              b.isactive,
+              b.iscancelled,
+              b.createdby,
+              b.status                AS b_status,
+              b.filestoreid,
+              b.createddate           AS b_createddate,
+              b.lastmodifiedby,
+              b.lastmodifieddate,
+              b.additionaldetails     AS b_additionaldetails,
+              bd.id                   AS bd_id,
+              bd.billid,
+              bd.tenantid             AS bd_tenantid,
+              bd.businessservice,
+              bd.demandid,
+              bd.fromperiod,
+              bd.toperiod,
+              bd.billno,
+              bd.billdate,
+              bd.consumercode,
+              bd.consumertype,
+              bd.billdescription,
+              bd.displaymessage,
+              bd.minimumamount,
+              bd.totalamount,
+              bd.callbackforapportioning,
+              bd.expirydate,
+              bd.partpaymentallowed,
+              bd.isadvanceallowed,
+              bd.collectionmodesnotallowed,
+              bd.createddate          AS bd_createddate,
+              bd.additionaldetails    AS bd_additionaldetails,
+              ad.id                   AS ad_id,
+              ad.tenantid             AS ad_tenantid,
+              ad.billdetail,
+              ad.glcode,
+              ad.orderno,
+              ad.accountdescription,
+              CEIL(ad.amount)         AS ad_amount,
+              ad.adjustedamount,
+              ad.taxheadcode,
+              ad.demanddetailid,
+              ad.isactualdemand,
+              ad.purpose,
+              ad.additionaldetails    AS ad_additionaldetails
+          FROM filtered_conn fc
+          LEFT JOIN LATERAL (
+              SELECT *
+              FROM egbs_bill_v1 b
+              WHERE b.consumercode = fc.connectionno
+                AND b.tenantid = fc.tenantid and b.tenantid = :conn.tenantid
+              ORDER BY b.createddate DESC
+              LIMIT 1
+          ) b ON TRUE
+          INNER JOIN egbs_billdetail_v1 bd
+              ON bd.billid = b.id
+            AND bd.tenantid = b.tenantid
+            AND bd.businessservice = 'WS'
+          INNER JOIN egbs_billaccountdetail_v1 ad
+              ON ad.billdetail = bd.id
+            AND ad.tenantid = bd.tenantid
+            AND ad.taxheadcode <> 'WS_Round_Off'
       searchParams:
         condition: AND
         params:
