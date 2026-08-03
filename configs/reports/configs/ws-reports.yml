@@ -6251,13 +6251,13 @@ ReportDefinitions:
         type: epoch
         source: ws
         isMandatory: true
-        searchClause: AND f.billdate >= $fromDate
+        searchClause: AND f.raw_billdate >= $fromDate
       - name: toDate
         label: To Date
         type: epoch
         source: ws
         isMandatory: true
-        searchClause: AND f.billdate <= $toDate
+        searchClause: AND f.raw_billdate <= $toDate
       - name: taxPeriod
         label: Quarter
         type: singlevaluelist
@@ -6272,6 +6272,7 @@ ReportDefinitions:
           TO_CHAR( TO_TIMESTAMP(bd.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata','MM-YYYY') || ' - ' ||
           TO_CHAR( TO_TIMESTAMP(bd.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata','MM-YYYY') AS quarter,
           bd.consumercode, bd.billno, bd.totalamount, bill.status,
+          bd.billdate AS raw_billdate,
           (TO_TIMESTAMP(bd.billdate / 1000) AT TIME ZONE 'Asia/Kolkata') AS billdate,
           ROW_NUMBER() OVER (PARTITION BY bd.consumercode  ORDER BY bd.toperiod ASC, bd.billdate ASC ) AS first_rn,
           ROW_NUMBER() OVER ( PARTITION BY bd.consumercode ORDER BY bd.toperiod DESC, bd.billdate DESC) AS last_rn
