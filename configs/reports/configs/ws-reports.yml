@@ -6262,10 +6262,10 @@ ReportDefinitions:
         label: Quarter
         type: singlevaluelist
         source: ws
-        isMandatory: true
-        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_search?tenantId='pb'&moduleName=BillingService&masterName=TaxPeriod|[?(@.service=='WS')].fromDate|[?(@.service=='WS')].code
+        isMandatory: false
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_search?tenantId=pb&moduleName=BillingService&masterName=TaxPeriod|[?(@.service=='WS')].code|[?(@.service=='WS')].fromDate
         wrapper: true
-        searchClause: and 1=1
+        searchClause: AND bd.fromperiod >= $taxPeriod.fromDate  AND bd.toperiod <= $taxPeriod.toDate
     query:
       WITH all_bill AS (
          SELECT
@@ -6279,8 +6279,7 @@ ReportDefinitions:
          JOIN egbs_bill_v1 bill ON bill.id = bd.billid
          WHERE bd.businessservice = 'WS'
          AND bill.tenantid = $tenantid
-         AND bd.fromperiod >= $taxPeriod.fromDate
-         AND bd.toperiod <= $taxPeriod.toDate
+         AND bd.fromperiod = $fromDate
           ),
       demand_amt AS (
         SELECT consumercode,createdtime, demand_amount
@@ -6297,8 +6296,7 @@ ReportDefinitions:
            JOIN egbs_demand_v1 d  ON dd.demandid = d.id
            WHERE d.status <> 'CANCELLED'
            AND d.businessservice = 'WS'
-           AND d.taxperiodfrom >= $taxPeriod.fromDate
-           AND d.taxperiodto <= $taxPeriod.toDate
+           AND d.taxperiodfrom = $fromDate
            AND dd.taxheadcode <> 'WS_ADVANCE_CARRYFORWARD'
            ) x
            WHERE rn = 1
