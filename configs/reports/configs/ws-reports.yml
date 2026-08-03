@@ -6280,7 +6280,7 @@ ReportDefinitions:
          JOIN egbs_bill_v1 bill ON bill.id = bd.billid
          WHERE bd.businessservice = 'WS'
          AND bill.tenantid = $tenantid
-         AND bd.fromperiod = $fromDate
+         AND bd.createdtime >= $fromDate AND bd.lastmodifiedtime <= $toDate
           ),
       demand_amt AS (
         SELECT consumercode,createdtime, demand_amount
@@ -6297,7 +6297,7 @@ ReportDefinitions:
            JOIN egbs_demand_v1 d  ON dd.demandid = d.id
            WHERE d.status <> 'CANCELLED'
            AND d.businessservice = 'WS'
-           AND d.taxperiodfrom = $fromDate
+           AND d.createdtime >= $fromDate and d.lastmodifiedtime <= $toDate
            AND dd.taxheadcode <> 'WS_ADVANCE_CARRYFORWARD'
            ) x
            WHERE rn = 1
