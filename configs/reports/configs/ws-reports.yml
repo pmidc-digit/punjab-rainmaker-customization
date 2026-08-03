@@ -2696,7 +2696,7 @@ ReportDefinitions:
        
        SELECT * FROM WS_Billing_cte where billingcyclestartdate >= $fromDate
 
-  - reportName: WSQuaterly_Bill_Generate
+  - reportName: WS-Quaterly_Bill_Generation_Report
     summary: Ws Quarterly Bill Generate Report
     version: 1.0.0
     moduleName: rainmaker-ws
@@ -6166,6 +6166,129 @@ ReportDefinitions:
            JOIN egbs_demand_v1 d  ON dd.demandid = d.id
            WHERE d.status <> 'CANCELLED'
            AND d.businessservice = 'SW'
+           AND d.taxperiodfrom = $fromDate
+           AND dd.taxheadcode <> 'SW_ADVANCE_CARRYFORWARD'
+           -– AND d.consumercode = '51456'
+           ) x
+           WHERE rn = 1
+           )
+        SELECT
+          f.quarter, f.consumercode, COALESCE(d.demand_amount, 0) AS demand_amount,
+          f.billno AS first_bill_no, f.totalamount AS first_bill_amount, f.billdate AS first_bill_date,
+          f.status AS first_bill_status,l.billno AS latest_bill_no, l.totalamount AS latest_bill_amount,
+          l.billdate AS latest_bill_date, l.status AS latest_bill_status
+        FROM all_bill f
+        JOIN all_bill l ON f.consumercode = l.consumercode
+        LEFT JOIN demand_amt d ON f.consumercode = d.consumercode
+        WHERE f.first_rn = 1 AND l.last_rn = 1
+    orderby: order by f.billdate
+
+  - reportName: WSQuaterly_Bill_Generate
+    summary: Water - Quaterly Bill Generation Report
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A4
+    sourceColumns:
+      - name: quarter
+        label: Quarter
+        type: string
+        source: ws
+        total: false
+      - name: consumercode
+        label: Consumercode
+        type: string
+        source: ws
+        total: false
+      - name: demand_amount
+        label: Demand Amount
+        type: string
+        source: ws
+        total: true
+      - name: first_bill_no
+        label: First Bill Number
+        type: string
+        source: ws
+        total: false
+      - name: first_bill_amount
+        label: First Bill Amount
+        type: string
+        source: ws
+        total: true
+      - name: first_bill_date
+        label: First Bill Date
+        type: string
+        source: ws
+        total: true
+      - name: first_bill_status
+        label: First Bill Status
+        type: string
+        source: ws
+        total: false
+      - name: latest_bill_no
+        label: Latest Bill Number
+        type: string
+        source: ws
+        total: false
+      - name: latest_bill_amount
+        label: Latest Bill Amount
+        type: string
+        source: ws
+        total: true
+      - name: latest_bill_date
+        label: Latest Bill Date
+        type: string
+        source: ws
+        total: false
+      - name: latest_bill_status
+        label: Latest Bill Status
+        type: string
+        source: ws
+        total: false
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND f.billdate >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: ws
+        isMandatory: true
+        searchClause: AND f.billdate <= $toDate
+    query:
+      WITH all_bill AS (
+         SELECT
+          TO_CHAR( TO_TIMESTAMP(bd.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata','MM-YYYY') || ' - ' ||
+          TO_CHAR( TO_TIMESTAMP(bd.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata','MM-YYYY') AS quarter,
+          bd.consumercode, bd.billno, bd.totalamount, bill.status,
+          (TO_TIMESTAMP(bd.billdate / 1000) AT TIME ZONE 'Asia/Kolkata') AS billdate,
+          ROW_NUMBER() OVER (PARTITION BY bd.consumercode  ORDER BY bd.toperiod ASC, bd.billdate ASC ) AS first_rn,
+          ROW_NUMBER() OVER ( PARTITION BY bd.consumercode ORDER BY bd.toperiod DESC, bd.billdate DESC) AS last_rn
+         FROM egbs_billdetail_v1 bd
+         JOIN egbs_bill_v1 bill ON bill.id = bd.billid
+         WHERE bd.businessservice = 'WS'
+         AND bill.tenantid = $tenantid
+         AND bd.fromperiod = $fromDate
+          ),
+      demand_amt AS (
+        SELECT consumercode,createdtime, demand_amount
+        FROM (
+           SELECT
+             d.consumercode, dd.createdtime,
+             CASE
+             WHEN MIN(dd.taxamount) OVER (PARTITION BY d.consumercode, dd.createdtime) > 0
+             THEN SUM(dd.taxamount) OVER (PARTITION BY d.consumercode, dd.createdtime)
+             ELSE MAX(dd.taxamount) OVER (PARTITION BY d.consumercode, dd.createdtime)
+             END AS demand_amount,
+             ROW_NUMBER() OVER (PARTITION BY d.consumercode  ORDER BY dd.createdtime aSC) AS rn
+           FROM egbs_demanddetail_v1 dd
+           JOIN egbs_demand_v1 d  ON dd.demandid = d.id
+           WHERE d.status <> 'CANCELLED'
+           AND d.businessservice = 'WS'
            AND d.taxperiodfrom = $fromDate
            AND dd.taxheadcode <> 'SW_ADVANCE_CARRYFORWARD'
            -– AND d.consumercode = '51456'
