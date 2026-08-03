@@ -6168,7 +6168,6 @@ ReportDefinitions:
            AND d.businessservice = 'SW'
            AND d.taxperiodfrom = $fromDate
            AND dd.taxheadcode <> 'SW_ADVANCE_CARRYFORWARD'
-           -– AND d.consumercode = '51456'
            ) x
            WHERE rn = 1
            )
@@ -6290,8 +6289,7 @@ ReportDefinitions:
            WHERE d.status <> 'CANCELLED'
            AND d.businessservice = 'WS'
            AND d.taxperiodfrom = $fromDate
-           AND dd.taxheadcode <> 'SW_ADVANCE_CARRYFORWARD'
-           -– AND d.consumercode = '51456'
+           AND dd.taxheadcode <> 'WS_ADVANCE_CARRYFORWARD'
            ) x
            WHERE rn = 1
            )
