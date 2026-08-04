@@ -6263,7 +6263,7 @@ ReportDefinitions:
         type: singlevaluelist
         source: ws
         isMandatory: false
-        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_search?tenantId=pb&moduleName=BillingService&masterName=TaxPeriod|$.MdmsRes.BillingService.TaxPeriod[?(@.service=='WS')].code|$.MdmsRes.BillingService.TaxPeriod[?(@.service=='WS')].fromDate|$.MdmsRes.BillingService.TaxPeriod[?(@.service=='WS')].toDate        
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_search?tenantId=pb&moduleName=BillingService&masterName=TaxPeriod|$.MdmsRes.BillingService.TaxPeriod[*].code|$.MdmsRes.BillingService.TaxPeriod[*].fromDate|$.MdmsRes.BillingService.TaxPeriod[*].toDate
         wrapper: true
         searchClause: AND bd.fromperiod >= $taxPeriod.fromDate  AND bd.toperiod <= $taxPeriod.toDate
     query:
