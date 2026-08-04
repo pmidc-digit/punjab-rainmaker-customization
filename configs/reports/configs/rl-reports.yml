@@ -860,14 +860,14 @@ ReportDefinitions:
         pattern: 'list://INITIATED:Initiated,FORWARD_FOT_SETLEMENT:Forward For Settlement,CLOSED:Closed, APPROVED:Approved,PENDINGFORAPPROVAL:Pending For Approval , PENDING_FOR_DOCUMENT_VERIFY:Pending For Document Verify,PENDING_FOR_PAYMENT:Pending For Payment,PENDING_REQUEST_FOR_DISCONNECTION:Pending Request For Disconnection'
         source: rl
         isMandatory: false
-        searchClause: AND r.status = $status
+        searchClause: AND status = $status
       - name: ulb
         label: ULB
         type: singlevaluelist
         pattern: 'http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name'
         source: rl
         isMandatory: false
-        searchClause: AND r.tenant_id = $ulb
+        searchClause: AND tenant_id = $ulb
 
     query: |
         select tenant_id, status, property_id, application_type, application_number from public.eg_rl_allotment 
