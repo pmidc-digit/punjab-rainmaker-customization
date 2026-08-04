@@ -862,7 +862,6 @@ ReportDefinitions:
         type: string
         source: rl
         total: false
-
     searchParams:
       - name: status
         label: Application Status
@@ -878,11 +877,10 @@ ReportDefinitions:
         source: rl
         isMandatory: false
         searchClause: AND tenant_id = $ulb
-
     query: |
       SELECT
           a.application_number AS "Application Number",
-        application_type,
+          application_type,
           a.property_id AS "Property ID",
           u.name AS "Owner/Tenant Name",
           rr.revised_rent AS "Rent Amount",
@@ -898,7 +896,4 @@ ReportDefinitions:
 
       LEFT JOIN public.eg_rl_rent_revision rr
           ON a.id = rr.allotment_id
-
-      WHERE a.application_type = 'NEW'
-
-      ORDER BY a.created_time DESC;
+    order by: ORDER BY a.created_time DESC;
