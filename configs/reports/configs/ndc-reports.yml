@@ -1484,92 +1484,64 @@ ReportDefinitions:
       LEFT JOIN (
           SELECT tenant_id, COUNT(*) AS count FROM eg_rl_allotment GROUP BY tenant_id
       ) rl ON t.tenantid = rl.tenant_id;
-  - reportName: ApplicationSearchByID
-    decryptionPathId: NDCAPPLICATION
-    encryptionPathId: UserSearchCriteria
-    summary: Application details of No Due Certificate by search Application ID
+  - reportName: ApplicationDetailsbyApplicationState
+    summary: Application details by application state
     version: 1.0.0
     moduleName: rainmaker-ndc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
     sourceColumns:
-      - name: ulb_name
-        label: ULB Name
-        type: string
-        source: ndc
-        total: false
-      - name: name
-        label: Owner Name
-        type: string
-        source: ndc
-        total: false
-      - name: mobilenumber
-        label: Owner Mobile Number
-        type: string
-        source: ndc
-        total: false
-      - name: applicationno
-        label: Application ID
-        type: string
-        source: ndc
-        total: false
-      - name: applicationstatus
-        label: Application Status
-        type: string
-        source: ndc
-        total: false
-      - name: assignee_employee
-        label: Previous Action Taken By
-        type: string
-        source: ndc
-        total: false 
-      - name: employee_name
-        label: Pending with Employee
-        type: string
-        source: ndc
-        total: false         
-    searchParams:
       - name: applicationno
         label: Application Number
         type: string
         source: ndc
-        isMandatory: false
-        searchClause: and n.applicationno = $applicationno
-      - name: mobileNumber
-        label: Mobile Number
+        total: false
+      - name: tenantid
+        label: ULB name
         type: string
         source: ndc
+        total: false
+      - name: action
+        label: Action 
+        type: string
+        source: ndc
+        total: false
+      - name: reason
+        label: Reason
+        type: string
+        source: ndc
+        total: false       
+    searchParams:
+      - name: applicationstatus
+        label: Application status
+        type: singlevaluelist
+        pattern: list://INITIATED:INITIATED,PENDINGPAYMENT:PENDINGPAYMENT,DOCUMENTVERIFY:DOCUMENTVERIFY,APPROVED:APPROVED,
+          REJECTED:REJECTED,TL-VERIFICATION:TL-VERIFICATION,WS-SW-VERIFICATION:WS-SW-VERIFICATION
+          ,CITIZENACTIONREQUIRED-DV:CITIZENACTIONREQUIRED-DV,BPA-VERIFICATION:BPA-VERIFICATION,PENDINGAPPROVAL:PENDINGAPPROVAL,CANCELLED:CANCELLED,PT-VERIFICATION:PT-VERIFICATION,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
+        source: ndc
+        isMandatory: true
+        searchClause: AND LOWER(applicationstatus) = LOWER($applicationstatus)
+      - name: fromDate
+        label: fromDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND createdtime >= $fromDate
+      - name: toDate
+        label: toDate
+        type: epoch
+        source: ndc
+        isMandatory: true
+        searchClause: AND createdtime <= $toDate
+      - name: ulb
+        label: ulb
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: ndc
         isMandatory: false
-        searchClause: and u.mobilenumber = $mobileNumber
+        searchClause: AND tenantid = $ulb
+      
+      
     query: |
-      -- Use CTE to force query plan, compute & use CTE later
-      WITH workflow_history AS (
-      SELECT 
-        wf.businessid,
-        ws.applicationstatus,
-        COALESCE(wf.assignee, wfa.assignee) AS current_employee_uuid,
-        LEAD(COALESCE(wf.assignee, wfa.assignee)) OVER (PARTITION BY wf.businessid ORDER BY wf.lastmodifiedtime DESC, wf.createdtime DESC) AS previous_employee_uuid,
-        LEAD(wf.action) OVER (PARTITION BY wf.businessid ORDER BY wf.lastmodifiedtime DESC, wf.createdtime DESC) AS previous_action,
-        ROW_NUMBER() OVER (PARTITION BY wf.businessid ORDER BY wf.lastmodifiedtime DESC, wf.createdtime DESC) AS rn
-        FROM eg_wf_processinstance_v2 wf
-        LEFT JOIN eg_wf_assignee_v2 wfa ON wfa.processinstanceid = wf.id
-        LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = wf.status
-        WHERE wf.businessservice = 'ndc-services' and wf.tenantid = $tenantid
-         )
-       SELECT 
-       n.applicationstatus,
-       n.applicationno,
-       u.name , 
-       u.mobilenumber ,
-       INITCAP(REPLACE(n.tenantid, 'pb.', '')) AS ulb_name,
-       emp_curr.name AS employee_name,
-       emp_appr.name AS assignee_employee,
-       wh.previous_action AS last_action_performed
-       FROM eg_ndc_application n
-       JOIN eg_ndc_owner o ON o.ndcapplicationuuid = n.uuid
-       JOIN eg_user u ON u.uuid = o.uuid
-       LEFT JOIN workflow_history wh ON wh.businessid = n.applicationno AND wh.rn = 1
-       LEFT JOIN eg_user emp_curr ON emp_curr.uuid = wh.current_employee_uuid
-       LEFT JOIN eg_user emp_appr ON emp_appr.uuid = wh.previous_employee_uuid
-       WHERE n.tenantid = $tenantid and o.isprimaryowner = 'true'
+      SELECT tenantid,action,applicationno,reason FROM public.eg_ndc_application where 1=1
