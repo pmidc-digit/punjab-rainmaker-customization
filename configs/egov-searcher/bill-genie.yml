@@ -2301,7 +2301,7 @@ SearchDefinitions:
             INNER JOIN eg_pt_property pt
               ON pt.propertyid = conn.property_id
               AND pt.status IN ('ACTIVE', 'PENDINGWS')
-              AND conn.tenantid = 'pb.phagwara'
+              AND conn.tenantid = :fc.tenantid
 
             INNER JOIN eg_pt_address ptadd
               ON ptadd.propertyid = pt.id
