@@ -580,7 +580,8 @@ SearchDefinitions:
               ptadd.district AS ptadd_district,
               ptadd.state AS ptadd_state,
               ptadd.latitude AS ptadd_latitude,
-              ptadd.longitude AS ptadd_longitude
+              ptadd.longitude AS ptadd_longitude,
+              ptown.userid as ptown_userid
 
             FROM egbs_bill_v1 b
 
@@ -597,6 +598,7 @@ SearchDefinitions:
 
             INNER JOIN eg_pt_address ptadd
               ON ptadd.propertyid = pt.id
+              INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id
 
             LEFT JOIN (
               SELECT *
@@ -817,7 +819,8 @@ SearchDefinitions:
               ptadd.district AS ptadd_district,
               ptadd.state AS ptadd_state,
               ptadd.latitude AS ptadd_latitude,
-              ptadd.longitude AS ptadd_longitude
+              ptadd.longitude AS ptadd_longitude,
+              ptown.userid as ptown_userid
 
             FROM egbs_bill_v1 b
 
@@ -834,6 +837,7 @@ SearchDefinitions:
 
             INNER JOIN eg_pt_address ptadd
               ON ptadd.propertyid = pt.id
+              INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id
 
             $where
               AND conn.status = 'Active'
@@ -1579,6 +1583,7 @@ SearchDefinitions:
               ptadd.state AS ptadd_state,
               ptadd.latitude AS ptadd_latitude,
               ptadd.longitude AS ptadd_longitude,
+              ptown.userid ,
 
               lm.connectionno AS mr_connectionno,
               lm.lastreading AS mr_lastreading,
@@ -1597,6 +1602,7 @@ SearchDefinitions:
 
             INNER JOIN eg_pt_address ptadd
               ON ptadd.propertyid = pt.id
+              INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id
 
             LEFT JOIN LATERAL (
               SELECT
