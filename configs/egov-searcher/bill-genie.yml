@@ -2158,7 +2158,7 @@ SearchDefinitions:
             SELECT DISTINCT ON (b.consumercode)
               b.*
             FROM egbs_bill_v1 b
-            WHERE b.tenantid = :b.tenantid
+            WHERE b.tenantid = :conn.tenantid
             ORDER BY b.consumercode, b.createddate DESC
           )
 
@@ -2224,7 +2224,7 @@ SearchDefinitions:
       searchParams:
         condition: AND
         params:
-          - name: b.tenantid
+          - name: conn.tenantid
             isMandatory: true
             jsonPath: $.searchCriteria.tenantId
           - name: bd.consumercode
@@ -2312,7 +2312,7 @@ SearchDefinitions:
             SELECT DISTINCT ON (b.consumercode)
               b.*
             FROM egbs_bill_v1 b
-            WHERE b.tenantid = :b.tenantid and b.status = 'ACTIVE'
+            WHERE b.tenantid = :conn.tenantid and b.status = 'ACTIVE'
             ORDER BY b.consumercode, b.createddate DESC
           )
 
@@ -2324,7 +2324,7 @@ SearchDefinitions:
             b.tenantid AS b_tenantid,
             b.payername AS b_payername,
             b.payeraddress AS b_payeraddress,
-            b.payeremail,
+            b.payeremail  AS b_payeremail,
             b.isactive AS b_isactive,
             b.iscancelled AS b_iscancelled,
             b.createdby AS b_createdby,
@@ -2378,7 +2378,7 @@ SearchDefinitions:
       searchParams:
         condition: AND
         params:
-          - name: b.tenantid
+          - name: conn.tenantid
             isMandatory: true
             jsonPath: $.searchCriteria.tenantId
           - name: bd.consumercode
