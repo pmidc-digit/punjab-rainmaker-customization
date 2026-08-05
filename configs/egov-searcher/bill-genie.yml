@@ -581,8 +581,15 @@ SearchDefinitions:
               ptadd.state AS ptadd_state,
               ptadd.latitude AS ptadd_latitude,
               ptadd.longitude AS ptadd_longitude,
-              ptown.userid as ptown_userid
-
+              ptown.userid as ptown_userid,
+              'NA' as ad_id,
+              'NA' as ad_tenantid,
+              'NA' as ad_billdetail,
+              'NA' as ad_orderno,
+              'NA' as ad_amount,
+              'NA' as ad_adjustedamount,
+              'NA' as ad_taxheadcode,
+              'NA' as demanddetailid
             FROM egbs_bill_v1 b
 
             INNER JOIN egbs_billdetail_v1 bd
@@ -820,7 +827,15 @@ SearchDefinitions:
               ptadd.state AS ptadd_state,
               ptadd.latitude AS ptadd_latitude,
               ptadd.longitude AS ptadd_longitude,
-              ptown.userid as ptown_userid
+              ptown.userid as ptown_userid,
+              'NA' as ad_id,
+              'NA' as ad_tenantid,
+              'NA' as ad_billdetail,
+              'NA' as ad_orderno,
+              'NA' as ad_amount,
+              'NA' as ad_adjustedamount,
+              'NA' as ad_taxheadcode,
+              'NA' as demanddetailid          
 
             FROM egbs_bill_v1 b
 
@@ -1672,7 +1687,15 @@ SearchDefinitions:
             bd.isadvanceallowed AS bd_isadvanceallowed,
             bd.collectionmodesnotallowed AS bd_collectionmodesnotallowed,
             bd.createddate AS bd_createddate,
-            bd.additionaldetails AS bd_additionaldetails
+            bd.additionaldetails AS bd_additionaldetails,
+              'NA' as ad_id,
+              'NA' as ad_tenantid,
+              'NA' as ad_billdetail,
+              'NA' as ad_orderno,
+              'NA' as ad_amount,
+              'NA' as ad_adjustedamount,
+              'NA' as ad_taxheadcode,
+              'NA' as demanddetailid            
 
           FROM filtered_conn fc
 
