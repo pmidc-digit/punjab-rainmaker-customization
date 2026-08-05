@@ -1751,17 +1751,7 @@ SearchDefinitions:
               ptadd.state AS ptadd_state,
               ptadd.latitude AS ptadd_latitude,
               ptadd.longitude AS ptadd_longitude,
-              ptown.userid ,
-
-              lm.connectionno AS mr_connectionno,
-              lm.lastreading AS mr_lastreading,
-              lm.lastreadingdate AS mr_lastreadingdate,
-              lm.currentreading AS mr_currentreading,
-              lm.currentreadingdate AS mr_currentreadingdate,
-              lm.consumption AS mr_consumption,
-              lm.meterstatus AS mr_meterstatus,
-              lm.billingperiod AS mr_billingperiod
-
+              ptown.userid 
             FROM eg_sw_connection conn
 
             INNER JOIN eg_pt_property pt
@@ -1771,23 +1761,6 @@ SearchDefinitions:
             INNER JOIN eg_pt_address ptadd
               ON ptadd.propertyid = pt.id
               INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id
-
-            LEFT JOIN LATERAL (
-              SELECT
-                mr.connectionno,
-                mr.lastreading,
-                mr.lastreadingdate,
-                mr.currentreading,
-                mr.currentreadingdate,
-                mr.consumption,
-                mr.meterstatus,
-                mr.billingperiod
-              FROM eg_sw_meterreading mr
-              WHERE mr.connectionno = conn.connectionno
-              ORDER BY mr.createdtime DESC
-              LIMIT 1
-            ) lm ON TRUE
-
             $where
               AND conn.status = 'Active'
           ),
@@ -1796,7 +1769,7 @@ SearchDefinitions:
             SELECT DISTINCT ON (b.consumercode)
               b.*
             FROM egbs_bill_v1 b
-            WHERE b.tenantid = :conn.tenantid
+            WHERE b.tenantid = :conn.tenantid and b.status = 'ACTIVE'
             ORDER BY b.consumercode, b.createddate DESC
           )
 
