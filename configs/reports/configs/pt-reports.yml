@@ -7706,10 +7706,10 @@ ReportDefinitions:
           JOIN egcl_billdetial bd ON bd.id = bad.billdetailid AND bd.tenantid = bad.tenantid
           JOIN egcl_paymentdetail pd_1 ON pd_1.billid = bd.billid AND bd.tenantid = pd_1.tenantid
           JOIN egcl_payment payment_1 ON pd_1.paymentid = payment_1.id AND payment_1.tenantid = bad.tenantid
-          WHERE pd_1.tenantid = 'pb.hoshiarpur'
+          WHERE pd_1.tenantid = '$tenantid'
             AND payment_1.paymentstatus <> 'CANCELLED'
             AND pd_1.businessservice = 'PT'
-            AND pd_1.receiptdate >= 1785522600000 AND pd_1.receiptdate < 1785890954000
+            AND pd_1.receiptdate >= $fromDate AND pd_1.receiptdate < $toDate
           GROUP BY pd_1.id
       )
 
@@ -7771,6 +7771,6 @@ ReportDefinitions:
       LEFT JOIN receipt_breakup ON receipt_breakup.pdid = pd.id
 
       WHERE payment.paymentstatus <> 'CANCELLED'
-        AND pd.businessservice = 'PT' and pd.tenantid = 'pb.hoshiarpur'
+        AND pd.businessservice = 'PT' and pd.tenantid = '$tenantid'
         AND payment.tenantid = pd.tenantid
-        AND pd.receiptdate >= 1785522600000 AND pd.receiptdate < 178589095400
+        AND pd.receiptdate >= $fromDate AND pd.receiptdate < $toDate
