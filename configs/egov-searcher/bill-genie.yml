@@ -1722,6 +1722,160 @@ SearchDefinitions:
         outJsonPath: $.Bills
         responseInfoPath: $.ResponseInfo
 
+    - name: groupbillssw_summary
+      isCustomerRowMapEnabled: true
+      rowMapperKey: billsearch
+      query:
+        baseQuery: >-
+          WITH filtered_conn AS (
+            SELECT
+              conn.connectionno,
+              conn.status AS conn_status,
+              conn.property_id AS pid,
+              conn.oldconnectionno AS oldpid,
+              conn.additionaldetails AS conn_add,
+              conn.tenantid,
+              pt.status AS pt_status,
+              pt.id AS pt_id,
+
+              ptadd.doorno AS ptadd_doorno,
+              ptadd.landmark AS ptadd_landmark,
+              ptadd.city AS ptadd_city,
+              ptadd.pincode AS ptadd_pincode,
+              ptadd.locality AS ptadd_locality,
+              ptadd.street AS ptadd_street,
+              ptadd.region AS ptadd_region,
+              ptadd.plotno AS ptadd_plotno,
+              ptadd.buildingname AS ptadd_buildingname,
+              ptadd.district AS ptadd_district,
+              ptadd.state AS ptadd_state,
+              ptadd.latitude AS ptadd_latitude,
+              ptadd.longitude AS ptadd_longitude,
+              ptown.userid ,
+
+              lm.connectionno AS mr_connectionno,
+              lm.lastreading AS mr_lastreading,
+              lm.lastreadingdate AS mr_lastreadingdate,
+              lm.currentreading AS mr_currentreading,
+              lm.currentreadingdate AS mr_currentreadingdate,
+              lm.consumption AS mr_consumption,
+              lm.meterstatus AS mr_meterstatus,
+              lm.billingperiod AS mr_billingperiod
+
+            FROM eg_sw_connection conn
+
+            INNER JOIN eg_pt_property pt
+              ON pt.propertyid = conn.property_id
+              AND pt.status IN ('ACTIVE', 'PENDINGWS')
+
+            INNER JOIN eg_pt_address ptadd
+              ON ptadd.propertyid = pt.id
+              INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id
+
+            LEFT JOIN LATERAL (
+              SELECT
+                mr.connectionno,
+                mr.lastreading,
+                mr.lastreadingdate,
+                mr.currentreading,
+                mr.currentreadingdate,
+                mr.consumption,
+                mr.meterstatus,
+                mr.billingperiod
+              FROM eg_sw_meterreading mr
+              WHERE mr.connectionno = conn.connectionno
+              ORDER BY mr.createdtime DESC
+              LIMIT 1
+            ) lm ON TRUE
+
+            $where
+              AND conn.status = 'Active'
+          ),
+
+          latest_bill AS (
+            SELECT DISTINCT ON (b.consumercode)
+              b.*
+            FROM egbs_bill_v1 b
+            WHERE b.tenantid = :conn.tenantid
+            ORDER BY b.consumercode, b.createddate DESC
+          )
+
+          SELECT
+            fc.*,
+
+            b.id AS b_id,
+            b.mobilenumber,
+            b.tenantid AS b_tenantid,
+            b.payername AS b_payername,
+            b.payeraddress AS b_payeraddress,
+            b.payeremail,
+            b.isactive AS b_isactive,
+            b.iscancelled AS b_iscancelled,
+            b.createdby AS b_createdby,
+            b.status AS b_status,
+            b.filestoreid AS b_filestoreid,
+            b.createddate AS b_createddate,
+            b.lastmodifiedby AS b_lastmodifiedby,
+            b.lastmodifieddate AS b_lastmodifieddate,
+            b.additionaldetails AS b_additionaldetails,
+
+            bd.id AS bd_id,
+            bd.billid AS bd_billid,
+            bd.tenantid AS bd_tenantid,
+            bd.businessservice AS bd_businessservice,
+            bd.demandid,
+            bd.fromperiod,
+            bd.toperiod,
+            bd.billno AS bd_billno,
+            bd.billdate AS bd_billdate,
+            bd.consumercode AS bd_consumercode,
+            bd.consumertype AS bd_consumertype,
+            bd.billdescription AS bd_billdescription,
+            bd.displaymessage AS bd_displaymessage,
+            bd.minimumamount AS bd_minimumamount,
+            bd.totalamount AS bd_totalamount,
+            bd.callbackforapportioning AS bd_callbackforapportioning,
+            bd.expirydate AS bd_expirydate,
+            bd.partpaymentallowed AS bd_partpaymentallowed,
+            bd.isadvanceallowed AS bd_isadvanceallowed,
+            bd.collectionmodesnotallowed AS bd_collectionmodesnotallowed,
+            bd.createddate AS bd_createddate,
+            bd.additionaldetails AS bd_additionaldetails,
+              'NA' as ad_id,
+              'NA' as ad_tenantid,
+              'NA' as ad_billdetail,
+              '0' as ad_orderno,
+              '0.0' as ad_amount,
+              '0.0' as ad_adjustedamount,
+              'NA' as ad_taxheadcode,
+              'NA' as demanddetailid            
+
+          FROM filtered_conn fc
+
+          LEFT JOIN latest_bill b
+            ON b.consumercode = fc.connectionno
+
+          INNER JOIN egbs_billdetail_v1 bd
+            ON bd.billid = b.id
+            AND bd.tenantid = b.tenantid
+            AND bd.businessservice = 'SW'
+      searchParams:
+        condition: AND
+        params:
+          - name: conn.tenantid
+            isMandatory: true
+            jsonPath: $.searchCriteria.tenantId
+          - name: conn.additionaldetails->>'groups'
+            isMandatory: true
+            jsonPath: $.searchCriteria.group
+      output:
+        jsonFormat:
+          ResponseInfo: {}
+          Bills: []
+        outJsonPath: $.Bills
+        responseInfoPath: $.ResponseInfo
+
+
     - name: groupbillssw
       isCustomerRowMapEnabled: true
       rowMapperKey: billsearch
