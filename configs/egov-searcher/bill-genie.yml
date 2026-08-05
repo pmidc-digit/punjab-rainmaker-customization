@@ -1462,7 +1462,7 @@ SearchDefinitions:
               b.tenantid              AS b_tenantid,
               b.payername,
               b.payeraddress,
-              b.payeremail,
+              b.payeremail as b_payeremail,
               b.isactive,
               b.iscancelled,
               b.createdby,
@@ -1655,7 +1655,7 @@ SearchDefinitions:
             b.tenantid AS b_tenantid,
             b.payername AS b_payername,
             b.payeraddress AS b_payeraddress,
-            b.payeremail,
+            b.payeremail AS b_payeremail,
             b.isactive AS b_isactive,
             b.iscancelled AS b_iscancelled,
             b.createdby AS b_createdby,
@@ -1751,7 +1751,7 @@ SearchDefinitions:
               ptadd.state AS ptadd_state,
               ptadd.latitude AS ptadd_latitude,
               ptadd.longitude AS ptadd_longitude,
-              ptown.userid as ptown.userid
+              ptown.userid as ptown_userid
             FROM eg_sw_connection conn
 
             INNER JOIN eg_pt_property pt
