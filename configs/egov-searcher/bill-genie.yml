@@ -2158,7 +2158,7 @@ SearchDefinitions:
             SELECT DISTINCT ON (b.consumercode)
               b.*
             FROM egbs_bill_v1 b
-            WHERE b.tenantid = :conn.tenantid
+            WHERE b.tenantid = :b.tenantid
             ORDER BY b.consumercode, b.createddate DESC
           )
 
@@ -2312,7 +2312,7 @@ SearchDefinitions:
             SELECT DISTINCT ON (b.consumercode)
               b.*
             FROM egbs_bill_v1 b
-            WHERE b.tenantid = :conn.tenantid and b.status = 'ACTIVE'
+            WHERE b.tenantid = :b.tenantid and b.status = 'ACTIVE'
             ORDER BY b.consumercode, b.createddate DESC
           )
 
