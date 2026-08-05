@@ -1948,15 +1948,13 @@ SearchDefinitions:
            LIMIT 1
          ) lm ON TRUE
 
-         $where
-           AND conn.status = 'Active'
        ),
 
        latest_bill AS (
          SELECT DISTINCT ON (b.consumercode)
            b.*
          FROM egbs_bill_v1 b
-         WHERE b.tenantid = :b.tenantid
+         WHERE b.tenantid = :fc.tenantid
          ORDER BY b.consumercode, b.createddate DESC
        )
 
@@ -2019,10 +2017,13 @@ SearchDefinitions:
          ON bd.billid = b.id
          AND bd.tenantid = b.tenantid
          AND bd.businessservice = 'WS'
+
+         $where
+           AND fc.conn_status = 'Active'
    searchParams:
      condition: AND
      params:
-       - name: b.tenantid
+       - name: fc.tenantid
          isMandatory: true
          jsonPath: $.searchCriteria.tenantId
        - name: bd.consumercode
@@ -2039,21 +2040,21 @@ SearchDefinitions:
          isMandatory: false
          operator: =
          jsonPath: $.searchCriteria.billNo
-       - name: ptadd.locality
+       - name: fc.ptadd_locality
          isMandatory: false
          jsonPath: $.searchCriteria.locality
-       - name: fromperiod
+       - name: bd.fromperiod
          isMandatory: false
          jsonPath: $.searchCriteria.fromPeriod
          operator: LE
-       - name: toperiod
+       - name: bd.toperiod
          isMandatory: false
          jsonPath: $.searchCriteria.toPeriod
          operator: GE
        - name: b.status
          isMandatory: false
          jsonPath: $.searchCriteria.billActive
-       - name: conn.property_id
+       - name: fc.pid
          isMandatory: false
          jsonPath: $.searchCriteria.propertyId
    output:
@@ -2103,15 +2104,14 @@ SearchDefinitions:
          INNER JOIN eg_pt_address ptadd
            ON ptadd.propertyid = pt.id
            INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id
-         $where
-           AND conn.status = 'Active'
+
        ),
 
        latest_bill AS (
          SELECT DISTINCT ON (b.consumercode)
            b.*
          FROM egbs_bill_v1 b
-         WHERE b.tenantid = :b.tenantid and b.status = 'ACTIVE'
+         WHERE b.tenantid = :fc.tenantid and b.status = 'ACTIVE'
          ORDER BY b.consumercode, b.createddate DESC
        )
 
@@ -2174,10 +2174,12 @@ SearchDefinitions:
          ON bd.billid = b.id
          AND bd.tenantid = b.tenantid
          AND bd.businessservice = 'SW'
+            $where
+              AND fc.conn_status = 'Active'
    searchParams:
      condition: AND
      params:
-       - name: b.tenantid
+       - name: fc.tenantid
          isMandatory: true
          jsonPath: $.searchCriteria.tenantId
        - name: bd.consumercode
@@ -2194,21 +2196,21 @@ SearchDefinitions:
          isMandatory: false
          operator: =
          jsonPath: $.searchCriteria.billNo
-       - name: ptadd.locality
+       - name: fc.ptadd_locality
          isMandatory: false
          jsonPath: $.searchCriteria.locality
-       - name: fromperiod
+       - name: bd.fromperiod
          isMandatory: false
          jsonPath: $.searchCriteria.fromPeriod
          operator: LE
-       - name: toperiod
+       - name: bd.toperiod
          isMandatory: false
          jsonPath: $.searchCriteria.toPeriod
          operator: GE
        - name: b.status
          isMandatory: false
          jsonPath: $.searchCriteria.billActive
-       - name: conn.property_id
+       - name: fc.pid
          isMandatory: false
          jsonPath: $.searchCriteria.propertyId
    output:
