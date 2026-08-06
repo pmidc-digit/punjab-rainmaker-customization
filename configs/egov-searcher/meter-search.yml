@@ -12,7 +12,7 @@ SearchDefinitions:
         baseQuery: >
           SELECT 
               mr.id,
-              mr.connectionno,
+              conn.connectionno,
               mr.billingperiod,
               mr.meterstatus,
               mr.lastreading,
@@ -47,11 +47,7 @@ SearchDefinitions:
 
               conn.additionaldetails->>'groups' as groups
 
-          FROM eg_ws_meterreading mr
-
-          INNER JOIN eg_ws_connection conn
-              ON mr.connectionno = conn.connectionno
-             AND mr.tenantid = conn.tenantid
+          FROM eg_ws_connection conn
 
           INNER JOIN eg_ws_service ews
               ON conn.id = ews.connection_id
@@ -70,17 +66,21 @@ SearchDefinitions:
               ON ebm.tenantid = conn.tenantid
              AND ebm.localitycode = epa.locality
 
+          LEFT JOIN eg_ws_meterreading mr
+              ON mr.connectionno = conn.connectionno
+             AND mr.tenantid = conn.tenantid
+
           $where
           AND ews.connectiontype = 'Metered'
           AND conn.status = 'Active'
           AND conn.applicationstatus IN ('CONNECTION_ACTIVATED','APPROVED')
 
-          ORDER BY mr.connectionno, mr.currentreadingdate DESC
+          ORDER BY conn.connectionno, mr.currentreadingdate DESC
 
       searchParams:
         condition: AND
         params:
-          - name: mr.tenantid
+          - name: conn.tenantid
             isMandatory: true
             jsonPath: $.searchCriteria.tenantId
 
@@ -100,7 +100,7 @@ SearchDefinitions:
             isMandatory: false
             jsonPath: $.searchCriteria.group
 
-          - name: mr.connectionno
+          - name: conn.connectionno
             isMandatory: false
             jsonPath: $.searchCriteria.connectionNo
             operator: =
