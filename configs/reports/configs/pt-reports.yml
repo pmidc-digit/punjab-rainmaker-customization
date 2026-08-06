@@ -10856,3 +10856,602 @@ ReportDefinitions:
     FROM dedup
     WHERE rn = 1 AND tenantid = $tenantid 
 
+- reportName: ReceiptRegister_without_locality_V2_test
+  decryptionPathId: ReceiptRegister_V2
+  summary: Receipt Register Test
+  version: 1.0.0
+  moduleName: rainmaker-pt
+  additionalConfig:
+    print:
+      pdfPageSize: "A1"
+  sourceColumns:
+  - name: receiptnumber
+    label: reports.pt.receiptNo
+    type: string
+    source: pt
+    total: false
+  - name: receiptdate
+    label: reports.pt.receiptDate
+    type: string
+    source: pt
+    total: false
+  - name: g8issuedate
+    label: reports.pt.g8issuedate
+    type: string
+    source: pt
+    total: false
+  - name: g8receiptno
+    label: reports.pt.g8receiptno
+    type: string
+    source: pt
+    total: false
+  - name: amount
+    label: reports.pt.amount
+    type: string
+    source: pt
+    total: true
+  - name: propertytax
+    label: reports.pt.propertyTax
+    type: string
+    source: pt
+    total: true
+  - name: paidpropertytax
+    label: reports.pt.paidpropertyTax
+    type: string
+    source: pt
+    total: true
+  - name: firecess
+    label: reports.pt.fireCess
+    type: string
+    source: pt
+    total: true
+  - name: cancercess
+    label: reports.pt.cancerCess
+    type: string
+    source: pt
+    total: true
+  - name: rebate
+    label: reports.pt.rebate
+    type: string
+    source: pt
+    total: true
+  - name: adhocrebate
+    label: reports.pt.adhocrebate
+    type: string
+    source: pt
+    total: true
+  - name: penalty
+    label: reports.pt.penalty
+    type: string
+    source: pt
+    total: true
+  - name: adhocpenalty
+    label: reports.pt.adhocpenalty
+    type: string
+    source: pt
+    total: true
+  - name: interest
+    label: reports.pt.interest
+    type: string
+    source: pt
+    total: true
+  - name: exemption
+    label: reports.pt.exemption
+    type: string
+    source: pt
+    total: true
+  - name: adjustment
+    label: reports.pt.roundoff
+    type: string
+    source: pt
+    total: true
+  - name: pendingamount
+    label: reports.pt.pendingamount
+    type: string
+    source: pt
+    total: true
+  - name: consumercode
+    label: reports.pt.propertyId
+    type: string
+    source: pt
+    total: false
+  - name: usagetype
+    label: reports.pt.usagetype
+    type: string
+    source: pt
+    total: false
+  - name: surveyid
+    label: reports.pt.surveyid
+    type: string
+    source: pt
+    total: false
+  - name: instrumenttype
+    label: reports.pt.paymentMode
+    type: string
+    source: pt
+    total: false
+  - name: transactionnumber
+    label: reports.pt.ddChequeTransactionNo
+    type: string
+    source: pt
+    total: false      
+  - name: transactiondate
+    label: reports.pt.ddChequeTransactionDate
+    type: string
+    source: pt
+    total: false
+  - name: bankname
+    label: reports.pt.bankName
+    type: string
+    source: pt
+    total: false
+  - name: collectorname
+    label: reports.pt.collectorname
+    type: string
+    source: pt
+    total: false
+  - name: financialyear
+    label: reports.pt.financialyear
+    type: string
+    source: pt
+    total: false
+  searchParams:
+  - name: fromDate
+    label: reports.pt.fromDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
+  - name: toDate
+    label: reports.pt.toDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
+  - name: financialyear
+    label: Financial Year
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=egf-master&masterName=FinancialYear|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].code|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].name
+    source: pt
+    wrapper: true
+    isMandatory: false
+    searchClause: AND financialyear = $financialyear
+  - name: paymentMode
+    label: Payment Mode
+    type: singlevaluelist
+    pattern: 'list://CARD:Card,CASH:Cash,CHEQUE:Cheque,DD:DD,OFFLINE_NEFT:NEFT,OFFLINE_RTGS:RTGS,ONLINE:Online,POSTAL_ORDER:PostalOrder'
+    source: pt
+    isMandatory: false
+    searchClause: AND instrumenttype = replace($paymentMode,',','_')
+query: |
+    WITH receipt_breakup AS (
+        SELECT
+            pd_1.id AS pdid,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_ADHOC_PENALTY' THEN bad.adjustedamount ELSE 0 END) AS adhocpenalty,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_ADHOC_REBATE' THEN bad.adjustedamount ELSE 0 END) AS adhocrebate,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_FIRE_CESS' THEN bad.adjustedamount ELSE 0 END) AS firecess,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_CANCER_CESS' THEN bad.adjustedamount ELSE 0 END) AS cancercess,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_TIME_INTEREST' THEN bad.adjustedamount ELSE 0 END) AS interest,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_TIME_PENALTY' THEN bad.adjustedamount ELSE 0 END) AS penalty,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_TIME_REBATE' THEN bad.adjustedamount ELSE 0 END) AS rebate,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_TAX' THEN bad.amount ELSE 0 END) AS propertytax,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_TAX' THEN bad.adjustedamount ELSE 0 END) AS paidpropertytax,
+            SUM(CASE WHEN bad.taxheadcode IN ('PT_UNIT_USAGE_EXEMPTION','PT_OWNER_EXEMPTION')
+                THEN bad.amount ELSE 0 END) AS exemption,
+            SUM(CASE WHEN bad.taxheadcode IN ('PT_ROUNDOFF','PT_DECIMAL_CEILING_DEBIT','PT_DECIMAL_CEILING_CREDIT')
+                THEN bad.adjustedamount ELSE 0 END) AS adjustment
+        FROM egcl_billaccountdetail bad
+        JOIN egcl_billdetial bd
+            ON bd.id = bad.billdetailid
+           AND bd.tenantid = bad.tenantid
+        JOIN egcl_paymentdetail pd_1
+            ON pd_1.billid = bd.billid
+           AND bd.tenantid = pd_1.tenantid
+        JOIN egcl_payment payment_1
+            ON pd_1.paymentid = payment_1.id
+           AND payment_1.tenantid = bad.tenantid
+        WHERE pd_1.tenantid = $tenantid
+          AND payment_1.paymentstatus <> 'CANCELLED'
+          AND pd_1.businessservice = 'PT'
+          AND pd_1.receiptdate >= $fromDate
+          AND pd_1.receiptdate <= $toDate
+        GROUP BY pd_1.id
+    )
+
+    SELECT
+        pd.receiptnumber AS receiptnumber,
+        to_char(
+            to_timestamp(pd.receiptdate / 1000)
+            AT TIME ZONE 'Asia/Kolkata',
+            'DD-MM-YYYY'
+        ) AS receiptdate,
+
+        to_char(
+            to_timestamp(pd.manualreceiptdate / 1000)
+            AT TIME ZONE 'Asia/Kolkata',
+            'DD-MM-YYYY'
+        ) AS g8issuedate,
+
+        pd.manualreceiptnumber AS g8receiptno,
+
+        payment.totalamountpaid AS amount,
+
+        receipt_breakup.propertytax AS propertytax,
+        receipt_breakup.paidpropertytax AS paidpropertytax,
+        receipt_breakup.firecess AS firecess,
+        receipt_breakup.cancercess AS cancercess,
+        receipt_breakup.rebate AS rebate,
+        receipt_breakup.adhocrebate AS adhocrebate,
+        receipt_breakup.penalty AS penalty,
+        receipt_breakup.adhocpenalty AS adhocpenalty,
+        receipt_breakup.interest AS interest,
+        receipt_breakup.exemption AS exemption,
+        receipt_breakup.adjustment AS adjustment,
+
+        payment.totaldue - payment.totalamountpaid AS pendingamount,
+
+        pt.propertyid AS consumercode,
+        pt.surveyid AS surveyid,
+
+        initcap(
+            CASE
+                WHEN pt.usagecategory LIKE '%.%'
+                THEN split_part(pt.usagecategory, '.', 2)
+                ELSE pt.usagecategory
+            END
+        ) AS usagetype,
+
+        payment.paymentmode AS instrumenttype,
+        payment.transactionnumber AS transactionnumber,
+
+        to_char(
+            to_timestamp(payment.instrumentdate / 1000)
+            AT TIME ZONE 'Asia/Kolkata',
+            'DD-MM-YYYY'
+        ) AS transactiondate,
+
+        concat(
+            bank_branches.bank_name,
+            ' ',
+            bank_branches.branch
+        ) AS bankname,
+
+        COALESCE(
+            eg_user.name,
+            '30048|21Fj+c3k2ldB0X3AzIh7atXB'
+        ) AS collectorname,
+
+        concat(
+            to_char(
+                to_timestamp(get_fromperiod(pd.billid) / 1000)
+                AT TIME ZONE 'Asia/Kolkata',
+                'YYYY'
+            ),
+            '-',
+            to_char(
+                to_timestamp(get_toperiod(pd.billid) / 1000)
+                AT TIME ZONE 'Asia/Kolkata',
+                'YY'
+            )
+        ) AS financialyear
+
+    FROM egcl_paymentdetail pd
+
+    LEFT JOIN eg_user
+        ON eg_user.id::text = pd.createdby::text
+
+    LEFT JOIN egcl_payment payment
+        ON pd.paymentid = payment.id
+
+    LEFT JOIN bank_branches
+        ON bank_branches.ifsc = payment.ifsccode
+
+    LEFT JOIN egcl_bill bill
+        ON bill.id = pd.billid
+       AND bill.tenantid = pd.tenantid
+
+    LEFT JOIN (
+        SELECT *
+        FROM (
+            SELECT
+                p.*,
+                ROW_NUMBER() OVER (
+                    PARTITION BY p.propertyid
+                    ORDER BY p.lastmodifiedtime DESC
+                ) AS rw
+            FROM eg_pt_property p
+        ) x
+        WHERE rw = 1
+    ) pt
+        ON pt.propertyid = bill.consumercode
+
+    LEFT JOIN receipt_breakup
+        ON receipt_breakup.pdid = pd.id
+
+    WHERE payment.paymentstatus <> 'CANCELLED'
+      AND pd.businessservice = 'PT'
+      AND payment.tenantid = pd.tenantid
+      AND pd.tenantid = $tenantid
+
+  orderby: ORDER BY receiptnumber DESC;
+
+- reportName: ReceiptRegisterSummary_test
+  decryptionPathId: ReceiptRegisterShort_V2
+  summary: Receipt Register Summary
+  version: 1.0.0
+  moduleName: rainmaker-pt
+  additionalConfig:
+    print:
+      pdfPageSize: "A1"
+  sourceColumns:
+  - name: ulb
+    label: reports.pt.ulb
+    type: string
+    source: pt
+    total: false
+  - name: paymentmode
+    label: reports.pt.paymentmode
+    type: string
+    source: pt
+    total: false
+  - name: adhocpenalty
+    label: reports.pt.adhocpenalty
+    type: string
+    source: pt
+    total: true
+  - name: adhocrebate
+    label: reports.pt.adhocrebate
+    type: string
+    source: pt
+    total: true
+  - name: firecess
+    label: reports.pt.firecess
+    type: string
+    source: pt
+    total: true
+  - name: cancercess
+    label: reports.pt.cancercess
+    type: string
+    source: pt
+    total: true
+  - name: interest
+    label: reports.pt.interest
+    type: string
+    source: pt
+    total: true
+  - name: penalty
+    label: reports.pt.penalty
+    type: string
+    source: pt
+    total: true
+  - name: rebate
+    label: reports.pt.rebate
+    type: string
+    source: pt
+    total: true
+  - name: propertytax
+    label: reports.pt.propertytax
+    type: string
+    source: pt
+    total: true
+  - name: exemption
+    label: reports.pt.exemption
+    type: string
+    source: pt
+    total: true
+  - name: adjustment
+    label: reports.pt.adjustment
+    type: string
+    source: pt
+    total: true
+  - name: noofassessments
+    label: reports.pt.noofassessments
+    type: string
+    source: pt
+    total: true     
+  - name: sumcash
+    label: reports.pt.sumcash
+    type: string
+    source: pt
+    total: true 
+  - name: sumcheque
+    label: reports.pt.sumcheque
+    type: string
+    source: pt
+    total: true
+  - name: countcheque
+    label: reports.pt.countcheque
+    type: string
+    source: pt
+    total: true     
+  - name: sumonline
+    label: reports.pt.sumonline
+    type: string
+    source: pt
+    total: true 
+  - name: totalamount
+    label: reports.pt.totalamount
+    type: string
+    source: pt
+    total: true    
+  - name: collectorname
+    label: reports.pt.collectorname
+    type: string
+    source: pt
+    total: false
+  searchParams:
+  - name: fromDate
+    label: reports.pt.fromDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
+  - name: toDate
+    label: reports.pt.toDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
+  - name: collectorname
+    label: reports.pt.collectorname
+    type: singlevaluelist
+    pattern: http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=PTCEMP|$.Employees[*].user.id|$.Employees[*].user.name
+    source: pt
+    wrapper: true
+    isMandatory: false
+    searchClause: AND collectorname = $collectorname::INTEGER
+  query: |
+WITH receipt_breakup AS (
+    SELECT
+        pd_1.id AS pdid,
+        SUM(CASE WHEN bad.taxheadcode = 'PT_ADHOC_PENALTY' THEN bad.adjustedamount ELSE 0 END) AS adhocpenalty,
+        SUM(CASE WHEN bad.taxheadcode = 'PT_ADHOC_REBATE' THEN bad.adjustedamount ELSE 0 END) AS adhocrebate,
+        SUM(CASE WHEN bad.taxheadcode = 'PT_FIRE_CESS' THEN bad.adjustedamount ELSE 0 END) AS firecess,
+        SUM(CASE WHEN bad.taxheadcode = 'PT_CANCER_CESS' THEN bad.adjustedamount ELSE 0 END) AS cancercess,
+        SUM(CASE WHEN bad.taxheadcode = 'PT_TIME_INTEREST' THEN bad.adjustedamount ELSE 0 END) AS interest,
+        SUM(CASE WHEN bad.taxheadcode = 'PT_TIME_PENALTY' THEN bad.adjustedamount ELSE 0 END) AS penalty,
+        SUM(CASE WHEN bad.taxheadcode = 'PT_TIME_REBATE' THEN bad.adjustedamount ELSE 0 END) AS rebate,
+        SUM(CASE WHEN bad.taxheadcode = 'PT_TAX' THEN bad.amount ELSE 0 END) AS propertytax,
+        SUM(CASE WHEN bad.taxheadcode = 'PT_TAX' THEN bad.adjustedamount ELSE 0 END) AS paidpropertytax,
+        SUM(CASE WHEN bad.taxheadcode IN ('PT_UNIT_USAGE_EXEMPTION','PT_OWNER_EXEMPTION')
+                 THEN bad.amount ELSE 0 END) AS exemption,
+        SUM(CASE WHEN bad.taxheadcode IN ('PT_ROUNDOFF','PT_DECIMAL_CEILING_DEBIT','PT_DECIMAL_CEILING_CREDIT')
+                 THEN bad.adjustedamount ELSE 0 END) AS adjustment
+    FROM egcl_billaccountdetail bad
+    JOIN egcl_billdetial bd
+      ON bd.id = bad.billdetailid
+     AND bd.tenantid = bad.tenantid
+    JOIN egcl_paymentdetail pd_1
+      ON pd_1.billid = bd.billid
+     AND bd.tenantid = pd_1.tenantid
+    JOIN egcl_payment payment_1
+      ON pd_1.paymentid = payment_1.id
+     AND payment_1.tenantid = bad.tenantid
+    WHERE pd_1.tenantid = $tenantid
+      AND payment_1.paymentstatus <> 'CANCELLED'
+      AND pd_1.businessservice = 'PT'
+      AND pd_1.receiptdate >= $fromDate
+      AND pd_1.receiptdate <= $toDate
+    GROUP BY pd_1.id
+),
+
+receipt_data AS (
+
+    SELECT
+        pd.tenantid,
+        pd.id AS pdid,
+        payment.totalamountpaid AS amount,
+        payment.paymentmode AS instrumenttype,
+
+        COALESCE(eg_user.name,
+        '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=') AS collectorname,
+
+        receipt_breakup.adhocpenalty,
+        receipt_breakup.adhocrebate,
+        receipt_breakup.firecess,
+        receipt_breakup.cancercess,
+        receipt_breakup.interest,
+        receipt_breakup.penalty,
+        receipt_breakup.rebate,
+        receipt_breakup.propertytax,
+        receipt_breakup.exemption,
+        receipt_breakup.adjustment,
+
+        concat(
+            to_char(
+                to_timestamp(get_fromperiod(pd.billid)/1000)
+                AT TIME ZONE 'Asia/Kolkata',
+                'YYYY'
+            ),
+            '-',
+            to_char(
+                to_timestamp(get_toperiod(pd.billid)/1000)
+                AT TIME ZONE 'Asia/Kolkata',
+                'YY'
+            )
+        ) AS financialyear
+
+    FROM egcl_paymentdetail pd
+
+    LEFT JOIN egcl_payment payment
+      ON pd.paymentid = payment.id
+
+    LEFT JOIN eg_user
+      ON eg_user.id::text = pd.createdby::text
+
+    LEFT JOIN receipt_breakup
+      ON receipt_breakup.pdid = pd.id
+
+    WHERE payment.paymentstatus <> 'CANCELLED'
+      AND payment.tenantid = pd.tenantid
+      AND pd.businessservice = 'PT'
+      AND pd.tenantid = $tenantid
+)
+
+SELECT
+    tenantid AS ulb,
+    instrumenttype AS paymentmode,
+    COUNT(DISTINCT pdid) AS noofassessments,
+
+    SUM(adhocpenalty) AS adhocpenalty,
+    SUM(adhocrebate) AS adhocrebate,
+    SUM(firecess) AS firecess,
+    SUM(cancercess) AS cancercess,
+    SUM(interest) AS interest,
+    SUM(penalty) AS penalty,
+    SUM(rebate) AS rebate,
+    SUM(propertytax) AS propertytax,
+    SUM(exemption) AS exemption,
+    SUM(adjustment) AS adjustment,
+
+    SUM(
+        CASE
+            WHEN instrumenttype = 'CASH'
+            THEN amount
+            ELSE 0
+        END
+    ) AS sumcash,
+
+    SUM(
+        CASE
+            WHEN instrumenttype = 'CHEQUE'
+            THEN amount
+            ELSE 0
+        END
+    ) AS sumcheque,
+
+    COUNT(
+        DISTINCT CASE
+            WHEN instrumenttype = 'CHEQUE'
+            THEN CONCAT(instrumenttype, amount)
+        END
+    ) AS countcheque,
+
+    SUM(
+        CASE
+            WHEN instrumenttype = 'ONLINE'
+            THEN amount
+            ELSE 0
+        END
+    ) AS sumonline,
+
+    CASE
+        WHEN instrumenttype <> 'ONLINE'
+        THEN collectorname
+        ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE='
+    END AS collectorname,
+
+    SUM(amount) AS totalamount
+
+FROM receipt_data
+
+GROUP BY
+    tenantid,
+    instrumenttype,
+    CASE
+        WHEN instrumenttype <> 'ONLINE'
+        THEN collectorname
+        ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE='
+    END
+  groupby: group by CASE WHEN instrumenttype != 'ONLINE' THEN collectorname ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END,tenantid,instrumenttype
+  
