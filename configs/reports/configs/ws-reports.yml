@@ -1,5 +1,3 @@
-
-
 ---
 ReportDefinitions:
   - reportName: ReceiptRegisterSW
@@ -6312,3 +6310,1084 @@ ReportDefinitions:
         LEFT JOIN demand_amt d ON f.consumercode = d.consumercode
         WHERE f.first_rn = 1 AND l.last_rn = 1
     orderby: order by f.billdate
+
+
+  - reportName: DemandCollectionBook_Water_FY20_21
+    summary: Demand Collection Book for Water (FY 2020-21)
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: reports.ws.consumercode
+        type: string
+        source: ws
+        total: false
+      - name: connecitonstatus
+        label: reports.ws.connecitonstatus
+        type: string
+        source: ws
+        total: false
+      - name: usagecategory
+        label: reports.ws.usagecategory
+        type: string
+        source: ws
+        total: false
+      - name: plotsize
+        label: reports.ws.plotsize
+        type: string
+        source: ws
+        total: false
+      - name: propertyid
+        label: reports.ws.propertyid
+        type: string
+        source: ws
+        total: false
+      - name: propertystatus
+        label: reports.ws.propertystatus
+        type: string
+        source: ws
+        total: false
+      - name: finyear
+        label: reports.ws.finyear
+        type: string
+        source: ws
+        total: false
+      - name: demandstauts
+        label: reports.ws.demandstauts
+        type: string
+        source: ws
+        total: false
+      - name: taxheadcode
+        label: reports.ws.taxheadcode
+        type: string
+        source: ws
+        total: false
+      - name: taxamt
+        label: reports.ws.taxamt
+        type: string
+        source: ws
+        total: true
+      - name: taxcoll
+        label: reports.ws.taxcoll
+        type: string
+        source: ws
+        total: true
+      - name: balance
+        label: reports.ws.balance
+        type: string
+        source: ws
+        total: true
+      - name: ispaymentcompleted
+        label: reports.ws.ispaymentcompleted
+        type: string
+        source: ws
+        total: false
+    searchParams: []
+    query: >
+      select d.consumercode, sw.status connecitonstatus , ep.usagecategory, ep.landarea plotsize, ep.propertyid , ep.status propertystatus,  to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') ||'-'|| to_char((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') as finyear,
+      d.status demandstauts,  dd.taxheadcode, dd.taxamount as taxamt, dd.collectionamount as taxcoll, (dd.taxamount - dd.collectionamount) balance, d.ispaymentcompleted 
+      from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_ws_connection sw ,  eg_pt_property ep
+      where dd.demandid=d.id 
+      and d.status!='CANCELLED'
+      and d.businessservice='WS'
+      and dd.tenantid = $tenantid
+      AND sw.connectionno = d.consumercode
+      and sw.connectionno IS NOT NULL
+      and sw.property_id = ep.propertyid 
+      and ep.status != 'INACTIVE'
+      and d.taxperiodfrom >= '1585699200000'
+      and d.taxperiodto <= '1617215399000'
+    orderby: order by d.consumercode, d.taxperiodfrom desc
+
+  - reportName: DemandCollectionBook_Water_FY21_22
+    summary: Demand Collection Book for Water (FY 2021-22)
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: reports.ws.consumercode
+        type: string
+        source: ws
+        total: false
+      - name: connecitonstatus
+        label: reports.ws.connecitonstatus
+        type: string
+        source: ws
+        total: false
+      - name: usagecategory
+        label: reports.ws.usagecategory
+        type: string
+        source: ws
+        total: false
+      - name: plotsize
+        label: reports.ws.plotsize
+        type: string
+        source: ws
+        total: false
+      - name: propertyid
+        label: reports.ws.propertyid
+        type: string
+        source: ws
+        total: false
+      - name: propertystatus
+        label: reports.ws.propertystatus
+        type: string
+        source: ws
+        total: false
+      - name: finyear
+        label: reports.ws.finyear
+        type: string
+        source: ws
+        total: false
+      - name: demandstauts
+        label: reports.ws.demandstauts
+        type: string
+        source: ws
+        total: false
+      - name: taxheadcode
+        label: reports.ws.taxheadcode
+        type: string
+        source: ws
+        total: false
+      - name: taxamt
+        label: reports.ws.taxamt
+        type: string
+        source: ws
+        total: true
+      - name: taxcoll
+        label: reports.ws.taxcoll
+        type: string
+        source: ws
+        total: true
+      - name: balance
+        label: reports.ws.balance
+        type: string
+        source: ws
+        total: true
+      - name: ispaymentcompleted
+        label: reports.ws.ispaymentcompleted
+        type: string
+        source: ws
+        total: false
+    searchParams: []
+    query: >
+      select d.consumercode, sw.status connecitonstatus , ep.usagecategory, ep.landarea plotsize, ep.propertyid , ep.status propertystatus,  to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') ||'-'|| to_char((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') as finyear,
+      d.status demandstauts,  dd.taxheadcode, dd.taxamount as taxamt, dd.collectionamount as taxcoll, (dd.taxamount - dd.collectionamount) balance, d.ispaymentcompleted 
+      from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_ws_connection sw ,  eg_pt_property ep
+      where dd.demandid=d.id 
+      and d.status!='CANCELLED'
+      and d.businessservice='WS'
+      and dd.tenantid = $tenantid
+      AND sw.connectionno = d.consumercode
+      and sw.connectionno IS NOT NULL
+      and sw.property_id = ep.propertyid 
+      and ep.status != 'INACTIVE'
+      and d.taxperiodfrom >= '1617235200000'
+      and d.taxperiodto <= '1648751399000'
+    orderby: order by d.consumercode, d.taxperiodfrom desc
+
+  - reportName: DemandCollectionBook_Water_FY22_23
+    summary: Demand Collection Book for Water (FY 2022-23)
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: reports.ws.consumercode
+        type: string
+        source: ws
+        total: false
+      - name: connecitonstatus
+        label: reports.ws.connecitonstatus
+        type: string
+        source: ws
+        total: false
+      - name: usagecategory
+        label: reports.ws.usagecategory
+        type: string
+        source: ws
+        total: false
+      - name: plotsize
+        label: reports.ws.plotsize
+        type: string
+        source: ws
+        total: false
+      - name: propertyid
+        label: reports.ws.propertyid
+        type: string
+        source: ws
+        total: false
+      - name: propertystatus
+        label: reports.ws.propertystatus
+        type: string
+        source: ws
+        total: false
+      - name: finyear
+        label: reports.ws.finyear
+        type: string
+        source: ws
+        total: false
+      - name: demandstauts
+        label: reports.ws.demandstauts
+        type: string
+        source: ws
+        total: false
+      - name: taxheadcode
+        label: reports.ws.taxheadcode
+        type: string
+        source: ws
+        total: false
+      - name: taxamt
+        label: reports.ws.taxamt
+        type: string
+        source: ws
+        total: true
+      - name: taxcoll
+        label: reports.ws.taxcoll
+        type: string
+        source: ws
+        total: true
+      - name: balance
+        label: reports.ws.balance
+        type: string
+        source: ws
+        total: true
+      - name: ispaymentcompleted
+        label: reports.ws.ispaymentcompleted
+        type: string
+        source: ws
+        total: false
+    searchParams: []
+    query: >
+      select d.consumercode, sw.status connecitonstatus , ep.usagecategory, ep.landarea plotsize, ep.propertyid , ep.status propertystatus,  to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') ||'-'|| to_char((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') as finyear,
+      d.status demandstauts,  dd.taxheadcode, dd.taxamount as taxamt, dd.collectionamount as taxcoll, (dd.taxamount - dd.collectionamount) balance, d.ispaymentcompleted 
+      from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_ws_connection sw ,  eg_pt_property ep
+      where dd.demandid=d.id 
+      and d.status!='CANCELLED'
+      and d.businessservice='WS'
+      and dd.tenantid = $tenantid
+      AND sw.connectionno = d.consumercode
+      and sw.connectionno IS NOT NULL
+      and sw.property_id = ep.propertyid 
+      and ep.status != 'INACTIVE'
+      and d.taxperiodfrom >= '1648771200000'
+      and d.taxperiodto <= '1680287399000'
+    orderby: order by d.consumercode, d.taxperiodfrom desc
+
+  - reportName: DemandCollectionBook_Water_FY23_24
+    summary: Demand Collection Book for Water (FY 2023-24)
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: reports.ws.consumercode
+        type: string
+        source: ws
+        total: false
+      - name: connecitonstatus
+        label: reports.ws.connecitonstatus
+        type: string
+        source: ws
+        total: false
+      - name: usagecategory
+        label: reports.ws.usagecategory
+        type: string
+        source: ws
+        total: false
+      - name: plotsize
+        label: reports.ws.plotsize
+        type: string
+        source: ws
+        total: false
+      - name: propertyid
+        label: reports.ws.propertyid
+        type: string
+        source: ws
+        total: false
+      - name: propertystatus
+        label: reports.ws.propertystatus
+        type: string
+        source: ws
+        total: false
+      - name: finyear
+        label: reports.ws.finyear
+        type: string
+        source: ws
+        total: false
+      - name: demandstauts
+        label: reports.ws.demandstauts
+        type: string
+        source: ws
+        total: false
+      - name: taxheadcode
+        label: reports.ws.taxheadcode
+        type: string
+        source: ws
+        total: false
+      - name: taxamt
+        label: reports.ws.taxamt
+        type: string
+        source: ws
+        total: true
+      - name: taxcoll
+        label: reports.ws.taxcoll
+        type: string
+        source: ws
+        total: true
+      - name: balance
+        label: reports.ws.balance
+        type: string
+        source: ws
+        total: true
+      - name: ispaymentcompleted
+        label: reports.ws.ispaymentcompleted
+        type: string
+        source: ws
+        total: false
+    searchParams: []
+    query: >
+      select d.consumercode, sw.status connecitonstatus , ep.usagecategory, ep.landarea plotsize, ep.propertyid , ep.status propertystatus,  to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') ||'-'|| to_char((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') as finyear,
+      d.status demandstauts,  dd.taxheadcode, dd.taxamount as taxamt, dd.collectionamount as taxcoll, (dd.taxamount - dd.collectionamount) balance, d.ispaymentcompleted 
+      from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_ws_connection sw ,  eg_pt_property ep
+      where dd.demandid=d.id 
+      and d.status!='CANCELLED'
+      and d.businessservice='WS'
+      and dd.tenantid = $tenantid
+      AND sw.connectionno = d.consumercode
+      and sw.connectionno IS NOT NULL
+      and sw.property_id = ep.propertyid 
+      and ep.status != 'INACTIVE'
+      and d.taxperiodfrom >= '1680307200000'
+      and d.taxperiodto <= '1711909799000'
+    orderby: order by d.consumercode, d.taxperiodfrom desc
+
+  - reportName: DemandCollectionBook_Water_FY24_25
+    summary: Demand Collection Book for Water (FY 2024-25)
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: reports.ws.consumercode
+        type: string
+        source: ws
+        total: false
+      - name: connecitonstatus
+        label: reports.ws.connecitonstatus
+        type: string
+        source: ws
+        total: false
+      - name: usagecategory
+        label: reports.ws.usagecategory
+        type: string
+        source: ws
+        total: false
+      - name: plotsize
+        label: reports.ws.plotsize
+        type: string
+        source: ws
+        total: false
+      - name: propertyid
+        label: reports.ws.propertyid
+        type: string
+        source: ws
+        total: false
+      - name: propertystatus
+        label: reports.ws.propertystatus
+        type: string
+        source: ws
+        total: false
+      - name: finyear
+        label: reports.ws.finyear
+        type: string
+        source: ws
+        total: false
+      - name: demandstauts
+        label: reports.ws.demandstauts
+        type: string
+        source: ws
+        total: false
+      - name: taxheadcode
+        label: reports.ws.taxheadcode
+        type: string
+        source: ws
+        total: false
+      - name: taxamt
+        label: reports.ws.taxamt
+        type: string
+        source: ws
+        total: true
+      - name: taxcoll
+        label: reports.ws.taxcoll
+        type: string
+        source: ws
+        total: true
+      - name: balance
+        label: reports.ws.balance
+        type: string
+        source: ws
+        total: true
+      - name: ispaymentcompleted
+        label: reports.ws.ispaymentcompleted
+        type: string
+        source: ws
+        total: false
+    searchParams: []
+    query: >
+      select d.consumercode, sw.status connecitonstatus , ep.usagecategory, ep.landarea plotsize, ep.propertyid , ep.status propertystatus,  to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') ||'-'|| to_char((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') as finyear,
+      d.status demandstauts,  dd.taxheadcode, dd.taxamount as taxamt, dd.collectionamount as taxcoll, (dd.taxamount - dd.collectionamount) balance, d.ispaymentcompleted 
+      from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_ws_connection sw ,  eg_pt_property ep
+      where dd.demandid=d.id 
+      and d.status!='CANCELLED'
+      and d.businessservice='WS'
+      and dd.tenantid = $tenantid
+      AND sw.connectionno = d.consumercode
+      and sw.connectionno IS NOT NULL
+      and sw.property_id = ep.propertyid 
+      and ep.status != 'INACTIVE'
+      and d.taxperiodfrom >= '1711929600000'
+      and d.taxperiodto <= '1743445799000'
+    orderby: order by d.consumercode, d.taxperiodfrom desc
+
+  - reportName: DemandCollectionBook_Water_FY25_26
+    summary: Demand Collection Book for Water (FY 2025-26)
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: reports.ws.consumercode
+        type: string
+        source: ws
+        total: false
+      - name: connecitonstatus
+        label: reports.ws.connecitonstatus
+        type: string
+        source: ws
+        total: false
+      - name: usagecategory
+        label: reports.ws.usagecategory
+        type: string
+        source: ws
+        total: false
+      - name: plotsize
+        label: reports.ws.plotsize
+        type: string
+        source: ws
+        total: false
+      - name: propertyid
+        label: reports.ws.propertyid
+        type: string
+        source: ws
+        total: false
+      - name: propertystatus
+        label: reports.ws.propertystatus
+        type: string
+        source: ws
+        total: false
+      - name: finyear
+        label: reports.ws.finyear
+        type: string
+        source: ws
+        total: false
+      - name: demandstauts
+        label: reports.ws.demandstauts
+        type: string
+        source: ws
+        total: false
+      - name: taxheadcode
+        label: reports.ws.taxheadcode
+        type: string
+        source: ws
+        total: false
+      - name: taxamt
+        label: reports.ws.taxamt
+        type: string
+        source: ws
+        total: true
+      - name: taxcoll
+        label: reports.ws.taxcoll
+        type: string
+        source: ws
+        total: true
+      - name: balance
+        label: reports.ws.balance
+        type: string
+        source: ws
+        total: true
+      - name: ispaymentcompleted
+        label: reports.ws.ispaymentcompleted
+        type: string
+        source: ws
+        total: false
+    searchParams: []
+    query: >
+      select d.consumercode, sw.status connecitonstatus , ep.usagecategory, ep.landarea plotsize, ep.propertyid , ep.status propertystatus,  to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') ||'-'|| to_char((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') as finyear,
+      d.status demandstauts,  dd.taxheadcode, dd.taxamount as taxamt, dd.collectionamount as taxcoll, (dd.taxamount - dd.collectionamount) balance, d.ispaymentcompleted 
+      from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_ws_connection sw ,  eg_pt_property ep
+      where dd.demandid=d.id 
+      and d.status!='CANCELLED'
+      and d.businessservice='WS'
+      and dd.tenantid = $tenantid
+      AND sw.connectionno = d.consumercode
+      and sw.connectionno IS NOT NULL
+      and sw.property_id = ep.propertyid 
+      and ep.status != 'INACTIVE'
+      and d.taxperiodfrom >= '1743465600000'
+      and d.taxperiodto <= '1774981799000'
+    orderby: order by d.consumercode, d.taxperiodfrom desc
+
+  - reportName: DemandCollectionBook_Sewage_FY20_21
+    summary: Demand Collection Book for Sewage (FY 2020-21)
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: reports.sw.consumercode
+        type: string
+        source: sw
+        total: false
+      - name: connecitonstatus
+        label: reports.sw.connecitonstatus
+        type: string
+        source: sw
+        total: false
+      - name: usagecategory
+        label: reports.sw.usagecategory
+        type: string
+        source: sw
+        total: false
+      - name: plotsize
+        label: reports.sw.plotsize
+        type: string
+        source: sw
+        total: false
+      - name: propertyid
+        label: reports.sw.propertyid
+        type: string
+        source: sw
+        total: false
+      - name: propertystatus
+        label: reports.sw.propertystatus
+        type: string
+        source: sw
+        total: false
+      - name: finyear
+        label: reports.sw.finyear
+        type: string
+        source: sw
+        total: false
+      - name: demandstauts
+        label: reports.sw.demandstauts
+        type: string
+        source: sw
+        total: false
+      - name: taxheadcode
+        label: reports.sw.taxheadcode
+        type: string
+        source: sw
+        total: false
+      - name: taxamt
+        label: reports.sw.taxamt
+        type: string
+        source: sw
+        total: true
+      - name: taxcoll
+        label: reports.sw.taxcoll
+        type: string
+        source: sw
+        total: true
+      - name: balance
+        label: reports.sw.balance
+        type: string
+        source: sw
+        total: true
+      - name: ispaymentcompleted
+        label: reports.sw.ispaymentcompleted
+        type: string
+        source: sw
+        total: false
+    searchParams: []
+    query: >
+      select d.consumercode, sw.status connecitonstatus , ep.usagecategory, ep.landarea plotsize, ep.propertyid , ep.status propertystatus,  to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') ||'-'|| to_char((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') as finyear,
+      d.status demandstauts,  dd.taxheadcode, dd.taxamount as taxamt, dd.collectionamount as taxcoll, (dd.taxamount - dd.collectionamount) balance, d.ispaymentcompleted 
+      from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_sw_connection sw ,  eg_pt_property ep
+      where dd.demandid=d.id 
+      and d.status!='CANCELLED'
+      and d.businessservice='SW'
+      and dd.tenantid = $tenantid
+      AND sw.connectionno = d.consumercode
+      and sw.connectionno IS NOT NULL
+      and sw.property_id = ep.propertyid 
+      and ep.status != 'INACTIVE'
+      and d.taxperiodfrom >= '1585699200000'
+      and d.taxperiodto <= '1617215399000'
+    orderby: order by d.consumercode, d.taxperiodfrom desc
+
+  - reportName: DemandCollectionBook_Sewage_FY21_22
+    summary: Demand Collection Book for Sewage (FY 2021-22)
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: reports.sw.consumercode
+        type: string
+        source: sw
+        total: false
+      - name: connecitonstatus
+        label: reports.sw.connecitonstatus
+        type: string
+        source: sw
+        total: false
+      - name: usagecategory
+        label: reports.sw.usagecategory
+        type: string
+        source: sw
+        total: false
+      - name: plotsize
+        label: reports.sw.plotsize
+        type: string
+        source: sw
+        total: false
+      - name: propertyid
+        label: reports.sw.propertyid
+        type: string
+        source: sw
+        total: false
+      - name: propertystatus
+        label: reports.sw.propertystatus
+        type: string
+        source: sw
+        total: false
+      - name: finyear
+        label: reports.sw.finyear
+        type: string
+        source: sw
+        total: false
+      - name: demandstauts
+        label: reports.sw.demandstauts
+        type: string
+        source: sw
+        total: false
+      - name: taxheadcode
+        label: reports.sw.taxheadcode
+        type: string
+        source: sw
+        total: false
+      - name: taxamt
+        label: reports.sw.taxamt
+        type: string
+        source: sw
+        total: true
+      - name: taxcoll
+        label: reports.sw.taxcoll
+        type: string
+        source: sw
+        total: true
+      - name: balance
+        label: reports.sw.balance
+        type: string
+        source: sw
+        total: true
+      - name: ispaymentcompleted
+        label: reports.sw.ispaymentcompleted
+        type: string
+        source: sw
+        total: false
+    searchParams: []
+    query: >
+      select d.consumercode, sw.status connecitonstatus , ep.usagecategory, ep.landarea plotsize, ep.propertyid , ep.status propertystatus,  to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') ||'-'|| to_char((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') as finyear,
+      d.status demandstauts,  dd.taxheadcode, dd.taxamount as taxamt, dd.collectionamount as taxcoll, (dd.taxamount - dd.collectionamount) balance, d.ispaymentcompleted 
+      from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_sw_connection sw ,  eg_pt_property ep
+      where dd.demandid=d.id 
+      and d.status!='CANCELLED'
+      and d.businessservice='SW'
+      and dd.tenantid = $tenantid
+      AND sw.connectionno = d.consumercode
+      and sw.connectionno IS NOT NULL
+      and sw.property_id = ep.propertyid 
+      and ep.status != 'INACTIVE'
+      and d.taxperiodfrom >= '1617235200000'
+      and d.taxperiodto <= '1648751399000'
+    orderby: order by d.consumercode, d.taxperiodfrom desc
+
+  - reportName: DemandCollectionBook_Sewage_FY22_23
+    summary: Demand Collection Book for Sewage (FY 2022-23)
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: reports.sw.consumercode
+        type: string
+        source: sw
+        total: false
+      - name: connecitonstatus
+        label: reports.sw.connecitonstatus
+        type: string
+        source: sw
+        total: false
+      - name: usagecategory
+        label: reports.sw.usagecategory
+        type: string
+        source: sw
+        total: false
+      - name: plotsize
+        label: reports.sw.plotsize
+        type: string
+        source: sw
+        total: false
+      - name: propertyid
+        label: reports.sw.propertyid
+        type: string
+        source: sw
+        total: false
+      - name: propertystatus
+        label: reports.sw.propertystatus
+        type: string
+        source: sw
+        total: false
+      - name: finyear
+        label: reports.sw.finyear
+        type: string
+        source: sw
+        total: false
+      - name: demandstauts
+        label: reports.sw.demandstauts
+        type: string
+        source: sw
+        total: false
+      - name: taxheadcode
+        label: reports.sw.taxheadcode
+        type: string
+        source: sw
+        total: false
+      - name: taxamt
+        label: reports.sw.taxamt
+        type: string
+        source: sw
+        total: true
+      - name: taxcoll
+        label: reports.sw.taxcoll
+        type: string
+        source: sw
+        total: true
+      - name: balance
+        label: reports.sw.balance
+        type: string
+        source: sw
+        total: true
+      - name: ispaymentcompleted
+        label: reports.sw.ispaymentcompleted
+        type: string
+        source: sw
+        total: false
+    searchParams: []
+    query: >
+      select d.consumercode, sw.status connecitonstatus , ep.usagecategory, ep.landarea plotsize, ep.propertyid , ep.status propertystatus,  to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') ||'-'|| to_char((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') as finyear,
+      d.status demandstauts,  dd.taxheadcode, dd.taxamount as taxamt, dd.collectionamount as taxcoll, (dd.taxamount - dd.collectionamount) balance, d.ispaymentcompleted 
+      from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_sw_connection sw ,  eg_pt_property ep
+      where dd.demandid=d.id 
+      and d.status!='CANCELLED'
+      and d.businessservice='SW'
+      and dd.tenantid = $tenantid
+      AND sw.connectionno = d.consumercode
+      and sw.connectionno IS NOT NULL
+      and sw.property_id = ep.propertyid 
+      and ep.status != 'INACTIVE'
+      and d.taxperiodfrom >= '1648771200000'
+      and d.taxperiodto <= '1680287399000'
+    orderby: order by d.consumercode, d.taxperiodfrom desc
+
+  - reportName: DemandCollectionBook_Sewage_FY23_24
+    summary: Demand Collection Book for Sewage (FY 2023-24)
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: reports.sw.consumercode
+        type: string
+        source: sw
+        total: false
+      - name: connecitonstatus
+        label: reports.sw.connecitonstatus
+        type: string
+        source: sw
+        total: false
+      - name: usagecategory
+        label: reports.sw.usagecategory
+        type: string
+        source: sw
+        total: false
+      - name: plotsize
+        label: reports.sw.plotsize
+        type: string
+        source: sw
+        total: false
+      - name: propertyid
+        label: reports.sw.propertyid
+        type: string
+        source: sw
+        total: false
+      - name: propertystatus
+        label: reports.sw.propertystatus
+        type: string
+        source: sw
+        total: false
+      - name: finyear
+        label: reports.sw.finyear
+        type: string
+        source: sw
+        total: false
+      - name: demandstauts
+        label: reports.sw.demandstauts
+        type: string
+        source: sw
+        total: false
+      - name: taxheadcode
+        label: reports.sw.taxheadcode
+        type: string
+        source: sw
+        total: false
+      - name: taxamt
+        label: reports.sw.taxamt
+        type: string
+        source: sw
+        total: true
+      - name: taxcoll
+        label: reports.sw.taxcoll
+        type: string
+        source: sw
+        total: true
+      - name: balance
+        label: reports.sw.balance
+        type: string
+        source: sw
+        total: true
+      - name: ispaymentcompleted
+        label: reports.sw.ispaymentcompleted
+        type: string
+        source: sw
+        total: false
+    searchParams: []
+    query: >
+      select d.consumercode, sw.status connecitonstatus , ep.usagecategory, ep.landarea plotsize, ep.propertyid , ep.status propertystatus,  to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') ||'-'|| to_char((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') as finyear,
+      d.status demandstauts,  dd.taxheadcode, dd.taxamount as taxamt, dd.collectionamount as taxcoll, (dd.taxamount - dd.collectionamount) balance, d.ispaymentcompleted 
+      from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_sw_connection sw ,  eg_pt_property ep
+      where dd.demandid=d.id 
+      and d.status!='CANCELLED'
+      and d.businessservice='SW'
+      and dd.tenantid = $tenantid
+      AND sw.connectionno = d.consumercode
+      and sw.connectionno IS NOT NULL
+      and sw.property_id = ep.propertyid 
+      and ep.status != 'INACTIVE'
+      and d.taxperiodfrom >= '1680307200000'
+      and d.taxperiodto <= '1711909799000'
+    orderby: order by d.consumercode, d.taxperiodfrom desc
+
+  - reportName: DemandCollectionBook_Sewage_FY24_25
+    summary: Demand Collection Book for Sewage (FY 2024-25)
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: reports.sw.consumercode
+        type: string
+        source: sw
+        total: false
+      - name: connecitonstatus
+        label: reports.sw.connecitonstatus
+        type: string
+        source: sw
+        total: false
+      - name: usagecategory
+        label: reports.sw.usagecategory
+        type: string
+        source: sw
+        total: false
+      - name: plotsize
+        label: reports.sw.plotsize
+        type: string
+        source: sw
+        total: false
+      - name: propertyid
+        label: reports.sw.propertyid
+        type: string
+        source: sw
+        total: false
+      - name: propertystatus
+        label: reports.sw.propertystatus
+        type: string
+        source: sw
+        total: false
+      - name: finyear
+        label: reports.sw.finyear
+        type: string
+        source: sw
+        total: false
+      - name: demandstauts
+        label: reports.sw.demandstauts
+        type: string
+        source: sw
+        total: false
+      - name: taxheadcode
+        label: reports.sw.taxheadcode
+        type: string
+        source: sw
+        total: false
+      - name: taxamt
+        label: reports.sw.taxamt
+        type: string
+        source: sw
+        total: true
+      - name: taxcoll
+        label: reports.sw.taxcoll
+        type: string
+        source: sw
+        total: true
+      - name: balance
+        label: reports.sw.balance
+        type: string
+        source: sw
+        total: true
+      - name: ispaymentcompleted
+        label: reports.sw.ispaymentcompleted
+        type: string
+        source: sw
+        total: false
+    searchParams: []
+    query: >
+      select d.consumercode, sw.status connecitonstatus , ep.usagecategory, ep.landarea plotsize, ep.propertyid , ep.status propertystatus,  to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') ||'-'|| to_char((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') as finyear,
+      d.status demandstauts,  dd.taxheadcode, dd.taxamount as taxamt, dd.collectionamount as taxcoll, (dd.taxamount - dd.collectionamount) balance, d.ispaymentcompleted 
+      from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_sw_connection sw ,  eg_pt_property ep
+      where dd.demandid=d.id 
+      and d.status!='CANCELLED'
+      and d.businessservice='SW'
+      and dd.tenantid = $tenantid
+      AND sw.connectionno = d.consumercode
+      and sw.connectionno IS NOT NULL
+      and sw.property_id = ep.propertyid 
+      and ep.status != 'INACTIVE'
+      and d.taxperiodfrom >= '1711929600000'
+      and d.taxperiodto <= '1743445799000'
+    orderby: order by d.consumercode, d.taxperiodfrom desc
+
+  - reportName: DemandCollectionBook_Sewage_FY25_26
+    summary: Demand Collection Book for Sewage (FY 2025-26)
+    version: 1.0.0
+    moduleName: rainmaker-ws
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: consumercode
+        label: reports.sw.consumercode
+        type: string
+        source: sw
+        total: false
+      - name: connecitonstatus
+        label: reports.sw.connecitonstatus
+        type: string
+        source: sw
+        total: false
+      - name: usagecategory
+        label: reports.sw.usagecategory
+        type: string
+        source: sw
+        total: false
+      - name: plotsize
+        label: reports.sw.plotsize
+        type: string
+        source: sw
+        total: false
+      - name: propertyid
+        label: reports.sw.propertyid
+        type: string
+        source: sw
+        total: false
+      - name: propertystatus
+        label: reports.sw.propertystatus
+        type: string
+        source: sw
+        total: false
+      - name: finyear
+        label: reports.sw.finyear
+        type: string
+        source: sw
+        total: false
+      - name: demandstauts
+        label: reports.sw.demandstauts
+        type: string
+        source: sw
+        total: false
+      - name: taxheadcode
+        label: reports.sw.taxheadcode
+        type: string
+        source: sw
+        total: false
+      - name: taxamt
+        label: reports.sw.taxamt
+        type: string
+        source: sw
+        total: true
+      - name: taxcoll
+        label: reports.sw.taxcoll
+        type: string
+        source: sw
+        total: true
+      - name: balance
+        label: reports.sw.balance
+        type: string
+        source: sw
+        total: true
+      - name: ispaymentcompleted
+        label: reports.sw.ispaymentcompleted
+        type: string
+        source: sw
+        total: false
+    searchParams: []
+    query: >
+      select d.consumercode, sw.status connecitonstatus , ep.usagecategory, ep.landarea plotsize, ep.propertyid , ep.status propertystatus,  to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') ||'-'|| to_char((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') as finyear,
+      d.status demandstauts,  dd.taxheadcode, dd.taxamount as taxamt, dd.collectionamount as taxcoll, (dd.taxamount - dd.collectionamount) balance, d.ispaymentcompleted 
+      from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_sw_connection sw ,  eg_pt_property ep
+      where dd.demandid=d.id 
+      and d.status!='CANCELLED'
+      and d.businessservice='SW'
+      and dd.tenantid = $tenantid
+      AND sw.connectionno = d.consumercode
+      and sw.connectionno IS NOT NULL
+      and sw.property_id = ep.propertyid 
+      and ep.status != 'INACTIVE'
+      and d.taxperiodfrom >= '1743465600000'
+      and d.taxperiodto <= '1774981799000'
+    orderby: order by d.consumercode, d.taxperiodfrom desc
