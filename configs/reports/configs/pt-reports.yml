@@ -7659,17 +7659,17 @@ ReportDefinitions:
         total: false
     searchParams:
       - name: fromDate
-        label: Only 30 days data fetch
+        label: reports.pt.fromDate
         type: epoch
         source: pt
         isMandatory: true
-        searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
+        searchClause: AND pd.receiptdate >= $fromDate
       - name: toDate
         label: reports.pt.toDate
         type: epoch
         source: pt
         isMandatory: true
-        searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
+        searchClause: AND pd.receiptdate <= $toDate
       - name: financialyear
         label: Financial Year
         type: singlevaluelist
