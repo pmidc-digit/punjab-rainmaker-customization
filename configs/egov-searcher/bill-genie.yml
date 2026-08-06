@@ -1107,154 +1107,154 @@ SearchDefinitions:
    rowMapperKey: billsearch
    query:
      baseQuery: >-
-WITH filtered_conn AS (
-    SELECT
-        conn.connectionno,
-        conn.status AS conn_status,
-        conn.property_id AS pid,
-        conn.oldconnectionno AS oldpid,
-        conn.additionaldetails AS conn_add,
-        conn.tenantid,
-        pt.status AS pt_status,
-        pt.id AS pt_id,
+      WITH filtered_conn AS (
+          SELECT
+              conn.connectionno,
+              conn.status AS conn_status,
+              conn.property_id AS pid,
+              conn.oldconnectionno AS oldpid,
+              conn.additionaldetails AS conn_add,
+              conn.tenantid,
+              pt.status AS pt_status,
+              pt.id AS pt_id,
 
-        ptadd.doorno AS ptadd_doorno,
-        ptadd.landmark AS ptadd_landmark,
-        ptadd.city AS ptadd_city,
-        ptadd.pincode AS ptadd_pincode,
-        ptadd.locality AS ptadd_locality,
-        ptadd.street AS ptadd_street,
-        ptadd.region AS ptadd_region,
-        ptadd.plotno AS ptadd_plotno,
-        ptadd.buildingname AS ptadd_buildingname,
-        ptadd.district AS ptadd_district,
-        ptadd.state AS ptadd_state,
-        ptadd.latitude AS ptadd_latitude,
-        ptadd.longitude AS ptadd_longitude,
-        ptown.userid ptown_userid,
+              ptadd.doorno AS ptadd_doorno,
+              ptadd.landmark AS ptadd_landmark,
+              ptadd.city AS ptadd_city,
+              ptadd.pincode AS ptadd_pincode,
+              ptadd.locality AS ptadd_locality,
+              ptadd.street AS ptadd_street,
+              ptadd.region AS ptadd_region,
+              ptadd.plotno AS ptadd_plotno,
+              ptadd.buildingname AS ptadd_buildingname,
+              ptadd.district AS ptadd_district,
+              ptadd.state AS ptadd_state,
+              ptadd.latitude AS ptadd_latitude,
+              ptadd.longitude AS ptadd_longitude,
+              ptown.userid ptown_userid,
 
-        lm.connectionno AS mr_connectionno,
-        lm.lastreading AS mr_lastreading,
-        lm.lastreadingdate AS mr_lastreadingdate,
-        lm.currentreading AS mr_currentreading,
-        lm.currentreadingdate AS mr_currentreadingdate,
-        lm.consumption AS mr_consumption,
-        lm.meterstatus AS mr_meterstatus,
-        lm.billingperiod AS mr_billingperiod
+              lm.connectionno AS mr_connectionno,
+              lm.lastreading AS mr_lastreading,
+              lm.lastreadingdate AS mr_lastreadingdate,
+              lm.currentreading AS mr_currentreading,
+              lm.currentreadingdate AS mr_currentreadingdate,
+              lm.consumption AS mr_consumption,
+              lm.meterstatus AS mr_meterstatus,
+              lm.billingperiod AS mr_billingperiod
 
-    FROM eg_ws_connection conn
+          FROM eg_ws_connection conn
 
-    INNER JOIN eg_pt_property pt
-        ON pt.propertyid = conn.property_id
-       AND pt.status IN ('ACTIVE', 'PENDINGWS')
+          INNER JOIN eg_pt_property pt
+              ON pt.propertyid = conn.property_id
+             AND pt.status IN ('ACTIVE', 'PENDINGWS')
 
-    INNER JOIN eg_pt_address ptadd
-        ON ptadd.propertyid = pt.id
+          INNER JOIN eg_pt_address ptadd
+              ON ptadd.propertyid = pt.id
 
-    INNER JOIN eg_pt_owner ptown
-        ON ptown.propertyid = pt.id
+          INNER JOIN eg_pt_owner ptown
+              ON ptown.propertyid = pt.id
 
-    LEFT JOIN LATERAL (
-        SELECT
-            mr.connectionno,
-            mr.lastreading,
-            mr.lastreadingdate,
-            mr.currentreading,
-            mr.currentreadingdate,
-            mr.consumption,
-            mr.meterstatus,
-            mr.billingperiod
-        FROM eg_ws_meterreading mr
-        WHERE mr.connectionno = conn.connectionno
-        ORDER BY mr.createdtime DESC
-        LIMIT 1
-    ) lm ON TRUE
+          LEFT JOIN LATERAL (
+              SELECT
+                  mr.connectionno,
+                  mr.lastreading,
+                  mr.lastreadingdate,
+                  mr.currentreading,
+                  mr.currentreadingdate,
+                  mr.consumption,
+                  mr.meterstatus,
+                  mr.billingperiod
+              FROM eg_ws_meterreading mr
+              WHERE mr.connectionno = conn.connectionno
+              ORDER BY mr.createdtime DESC
+              LIMIT 1
+          ) lm ON TRUE
 
-    $where
-      AND conn.status = 'Active'
-),
+          $where
+            AND conn.status = 'Active'
+      ),
 
-filtered_bills AS (
-    SELECT
-        fc.*,
+      filtered_bills AS (
+          SELECT
+              fc.*,
 
-        b.id AS b_id,
-        b.mobilenumber,
-        b.tenantid AS b_tenantid,
-        b.payername AS b_payername,
-        b.payeraddress AS b_payeraddress,
-        b.payeremail AS b_payeremail,
-        b.isactive AS b_isactive,
-        b.iscancelled AS b_iscancelled,
-        b.createdby AS b_createdby,
-        b.status AS b_status,
-        b.filestoreid AS b_filestoreid,
-        b.createddate AS b_createddate,
-        b.lastmodifiedby AS b_lastmodifiedby,
-        b.lastmodifieddate AS b_lastmodifieddate,
-        b.additionaldetails AS b_additionaldetails,
+              b.id AS b_id,
+              b.mobilenumber,
+              b.tenantid AS b_tenantid,
+              b.payername AS b_payername,
+              b.payeraddress AS b_payeraddress,
+              b.payeremail AS b_payeremail,
+              b.isactive AS b_isactive,
+              b.iscancelled AS b_iscancelled,
+              b.createdby AS b_createdby,
+              b.status AS b_status,
+              b.filestoreid AS b_filestoreid,
+              b.createddate AS b_createddate,
+              b.lastmodifiedby AS b_lastmodifiedby,
+              b.lastmodifieddate AS b_lastmodifieddate,
+              b.additionaldetails AS b_additionaldetails,
 
-        bd.id AS bd_id,
-        bd.billid AS bd_billid,
-        bd.tenantid AS bd_tenantid,
-        bd.businessservice AS bd_businessservice,
-        bd.demandid,
-        bd.fromperiod,
-        bd.toperiod,
-        bd.billno AS bd_billno,
-        bd.billdate AS bd_billdate,
-        bd.consumercode AS bd_consumercode,
-        bd.consumertype AS bd_consumertype,
-        bd.billdescription AS bd_billdescription,
-        bd.displaymessage AS bd_displaymessage,
-        bd.minimumamount AS bd_minimumamount,
-        bd.totalamount AS bd_totalamount,
-        bd.callbackforapportioning AS bd_callbackforapportioning,
-        bd.expirydate AS bd_expirydate,
-        bd.partpaymentallowed AS bd_partpaymentallowed,
-        bd.isadvanceallowed AS bd_isadvanceallowed,
-        bd.collectionmodesnotallowed AS bd_collectionmodesnotallowed,
-        bd.createddate AS bd_createddate,
-        bd.additionaldetails AS bd_additionaldetails,
+              bd.id AS bd_id,
+              bd.billid AS bd_billid,
+              bd.tenantid AS bd_tenantid,
+              bd.businessservice AS bd_businessservice,
+              bd.demandid,
+              bd.fromperiod,
+              bd.toperiod,
+              bd.billno AS bd_billno,
+              bd.billdate AS bd_billdate,
+              bd.consumercode AS bd_consumercode,
+              bd.consumertype AS bd_consumertype,
+              bd.billdescription AS bd_billdescription,
+              bd.displaymessage AS bd_displaymessage,
+              bd.minimumamount AS bd_minimumamount,
+              bd.totalamount AS bd_totalamount,
+              bd.callbackforapportioning AS bd_callbackforapportioning,
+              bd.expirydate AS bd_expirydate,
+              bd.partpaymentallowed AS bd_partpaymentallowed,
+              bd.isadvanceallowed AS bd_isadvanceallowed,
+              bd.collectionmodesnotallowed AS bd_collectionmodesnotallowed,
+              bd.createddate AS bd_createddate,
+              bd.additionaldetails AS bd_additionaldetails,
 
-        'NA' AS ad_id,
-        'NA' AS ad_tenantid,
-        'NA' AS ad_billdetail,
-        '0' AS ad_orderno,
-        '0.0' AS ad_amount,
-        '0.0' AS ad_adjustedamount,
-        'NA' AS ad_taxheadcode,
-        'NA' AS demanddetailid
+              'NA' AS ad_id,
+              'NA' AS ad_tenantid,
+              'NA' AS ad_billdetail,
+              '0' AS ad_orderno,
+              '0.0' AS ad_amount,
+              '0.0' AS ad_adjustedamount,
+              'NA' AS ad_taxheadcode,
+              'NA' AS demanddetailid
 
-    FROM filtered_conn fc
+          FROM filtered_conn fc
 
-    INNER JOIN egbs_bill_v1 b
-        ON b.consumercode = fc.connectionno
-       AND b.tenantid = fc.tenantid
-       AND b.status = 'ACTIVE'
+          INNER JOIN egbs_bill_v1 b
+              ON b.consumercode = fc.connectionno
+             AND b.tenantid = fc.tenantid
+             AND b.status = 'ACTIVE'
 
-    INNER JOIN egbs_billdetail_v1 bd
-        ON bd.billid = b.id
-       AND bd.tenantid = b.tenantid
-       AND bd.businessservice = 'WS'
+          INNER JOIN egbs_billdetail_v1 bd
+              ON bd.billid = b.id
+             AND bd.tenantid = b.tenantid
+             AND bd.businessservice = 'WS'
 
-    WHERE bd.totalamount > 0
-),
+          WHERE bd.totalamount > 0
+      ),
 
-latest_bills AS (
-    SELECT
-        bd_consumercode,
-        MAX(b_createddate) AS maxcreateddate
-    FROM filtered_bills
-    GROUP BY bd_consumercode
-)
+      latest_bills AS (
+          SELECT
+              bd_consumercode,
+              MAX(b_createddate) AS maxcreateddate
+          FROM filtered_bills
+          GROUP BY bd_consumercode
+      )
 
-SELECT
-    fb.*
-FROM filtered_bills fb
-JOIN latest_bills lb
-    ON fb.bd_consumercode = lb.bd_consumercode
-   AND fb.b_createddate = lb.maxcreateddate
+      SELECT
+          fb.*
+      FROM filtered_bills fb
+      JOIN latest_bills lb
+          ON fb.bd_consumercode = lb.bd_consumercode
+         AND fb.b_createddate = lb.maxcreateddate
    searchParams:
      condition: AND
      params:
@@ -1277,131 +1277,130 @@ JOIN latest_bills lb
    rowMapperKey: billsearch
    query:
      baseQuery: >-
-----new --- 
-WITH filtered_conn AS (
-    SELECT
-        conn.connectionno,
-        conn.status AS conn_status,
-        conn.property_id AS pid,
-        conn.oldconnectionno AS oldpid,
-        conn.additionaldetails AS conn_add,
-        conn.tenantid,
-        pt.status AS pt_status,
-        pt.id AS pt_id,
-
-        ptadd.doorno AS ptadd_doorno,
-        ptadd.landmark AS ptadd_landmark,
-        ptadd.city AS ptadd_city,
-        ptadd.pincode AS ptadd_pincode,
-        ptadd.locality AS ptadd_locality,
-        ptadd.street AS ptadd_street,
-        ptadd.region AS ptadd_region,
-        ptadd.plotno AS ptadd_plotno,
-        ptadd.buildingname AS ptadd_buildingname,
-        ptadd.district AS ptadd_district,
-        ptadd.state AS ptadd_state,
-        ptadd.latitude AS ptadd_latitude,
-        ptadd.longitude AS ptadd_longitude,
-        ptown.userid AS ptown_userid
-
-    FROM eg_sw_connection conn
-
-    INNER JOIN eg_pt_property pt
-        ON pt.propertyid = conn.property_id
-       AND pt.status IN ('ACTIVE', 'PENDINGWS')
-
-    INNER JOIN eg_pt_address ptadd
-        ON ptadd.propertyid = pt.id
-
-    INNER JOIN eg_pt_owner ptown
-        ON ptown.propertyid = pt.id
-
-    $where 
-      AND conn.status = 'Active'
-),
-
-filtered_bills AS (
-    SELECT
-        fc.*,
-
-        b.id AS b_id,
-        b.mobilenumber,
-        b.tenantid AS b_tenantid,
-        b.payername AS b_payername,
-        b.payeraddress AS b_payeraddress,
-        b.payeremail AS b_payeremail,
-        b.isactive AS b_isactive,
-        b.iscancelled AS b_iscancelled,
-        b.createdby AS b_createdby,
-        b.status AS b_status,
-        b.filestoreid AS b_filestoreid,
-        b.createddate AS b_createddate,
-        b.lastmodifiedby AS b_lastmodifiedby,
-        b.lastmodifieddate AS b_lastmodifieddate,
-        b.additionaldetails AS b_additionaldetails,
-
-        bd.id AS bd_id,
-        bd.billid AS bd_billid,
-        bd.tenantid AS bd_tenantid,
-        bd.businessservice AS bd_businessservice,
-        bd.demandid,
-        bd.fromperiod,
-        bd.toperiod,
-        bd.billno AS bd_billno,
-        bd.billdate AS bd_billdate,
-        bd.consumercode AS bd_consumercode,
-        bd.consumertype AS bd_consumertype,
-        bd.billdescription AS bd_billdescription,
-        bd.displaymessage AS bd_displaymessage,
-        bd.minimumamount AS bd_minimumamount,
-        bd.totalamount AS bd_totalamount,
-        bd.callbackforapportioning AS bd_callbackforapportioning,
-        bd.expirydate AS bd_expirydate,
-        bd.partpaymentallowed AS bd_partpaymentallowed,
-        bd.isadvanceallowed AS bd_isadvanceallowed,
-        bd.collectionmodesnotallowed AS bd_collectionmodesnotallowed,
-        bd.createddate AS bd_createddate,
-        bd.additionaldetails AS bd_additionaldetails,
-
-        'NA' AS ad_id,
-        'NA' AS ad_tenantid,
-        'NA' AS ad_billdetail,
-        '0' AS ad_orderno,
-        '0.0' AS ad_amount,
-        '0.0' AS ad_adjustedamount,
-        'NA' AS ad_taxheadcode,
-        'NA' AS demanddetailid
-
-    FROM filtered_conn fc
-
-    INNER JOIN egbs_bill_v1 b
-        ON b.consumercode = fc.connectionno
-       AND b.tenantid = fc.tenantid
-       AND b.status = 'ACTIVE'
-
-    INNER JOIN egbs_billdetail_v1 bd
-        ON bd.billid = b.id
-       AND bd.tenantid = b.tenantid
-       AND bd.businessservice = 'SW'
-
-    WHERE bd.totalamount > 0
-),
-
-latest_bills AS (
-    SELECT
-        bd_consumercode,
-        MAX(b_createddate) AS maxcreateddate
-    FROM filtered_bills
-    GROUP BY bd_consumercode
-)
-
-SELECT DISTINCT
-    fb.*,
-lb.maxcreateddate
-FROM filtered_bills fb
-JOIN latest_bills lb
-  ON fb.bd_consumercode = lb.bd_consumercode
- AND fb.b_createddate = lb.maxcreateddate
+      WITH filtered_conn AS (
+          SELECT
+              conn.connectionno,
+              conn.status AS conn_status,
+              conn.property_id AS pid,
+              conn.oldconnectionno AS oldpid,
+              conn.additionaldetails AS conn_add,
+              conn.tenantid,
+              pt.status AS pt_status,
+              pt.id AS pt_id,
+      
+              ptadd.doorno AS ptadd_doorno,
+              ptadd.landmark AS ptadd_landmark,
+              ptadd.city AS ptadd_city,
+              ptadd.pincode AS ptadd_pincode,
+              ptadd.locality AS ptadd_locality,
+              ptadd.street AS ptadd_street,
+              ptadd.region AS ptadd_region,
+              ptadd.plotno AS ptadd_plotno,
+              ptadd.buildingname AS ptadd_buildingname,
+              ptadd.district AS ptadd_district,
+              ptadd.state AS ptadd_state,
+              ptadd.latitude AS ptadd_latitude,
+              ptadd.longitude AS ptadd_longitude,
+              ptown.userid AS ptown_userid
+      
+          FROM eg_sw_connection conn
+      
+          INNER JOIN eg_pt_property pt
+              ON pt.propertyid = conn.property_id
+             AND pt.status IN ('ACTIVE', 'PENDINGWS')
+      
+          INNER JOIN eg_pt_address ptadd
+              ON ptadd.propertyid = pt.id
+      
+          INNER JOIN eg_pt_owner ptown
+              ON ptown.propertyid = pt.id
+      
+          $where 
+                AND conn.status = 'Active'
+          ),
+          
+          filtered_bills AS (
+              SELECT
+                  fc.*,
+          
+                  b.id AS b_id,
+                  b.mobilenumber,
+                  b.tenantid AS b_tenantid,
+                  b.payername AS b_payername,
+                  b.payeraddress AS b_payeraddress,
+                  b.payeremail AS b_payeremail,
+                  b.isactive AS b_isactive,
+                  b.iscancelled AS b_iscancelled,
+                  b.createdby AS b_createdby,
+                  b.status AS b_status,
+                  b.filestoreid AS b_filestoreid,
+                  b.createddate AS b_createddate,
+                  b.lastmodifiedby AS b_lastmodifiedby,
+                  b.lastmodifieddate AS b_lastmodifieddate,
+                  b.additionaldetails AS b_additionaldetails,
+          
+                  bd.id AS bd_id,
+                  bd.billid AS bd_billid,
+                  bd.tenantid AS bd_tenantid,
+                  bd.businessservice AS bd_businessservice,
+                  bd.demandid,
+                  bd.fromperiod,
+                  bd.toperiod,
+                  bd.billno AS bd_billno,
+                  bd.billdate AS bd_billdate,
+                  bd.consumercode AS bd_consumercode,
+                  bd.consumertype AS bd_consumertype,
+                  bd.billdescription AS bd_billdescription,
+                  bd.displaymessage AS bd_displaymessage,
+                  bd.minimumamount AS bd_minimumamount,
+                  bd.totalamount AS bd_totalamount,
+                  bd.callbackforapportioning AS bd_callbackforapportioning,
+                  bd.expirydate AS bd_expirydate,
+                  bd.partpaymentallowed AS bd_partpaymentallowed,
+                  bd.isadvanceallowed AS bd_isadvanceallowed,
+                  bd.collectionmodesnotallowed AS bd_collectionmodesnotallowed,
+                  bd.createddate AS bd_createddate,
+                  bd.additionaldetails AS bd_additionaldetails,
+          
+                  'NA' AS ad_id,
+                  'NA' AS ad_tenantid,
+                  'NA' AS ad_billdetail,
+                  '0' AS ad_orderno,
+                  '0.0' AS ad_amount,
+                  '0.0' AS ad_adjustedamount,
+                  'NA' AS ad_taxheadcode,
+                  'NA' AS demanddetailid
+          
+              FROM filtered_conn fc
+          
+              INNER JOIN egbs_bill_v1 b
+                  ON b.consumercode = fc.connectionno
+                 AND b.tenantid = fc.tenantid
+                 AND b.status = 'ACTIVE'
+          
+              INNER JOIN egbs_billdetail_v1 bd
+                  ON bd.billid = b.id
+                 AND bd.tenantid = b.tenantid
+                 AND bd.businessservice = 'SW'
+          
+              WHERE bd.totalamount > 0
+          ),
+          
+          latest_bills AS (
+              SELECT
+                  bd_consumercode,
+                  MAX(b_createddate) AS maxcreateddate
+              FROM filtered_bills
+              GROUP BY bd_consumercode
+          )
+          
+          SELECT DISTINCT
+              fb.*,
+          lb.maxcreateddate
+          FROM filtered_bills fb
+          JOIN latest_bills lb
+            ON fb.bd_consumercode = lb.bd_consumercode
+           AND fb.b_createddate = lb.maxcreateddate
    searchParams:
      condition: AND
      params:
