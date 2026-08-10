@@ -2338,7 +2338,8 @@ ReportDefinitions:
         source: pt
         wrapper: true
         isMandatory: false
-        searchClause: AND concat(to_char((To_timestamp(get_fromperiod(pd.billid)/1000)
+        searchClause:
+          AND concat(to_char((To_timestamp(get_fromperiod(pd.billid)/1000)
           at time Zone 'Asia/Kolkata'),'YYYY'),'-',
           to_char((To_timestamp(get_toperiod(pd.billid)/1000) at time Zone
           'Asia/Kolkata'),'YY')) = $financialyear
@@ -2766,7 +2767,7 @@ ReportDefinitions:
         AND payment.tenantid::text = pd.tenantid::text 
         AND pd.receiptdate >= (EXTRACT(EPOCH FROM (now() - INTERVAL '30 days')) * 1000)::bigint
         AND pd.receiptdate <= (EXTRACT(EPOCH FROM now()) * 1000)::bigint AND pd.tenantid=$tenantid
-  
+
     orderby: ORDER BY receiptnumber DESC;
   - reportName: CancelledReceiptRegister_V2
     decryptionPathId: CancelledReceiptRegister_V2
@@ -2922,7 +2923,8 @@ ReportDefinitions:
         source: pt
         wrapper: true
         isMandatory: false
-        searchClause: AND concat(to_char((To_timestamp(get_fromperiod(pd.billid)/1000)
+        searchClause:
+          AND concat(to_char((To_timestamp(get_fromperiod(pd.billid)/1000)
           at time Zone 'Asia/Kolkata'),'YYYY'),'-',
           to_char((To_timestamp(get_toperiod(pd.billid)/1000) at time Zone
           'Asia/Kolkata'),'YY')) = $financialyear
@@ -2988,7 +2990,7 @@ ReportDefinitions:
 
       and pt.propertyid = bill.consumercode and receipt_breakup.pdid=pd.id  and pt.status!='INACTIVE' 
 
-      --and pt_addr.propertyid=pt.id 
+      --and pt_addr.propertyid=pt.id
     orderby: ORDER BY pd.receiptdate DESC;
   - reportName: OldUlbWisePtCollection_V2
     summary: ULB-wise PT Collection
@@ -3314,7 +3316,8 @@ ReportDefinitions:
         source: pt
         wrapper: true
         isMandatory: false
-        searchClause: AND concat(to_char((To_timestamp(get_fromperiod(pd.billid)/1000)
+        searchClause:
+          AND concat(to_char((To_timestamp(get_fromperiod(pd.billid)/1000)
           at time Zone 'Asia/Kolkata'),'YYYY'),'-',
           to_char((To_timestamp(get_toperiod(pd.billid)/1000) at time Zone
           'Asia/Kolkata'),'YY')) = $financialyear
@@ -3403,7 +3406,8 @@ ReportDefinitions:
         source: pt
         wrapper: true
         isMandatory: false
-        searchClause: AND concat(to_char((To_timestamp(get_fromperiod(pd.billid)/1000)
+        searchClause:
+          AND concat(to_char((To_timestamp(get_fromperiod(pd.billid)/1000)
           at time Zone 'Asia/Kolkata'),'YYYY'),'-',
           to_char((To_timestamp(get_toperiod(pd.billid)/1000) at time Zone
           'Asia/Kolkata'),'YY')) = $financialyear
@@ -3531,7 +3535,8 @@ ReportDefinitions:
         source: pt
         wrapper: true
         isMandatory: false
-        searchClause: AND concat(to_char((To_timestamp(bd.fromperiod/1000) at time Zone
+        searchClause:
+          AND concat(to_char((To_timestamp(bd.fromperiod/1000) at time Zone
           'Asia/Kolkata'),'YYYY'),'-', to_char((To_timestamp(bd.toperiod/1000)
           at time Zone 'Asia/Kolkata'),'YY')) = $financialyear
       - name: localityArray
@@ -3578,7 +3583,7 @@ ReportDefinitions:
 
       and pt.propertyid = bd.consumercodei and pt.status!='INACTIVE' 
 
-      and pt_addr.propertyid=pt.id 
+      and pt_addr.propertyid=pt.id
     orderby: ORDER BY pd.receiptdate DESC;
   - reportName: ReceiptRegisterShort_WithoutLocality_V2
     decryptionPathId: ReceiptRegisterShort_V2
@@ -3676,7 +3681,8 @@ ReportDefinitions:
         source: pt
         wrapper: true
         isMandatory: false
-        searchClause: AND concat(to_char((To_timestamp(bd.fromperiod/1000) at time Zone
+        searchClause:
+          AND concat(to_char((To_timestamp(bd.fromperiod/1000) at time Zone
           'Asia/Kolkata'),'YYYY'),'-', to_char((To_timestamp(bd.toperiod/1000)
           at time Zone 'Asia/Kolkata'),'YY')) = $financialyear
       - name: collectorname
@@ -3861,7 +3867,8 @@ ReportDefinitions:
         source: pt
         wrapper: true
         isMandatory: false
-        searchClause: AND concat(to_char((To_timestamp(billd.fromperiod/1000) at time
+        searchClause:
+          AND concat(to_char((To_timestamp(billd.fromperiod/1000) at time
           Zone 'Asia/Kolkata'),'YYYY'),'-',
           to_char((To_timestamp(billd.toperiod/1000) at time Zone
           'Asia/Kolkata'),'YY')) = $financialyear
@@ -3941,7 +3948,7 @@ ReportDefinitions:
 
       left outer join eg_pt_unit_v2_ot as pot on pot.propertyid = pt.id
 
-      where payd.tenantid = $tenantid and payment.paymentstatus != 'CANCELLED' and payd.businessservice='PT' and pt.status!='INACTIVE' 
+      where payd.tenantid = $tenantid and payment.paymentstatus != 'CANCELLED' and payd.businessservice='PT' and pt.status!='INACTIVE'
   - reportName: Sewa_Kendra_ReceiptRegister_V2
     summary: Sewa Kendra Receipt Register
     version: 1.0.0
@@ -4839,7 +4846,7 @@ ReportDefinitions:
         where payd.tenantid = $tenantid 
         and bill.consumercode not in (select consumercode from egcl_bill where tenantid=$tenantid and businessservice='PT' and id in (select billid from egcl_billdetial where tenantid=$tenantid and concat(to_char((To_timestamp(fromperiod/1000) at time Zone 'Asia/Kolkata'),'YYYY'),'-',to_char((To_timestamp(toperiod/1000) at time Zone 'Asia/Kolkata'),'YY')) ='2020-21'))
         and pt.status!='INACTIVE'
-        
+
   - reportName: ULBDEFAULTERPTREPORT_NEW_V2
     decryptionPathId: ULBDEFAULTERPTREPORT_V2
     summary: ULB Defaulter Pt report
@@ -6188,7 +6195,7 @@ ReportDefinitions:
          sum(firecess_po),
          sum(cancercess_po),
          sum(po)
-       from paidbills where 1=1 
+       from paidbills where 1=1
   - reportName: CHEQUE_REPORT
     summary: Cheque Report Register
     version: 1.0.0
@@ -6478,7 +6485,7 @@ ReportDefinitions:
     moduleName: rainmaker-pt
     additionalConfig:
     print:
-        pdfPageSize: "A1"
+      pdfPageSize: "A1"
     sourceColumns:
       - name: tenantid
         label: tenantid
@@ -6585,7 +6592,7 @@ ReportDefinitions:
     moduleName: rainmaker-pt
     additionalConfig:
     print:
-        pdfPageSize: "A1"
+      pdfPageSize: "A1"
     sourceColumns:
       - name: tenantid
         label: tenantid
@@ -6618,28 +6625,28 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND d.tenantid = $tenantid
     query: |
-       -- Use CTE to force query plan, compute & use CTE later
-       WITH defaulters AS (
-       SELECT tenantid, property_id
-       FROM pt_defaulter_ids
-       ),
-       bills_after_april AS (
-       SELECT tenantid, consumercode AS property_id, billdate
-       FROM egcl_bill 
-       WHERE businessservice = 'PT'
-          AND billdate > $fromDate
-       ),
-       ulb_mapped AS (
-       SELECT ulb_code, district, name_of_ulb
-       FROM ulb_data
-       )
-       SELECT 
-       COALESCE(u.name_of_ulb, d.tenantid) AS tenantid,
-       COALESCE(u.district, 'UNKNOWN') AS district,d.property_id
-       FROM defaulters d
-       LEFT JOIN bills_after_april b ON d.property_id = b.property_id AND d.tenantid = b.tenantid
-       LEFT JOIN ulb_mapped u ON TRIM(LOWER(d.tenantid)) = TRIM(LOWER(u.ulb_code))
-       WHERE b.property_id IS NULL 
+      -- Use CTE to force query plan, compute & use CTE later
+      WITH defaulters AS (
+      SELECT tenantid, property_id
+      FROM pt_defaulter_ids
+      ),
+      bills_after_april AS (
+      SELECT tenantid, consumercode AS property_id, billdate
+      FROM egcl_bill 
+      WHERE businessservice = 'PT'
+         AND billdate > $fromDate
+      ),
+      ulb_mapped AS (
+      SELECT ulb_code, district, name_of_ulb
+      FROM ulb_data
+      )
+      SELECT 
+      COALESCE(u.name_of_ulb, d.tenantid) AS tenantid,
+      COALESCE(u.district, 'UNKNOWN') AS district,d.property_id
+      FROM defaulters d
+      LEFT JOIN bills_after_april b ON d.property_id = b.property_id AND d.tenantid = b.tenantid
+      LEFT JOIN ulb_mapped u ON TRIM(LOWER(d.tenantid)) = TRIM(LOWER(u.ulb_code))
+      WHERE b.property_id IS NULL
     orderby: ORDER BY d.property_id DESC;
   - reportName: STATEDEFAULTER_REPORT_WITH_LOCALITY_UNPAID_DEMAND_NEW
     decryptionPathId: ULBDEFAULTERPTREPORT_V2
@@ -6712,18 +6719,18 @@ ReportDefinitions:
         type: string
         source: pt
         total: false
-    searchParams:  
+    searchParams:
       - name: finYear
         label: Financial Year
         type: singlevaluelist
-        pattern:   'list://2015-16:2015-16,2016-17:2016-17,2017-18:2017-18,2017-18:2017-18,2018-19:2018-19,2019-20:2019-20,2020-21:2020-21,2021-22:2021-22,2022-23:    2022-23,2023-24:2023-24,2024-25:2024-25,2025-26:2025-26'
+        pattern: "list://2015-16:2015-16,2016-17:2016-17,2017-18:2017-18,2017-18:2017-18,2018-19:2018-19,2019-20:2019-20,2020-21:2020-21,2021-22:2021-22,2022-23:    2022-23,2023-24:2023-24,2024-25:2024-25,2025-26:2025-26"
         source: pt
         isMandatory: false
         searchClause: AND 1=1
       - name: usageType
         label: Usage Type
         type: singlevaluelist
-        pattern: 'list://RESIDENTIAL:Residential,NONRESIDENTIAL:NonResidential,MIXED:Mixed'
+        pattern: "list://RESIDENTIAL:Residential,NONRESIDENTIAL:NonResidential,MIXED:Mixed"
         source: pt
         isMandatory: false
         searchClause: AND split_part(props.propertyusagetype,'.',1) = $usageType
@@ -6742,45 +6749,45 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND tenantid = $ulb
     query: |
-       with assessments as
-       (
-           select 
-               propertyid,
-               string_agg(concat(assessmentyears,' (Rs.',totalamount,')'),', ') as fy,
-               max(assessmentyears) as latest_fy,
-               max(totalamount) as maxtotal,
-               max(propertytax) as max_pt_tax
-           from report_assessments 
-           where tenantid=$tenantid and propertyid not in (select propertyid from report_assessments where tenantid=$tenantid and assessmentyears =$finYear)
-               group by propertyid
-       ),
-       owners as 
-       (
-           select 
-           split_part(string_agg(ownername,','),',',1) as ownername,
-           split_part(string_agg(mobileNumber,','),',',1) as mobileNumber,
-           propertyid
-           from report_owners where tenantid=$tenantid and status='ACTIVE'
-           group by propertyid
-       )
-       select 
-           assessments.propertyid as propertyid,
-           props.oldpropertyid as oldpropertyid,
-           props.firmbusinessname as businessname,
-           assessments.fy as financialyear,
-           assessments.latest_fy as latestfy,
-           assessments.max_pt_tax as max_pt_tax,
-           assessments.maxtotal as max_paid,
-           props.propertytype as propertytype,
-           propertyusagetype as propertyusagetype,
-           concat(address,' ',localityname) as address,
-           blockcode as block,
-           owners.ownername as ownername,
-           owners.mobileNumber as mobileno
-       from report_properties props
-       inner join assessments on assessments.propertyid=props.propertyid
-       inner join owners on owners.propertyid=props.propertyid 
-       where tenantid=$tenantid
+      with assessments as
+      (
+          select 
+              propertyid,
+              string_agg(concat(assessmentyears,' (Rs.',totalamount,')'),', ') as fy,
+              max(assessmentyears) as latest_fy,
+              max(totalamount) as maxtotal,
+              max(propertytax) as max_pt_tax
+          from report_assessments 
+          where tenantid=$tenantid and propertyid not in (select propertyid from report_assessments where tenantid=$tenantid and assessmentyears =$finYear)
+              group by propertyid
+      ),
+      owners as 
+      (
+          select 
+          split_part(string_agg(ownername,','),',',1) as ownername,
+          split_part(string_agg(mobileNumber,','),',',1) as mobileNumber,
+          propertyid
+          from report_owners where tenantid=$tenantid and status='ACTIVE'
+          group by propertyid
+      )
+      select 
+          assessments.propertyid as propertyid,
+          props.oldpropertyid as oldpropertyid,
+          props.firmbusinessname as businessname,
+          assessments.fy as financialyear,
+          assessments.latest_fy as latestfy,
+          assessments.max_pt_tax as max_pt_tax,
+          assessments.maxtotal as max_paid,
+          props.propertytype as propertytype,
+          propertyusagetype as propertyusagetype,
+          concat(address,' ',localityname) as address,
+          blockcode as block,
+          owners.ownername as ownername,
+          owners.mobileNumber as mobileno
+      from report_properties props
+      inner join assessments on assessments.propertyid=props.propertyid
+      inner join owners on owners.propertyid=props.propertyid 
+      where tenantid=$tenantid
   - reportName: Defaulter_report_with_taxdue
     decryptionPathId: ULBDEFAULTERPTREPORT_V2
     summary: Defaulter report with tax due
@@ -6841,8 +6848,8 @@ ReportDefinitions:
         label: 2024-25
         type: string
         source: pt
-        total: false                                
-    searchParams:  
+        total: false
+    searchParams:
       - name: ulb
         label: ULB
         type: singlevaluelist
@@ -6852,12 +6859,12 @@ ReportDefinitions:
         isMandatory: true
         searchClause: AND 1=1
     query: |
-       -- Defaulter-only report for tenant 
-       SELECT propertyid_property AS propertyid_property, owner_ids  AS owner_ids, localities   AS localities,
-       landarea  AS landarea,usagecategory  AS usagecategory,"2013-14"  AS "2013-14","2014-15"  AS "2014-15","2015-16" AS "2015-16",
-       "2016-17"  AS "2016-17","2017-18"  AS "2017-18","2018-19"  AS "2018-19",
-       "2019-20" AS "2019-20","2020-21" AS "2020-21", "2021-22"   AS "2021-22", "2022-23"  AS "2022-23",
-       "2023-24"   AS "2023-24","2024-25"   AS "2024-25",IsDefaulter  AS IsDefaulter FROM mv_pdc_defaulter_report WHERE 1=1
+      -- Defaulter-only report for tenant 
+      SELECT propertyid_property AS propertyid_property, owner_ids  AS owner_ids, localities   AS localities,
+      landarea  AS landarea,usagecategory  AS usagecategory,"2013-14"  AS "2013-14","2014-15"  AS "2014-15","2015-16" AS "2015-16",
+      "2016-17"  AS "2016-17","2017-18"  AS "2017-18","2018-19"  AS "2018-19",
+      "2019-20" AS "2019-20","2020-21" AS "2020-21", "2021-22"   AS "2021-22", "2022-23"  AS "2022-23",
+      "2023-24"   AS "2023-24","2024-25"   AS "2024-25",IsDefaulter  AS IsDefaulter FROM mv_pdc_defaulter_report WHERE 1=1
 
   - reportName: PT_Dump_Report
     decryptionPathId: ULBPTDataDumpReport_V2
@@ -6866,7 +6873,7 @@ ReportDefinitions:
     moduleName: rainmaker-pt
     additionalConfig:
       print:
-        pdfPageSize: A1    
+        pdfPageSize: A1
     sourceColumns:
       - name: ulb
         label: reports.pt.ulb
@@ -6877,7 +6884,7 @@ ReportDefinitions:
         label: reports.pt.propertytaxuniqueid
         type: string
         source: pt
-        total: false   
+        total: false
       - name: existingpropertyid
         label: reports.pt.existingpropertyid
         type: string
@@ -6887,27 +6894,27 @@ ReportDefinitions:
         label: surveyid
         type: string
         source: pt
-        total: false    
+        total: false
       - name: receiptnumber
         label: reports.pt.receiptnumber
         type: string
         source: pt
-        total: false 
+        total: false
       - name: paymentamount
         label: Amount
         type: string
         source: pt
-        total: true     
+        total: true
       - name: ownername
         label: reports.pt.ownername
         type: string
         source: pt
-        total: false  
+        total: false
       - name: guardianname
         label: reports.pt.guardianname
         type: string
         source: pt
-        total: false   
+        total: false
       - name: mobileno
         label: reports.pt.mobileno
         type: string
@@ -6917,42 +6924,42 @@ ReportDefinitions:
         label: financialyear
         type: string
         source: pt
-        total: false    
+        total: false
       - name: usagecategory
         label: usagecategory
         type: string
         source: pt
-        total: false 
+        total: false
       - name: occupancy
         label: occupancy
         type: string
         source: pt
-        total: false     
+        total: false
       - name: totalarea
         label: Landarea
         type: string
         source: pt
-        total: false 
+        total: false
       - name: builtarea
         label: Built up area
         type: string
         source: pt
-        total: false 
+        total: false
       - name: floors
         label: no. of floors
         type: string
         source: pt
-        total: false    
+        total: false
       - name: address
         label: reports.pt.address
         type: string
         source: pt
-        total: false 
+        total: false
       - name: businessname
         label: reports.pt.businessname
         type: string
         source: pt
-        total: false 
+        total: false
       - name: localityname
         label: reports.pt.localityname
         type: string
@@ -6978,11 +6985,11 @@ ReportDefinitions:
         source: pt
         wrapper: true
         isMandatory: false
-        searchClause: AND pt.usagecategory = $usage    
+        searchClause: AND pt.usagecategory = $usage
       - name: occupancy
         label: Occupancy Type
         type: singlevaluelist
-        pattern: 'list://RENTED:Rented,SELFOCCUPIED:SelfOccupied,UNOCCUPIED:UnOccupied,PG:Paying Guest'
+        pattern: "list://RENTED:Rented,SELFOCCUPIED:SelfOccupied,UNOCCUPIED:UnOccupied,PG:Paying Guest"
         source: pt
         isMandatory: false
         searchClause: and  pot.occupancytype like concat('%',$occupancy,'%')
@@ -6992,96 +6999,96 @@ ReportDefinitions:
         source: pt
         isMandatory: true
         searchClause: AND pta.locality IN ($localityArray)
-    query: >        
-       WITH eg_pt_unit_v2_ot AS (
-         SELECT 
-           propertyid,
-           string_agg(DISTINCT pu.occupancytype, ',') AS occupancytype, 
-           string_agg(
-             DISTINCT initcap(
-               CASE 
-                 WHEN usagecategory LIKE '%.%' THEN split_part(usagecategory, '.', 2) 
-                 ELSE usagecategory 
-               END
-             ),
-             ','
-           ) AS propertytype 
-         FROM eg_pt_unit AS pu
-         WHERE pu.tenantid = $tenantid
-         GROUP BY propertyid
-       ),
-       
-       unit_sum AS (
-         SELECT 
-           u.propertyid,  -- FK to eg_pt_property.id
-           ROUND(SUM(COALESCE(u.builtuparea, 0)), 2) AS totalsuperbuitluparea
-         FROM eg_pt_unit AS u
-         WHERE u.tenantid = $tenantid
-         GROUP BY u.propertyid
-       )
-       
-       SELECT 
-         DISTINCT ON (payd.receiptnumber)
-         initcap(split_part(payd.tenantid, '.', 2)) AS "ulb",
-         split_part(consumercode, ':', 1)           AS "propertytaxuniqueid",
-         --to_char((To_timestamp(receiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') AS "transcationdate",
-         receiptnumber                               AS "receiptnumber",
-         pt.oldpropertyid                            AS "existingpropertyid",
-         pt.surveyid,
-         concat(
-           to_char((to_timestamp(billd.fromperiod/1000) at time zone 'Asia/Kolkata'),'YYYY'),'-',
-           to_char((to_timestamp(billd.toperiod/1000)  at time zone 'Asia/Kolkata'),'YY')
-         ) AS "financialyear",
-         -- getfinancialyear(payd.billid) as financialyear,
-         eu."name"           AS "ownername", 
-         eu.guardian         AS "guardianname",
-         pt.landarea         AS "totalarea",
-       
-         pt.superbuiltuparea * 9 AS "builtarea",   -- kept exactly as you had
-       
-         ROUND(us.totalsuperbuitluparea * 9) AS totalsuperbuitluparea,
-       
-         pt.nooffloors       AS "floors",
-         eu.mobilenumber     AS "mobileno",
-         -- paymentmode as "transcationmode",
-         payment.totalamountpaid AS "paymentamount",
-         --to_char((To_timestamp(payment.transactiondate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') AS "paymentdate",
-         --eu.emailid AS "emailid",
-         REGEXP_REPLACE(
-           REGEXP_REPLACE(CONCAT(pta.doorno, ',', pta.buildingname, ',', pta.street, ',', pta.pincode), ',+', ','),
-           '^,|,$',
-           ''
-         ) AS "address",
-         --payment.payeraddress as "payeraddress",
-         --pt.additionaldetails->>'remarks' as "remarks",
-         pt.additionaldetails->>'FirmBusinessName' AS "businessname",
-         pot.occupancytype AS occupancy,
-         --pot.propertytype as propertytype,
-         --pta.locality as "localitycode",
-         pt.usagecategory AS usagecategory,
-         localnames.localityname AS localityname
-       
-       FROM egcl_paymentdetail AS payd
-       INNER JOIN egcl_payment     AS payment   ON payment.id   = payd.paymentid        
-       INNER JOIN egcl_bill        AS bill      ON bill.id      = payd.billid 
-       INNER JOIN egcl_billdetial  AS billd     ON billd.billid = bill.id         
-       INNER JOIN eg_pt_property   AS pt        ON pt.propertyid = bill.consumercode
-       INNER JOIN eg_pt_owner      AS po        ON po.propertyid = pt.id  AND po.status = 'ACTIVE'
-       INNER JOIN eg_user          AS eu        ON eu.uuid = po.userid
-       INNER JOIN eg_pt_address    AS pta       ON pta.propertyid = pt.id
-       
-       LEFT OUTER JOIN eg_bndry_mohalla AS localnames ON pta.locality = localnames.localitycode
-       LEFT OUTER JOIN eg_pt_unit_v2_ot  AS pot       ON pot.propertyid = pt.id
-       
-       LEFT OUTER JOIN unit_sum AS us ON us.propertyid = pt.id
-       
-       WHERE 
-        payd.tenantid = $tenantid AND
-          payment.paymentstatus != 'CANCELLED'
-         AND payd.businessservice = 'PT' 
-         AND pt.status != 'INACTIVE' 
-       
-    orderby: ORDER BY payd.receiptnumber, payd.createdtime DESC   
+    query: >
+      WITH eg_pt_unit_v2_ot AS (
+        SELECT 
+          propertyid,
+          string_agg(DISTINCT pu.occupancytype, ',') AS occupancytype, 
+          string_agg(
+            DISTINCT initcap(
+              CASE 
+                WHEN usagecategory LIKE '%.%' THEN split_part(usagecategory, '.', 2) 
+                ELSE usagecategory 
+              END
+            ),
+            ','
+          ) AS propertytype 
+        FROM eg_pt_unit AS pu
+        WHERE pu.tenantid = $tenantid
+        GROUP BY propertyid
+      ),
+
+      unit_sum AS (
+        SELECT 
+          u.propertyid,  -- FK to eg_pt_property.id
+          ROUND(SUM(COALESCE(u.builtuparea, 0)), 2) AS totalsuperbuitluparea
+        FROM eg_pt_unit AS u
+        WHERE u.tenantid = $tenantid
+        GROUP BY u.propertyid
+      )
+
+      SELECT 
+        DISTINCT ON (payd.receiptnumber)
+        initcap(split_part(payd.tenantid, '.', 2)) AS "ulb",
+        split_part(consumercode, ':', 1)           AS "propertytaxuniqueid",
+        --to_char((To_timestamp(receiptdate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') AS "transcationdate",
+        receiptnumber                               AS "receiptnumber",
+        pt.oldpropertyid                            AS "existingpropertyid",
+        pt.surveyid,
+        concat(
+          to_char((to_timestamp(billd.fromperiod/1000) at time zone 'Asia/Kolkata'),'YYYY'),'-',
+          to_char((to_timestamp(billd.toperiod/1000)  at time zone 'Asia/Kolkata'),'YY')
+        ) AS "financialyear",
+        -- getfinancialyear(payd.billid) as financialyear,
+        eu."name"           AS "ownername", 
+        eu.guardian         AS "guardianname",
+        pt.landarea         AS "totalarea",
+
+        pt.superbuiltuparea * 9 AS "builtarea",   -- kept exactly as you had
+
+        ROUND(us.totalsuperbuitluparea * 9) AS totalsuperbuitluparea,
+
+        pt.nooffloors       AS "floors",
+        eu.mobilenumber     AS "mobileno",
+        -- paymentmode as "transcationmode",
+        payment.totalamountpaid AS "paymentamount",
+        --to_char((To_timestamp(payment.transactiondate/1000) at time Zone 'Asia/Kolkata'),'DD-MM-YYYY') AS "paymentdate",
+        --eu.emailid AS "emailid",
+        REGEXP_REPLACE(
+          REGEXP_REPLACE(CONCAT(pta.doorno, ',', pta.buildingname, ',', pta.street, ',', pta.pincode), ',+', ','),
+          '^,|,$',
+          ''
+        ) AS "address",
+        --payment.payeraddress as "payeraddress",
+        --pt.additionaldetails->>'remarks' as "remarks",
+        pt.additionaldetails->>'FirmBusinessName' AS "businessname",
+        pot.occupancytype AS occupancy,
+        --pot.propertytype as propertytype,
+        --pta.locality as "localitycode",
+        pt.usagecategory AS usagecategory,
+        localnames.localityname AS localityname
+
+      FROM egcl_paymentdetail AS payd
+      INNER JOIN egcl_payment     AS payment   ON payment.id   = payd.paymentid        
+      INNER JOIN egcl_bill        AS bill      ON bill.id      = payd.billid 
+      INNER JOIN egcl_billdetial  AS billd     ON billd.billid = bill.id         
+      INNER JOIN eg_pt_property   AS pt        ON pt.propertyid = bill.consumercode
+      INNER JOIN eg_pt_owner      AS po        ON po.propertyid = pt.id  AND po.status = 'ACTIVE'
+      INNER JOIN eg_user          AS eu        ON eu.uuid = po.userid
+      INNER JOIN eg_pt_address    AS pta       ON pta.propertyid = pt.id
+
+      LEFT OUTER JOIN eg_bndry_mohalla AS localnames ON pta.locality = localnames.localitycode
+      LEFT OUTER JOIN eg_pt_unit_v2_ot  AS pot       ON pot.propertyid = pt.id
+
+      LEFT OUTER JOIN unit_sum AS us ON us.propertyid = pt.id
+
+      WHERE 
+       payd.tenantid = $tenantid AND
+         payment.paymentstatus != 'CANCELLED'
+        AND payd.businessservice = 'PT' 
+        AND pt.status != 'INACTIVE'
+
+    orderby: ORDER BY payd.receiptnumber, payd.createdtime DESC
 
   - reportName: Revenuepropertysummary
     summary: State report of  summary of property Ids for verification status , mapping status
@@ -7236,17 +7243,17 @@ ReportDefinitions:
         label: sub_category_name
         type: string
         source: pt
-        total: false 
+        total: false
       - name: is_verified
         label: is_verified
         type: string
         source: pt
-        total: false 
+        total: false
       - name: rate
         label: rate
         type: string
         source: pt
-        total: false                                                                                
+        total: false
     searchParams:
       - name: district
         label: District
@@ -7274,7 +7281,7 @@ ReportDefinitions:
         pattern: list://True:True,False:False,
         source: pt
         isMandatory: false
-        searchClause: AND is_verified = $is_verified              
+        searchClause: AND is_verified = $is_verified
     query: >
       WITH dedup AS (
         SELECT
@@ -7316,7 +7323,7 @@ ReportDefinitions:
       WHERE rn = 1 and tenantid not in ('pb.testing','pb.balianvali', 'pb.chaunke', 'pb.rampura' ,'pb.mandikalan')
 
   - reportName: ulbrevenuepropertysummary
-    summary: ULB wise summary of property Ids for verification status , mapping status 
+    summary: ULB wise summary of property Ids for verification status , mapping status
     version: 1.0.0
     moduleName: rainmaker-pt
     additionalConfig:
@@ -7446,17 +7453,17 @@ ReportDefinitions:
         label: sub_category_name
         type: string
         source: pt
-        total: false 
+        total: false
       - name: is_verified
         label: is_verified
         type: string
         source: pt
-        total: false 
+        total: false
       - name: rate
         label: rate
         type: string
         source: pt
-        total: false                                                                                
+        total: false
     searchParams:
       - name: localityArray
         label: reports.pt.zoneList
@@ -7477,7 +7484,7 @@ ReportDefinitions:
         pattern: list://True:True,False:False,
         source: pt
         isMandatory: false
-        searchClause: AND is_verified = $is_verified              
+        searchClause: AND is_verified = $is_verified
     query: >
       WITH dedup AS (
         SELECT
@@ -7516,7 +7523,7 @@ ReportDefinitions:
       )
       SELECT *
       FROM dedup
-      WHERE rn = 1 AND tenantid = $tenantid         
+      WHERE rn = 1 AND tenantid = $tenantid
 
   - reportName: Test
     decryptionPathId: ReceiptRegister_V2
@@ -7686,77 +7693,77 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND instrumenttype = replace($paymentMode,',','_')
     query: >
-      set statement_timeout = 0;
-      WITH receipt_breakup AS (
-          SELECT 
-              pd_1.id AS pdid,
-              SUM(CASE WHEN bad.taxheadcode = 'PT_ADHOC_PENALTY' THEN bad.adjustedamount ELSE 0 END) AS adhocpenalty,
-              SUM(CASE WHEN bad.taxheadcode = 'PT_ADHOC_REBATE' THEN bad.adjustedamount ELSE 0 END) AS adhocrebate,
-              SUM(CASE WHEN bad.taxheadcode = 'PT_FIRE_CESS' THEN bad.adjustedamount ELSE 0 END) AS firecess,
-              SUM(CASE WHEN bad.taxheadcode = 'PT_CANCER_CESS' THEN bad.adjustedamount ELSE 0 END) AS cancercess,
-              SUM(CASE WHEN bad.taxheadcode = 'PT_TIME_INTEREST' THEN bad.adjustedamount ELSE 0 END) AS interest,
-              SUM(CASE WHEN bad.taxheadcode = 'PT_TIME_PENALTY' THEN bad.adjustedamount ELSE 0 END) AS penalty,
-              SUM(CASE WHEN bad.taxheadcode = 'PT_TIME_REBATE' THEN bad.adjustedamount ELSE 0 END) AS rebate,
-              SUM(CASE WHEN bad.taxheadcode = 'PT_TAX' THEN bad.amount ELSE 0 END) AS propertytax,
-              SUM(CASE WHEN bad.taxheadcode = 'PT_TAX' THEN bad.adjustedamount ELSE 0 END) AS paidpropertytax,
-              SUM(CASE WHEN bad.taxheadcode IN ('PT_UNIT_USAGE_EXEMPTION','PT_OWNER_EXEMPTION') THEN bad.amount ELSE 0 END) AS exemption,
-              SUM(CASE WHEN bad.taxheadcode IN ('PT_ROUNDOFF','PT_DECIMAL_CEILING_DEBIT','PT_DECIMAL_CEILING_CREDIT') 
-                      THEN bad.adjustedamount ELSE 0 END) AS adjustment
-          FROM egcl_billaccountdetail bad
-          JOIN egcl_billdetial bd ON bd.id = bad.billdetailid AND bd.tenantid = bad.tenantid
-          JOIN egcl_paymentdetail pd_1 ON pd_1.billid = bd.billid AND bd.tenantid = pd_1.tenantid
-          JOIN egcl_payment payment_1 ON pd_1.paymentid = payment_1.id AND payment_1.tenantid = bad.tenantid
-          WHERE pd_1.tenantid = '$tenantid'
-            AND payment_1.paymentstatus <> 'CANCELLED'
-            AND pd_1.businessservice = 'PT'
-            AND pd_1.receiptdate >= $fromDate AND pd_1.receiptdate < $toDate
-          GROUP BY pd_1.id
-      )
-
+query: >
+  set statement_timeout = 0;
+  WITH receipt_breakup AS (
+      SELECT 
+          pd_1.id AS pdid,
+          SUM(CASE WHEN bad.taxheadcode = 'PT_ADHOC_PENALTY' THEN bad.adjustedamount ELSE 0 END) AS adhocpenalty,
+          SUM(CASE WHEN bad.taxheadcode = 'PT_ADHOC_REBATE' THEN bad.adjustedamount ELSE 0 END) AS adhocrebate,
+          SUM(CASE WHEN bad.taxheadcode = 'PT_FIRE_CESS' THEN bad.adjustedamount ELSE 0 END) AS firecess,
+          SUM(CASE WHEN bad.taxheadcode = 'PT_CANCER_CESS' THEN bad.adjustedamount ELSE 0 END) AS cancercess,
+          SUM(CASE WHEN bad.taxheadcode = 'PT_TIME_INTEREST' THEN bad.adjustedamount ELSE 0 END) AS interest,
+          SUM(CASE WHEN bad.taxheadcode = 'PT_TIME_PENALTY' THEN bad.adjustedamount ELSE 0 END) AS penalty,
+          SUM(CASE WHEN bad.taxheadcode = 'PT_TIME_REBATE' THEN bad.adjustedamount ELSE 0 END) AS rebate,
+          SUM(CASE WHEN bad.taxheadcode = 'PT_TAX' THEN bad.amount ELSE 0 END) AS propertytax,
+          SUM(CASE WHEN bad.taxheadcode = 'PT_TAX' THEN bad.adjustedamount ELSE 0 END) AS paidpropertytax,
+          SUM(CASE WHEN bad.taxheadcode IN ('PT_UNIT_USAGE_EXEMPTION','PT_OWNER_EXEMPTION') THEN bad.amount ELSE 0 END) AS exemption,
+          SUM(CASE WHEN bad.taxheadcode IN ('PT_ROUNDOFF','PT_DECIMAL_CEILING_DEBIT','PT_DECIMAL_CEILING_CREDIT') 
+                  THEN bad.adjustedamount ELSE 0 END) AS adjustment
+      FROM egcl_billaccountdetail bad
+      JOIN egcl_billdetial bd ON bd.id = bad.billdetailid AND bd.tenantid = bad.tenantid
+      JOIN egcl_paymentdetail pd_1 ON pd_1.billid = bd.billid AND bd.tenantid = pd_1.tenantid
+      JOIN egcl_payment payment_1 ON pd_1.paymentid = payment_1.id AND payment_1.tenantid = bad.tenantid
+      WHERE pd_1.tenantid = '$tenantid'
+        AND payment_1.paymentstatus <> 'CANCELLED'
+        AND pd_1.businessservice = 'PT'
+        AND pd_1.receiptdate >= $fromDate AND pd_1.receiptdate < $toDate
+      GROUP BY pd_1.id
+  ),
+  report_data AS (
       SELECT 
           pd.tenantid,
           pd.id,
           pt.propertyid AS consumercode,
           pt.surveyid,
-
-          (to_timestamp(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate,
-          
+          to_char(to_timestamp(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate,
           concat(bank_branches.bank_name, ' ', bank_branches.branch) AS bankname,
           pd.receiptnumber,
           payment.totalamountpaid AS amount,
           payment.paymentmode AS instrumenttype,
           payment.transactionnumber,
-
           concat(
               to_char(to_timestamp(get_fromperiod(pd.billid) / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY'),
               '-',
               to_char(to_timestamp(get_toperiod(pd.billid) / 1000) AT TIME ZONE 'Asia/Kolkata', 'YY')
           ) AS financialyear,
-
           to_char(to_timestamp(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS transactiondate,
-
           payment.totaldue - payment.totalamountpaid AS pendingamount,
-
           initcap(
               CASE
                   WHEN pt.usagecategory LIKE '%.%' THEN split_part(pt.usagecategory, '.', 2)
                   ELSE pt.usagecategory
               END
           ) AS usagetype,
-
           COALESCE(eg_user.name, '30048|21Fj+c3k2ldB0X3AzIh7atXB') AS collectorname,
-
-          receipt_breakup.*,
-
+          receipt_breakup.adhocpenalty,
+          receipt_breakup.adhocrebate,
+          receipt_breakup.firecess,
+          receipt_breakup.cancercess,
+          receipt_breakup.interest,
+          receipt_breakup.penalty,
+          receipt_breakup.rebate,
+          receipt_breakup.propertytax,
+          receipt_breakup.paidpropertytax,
+          receipt_breakup.exemption,
+          receipt_breakup.adjustment,
           to_char(to_timestamp(pd.manualreceiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS g8issuedate,
           pd.manualreceiptnumber AS g8receiptno
-
       FROM egcl_paymentdetail pd
       LEFT JOIN eg_user ON eg_user.id::text = pd.createdby::text
       LEFT JOIN egcl_payment payment ON pd.paymentid = payment.id
       LEFT JOIN bank_branches ON bank_branches.ifsc = payment.ifsccode
       LEFT JOIN egcl_bill bill ON bill.id = pd.billid AND bill.tenantid = pd.tenantid
-
       LEFT JOIN (
           SELECT *
           FROM (
@@ -7767,10 +7774,10 @@ ReportDefinitions:
           ) x
           WHERE rw = 1
       ) pt ON pt.propertyid = bill.consumercode
-
       LEFT JOIN receipt_breakup ON receipt_breakup.pdid = pd.id
-
       WHERE payment.paymentstatus <> 'CANCELLED'
         AND pd.businessservice = 'PT' and pd.tenantid = '$tenantid'
         AND payment.tenantid = pd.tenantid
         AND pd.receiptdate >= $fromDate AND pd.receiptdate < $toDate
+  )
+  SELECT * FROM report_data WHERE 1=1
