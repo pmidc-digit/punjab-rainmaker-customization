@@ -7777,7 +7777,7 @@ ReportDefinitions:
       LEFT JOIN receipt_breakup ON receipt_breakup.pdid = pd.id
 
       WHERE payment.paymentstatus <> 'CANCELLED'
-        AND pd.businessservice = 'PT' and pd.tenantid = $tenentid
+        AND pd.businessservice = 'PT' and pd.tenantid = $tenantid
         AND payment.tenantid = pd.tenantid
         AND pd.receiptdate BETWEEN $fromDate AND $toDate
 
