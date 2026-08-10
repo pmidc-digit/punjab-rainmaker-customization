@@ -7725,8 +7725,7 @@ ReportDefinitions:
           pd.id,
           pt.propertyid AS consumercode,
           pt.surveyid,
-
-          to_char(to_timestamp(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate,
+          pd.receiptdate,
           
           concat(bank_branches.bank_name, ' ', bank_branches.branch) AS bankname,
           pd.receiptnumber,
