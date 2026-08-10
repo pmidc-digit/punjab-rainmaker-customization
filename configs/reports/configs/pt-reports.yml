@@ -7670,13 +7670,13 @@ ReportDefinitions:
         type: epoch
         source: pt
         isMandatory: true
-        searchClause: AND epoch_receiptdate >= $fromDate
+        searchClause: AND pd.receiptdate >= $fromDate
       - name: toDate
         label: reports.pt.toDate
         type: epoch
         source: pt
         isMandatory: true
-        searchClause: AND epoch_receiptdate <= $toDate
+        searchClause: AND pd.receiptdate <= $toDate
       - name: financialyear
         label: Financial Year
         type: singlevaluelist
@@ -7693,6 +7693,7 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND instrumenttype = replace($paymentMode,',','_')
     query: >
+      set statement_timeout = 0;
       WITH receipt_breakup AS (
           SELECT 
               pd_1.id AS pdid,
@@ -7712,71 +7713,73 @@ ReportDefinitions:
           JOIN egcl_billdetial bd ON bd.id = bad.billdetailid AND bd.tenantid = bad.tenantid
           JOIN egcl_paymentdetail pd_1 ON pd_1.billid = bd.billid AND bd.tenantid = pd_1.tenantid
           JOIN egcl_payment payment_1 ON pd_1.paymentid = payment_1.id AND payment_1.tenantid = bad.tenantid
-          WHERE pd_1.tenantid = '$tenantid'
+          WHERE pd_1.tenantid = $tenantid
             AND payment_1.paymentstatus <> 'CANCELLED'
             AND pd_1.businessservice = 'PT'
-            AND pd_1.receiptdate >= $fromDate AND pd_1.receiptdate < $toDate
+            AND pd_1.receiptdate BETWEEN $fromDate AND $toDate
           GROUP BY pd_1.id
-      ),
-      report_data AS (
-          SELECT 
-              pd.tenantid,
-              pd.id,
-              pd.receiptdate AS epoch_receiptdate,
-              pt.propertyid AS consumercode,
-              pt.surveyid,
-              to_char(to_timestamp(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate,
-              concat(bank_branches.bank_name, ' ', bank_branches.branch) AS bankname,
-              pd.receiptnumber,
-              payment.totalamountpaid AS amount,
-              payment.paymentmode AS instrumenttype,
-              payment.transactionnumber,
-              concat(
-                  to_char(to_timestamp(get_fromperiod(pd.billid) / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY'),
-                  '-',
-                  to_char(to_timestamp(get_toperiod(pd.billid) / 1000) AT TIME ZONE 'Asia/Kolkata', 'YY')
-              ) AS financialyear,
-              to_char(to_timestamp(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS transactiondate,
-              payment.totaldue - payment.totalamountpaid AS pendingamount,
-              initcap(
-                  CASE
-                      WHEN pt.usagecategory LIKE '%.%' THEN split_part(pt.usagecategory, '.', 2)
-                      ELSE pt.usagecategory
-                  END
-              ) AS usagetype,
-              COALESCE(eg_user.name, '30048|21Fj+c3k2ldB0X3AzIh7atXB') AS collectorname,
-              receipt_breakup.adhocpenalty,
-              receipt_breakup.adhocrebate,
-              receipt_breakup.firecess,
-              receipt_breakup.cancercess,
-              receipt_breakup.interest,
-              receipt_breakup.penalty,
-              receipt_breakup.rebate,
-              receipt_breakup.propertytax,
-              receipt_breakup.paidpropertytax,
-              receipt_breakup.exemption,
-              receipt_breakup.adjustment,
-              to_char(to_timestamp(pd.manualreceiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS g8issuedate,
-              pd.manualreceiptnumber AS g8receiptno
-          FROM egcl_paymentdetail pd
-          LEFT JOIN eg_user ON eg_user.id::text = pd.createdby::text
-          LEFT JOIN egcl_payment payment ON pd.paymentid = payment.id
-          LEFT JOIN bank_branches ON bank_branches.ifsc = payment.ifsccode
-          LEFT JOIN egcl_bill bill ON bill.id = pd.billid AND bill.tenantid = pd.tenantid
-          LEFT JOIN (
-              SELECT *
-              FROM (
-                  SELECT 
-                      p.*,
-                      ROW_NUMBER() OVER (PARTITION BY p.propertyid ORDER BY p.lastmodifiedtime DESC) AS rw
-                  FROM eg_pt_property p
-              ) x
-              WHERE rw = 1
-          ) pt ON pt.propertyid = bill.consumercode
-          LEFT JOIN receipt_breakup ON receipt_breakup.pdid = pd.id
-          WHERE payment.paymentstatus <> 'CANCELLED'
-            AND pd.businessservice = 'PT' and pd.tenantid = '$tenantid'
-            AND payment.tenantid = pd.tenantid
-            AND pd.receiptdate >= $fromDate AND pd.receiptdate < $toDate
       )
-      SELECT * FROM report_data WHERE 1=1
+
+      SELECT 
+          pd.tenantid,
+          pd.id,
+          pt.propertyid AS consumercode,
+          pt.surveyid,
+
+          to_char(to_timestamp(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate,
+          
+          concat(bank_branches.bank_name, ' ', bank_branches.branch) AS bankname,
+          pd.receiptnumber,
+          payment.totalamountpaid AS amount,
+          payment.paymentmode AS instrumenttype,
+          payment.transactionnumber,
+
+          concat(
+              to_char(to_timestamp(get_fromperiod(pd.billid) / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY'),
+              '-',
+              to_char(to_timestamp(get_toperiod(pd.billid) / 1000) AT TIME ZONE 'Asia/Kolkata', 'YY')
+          ) AS financialyear,
+
+          to_char(to_timestamp(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS transactiondate,
+
+          payment.totaldue - payment.totalamountpaid AS pendingamount,
+
+          initcap(
+              CASE
+                  WHEN pt.usagecategory LIKE '%.%' THEN split_part(pt.usagecategory, '.', 2)
+                  ELSE pt.usagecategory
+              END
+          ) AS usagetype,
+
+          COALESCE(eg_user.name, '30048|21Fj+c3k2ldB0X3AzIh7atXB') AS collectorname,
+
+          receipt_breakup.*,
+
+          to_char(to_timestamp(pd.manualreceiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS g8issuedate,
+          pd.manualreceiptnumber AS g8receiptno
+
+      FROM egcl_paymentdetail pd
+      LEFT JOIN eg_user ON eg_user.id::text = pd.createdby::text
+      LEFT JOIN egcl_payment payment ON pd.paymentid = payment.id
+      LEFT JOIN bank_branches ON bank_branches.ifsc = payment.ifsccode
+      LEFT JOIN egcl_bill bill ON bill.id = pd.billid AND bill.tenantid = pd.tenantid
+
+      LEFT JOIN (
+          SELECT *
+          FROM (
+              SELECT 
+                  p.*,
+                  ROW_NUMBER() OVER (PARTITION BY p.propertyid ORDER BY p.lastmodifiedtime DESC) AS rw
+              FROM eg_pt_property p
+          ) x
+          WHERE rw = 1
+      ) pt ON pt.propertyid = bill.consumercode
+
+      LEFT JOIN receipt_breakup ON receipt_breakup.pdid = pd.id
+
+      WHERE payment.paymentstatus <> 'CANCELLED'
+        AND pd.businessservice = 'PT' and pd.tenantid = $tenentid
+        AND payment.tenantid = pd.tenantid
+        AND pd.receiptdate BETWEEN $fromDate AND $toDate
+
+    orderby: ORDER BY pd.receiptdate DESC;
