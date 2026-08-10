@@ -7666,17 +7666,17 @@ ReportDefinitions:
         total: false
     searchParams:
       - name: fromDate
-        label: Only 30 days data fetch
+        label: reports.pt.fromDate
         type: epoch
         source: pt
         isMandatory: true
-        searchClause: AND pd.receiptdate >= $fromDate
+        searchClause: AND epoch_receiptdate >= $fromDate
       - name: toDate
         label: reports.pt.toDate
         type: epoch
         source: pt
         isMandatory: true
-        searchClause: AND pd.receiptdate <= $toDate
+        searchClause: AND epoch_receiptdate <= $toDate
       - name: financialyear
         label: Financial Year
         type: singlevaluelist
@@ -7723,6 +7723,7 @@ ReportDefinitions:
           SELECT 
               pd.tenantid,
               pd.id,
+              pd.receiptdate AS epoch_receiptdate,
               pt.propertyid AS consumercode,
               pt.surveyid,
               to_char(to_timestamp(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate,
