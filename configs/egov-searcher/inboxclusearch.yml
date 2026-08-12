@@ -22,6 +22,7 @@ SearchDefinitions:
                    owner.relationship,
                    owner.ownershippercentage
             from eg_clu as clu
+            LEFT JOIN eg_clu_details details ON details.cluid = clu.id
             LEFT JOIN eg_clu_owner owner ON owner.cluid = clu.id 
             INNER JOIN (
               SELECT cluid, uuid as user_id FROM eg_clu_owner
@@ -30,6 +31,9 @@ SearchDefinitions:
             ) clu_user ON clu_user.cluid = clu.id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = clu.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            LEFT JOIN LATERAL (
+              SELECT COALESCE(details.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+            ) mig ON TRUE
             $where 
             AND pi.latest = TRUE
             order by clu.createdtime asc
@@ -85,6 +89,9 @@ SearchDefinitions:
             isMandatory: false
             jsonPath: $.searchCriteria.ownerUuid
             operator: IN
+          - name: mig.ismigrationtrue
+            isMandatory: false
+            jsonPath: $.searchCriteria.isMigrationTrue
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -104,6 +111,9 @@ SearchDefinitions:
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = clu.applicationno
             LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            LEFT JOIN LATERAL (
+              SELECT COALESCE(details.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+            ) mig ON TRUE
             $where
             AND pi.createdtime IN (
               select max(createdtime) 
@@ -162,6 +172,9 @@ SearchDefinitions:
             isMandatory: false
             jsonPath: $.searchCriteria.ownerUuid
             operator: IN
+          - name: mig.ismigrationtrue
+            isMandatory: false
+            jsonPath: $.searchCriteria.isMigrationTrue
 
       output:
         jsonFormat: {"ResponseInfo": {},"totalCount": []}
@@ -188,6 +201,7 @@ SearchDefinitions:
                    owner.relationship,
                    owner.ownershippercentage
             from eg_clu as clu
+            LEFT JOIN eg_clu_details details ON details.cluid = clu.id
             LEFT JOIN eg_clu_owner owner ON owner.cluid = clu.id 
             INNER JOIN (
               SELECT cluid, uuid as user_id FROM eg_clu_owner
@@ -196,6 +210,9 @@ SearchDefinitions:
             ) clu_user ON clu_user.cluid = clu.id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = clu.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            LEFT JOIN LATERAL (
+              SELECT COALESCE(details.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+            ) mig ON TRUE
             $where
             AND pi.latest = TRUE
             order by clu.createdtime desc
@@ -251,6 +268,9 @@ SearchDefinitions:
             isMandatory: false
             jsonPath: $.searchCriteria.ownerUuid
             operator: IN
+          - name: mig.ismigrationtrue
+            isMandatory: false
+            jsonPath: $.searchCriteria.isMigrationTrue
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -264,8 +284,12 @@ SearchDefinitions:
         baseQuery: |
           Select row_to_json(result) from (
             select clu.tenantid, clu.applicationno, pi.status as status_id from eg_clu as clu
+            LEFT JOIN eg_clu_details details ON details.cluid = clu.id
             LEFT JOIN eg_clu_owner owner ON owner.cluid = clu.id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = clu.applicationno
+            LEFT JOIN LATERAL (
+              SELECT COALESCE(details.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+            ) mig ON TRUE
             $where 
             AND pi.latest = TRUE
             GROUP BY clu.tenantid, clu.applicationno, pi.status
@@ -291,6 +315,9 @@ SearchDefinitions:
             isMandatory: false
             jsonPath: $.searchCriteria.status
             operator: IN
+          - name: mig.ismigrationtrue
+            isMandatory: false
+            jsonPath: $.searchCriteria.isMigrationTrue
       output:
         jsonFormat: {"ResponseInfo": {},"cluApplication": []}
         outJsonPath: $.cluApplication
