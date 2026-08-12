@@ -10855,4 +10855,259 @@ ReportDefinitions:
     SELECT *
     FROM dedup
     WHERE rn = 1 AND tenantid = $tenantid 
+- reportName: receiptRegisterTest
+  decryptionPathId: ReceiptRegister_V2
+  summary: Receipt Register
+  version: 1.0.0
+  moduleName: rainmaker-pt
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+    - name: receiptnumber
+      label: reports.pt.receiptNo
+      type: string
+      source: pt
+      total: false
+    - name: receiptdate
+      label: reports.pt.receiptDate
+      type: string
+      source: pt
+      total: false
+    - name: g8issuedate
+      label: reports.pt.g8issuedate
+      type: string
+      source: pt
+      total: false
+    - name: g8receiptno
+      label: reports.pt.g8receiptno
+      type: string
+      source: pt
+      total: false
+    - name: amount
+      label: reports.pt.amount
+      type: string
+      source: pt
+      total: true
+    - name: propertytax
+      label: reports.pt.propertyTax
+      type: string
+      source: pt
+      total: true
+    - name: paidpropertytax
+      label: reports.pt.paidpropertyTax
+      type: string
+      source: pt
+      total: true
+    - name: firecess
+      label: reports.pt.fireCess
+      type: string
+      source: pt
+      total: true
+    - name: cancercess
+      label: reports.pt.cancerCess
+      type: string
+      source: pt
+      total: true
+    - name: rebate
+      label: reports.pt.rebate
+      type: string
+      source: pt
+      total: true
+    - name: adhocrebate
+      label: reports.pt.adhocrebate
+      type: string
+      source: pt
+      total: true
+    - name: penalty
+      label: reports.pt.penalty
+      type: string
+      source: pt
+      total: true
+    - name: adhocpenalty
+      label: reports.pt.adhocpenalty
+      type: string
+      source: pt
+      total: true
+    - name: interest
+      label: reports.pt.interest
+      type: string
+      source: pt
+      total: true
+    - name: exemption
+      label: reports.pt.exemption
+      type: string
+      source: pt
+      total: true
+    - name: adjustment
+      label: reports.pt.roundoff
+      type: string
+      source: pt
+      total: true
+    - name: pendingamount
+      label: reports.pt.pendingamount
+      type: string
+      source: pt
+      total: true
+    - name: consumercode
+      label: reports.pt.propertyId
+      type: string
+      source: pt
+      total: false
+    - name: usagetype
+      label: reports.pt.usagetype
+      type: string
+      source: pt
+      total: false
+    - name: surveyid
+      label: reports.pt.surveyid
+      type: string
+      source: pt
+      total: false
+    - name: instrumenttype
+      label: reports.pt.paymentMode
+      type: string
+      source: pt
+      total: false
+    - name: transactionnumber
+      label: reports.pt.ddChequeTransactionNo
+      type: string
+      source: pt
+      total: false
+    - name: transactiondate
+      label: reports.pt.ddChequeTransactionDate
+      type: string
+      source: pt
+      total: false
+    - name: bankname
+      label: reports.pt.bankName
+      type: string
+      source: pt
+      total: false
+    - name: collectorname
+      label: reports.pt.collectorname
+      type: string
+      source: pt
+      total: false
+    - name: financialyear
+      label: reports.pt.financialyear
+      type: string
+      source: pt
+      total: false
+  searchParams:
+    - name: fromDate
+      label: reports.pt.fromDate
+      type: epoch
+      source: pt
+      isMandatory: true
+      searchClause: AND pd.receiptdate >= $fromDate
+    - name: toDate
+      label: reports.pt.toDate
+      type: epoch
+      source: pt
+      isMandatory: true
+      searchClause: AND pd.receiptdate <= $toDate
+    - name: financialyear
+      label: Financial Year
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=egf-master&masterName=FinancialYear|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].code|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].name
+      source: pt
+      wrapper: true
+      isMandatory: false
+      searchClause: AND financialyear = $financialyear
+    - name: paymentMode
+      label: Payment Mode
+      type: singlevaluelist
+      pattern: list://CARD:Card,CASH:Cash,CHEQUE:Cheque,DD:DD,OFFLINE_NEFT:NEFT,OFFLINE_RTGS:RTGS,ONLINE:Online,POSTAL_ORDER:PostalOrder
+      source: pt
+      isMandatory: false
+      searchClause: AND instrumenttype = replace($paymentMode,',','_')
+  query: >
+    WITH receipt_breakup AS (
+        SELECT 
+            pd_1.id AS pdid,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_ADHOC_PENALTY' THEN bad.adjustedamount ELSE 0 END) AS adhocpenalty,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_ADHOC_REBATE' THEN bad.adjustedamount ELSE 0 END) AS adhocrebate,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_FIRE_CESS' THEN bad.adjustedamount ELSE 0 END) AS firecess,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_CANCER_CESS' THEN bad.adjustedamount ELSE 0 END) AS cancercess,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_TIME_INTEREST' THEN bad.adjustedamount ELSE 0 END) AS interest,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_TIME_PENALTY' THEN bad.adjustedamount ELSE 0 END) AS penalty,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_TIME_REBATE' THEN bad.adjustedamount ELSE 0 END) AS rebate,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_TAX' THEN bad.amount ELSE 0 END) AS propertytax,
+            SUM(CASE WHEN bad.taxheadcode = 'PT_TAX' THEN bad.adjustedamount ELSE 0 END) AS paidpropertytax,
+            SUM(CASE WHEN bad.taxheadcode IN ('PT_UNIT_USAGE_EXEMPTION','PT_OWNER_EXEMPTION') THEN bad.amount ELSE 0 END) AS exemption,
+            SUM(CASE WHEN bad.taxheadcode IN ('PT_ROUNDOFF','PT_DECIMAL_CEILING_DEBIT','PT_DECIMAL_CEILING_CREDIT') 
+                    THEN bad.adjustedamount ELSE 0 END) AS adjustment
+        FROM egcl_billaccountdetail bad
+        JOIN egcl_billdetial bd ON bd.id = bad.billdetailid AND bd.tenantid = bad.tenantid
+        JOIN egcl_paymentdetail pd_1 ON pd_1.billid = bd.billid AND bd.tenantid = pd_1.tenantid
+        JOIN egcl_payment payment_1 ON pd_1.paymentid = payment_1.id AND payment_1.tenantid = bad.tenantid
+        WHERE pd_1.tenantid = $tenantid
+          AND payment_1.paymentstatus <> 'CANCELLED'
+          AND pd_1.businessservice = 'PT'
+          AND pd_1.receiptdate BETWEEN $fromDate AND $toDate
+        GROUP BY pd_1.id
+    )
 
+    SELECT 
+        pd.tenantid,
+        pd.id,
+        pt.propertyid AS consumercode,
+        pt.surveyid,
+
+        to_char(to_timestamp(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate,
+        
+        concat(bank_branches.bank_name, ' ', bank_branches.branch) AS bankname,
+        pd.receiptnumber,
+        payment.totalamountpaid AS amount,
+        payment.paymentmode AS instrumenttype,
+        payment.transactionnumber,
+
+        concat(
+            to_char(to_timestamp(get_fromperiod(pd.billid) / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY'),
+            '-',
+            to_char(to_timestamp(get_toperiod(pd.billid) / 1000) AT TIME ZONE 'Asia/Kolkata', 'YY')
+        ) AS financialyear,
+
+        to_char(to_timestamp(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS transactiondate,
+
+        payment.totaldue - payment.totalamountpaid AS pendingamount,
+
+        initcap(
+            CASE
+                WHEN pt.usagecategory LIKE '%.%' THEN split_part(pt.usagecategory, '.', 2)
+                ELSE pt.usagecategory
+            END
+        ) AS usagetype,
+
+        COALESCE(eg_user.name, '30048|21Fj+c3k2ldB0X3AzIh7atXB') AS collectorname,
+
+        receipt_breakup.*,
+
+        to_char(to_timestamp(pd.manualreceiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS g8issuedate,
+        pd.manualreceiptnumber AS g8receiptno
+
+    FROM egcl_paymentdetail pd
+    LEFT JOIN eg_user ON eg_user.id::text = pd.createdby::text
+    LEFT JOIN egcl_payment payment ON pd.paymentid = payment.id
+    LEFT JOIN bank_branches ON bank_branches.ifsc = payment.ifsccode
+    LEFT JOIN egcl_bill bill ON bill.id = pd.billid AND bill.tenantid = pd.tenantid
+
+    LEFT JOIN (
+        SELECT *
+        FROM (
+            SELECT 
+                p.*,
+                ROW_NUMBER() OVER (PARTITION BY p.propertyid ORDER BY p.lastmodifiedtime DESC) AS rw
+            FROM eg_pt_property p
+        ) x
+        WHERE rw = 1
+    ) pt ON pt.propertyid = bill.consumercode
+
+    LEFT JOIN receipt_breakup ON receipt_breakup.pdid = pd.id
+
+    WHERE payment.paymentstatus <> 'CANCELLED'
+      AND pd.businessservice = 'PT' and pd.tenantid = $tenantid
+      AND payment.tenantid = pd.tenantid
+
+  orderby: ORDER BY pd.receiptdate DESC;
