@@ -6241,9 +6241,9 @@ ReportDefinitions:
         type: singlevaluelist
         source: ws
         isMandatory: false
-        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=pb&moduleName=BillingService&masterName=TaxPeriod|$.MdmsRes.BillingService.TaxPeriod[?(@.service=='WS')].fromDate|$.MdmsRes.BillingService.TaxPeriod[?(@.service=='WS')].code|$.MdmsRes.BillingService.TaxPeriod[?(@.service=='WS')].toDate
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=pb&moduleName=BillingService&masterName=TaxPeriod|$.MdmsRes.BillingService.TaxPeriod[?(@.service=='WS')].fromDate|$.MdmsRes.BillingService.TaxPeriod[?(@.service=='WS')].toDate|$.MdmsRes.BillingService.TaxPeriod[?(@.service=='WS')].code
         wrapper: true
-        searchClause: AND bd.fromperiod >= $taxPeriod.fromDate  AND bd.toperiod <= $taxPeriod.toDate
+        searchClause: AND 1=1
     query: WITH all_bill AS (
       SELECT
       TO_CHAR( TO_TIMESTAMP(bd.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata','MM-YYYY') || ' - ' ||
@@ -6257,7 +6257,7 @@ ReportDefinitions:
       JOIN egbs_bill_v1 bill ON bill.id = bd.billid
       WHERE bd.businessservice = 'WS'
       AND bill.tenantid = $tenantid
-      AND bd.fromperiod >= $fromDate AND bd.toperiod <= $toDate
+      AND bd.fromperiod >= $taxPeriod 
       ),
       demand_amt AS (
       SELECT consumercode,createdtime, demand_amount
@@ -6274,7 +6274,7 @@ ReportDefinitions:
       JOIN egbs_demand_v1 d  ON dd.demandid = d.id
       WHERE d.status <> 'CANCELLED'
       AND d.businessservice = 'WS'
-      AND d.taxperiodfrom >= $fromDate and d.taxperiodto <= $toDate
+      AND d.taxperiodfrom >= $taxPeriod 
       AND dd.taxheadcode <> 'WS_ADVANCE_CARRYFORWARD'
       ) x
       WHERE rn = 1
