@@ -6361,7 +6361,7 @@ ReportDefinitions:
         isMandatory: false
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=pb&moduleName=BillingService&masterName=TaxPeriod|$.MdmsRes.BillingService.TaxPeriod.*.fromDate|$.MdmsRes.BillingService.TaxPeriod.*.code
         wrapper: true
-        searchClause: AND bd.fromperiod >= $taxPeriod.fromDate  AND bd.toperiod <= $taxPeriod.toDate
+        searchClause: AND 1=1
     query: WITH all_bill AS (
       SELECT
       TO_CHAR( TO_TIMESTAMP(bd.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata','MM-YYYY') || ' - ' ||
@@ -6375,7 +6375,7 @@ ReportDefinitions:
       JOIN egbs_bill_v1 bill ON bill.id = bd.billid
       WHERE bd.businessservice = 'SW'
       AND bill.tenantid = $tenantid
-      AND bd.fromperiod >= $fromDate AND bd.toperiod <= $toDate
+      AND bd.fromperiod >= $taxPeriod.fromDate AND bd.toperiod <= $taxPeriod.toDate
       ),
       demand_amt AS (
       SELECT consumercode,createdtime, demand_amount
@@ -6392,7 +6392,7 @@ ReportDefinitions:
       JOIN egbs_demand_v1 d  ON dd.demandid = d.id
       WHERE d.status <> 'CANCELLED'
       AND d.businessservice = 'SW'
-      AND d.taxperiodfrom >= $fromDate and d.taxperiodto <= $toDate
+      AND d.taxperiodfrom >= $taxPeriod.fromDate and d.taxperiodto <= $taxPeriod.toDate
       AND dd.taxheadcode <> 'SW_ADVANCE_CARRYFORWARD'
       ) x
       WHERE rn = 1
