@@ -23,6 +23,7 @@ SearchDefinitions:
                    owner.relationship,
                    owner.ownershippercentage
             from eg_layout as layout
+            LEFT JOIN eg_layout_details details ON details.layoutid = layout.id
             LEFT JOIN eg_layout_owner owner ON owner.layoutid = layout.id AND owner.isprimaryowner = true
             INNER JOIN (
               SELECT layoutid, uuid as user_id FROM eg_layout_owner
@@ -31,6 +32,9 @@ SearchDefinitions:
             ) layout_user ON layout_user.layoutid = layout.id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = layout.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            LEFT JOIN LATERAL (
+              SELECT COALESCE(details.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+            ) mig ON TRUE
             $where 
             AND pi.latest = TRUE
             order by layout.createdtime asc
@@ -86,6 +90,9 @@ SearchDefinitions:
             isMandatory: false
             jsonPath: $.searchCriteria.ownerUuid
             operator: IN
+          - name: mig.ismigrationtrue
+            isMandatory: false
+            jsonPath: $.searchCriteria.isMigrationTrue
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -105,6 +112,9 @@ SearchDefinitions:
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = layout.applicationno
             LEFT JOIN eg_wf_state_v2 ws ON ws.uuid = pi.status
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            LEFT JOIN LATERAL (
+              SELECT COALESCE(details.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+            ) mig ON TRUE
             $where
             AND pi.latest = TRUE
           ) result
@@ -158,6 +168,9 @@ SearchDefinitions:
             isMandatory: false
             jsonPath: $.searchCriteria.ownerUuid
             operator: IN
+          - name: mig.ismigrationtrue
+            isMandatory: false
+            jsonPath: $.searchCriteria.isMigrationTrue
 
       output:
         jsonFormat: {"ResponseInfo": {},"totalCount": []}
@@ -184,6 +197,7 @@ SearchDefinitions:
                    owner.relationship,
                    owner.ownershippercentage
             from eg_layout as layout
+            LEFT JOIN eg_layout_details details ON details.layoutid = layout.id
             LEFT JOIN eg_layout_owner owner ON owner.layoutid = layout.id AND owner.isprimaryowner = true
             INNER JOIN (
               SELECT layoutid, uuid as user_id FROM eg_layout_owner
@@ -192,6 +206,9 @@ SearchDefinitions:
             ) layout_user ON layout_user.layoutid = layout.id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = layout.applicationno
             LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+            LEFT JOIN LATERAL (
+              SELECT COALESCE(details.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+            ) mig ON TRUE
             $where
             AND pi.latest = TRUE
             order by layout.createdtime desc
@@ -247,6 +264,9 @@ SearchDefinitions:
             isMandatory: false
             jsonPath: $.searchCriteria.ownerUuid
             operator: IN
+          - name: mig.ismigrationtrue
+            isMandatory: false
+            jsonPath: $.searchCriteria.isMigrationTrue
         pagination:
           noOfRecords: $.searchCriteria.noOfRecords
           offset: $.searchCriteria.offset
@@ -261,8 +281,12 @@ SearchDefinitions:
           Select row_to_json(result) from (
             select layout.tenantId, layout.applicationno, pi.status as status_id
             from eg_layout as layout
+            LEFT JOIN eg_layout_details details ON details.layoutid = layout.id
             LEFT JOIN eg_layout_owner owner ON owner.layoutid = layout.id
             INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = layout.applicationno
+            LEFT JOIN LATERAL (
+              SELECT COALESCE(details.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+            ) mig ON TRUE
             $where
             AND pi.latest = TRUE
             GROUP BY layout.tenantId, layout.applicationno, pi.status
@@ -291,6 +315,9 @@ SearchDefinitions:
             isMandatory: false
             jsonPath: $.searchCriteria.status
             operator: IN
+          - name: mig.ismigrationtrue
+            isMandatory: false
+            jsonPath: $.searchCriteria.isMigrationTrue
       output:
         jsonFormat: {"ResponseInfo": {},"layoutApplication": []}
         outJsonPath: $.layoutApplication
