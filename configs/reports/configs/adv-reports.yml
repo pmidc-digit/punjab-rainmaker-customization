@@ -487,7 +487,7 @@ ReportDefinitions:
         searchClause: AND payment.paymentmode like $paymentMode
     query: >
       -- Use CTE to force query plan, compute & use CTE later
-       SELECT
+       SELECT DISTINCT ON (pd.receiptnumber)
         pd.receiptnumber AS receiptno,
         bill.consumercode AS connectionno,
         TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate,
@@ -513,7 +513,7 @@ ReportDefinitions:
        LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
        WHERE b.tenant_id = $tenantid
        AND payment.paymentstatus != 'CANCELLED'
-    orderby: ORDER BY pd.receiptdate DESC
+    orderby: ORDER BY pd.receiptnumber,pd.receiptdate DESC
 
   - reportName: StateActiveHoardingSummary
     decryptionPathId: ADVREPORTS
@@ -1028,7 +1028,7 @@ ReportDefinitions:
         searchClause: AND b.tenant_id= $ulb
     query: >
       -- Use CTE to force query plan, compute & use CTE later
-       SELECT
+       SELECT DISTINCT ON (pd.receiptnumber)
         pd.receiptnumber AS receiptno,
         bill.consumercode AS connectionno,
         TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate,
@@ -1053,4 +1053,4 @@ ReportDefinitions:
        JOIN egcl_payment payment ON payment.id = pd.paymentid
        LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
        WHERE payment.paymentstatus != 'CANCELLED'
-    orderby: ORDER BY pd.receiptdate DESC
+    orderby: ORDER BY  pd.receiptnumber,pd.receiptdate DESC
