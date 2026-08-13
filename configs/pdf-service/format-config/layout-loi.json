@@ -3,21 +3,40 @@
   "config": {
     "content": [
       {
-        "style": "loi-office-header",
-        "stack": [
-          {
-            "text": "OFFICE OF THE {{officeName}}",
-            "bold": true,
-            "alignment": "center",
-            "fontSize": 12
-          },
-          {
-            "text": "{{officeSubLine}}",
-            "alignment": "center",
-            "fontSize": 11,
-            "bold": true
-          }
-        ]
+        "style": "noc-head",
+        "table": {
+          "widths": [90, "*", 90],
+          "body": [
+            [
+              {},
+              {
+                "style": "loi-office-header",
+                "stack": [
+                  {
+                    "text": "OFFICE OF THE {{officeName}}",
+                    "bold": true,
+                    "alignment": "center",
+                    "fontSize": 12
+                  },
+                  {
+                    "text": "{{officeSubLine}}",
+                    "alignment": "center",
+                    "fontSize": 11,
+                    "bold": true
+                  }
+                ]
+              },
+              {
+                "image": "{{qrcodeimage}}",
+                "width": 72,
+                "height": 72,
+                "alignment": "right",
+                "margin": [0, 0, 0, 0]
+              }
+            ]
+          ]
+        },
+        "layout": "noBorders"
       },
 
       {
@@ -235,6 +254,9 @@
     ],
 
     "styles": {
+      "noc-head": {
+        "margin": [-30, -30, 0, 1]
+      },
       "loi-office-header": { "margin": [0, 0, 0, 10] },
       "loi-from-block": {
         "fontSize": 11,
