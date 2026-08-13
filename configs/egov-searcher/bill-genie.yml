@@ -1239,14 +1239,12 @@ SearchDefinitions:
           INNER JOIN egbs_bill_v1 b
               ON b.consumercode = fc.connectionno
              AND b.tenantid = fc.tenantid
-             AND b.status = 'ACTIVE'
 
           INNER JOIN egbs_billdetail_v1 bd
               ON bd.billid = b.id
              AND bd.tenantid = b.tenantid
              AND bd.businessservice = 'WS'
 
-          WHERE bd.totalamount > 0
       ),
 
               latest_bills AS (
