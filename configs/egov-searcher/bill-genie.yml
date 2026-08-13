@@ -1070,13 +1070,23 @@ SearchDefinitions:
               ad.additionaldetails    AS ad_additionaldetails
           FROM filtered_conn fc
           LEFT JOIN LATERAL (
-              SELECT *
-              FROM egbs_bill_v1 b
-              WHERE b.consumercode = fc.connectionno
-                AND b.tenantid = fc.tenantid and b.tenantid = :conn.tenantid
-              ORDER BY b.createddate DESC
-              LIMIT 1
-          ) b ON TRUE
+          SELECT b.*
+             FROM egbs_bill_v1 b
+           WHERE b.consumercode = fc.connectionno
+           AND b.tenantid = fc.tenantid
+           AND b.tenantid = :conn.tenantid
+           AND b.status = 'ACTIVE'
+           AND EXISTS (
+            SELECT 1
+            FROM egbs_billdetail_v1 bd1
+            WHERE bd1.billid = b.id
+              AND bd1.tenantid = b.tenantid
+              AND bd1.businessservice = 'WS'
+              AND bd1.totalamount > 0
+              )
+            ORDER BY b.createddate DESC
+            LIMIT 1
+           ) b ON TRUE
           INNER JOIN egbs_billdetail_v1 bd
               ON bd.billid = b.id
             AND bd.tenantid = b.tenantid
@@ -1241,20 +1251,20 @@ SearchDefinitions:
           WHERE bd.totalamount > 0
       ),
 
-      latest_bills AS (
-          SELECT
-              bd_consumercode,
-              MAX(b_createddate) AS maxcreateddate
-          FROM filtered_bills
-          GROUP BY bd_consumercode
-      )
+              latest_bills AS (
+              SELECT fb.*,
+                  ROW_NUMBER() OVER (
+                PARTITION BY bd_consumercode
+               ORDER BY b_createddate DESC
+           ) rn
+              FROM filtered_bills fb 
+          )
 
       SELECT
           fb.*
-      FROM filtered_bills fb
-      JOIN latest_bills lb
-          ON fb.bd_consumercode = lb.bd_consumercode
-         AND fb.b_createddate = lb.maxcreateddate
+      FROM latest_bills fb
+      WHERE fb.rn =1
+
    searchParams:
      condition: AND
      params:
