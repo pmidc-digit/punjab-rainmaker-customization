@@ -6,15 +6,16 @@
         "style": "loi-office-header",
         "stack": [
           {
-            "text": "Office of The {{officeName}}",
+            "text": "OFFICE OF THE {{officeName}}",
             "bold": true,
             "alignment": "center",
             "fontSize": 12
           },
           {
-            "text": "({{officeSubLine}}).",
+            "text": "{{officeSubLine}}",
             "alignment": "center",
-            "fontSize": 11
+            "fontSize": 11,
+            "bold": true
           }
         ]
       },
@@ -39,9 +40,9 @@
         "style": "loi-to-block",
         "stack": [
           { "text": "To", "bold": true, "margin": [0, 10, 0, 0] },
-          { "text": "{{applicantName}}", "margin": [20, 4, 0, 0] },
+          { "text": "{{promoterFirmName}}", "margin": [20, 4, 0, 0] },
           { "text": "{{applicantAddress}},", "margin": [20, 0, 0, 0] },
-          { "text": "{{promoterFirmName}}", "margin": [20, 0, 0, 0] }
+          { "text": "{{applicantName}}", "margin": [20, 0, 0, 0] }
         ]
       },
 
@@ -75,7 +76,7 @@
         "text": [
           { "text": "Subject: ", "bold": true },
           {
-            "text": "Issue of Letter of Intent for setting up a {{colonyTypeName}} Colony to {{promoterFirmName}} — {{projectDescription}} — Under Rule 11(3) of PAPRA Rules, 1985"
+            "text": "Issue of Letter of Intent for setting up a {{colonyTypeName}} Colony to {{applicantName}} — {{projectDescription}} — Under Rule 11(3) of PAPRA Rules, 1985"
           }
         ]
       },
@@ -95,45 +96,81 @@
       {
         "style": "loi-conditions",
         "ol": [
-          "{{loi_1}}",
-          "{{loi_2}}",
-          "{{loi_3}}",
-          "{{loi_4a}} {{jurisdictionName}} {{loi_4b}} {{jurisdictionName}} {{loi_4c}}",
-          "{{loi_5a}} {{ulbType}}, {{ulbName}} {{loi_5b}}",
-          "{{loi_6a}} {{ulbType}}, {{ulbName}} {{loi_6b}} {{ulbType}}, {{ulbName}}.",
-          "{{loi_7}}",
-          "{{loi_8}}",
-          "{{loi_9}}",
-          "{{loi_10a}} {{projectDescription}} {{loi_10b}} {{ulbType}}, {{ulbName}} {{loi_10c}} {{ulbType}}, {{ulbName}} {{loi_10d}} {{ulbType}}, {{ulbName}} {{loi_10e}}",
-          "{{loi_11a}} {{ulbName}} {{loi_11b}}",
-          "{{loi_12}}",
-          "{{loi_13}}",
-          "{{loi_14}}",
-          "{{loi_15}}",
-          "{{loi_16a}} {{officerDesignation}}, {{ulbType}}, {{ulbName}} {{loi_16b}}",
-          "{{loi_17}}",
-          "{{loi_18a}} {{ulbType}}, {{ulbName}} {{loi_18b}} {{ulbType}}, {{ulbName}} {{loi_18c}}",
-          "{{loi_19}}",
-          "{{loi_20}}",
-          "{{loi_21}}",
-          "{{loi_22a}} {{ulbName}} {{loi_22b}}",
-          "{{loi_23}}",
-          "{{loi_24}}",
-          "{{loi_25a}} {{ulbType}}, {{ulbName}} {{loi_25b}}",
-          "{{loi_26}}",
-          "{{loi_27}}",
-          "{{loi_28}}",
-          "{{loi_29}}",
-          "{{loi_30}}",
-          "{{loi_31}}",
-          "{{loi_32}}",
-          "{{loi_33}}",
-          "{{loi_34a}} {{officerDesignation}}, {{ulbType}}, {{ulbName}} {{loi_34b}}",
-          "{{loi_35}}",
-          "{{loi_36}}",
-          "{{loi_37}}",
-          "{{loi_38}}",
-          "{{loi_39}}"
+          { "text": "{{loi_1}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_2}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_3}}", "margin": [0, 0, 0, 8] },
+          {
+            "text": "{{loi_4a}} {{jurisdictionName}} {{loi_4b}} {{jurisdictionName}} {{loi_4c}}",
+            "margin": [0, 0, 0, 8]
+          },
+          {
+            "text": "{{loi_5a}} {{ulbType}}, {{ulbName}} {{loi_5b}}",
+            "margin": [0, 0, 0, 8]
+          },
+          {
+            "text": "{{loi_6a}} {{ulbType}}, {{ulbName}} {{loi_6b}} {{ulbType}}, {{ulbName}}.",
+            "margin": [0, 0, 0, 8]
+          },
+          { "text": "{{loi_7}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_8}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_9}}", "margin": [0, 0, 0, 8] },
+          {
+            "text": "{{loi_10a}} {{projectDescription}} {{loi_10b}} {{ulbType}}, {{ulbName}} {{loi_10c}} {{ulbType}}, {{ulbName}} {{loi_10d}} {{ulbType}}, {{ulbName}} {{loi_10e}}",
+            "margin": [0, 0, 0, 8]
+          },
+          {
+            "text": "{{loi_11a}} {{ulbName}} {{loi_11b}}",
+            "margin": [0, 0, 0, 8]
+          },
+          { "text": "{{loi_12}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_13}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_14}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_15}}", "margin": [0, 0, 0, 8] },
+          {
+            "text": "{{loi_16a}} {{officerDesignation}}, {{ulbType}}, {{ulbName}} {{loi_16b}}",
+            "margin": [0, 0, 0, 8]
+          },
+          { "text": "{{loi_17}}", "margin": [0, 0, 0, 8] },
+          {
+            "text": "{{loi_18a}}",
+            "margin": [0, 0, 0, 8],
+            "ol": [
+              {
+                "text": "{{loi_18a1}} {{ulbType}}, {{ulbName}} {{loi_18b}} {{ulbType}}, {{ulbName}} {{loi_18c}}",
+                "margin": [0, 4, 0, 8]
+              }
+            ]
+          },
+          { "text": "{{loi_19}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_20}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_21}}", "margin": [0, 0, 0, 8] },
+          {
+            "text": "{{loi_22a}} {{ulbName}} {{loi_22b}}",
+            "margin": [0, 0, 0, 8]
+          },
+          { "text": "{{loi_23}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_24}}", "margin": [0, 0, 0, 8] },
+          {
+            "text": "{{loi_25a}} {{ulbType}}, {{ulbName}} {{loi_25b}}",
+            "margin": [0, 0, 0, 8]
+          },
+          { "text": "{{loi_26}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_27}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_28}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_29}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_30}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_31}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_32}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_33}}", "margin": [0, 0, 0, 8] },
+          {
+            "text": "{{loi_34a}} {{officerDesignation}}, {{ulbType}}, {{ulbName}} {{loi_34b}}",
+            "margin": [0, 0, 0, 8]
+          },
+          { "text": "{{loi_35}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_36}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_37}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_38}}", "margin": [0, 0, 0, 8] },
+          { "text": "{{loi_39}}", "margin": [0, 0, 0, 8] }
         ],
         "margin": [20, 4, 0, 10]
       },
@@ -154,8 +191,8 @@
       {
         "style": "loi-endst",
         "text": [
-          { "text": "Endst. No.: PAPRA/({{consumerID}})", "bold": true },
-          { "text": "    Dated: {{issueDate}}" }
+          { "text": "Endst. No.: PAPRA/{{consumerID}}", "bold": true },
+          { "text": "    Dated: {{issueDate}}", "alignment": "right" }
         ]
       },
 
@@ -185,8 +222,8 @@
       {
         "style": "loi-endst",
         "text": [
-          { "text": "Endst. No.: PAPRA/({{consumerID}})", "bold": true },
-          { "text": "    Dated: {{issueDate}}" }
+          { "text": "Endst. No.: PAPRA/{{consumerID}}", "bold": true },
+          { "text": "    Dated: {{issueDate}}" , "alignment": "right" }
         ]
       },
 
