@@ -158,10 +158,6 @@ const TAX_TYPE = {
     PT_TIME_INTEREST: false
 }
 const CCAVANUE_EXCLUDED_MODULES = [
-    'WS',
-    'SW',
-    'WS.ONE_TIME_FEE',
-    'SW.ONE_TIME_FEE',
     'BPA.NC_APP_FEE',
     'BPA.NC_OC_APP_FEE',
     'obpas_noc',
