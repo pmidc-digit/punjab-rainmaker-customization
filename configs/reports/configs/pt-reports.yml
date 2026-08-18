@@ -11111,3 +11111,646 @@ ReportDefinitions:
       AND payment.tenantid = pd.tenantid
 
   orderby: ORDER BY pd.receiptdate DESC;
+
+- reportName: ReceiptRegister_24_25
+  decryptionPathId: ReceiptRegister_V2
+  summary: Receipt Register 24 25
+  version: 1.0.0
+  moduleName: rainmaker-pt
+  additionalConfig:
+    print:
+      pdfPageSize: "A1"
+  sourceColumns:
+    - name: receiptnumber
+      label: reports.pt.receiptNo
+      type: string
+      source: pt
+      total: false
+    - name: receiptdate
+      label: reports.pt.receiptDate
+      type: string
+      source: pt
+      total: false
+    - name: g8issuedate
+      label: reports.pt.g8issuedate
+      type: string
+      source: pt
+      total: false
+    - name: g8receiptno
+      label: reports.pt.g8receiptno
+      type: string
+      source: pt
+      total: false
+    - name: amount
+      label: reports.pt.amount
+      type: string
+      source: pt
+      total: true
+    - name: propertytax
+      label: reports.pt.propertyTax
+      type: string
+      source: pt
+      total: true
+    - name: paidpropertytax
+      label: reports.pt.paidpropertyTax
+      type: string
+      source: pt
+      total: true
+    - name: firecess
+      label: reports.pt.fireCess
+      type: string
+      source: pt
+      total: true
+    - name: cancercess
+      label: reports.pt.cancerCess
+      type: string
+      source: pt
+      total: true
+    - name: rebate
+      label: reports.pt.rebate
+      type: string
+      source: pt
+      total: true
+    - name: adhocrebate
+      label: reports.pt.adhocrebate
+      type: string
+      source: pt
+      total: true
+    - name: penalty
+      label: reports.pt.penalty
+      type: string
+      source: pt
+      total: true
+    - name: adhocpenalty
+      label: reports.pt.adhocpenalty
+      type: string
+      source: pt
+      total: true
+    - name: interest
+      label: reports.pt.interest
+      type: string
+      source: pt
+      total: true
+    - name: exemption
+      label: reports.pt.exemption
+      type: string
+      source: pt
+      total: true
+    - name: adjustment
+      label: reports.pt.roundoff
+      type: string
+      source: pt
+      total: true
+    - name: pendingamount
+      label: reports.pt.pendingamount
+      type: string
+      source: pt
+      total: true
+    - name: consumercode
+      label: reports.pt.propertyId
+      type: string
+      source: pt
+      total: false
+    - name: usagetype
+      label: reports.pt.usagetype
+      type: string
+      source: pt
+      total: false
+    - name: surveyid
+      label: reports.pt.surveyid
+      type: string
+      source: pt
+      total: false
+    - name: instrumenttype
+      label: reports.pt.paymentMode
+      type: string
+      source: pt
+      total: false
+    - name: transactionnumber
+      label: reports.pt.ddChequeTransactionNo
+      type: string
+      source: pt
+      total: false
+    - name: transactiondate
+      label: reports.pt.ddChequeTransactionDate
+      type: string
+      source: pt
+      total: false
+    - name: bankname
+      label: reports.pt.bankName
+      type: string
+      source: pt
+      total: false
+    - name: collectorname
+      label: reports.pt.collectorname
+      type: string
+      source: pt
+      total: false
+    - name: financialyear
+      label: reports.pt.financialyear
+      type: string
+      source: pt
+      total: false
+  searchParams:
+    - name: fromDate
+      label: reports.pt.fromDate
+      type: epoch
+      source: pt
+      isMandatory: true
+      searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
+    - name: toDate
+      label: reports.pt.toDate
+      type: epoch
+      source: pt
+      isMandatory: true
+      searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
+    - name: financialyear
+      label: Financial Year
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=egf-master&masterName=FinancialYear|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].code|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].name
+      source: pt
+      wrapper: true
+      isMandatory: false
+      searchClause: AND financialyear = $financialyear
+    - name: paymentMode
+      label: Payment Mode
+      type: singlevaluelist
+      pattern: "list://CARD:Card,CASH:Cash,CHEQUE:Cheque,DD:DD,OFFLINE_NEFT:NEFT,OFFLINE_RTGS:RTGS,ONLINE:Online,POSTAL_ORDER:PostalOrder"
+      source: pt
+      isMandatory: false
+      searchClause: AND instrumenttype = replace($paymentMode,',','_')
+  query: |
+    -- Use CTE to force query plan, compute & use CTE later 
+    Select receiptnumber as receiptnumber,receiptdate as receiptdate,g8issuedate as g8issuedate,
+    g8receiptno as g8receiptno,amount as amount,propertytax as propertytax,firecess as firecess,
+    cancercess as cancercess,rebate as rebate,adhocrebate as adhocrebate,penalty as penalty,
+    adhocpenalty as adhocpenalty,interest as interest,exemption as exemption,adjustment as adjustment,
+    pendingamount as pendingamount,consumercode as consumercode,usagetype as usagetype,
+    instrumenttype as instrumenttype,transactionnumber as transactionnumber,transactiondate as transactiondate, 
+    bankname as bankname, collectorname as collectorname,financialyear as financialyear from public.mv_pt_receipt_regiester_24_25 
+    where tenantid=$tenantid
+  orderby: ORDER BY receiptnumber DESC;
+
+- reportName: ReceiptRegister_25_26
+  decryptionPathId: ReceiptRegister_V2
+  summary: Receipt Register 25 26
+  version: 1.0.0
+  moduleName: rainmaker-pt
+  additionalConfig:
+    print:
+      pdfPageSize: "A1"
+  sourceColumns:
+  - name: receiptnumber
+    label: reports.pt.receiptNo
+    type: string
+    source: pt
+    total: false
+  - name: receiptdate
+    label: reports.pt.receiptDate
+    type: string
+    source: pt
+    total: false
+  - name: g8issuedate
+    label: reports.pt.g8issuedate
+    type: string
+    source: pt
+    total: false
+  - name: g8receiptno
+    label: reports.pt.g8receiptno
+    type: string
+    source: pt
+    total: false
+  - name: amount
+    label: reports.pt.amount
+    type: string
+    source: pt
+    total: true
+  - name: propertytax
+    label: reports.pt.propertyTax
+    type: string
+    source: pt
+    total: true
+  - name: paidpropertytax
+    label: reports.pt.paidpropertyTax
+    type: string
+    source: pt
+    total: true
+  - name: firecess
+    label: reports.pt.fireCess
+    type: string
+    source: pt
+    total: true
+  - name: cancercess
+    label: reports.pt.cancerCess
+    type: string
+    source: pt
+    total: true
+  - name: rebate
+    label: reports.pt.rebate
+    type: string
+    source: pt
+    total: true
+  - name: adhocrebate
+    label: reports.pt.adhocrebate
+    type: string
+    source: pt
+    total: true
+  - name: penalty
+    label: reports.pt.penalty
+    type: string
+    source: pt
+    total: true
+  - name: adhocpenalty
+    label: reports.pt.adhocpenalty
+    type: string
+    source: pt
+    total: true
+  - name: interest
+    label: reports.pt.interest
+    type: string
+    source: pt
+    total: true
+  - name: exemption
+    label: reports.pt.exemption
+    type: string
+    source: pt
+    total: true
+  - name: adjustment
+    label: reports.pt.roundoff
+    type: string
+    source: pt
+    total: true
+  - name: pendingamount
+    label: reports.pt.pendingamount
+    type: string
+    source: pt
+    total: true
+  - name: consumercode
+    label: reports.pt.propertyId
+    type: string
+    source: pt
+    total: false
+  - name: usagetype
+    label: reports.pt.usagetype
+    type: string
+    source: pt
+    total: false
+  - name: surveyid
+    label: reports.pt.surveyid
+    type: string
+    source: pt
+    total: false
+  - name: instrumenttype
+    label: reports.pt.paymentMode
+    type: string
+    source: pt
+    total: false
+  - name: transactionnumber
+    label: reports.pt.ddChequeTransactionNo
+    type: string
+    source: pt
+    total: false      
+  - name: transactiondate
+    label: reports.pt.ddChequeTransactionDate
+    type: string
+    source: pt
+    total: false
+  - name: bankname
+    label: reports.pt.bankName
+    type: string
+    source: pt
+    total: false
+  - name: collectorname
+    label: reports.pt.collectorname
+    type: string
+    source: pt
+    total: false
+  - name: financialyear
+    label: reports.pt.financialyear
+    type: string
+    source: pt
+    total: false
+  searchParams:
+  - name: fromDate
+    label: reports.pt.fromDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
+  - name: toDate
+    label: reports.pt.toDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
+  - name: financialyear
+    label: Financial Year
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=egf-master&masterName=FinancialYear|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].code|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].name
+    source: pt
+    wrapper: true
+    isMandatory: false
+    searchClause: AND financialyear = $financialyear
+  - name: paymentMode
+    label: Payment Mode
+    type: singlevaluelist
+    pattern: 'list://CARD:Card,CASH:Cash,CHEQUE:Cheque,DD:DD,OFFLINE_NEFT:NEFT,OFFLINE_RTGS:RTGS,ONLINE:Online,POSTAL_ORDER:PostalOrder'
+    source: pt
+    isMandatory: false
+    searchClause: AND instrumenttype = replace($paymentMode,',','_')
+  query: |
+      -- Use CTE to force query plan, compute & use CTE later 
+      Select receiptnumber as receiptnumber,receiptdate as receiptdate,g8issuedate as g8issuedate,
+      g8receiptno as g8receiptno,amount as amount,propertytax as propertytax,firecess as firecess,
+      cancercess as cancercess,rebate as rebate,adhocrebate as adhocrebate,penalty as penalty,
+      adhocpenalty as adhocpenalty,interest as interest,exemption as exemption,adjustment as adjustment,
+      pendingamount as pendingamount,consumercode as consumercode,usagetype as usagetype,
+      instrumenttype as instrumenttype,transactionnumber as transactionnumber,transactiondate as transactiondate, 
+      bankname as bankname, collectorname as collectorname,financialyear as financialyear from public.mv_pt_receipt_regiester_25_26 
+      where tenantid=$tenantid
+  orderby: ORDER BY receiptnumber DESC;
+    
+- reportName: ReceiptRegisterSummary_24_25
+  decryptionPathId: ReceiptRegisterShort_V2
+  summary: Receipt Register Summary 24 25
+  version: 1.0.0
+  moduleName: rainmaker-pt
+  additionalConfig:
+    print:
+      pdfPageSize: "A1"
+  sourceColumns:
+  - name: ulb
+    label: reports.pt.ulb
+    type: string
+    source: pt
+    total: false
+  - name: paymentmode
+    label: reports.pt.paymentmode
+    type: string
+    source: pt
+    total: false
+  - name: adhocpenalty
+    label: reports.pt.adhocpenalty
+    type: string
+    source: pt
+    total: true
+  - name: adhocrebate
+    label: reports.pt.adhocrebate
+    type: string
+    source: pt
+    total: true
+  - name: firecess
+    label: reports.pt.firecess
+    type: string
+    source: pt
+    total: true
+  - name: cancercess
+    label: reports.pt.cancercess
+    type: string
+    source: pt
+    total: true
+  - name: interest
+    label: reports.pt.interest
+    type: string
+    source: pt
+    total: true
+  - name: penalty
+    label: reports.pt.penalty
+    type: string
+    source: pt
+    total: true
+  - name: rebate
+    label: reports.pt.rebate
+    type: string
+    source: pt
+    total: true
+  - name: propertytax
+    label: reports.pt.propertytax
+    type: string
+    source: pt
+    total: true
+  - name: exemption
+    label: reports.pt.exemption
+    type: string
+    source: pt
+    total: true
+  - name: adjustment
+    label: reports.pt.adjustment
+    type: string
+    source: pt
+    total: true
+  - name: noofassessments
+    label: reports.pt.noofassessments
+    type: string
+    source: pt
+    total: true     
+  - name: sumcash
+    label: reports.pt.sumcash
+    type: string
+    source: pt
+    total: true 
+  - name: sumcheque
+    label: reports.pt.sumcheque
+    type: string
+    source: pt
+    total: true
+  - name: countcheque
+    label: reports.pt.countcheque
+    type: string
+    source: pt
+    total: true     
+  - name: sumonline
+    label: reports.pt.sumonline
+    type: string
+    source: pt
+    total: true 
+  - name: totalamount
+    label: reports.pt.totalamount
+    type: string
+    source: pt
+    total: true    
+  - name: collectorname
+    label: reports.pt.collectorname
+    type: string
+    source: pt
+    total: false
+  searchParams:
+  - name: fromDate
+    label: reports.pt.fromDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
+  - name: toDate
+    label: reports.pt.toDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
+  - name: collectorname
+    label: reports.pt.collectorname
+    type: singlevaluelist
+    pattern: http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=PTCEMP|$.Employees[*].user.id|$.Employees[*].user.name
+    source: pt
+    wrapper: true
+    isMandatory: false
+    searchClause: AND collectorname = $collectorname::INTEGER
+  query: |
+      -- Use CTE to force query plan, compute & use CTE later
+      SELECT tenantid AS ulb,instrumenttype AS paymentmode,COUNT(DISTINCT pdid) AS noofassessments, 
+      SUM(adhocpenalty) AS adhocpenalty,SUM(adhocrebate) AS adhocrebate,
+      SUM(firecess) AS firecess,SUM(cancercess) AS cancercess,SUM(interest) AS interest,
+      SUM(penalty) AS penalty,SUM(rebate) AS rebate,SUM(propertytax) AS propertytax,
+      SUM(exemption) AS exemption,SUM(adjustment) AS adjustment,
+      SUM(CASE WHEN instrumenttype = 'CASH' THEN amount ELSE 0 END) AS sumcash,
+      SUM(CASE WHEN instrumenttype = 'CHEQUE' THEN amount ELSE 0 END) AS sumcheque,
+      COUNT(DISTINCT CASE WHEN instrumenttype = 'CHEQUE' THEN CONCAT(instrumenttype, amount) END) AS countcheque,
+      SUM(CASE WHEN instrumenttype = 'ONLINE' THEN amount ELSE 0 END) AS sumonline,
+      CASE WHEN instrumenttype != 'ONLINE' THEN collectorname ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END AS collectorname,
+      SUM(amount) AS totalamount
+      FROM public.mv_pt_receipt_regiester_24_25
+      WHERE tenantid = $tenantid
+  groupby: group by CASE WHEN instrumenttype != 'ONLINE' THEN collectorname ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END,tenantid,instrumenttype    
+
+  
+- reportName: ReceiptRegisterSummary_25_26
+  decryptionPathId: ReceiptRegisterShort_V2
+  summary: Receipt Register Summary 25 26
+  version: 1.0.0
+  moduleName: rainmaker-pt
+  additionalConfig:
+    print:
+      pdfPageSize: "A1"
+  sourceColumns:
+  - name: ulb
+    label: reports.pt.ulb
+    type: string
+    source: pt
+    total: false
+  - name: paymentmode
+    label: reports.pt.paymentmode
+    type: string
+    source: pt
+    total: false
+  - name: adhocpenalty
+    label: reports.pt.adhocpenalty
+    type: string
+    source: pt
+    total: true
+  - name: adhocrebate
+    label: reports.pt.adhocrebate
+    type: string
+    source: pt
+    total: true
+  - name: firecess
+    label: reports.pt.firecess
+    type: string
+    source: pt
+    total: true
+  - name: cancercess
+    label: reports.pt.cancercess
+    type: string
+    source: pt
+    total: true
+  - name: interest
+    label: reports.pt.interest
+    type: string
+    source: pt
+    total: true
+  - name: penalty
+    label: reports.pt.penalty
+    type: string
+    source: pt
+    total: true
+  - name: rebate
+    label: reports.pt.rebate
+    type: string
+    source: pt
+    total: true
+  - name: propertytax
+    label: reports.pt.propertytax
+    type: string
+    source: pt
+    total: true
+  - name: exemption
+    label: reports.pt.exemption
+    type: string
+    source: pt
+    total: true
+  - name: adjustment
+    label: reports.pt.adjustment
+    type: string
+    source: pt
+    total: true
+  - name: noofassessments
+    label: reports.pt.noofassessments
+    type: string
+    source: pt
+    total: true     
+  - name: sumcash
+    label: reports.pt.sumcash
+    type: string
+    source: pt
+    total: true 
+  - name: sumcheque
+    label: reports.pt.sumcheque
+    type: string
+    source: pt
+    total: true
+  - name: countcheque
+    label: reports.pt.countcheque
+    type: string
+    source: pt
+    total: true     
+  - name: sumonline
+    label: reports.pt.sumonline
+    type: string
+    source: pt
+    total: true 
+  - name: totalamount
+    label: reports.pt.totalamount
+    type: string
+    source: pt
+    total: true    
+  - name: collectorname
+    label: reports.pt.collectorname
+    type: string
+    source: pt
+    total: false
+  searchParams:
+  - name: fromDate
+    label: reports.pt.fromDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
+  - name: toDate
+    label: reports.pt.toDate
+    type: epoch
+    source: pt
+    isMandatory: true
+    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
+  - name: collectorname
+    label: reports.pt.collectorname
+    type: singlevaluelist
+    pattern: http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=PTCEMP|$.Employees[*].user.id|$.Employees[*].user.name
+    source: pt
+    wrapper: true
+    isMandatory: false
+    searchClause: AND collectorname = $collectorname::INTEGER
+  query: |
+      -- Use CTE to force query plan, compute & use CTE later
+      SELECT tenantid AS ulb,instrumenttype AS paymentmode,COUNT(DISTINCT pdid) AS noofassessments, 
+      SUM(adhocpenalty) AS adhocpenalty,SUM(adhocrebate) AS adhocrebate,
+      SUM(firecess) AS firecess,SUM(cancercess) AS cancercess,SUM(interest) AS interest,
+      SUM(penalty) AS penalty,SUM(rebate) AS rebate,SUM(propertytax) AS propertytax,
+      SUM(exemption) AS exemption,SUM(adjustment) AS adjustment,
+      SUM(CASE WHEN instrumenttype = 'CASH' THEN amount ELSE 0 END) AS sumcash,
+      SUM(CASE WHEN instrumenttype = 'CHEQUE' THEN amount ELSE 0 END) AS sumcheque,
+      COUNT(DISTINCT CASE WHEN instrumenttype = 'CHEQUE' THEN CONCAT(instrumenttype, amount) END) AS countcheque,
+      SUM(CASE WHEN instrumenttype = 'ONLINE' THEN amount ELSE 0 END) AS sumonline,
+      CASE WHEN instrumenttype != 'ONLINE' THEN collectorname ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END AS collectorname,
+      SUM(amount) AS totalamount
+      FROM public.mv_pt_receipt_regiester_25_26 
+      WHERE tenantid = $tenantid
+  groupby: group by CASE WHEN instrumenttype != 'ONLINE' THEN collectorname ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END,tenantid,instrumenttype
