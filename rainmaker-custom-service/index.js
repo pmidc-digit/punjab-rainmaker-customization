@@ -157,6 +157,22 @@ const TAX_TYPE = {
     PT_OWNER_EXEMPTION: true,
     PT_TIME_INTEREST: false
 }
+const CCAVANUE_EXCLUDED_MODULES = [
+    'WS',
+    'SW',
+    'WS.ONE_TIME_FEE',
+    'SW.ONE_TIME_FEE',
+    'BPA.NC_APP_FEE',
+    'BPA.NC_OC_APP_FEE',
+    'obpas_noc',
+    'LAYOUT.PAY1',
+    'LAYOUT.PAY2',
+    'BPAREG',
+    'CLU.PAY1',
+    'CLU.PAY2',
+    'BPA.NC_SAN_FEE',
+    'BPA.NC_OC_SAN_FEE'
+];
 
 if (PT_DEMAND_HOST === undefined) {
     throw Error("PT_DEMAND_HOST environment variable needs to be configured to run this")
@@ -1024,7 +1040,6 @@ router.post('/open/punjab-pt/payu/confirm', asyncMiddleware((async function (req
 router.post('/open/punjab-pt/ccavanue/confirm', asyncMiddleware((async function (req, res) {
   let return_data = req.body;
      console.log('Request Body :', return_data);
-    let orderNo = return_data.orderNo;
 
     original_callback = req.query.original_callback;
          console.log('Request Query  :',  req.query);
@@ -1042,7 +1057,7 @@ router.post('/open/punjab-pt/ccavanue/confirm', asyncMiddleware((async function 
         }
     )
     //ensuring the first query param is eg_pg_txnid
-    redirect_url = redirect_url.replace('?', '?'+ 'eg_pg_txnid=' + orderNo +'&')
+    redirect_url = redirect_url.replace('?', '?'+ 'eg_pg_txnid=' + txnid +'&')
     res.redirect(redirect_url);
 })))
 
@@ -1054,31 +1069,33 @@ router.post('/protected/punjab-pt/pre-hook/pg-service/transaction/v1/_create', a
     if (request['Transaction']['tenantId'] == 'pb.jalandhar' ) {
         let original_callback = request['Transaction']['callbackUrl'];
         request['Transaction']['gateway'] = 'PAYU'
-        url_callback = url.parse(original_callback)
+        url_callback = url.parse(original_callback, true)
 
         url_callback.query = url_callback.query || {};
 
-        url_callback.query['original_callback'] = url_callback.path;
+        url_callback.query['original_callback'] = url_callback.pathname;
+        url_callback.search = null;
 
         url_callback.path = '/customization/open/punjab-pt/payu/confirm';
         url_callback.pathname = '/customization/open/punjab-pt/payu/confirm';
 
         request['Transaction']['callbackUrl'] = url.format(url_callback);
     }
-    //    else  if (request['Transaction']['tenantId'] == 'pb.amritsar' && (request['Transaction']['module'] == 'WS' || request['Transaction']['module'] == 'SW' || request['Transaction']['module'] == 'WS.ONE_TIME_FEE' || request['Transaction']['module'] == 'SW.ONE_TIME_FEE' )) {
-    //     let original_callback = request['Transaction']['callbackUrl'];
-    //     request['Transaction']['gateway'] = 'CCAVANUE'
-    //     url_callback = url.parse(original_callback)
+       else  if (request['Transaction']['tenantId'] == 'pb.amritsar' && !CCAVANUE_EXCLUDED_MODULES.includes(request['Transaction']['module'])) {
+        let original_callback = request['Transaction']['callbackUrl'];
+        request['Transaction']['gateway'] = 'CCAVANUE'
+        url_callback = url.parse(original_callback, true)
 
-    //     url_callback.query = url_callback.query || {};
+        url_callback.query = url_callback.query || {};
 
-    //     url_callback.query['original_callback'] = url_callback.path;
+        url_callback.query['original_callback'] = url_callback.pathname;
+        url_callback.search = null;
 
-    //      url_callback.path = '/customization/open/punjab-pt/ccavanue/confirm';
-    //      url_callback.pathname = '/customization/open/punjab-pt/ccavanue/confirm';
+         url_callback.path = '/customization/open/punjab-pt/ccavanue/confirm';
+         url_callback.pathname = '/customization/open/punjab-pt/ccavanue/confirm';
 
-    //     request['Transaction']['callbackUrl'] = url.format(url_callback);
-    // }
+        request['Transaction']['callbackUrl'] = url.format(url_callback);
+    }
      // else if (request['Transaction']['tenantId'] == 'pb.amritsar' || request['Transaction']['tenantId'] == 'pb.mohali' || request['Transaction']['tenantId'] == 'pb.hoshiarpur' || request['Transaction']['tenantId'] == 'pb.kapurthala' || request['Transaction']['tenantId'] == 'pb.khanna' || request['Transaction']['tenantId'] == 'pb.moga' || request['Transaction']['tenantId'] == 'pb.mandigobindgarh'|| request['Transaction']['tenantId'] == 'pb.handiaya') {
     else {
     let original_callback = request['Transaction']['callbackUrl'];
