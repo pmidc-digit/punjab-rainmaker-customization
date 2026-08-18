@@ -6566,13 +6566,13 @@ ReportDefinitions:
         pt.usagecategory,
         wc.connectionno,
         wc.property_id,
-        lb.billid,
-        bd.billno AS bill_no,
-        to_char((to_timestamp(bd.billdate / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD HH24:MI:SS') AS bill_date, 
+        lb.billno AS bill_no,
+        to_char((to_timestamp(lb.billdate / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD HH24:MI:SS') AS bill_date, 
+        to_char((to_timestamp(lb.expirydate / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD HH24:MI:SS') AS expiry_date,
         lb.totalamount,
-        lb.consumercode,
         bm.localityname,bm.localitycode,bm.zonecode,bm.blockcode,
         wc.status AS wc_status,
+        wc.additionaldetails ->> 'groups' AS group_name,
         pt.landarea,
         b.status AS bill_status
     FROM eg_sw_connection wc JOIN eg_pt_property pt  ON wc.property_id = pt.propertyid AND pt.status IN ('ACTIVE', 'PENDINGWS')
@@ -6581,10 +6581,10 @@ ReportDefinitions:
     JOIN latest_bill lb     ON lb.consumercode = wc.connectionno
         AND lb.rn = 1           
     JOIN egbs_bill_v1 b     ON lb.billid = b.id and b.tenantid = $tenantid
-    JOIN egbs_billdetail_v1 bd on bd.billid = b.id and bd.tenantid = $tenantid
     WHERE wc.tenantid = $tenantid
       AND wc.connectionno IS NOT NULL
       AND wc.status = 'Active' 
+
 - reportName: WSTotal_Bill_Generate
   summary: WS Total Bill Generate Report
   version: 1.0.0
@@ -6694,12 +6694,12 @@ ReportDefinitions:
         pt.usagecategory,
         wc.connectionno,
         wc.property_id,
-        lb.billid,
-        bd.billno AS bill_no,
-        to_char((to_timestamp(bd.billdate / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD HH24:MI:SS') AS bill_date,
+        lb.billno AS bill_no,
+        to_char((to_timestamp(lb.billdate / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD HH24:MI:SS') AS bill_date,
+        to_char((to_timestamp(lb.expirydate / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD HH24:MI:SS') AS expiry_date,
         lb.totalamount,
-        lb.consumercode,
         bm.localityname,bm.localitycode,bm.zonecode,bm.blockcode,
+        wc.additionaldetails ->> 'groups' AS group_name,
         wc.status AS wc_status,
         pt.landarea,
         b.status AS bill_status
@@ -6709,10 +6709,10 @@ ReportDefinitions:
     JOIN latest_bill lb     ON lb.consumercode = wc.connectionno
         AND lb.rn = 1           
     JOIN egbs_bill_v1 b     ON lb.billid = b.id and b.tenantid = $tenantid
-    JOIN egbs_billdetail_v1 bd on bd.billid = b.id and bd.tenantid = $tenantid
     WHERE wc.tenantid = $tenantid
       AND wc.connectionno IS NOT NULL
       AND wc.status = 'Active'
+
 
 - reportName: Bill_Amendment_Report
   summary: Bill Amendment Report
