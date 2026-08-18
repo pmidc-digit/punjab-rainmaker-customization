@@ -7693,6 +7693,7 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND instrumenttype = replace($paymentMode,',','_')
     query: >
+      set statement_timeout = 0;
       WITH receipt_breakup AS (
           SELECT 
               pd_1.id AS pdid,
@@ -7779,6 +7780,7 @@ ReportDefinitions:
       WHERE payment.paymentstatus <> 'CANCELLED'
         AND pd.businessservice = 'PT' and pd.tenantid = $tenantid
         AND payment.tenantid = pd.tenantid
+        AND pd.receiptdate BETWEEN $fromDate AND $toDate
 
     orderby: ORDER BY pd.receiptdate DESC;
 
