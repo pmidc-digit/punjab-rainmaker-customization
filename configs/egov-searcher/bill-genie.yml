@@ -2150,12 +2150,18 @@ SearchDefinitions:
        ),
 
        latest_bill AS (
-         SELECT DISTINCT ON (b.consumercode)
-           b.*
-         FROM egbs_bill_v1 b
-         WHERE b.tenantid = :fc.tenantid and b.status = 'ACTIVE'
-         ORDER BY b.consumercode, b.createddate DESC
-       )
+               SELECT DISTINCT ON (b.consumercode)
+                    b.*
+                  FROM egbs_bill_v1 b
+                  INNER JOIN egbs_billdetail_v1 bd
+                 ON bd.billid = b.id
+               AND bd.tenantid = b.tenantid
+                 AND bd.businessservice = 'SW'
+                 AND bd.totalamount > 0
+                   WHERE b.tenantid = :fc.tenantid
+                   AND b.status = 'ACTIVE'
+                    ORDER BY b.consumercode, b.createddate DESC
+                   )
 
        SELECT
          fc.*,
@@ -2221,7 +2227,7 @@ SearchDefinitions:
    searchParams:
      condition: AND
      params:
-       - name: fc.tenantid
+       - name: bd.tenantid
          isMandatory: true
          jsonPath: $.searchCriteria.tenantId
        - name: bd.consumercode
