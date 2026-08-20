@@ -2920,21 +2920,23 @@ ReportDefinitions:
       COALESCE((tenant_mdms.city_json::jsonb)->>'ulbGrade', '') AS ulb_type_code,
       COALESCE((tenant_mdms.city_json::jsonb)->>'ulbType', '') AS ulb_type_description,
       COALESCE(tenant_mdms.ulb_name, '') AS ulb_name,
-      COALESCE(users.name, '') AS name,
-      COALESCE(useraddr.address, '') AS address_home,
-      COALESCE(
-        CASE 
-          WHEN landaddress.locality LIKE '{%' THEN (landaddress.locality::jsonb)->>'name'
-          ELSE landaddress.locality 
-        END, 
-        landaddress.city, 
+      NULLIF(users.name, '') AS name,
+      NULLIF(useraddr.address, '') AS address_home,
+      NULLIF(
+        COALESCE(
+          CASE 
+            WHEN landaddress.locality LIKE '{%' THEN (landaddress.locality::jsonb)->>'name'
+            ELSE landaddress.locality 
+          END, 
+          landaddress.city
+        ),
         ''
       ) AS site_address,
       COALESCE(NULLIF(bpa.additionaldetails->>'estimatedCost', ''), '0')::numeric AS estimated_cost,
       COALESCE(NULLIF(bpa.additionaldetails->>'area', ''), '0')::numeric AS proposed_area,
       COALESCE(bpa.additionaldetails->>'usage', bpa.additionaldetails->>'categoriesName', '') AS building_category, 
       COALESCE(bpa.additionaldetails->>'usage', bpa.additionaldetails->>'categoriesName', '') AS building_category_description,
-      COALESCE(users.mobilenumber, '') AS mobilenumber,
+      NULLIF(users.mobilenumber, '') AS mobilenumber,
       '' AS development_authority,
       CASE 
         WHEN bpa.approvaldate IS NOT NULL AND bpa.approvaldate > 0 
