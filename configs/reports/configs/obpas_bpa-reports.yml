@@ -2921,21 +2921,7 @@ ReportDefinitions:
       COALESCE((tenant_mdms.city_json::jsonb)->>'ulbType', '') AS ulb_type_description,
       COALESCE(tenant_mdms.ulb_name, '') AS ulb_name,
       NULLIF(users.name, '') AS name,
-      COALESCE(
-        NULLIF(useraddr.address, ''),
-        NULLIF(
-          TRIM(BOTH ', ' FROM 
-            CONCAT_WS(', ', 
-              NULLIF(useraddr.doorno, ''), 
-              NULLIF(useraddr.buildingname, ''), 
-              NULLIF(useraddr.street, ''), 
-              NULLIF(useraddr.city, ''), 
-              NULLIF(useraddr.pincode, '')
-            )
-          ),
-          ''
-        )
-      ) AS address,
+      NULLIF(useraddr.address, '') AS address,
       NULLIF(
         COALESCE(
           CASE 
@@ -2991,7 +2977,7 @@ ReportDefinitions:
     ) ownerinfo ON ownerinfo.landinfoid = bpa.landid
     LEFT JOIN eg_user users ON ownerinfo.uuid = users.uuid
     LEFT JOIN (
-      SELECT DISTINCT ON (userid) userid, address, doorno, buildingname, street, city, pincode 
+      SELECT DISTINCT ON (userid) userid, address 
       FROM eg_user_address 
       ORDER BY userid, createddate DESC
     ) useraddr ON users.id = useraddr.userid
