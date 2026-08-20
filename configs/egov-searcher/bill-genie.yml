@@ -1971,7 +1971,7 @@ SearchDefinitions:
 
          INNER JOIN eg_pt_address ptadd
            ON ptadd.propertyid = pt.id
-           INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id
+           INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id AND ptown.status <> 'INACTIVE'
 
          LEFT JOIN LATERAL (
            SELECT
@@ -1990,15 +1990,23 @@ SearchDefinitions:
          ) lm ON TRUE
 
        ),
-
+        
        latest_bill AS (
-         SELECT DISTINCT ON (b.consumercode)
-           b.*
-         FROM egbs_bill_v1 b
-         WHERE b.tenantid = :fc.tenantid
-         ORDER BY b.consumercode, b.createddate DESC
-       )
-
+               SELECT DISTINCT ON (bd.consumercode)
+                    b.*
+                FROM egbs_bill_v1 b
+                 INNER JOIN egbs_billdetail_v1 bd
+                     ON bd.billid = b.id
+               AND bd.tenantid = b.tenantid
+               WHERE b.tenantid = :fc.tenantid
+               AND b.status = 'ACTIVE'
+               AND bd.businessservice = 'WS'
+              AND bd.totalamount > 0
+              ORDER BY
+                     bd.consumercode,
+                   b.createddate DESC,
+                   b.id DESC
+                    )
        SELECT
          fc.*,
 
