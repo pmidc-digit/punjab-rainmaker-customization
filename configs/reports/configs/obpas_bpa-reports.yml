@@ -2776,138 +2776,138 @@ ReportDefinitions:
     - name: file_no
       label: File Number
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: file_date
       label: File Date
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: district_id
       label: District Id
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: district_code
       label: District Code
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: district_name
       label: District Name
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: ulb_id
       label: ULB Id
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: ulb_code
       label: ULB Code
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: ulb_type_code
       label: ULB Type Code
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: ulb_type_description
       label: ULB Type Description
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: ulb_name
       label: ULB Name
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: name
       label: Name of Owner
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: address_home
       label: Address Home
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: site_address
       label: Site Address
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: estimated_cost
       label: Estimated Cost
       type: number
-      source: bpa-services
+      source: obpas_bpa
     - name: proposed_area
       label: Proposed Area
       type: number
-      source: bpa-services
+      source: obpas_bpa
     - name: building_category
       label: Building Category
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: building_category_description
       label: Building Category Description
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: mobilenumber
       label: Mobile Number
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: development_authority
       label: Development Authority
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: approved_date
       label: Approved Date
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: txn_no
       label: Txn No
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: payment_date
       label: Payment Date
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: payment_mode
       label: Payment Mode
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: txn_amount
       label: Txn Amount
       type: number
-      source: bpa-services
+      source: obpas_bpa
     - name: status
       label: Status
       type: number
-      source: bpa-services
+      source: obpas_bpa
     - name: payment_transfer_date
       label: Payment Transfer Date
       type: string
-      source: bpa-services
+      source: obpas_bpa
     - name: payment_transfer_transaction_id
       label: Payment Transfer transaction Id
       type: string
-      source: bpa-services
+      source: obpas_bpa
   searchParams:
     - name: fromDate
       label: From Date
       type: epoch
-      source: bpa-services
+      source: obpas_bpa
       isMandatory: true
       searchClause: AND bpa.createdtime >= $fromDate
     - name: toDate
       label: To Date
       type: epoch
-      source: bpa-services
+      source: obpas_bpa
       isMandatory: true
       searchClause: AND bpa.createdtime <= $toDate
     - name: status
       label: Status
       type: singlevaluelist
-      source: bpa-services
+      source: obpas_bpa
       pattern: "list://PENDING_SANC_FEE_PAYMENT:Approved but Payment Pending,APPROVED:Approved and Payment Done"
       isMandatory: false
       searchClause: AND bpa.status = $status
-    - name: tenantId
+    - name: ulb
       label: ULB Name
       type: singlevaluelist
-      source: bpa-services
+      source: obpas_bpa
       pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
       isMandatory: false
-      searchClause: AND bpa.tenantid = $tenantId
+      searchClause: AND bpa.tenantid = $ulb
   query: |
     SELECT 
       bpa.applicationno AS file_no,
