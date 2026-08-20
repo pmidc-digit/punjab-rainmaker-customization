@@ -2817,7 +2817,7 @@ ReportDefinitions:
       label: Name of Owner
       type: string
       source: obpas_bpa
-    - name: address_home
+    - name: address
       label: Address Home
       type: string
       source: obpas_bpa
@@ -2921,7 +2921,7 @@ ReportDefinitions:
       COALESCE((tenant_mdms.city_json::jsonb)->>'ulbType', '') AS ulb_type_description,
       COALESCE(tenant_mdms.ulb_name, '') AS ulb_name,
       NULLIF(users.name, '') AS name,
-      NULLIF(useraddr.address, '') AS address_home,
+      NULLIF(useraddr.address, '') AS address,
       NULLIF(
         COALESCE(
           CASE 
