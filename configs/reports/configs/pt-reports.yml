@@ -11253,18 +11253,6 @@ ReportDefinitions:
       source: pt
       total: false
   searchParams:
-    - name: fromDate
-      label: reports.pt.fromDate
-      type: epoch
-      source: pt
-      isMandatory: true
-      searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
-    - name: toDate
-      label: reports.pt.toDate
-      type: epoch
-      source: pt
-      isMandatory: true
-      searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
     - name: financialyear
       label: Financial Year
       type: singlevaluelist
@@ -11432,18 +11420,6 @@ ReportDefinitions:
     source: pt
     total: false
   searchParams:
-  - name: fromDate
-    label: reports.pt.fromDate
-    type: epoch
-    source: pt
-    isMandatory: true
-    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
-  - name: toDate
-    label: reports.pt.toDate
-    type: epoch
-    source: pt
-    isMandatory: true
-    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
   - name: financialyear
     label: Financial Year
     type: singlevaluelist
@@ -11575,27 +11551,6 @@ ReportDefinitions:
     type: string
     source: pt
     total: false
-  searchParams:
-  - name: fromDate
-    label: reports.pt.fromDate
-    type: epoch
-    source: pt
-    isMandatory: true
-    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
-  - name: toDate
-    label: reports.pt.toDate
-    type: epoch
-    source: pt
-    isMandatory: true
-    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
-  - name: collectorname
-    label: reports.pt.collectorname
-    type: singlevaluelist
-    pattern: http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=PTCEMP|$.Employees[*].user.id|$.Employees[*].user.name
-    source: pt
-    wrapper: true
-    isMandatory: false
-    searchClause: AND collectorname = $collectorname::INTEGER
   query: |
       -- Use CTE to force query plan, compute & use CTE later
       SELECT tenantid AS ulb,instrumenttype AS paymentmode,COUNT(DISTINCT pdid) AS noofassessments, 
@@ -11718,27 +11673,6 @@ ReportDefinitions:
     type: string
     source: pt
     total: false
-  searchParams:
-  - name: fromDate
-    label: reports.pt.fromDate
-    type: epoch
-    source: pt
-    isMandatory: true
-    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) >= $fromDate
-  - name: toDate
-    label: reports.pt.toDate
-    type: epoch
-    source: pt
-    isMandatory: true
-    searchClause: AND (EXTRACT(EPOCH FROM TO_TIMESTAMP(receiptdate, 'DD-MM-YYYY')) * 1000) <= $toDate
-  - name: collectorname
-    label: reports.pt.collectorname
-    type: singlevaluelist
-    pattern: http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=PTCEMP|$.Employees[*].user.id|$.Employees[*].user.name
-    source: pt
-    wrapper: true
-    isMandatory: false
-    searchClause: AND collectorname = $collectorname::INTEGER
   query: |
       -- Use CTE to force query plan, compute & use CTE later
       SELECT tenantid AS ulb,instrumenttype AS paymentmode,COUNT(DISTINCT pdid) AS noofassessments, 
