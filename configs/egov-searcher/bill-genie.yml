@@ -1640,7 +1640,7 @@ SearchDefinitions:
                  PARTITION BY mr.connectionno
                  ORDER BY mr.createdtime DESC
                ) rn
-             FROM eg_ws_meterreading mr
+             FROM eg_ws_meterreading mr where mr.tenantid = :b.tenantid 
            ) t
            WHERE rn = 1
          ) lm
