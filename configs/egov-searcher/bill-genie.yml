@@ -828,7 +828,7 @@ SearchDefinitions:
           INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id
           INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id
           $where
-          AND conn.status = 'Active'
+          AND conn.status = 'Active' and pt.status in ('ACTIVE','PENDINGWS')
           ),
 
           filtered_bills AS (
@@ -1322,7 +1322,7 @@ SearchDefinitions:
               ON ptown.propertyid = pt.id
       
           $where 
-                AND conn.status = 'Active'
+                AND conn.status = 'Active' 
           ),
           
           filtered_bills AS (
@@ -1470,12 +1470,12 @@ SearchDefinitions:
            FROM egbs_bill_v1 b INNER JOIN egbs_billdetail_v1 bd ON b.id = bd.billid AND b.tenantid = bd.tenantid 
             INNER JOIN egbs_billaccountdetail_v1 ad ON bd.id = ad.billdetail AND bd.tenantid = ad.tenantid
             INNER JOIN eg_ws_connection conn ON bd.consumercode = conn.connectionno
-            INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid
+            INNER JOIN eg_pt_property pt ON conn.property_id = pt.propertyid 
             INNER JOIN eg_pt_address ptadd ON ptadd.propertyid = pt.id 
             INNER JOIN eg_pt_owner ptown ON ptown.propertyid = pt.id LEFT JOIN (
             SELECT * FROM (SELECT mr.*,ROW_NUMBER() OVER (PARTITION BY mr.connectionno ORDER BY mr.createdtime DESC) rn FROM eg_ws_meterreading mr) t WHERE rn = 1
             ) lm ON lm.connectionno = conn.connectionno
-            $where and conn.status='Active' and b.status='ACTIVE')
+            $where and conn.status='Active' and b.status='ACTIVE' and pt.status in ('ACTIVE','PENDINGWS'))
 
             select * from bill_data inner join (select max(b_createddate) as maxcreateddate, bd_consumercode from bill_data group by bd_consumercode) as max ON max.maxcreateddate=b_createddate
    searchParams: 
