@@ -2921,7 +2921,7 @@ ReportDefinitions:
       COALESCE((tenant_mdms.city_json::jsonb)->>'ulbType', '') AS ulb_type_description,
       COALESCE(tenant_mdms.ulb_name, '') AS ulb_name,
       NULLIF(users.name, '') AS name,
-      NULLIF(useraddr.address, '') AS user_address,
+      useraddr.address AS user_address,
       NULLIF(
         COALESCE(
           CASE 
