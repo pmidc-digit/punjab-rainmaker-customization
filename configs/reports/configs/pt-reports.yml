@@ -7923,6 +7923,14 @@ ReportDefinitions:
         source: pt
         total: false
     searchParams:
+      - name: financialyear
+        label: Financial Year
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=egf-master&masterName=FinancialYear|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].code|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].name
+        source: pt
+        wrapper: true
+        isMandatory: false
+        searchClause: AND financialyear = $financialyear
       - name: paymentMode
         label: Payment Mode
         type: singlevaluelist
@@ -8082,6 +8090,14 @@ ReportDefinitions:
       source: pt
       total: false
     searchParams:
+    - name: financialyear
+      label: Financial Year
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=egf-master&masterName=FinancialYear|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].code|$.MdmsRes.egf-master.FinancialYear.[?(@.module=='PT')].name
+      source: pt
+      wrapper: true
+      isMandatory: false
+      searchClause: AND financialyear = $financialyear
     - name: paymentMode
       label: Payment Mode
       type: singlevaluelist
@@ -8205,6 +8221,15 @@ ReportDefinitions:
       type: string
       source: pt
       total: false
+    searchParams:
+    - name: collectorname
+      label: reports.pt.collectorname
+      type: singlevaluelist
+      pattern: http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=PTCEMP|$.Employees[*].user.id|$.Employees[*].user.name
+      source: pt
+      wrapper: true
+      isMandatory: false
+      searchClause: AND collectorname = $collectorname::INTEGER
     query: |
         -- Use CTE to force query plan, compute & use CTE later
         SELECT tenantid AS ulb,instrumenttype AS paymentmode,COUNT(DISTINCT pdid) AS noofassessments, 
@@ -8327,6 +8352,15 @@ ReportDefinitions:
       type: string
       source: pt
       total: false
+    searchParams:
+    - name: collectorname
+      label: reports.pt.collectorname
+      type: singlevaluelist
+      pattern: http://egov-hrms:8080/egov-hrms/employees/_search?tenantId=$tenantid&roles=PTCEMP|$.Employees[*].user.id|$.Employees[*].user.name
+      source: pt
+      wrapper: true
+      isMandatory: false
+      searchClause: AND collectorname = $collectorname::INTEGER
     query: |
         -- Use CTE to force query plan, compute & use CTE later
         SELECT tenantid AS ulb,instrumenttype AS paymentmode,COUNT(DISTINCT pdid) AS noofassessments, 
