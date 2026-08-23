@@ -2758,3 +2758,227 @@ ReportDefinitions:
             WHERE bd.businessservice IN ('BPA.NC_APP_FEE', 'BPA.NC_SAN_FEE') 
             AND pg.tenant_id != 'pb.testing' 
   orderby: ORDER BY application_number, created_date;
+
+
+- reportName: BpaLabourDepartmentReport
+  decryptionPathId: LAYOUTREPORTS
+  summary: Building Plan Approval - Labour Department Report
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  externalService:
+    - entity: $.MdmsRes.tenant.tenants[*]
+      apiURL: http://egov-mdms-service:8080/egov-mdms-service/v1/_search
+      keyOrder: code,ulbCode,ulbName,districtCode,city
+      tableName: tbl_tenant
+      postObject: $RequestInfo,"MdmsCriteria":{"tenantId":"$tenantid","moduleDetails":[{"moduleName":"tenant","masterDetails":[{"name":"tenants"}]}]}
+      stateData: true
+  sourceColumns:
+    - name: file_no
+      label: File Number
+      type: string
+      source: obpas_bpa
+    - name: file_date
+      label: File Date
+      type: string
+      source: obpas_bpa
+    - name: district_id
+      label: District Id
+      type: string
+      source: obpas_bpa
+    - name: district_code
+      label: District Code
+      type: string
+      source: obpas_bpa
+    - name: district_name
+      label: District Name
+      type: string
+      source: obpas_bpa
+    - name: ulb_id
+      label: ULB Id
+      type: string
+      source: obpas_bpa
+    - name: ulb_code
+      label: ULB Code
+      type: string
+      source: obpas_bpa
+    - name: ulb_type_code
+      label: ULB Type Code
+      type: string
+      source: obpas_bpa
+    - name: ulb_type_description
+      label: ULB Type Description
+      type: string
+      source: obpas_bpa
+    - name: ulb_name
+      label: ULB Name
+      type: string
+      source: obpas_bpa
+    - name: name
+      label: Name of Owner
+      type: string
+      source: obpas_bpa
+    - name: user_address
+      label: Address Home
+      type: string
+      source: obpas_bpa
+    - name: site_address
+      label: Site Address
+      type: string
+      source: obpas_bpa
+    - name: estimated_cost
+      label: Estimated Cost
+      type: number
+      source: obpas_bpa
+    - name: proposed_area
+      label: Proposed Area
+      type: number
+      source: obpas_bpa
+    - name: building_category
+      label: Building Category
+      type: string
+      source: obpas_bpa
+    - name: building_category_description
+      label: Building Category Description
+      type: string
+      source: obpas_bpa
+    - name: mobilenumber
+      label: Mobile Number
+      type: string
+      source: obpas_bpa
+    - name: development_authority
+      label: Development Authority
+      type: string
+      source: obpas_bpa
+    - name: approved_date
+      label: Approved Date
+      type: string
+      source: obpas_bpa
+    - name: txn_no
+      label: Txn No
+      type: string
+      source: obpas_bpa
+    - name: payment_date
+      label: Payment Date
+      type: string
+      source: obpas_bpa
+    - name: payment_mode
+      label: Payment Mode
+      type: string
+      source: obpas_bpa
+    - name: txn_amount
+      label: Txn Amount
+      type: number
+      source: obpas_bpa
+    - name: status
+      label: Status
+      type: string
+      source: obpas_bpa
+    - name: payment_transfer_date
+      label: Payment Transfer Date
+      type: string
+      source: obpas_bpa
+    - name: payment_transfer_transaction_id
+      label: Payment Transfer transaction Id
+      type: string
+      source: obpas_bpa
+  searchParams:
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: obpas_bpa
+      isMandatory: true
+      searchClause: AND bpa.createdtime >= $fromDate
+    - name: toDate
+      label: To Date
+      type: epoch
+      source: obpas_bpa
+      isMandatory: true
+      searchClause: AND bpa.createdtime <= $toDate
+    - name: status
+      label: Status
+      type: singlevaluelist
+      source: obpas_bpa
+      pattern: "list://PENDING_SANC_FEE_PAYMENT:Approved but Payment Pending,APPROVED:Approved and Payment Done"
+      isMandatory: false
+      searchClause: AND bpa.status = $status
+    - name: ulb
+      label: ULB Name
+      type: singlevaluelist
+      source: obpas_bpa
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      isMandatory: false
+      searchClause: AND bpa.tenantid = $ulb
+  query: |
+    SELECT 
+      bpa.applicationno AS file_no,
+      to_char(to_timestamp(bpa.createdtime / 1000.0), 'YYYY-MM-DD HH24:MI:SS') AS file_date,
+      COALESCE((tenant_mdms.city_json::jsonb)->>'districtCode', tenant_mdms.district_code, '') AS district_id,
+      COALESCE(tenant_mdms.district_code, '') AS district_code,
+      COALESCE((tenant_mdms.city_json::jsonb)->>'districtName', '') AS district_name,
+      COALESCE((tenant_mdms.city_json::jsonb)->>'code', tenant_mdms.ulb_code, '') AS ulb_id,
+      COALESCE(tenant_mdms.ulb_code, '') AS ulb_code,
+      COALESCE((tenant_mdms.city_json::jsonb)->>'ulbGrade', '') AS ulb_type_code,
+      COALESCE((tenant_mdms.city_json::jsonb)->>'ulbType', '') AS ulb_type_description,
+      COALESCE(tenant_mdms.ulb_name, '') AS ulb_name,
+      NULLIF(users.name, '') AS name,
+      useraddr.address AS user_address,
+      NULLIF(
+        COALESCE(
+          CASE 
+            WHEN landaddress.locality LIKE '{%' THEN (landaddress.locality::jsonb)->>'name'
+            ELSE landaddress.locality 
+          END, 
+          landaddress.city
+        ),
+        ''
+      ) AS site_address,
+      COALESCE(NULLIF(bpa.additionaldetails->>'estimatedCost', ''), '0')::numeric AS estimated_cost,
+      COALESCE(NULLIF(bpa.additionaldetails->>'area', ''), '0')::numeric AS proposed_area,
+      COALESCE(bpa.additionaldetails->>'usage', bpa.additionaldetails->>'categoriesName', '') AS building_category, 
+      COALESCE(bpa.additionaldetails->>'usage', bpa.additionaldetails->>'categoriesName', '') AS building_category_description,
+      NULLIF(users.mobilenumber, '') AS mobilenumber,
+      '' AS development_authority,
+      CASE 
+        WHEN bpa.approvaldate IS NOT NULL AND bpa.approvaldate > 0 
+        THEN to_char(to_timestamp(bpa.approvaldate / 1000.0), 'YYYY-MM-DD HH24:MI:SS') 
+        ELSE '' 
+      END AS approved_date,
+      COALESCE(pg.txn_id, '') AS txn_no,
+      COALESCE(to_char(to_timestamp(pg.created_time / 1000.0), 'YYYY-MM-DD HH24:MI:SS'), '') AS payment_date,
+      COALESCE(pg.gateway_payment_mode, '') AS payment_mode,
+      COALESCE(pg.txn_amount, 0) AS txn_amount,
+      CASE 
+        WHEN bpa.status = 'PENDING_SANC_FEE_PAYMENT' THEN 'Approved but Payment Pending' 
+        WHEN bpa.status = 'APPROVED' THEN 'Approved and Payment Done' 
+        ELSE bpa.status 
+      END AS status,
+      '' AS payment_transfer_date,
+      '' AS payment_transfer_transaction_id
+    FROM eg_bpa_buildingplan bpa
+    LEFT JOIN (
+      VALUES tbl_tenant
+    ) AS tenant_mdms (tenant_code, ulb_code, ulb_name, district_code, city_json)
+      ON tenant_mdms.tenant_code = bpa.tenantid
+    LEFT JOIN (
+      SELECT DISTINCT ON (consumer_code) consumer_code, txn_id, created_time, gateway_payment_mode, txn_amount
+      FROM eg_pg_transactions
+      WHERE txn_status = 'SUCCESS'
+      ORDER BY consumer_code, created_time DESC
+    ) pg ON pg.consumer_code = bpa.applicationno
+    LEFT JOIN (
+      SELECT DISTINCT ON (landinfoid) landinfoid, locality, city
+      FROM eg_land_address
+      ORDER BY landinfoid
+    ) landaddress ON landaddress.landinfoid = bpa.landid
+    LEFT JOIN (
+      SELECT DISTINCT ON (landinfoid) landinfoid, uuid 
+      FROM eg_land_ownerinfo
+      ORDER BY landinfoid
+    ) ownerinfo ON ownerinfo.landinfoid = bpa.landid
+    LEFT JOIN eg_user users ON ownerinfo.uuid = users.uuid
+    LEFT JOIN (
+      SELECT DISTINCT ON (userid) userid, address 
+      FROM eg_user_address 
+      ORDER BY userid, createddate DESC
+    ) useraddr ON users.id = useraddr.userid
+    WHERE (bpa.additionaldetails->>'isMigrationTrue' IS NULL OR bpa.additionaldetails->>'isMigrationTrue' != 'true')
