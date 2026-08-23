@@ -1010,55 +1010,32 @@ function getRequestResponse(req) {
     }
 }
 
+const redirectGatewayResponse = function (req, res) {
+  let redirectUrl;
+
+  try {
+    redirectUrl = new URL(req.query.original_callback);
+  } catch (error) {
+    return res.status(400).send("Invalid original_callback");
+  }
+
+  if (req.query.eg_pg_txnid) {
+    redirectUrl.searchParams.set("eg_pg_txnid", req.query.eg_pg_txnid);
+  }
+
+  return res.redirect(302, redirectUrl.toString());
+};
+
 router.post('/protected/punjab-pt/assessment/_create',  asyncMiddleware(_createAndUpdateRequestHandler))
 
 router.post('/protected/punjab-pt/assessment/_update', asyncMiddleware(_createAndUpdateRequestHandler))
 
-router.post('/open/punjab-pt/payu/confirm', asyncMiddleware((async function (req, res) {
-    let return_data = req.body;
-    original_callback = req.query.original_callback;
-    delete req.query['original_callback'];
-    let txnid = req.query.eg_pg_txnid
-    delete req.query['eg_pg_txnid'];
-
-    new_query_params = Object.assign({}, return_data, req.query);
-    redirect_url = url.format(
-        {
-            pathname: original_callback,
-            query: new_query_params
-        }
-    )
-    //ensuring the first query param is eg_pg_txnid
-    redirect_url = redirect_url.replace('?', '?'+ 'eg_pg_txnid=' + txnid +'&')
-    res.redirect(redirect_url);
-})))
-
-router.post('/open/punjab-pt/ccavanue/confirm', asyncMiddleware((async function (req, res) {
-  let return_data = req.body;
-     console.log('Request Body :', return_data);
-
-    original_callback = req.query.original_callback;
-         console.log('Request Query  :',  req.query);
-         console.log('Request original callback  :',  original_callback);
-
-    delete req.query['original_callback'];
-    let txnid = req.query.eg_pg_txnid
-    let orderNo = return_data.orderNo;
-
-    delete req.query['eg_pg_txnid'];
-
-    new_query_params = Object.assign({}, return_data, req.query);
-    redirect_url = url.format(
-        {
-            pathname: original_callback,
-            query: new_query_params
-        }
-    )
-    //ensuring the first query param is eg_pg_txnid
-    redirect_url = redirect_url.replace('?', '?'+ 'eg_pg_txnid=' + orderNo +'&')
-    res.redirect(redirect_url);
-})))
-
+router.all(
+  "/open/punjab-pt/:gateway/confirm",
+  asyncMiddleware(async function (req, res) {
+    return redirectGatewayResponse(req, res);
+  })
+);
 router.post('/protected/punjab-pt/pre-hook/pg-service/transaction/v1/_create', asyncMiddleware((async function (req, res) {
     let {
         request
