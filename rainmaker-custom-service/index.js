@@ -1033,7 +1033,8 @@ router.post('/protected/punjab-pt/assessment/_update', asyncMiddleware(_createAn
 router.all(
   "/open/punjab-pt/:gateway/confirm",
   asyncMiddleware(async function (req, res) {
-    return redirectGatewayResponse(req, res);
+    const fallbackTxnId = req.body && req.body.orderNo;
+    return redirectGatewayResponse(req, res, fallbackTxnId);
   })
 );
 router.post('/protected/punjab-pt/pre-hook/pg-service/transaction/v1/_create', asyncMiddleware((async function (req, res) {
