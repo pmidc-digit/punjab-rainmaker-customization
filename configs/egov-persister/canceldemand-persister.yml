@@ -22,3 +22,26 @@ serviceMaps:
           jsonMaps:
             - jsonPath: $.businessservice
             - jsonPath: $.consumercode
+
+    # NEW MAPPING FOR METER READING UPDATE
+
+    - version: 1.0
+      name: w/s cancel meter connection demand
+      description: Cancels previous active WS/SW demand and expires related bill when meter reading is updated.
+      fromTopic: cancel-demand-meter
+      isTransaction: true
+
+      queryMaps:
+
+        - query: "UPDATE egbs_demand_v1 SET status='CANCELLED' WHERE id = ? AND status='ACTIVE' AND tenantId=? AND businessservice=?;"
+          basePath: $
+          jsonMaps:
+            - jsonPath: $.id
+            - jsonPath: $.tenantId
+            - jsonPath: $.businessService
+
+        - query: "UPDATE egbs_bill_v1 bill SET status = 'EXPIRED' FROM egbs_billdetail_v1 bd WHERE bd.billid = bill.id AND bill.status = 'ACTIVE' AND bd.businessservice = ? AND bd.consumercode = ?;"
+          basePath: $
+          jsonMaps:
+            - jsonPath: $.businessService
+            - jsonPath: $.consumerCode
