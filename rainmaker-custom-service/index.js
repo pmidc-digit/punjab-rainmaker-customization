@@ -113,6 +113,24 @@ function isReceiptGenerated(demand){
     return false;
 }
 
+const redirectGatewayResponse = function (req, res, fallbackTxnId) {
+  let redirectUrl;
+
+  try {
+    redirectUrl = new URL(req.query.original_callback);
+  } catch (error) {
+    return res.status(400).send("Invalid original_callback");
+  }
+
+  const pgTxnId = req.query.eg_pg_txnid || fallbackTxnId;
+
+  if (pgTxnId) {
+    redirectUrl.searchParams.set("eg_pg_txnid", pgTxnId);
+  }
+
+  return res.redirect(302, redirectUrl.toString());
+};
+
 async function getFireCessConfig(tenantId) {
     let fireCessConfig = await request.post({
         url: url.resolve(EGOV_MDMS_HOST, "/egov-mdms-service/v1/_search?tenantId=" + tenantId),
@@ -1002,6 +1020,12 @@ router.post('/protected/punjab-pt/assessment/_create',  asyncMiddleware(_createA
 
 router.post('/protected/punjab-pt/assessment/_update', asyncMiddleware(_createAndUpdateRequestHandler))
 
+router.all(
+  "/open/punjab-pt/:gateway/confirm",
+  asyncMiddleware(async function (req, res) {
+    return redirectGatewayResponse(req, res, req.body && req.body.orderNo);
+  })
+);
 router.post('/open/punjab-pt/payu/confirm', asyncMiddleware((async function (req, res) {
     let return_data = req.body;
     original_callback = req.query.original_callback;
