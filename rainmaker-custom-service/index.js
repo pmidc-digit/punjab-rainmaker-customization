@@ -1010,7 +1010,7 @@ function getRequestResponse(req) {
     }
 }
 
-const redirectGatewayResponse = function (req, res) {
+const redirectGatewayResponse = function (req, res, fallbackTxnId) {
   let redirectUrl;
 
   try {
@@ -1019,9 +1019,11 @@ const redirectGatewayResponse = function (req, res) {
     return res.status(400).send("Invalid original_callback");
   }
 
-  if (req.query.eg_pg_txnid) {
-    redirectUrl.searchParams.set("eg_pg_txnid", req.query.eg_pg_txnid);
-  }
+  const pgTxnId = req.query.eg_pg_txnid || fallbackTxnId;
+
+    if (pgTxnId) {
+    redirectUrl.searchParams.set("eg_pg_txnid", pgTxnId);
+    }
 
   return res.redirect(302, redirectUrl.toString());
 };
