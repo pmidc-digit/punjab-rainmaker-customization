@@ -1,0 +1,127 @@
+SearchDefinitions:
+  moduleName: rainmaker-obpas_bpa
+  summary: Building Plan Approval - Labour Department Search
+  version: 1.0.0
+  definitions:
+
+  - name: bpaLabourDepartmentSearch
+    decryptionPathId: LAYOUTREPORTS
+    externalService:
+      - entity: $.MdmsRes.tenant.tenants[*]
+        apiURL: http://egov-mdms-service:8080/egov-mdms-service/v1/_search
+        keyOrder: code,ulbCode,ulbName,districtCode,city
+        tableName: tbl_tenant
+        postObject: $RequestInfo,"MdmsCriteria":{"tenantId":"$tenantid","moduleDetails":[{"moduleName":"tenant","masterDetails":[{"name":"tenants"}]}]}
+        stateData: true
+    query:
+      baseQuery: |
+        SELECT row_to_json(result) FROM (
+          SELECT 
+            bpa.applicationno AS file_no,
+            to_char(to_timestamp(bpa.createdtime / 1000.0), 'YYYY-MM-DD HH24:MI:SS') AS file_date,
+            COALESCE((tenant_mdms.city_json::jsonb)->>'districtCode', tenant_mdms.district_code, '') AS district_id,
+            COALESCE(tenant_mdms.district_code, '') AS district_code,
+            COALESCE((tenant_mdms.city_json::jsonb)->>'districtName', '') AS district_name,
+            COALESCE((tenant_mdms.city_json::jsonb)->>'code', tenant_mdms.ulb_code, '') AS ulb_id,
+            COALESCE(tenant_mdms.ulb_code, '') AS ulb_code,
+            COALESCE((tenant_mdms.city_json::jsonb)->>'ulbGrade', '') AS ulb_type_code,
+            COALESCE((tenant_mdms.city_json::jsonb)->>'ulbType', '') AS ulb_type_description,
+            COALESCE(tenant_mdms.ulb_name, '') AS ulb_name,
+            NULLIF(users.name, '') AS name,
+            useraddr.address AS user_address,
+            NULLIF(
+              COALESCE(
+                CASE 
+                  WHEN landaddress.locality LIKE '{%' THEN (landaddress.locality::jsonb)->>'name'
+                  ELSE landaddress.locality 
+                END, 
+                landaddress.city
+              ),
+              ''
+            ) AS site_address,
+            COALESCE(NULLIF(bpa.additionaldetails->>'estimatedCost', ''), '0')::numeric AS estimated_cost,
+            COALESCE(NULLIF(bpa.additionaldetails->>'area', ''), '0')::numeric AS proposed_area,
+            COALESCE(bpa.additionaldetails->>'usage', bpa.additionaldetails->>'categoriesName', '') AS building_category, 
+            COALESCE(bpa.additionaldetails->>'usage', bpa.additionaldetails->>'categoriesName', '') AS building_category_description,
+            NULLIF(users.mobilenumber, '') AS mobilenumber,
+            '' AS development_authority,
+            CASE 
+              WHEN bpa.approvaldate IS NOT NULL AND bpa.approvaldate > 0 
+              THEN to_char(to_timestamp(bpa.approvaldate / 1000.0), 'YYYY-MM-DD HH24:MI:SS') 
+              ELSE '' 
+            END AS approved_date,
+            COALESCE(pg.txn_id, '') AS txn_no,
+            COALESCE(to_char(to_timestamp(pg.created_time / 1000.0), 'YYYY-MM-DD HH24:MI:SS'), '') AS payment_date,
+            COALESCE(pg.gateway_payment_mode, '') AS payment_mode,
+            COALESCE(pg.txn_amount, 0) AS txn_amount,
+            CASE 
+              WHEN bpa.status = 'PENDING_SANC_FEE_PAYMENT' THEN 'Approved but Payment Pending' 
+              WHEN bpa.status = 'APPROVED' THEN 'Approved and Payment Done' 
+              ELSE bpa.status 
+            END AS status,
+            '' AS payment_transfer_date,
+            '' AS payment_transfer_transaction_id,
+            users.uuid AS uuid
+          FROM eg_bpa_buildingplan bpa
+          LEFT JOIN (
+            VALUES tbl_tenant
+          ) AS tenant_mdms (tenant_code, ulb_code, ulb_name, district_code, city_json)
+            ON tenant_mdms.tenant_code = bpa.tenantid
+          LEFT JOIN (
+            SELECT DISTINCT ON (consumer_code) consumer_code, txn_id, created_time, gateway_payment_mode, txn_amount
+            FROM eg_pg_transactions
+            WHERE txn_status = 'SUCCESS'
+            ORDER BY consumer_code, created_time DESC
+          ) pg ON pg.consumer_code = bpa.applicationno
+          LEFT JOIN (
+            SELECT DISTINCT ON (landinfoid) landinfoid, locality, city
+            FROM eg_land_address
+            ORDER BY landinfoid
+          ) landaddress ON landaddress.landinfoid = bpa.landid
+          LEFT JOIN (
+            SELECT DISTINCT ON (landinfoid) landinfoid, uuid 
+            FROM eg_land_ownerinfo
+            ORDER BY landinfoid
+          ) ownerinfo ON ownerinfo.landinfoid = bpa.landid
+          LEFT JOIN eg_user users ON ownerinfo.uuid = users.uuid
+          LEFT JOIN (
+            SELECT DISTINCT ON (userid) userid, address 
+            FROM eg_user_address 
+            ORDER BY userid, createddate DESC
+          ) useraddr ON users.id = useraddr.userid
+          $where
+          AND (bpa.additionaldetails->>'isMigrationTrue' IS NULL OR bpa.additionaldetails->>'isMigrationTrue' != 'true')
+          ORDER BY bpa.createdtime DESC $pagination
+        ) result
+      groupBy:
+      orderBy:
+    searchParams:
+      condition: AND
+      params:
+      - name: bpa.createdtime
+        isMandatory: false
+        operator: GE
+        jsonPath: $.searchCriteria.fromDate
+      - name: bpa.createdtime
+        isMandatory: false
+        operator: LE
+        jsonPath: $.searchCriteria.toDate
+      - name: bpa.status
+        isMandatory: false
+        jsonPath: $.searchCriteria.status
+      - name: bpa.tenantid
+        isMandatory: false
+        jsonPath: $.searchCriteria.tenantId
+      - name: bpa.tenantid
+        isMandatory: false
+        jsonPath: $.searchCriteria.ulb
+      - name: bpa.applicationno
+        isMandatory: false
+        jsonPath: $.searchCriteria.applicationNo
+      pagination:
+        noOfRecords: $.searchCriteria.noOfRecords
+        offset: $.searchCriteria.offset
+    output:
+      jsonFormat: {"ResponseInfo": {},"BpaLabourData": []}
+      outJsonPath: $.BpaLabourData
+      responseInfoPath: $.ResponseInfo
