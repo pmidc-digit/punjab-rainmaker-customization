@@ -50,10 +50,19 @@ SearchDefinitions:
               THEN to_char(to_timestamp(bpa.approvaldate / 1000.0), 'YYYY-MM-DD HH24:MI:SS') 
               ELSE '' 
             END AS approved_date,
-            COALESCE(pg.txn_id, '') AS txn_no,
-            COALESCE(to_char(to_timestamp(pg.created_time / 1000.0), 'YYYY-MM-DD HH24:MI:SS'), '') AS payment_date,
-            COALESCE(pg.gateway_payment_mode, '') AS payment_mode,
-            COALESCE(pg.txn_amount, 0) AS txn_amount,
+            COALESCE(NULLIF(pay.transactionnumber, ''), pay.receiptnumber, '') AS txn_no,
+            COALESCE(
+              CASE 
+                WHEN pay.transactiondate IS NOT NULL AND pay.transactiondate > 0 
+                THEN to_char(to_timestamp(pay.transactiondate / 1000.0), 'YYYY-MM-DD HH24:MI:SS')
+                WHEN pay.receiptdate IS NOT NULL AND pay.receiptdate > 0 
+                THEN to_char(to_timestamp(pay.receiptdate / 1000.0), 'YYYY-MM-DD HH24:MI:SS')
+                ELSE ''
+              END, 
+              ''
+            ) AS payment_date,
+            COALESCE(pay.paymentmode, '') AS payment_mode,
+            COALESCE(pay.amountpaid, pay.totalamountpaid, 0) AS txn_amount,
             CASE 
               WHEN bpa.status = 'PENDING_SANC_FEE_PAYMENT' THEN 'Approved but Payment Pending' 
               WHEN bpa.status = 'APPROVED' THEN 'Approved and Payment Done' 
@@ -68,11 +77,21 @@ SearchDefinitions:
           ) AS tenant_mdms (tenant_code, ulb_code, ulb_name, district_code, city_json)
             ON tenant_mdms.tenant_code = bpa.tenantid
           LEFT JOIN (
-            SELECT DISTINCT ON (consumer_code) consumer_code, txn_id, created_time, gateway_payment_mode, txn_amount
-            FROM eg_pg_transactions
-            WHERE txn_status = 'SUCCESS'
-            ORDER BY consumer_code, created_time DESC
-          ) pg ON pg.consumer_code = bpa.applicationno
+            SELECT DISTINCT ON (bill.consumercode) 
+              bill.consumercode,
+              p.paymentmode,
+              p.transactionnumber,
+              p.transactiondate,
+              p.totalamountpaid,
+              pd.receiptnumber,
+              pd.receiptdate,
+              pd.amountpaid
+            FROM egcl_bill bill
+            JOIN egcl_paymentdetail pd ON pd.billid = bill.id
+            JOIN egcl_payment p ON pd.paymentid = p.id
+            WHERE UPPER(p.paymentstatus) != 'CANCELLED'
+            ORDER BY bill.consumercode, p.createdtime DESC
+          ) pay ON pay.consumercode = bpa.applicationno
           LEFT JOIN (
             SELECT DISTINCT ON (landinfoid) landinfoid, locality, city
             FROM eg_land_address
