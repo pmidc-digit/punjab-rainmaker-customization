@@ -76,9 +76,9 @@ SearchDefinitions:
             VALUES tbl_tenant
           ) AS tenant_mdms (tenant_code, ulb_code, ulb_name, district_code, city_json)
             ON tenant_mdms.tenant_code = bpa.tenantid
-          LEFT JOIN (
-            SELECT DISTINCT ON (bill.consumercode) 
-              bill.consumercode,
+          -- Optimized payment lookup using LATERAL
+          LEFT JOIN LATERAL (
+            SELECT 
               p.paymentmode,
               p.transactionnumber,
               p.transactiondate,
@@ -89,25 +89,34 @@ SearchDefinitions:
             FROM egcl_bill bill
             JOIN egcl_paymentdetail pd ON pd.billid = bill.id
             JOIN egcl_payment p ON pd.paymentid = p.id
-            WHERE UPPER(p.paymentstatus) != 'CANCELLED'
-            ORDER BY bill.consumercode, p.createdtime DESC
-          ) pay ON pay.consumercode = bpa.applicationno
-          LEFT JOIN (
-            SELECT DISTINCT ON (landinfoid) landinfoid, locality, city
+            WHERE bill.consumercode = bpa.applicationno
+              AND UPPER(p.paymentstatus) != 'CANCELLED'
+            ORDER BY p.createdtime DESC
+            LIMIT 1
+          ) pay ON TRUE
+          -- Optimized land address lookup
+          LEFT JOIN LATERAL (
+            SELECT locality, city
             FROM eg_land_address
-            ORDER BY landinfoid
-          ) landaddress ON landaddress.landinfoid = bpa.landid
-          LEFT JOIN (
-            SELECT DISTINCT ON (landinfoid) landinfoid, uuid 
+            WHERE landinfoid = bpa.landid
+            LIMIT 1
+          ) landaddress ON TRUE
+          -- Optimized owner info lookup
+          LEFT JOIN LATERAL (
+            SELECT uuid 
             FROM eg_land_ownerinfo
-            ORDER BY landinfoid
-          ) ownerinfo ON ownerinfo.landinfoid = bpa.landid
+            WHERE landinfoid = bpa.landid
+            LIMIT 1
+          ) ownerinfo ON TRUE
           LEFT JOIN eg_user users ON ownerinfo.uuid = users.uuid
-          LEFT JOIN (
-            SELECT DISTINCT ON (userid) userid, address 
+          -- Optimized user address lookup
+          LEFT JOIN LATERAL (
+            SELECT address 
             FROM eg_user_address 
-            ORDER BY userid, createddate DESC
-          ) useraddr ON users.id = useraddr.userid
+            WHERE userid = users.id
+            ORDER BY createddate DESC
+            LIMIT 1
+          ) useraddr ON TRUE
           $where
           AND (bpa.additionaldetails->>'isMigrationTrue' IS NULL OR bpa.additionaldetails->>'isMigrationTrue' != 'true')
           ORDER BY bpa.createdtime DESC $pagination
