@@ -3584,7 +3584,7 @@ ReportDefinitions:
     INNER JOIN eg_user          AS eu        ON eu.uuid = po.userid
     INNER JOIN eg_pt_address    AS pta       ON pta.propertyid = pt.id
     
-    LEFT OUTER JOIN eg_bndry_mohalla AS localnames ON pta.locality = localnames.localitycode
+    LEFT OUTER JOIN eg_bndry_mohalla AS localnames ON (pta.locality = localnames.localitycode and localnames.tenantid=$tenantid)
     LEFT OUTER JOIN eg_pt_unit_v2_ot  AS pot       ON pot.propertyid = pt.id
     
     LEFT OUTER JOIN unit_sum AS us ON us.propertyid = pt.id
