@@ -14,7 +14,7 @@ SearchDefinitions:
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
           $where
-          AND pi.createdtime IN (select max(createdtime) from eg_wf_processinstance_v2 wf where wf.businessid = bpa.applicationno GROUP BY wf.businessid)
+          AND pi.latest = TRUE
           order by bpa.createdtime asc $pagination
           ) result
     groupBy:
@@ -78,7 +78,7 @@ SearchDefinitions:
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
           $where
-          AND pi.createdtime IN (select max(createdtime) from eg_wf_processinstance_v2 wf where wf.businessid = bpa.applicationno GROUP BY wf.businessid)
+          AND pi.latest = TRUE
           order by bpa.createdtime asc $pagination
           ) result
     groupBy:
@@ -143,7 +143,7 @@ SearchDefinitions:
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
           $where
-          AND pi.createdtime IN (select max(createdtime) from eg_wf_processinstance_v2 wf where wf.businessid = bpa.applicationno GROUP BY wf.businessid)
+          AND pi.latest = TRUE
           order by bpa.createdtime asc
           ) result) TotalCount
     groupBy:
@@ -207,7 +207,7 @@ SearchDefinitions:
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
           $where
-          AND pi.createdtime IN (select max(createdtime) from eg_wf_processinstance_v2 wf where wf.businessid = bpa.applicationno GROUP BY wf.businessid)
+          AND pi.latest = TRUE
           order by bpa.createdtime asc
           ) result) TotalCount
     groupBy:
@@ -272,7 +272,7 @@ SearchDefinitions:
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
           $where
-          AND pi.createdtime IN (select max(createdtime) from eg_wf_processinstance_v2 wf where wf.businessid = bpa.applicationno GROUP BY wf.businessid)
+          AND pi.latest = TRUE
           order by bpa.createdtime desc $pagination
           ) result
     groupBy:
@@ -336,7 +336,7 @@ SearchDefinitions:
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
           $where
-          AND pi.createdtime IN (select max(createdtime) from eg_wf_processinstance_v2 wf where wf.businessid = bpa.applicationno GROUP BY wf.businessid)
+          AND pi.latest = TRUE
           order by bpa.createdtime desc $pagination
           ) result
     groupBy:
