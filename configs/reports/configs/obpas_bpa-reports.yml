@@ -1940,7 +1940,7 @@ ReportDefinitions:
           -- 1. Modules Stack with Filters
           SELECT tenantid, status as applicationstatus, 'Building Plan' as module 
           FROM eg_bpa_buildingplan 
-          WHERE tenantid != 'pb.testing' 
+          WHERE tenantid != 'pb.testing' AND applicationno like 'PB-%' AND  additionaldetails::text not LIKE '%isMigrationTrue%'  OR additionaldetails IS NULL
             AND createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
           
           UNION ALL
@@ -1956,14 +1956,14 @@ ReportDefinitions:
           
           SELECT tenantid, applicationstatus, 'CLU' as module 
           FROM eg_clu 
-          WHERE tenantid != 'pb.testing' 
+          WHERE tenantid != 'pb.testing'  and applicationno like 'PB-%'
             AND createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
           
           UNION ALL
           
           SELECT tenantid, applicationstatus, 'Layout' as module 
           FROM eg_layout 
-          WHERE tenantid != 'pb.testing' 
+          WHERE tenantid != 'pb.testing'  and applicationno like 'PB-%'
             AND createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
       ),
       ulb_metadata AS (
