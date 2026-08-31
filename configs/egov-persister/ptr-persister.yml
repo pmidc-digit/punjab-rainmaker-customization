@@ -14,7 +14,7 @@ serviceMaps:
 
       queryMaps:
 
-        - query: INSERT INTO eg_ptr_registration(id,tenantid,applicationnumber,applicationType,validityDate,status,expireFlag,petToken,previousApplicationNumber,petregistrationnumber,propertyId,createdby,lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        - query: INSERT INTO eg_ptr_registration(id,tenantid,applicationnumber,applicationType,validityDate,status,expireFlag,petToken,previousApplicationNumber,petregistrationnumber,propertyId,consentdocument,createdby,lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
           basePath: PetRegistrationApplications.*
 
@@ -41,6 +41,8 @@ serviceMaps:
             - jsonPath: $.PetRegistrationApplications.*.petRegistrationNumber
 
             - jsonPath: $.PetRegistrationApplications.*.propertyId
+
+            - jsonPath: $.PetRegistrationApplications.*.consentDocument
 
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.createdBy
 
@@ -222,6 +224,8 @@ serviceMaps:
 
             propertyid = COALESCE(?, propertyid),
 
+            consentdocument = COALESCE(?, consentdocument),
+
             lastmodifiedby = ?,
 
             lastmodifiedtime = ?
@@ -251,6 +255,8 @@ serviceMaps:
             - jsonPath: $.PetRegistrationApplications.*.petRegistrationNumber
 
             - jsonPath: $.PetRegistrationApplications.*.propertyId
+
+            - jsonPath: $.PetRegistrationApplications.*.consentDocument
 
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.lastModifiedBy
 
@@ -516,7 +522,7 @@ serviceMaps:
 
       queryMaps:
 
-        - query: INSERT INTO eg_ptr_registration(id,tenantid,applicationnumber,applicationType,validityDate,status,expireFlag,petToken,previousApplicationNumber,petregistrationnumber,propertyId,createdby,lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        - query: INSERT INTO eg_ptr_registration(id,tenantid,applicationnumber,applicationType,validityDate,status,expireFlag,petToken,previousApplicationNumber,petregistrationnumber,propertyId,consentdocument,createdby,lastmodifiedby,createdtime,lastmodifiedtime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
           basePath: PetRegistrationApplications.*
 
@@ -543,6 +549,8 @@ serviceMaps:
             - jsonPath: $.PetRegistrationApplications.*.petRegistrationNumber
 
             - jsonPath: $.PetRegistrationApplications.*.propertyId
+
+            - jsonPath: $.PetRegistrationApplications.*.consentDocument
 
             - jsonPath: $.PetRegistrationApplications.*.auditDetails.createdBy
 
