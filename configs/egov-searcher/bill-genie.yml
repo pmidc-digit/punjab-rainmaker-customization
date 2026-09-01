@@ -2011,8 +2011,8 @@ SearchDefinitions:
                  INNER JOIN egbs_billdetail_v1 bd
                      ON bd.billid = b.id
                AND bd.tenantid = b.tenantid
-               WHERE b.tenantid = :fc.tenantid
-               AND b.status = 'ACTIVE'
+               WHERE -- b.tenantid = :fc.tenantid AND
+                b.status = 'ACTIVE'
                AND bd.businessservice = 'WS'
               AND bd.totalamount > 0
               ORDER BY
@@ -2162,7 +2162,7 @@ SearchDefinitions:
          INNER JOIN eg_pt_property pt
            ON pt.propertyid = conn.property_id
            AND pt.status IN ('ACTIVE', 'PENDINGWS')
-           AND conn.tenantid = :bd.tenantid
+           -- AND conn.tenantid = :bd.tenantid
 
          INNER JOIN eg_pt_address ptadd
            ON ptadd.propertyid = pt.id
@@ -2179,8 +2179,8 @@ SearchDefinitions:
                AND bd.tenantid = b.tenantid
                  AND bd.businessservice = 'SW'
                  AND bd.totalamount > 0
-                   WHERE b.tenantid = :bd.tenantid
-                   AND b.status = 'ACTIVE'
+                   WHERE -- b.tenantid = :bd.tenantid AND
+                    b.status = 'ACTIVE'
                     ORDER BY b.consumercode, b.createddate DESC
                    )
 
