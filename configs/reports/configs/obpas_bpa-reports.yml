@@ -109,7 +109,7 @@ ReportDefinitions:
           (additionaldetails::jsonb)->>'area' AS plot_area,
           (additionaldetails::jsonb)->>'architectName' AS architect_name,
           (additionaldetails::jsonb)->> 'Ulblisttype' AS ulb_type
-      FROM eg_bpa_buildingplan  where 1=1 AND tenantid != 'pb.testing'
+      FROM eg_bpa_buildingplan  where 1=1 AND tenantid != 'pb.testing' and (additionaldetails->>'isMigrationTrue' IS NULL OR additionaldetails->>'isMigrationTrue' != 'true')
   orderby:  ORDER BY createdtime DESC;
 
 - reportName: CollectionsReportBPA
@@ -242,7 +242,7 @@ ReportDefinitions:
         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
         LEFT JOIN eg_user u ON u.uuid = wa.assignee
         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        WHERE wf.businessservice in   ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') 
+        WHERE wf.businessservice in   ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') and wf.businessid like 'PB-%'
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       ),
       
@@ -288,7 +288,7 @@ ReportDefinitions:
         LEFT JOIN eg_user u ON u.id::text = p.createdby::text
         LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno OR ch.applicationno = a.id::text
-        WHERE pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE')
+        WHERE pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE') AND (a.additionaldetails->>'isMigrationTrue' IS NULL OR a.additionaldetails->>'isMigrationTrue' != 'true')
           AND upper(p.paymentstatus) != 'CANCELLED'
       )
       
@@ -398,7 +398,7 @@ ReportDefinitions:
               wf.id AS processinstanceid
           FROM eg_wf_processinstance_v2 wf
           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-          WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')                
+          WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') AND wf.businessid like 'PB-%'                
       ),
       status_times AS (
           SELECT
@@ -495,6 +495,7 @@ ReportDefinitions:
       JOIN sla_data sla ON n.businessservice = sla.businessservice
       LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
       WHERE UPPER(COALESCE(ls.applicationstatus, '')) NOT IN ('CITIZEN_APPROVAL_INPROCESS','PENDING_APPL_FEE','INITIATED') and n.tenantid != 'pb.testing'
+      AND (n.additionaldetails->>'isMigrationTrue' IS NULL OR n.additionaldetails->>'isMigrationTrue' != 'true')
   orderby:  ORDER BY n.applicationno,n.createdtime DESC
 
 - reportName: ReceiptRegisterbpa
@@ -626,6 +627,7 @@ ReportDefinitions:
       WHERE
           pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE')
           AND payment.paymentstatus != 'CANCELLED' and pd.tenantid != 'pb.testing'
+          and (a.additionaldetails->>'isMigrationTrue' IS NULL OR a.additionaldetails->>'isMigrationTrue' != 'true')
   orderby: ORDER BY pd.receiptdate DESC;
 
 - reportName: Detailed_File_List
@@ -719,7 +721,7 @@ ReportDefinitions:
           'Building Plan' AS businessservice 
           FROM eg_bpa_buildingplan bpa 
           INNER JOIN ulb_data ON bpa.tenantid = ulb_data.ulb_code 
-          WHERE 1=1 
+          WHERE 1=1 and (bpa.additionaldetails->>'isMigrationTrue' IS NULL OR bpa.additionaldetails->>'isMigrationTrue' != 'true')
   orderby : ORDER BY ulb_data.district, bpa.tenantid, bpa.applicationno;
 
 - reportName: Pending_Files_Summary
@@ -766,12 +768,13 @@ ReportDefinitions:
            ulb_data.district,
            INITCAP(REPLACE(eg_bpa_buildingplan.tenantid, 'pb.', '')) AS ulb_name,
            COUNT(*) AS Pending_Files
-          FROM eg_bpa_buildingplan inner join ulb_data on eg_bpa_buildingplan.tenantid = ulb_data.ulb_code
+          FROM eg_bpa_buildingplan bpa inner join ulb_data on bpa.tenantid = ulb_data.ulb_code
           WHERE status IN (
             'APPROVAL_PENDING','ATPHQ_APPROVAL_PENDING','DOC_VERIFICATION_PENDING','EO_VERIFICATION_PENDING','FIELDINSPECTION_INPROGRESS',
              'INPROGRESS','INSPECTION_REPORT_PENDING','JC_VERIFICATION_PENDING','LEVEL3_VERIFICATION_PENDING',
              'LEVEL4_VERIFICATION_PENDING','MC_VERIFICATION_PENDING','MTPHQ_APPROVAL_PENDING',
-             'PENDINGINITIALVERIFICATION','PENDINGVERIFICATION','STP_VERIFICATION_PENDING','STPHQ_APPROVAL_PENDING')
+             'PENDINGINITIALVERIFICATION','PENDINGVERIFICATION','STP_VERIFICATION_PENDING','STPHQ_APPROVAL_PENDING') 
+             and (bpa.additionaldetails->>'isMigrationTrue' IS NULL OR bpa.additionaldetails->>'isMigrationTrue' != 'true')
   groupby: GROUP BY eg_bpa_buildingplan.tenantid,ulb_data.district
   
 - reportName: officers_with_highest_pendency
@@ -825,7 +828,7 @@ ReportDefinitions:
          LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
          inner JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
          inner join designation d on a.designation = d.code
-          WHERE wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+          WHERE wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') and wf.businessid like ''PB-%'
          ORDER BY wf.businessid, wf.lastmodifiedtime DESC
        ),
        
@@ -843,6 +846,7 @@ ReportDefinitions:
              'LEVEL4_VERIFICATION_PENDING','MC_VERIFICATION_PENDING','MTPHQ_APPROVAL_PENDING',
              'PENDINGINITIALVERIFICATION','PENDINGVERIFICATION','STP_VERIFICATION_PENDING','STPHQ_APPROVAL_PENDING'
            )
+           AND (additionaldetails->>'isMigrationTrue' IS NULL OR additionaldetails->>'isMigrationTrue' != 'true')
        ),
        
        merged AS (
@@ -975,6 +979,7 @@ ReportDefinitions:
             'INSPECTION_REPORT_PENDING',
             'DOC_VERIFICATION_INPROGRESS'
           )
+          AND (p.additionaldetails->>'isMigrationTrue' IS NULL OR p.additionaldetails->>'isMigrationTrue' != 'true')
       ),
       
       date_list AS (
@@ -990,7 +995,7 @@ ReportDefinitions:
           w.businessservice,
           COUNT(w.created_date) AS cnt
         FROM date_list d
-        LEFT JOIN wf_data w ON w.created_date = d.dt
+        INNER JOIN wf_data w ON w.created_date = d.dt
         GROUP BY d.dt,w.tenantid, w.designation_code, w.businessservice
       )
       
@@ -1067,7 +1072,7 @@ ReportDefinitions:
               st.sla AS state_sla
           FROM eg_wf_processinstance_v2 wf
           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-          WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+          WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') AND wf.businessid like 'PB-%'
       ),
       latest_status AS (
           SELECT DISTINCT ON (uuid)
@@ -1161,33 +1166,33 @@ ReportDefinitions:
     total: false
   searchParams:
   - name: fromDate
-    label: fromDate
+    label: From Date
     type: epoch
     source: obpas_bpa
     isMandatory: false
     searchClause: AND receiptdate >= $fromDate
   - name: toDate
-    label: toDate
+    label: To Date
     type: epoch
     source: obpas_bpa
     isMandatory: false
     searchClause: AND receiptdate <= $toDate 
   - name: district
-    label: district
+    label: District
     type: singlevaluelist
-    pattern: 'list://Roopnagar:Roopnagar,Moga:Moga,Fazilka:Fazilka,Faridkot:Faridkot,Ludhiana:Ludhiana,kapurthala:kapurthala,Patiala:Patiala,SAS Nagar:SAS Nagar,Ferozepur:Ferozepur,Bathinda:Bathinda,Mansa:Mansa,Pathankot:Pathankot,Hoshiarpur:Hoshiarpur,Kapurthala:Kapurthala,Jalandhar:Jalandhar,Gurdaspur:Gurdaspur,Barnala:Barnala,SBS Nagar:SBS Nagar,Amritsar:Amritsar,Sangrur:Sangrur,Fatehgarh Sahib:Fatehgarh Sahib,Malerkotla:Malerkotla,Tarn Taran:Tarn Taran,Sri Muktsar Sahib:Sri Muktsar Sahib'
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.district = $district
   - name: ulb
-    label: ulb
+    label: ULB Name
     type: singlevaluelist
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
     searchClause: AND u.name_of_ulb= $ulb 
   - name: businessservice
-    label: Business Service
+    label: Service
     type: singlevaluelist
     pattern: "list://BPA_LOW:Self Certification"
     source: obpas_bpa
@@ -1206,7 +1211,7 @@ ReportDefinitions:
            st.sla AS state_sla
            FROM eg_wf_processinstance_v2 wf
            JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-           WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+           WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') AND wf.businessid like 'PB-%'
            ),
       latest_status AS (
          SELECT DISTINCT ON (uuid)
@@ -1358,7 +1363,7 @@ ReportDefinitions:
            WHERE wf.businessservice IN (
            'BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP',
            'BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH'
-            )
+            ) AND wf.businessid like 'PB-%'
         ),
        status_times AS (
         SELECT
@@ -1496,9 +1501,9 @@ ReportDefinitions:
               WHERE wf.businessservice IN (
                   'BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP',
                   'BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH'
-              )
+              ) AND wf.businessid like 'PB-%'
           ),
-          latest_status AS (
+          latest_status AS  (
           SELECT DISTINCT ON (uuid)
               uuid,
               applicationstatus
@@ -1941,7 +1946,7 @@ ReportDefinitions:
           SELECT tenantid, status as applicationstatus, 'Building Plan' as module 
           FROM eg_bpa_buildingplan 
           WHERE tenantid != 'pb.testing' AND applicationno like 'PB-%' AND  additionaldetails::text not LIKE '%isMigrationTrue%'  OR additionaldetails IS NULL
-            AND createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
+            AND createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27' 
           
           UNION ALL
           
@@ -2103,7 +2108,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: district
-    label: Distrcit
+    label: District
     type: string
     source: obpas_bpa
     total: false
@@ -2460,7 +2465,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: district
-    label: Distrcit
+    label: District
     type: string
     source: obpas_bpa
     total: false
