@@ -448,7 +448,7 @@ ReportDefinitions:
               LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
               inner JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
               inner join designation d on a.designation = d.code
-               WHERE wf.businessservice in ('NOC_MC','NOC_NP')
+               WHERE wf.businessservice in ('NOC_MC','NOC_NP') and wf.businessid like 'PB-%'
               ORDER BY wf.businessid, wf.lastmodifiedtime DESC
             ),    
             merged AS (
@@ -528,7 +528,7 @@ ReportDefinitions:
            st.sla AS state_sla
            FROM eg_wf_processinstance_v2 wf
            JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-           WHERE wf.businessservice IN ('NOC_MC','NOC_NP')
+           WHERE wf.businessservice IN ('NOC_MC','NOC_NP') and wf.businessid like 'PB-%'
            and st.applicationstatus not in ('CANCELLED')         
        ),
       inspection_time AS (
@@ -657,7 +657,7 @@ ReportDefinitions:
                  st.sla AS state_sla
                  FROM eg_wf_processinstance_v2 wf
                  JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-                 WHERE wf.businessservice IN ('NOC_MC','NOC_NP')
+                 WHERE wf.businessservice IN ('NOC_MC','NOC_NP') and wf.businessid like 'PB-%'
                  and st.applicationstatus not in ('CANCELLED','CITIZENACTIONREQUIRED')
                  ),
             first_stage_time AS (
@@ -810,7 +810,7 @@ ReportDefinitions:
         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
         INNER JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
         INNER JOIN designation d ON d.code = a.designation
-        WHERE wf.businessservice in ('NOC_NP','NOC_MC')
+        WHERE wf.businessservice in ('NOC_NP','NOC_MC') and wf.businessid like 'PB-%'
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       ),
       
@@ -943,7 +943,7 @@ ReportDefinitions:
            wf.lastmodifiedtime
            FROM eg_wf_processinstance_v2 wf
            JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-           WHERE wf.businessservice in ('NOC_NP','NOC_MC') AND st.applicationstatus not in ('INITIATED','CANCELLED')
+           WHERE wf.businessservice in ('NOC_NP','NOC_MC') AND st.applicationstatus not in ('INITIATED','CANCELLED') and wf.businessid like 'PB-%'
         ),
        status_times AS (
         SELECT
@@ -1071,7 +1071,7 @@ ReportDefinitions:
            wf.lastmodifiedtime
            FROM eg_wf_processinstance_v2 wf
            JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-           WHERE wf.businessservice in ('NOC_NP','NOC_MC') AND st.applicationstatus not in ('INITIATED','CANCELLED')
+           WHERE wf.businessservice in ('NOC_NP','NOC_MC') AND st.applicationstatus not in ('INITIATED','CANCELLED') and wf.businessid like 'PB-%'
         ),
       latest_status AS (
         SELECT DISTINCT ON (uuid)
@@ -1263,7 +1263,7 @@ ReportDefinitions:
         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
         LEFT JOIN eg_user u ON u.uuid = wa.assignee
         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        WHERE  wf.businessservice in ('NOC_MC','NOC_NP') and wf.businessid not like 'PB/%'
+        WHERE  wf.businessservice in ('NOC_MC','NOC_NP') and wf.businessid not like 'PB/%' and wf.businessid like 'PB-%'
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       ),
 
@@ -1463,7 +1463,9 @@ ReportDefinitions:
           ON usr.id = payment.createdby::integer
       WHERE
           pd.businessservice = 'obpas_noc'
-          AND payment.paymentstatus != 'CANCELLED' AND bill.consumercode not like 'PB/%' AND pd.tenantid != 'pb.testing'
+          AND payment.paymentstatus != 'CANCELLED' AND bill.consumercode not like 'PB/%' AND pd.tenantid != 'pb.testing' 
+          AND a.applicationno not like 'PB/%' AND (d.additionaldetails::text not LIKE '%isMigrationTrue%'  OR d.additionaldetails IS NULL)
+
     orderby: ORDER BY pd.receiptdate DESC;
     
   - reportName: NOC_Collection_Summary
@@ -1472,7 +1474,7 @@ ReportDefinitions:
     moduleName: rainmaker-obpas_noc
     additionalConfig:
       print:
-        pdfPageSize: A1
+        pdfPageSize: A4
 
     sourceColumns:
     - name: service_code
@@ -1506,7 +1508,7 @@ ReportDefinitions:
       source: obpas_noc
       total: false
     - name: district
-      label: Distrcit
+      label: District
       type: string
       source: obpas_bpa
       total: false
@@ -1682,7 +1684,9 @@ ReportDefinitions:
        INNER JOIN egbs_bill_v1 bill ON bill.id = pg.bill_id
        INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
        LEFT JOIN eg_noc noc ON pg.consumer_code = noc.applicationno AND pg.tenant_id = noc.tenantid
+       LEFT JOIN eg_noc_details nd ON nd.nocid = noc.id
        LEFT JOIN ulb_data ud ON pg.tenant_id = ud.ulb_code
        WHERE bd.businessservice = 'obpas_noc' 
-       AND pg.tenant_id != 'pb.testing'
+       AND pg.tenant_id != 'pb.testing' and n.tenantid !='pb.testing' 
+       and noc.applicationno not like 'PB/%' AND (nd.additionaldetails::text not LIKE '%isMigrationTrue%'  OR nd.additionaldetails IS NULL)
     orderby: ORDER BY application_number, created_date;
