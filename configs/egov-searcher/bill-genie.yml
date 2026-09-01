@@ -1074,7 +1074,7 @@ SearchDefinitions:
              FROM egbs_bill_v1 b
            WHERE b.consumercode = fc.connectionno
            AND b.tenantid = fc.tenantid
-           AND b.tenantid = :conn.tenantid
+           -- AND b.tenantid = :conn.tenantid
            AND EXISTS (
             SELECT 1
             FROM egbs_billdetail_v1 bd1
