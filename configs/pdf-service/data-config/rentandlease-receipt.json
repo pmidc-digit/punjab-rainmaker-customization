@@ -19,7 +19,48 @@
                   "path": "$.billRootData.rlSearchData.OwnerInfo[0].name"
                 }
               },
-
+              {
+                "variable": "propertyAddress",
+                "value": {
+                  "path": "$.billRootData.rlSearchData.additionalDetails.propertyDetails[0].address"
+                }
+              },
+              {
+                "variable": "allotmentType",
+                "value": {
+                  "path": "$.billRootData.rlSearchData.additionalDetails.selectedProperty.allotmentType"
+                }
+              },
+              {
+                "variable": "feesPeriodCycle",
+                "value": {
+                  "path": "$.billRootData.rlSearchData.additionalDetails.propertyDetails[0].feesPeriodCycle"
+                }
+              },
+              {
+                "variable": "rlAmountPaidLabel",
+                "value": {
+                  "path": "$.billRootData.rlAmountPaidLabel"
+                }
+              },
+              {
+                "variable": "rlAmountPaid",
+                "value": {
+                  "path": "$.billRootData.rlAmountPaid"
+                }
+              },
+              {
+                "variable": "rlAmountLeftLabel",
+                "value": {
+                  "path": "$.billRootData.rlAmountLeftLabel"
+                }
+              },
+              {
+                "variable": "rlAmountLeft",
+                "value": {
+                  "path": "$.billRootData.rlAmountLeft"
+                }
+              },
               {
                 "variable": "designation",
                 "value": {
@@ -110,7 +151,13 @@
               {
                 "variable": "totalAmount",
                 "value": {
-                  "path": "$.amount"
+                  "path": "$.amountPaid"
+                }
+              },
+              {
+                "variable": "totalAdjustedAmount",
+                "value": {
+                  "path": "$.totalAdjustedAmount"
                 }
               },
               {
@@ -158,7 +205,7 @@
                     },
                     {
                       "variable": "billAmount",
-                      "value": "amount"
+                      "value": "adjustedAmount"
                     }
                   ]
                 }
@@ -239,16 +286,35 @@
               {
                 "variable": "fromPeriod",
                 "value": {
-                  "path": "$.billRootData.rlSearchData.startDate"
+                  "path": "$.fromPeriod"
+                },
+                "type": "date"
+              },
+              {
+                "variable": "billToPeriod",
+                "value": {
+                  "path": "$.toPeriod"
                 },
                 "type": "date"
               },
               {
                 "variable": "toPeriod",
                 "value": {
-                  "path": "$.billRootData.rlSearchData.endDate"
+                  "path": "$.expiryDate"
                 },
                 "type": "date"
+              },
+              {
+                "variable": "advanceLabel",
+                "value": {
+                  "path": "$.advanceLabel"
+                }
+              },
+              {
+                "variable": "advanceAmount",
+                "value": {
+                  "path": "$.advanceAmount"
+                }
               },
               {
                 "variable": "stakeholderType",
@@ -283,7 +349,7 @@
               {
                 "variable": "paymentDate",
                 "value": {
-                  "path": "$.fromPeriod"
+                  "path": "$.billRootData.transactionDate"
                 },
                 "type": "date"
               },
