@@ -200,3 +200,61 @@ ServiceMaps:
                 outJsonPath: $.Document.createdTime
               - inJsonPath: $['$parent'].auditDetails.lastModifiedTime
                 outJsonPath: $.Document.lastModifiedTime
+
+    # ===============================
+    # LEGACY INDEX (DB -> ES BACKFILL)
+    # ===============================
+    # Driven by the indexer's /egov-indexer-v2/index-operations/_legacyindex job.
+    # The indexer calls the BPA plain-search API (POST /v1/bpa/_plainsearch),
+    # which reads eg_bpa_buildingplan directly from the DB, and publishes each
+    # batch onto this topic. jsonPath $.BPA + isBulk:true iterate the array
+    # returned by the search API (the live INDEX topics carry a single object).
+    - topic: bpa-buildingplan-legacyIndex
+      configKey: LEGACYINDEX
+      indexes:
+        - name: bpa-buildingplan-index
+          type: general
+          id: $.id, $.tenantId
+          isBulk: true
+          timeStampField: $.auditDetails.createdTime
+          jsonPath: $.BPA
+          customJsonMapping:
+            indexMapping:
+              Data: {}
+            fieldMapping:
+              - inJsonPath: $.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.applicationNo
+                outJsonPath: $.Data.applicationNo
+              - inJsonPath: $.approvalNo
+                outJsonPath: $.Data.approvalNo
+              - inJsonPath: $.applicationDate
+                outJsonPath: $.Data.applicationDate
+              - inJsonPath: $.edcrNumber
+                outJsonPath: $.Data.edcrNumber
+              - inJsonPath: $.landId
+                outJsonPath: $.Data.landId
+              - inJsonPath: $.accountId
+                outJsonPath: $.Data.accountId
+              - inJsonPath: $.businessService
+                outJsonPath: $.Data.businessService
+              - inJsonPath: $.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.approvalDate
+                outJsonPath: $.Data.approvalDate
+              - inJsonPath: $.additionalDetails
+                outJsonPath: $.Data.additionalDetails
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+              - inJsonPath: $.documents
+                outJsonPath: $.Data.documents
+              - inJsonPath: $.applicationType
+                outJsonPath: $.Data.applicationType
