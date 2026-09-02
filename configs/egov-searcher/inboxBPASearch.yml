@@ -11,10 +11,9 @@ SearchDefinitions:
           INNER JOIN eg_land_landInfo landinfo ON bpa.landId = landinfo.id
           INNER JOIN eg_land_Address landaddress ON landinfo.id = landaddress.landInfoId
           INNER JOIN eg_land_ownerInfo ownerinfo ON landinfo.id = ownerinfo.landInfoId
-          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno
+          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno AND pi.latest = TRUE
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
           $where
-          AND pi.createdtime IN (select max(createdtime) from eg_wf_processinstance_v2 wf where wf.businessid = bpa.applicationno GROUP BY wf.businessid)
           order by bpa.createdtime asc $pagination
           ) result
     groupBy:
@@ -75,10 +74,9 @@ SearchDefinitions:
           select DISTINCT(bpa.applicationno) as applicationno,bpa.createdtime as createdtime from eg_bpa_buildingplan as bpa
           INNER JOIN eg_land_landInfo landinfo ON bpa.landId = landinfo.id
           INNER JOIN eg_land_Address landaddress ON landinfo.id = landaddress.landInfoId
-          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno
+          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno AND pi.latest = TRUE
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
           $where
-          AND pi.createdtime IN (select max(createdtime) from eg_wf_processinstance_v2 wf where wf.businessid = bpa.applicationno GROUP BY wf.businessid)
           order by bpa.createdtime asc $pagination
           ) result
     groupBy:
@@ -134,18 +132,11 @@ SearchDefinitions:
 
  - name: inboxbpacitizensearchcount
    query:
-    baseQuery: SELECT row_to_json(TotalCount) from (SELECT COUNT(result) from
-          (
-          select DISTINCT(bpa.applicationno) as applicationno,bpa.createdtime as createdtime from eg_bpa_buildingplan as bpa
-          INNER JOIN eg_land_landInfo landinfo ON bpa.landId = landinfo.id
-          INNER JOIN eg_land_Address landaddress ON landinfo.id = landaddress.landInfoId
-          INNER JOIN eg_land_ownerInfo ownerinfo ON landinfo.id = ownerinfo.landInfoId
-          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno
+    baseQuery: SELECT row_to_json(TotalCount) from (SELECT COUNT(DISTINCT bpa.applicationno) from eg_bpa_buildingplan as bpa
+          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno AND pi.latest = TRUE
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
           $where
-          AND pi.createdtime IN (select max(createdtime) from eg_wf_processinstance_v2 wf where wf.businessid = bpa.applicationno GROUP BY wf.businessid)
-          order by bpa.createdtime asc
-          ) result) TotalCount
+          ) TotalCount
     groupBy:
     orderBy:
    searchParams:
@@ -164,18 +155,12 @@ SearchDefinitions:
     - name: bpa.approvalNo
       isMandatory: false
       jsonPath: $.searchCriteria.approvalNo
-    - name: landaddress.locality
-      isMandatory: false
-      jsonPath: $.searchCriteria.locality
     - name: assg.assignee
       isMandatory: false
       jsonPath: $.searchCriteria.assignee
     - name: pi.status
       isMandatory: false
       jsonPath: $.searchCriteria.status
-    - name: ownerinfo.uuid
-      isMandatory: false
-      jsonPath: $.searchCriteria.userid
     - name: pi.businessservice
       isMandatory: false
       jsonPath: $.searchCriteria.businessservice
@@ -199,17 +184,11 @@ SearchDefinitions:
 
  - name: inboxbpastakeholdersearchcount
    query:
-    baseQuery: SELECT row_to_json(TotalCount) from (SELECT COUNT(result) from
-          (
-          select DISTINCT(bpa.applicationno) as applicationno,bpa.createdtime as createdtime from eg_bpa_buildingplan as bpa
-          INNER JOIN eg_land_landInfo landinfo ON bpa.landId = landinfo.id
-          INNER JOIN eg_land_Address landaddress ON landinfo.id = landaddress.landInfoId
-          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno
+    baseQuery: SELECT row_to_json(TotalCount) from (SELECT COUNT(DISTINCT bpa.applicationno) from eg_bpa_buildingplan as bpa
+          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno AND pi.latest = TRUE
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
           $where
-          AND pi.createdtime IN (select max(createdtime) from eg_wf_processinstance_v2 wf where wf.businessid = bpa.applicationno GROUP BY wf.businessid)
-          order by bpa.createdtime asc
-          ) result) TotalCount
+          ) TotalCount
     groupBy:
     orderBy:
    searchParams:
@@ -228,9 +207,6 @@ SearchDefinitions:
     - name: bpa.approvalNo
       isMandatory: false
       jsonPath: $.searchCriteria.approvalNo
-    - name: landaddress.locality
-      isMandatory: false
-      jsonPath: $.searchCriteria.locality
     - name: assg.assignee
       isMandatory: false
       jsonPath: $.searchCriteria.assignee
@@ -269,10 +245,9 @@ SearchDefinitions:
           INNER JOIN eg_land_landInfo landinfo ON bpa.landId = landinfo.id
           INNER JOIN eg_land_Address landaddress ON landinfo.id = landaddress.landInfoId
           INNER JOIN eg_land_ownerInfo ownerinfo ON landinfo.id = ownerinfo.landInfoId
-          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno
+          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno AND pi.latest = TRUE
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
           $where
-          AND pi.createdtime IN (select max(createdtime) from eg_wf_processinstance_v2 wf where wf.businessid = bpa.applicationno GROUP BY wf.businessid)
           order by bpa.createdtime desc $pagination
           ) result
     groupBy:
@@ -333,10 +308,9 @@ SearchDefinitions:
           select DISTINCT(bpa.applicationno) as applicationno,bpa.createdtime as createdtime from eg_bpa_buildingplan as bpa
           INNER JOIN eg_land_landInfo landinfo ON bpa.landId = landinfo.id
           INNER JOIN eg_land_Address landaddress ON landinfo.id = landaddress.landInfoId
-          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno
+          INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno AND pi.latest = TRUE
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
           $where
-          AND pi.createdtime IN (select max(createdtime) from eg_wf_processinstance_v2 wf where wf.businessid = bpa.applicationno GROUP BY wf.businessid)
           order by bpa.createdtime desc $pagination
           ) result
     groupBy:
