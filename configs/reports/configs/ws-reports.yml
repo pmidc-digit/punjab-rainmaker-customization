@@ -7361,11 +7361,11 @@ ReportDefinitions:
               demand_amount,
               first_bill_no,
               first_bill_amount,
-              first_bill_date,
+              TO_CHAR(TO_TIMESTAMP(first_bill_date/1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS first_bill_date,
               first_bill_status,
               latest_bill_no,
               latest_bill_amount,
-              latest_bill_date,
+              TO_CHAR(TO_TIMESTAMP(latest_bill_date/1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY' ) AS latest_bill_date,
               latest_bill_status
           FROM mv_ws_amritsar_bills_summary          
         WHERE taxperiodfrom::text = $taxPeriodfrom 
@@ -7459,11 +7459,11 @@ ReportDefinitions:
               demand_amount,
               first_bill_no,
               first_bill_amount,
-              first_bill_date,
+              TO_CHAR(TO_TIMESTAMP(first_bill_date/1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS first_bill_date,
               first_bill_status,
               latest_bill_no,
               latest_bill_amount,
-              latest_bill_date,
+              TO_CHAR(TO_TIMESTAMP(latest_bill_date/1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY' ) AS latest_bill_date,
               latest_bill_status
           FROM mv_sw_amritsar_bills_summary          
         WHERE taxperiodfrom::text = $taxPeriodfrom 
