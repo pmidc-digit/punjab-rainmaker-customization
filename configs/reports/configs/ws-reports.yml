@@ -7368,8 +7368,8 @@ ReportDefinitions:
               latest_bill_date,
               latest_bill_status
           FROM mv_ws_amritsar_bills_summary          
-        WHERE taxperiodfrom = $taxPeriodfrom 
-              AND taxperiodto   = $taxPeriodto 
+        WHERE taxperiodfrom::text = $taxPeriodfrom 
+              AND taxperiodto::text   = $taxPeriodto 
 
 
 - reportName: SWQuaterly_Bill_Generate_Finance
@@ -7466,5 +7466,5 @@ ReportDefinitions:
               latest_bill_date,
               latest_bill_status
           FROM mv_sw_amritsar_bills_summary          
-        WHERE taxperiodfrom = $taxPeriodfrom 
-              AND taxperiodto   = $taxPeriodto 
+        WHERE taxperiodfrom::text = $taxPeriodfrom 
+              AND taxperiodto::text   = $taxPeriodto 
