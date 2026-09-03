@@ -7,11 +7,12 @@ serviceMaps:
    fromTopic: save-ws-demand-log-v2
    isTransaction: true
    queryMaps:
-    - query: INSERT INTO eg_ws_batch_demand_log(id, tenantid, taxperiodfrom, taxperiodto, insertiontime, totalconnectioncount, isdemandexecuted) VALUES (?, ?, ?, ?, ?, ?, ?);
+    - query: INSERT INTO eg_ws_batch_demand_log(id, tenantid, locality, taxperiodfrom, taxperiodto, insertiontime, totalconnectioncount, isdemandexecuted) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
       basePath: $
       jsonMaps:
        - jsonPath: $.id
        - jsonPath: $.tenantId
+       - jsonPath: $.locality
        - jsonPath: $.taxPeriodFrom
        - jsonPath: $.taxPeriodTo
        - jsonPath: $.insertionTime
