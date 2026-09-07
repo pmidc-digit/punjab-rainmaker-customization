@@ -8343,3 +8343,82 @@ ReportDefinitions:
         FROM public.mv_pt_receipt_regiester_25_26 
         WHERE tenantid = $tenantid
     groupby: group by CASE WHEN instrumenttype != 'ONLINE' THEN collectorname ELSE '30048|23/xn3x2FAxn8vYAN0IdplsOxaE=' END,tenantid,instrumenttype
+
+  - reportName: PropertyTaxCollectionReport_26
+    decryptionPathId: PropertyTaxCollection_V2
+    summary: Property Tax Collections Report by Zone and Locality
+    version: 1.0.0
+    moduleName: rainmaker-pt
+    additionalConfig:
+      print:
+        pdfPageSize: "A1"
+    sourceColumns:
+      - name: zone
+        label: reports.pt.zone
+        type: string
+        source: pt
+        total: false
+      - name: locality
+        label: reports.pt.locality
+        type: string
+        source: pt
+        total: false
+      - name: propertyid
+        label: reports.pt.propertyid
+        type: string
+        source: pt
+        total: false
+      - name: name
+        label: reports.pt.name
+        type: string
+        source: pt
+        total: false
+      - name: address
+        label: reports.pt.address
+        type: string
+        source: pt
+        total: false
+      - name: mobilenumber
+        label: reports.pt.mobilenumber
+        type: string
+        source: pt
+        total: false
+      - name: receiptnumber
+        label: reports.pt.receiptnumber
+        type: string
+        source: pt
+        total: false
+      - name: amountpaid
+        label: reports.pt.amountpaid
+        type: string
+        source: pt
+        total: true
+      - name: usagetype
+        label: reports.pt.usagetype
+        type: string
+        source: pt
+        total: false
+    query: |
+        SELECT  
+            addr.zone AS zone,
+            addr.locality AS locality,
+            prop.propertyid AS propertyid,
+            usr.name AS name, 
+            CONCAT(addr.doorno, ', ', addr.buildingname, ', ', addr.street) AS address,
+            usr.mobilenumber AS mobilenumber, 
+            rec.receiptnumber AS receiptnumber,
+            rec.totalamount AS amountpaid, 
+            pd.usagecategorymajor AS usagetype 
+        FROM eg_pt_property_v2 prop
+        JOIN eg_pt_address_v2 addr ON prop.propertyid = addr.property 
+        JOIN eg_pt_propertydetail_v2 pd ON prop.propertyid = pd.property 
+        JOIN eg_pt_owner_v2 own ON pd.assessmentnumber = own.propertydetail 
+        JOIN eg_user usr ON own.userid = usr.uuid 
+        JOIN egcl_receiptheader_v1 rec ON CONCAT(prop.propertyid, ':', pd.assessmentnumber) = rec.consumercode
+        WHERE 
+            prop.tenantid = $tenantid
+            AND (own.isprimaryowner = true OR own.isprimaryowner IS NULL)
+            AND addr.zone = ANY(string_to_array($zone, ','))
+            AND addr.locality = ANY(string_to_array($locality, ','))
+            AND rec.receiptdate BETWEEN CAST($fromDate AS BIGINT) AND CAST($toDate AS BIGINT)
+    orderby: order by rec.receiptdate DESC
