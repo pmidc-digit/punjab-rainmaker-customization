@@ -109,7 +109,7 @@ ReportDefinitions:
           (additionaldetails::jsonb)->>'area' AS plot_area,
           (additionaldetails::jsonb)->>'architectName' AS architect_name,
           (additionaldetails::jsonb)->> 'Ulblisttype' AS ulb_type
-      FROM eg_bpa_buildingplan  where 1=1 AND tenantid != 'pb.testing'
+      FROM eg_bpa_buildingplan  where 1=1 AND tenantid != 'pb.testing' and (additionaldetails->>'isMigrationTrue' IS NULL OR additionaldetails->>'isMigrationTrue' != 'true')
   orderby:  ORDER BY createdtime DESC;
 
 - reportName: CollectionsReportBPA
@@ -222,7 +222,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: and tenantid = $ulb     
+    searchClause: and tenantid = $ulb
   - name: collector_code
     label: Collector Code
     type: string
@@ -242,7 +242,7 @@ ReportDefinitions:
         LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
         LEFT JOIN eg_user u ON u.uuid = wa.assignee
         LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        WHERE wf.businessservice in   ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') 
+        WHERE wf.businessservice in   ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') and wf.businessid like 'PB-%'
         ORDER BY wf.businessid, wf.lastmodifiedtime DESC
       ),
       
@@ -288,7 +288,7 @@ ReportDefinitions:
         LEFT JOIN eg_user u ON u.id::text = p.createdby::text
         LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
         LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno OR ch.applicationno = a.id::text
-        WHERE pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE')
+        WHERE pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE') AND (a.additionaldetails->>'isMigrationTrue' IS NULL OR a.additionaldetails->>'isMigrationTrue' != 'true')
           AND upper(p.paymentstatus) != 'CANCELLED'
       )
       
@@ -398,7 +398,7 @@ ReportDefinitions:
               wf.id AS processinstanceid
           FROM eg_wf_processinstance_v2 wf
           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-          WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')                
+          WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') AND wf.businessid like 'PB-%'                
       ),
       status_times AS (
           SELECT
@@ -495,6 +495,7 @@ ReportDefinitions:
       JOIN sla_data sla ON n.businessservice = sla.businessservice
       LEFT JOIN assignee_details ad ON n.applicationno = ad.businessid
       WHERE UPPER(COALESCE(ls.applicationstatus, '')) NOT IN ('CITIZEN_APPROVAL_INPROCESS','PENDING_APPL_FEE','INITIATED') and n.tenantid != 'pb.testing'
+      AND (n.additionaldetails->>'isMigrationTrue' IS NULL OR n.additionaldetails->>'isMigrationTrue' != 'true')
   orderby:  ORDER BY n.applicationno,n.createdtime DESC
 
 - reportName: ReceiptRegisterbpa
@@ -626,6 +627,7 @@ ReportDefinitions:
       WHERE
           pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE')
           AND payment.paymentstatus != 'CANCELLED' and pd.tenantid != 'pb.testing'
+          and (a.additionaldetails->>'isMigrationTrue' IS NULL OR a.additionaldetails->>'isMigrationTrue' != 'true')
   orderby: ORDER BY pd.receiptdate DESC;
 
 - reportName: Detailed_File_List
@@ -719,7 +721,7 @@ ReportDefinitions:
           'Building Plan' AS businessservice 
           FROM eg_bpa_buildingplan bpa 
           INNER JOIN ulb_data ON bpa.tenantid = ulb_data.ulb_code 
-          WHERE 1=1
+          WHERE 1=1 and (bpa.additionaldetails->>'isMigrationTrue' IS NULL OR bpa.additionaldetails->>'isMigrationTrue' != 'true')
   orderby : ORDER BY ulb_data.district, bpa.tenantid, bpa.applicationno;
 
 - reportName: Pending_Files_Summary
@@ -766,12 +768,13 @@ ReportDefinitions:
            ulb_data.district,
            INITCAP(REPLACE(eg_bpa_buildingplan.tenantid, 'pb.', '')) AS ulb_name,
            COUNT(*) AS Pending_Files
-          FROM eg_bpa_buildingplan inner join ulb_data on eg_bpa_buildingplan.tenantid = ulb_data.ulb_code
+          FROM eg_bpa_buildingplan bpa inner join ulb_data on bpa.tenantid = ulb_data.ulb_code
           WHERE status IN (
             'APPROVAL_PENDING','ATPHQ_APPROVAL_PENDING','DOC_VERIFICATION_PENDING','EO_VERIFICATION_PENDING','FIELDINSPECTION_INPROGRESS',
              'INPROGRESS','INSPECTION_REPORT_PENDING','JC_VERIFICATION_PENDING','LEVEL3_VERIFICATION_PENDING',
              'LEVEL4_VERIFICATION_PENDING','MC_VERIFICATION_PENDING','MTPHQ_APPROVAL_PENDING',
-             'PENDINGINITIALVERIFICATION','PENDINGVERIFICATION','STP_VERIFICATION_PENDING','STPHQ_APPROVAL_PENDING')
+             'PENDINGINITIALVERIFICATION','PENDINGVERIFICATION','STP_VERIFICATION_PENDING','STPHQ_APPROVAL_PENDING') 
+             and (bpa.additionaldetails->>'isMigrationTrue' IS NULL OR bpa.additionaldetails->>'isMigrationTrue' != 'true')
   groupby: GROUP BY eg_bpa_buildingplan.tenantid,ulb_data.district
 
 - reportName: officers_with_highest_pendency
@@ -825,7 +828,7 @@ ReportDefinitions:
          LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
          inner JOIN eg_hrms_assignment a ON a.employeeid = e.uuid
          inner join designation d on a.designation = d.code
-          WHERE wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+          WHERE wf.businessservice in ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') and wf.businessid like ''PB-%'
          ORDER BY wf.businessid, wf.lastmodifiedtime DESC
        ),
        
@@ -843,6 +846,7 @@ ReportDefinitions:
              'LEVEL4_VERIFICATION_PENDING','MC_VERIFICATION_PENDING','MTPHQ_APPROVAL_PENDING',
              'PENDINGINITIALVERIFICATION','PENDINGVERIFICATION','STP_VERIFICATION_PENDING','STPHQ_APPROVAL_PENDING'
            )
+           AND (additionaldetails->>'isMigrationTrue' IS NULL OR additionaldetails->>'isMigrationTrue' != 'true')
        ),
        
        merged AS (
@@ -975,6 +979,7 @@ ReportDefinitions:
             'INSPECTION_REPORT_PENDING',
             'DOC_VERIFICATION_INPROGRESS'
           )
+          AND (p.additionaldetails->>'isMigrationTrue' IS NULL OR p.additionaldetails->>'isMigrationTrue' != 'true')
       ),
       
       date_list AS (
@@ -990,7 +995,7 @@ ReportDefinitions:
           w.businessservice,
           COUNT(w.created_date) AS cnt
         FROM date_list d
-        LEFT JOIN wf_data w ON w.created_date = d.dt
+        INNER JOIN wf_data w ON w.created_date = d.dt
         GROUP BY d.dt,w.tenantid, w.designation_code, w.businessservice
       )
       
@@ -1067,7 +1072,7 @@ ReportDefinitions:
               st.sla AS state_sla
           FROM eg_wf_processinstance_v2 wf
           JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-          WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+          WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') AND wf.businessid like 'PB-%'
       ),
       latest_status AS (
           SELECT DISTINCT ON (uuid)
@@ -1206,7 +1211,7 @@ ReportDefinitions:
            st.sla AS state_sla
            FROM eg_wf_processinstance_v2 wf
            JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-           WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+           WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') AND wf.businessid like 'PB-%'
            ),
       latest_status AS (
          SELECT DISTINCT ON (uuid)
@@ -1358,7 +1363,7 @@ ReportDefinitions:
            WHERE wf.businessservice IN (
            'BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP',
            'BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH'
-            )
+            ) AND wf.businessid like 'PB-%'
         ),
        status_times AS (
         SELECT
@@ -1496,9 +1501,9 @@ ReportDefinitions:
               WHERE wf.businessservice IN (
                   'BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP',
                   'BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH'
-              )
+              ) AND wf.businessid like 'PB-%'
           ),
-          latest_status AS (
+          latest_status AS  (
           SELECT DISTINCT ON (uuid)
               uuid,
               applicationstatus
@@ -1940,8 +1945,8 @@ ReportDefinitions:
           -- 1. Modules Stack with Filters
           SELECT tenantid, status as applicationstatus, 'Building Plan' as module 
           FROM eg_bpa_buildingplan 
-          WHERE tenantid != 'pb.testing' 
-            AND createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
+          WHERE tenantid != 'pb.testing' AND applicationno like 'PB-%' AND  additionaldetails::text not LIKE '%isMigrationTrue%'  OR additionaldetails IS NULL
+            AND createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27' 
           
           UNION ALL
           
@@ -1963,7 +1968,7 @@ ReportDefinitions:
           
           SELECT tenantid, applicationstatus, 'Layout' as module 
           FROM eg_layout 
-          WHERE tenantid != 'pb.testing' and applicationno like 'PB-%'
+          WHERE tenantid != 'pb.testing'  and applicationno like 'PB-%'
             AND createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
       ),
       ulb_metadata AS (
@@ -2068,7 +2073,6 @@ ReportDefinitions:
         (g.grp_level = 0) 
         OR (g.grp_level = 1 AND s.distinct_statuses > 1) OR (g.grp_level = 15)
   orderby: ORDER BY g.ulb_type, g.ulb_district, g.name_of_ulb, g.grp_level, g.localized_status;
-
 - reportName: OBPAS_Collection_Summary_Report
   summary: Transaction detail for OBPS Module
   version: 1.0.0
@@ -2759,3 +2763,227 @@ ReportDefinitions:
             WHERE bd.businessservice IN ('BPA.NC_APP_FEE', 'BPA.NC_SAN_FEE') 
             AND pg.tenant_id != 'pb.testing'
   orderby: ORDER BY application_number, created_date;
+
+
+- reportName: BpaLabourDepartmentReport
+  decryptionPathId: LAYOUTREPORTS
+  summary: Building Plan Approval - Labour Department Report
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  externalService:
+    - entity: $.MdmsRes.tenant.tenants[*]
+      apiURL: http://egov-mdms-service:8080/egov-mdms-service/v1/_search
+      keyOrder: code,ulbCode,ulbName,districtCode,city
+      tableName: tbl_tenant
+      postObject: $RequestInfo,"MdmsCriteria":{"tenantId":"$tenantid","moduleDetails":[{"moduleName":"tenant","masterDetails":[{"name":"tenants"}]}]}
+      stateData: true
+  sourceColumns:
+    - name: file_no
+      label: File Number
+      type: string
+      source: obpas_bpa
+    - name: file_date
+      label: File Date
+      type: string
+      source: obpas_bpa
+    - name: district_id
+      label: District Id
+      type: string
+      source: obpas_bpa
+    - name: district_code
+      label: District Code
+      type: string
+      source: obpas_bpa
+    - name: district_name
+      label: District Name
+      type: string
+      source: obpas_bpa
+    - name: ulb_id
+      label: ULB Id
+      type: string
+      source: obpas_bpa
+    - name: ulb_code
+      label: ULB Code
+      type: string
+      source: obpas_bpa
+    - name: ulb_type_code
+      label: ULB Type Code
+      type: string
+      source: obpas_bpa
+    - name: ulb_type_description
+      label: ULB Type Description
+      type: string
+      source: obpas_bpa
+    - name: ulb_name
+      label: ULB Name
+      type: string
+      source: obpas_bpa
+    - name: name
+      label: Name of Owner
+      type: string
+      source: obpas_bpa
+    - name: user_address
+      label: Address Home
+      type: string
+      source: obpas_bpa
+    - name: site_address
+      label: Site Address
+      type: string
+      source: obpas_bpa
+    - name: estimated_cost
+      label: Estimated Cost
+      type: number
+      source: obpas_bpa
+    - name: proposed_area
+      label: Proposed Area
+      type: number
+      source: obpas_bpa
+    - name: building_category
+      label: Building Category
+      type: string
+      source: obpas_bpa
+    - name: building_category_description
+      label: Building Category Description
+      type: string
+      source: obpas_bpa
+    - name: mobilenumber
+      label: Mobile Number
+      type: string
+      source: obpas_bpa
+    - name: development_authority
+      label: Development Authority
+      type: string
+      source: obpas_bpa
+    - name: approved_date
+      label: Approved Date
+      type: string
+      source: obpas_bpa
+    - name: txn_no
+      label: Txn No
+      type: string
+      source: obpas_bpa
+    - name: payment_date
+      label: Payment Date
+      type: string
+      source: obpas_bpa
+    - name: payment_mode
+      label: Payment Mode
+      type: string
+      source: obpas_bpa
+    - name: txn_amount
+      label: Txn Amount
+      type: number
+      source: obpas_bpa
+    - name: status
+      label: Status
+      type: string
+      source: obpas_bpa
+    - name: payment_transfer_date
+      label: Payment Transfer Date
+      type: string
+      source: obpas_bpa
+    - name: payment_transfer_transaction_id
+      label: Payment Transfer transaction Id
+      type: string
+      source: obpas_bpa
+  searchParams:
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: obpas_bpa
+      isMandatory: true
+      searchClause: AND bpa.createdtime >= $fromDate
+    - name: toDate
+      label: To Date
+      type: epoch
+      source: obpas_bpa
+      isMandatory: true
+      searchClause: AND bpa.createdtime <= $toDate
+    - name: status
+      label: Status
+      type: singlevaluelist
+      source: obpas_bpa
+      pattern: "list://PENDING_SANC_FEE_PAYMENT:Approved but Payment Pending,APPROVED:Approved and Payment Done"
+      isMandatory: false
+      searchClause: AND bpa.status = $status
+    - name: ulb
+      label: ULB Name
+      type: singlevaluelist
+      source: obpas_bpa
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      isMandatory: false
+      searchClause: AND bpa.tenantid = $ulb
+  query: |
+    SELECT 
+      bpa.applicationno AS file_no,
+      to_char(to_timestamp(bpa.createdtime / 1000.0), 'YYYY-MM-DD HH24:MI:SS') AS file_date,
+      COALESCE((tenant_mdms.city_json::jsonb)->>'districtCode', tenant_mdms.district_code, '') AS district_id,
+      COALESCE(tenant_mdms.district_code, '') AS district_code,
+      COALESCE((tenant_mdms.city_json::jsonb)->>'districtName', '') AS district_name,
+      COALESCE((tenant_mdms.city_json::jsonb)->>'code', tenant_mdms.ulb_code, '') AS ulb_id,
+      COALESCE(tenant_mdms.ulb_code, '') AS ulb_code,
+      COALESCE((tenant_mdms.city_json::jsonb)->>'ulbGrade', '') AS ulb_type_code,
+      COALESCE((tenant_mdms.city_json::jsonb)->>'ulbType', '') AS ulb_type_description,
+      COALESCE(tenant_mdms.ulb_name, '') AS ulb_name,
+      NULLIF(users.name, '') AS name,
+      useraddr.address AS user_address,
+      NULLIF(
+        COALESCE(
+          CASE 
+            WHEN landaddress.locality LIKE '{%' THEN (landaddress.locality::jsonb)->>'name'
+            ELSE landaddress.locality 
+          END, 
+          landaddress.city
+        ),
+        ''
+      ) AS site_address,
+      COALESCE(NULLIF(bpa.additionaldetails->>'estimatedCost', ''), '0')::numeric AS estimated_cost,
+      COALESCE(NULLIF(bpa.additionaldetails->>'area', ''), '0')::numeric AS proposed_area,
+      COALESCE(bpa.additionaldetails->>'usage', bpa.additionaldetails->>'categoriesName', '') AS building_category, 
+      COALESCE(bpa.additionaldetails->>'usage', bpa.additionaldetails->>'categoriesName', '') AS building_category_description,
+      NULLIF(users.mobilenumber, '') AS mobilenumber,
+      '' AS development_authority,
+      CASE 
+        WHEN bpa.approvaldate IS NOT NULL AND bpa.approvaldate > 0 
+        THEN to_char(to_timestamp(bpa.approvaldate / 1000.0), 'YYYY-MM-DD HH24:MI:SS') 
+        ELSE '' 
+      END AS approved_date,
+      COALESCE(pg.txn_id, '') AS txn_no,
+      COALESCE(to_char(to_timestamp(pg.created_time / 1000.0), 'YYYY-MM-DD HH24:MI:SS'), '') AS payment_date,
+      COALESCE(pg.gateway_payment_mode, '') AS payment_mode,
+      COALESCE(pg.txn_amount, 0) AS txn_amount,
+      CASE 
+        WHEN bpa.status = 'PENDING_SANC_FEE_PAYMENT' THEN 'Approved but Payment Pending' 
+        WHEN bpa.status = 'APPROVED' THEN 'Approved and Payment Done' 
+        ELSE bpa.status 
+      END AS status,
+      '' AS payment_transfer_date,
+      '' AS payment_transfer_transaction_id
+    FROM eg_bpa_buildingplan bpa
+    LEFT JOIN (
+      VALUES tbl_tenant
+    ) AS tenant_mdms (tenant_code, ulb_code, ulb_name, district_code, city_json)
+      ON tenant_mdms.tenant_code = bpa.tenantid
+    LEFT JOIN (
+      SELECT DISTINCT ON (consumer_code) consumer_code, txn_id, created_time, gateway_payment_mode, txn_amount
+      FROM eg_pg_transactions
+      WHERE txn_status = 'SUCCESS'
+      ORDER BY consumer_code, created_time DESC
+    ) pg ON pg.consumer_code = bpa.applicationno
+    LEFT JOIN (
+      SELECT DISTINCT ON (landinfoid) landinfoid, locality, city
+      FROM eg_land_address
+      ORDER BY landinfoid
+    ) landaddress ON landaddress.landinfoid = bpa.landid
+    LEFT JOIN (
+      SELECT DISTINCT ON (landinfoid) landinfoid, uuid 
+      FROM eg_land_ownerinfo
+      ORDER BY landinfoid
+    ) ownerinfo ON ownerinfo.landinfoid = bpa.landid
+    LEFT JOIN eg_user users ON ownerinfo.uuid = users.uuid
+    LEFT JOIN (
+      SELECT DISTINCT ON (userid) userid, address 
+      FROM eg_user_address 
+      ORDER BY userid, createddate DESC
+    ) useraddr ON users.id = useraddr.userid
+    WHERE (bpa.additionaldetails->>'isMigrationTrue' IS NULL OR bpa.additionaldetails->>'isMigrationTrue' != 'true')
