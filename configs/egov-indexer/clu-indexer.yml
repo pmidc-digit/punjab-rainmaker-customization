@@ -64,6 +64,75 @@ ServiceMaps:
               - inJsonPath: $.Clu.owners
                 outJsonPath: $.Data.owners
 
+    # ===============================
+    # LEGACY INDEX (DB -> ES BACKFILL)
+    # ===============================
+    # Plain-search API: POST /v1/clu/_plainsearch returns {ResponseInfo, Clu:[...]}.
+    # jsonPath $.Clu + isBulk:true iterate the array returned by the search API
+    # (the live INDEX topics carry a single {Clu:{...}} object so they use
+    # jsonPath $ / isBulk:false and reference $.Clu.* fields).
+    - topic: clu-application-legacyIndex
+      configKey: LEGACYINDEX
+      indexes:
+        - name: clu-application-index
+          type: general
+          id: $.id, $.tenantId
+          isBulk: true
+          timeStampField: $.auditDetails.createdTime
+          jsonPath: $.Clu
+          customJsonMapping:
+            indexMapping:
+              Data:
+                id: id
+                tenantId: tenantId
+                applicationNo: applicationNo
+                status: status
+                cluNo: cluNo
+                applicationType: applicationType
+                cluType: cluType
+                accountId: accountId
+                applicationStatus: applicationStatus
+                createdBy: createdBy
+                lastModifiedBy: lastModifiedBy
+                createdTime: createdTime
+                lastModifiedTime: lastModifiedTime
+                documents: documents
+                cluDetails: cluDetails
+                owners: owners
+            fieldMapping:
+              - inJsonPath: $.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.applicationNo
+                outJsonPath: $.Data.applicationNo
+              - inJsonPath: $.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.cluNo
+                outJsonPath: $.Data.cluNo
+              - inJsonPath: $.applicationType
+                outJsonPath: $.Data.applicationType
+              - inJsonPath: $.cluType
+                outJsonPath: $.Data.cluType
+              - inJsonPath: $.accountId
+                outJsonPath: $.Data.accountId
+              - inJsonPath: $.applicationStatus
+                outJsonPath: $.Data.applicationStatus
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+              - inJsonPath: $.documents
+                outJsonPath: $.Data.documents
+              - inJsonPath: $.cluDetails
+                outJsonPath: $.Data.cluDetails
+              - inJsonPath: $.owners
+                outJsonPath: $.Data.owners
+
     - topic: update-clu-application
       configKey: INDEX
       indexes:

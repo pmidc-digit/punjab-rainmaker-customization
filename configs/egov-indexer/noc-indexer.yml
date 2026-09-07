@@ -64,6 +64,75 @@ ServiceMaps:
               - inJsonPath: $.Noc.owners
                 outJsonPath: $.Data.owners
 
+    # ===============================
+    # LEGACY INDEX (DB -> ES BACKFILL)
+    # ===============================
+    # Plain-search API: POST /v1/noc/_plainsearch returns {ResponseInfo, Noc:[...]}.
+    # jsonPath $.Noc + isBulk:true iterate the array returned by the search API
+    # (the live INDEX topics carry a single {Noc:{...}} object so they use
+    # jsonPath $ / isBulk:false and reference $.Noc.* fields).
+    - topic: noc-application-legacyIndex
+      configKey: LEGACYINDEX
+      indexes:
+        - name: noc-application-index
+          type: general
+          id: $.id, $.tenantId
+          isBulk: true
+          timeStampField: $.auditDetails.createdTime
+          jsonPath: $.Noc
+          customJsonMapping:
+            indexMapping:
+              Data:
+                id: id
+                tenantId: tenantId
+                applicationNo: applicationNo
+                status: status
+                nocNo: nocNo
+                applicationType: applicationType
+                nocType: nocType
+                accountId: accountId
+                applicationStatus: applicationStatus
+                createdBy: createdBy
+                lastModifiedBy: lastModifiedBy
+                createdTime: createdTime
+                lastModifiedTime: lastModifiedTime
+                documents: documents
+                nocDetails: nocDetails
+                owners: owners
+            fieldMapping:
+              - inJsonPath: $.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.applicationNo
+                outJsonPath: $.Data.applicationNo
+              - inJsonPath: $.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.nocNo
+                outJsonPath: $.Data.nocNo
+              - inJsonPath: $.applicationType
+                outJsonPath: $.Data.applicationType
+              - inJsonPath: $.nocType
+                outJsonPath: $.Data.nocType
+              - inJsonPath: $.accountId
+                outJsonPath: $.Data.accountId
+              - inJsonPath: $.applicationStatus
+                outJsonPath: $.Data.applicationStatus
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+              - inJsonPath: $.documents
+                outJsonPath: $.Data.documents
+              - inJsonPath: $.nocDetails
+                outJsonPath: $.Data.nocDetails
+              - inJsonPath: $.owners
+                outJsonPath: $.Data.owners
+
     - topic: update-noc-application
       configKey: INDEX
       indexes:
