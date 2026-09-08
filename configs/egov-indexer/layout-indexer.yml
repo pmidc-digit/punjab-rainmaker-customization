@@ -64,6 +64,75 @@ ServiceMaps:
               - inJsonPath: $.Layout.owners
                 outJsonPath: $.Data.owners
 
+    # ===============================
+    # LEGACY INDEX (DB -> ES BACKFILL)
+    # ===============================
+    # Plain-search API: POST /v1/layout/_plainsearch returns {ResponseInfo, Layout:[...]}.
+    # jsonPath $.Layout + isBulk:true iterate the array returned by the search API
+    # (the live INDEX topics carry a single {Layout:{...}} object so they use
+    # jsonPath $ / isBulk:false and reference $.Layout.* fields).
+    - topic: layout-application-legacyIndex
+      configKey: LEGACYINDEX
+      indexes:
+        - name: layout-application-index
+          type: general
+          id: $.id, $.tenantId
+          isBulk: true
+          timeStampField: $.auditDetails.createdTime
+          jsonPath: $.Layout
+          customJsonMapping:
+            indexMapping:
+              Data:
+                id: id
+                tenantId: tenantId
+                applicationNo: applicationNo
+                status: status
+                layoutNo: layoutNo
+                applicationType: applicationType
+                layoutType: layoutType
+                accountId: accountId
+                applicationStatus: applicationStatus
+                createdBy: createdBy
+                lastModifiedBy: lastModifiedBy
+                createdTime: createdTime
+                lastModifiedTime: lastModifiedTime
+                documents: documents
+                layoutDetails: layoutDetails
+                owners: owners
+            fieldMapping:
+              - inJsonPath: $.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.applicationNo
+                outJsonPath: $.Data.applicationNo
+              - inJsonPath: $.status
+                outJsonPath: $.Data.status
+              - inJsonPath: $.layoutNo
+                outJsonPath: $.Data.layoutNo
+              - inJsonPath: $.applicationType
+                outJsonPath: $.Data.applicationType
+              - inJsonPath: $.layoutType
+                outJsonPath: $.Data.layoutType
+              - inJsonPath: $.accountId
+                outJsonPath: $.Data.accountId
+              - inJsonPath: $.applicationStatus
+                outJsonPath: $.Data.applicationStatus
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+              - inJsonPath: $.documents
+                outJsonPath: $.Data.documents
+              - inJsonPath: $.layoutDetails
+                outJsonPath: $.Data.layoutDetails
+              - inJsonPath: $.owners
+                outJsonPath: $.Data.owners
+
     - topic: update-layout-application
       configKey: INDEX
       indexes:
