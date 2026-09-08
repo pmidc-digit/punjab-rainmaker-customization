@@ -13,6 +13,10 @@ SearchDefinitions:
           INNER JOIN eg_land_ownerInfo ownerinfo ON landinfo.id = ownerinfo.landInfoId
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno AND pi.latest = TRUE
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+
+          LEFT JOIN LATERAL (
+              SELECT COALESCE(bpa.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+          ) mig ON TRUE
           $where
           order by bpa.createdtime asc $pagination
           ) result
@@ -58,6 +62,9 @@ SearchDefinitions:
     - name: bpa.additionaldetails->>'isSelfCertification'
       isMandatory: false
       jsonPath: $.searchCriteria.isSelfCertification
+    - name: mig.ismigrationtrue
+      isMandatory: false
+      jsonPath: $.searchCriteria.isMigrationTrue
     pagination:
       noOfRecords: $.searchCriteria.noOfRecords
       offset: $.searchCriteria.offset
@@ -76,6 +83,10 @@ SearchDefinitions:
           INNER JOIN eg_land_Address landaddress ON landinfo.id = landaddress.landInfoId
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno AND pi.latest = TRUE
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+
+          LEFT JOIN LATERAL (
+              SELECT COALESCE(bpa.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+          ) mig ON TRUE
           $where
           order by bpa.createdtime asc $pagination
           ) result
@@ -121,6 +132,9 @@ SearchDefinitions:
     - name: bpa.additionaldetails->>'isSelfCertification'
       isMandatory: false
       jsonPath: $.searchCriteria.isSelfCertification
+    - name: mig.ismigrationtrue
+      isMandatory: false
+      jsonPath: $.searchCriteria.isMigrationTrue
     pagination:
       noOfRecords: $.searchCriteria.noOfRecords
       offset: $.searchCriteria.offset
@@ -135,6 +149,10 @@ SearchDefinitions:
     baseQuery: SELECT row_to_json(TotalCount) from (SELECT COUNT(DISTINCT bpa.applicationno) from eg_bpa_buildingplan as bpa
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno AND pi.latest = TRUE
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+
+          LEFT JOIN LATERAL (
+              SELECT COALESCE(bpa.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+          ) mig ON TRUE
           $where
           ) TotalCount
     groupBy:
@@ -173,6 +191,9 @@ SearchDefinitions:
     - name: bpa.additionaldetails->>'isSelfCertification'
       isMandatory: false
       jsonPath: $.searchCriteria.isSelfCertification
+    - name: mig.ismigrationtrue
+      isMandatory: false
+      jsonPath: $.searchCriteria.isMigrationTrue
     pagination:
       noOfRecords: $.searchCriteria.noOfRecords
       offset: $.searchCriteria.offset
@@ -187,6 +208,10 @@ SearchDefinitions:
     baseQuery: SELECT row_to_json(TotalCount) from (SELECT COUNT(DISTINCT bpa.applicationno) from eg_bpa_buildingplan as bpa
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno AND pi.latest = TRUE
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+
+          LEFT JOIN LATERAL (
+              SELECT COALESCE(bpa.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+          ) mig ON TRUE
           $where
           ) TotalCount
     groupBy:
@@ -228,6 +253,9 @@ SearchDefinitions:
     - name: bpa.additionaldetails->>'isSelfCertification'
       isMandatory: false
       jsonPath: $.searchCriteria.isSelfCertification
+    - name: mig.ismigrationtrue
+      isMandatory: false
+      jsonPath: $.searchCriteria.isMigrationTrue
     pagination:
       noOfRecords: $.searchCriteria.noOfRecords
       offset: $.searchCriteria.offset
@@ -247,6 +275,10 @@ SearchDefinitions:
           INNER JOIN eg_land_ownerInfo ownerinfo ON landinfo.id = ownerinfo.landInfoId
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno AND pi.latest = TRUE
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+
+          LEFT JOIN LATERAL (
+              SELECT COALESCE(bpa.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+          ) mig ON TRUE
           $where
           order by bpa.createdtime desc $pagination
           ) result
@@ -292,6 +324,9 @@ SearchDefinitions:
     - name: bpa.additionaldetails->>'isSelfCertification'
       isMandatory: false
       jsonPath: $.searchCriteria.isSelfCertification
+    - name: mig.ismigrationtrue
+      isMandatory: false
+      jsonPath: $.searchCriteria.isMigrationTrue
     pagination:
       noOfRecords: $.searchCriteria.noOfRecords
       offset: $.searchCriteria.offset
@@ -310,6 +345,10 @@ SearchDefinitions:
           INNER JOIN eg_land_Address landaddress ON landinfo.id = landaddress.landInfoId
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno AND pi.latest = TRUE
           LEFT JOIN eg_wf_assignee_v2 assg ON pi.id = assg.processinstanceid
+
+          LEFT JOIN LATERAL (
+              SELECT COALESCE(bpa.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+          ) mig ON TRUE
           $where
           order by bpa.createdtime desc $pagination
           ) result
@@ -355,6 +394,9 @@ SearchDefinitions:
     - name: bpa.additionaldetails->>'isSelfCertification'
       isMandatory: false
       jsonPath: $.searchCriteria.isSelfCertification
+    - name: mig.ismigrationtrue
+      isMandatory: false
+      jsonPath: $.searchCriteria.isMigrationTrue
     pagination:
       noOfRecords: $.searchCriteria.noOfRecords
       offset: $.searchCriteria.offset
@@ -372,6 +414,10 @@ SearchDefinitions:
           INNER JOIN eg_land_landInfo landinfo ON bpa.landId = landinfo.id
           INNER JOIN eg_land_Address landaddress ON landinfo.id = landaddress.landInfoId
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno
+
+          LEFT JOIN LATERAL (
+              SELECT COALESCE(bpa.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+          ) mig ON TRUE
           $where AND pi.latest = TRUE GROUP BY bpa.tenantId, bpa.applicationno, pi.status
           ) result
     groupBy:
@@ -391,6 +437,9 @@ SearchDefinitions:
     - name: pi.status
       isMandatory: false
       jsonPath: $.searchCriteria.status
+    - name: mig.ismigrationtrue
+      isMandatory: false
+      jsonPath: $.searchCriteria.isMigrationTrue
 
 
    output:
@@ -407,6 +456,10 @@ SearchDefinitions:
           INNER JOIN eg_land_ownerInfo ownerinfo ON landinfo.id = ownerinfo.landInfoId
           INNER JOIN eg_land_Address landaddress ON landinfo.id = landaddress.landInfoId
           INNER JOIN eg_wf_processinstance_v2 pi ON pi.businessid = bpa.applicationno
+
+          LEFT JOIN LATERAL (
+              SELECT COALESCE(bpa.additionaldetails->>'isMigrationTrue', 'false') AS ismigrationtrue
+          ) mig ON TRUE
           $where AND pi.latest = TRUE GROUP BY bpa.tenantId, bpa.applicationno, pi.status
           ) result
     groupBy:
@@ -426,6 +479,9 @@ SearchDefinitions:
     - name: pi.status
       isMandatory: false
       jsonPath: $.searchCriteria.status 
+    - name: mig.ismigrationtrue
+      isMandatory: false
+      jsonPath: $.searchCriteria.isMigrationTrue
 
    output:
     jsonFormat: {"ResponseInfo": {},"BPA": {}}
