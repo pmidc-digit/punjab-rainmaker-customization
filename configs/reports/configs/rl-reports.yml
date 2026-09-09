@@ -953,15 +953,16 @@ ReportDefinitions:
       SELECT
           a.application_number,
           a.property_id,
-          STRING_AGG(
-              DISTINCT
-              CASE
-                  WHEN eu.name IS NULL
-                  THEN '30048|23/xn3x2FAxn8vYAN0IdplsOxaE='
-                  ELSE eu.name
-              END,
-              ', '
-          ) AS owner_name,
+        STRING_AGG(
+          DISTINCT
+          CASE
+              WHEN eu.name IS NULL
+              THEN '30048|23/xn3x2FAxn8vYAN0IdplsOxaE='
+              ELSE eu.name
+          END,
+          ', '
+      ) AS owner_name,
+          -- STRING_AGG(DISTINCT eu.name, ', ') AS owner_name,
           a.tenant_id AS ulb,
           a.amount_tobe_deducted AS rent_amount,
           a.status AS application_status,
@@ -971,10 +972,11 @@ ReportDefinitions:
           ) AS application_creation_date
       FROM eg_rl_allotment a
       LEFT JOIN eg_rl_owner_info oi
-             ON oi.allotment_id = a.id   
+            ON oi.allotment_id = a.id   
+          -- AND oi.is_primary_owner = true
       LEFT JOIN eg_user eu
-             ON eu.uuid = oi.user_uuid
-      WHERE a.tenant_id = $tenantid
+            ON eu.uuid = oi.user_uuid
+      WHERE 1=1
       GROUP BY
           a.id,
           a.application_number,
@@ -983,6 +985,7 @@ ReportDefinitions:
           a.amount_tobe_deducted,
           a.status,
           a.created_time
+      ORDER BY a.created_time DESC;
     orderby: ORDER BY a.created_time DESC
         
 
