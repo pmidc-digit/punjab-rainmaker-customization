@@ -872,16 +872,15 @@ ReportDefinitions:
     query: |
         select tenant_id, status, property_id, application_type, application_number from public.eg_rl_allotment 
         where 1=1
+
   - reportName: RentAndLeaseNewApplicationsReport
     decryptionPathId: RLREPORTS
-    summary: Details of newly created Rent & Lease applications
+    summary: Details of applications in Rent & Lease service with owner name, ULB, rent amount and status
     version: 1.0.0
     moduleName: rainmaker-rl
-
     additionalConfig:
       print:
         pdfPageSize: A1
-
     sourceColumns:
       - name: application_number
         label: Application Number
@@ -990,5 +989,7 @@ ReportDefinitions:
       LEFT JOIN eg_user eu
             ON eu.uuid = oi.user_uuid
       WHERE 1=1
+
+    groupby: GROUP BY a.id, a.application_number, a.property_id, a.tenant_id, a.amount_tobe_deducted, a.status, a.created_time
 
     orderby: ORDER BY a.created_time DESC
