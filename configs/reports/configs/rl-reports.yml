@@ -872,6 +872,7 @@ ReportDefinitions:
     query: |
         select tenant_id, status, property_id, application_type, application_number from public.eg_rl_allotment 
         where 1=1
+    
   - reportName: RentAndLeaseNewApplicationsReport
     decryptionPathId: RLREPORTS
     summary: Details of newly created Rent & Lease applications
@@ -932,63 +933,84 @@ ReportDefinitions:
         type: string
         source: rl
         isMandatory: false
-        searchClause: AND a.application_number LIKE $applicationNumber
+        searchClause: AND r.application_number LIKE $applicationNumber
 
       - name: status
         label: Application Status
         type: singlevaluelist
-        pattern: 'list://INITIATED:Initiated,FORWARD_FOT_SETLEMENT:Forward For Settlement,CLOSED:Closed, APPROVED:Approved,PENDINGFORAPPROVAL:Pending For Approval , PENDING_FOR_DOCUMENT_VERIFY:Pending For Document Verify,PENDING_FOR_PAYMENT:Pending For Payment,PENDING_REQUEST_FOR_DISCONNECTION:Pending Request For Disconnection'
+        pattern: 'list://INITIATED:Initiated,FORWARD_FOT_SETLEMENT:Forward For Settlement,CLOSED:Closed,APPROVED:Approved,PENDINGFORAPPROVAL:Pending For Approval,PENDING_FOR_DOCUMENT_VERIFY:Pending For Document Verify,PENDING_FOR_PAYMENT:Pending For Payment,PENDING_REQUEST_FOR_DISCONNECTION:Pending Request For Disconnection'
         source: rl
         isMandatory: false
-        searchClause: AND a.status = $status
+        searchClause: AND r.application_status = $status
 
       - name: fromDate
         label: From Date
         type: epoch
         source: rl
         isMandatory: true
-        searchClause: AND a.created_time >= $fromDate
+        searchClause: AND r.created_time >= $fromDate
 
       - name: toDate
         label: To Date
         type: epoch
         source: rl
         isMandatory: true
-        searchClause: AND a.created_time <= $toDate
+        searchClause: AND r.created_time <= $toDate
 
       - name: ulb
         label: ULB Name
         type: singlevaluelist
-        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        pattern: 'http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name'
         source: rl
         isMandatory: true
-        searchClause: AND a.tenant_id = $ulb
+        searchClause: AND r.ulb = $ulb
 
     query: |
       SELECT
-          a.application_number,
-          a.property_id,
-          STRING_AGG(
-              DISTINCT
-              CASE
-                  WHEN eu.name IS NULL
-                  THEN '30048|23/xn3x2FAxn8vYAN0IdplsOxaE='
-                  ELSE eu.name
-              END,
-              ', '
-          ) AS owner_name,
-          a.tenant_id AS ulb,
-          a.amount_tobe_deducted AS rent_amount,
-          a.status AS application_status,
-          TO_CHAR(
-              TO_TIMESTAMP(a.created_time/1000),
-              'DD-MM-YYYY HH24:MI:SS'
-          ) AS application_creation_date
-      FROM eg_rl_allotment a
-      LEFT JOIN eg_rl_owner_info oi
-            ON oi.allotment_id = a.id
-      LEFT JOIN eg_user eu
-            ON eu.uuid = oi.user_uuid
+          r.application_number,
+          r.property_id,
+          r.owner_name,
+          r.ulb,
+          r.rent_amount,
+          r.application_status,
+          r.application_creation_date,
+          r.created_time
+      FROM
+      (
+          SELECT
+              a.application_number,
+              a.property_id,
+              STRING_AGG(
+                  DISTINCT
+                  CASE
+                      WHEN eu.name IS NULL
+                      THEN '30048|23/xn3x2FAxn8vYAN0IdplsOxaE='
+                      ELSE eu.name
+                  END,
+                  ', '
+              ) AS owner_name,
+              a.tenant_id AS ulb,
+              a.amount_tobe_deducted AS rent_amount,
+              a.status AS application_status,
+              TO_CHAR(
+                  TO_TIMESTAMP(a.created_time/1000),
+                  'DD-MM-YYYY HH24:MI:SS'
+              ) AS application_creation_date,
+              a.created_time
+          FROM eg_rl_allotment a
+          LEFT JOIN eg_rl_owner_info oi
+                ON oi.allotment_id = a.id
+          LEFT JOIN eg_user eu
+                ON eu.uuid = oi.user_uuid
+          GROUP BY
+              a.id,
+              a.application_number,
+              a.property_id,
+              a.tenant_id,
+              a.amount_tobe_deducted,
+              a.status,
+              a.created_time
+      ) r
       WHERE 1=1
 
-    orderby: ORDER BY a.created_time DESC
+    orderby: ORDER BY r.created_time DESC
