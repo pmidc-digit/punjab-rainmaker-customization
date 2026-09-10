@@ -1,0 +1,216 @@
+ServiceMaps:
+  serviceName: egov-workflow-v2
+  version: 1.0.0
+  mappings:
+
+    # ===============================
+    # WORKFLOW PROCESS INSTANCE (transitions)
+    # ===============================
+    # Producer: org.egov.wf.service.StatusUpdateService -> kafka topic save-wf-transitions
+    # Payload : { "RequestInfo": {...}, "ProcessInstances": [ {..ProcessInstance..} ] }
+    # The same topic is also consumed by the persister
+    # (configs/egov-persister/egov-workflow-v2-persister.yml) which writes
+    # eg_wf_processinstance_v2 / eg_wf_document_v2 / eg_wf_assignee_v2.
+    - topic: save-wf-transitions
+      configKey: INDEX
+      indexes:
+        - name: wf-processinstance-index
+          type: general
+          id: $.id, $.tenantId
+          isBulk: true
+          timeStampField: $.auditDetails.createdTime
+          jsonPath: $.ProcessInstances.*
+          customJsonMapping:
+            indexMapping:
+              Data:
+                id: ""
+                tenantId: ""
+                businessService: ""
+                businessId: ""
+                moduleName: ""
+                action: ""
+                status: ""
+                applicationStatus: ""
+                comment: ""
+                assigner: {}
+                assignes: []
+                state: {}
+                documents: []
+                stateSla: null
+                businessServiceSla: null
+                previousStatus: ""
+                rating: null
+                escalated: false
+                createdBy: ""
+                lastModifiedBy: ""
+                createdTime: null
+                lastModifiedTime: null
+            fieldMapping:
+              - inJsonPath: $.id
+                outJsonPath: $.Data.id
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.businessService
+                outJsonPath: $.Data.businessService
+              - inJsonPath: $.businessId
+                outJsonPath: $.Data.businessId
+              - inJsonPath: $.moduleName
+                outJsonPath: $.Data.moduleName
+              - inJsonPath: $.action
+                outJsonPath: $.Data.action
+                # eg_wf_processinstance_v2.status column is populated with state.uuid
+              - inJsonPath: $.state.uuid
+                outJsonPath: $.Data.status
+              - inJsonPath: $.state.applicationStatus
+                outJsonPath: $.Data.applicationStatus
+              - inJsonPath: $.state
+                outJsonPath: $.Data.state
+              - inJsonPath: $.comment
+                outJsonPath: $.Data.comment
+              - inJsonPath: $.assigner
+                outJsonPath: $.Data.assigner
+              - inJsonPath: $.assignes
+                outJsonPath: $.Data.assignes
+              - inJsonPath: $.documents
+                outJsonPath: $.Data.documents
+              - inJsonPath: $.stateSla
+                outJsonPath: $.Data.stateSla
+                # NOTE: property really is businesssServiceSla (extra 's') in ProcessInstance
+              - inJsonPath: $.businesssServiceSla
+                outJsonPath: $.Data.businessServiceSla
+              - inJsonPath: $.previousStatus
+                outJsonPath: $.Data.previousStatus
+              - inJsonPath: $.rating
+                outJsonPath: $.Data.rating
+              - inJsonPath: $.escalated
+                outJsonPath: $.Data.escalated
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+
+    # ===============================
+    # BUSINESS SERVICE CREATE (states + actions)
+    # ===============================
+    # Producer: org.egov.wf.service.BusinessMasterService -> save-wf-businessservice
+    # Payload : { "RequestInfo": {...}, "BusinessServices": [ {..BusinessService..} ] }
+    # Persister counterpart writes eg_wf_businessservice_v2 / eg_wf_state_v2 / eg_wf_action_v2.
+    - topic: save-wf-businessservice
+      configKey: INDEX
+      indexes:
+        - name: wf-businessservice-index
+          type: general
+          id: $.uuid
+          isBulk: true
+          timeStampField: $.auditDetails.createdTime
+          jsonPath: $.BusinessServices.*
+          customJsonMapping:
+            indexMapping:
+              Data:
+                uuid: ""
+                tenantId: ""
+                businessService: ""
+                business: ""
+                getUri: ""
+                postUri: ""
+                businessServiceSla: null
+                states: []
+                createdBy: ""
+                lastModifiedBy: ""
+                createdTime: null
+                lastModifiedTime: null
+            fieldMapping:
+              - inJsonPath: $.uuid
+                outJsonPath: $.Data.uuid
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.businessService
+                outJsonPath: $.Data.businessService
+              - inJsonPath: $.business
+                outJsonPath: $.Data.business
+                # BusinessService declares @JsonProperty("getUri")/("postUri").
+                # The persister config uses lowercase "geturi"/"posturi"; the
+                # lowercase entries below are harmless fallbacks (a failed
+                # jsonPath is skipped and leaves the already-mapped value).
+              - inJsonPath: $.getUri
+                outJsonPath: $.Data.getUri
+              - inJsonPath: $.geturi
+                outJsonPath: $.Data.getUri
+              - inJsonPath: $.postUri
+                outJsonPath: $.Data.postUri
+              - inJsonPath: $.posturi
+                outJsonPath: $.Data.postUri
+              - inJsonPath: $.businessServiceSla
+                outJsonPath: $.Data.businessServiceSla
+              - inJsonPath: $.states
+                outJsonPath: $.Data.states
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
+
+    # ===============================
+    # BUSINESS SERVICE UPDATE (states + actions)
+    # ===============================
+    # Producer: org.egov.wf.service.BusinessMasterService -> update-wf-businessservice
+    - topic: update-wf-businessservice
+      configKey: INDEX
+      indexes:
+        - name: wf-businessservice-index
+          type: general
+          id: $.uuid
+          isBulk: true
+          timeStampField: $.auditDetails.lastModifiedTime
+          jsonPath: $.BusinessServices.*
+          customJsonMapping:
+            indexMapping:
+              Data:
+                uuid: ""
+                tenantId: ""
+                businessService: ""
+                business: ""
+                getUri: ""
+                postUri: ""
+                businessServiceSla: null
+                states: []
+                createdBy: ""
+                lastModifiedBy: ""
+                createdTime: null
+                lastModifiedTime: null
+            fieldMapping:
+              - inJsonPath: $.uuid
+                outJsonPath: $.Data.uuid
+              - inJsonPath: $.tenantId
+                outJsonPath: $.Data.tenantId
+              - inJsonPath: $.businessService
+                outJsonPath: $.Data.businessService
+              - inJsonPath: $.business
+                outJsonPath: $.Data.business
+              - inJsonPath: $.getUri
+                outJsonPath: $.Data.getUri
+              - inJsonPath: $.geturi
+                outJsonPath: $.Data.getUri
+              - inJsonPath: $.postUri
+                outJsonPath: $.Data.postUri
+              - inJsonPath: $.posturi
+                outJsonPath: $.Data.postUri
+              - inJsonPath: $.businessServiceSla
+                outJsonPath: $.Data.businessServiceSla
+              - inJsonPath: $.states
+                outJsonPath: $.Data.states
+              - inJsonPath: $.auditDetails.createdBy
+                outJsonPath: $.Data.createdBy
+              - inJsonPath: $.auditDetails.lastModifiedBy
+                outJsonPath: $.Data.lastModifiedBy
+              - inJsonPath: $.auditDetails.createdTime
+                outJsonPath: $.Data.createdTime
+              - inJsonPath: $.auditDetails.lastModifiedTime
+                outJsonPath: $.Data.lastModifiedTime
