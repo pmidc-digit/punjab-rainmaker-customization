@@ -268,8 +268,28 @@
             [
               {
                 "table": {
-                  "widths": ["*", "*"],
-                  "body": "[{{#var_billDetails}}[{\"text\":\"{{billTaxHeadCode}}\",\"alignment\":\"left\",\"border\":[true,true,false,true], \"style\":\"receipt-table2\"},{\"text\":\"{{billAmount}}\",\"alignment\":\"left\",\"style\":\"receipt-table2\",\"border\":[false,true,true,true]}]{{/var_billDetails}}]"
+                  "widths": ["*", "*" ,"*"],
+                  "body": [
+                    [
+                      {
+                        "text": "Tax Head Code",
+                        "border": [true, true, false, true],
+                        "style": "receipt-table-value"
+                      },
+                      {
+                        "text": "Adjusted Amount",
+                        "border": [false, true, false, true],
+                        "style": "receipt-table-value"
+                      },
+                      {
+                        "text": "Original Amount",
+                        "border": [false, true, true, true],
+                        "style": "receipt-table-value",
+                        "font": "Roboto"
+                      }
+                    ],
+                    "{{#var_billDetails}}[{\"text\":\"{{billTaxHeadCode}}\",\"alignment\":\"left\",\"border\":[true,true,false,true], \"style\":\"receipt-table2\"},{\"text\":\"{{billAmount}}\",\"alignment\":\"left\",\"style\":\"receipt-table2\",\"border\":[false,true,false,true]},{\"text\":\"{{billAmountOG}}\",\"alignment\":\"left\",\"border\":[false,true,true,true], \"style\":\"receipt-table2\"}]{{/var_billDetails}}"
+                  ]
                 },
                 "border": [true, true, true, true]
               }
@@ -277,7 +297,7 @@
             [
               {
                 "table": {
-                  "widths": ["*", "*"],
+                  "widths": ["35%", "65%"],
                   "body": [
                     [
                       {
