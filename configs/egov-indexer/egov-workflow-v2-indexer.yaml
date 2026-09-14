@@ -255,10 +255,16 @@ ServiceMaps:
     # egov-workflow-v2 plain-search API and republishes its response
     # { "ResponseInfo": {...}, "ProcessInstances": [ ... ] } onto this topic.
     # jsonPath $.ProcessInstances.* unwraps each element exactly like the live
-    # save-wf-transitions payload, so the mapping below is identical to it.
+    # save-wf-transitions payload, so the mapping below is identical to it,
+    # plus the "latest" flag which only the DB-backed backfill can supply.
     # Indexes ALL transitions — pass history=true in the legacy job request,
     # otherwise the service appends "latest=true" and only the newest row per
     # businessId is returned.
+    # NOTE: the live INDEX mapping above intentionally does NOT set "latest":
+    # the indexer only sees the newly created row, never the "latest=false"
+    # update applied to the previous row, so a live-authored flag would go stale.
+    # `latest` is therefore authoritative for rows written by this backfill; the
+    # plain-search API must select eg_wf_processinstance_v2.latest to populate it.
     - topic: wf-processinstance-legacyIndex
       configKey: LEGACYINDEX
       indexes:
@@ -289,6 +295,7 @@ ServiceMaps:
                 previousStatus: ""
                 rating: null
                 escalated: false
+                latest: null
                 createdBy: ""
                 lastModifiedBy: ""
                 createdTime: null
@@ -338,6 +345,8 @@ ServiceMaps:
                 outJsonPath: $.Data.lastModifiedBy
               - inJsonPath: $.auditDetails.createdTime
                 outJsonPath: $.Data.createdTime
+              - inJsonPath: $.latest
+                outJsonPath: $.Data.latest
               - inJsonPath: $.auditDetails.lastModifiedTime
                 outJsonPath: $.Data.lastModifiedTime
 
