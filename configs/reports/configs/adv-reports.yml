@@ -1029,7 +1029,7 @@ ReportDefinitions:
     query: >
       -- Use CTE to force query plan, compute & use CTE later
        SELECT  DISTINCT ON (pd.receiptnumber)
-        pd.receiptnumber AS receiptno, INITCAP(split_part(pd.tenant_id, '.', 2)) AS tenant,
+        pd.receiptnumber AS receiptno, INITCAP(split_part(pd.tenantid, '.', 2)) AS tenant,
         bill.consumercode AS connectionno,
         TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate,
         'ADVERTISEMENT' AS service,
