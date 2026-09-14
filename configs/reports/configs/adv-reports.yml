@@ -9,7 +9,7 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: tenantId
+      - name: tenant
         label: tenantId
         type: string
         source: adv
@@ -95,7 +95,7 @@ ReportDefinitions:
     query: >
       -- Use CTE to force query plan, compute & use CTE later
        SELECT 
-           split_part(b.tenant_id, '.', 2) AS tenantId ,b.booking_no, b.receipt_no , 
+           split_part(b.tenant_id, '.', 2) AS tenant ,b.booking_no, b.receipt_no , 
            a.applicant_name , a.applicant_mobile_no,
            ad.address_line_1 , ad.pincode ,
            c.add_type , c.location , c.face_area , c.booking_date , c.booking_from_time , 
@@ -513,10 +513,10 @@ ReportDefinitions:
        LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
        WHERE b.tenant_id = $tenantid
        AND payment.paymentstatus != 'CANCELLED'
-    orderby: ORDER BY pd.receiptnumber,pd.receiptdate DESC
+    orderby: ORDER BY  pd.receiptnumber,pd.receiptdate DESC;
 
   - reportName: StateActiveHoardingSummary
-    decryptionPathId: ADVREPORTS
+    decryptionPathId: STATEADVREPORTS
     summary: Details of active hoarding booking slots in adv service
     version: 1.0.0
     moduleName: rainmaker-adv
@@ -524,8 +524,8 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: tenantId
-        label: tenantId
+      - name: tenant
+        label: ULB Name
         type: string
         source: adv
         total: false
@@ -617,7 +617,7 @@ ReportDefinitions:
     query: >
       -- Use CTE to force query plan, compute & use CTE later
        SELECT 
-           split_part(b.tenant_id, '.', 2) AS tenantId ,b.booking_no, b.receipt_no , 
+           INITCAP(split_part(b.tenant_id, '.', 2)) AS tenant ,b.booking_no, b.receipt_no , 
            a.applicant_name , a.applicant_mobile_no,
            ad.address_line_1 , ad.pincode ,
            c.add_type , c.location , c.face_area , c.booking_date , c.booking_from_time , 
@@ -626,11 +626,11 @@ ReportDefinitions:
           INNER JOIN eg_adv_applicant_detail a on a.booking_id=b.booking_id
           INNER JOIN eg_adv_address_detail ad on ad.applicant_detail_id = a.applicant_detail_id
           INNER JOIN eg_adv_cart_detail c on c.booking_id=b.booking_id
-          WHERE  c.status='BOOKED' 
+          WHERE  c.status='BOOKED'  and b.tenant_id != 'pb.testing'
     orderby: ORDER BY c.booking_date
     
   - reportName: StateCollectionsReport
-    decryptionPathId: ADVREPORTS  
+    decryptionPathId: STATEADVREPORTS  
     summary: Collections
     version: 1.0.0
     moduleName: rainmaker-adv
@@ -638,91 +638,96 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
+      - name: tenant
+        label: ULB Name
+        type: string
+        source: adv
+        total: false
       - name: applicationno
-        label: applicationno
+        label: Application Number
         type: string
         source: adv
         total: false
       - name: name
-        label: name
+        label: Name
         type: string
         source: adv
         total: false
       - name: mobilenumber
-        label: mobilenumber
+        label: Mobile Number
         type: string
         source: adv
         total: false
       - name: businessservice
-        label: businessservice
+        label: Businessservice
         type: string
         source: adv
         total: false
       - name: current_stage
-        label: current_stage
+        label: Current Stage
         type: string
         source: adv
         total: false
       - name: cash_amount
-        label: cash_amount
+        label: CASH Amount
         type: string
         source: adv
         total: true
       - name: cheque_amount
-        label: cheque_amount
+        label: Cheque Amount
         type: string
         source: adv
         total: true
       - name: card_amount
-        label: card_amount
+        label: CARD Amount
         type: string
         source: adv
         total: true
       - name: dd_amount
-        label: dd_amount
+        label: DD Amount
         type: string
         source: adv
         total: true
       - name: neft_amount
-        label: neft_amount
+        label: NEFT Amount
         type: string
         source: adv
         total: true
       - name: rtgs_amount
-        label: rtgs_amount
+        label: RTGS Amount
         type: string
         source: adv
         total: true
       - name: online_amount
-        label: online_amount
+        label: Online Amount
         type: string
         source: adv
         total: true
       - name: amountpaid
-        label: amountpaid
+        label: Amount Paid
         type: string
         source: adv
         total: true
       - name: PaymentDate
-        label: PaymentDate
+        label: Payment Date
         type: string
         source: adv
         total: false
     searchParams:
       - name: fromDate
-        label: fromDate
+        label: From Date
         type: epoch
         source: adv
         isMandatory: true
         searchClause: AND createdtime >= $fromDate
       - name: toDate
-        label: toDate
+        label: To Date
         type: epoch
         source: adv
         isMandatory: true
         searchClause: AND createdtime <= $toDate
       - name: ulb
-        label: ulb
+        label: ULB Name
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: adv
@@ -748,7 +753,7 @@ ReportDefinitions:
         unique_transactions AS (
          SELECT
           p.id AS transaction_id,
-          p.createdtime,
+          p.createdtime, INITCAP(split_part(p.tenantid, '.', 2)) AS tenant,
           p.tenantid AS tenantid,  
           pd.amountpaid,
           CASE WHEN p.paymentmode IN ('CASH','OFFLINE_CASH') THEN pd.amountpaid ELSE 0 END AS cash_amount,
@@ -777,7 +782,7 @@ ReportDefinitions:
         ) 
        SELECT
         applicationno,
-        name,
+        name,tenant,
         mobilenumber,
         'ADV' AS businessservice,
         current_stage ,
@@ -792,11 +797,11 @@ ReportDefinitions:
         amountpaid,
         to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS paymentdate
         FROM unique_transactions
-        WHERE 1=1
+        WHERE 1=1 and tenantid != 'pb.testing'
     orderby: ORDER BY createdtime DESC
     
   - reportName: StateTimelyHoardingSummary
-    decryptionPathId: ADVREPORTS
+    decryptionPathId: STATEADVREPORTS
     summary: Details of booking slots in adv service
     version: 1.0.0
     moduleName: rainmaker-adv
@@ -805,27 +810,27 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
       - name: tenantId
-        label: tenantId
+        label: ULB Name
         type: string
         source: adv
         total: false
       - name: booking_no
-        label: Booking No
+        label: Booking Number
         type: string
         source: adv
         total: false
       - name: receipt_no
-        label: Receipt No
+        label: Receipt Number
         type: string
         source: adv
         total: false
       - name: applicant_name
-        label: applicant_name
+        label: Applicant Name
         type: string
         source: adv
         total: false
       - name: applicant_mobile_no
-        label: applicant_mobile_no
+        label: Applicant Mobile Number
         type: string
         source: adv
         total: false
@@ -876,19 +881,19 @@ ReportDefinitions:
         total: false
     searchParams:
       - name: fromDate
-        label: fromDate
+        label: From Date
         type: epoch
         source: adv
         isMandatory: true
         searchClause: AND c.booking_date >= to_timestamp($fromDate / 1000)
       - name: toDate
-        label: toDate
+        label: To Date
         type: epoch
         source: adv
         isMandatory: true
         searchClause: AND c.booking_date <= to_timestamp($toDate / 1000)
       - name: ulb
-        label: ulb
+        label: ULB Name
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: adv
@@ -897,7 +902,7 @@ ReportDefinitions:
     query: >
       -- Use CTE to force query plan, compute & use CTE later
        SELECT 
-           split_part(b.tenant_id, '.', 2) AS tenantId ,b.booking_no, b.receipt_no , 
+           INITCAP(split_part(b.tenant_id, '.', 2)) AS tenantId ,b.booking_no, b.receipt_no , 
            a.applicant_name  , a.applicant_mobile_no,
            ad.address_line_1, ad.pincode ,
            c.add_type , c.location , c.face_area , c.booking_date , c.booking_from_time , 
@@ -906,11 +911,11 @@ ReportDefinitions:
           INNER JOIN eg_adv_applicant_detail a on a.booking_id=b.booking_id
           INNER JOIN eg_adv_address_detail ad on ad.applicant_detail_id = a.applicant_detail_id
           INNER JOIN eg_adv_cart_detail c on c.booking_id=b.booking_id
-          WHERE  1=1
+          WHERE  1=1 and b.tenant_id != 'pb.testing'
     orderby: ORDER BY c.booking_date
     
   - reportName: StateReceiptRegisterADV
-    decryptionPathId: ADVREPORTS
+    decryptionPathId: STATEADVREPORTS
     summary: Details of collector register in ADV service
     version: 1.0.0
     moduleName: rainmaker-adv
@@ -918,109 +923,104 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
+      - name: tenant
+        label: ULB Name
+        type: string
+        source: adv
+        total: false
       - name: receiptno
-        label: receiptno
+        label: Receipt Number
         type: string
         source: adv
         total: false
       - name: connectionno
-        label: connectionno
+        label: Connection Number
         type: string
         source: adv
         total: false
       - name: receiptdate
-        label: receiptdate
+        label: Receipt Date
         type: string
         source: adv
         total: false
       - name: service
-        label: service
+        label: Service
         type: string
         source: adv
         total: false
       - name: collectorname
-        label: collectorname
+        label: Collector Name
         type: string
         source: adv
         total: false
       - name: transactiondate
-        label: transactiondate
+        label: Transaction Date
         type: string
         source: adv
         total: false
       - name: instrumentnumber
-        label: instrumentnumber
+        label: Instrument Number
         type: string
         source: adv
         total: false
       - name: payername
-        label: payername
+        label: Payer Name
         type: string
         source: adv
         total: false
       - name: amountpaid
-        label: amountpaid
+        label: Amount Paid
         type: string
         source: adv
         total: false
       - name: paymentmode
-        label: paymentmode
+        label: Payment Mode
         type: string
         source: adv
         total: false
       - name: paymentstatus
-        label: paymentstatus
-        type: string
-        source: adv
-        total: false
-      - name: ownername1
-        label: ownername1
-        type: string
-        source: adv
-        total: false
-      - name: user
-        label: user
+        label: Payment Status
         type: string
         source: adv
         total: false
       - name: manualreceiptnumber
-        label: manualreceiptnumber
+        label: Manual Receipt Number
         type: string
         source: adv
         total: false
       - name: manualreceiptdate
-        label: manualreceiptdate
+        label: Manual Receipt Date
         type: string
         source: adv
         total: false
     searchParams:
       - name: fromDate
-        label: fromDate
+        label: From Date
         type: epoch
         source: adv
         isMandatory: true
         searchClause: AND pd.receiptdate >= $fromDate
       - name: toDate
-        label: toDate
+        label: To Date
         type: epoch
         source: adv
         isMandatory: true
         searchClause: AND pd.receiptdate <= $toDate
       - name: receiptno
-        label: receiptno
+        label: Receipt Number
         type: string
         source: adv
         isMandatory: false
         searchClause: AND pd.receiptnumber like $receiptno
       - name: paymentMode
-        label: paymentMode
+        label: Payment Mode
         type: singlevaluelist
         pattern: 'list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT'
         source: adv
         isMandatory: false
         searchClause: AND payment.paymentmode like $paymentMode
       - name: ulb
-        label: ulb
+        label: ULB Name
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: adv
@@ -1028,8 +1028,8 @@ ReportDefinitions:
         searchClause: AND b.tenant_id= $ulb
     query: >
       -- Use CTE to force query plan, compute & use CTE later
-       SELECT DISTINCT ON (pd.receiptnumber)
-        pd.receiptnumber AS receiptno,
+       SELECT  DISTINCT ON (pd.receiptnumber)
+        pd.receiptnumber AS receiptno, INITCAP(split_part(pd.tenantid, '.', 2)) AS tenant,
         bill.consumercode AS connectionno,
         TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate,
         'ADVERTISEMENT' AS service,
@@ -1052,5 +1052,5 @@ ReportDefinitions:
        JOIN egcl_paymentdetail pd ON pd.billid = bill.id 
        JOIN egcl_payment payment ON payment.id = pd.paymentid
        LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
-       WHERE payment.paymentstatus != 'CANCELLED'
-    orderby: ORDER BY  pd.receiptnumber,pd.receiptdate DESC
+       WHERE payment.paymentstatus != 'CANCELLED' and pd.tenantid != 'pb.testing'
+    orderby: ORDER BY pd.receiptnumber, pd.receiptdate DESC;
