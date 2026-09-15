@@ -678,7 +678,7 @@ ReportDefinitions:
           SUM(CASE WHEN dd.taxheadcode = 'RL_SGST_FEE' THEN dd.taxamount ELSE 0 END) AS rl_sgst_fee,
           SUM(dd.taxamount) AS total_amount
       FROM egcl_paymentdetail pd
-      INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = 'pb.pathankot'
+      INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = $tenantid
       INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
       INNER JOIN egbs_demanddetail_v1 dd ON dd.demandid = bd.demandid
       INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
@@ -686,11 +686,11 @@ ReportDefinitions:
       INNER JOIN public.eg_rl_owner_info o ON o.allotment_id = r.id
       LEFT JOIN eg_user u_owner ON u_owner.uuid = o.user_uuid
       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
-      WHERE bill.tenantid = 'pb.pathankot'
+      WHERE bill.tenantid = $tenantid
         AND pd.businessservice = 'rl-services'
     groupby: GROUP BY pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name, payment.instrumentdate, payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
     orderby: ORDER BY pd.receiptdate DESC
-    
+
   - reportName: StateReceiptRegisterRL
     decryptionPathId: RLREPORTS
     summary: Details of collector register in Rent & Lease service
