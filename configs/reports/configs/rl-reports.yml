@@ -611,6 +611,26 @@ ReportDefinitions:
         type: string
         source: rl
         total: false
+      - name: rl_arrear_fee
+        label: RL Arrear Fee
+        type: string
+        source: rl
+        total: true
+      - name: rl_cgst_fee
+        label: RL CGST Fee
+        type: string
+        source: rl
+        total: true
+      - name: rl_sgst_fee
+        label: RL SGST Fee
+        type: string
+        source: rl
+        total: true
+      - name: total_amount
+        label: Total Amount
+        type: string
+        source: rl
+        total: true
     searchParams:
       - name: fromDate
         label: From Date
@@ -638,37 +658,85 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND payment.paymentmode like $paymentMode
     query: >
-      -- Use CTE to force query plan, compute & use CTE later
-       SELECT
-        pd.receiptnumber AS receiptno,
-        bill.consumercode AS connectionno,
-        TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate,
-        'Rent & lease' AS service,
-        usr.name AS collectorname,
-        TO_CHAR(TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS transactiondate,
-        payment.instrumentnumber AS instrumentnumber,
-        u_owner.name AS payername,
-        pd.amountpaid,
-        payment.paymentmode,
-        payment.paymentstatus,
-        u_owner.name AS ownername1,
-        usr.id AS user,
-        usr.name  AS ownername1,
-        pd.amountpaid AS amountpaid,
-        payment.paymentmode AS paymentmode,
-        payment.paymentstatus AS paymentstatus,
-        pd.manualreceiptnumber,
-        pd.manualreceiptdate
-       FROM egcl_paymentdetail pd
-       INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = $tenantid
-       INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
-       JOIN eg_rl_allotment r ON r.application_number = bill.consumercode
-       INNER JOIN public.eg_rl_owner_info o ON o.allotment_id= r.id
-       LEFT JOIN eg_user u_owner ON u_owner.uuid = o.user_uuid      
-       LEFT JOIN eg_user usr  ON usr.id = payment.createdby::integer
-       WHERE bill.tenantid = $tenantid
+      SELECT
+          pd.receiptnumber AS receiptno,
+          bill.consumercode AS connectionno,
+          TO_CHAR(
+              TO_TIMESTAMP(pd.receiptdate / 1000)
+              AT TIME ZONE 'Asia/Kolkata',
+              'DD-MM-YYYY'
+          ) AS receiptdate,
+          'Rent & lease' AS service,
+          usr.name AS collectorname,
+          TO_CHAR(
+              TO_TIMESTAMP(payment.instrumentdate / 1000)
+              AT TIME ZONE 'Asia/Kolkata',
+              'DD-MM-YYYY'
+          ) AS transactiondate,
+          payment.instrumentnumber AS instrumentnumber,
+          u_owner.name AS payername,
+          pd.amountpaid AS amountpaid,
+          payment.paymentmode AS paymentmode,
+          payment.paymentstatus AS paymentstatus,
+          u_owner.name AS ownername1,
+          pd.manualreceiptnumber AS manualreceiptnumber,
+          pd.manualreceiptdate AS manualreceiptdate,
+          SUM(
+              CASE
+                  WHEN dd.taxheadcode = 'RL_ARREAR_FEE'
+                  THEN dd.taxamount
+                  ELSE 0
+              END
+          ) AS rl_arrear_fee,
+          SUM(
+              CASE
+                  WHEN dd.taxheadcode = 'RL_CGST_FEE'
+                  THEN dd.taxamount
+                  ELSE 0
+              END
+          ) AS rl_cgst_fee,
+          SUM(
+              CASE
+                  WHEN dd.taxheadcode = 'RL_SGST_FEE'
+                  THEN dd.taxamount
+                  ELSE 0
+              END
+          ) AS rl_sgst_fee,
+          SUM(dd.taxamount) AS total_amount
+      FROM egcl_paymentdetail pd
+      INNER JOIN egcl_bill bill
+          ON bill.id = pd.billid
+          AND pd.tenantid = 'pb.pathankot'
+      INNER JOIN egbs_billdetail_v1 bd
+          ON bd.billid = bill.id
+      INNER JOIN egbs_demanddetail_v1 dd
+          ON dd.demandid = bd.demandid
+      INNER JOIN egcl_payment payment
+          ON payment.id = pd.paymentid
+      JOIN eg_rl_allotment r
+          ON r.application_number = bill.consumercode
+      INNER JOIN public.eg_rl_owner_info o
+          ON o.allotment_id = r.id
+      LEFT JOIN eg_user u_owner
+          ON u_owner.uuid = o.user_uuid
+      LEFT JOIN eg_user usr
+          ON usr.id = payment.createdby::integer
+      WHERE bill.tenantid = 'pb.pathankot'
         AND pd.businessservice = 'rl-services'
-    orderby: ORDER BY pd.receiptdate DESC;
+      GROUP BY
+          pd.receiptnumber,
+          bill.consumercode,
+          pd.receiptdate,
+          usr.name,
+          payment.instrumentdate,
+          payment.instrumentnumber,
+          u_owner.name,
+          pd.amountpaid,
+          payment.paymentmode,
+          payment.paymentstatus,
+          pd.manualreceiptnumber,
+          pd.manualreceiptdate
+    orderby: ORDER BY pd.receiptdate DESC
     
   - reportName: StateReceiptRegisterRL
     decryptionPathId: RLREPORTS
