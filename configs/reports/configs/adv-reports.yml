@@ -613,22 +613,38 @@ ReportDefinitions:
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: adv
         isMandatory: true
-        searchClause: AND b.tenant_id= $ulb
+        searchClause: AND b.tenant_id = $ulb
+
     query: >
-      -- Use CTE to force query plan, compute & use CTE later
-       SELECT 
-           INITCAP(split_part(b.tenant_id, '.', 2)) AS tenant ,b.booking_no, b.receipt_no , 
-           a.applicant_name , a.applicant_mobile_no,
-           ad.address_line_1 , ad.pincode ,
-           c.add_type , c.location , c.face_area , c.booking_date , c.booking_from_time , 
-           c.booking_to_time,c.status
-         FROM eg_adv_booking_detail b
-          INNER JOIN eg_adv_applicant_detail a on a.booking_id=b.booking_id
-          INNER JOIN eg_adv_address_detail ad on ad.applicant_detail_id = a.applicant_detail_id
-          INNER JOIN eg_adv_cart_detail c on c.booking_id=b.booking_id
-          WHERE  c.status='BOOKED'  and b.tenant_id != 'pb.testing'
-    orderby: ORDER BY c.booking_date
-    
+      SELECT
+          INITCAP(split_part(b.tenant_id, '.', 2)) AS tenant,
+          b.booking_no,
+          b.receipt_no,
+          a.applicant_name,
+          a.applicant_mobile_no,
+          ad.address_line_1,
+          ad.pincode,
+          c.add_type,
+          c.location,
+          c.face_area,
+          TO_CHAR(
+              c.booking_date AT TIME ZONE 'Asia/Kolkata',
+              'DD-MM-YYYY'
+          ) AS booking_date,
+          c.booking_from_time,
+          c.booking_to_time,
+          c.status
+      FROM eg_adv_booking_detail b
+          INNER JOIN eg_adv_applicant_detail a
+              ON a.booking_id = b.booking_id
+          INNER JOIN eg_adv_address_detail ad
+              ON ad.applicant_detail_id = a.applicant_detail_id
+          INNER JOIN eg_adv_cart_detail c
+              ON c.booking_id = b.booking_id
+      WHERE c.status = 'BOOKED'
+        AND b.tenant_id != 'pb.testing'
+
+    orderby: ORDER BY c.booking_date    
   - reportName: StateCollectionsReport
     decryptionPathId: STATEADVREPORTS  
     summary: Collections
