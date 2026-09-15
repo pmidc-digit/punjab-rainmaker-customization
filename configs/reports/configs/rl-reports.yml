@@ -1249,7 +1249,7 @@ ReportDefinitions:
     groupby: GROUP BY a.id, a.application_number, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto HAVING SUM(dd.taxamount - dd.collectionamount) > 0 AND TO_TIMESTAMP(d.taxperiodto / 1000)::date < date_trunc('month', current_date)::date
     orderby: ORDER BY a.created_time DESC
 
-      - reportName: StateRentAndLeaseNewApplicationsReport
+  - reportName: StateRentAndLeaseNewApplicationsReport
     decryptionPathId: RLREPORTS
     summary: State level report of applications in Rent & Lease service with ULB, owner name, rent amount and status
     version: 1.0.0
