@@ -50,6 +50,12 @@
                 }
               },
               {
+                "variable": "applicantAddress",
+                "value": {
+                  "path": "$.bookingData[0].bookingApplication[0].address.addressLine1"
+                }
+              },
+              {
                 "variable": "paymentStatus",
                 "value": {
                   "path": "$.paymentStatus"
@@ -802,6 +808,14 @@
               {
                 "variable": "excessAmountPaid",
                 "formula": "{{paidAmount}}>{{dueAmount}}?{{paidAmount}}-{{dueAmount}}:0"
+              },
+              {
+                "variable": "advSecurityDeposit",
+                "formula": "{{advSecurityDeposit}}>0?{{advSecurityDeposit}}:0"
+              },
+              {
+                "variable": "advServiceCharge",
+                "formula": "{{advServiceCharge}}>0?{{advServiceCharge}}:0"
               }
             ]
           },
