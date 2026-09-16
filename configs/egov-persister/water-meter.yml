@@ -37,12 +37,11 @@ serviceMaps:
         - query: >
             UPDATE egbs_demand_v1 
             SET status = 'CANCELLED' 
-            WHERE id = ? AND tenantid = ? AND consumerCode = ? AND businessservice = ?;
+            WHERE id = ? AND status='ACTIVE' AND tenantId=? AND businessservice=?;
           basePath: $
           jsonMaps:
             - jsonPath: $.id
             - jsonPath: $.tenantId
-            - jsonPath: $.consumerCode
             - jsonPath: $.businessService
 
         - query: >
@@ -53,11 +52,13 @@ serviceMaps:
             AND egbs_bill_v1.status = 'ACTIVE' 
             AND egbs_billdetail_v1.demandid = ?
             AND egbs_bill_v1.tenantid = ?
+            AND egbs_billdetail_v1.consumerCode = ?
             AND egbs_billdetail_v1.businessservice = ?;
           basePath: $
           jsonMaps:
             - jsonPath: $.id
             - jsonPath: $.tenantId
+            - jsonPath: $.consumerCode
             - jsonPath: $.businessService
     - version: 1.0
       name: UpdateLatestMeterReading
