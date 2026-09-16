@@ -50,12 +50,16 @@ serviceMaps:
             FROM egbs_billdetail_v1
             WHERE egbs_bill_v1.id = egbs_billdetail_v1.billid
             AND egbs_bill_v1.status = 'ACTIVE' 
+            AND egbs_billdetail_v1.demandid = ?
             AND egbs_bill_v1.tenantid = ?
+            AND egbs_billdetail_v1.consumerCode = ?
             AND egbs_billdetail_v1.businessservice = ?;
           basePath: $
           jsonMaps:
-            - jsonPath: $.businessService
+            - jsonPath: $.id
+            - jsonPath: $.tenantId
             - jsonPath: $.consumerCode
+            - jsonPath: $.businessService
     - version: 1.0
       name: UpdateLatestMeterReading
       description: Update only the latest meter reading for a connection
