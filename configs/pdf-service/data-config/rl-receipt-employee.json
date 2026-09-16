@@ -20,6 +20,12 @@
                 }
               },
               {
+                "variable": "allotmentType",
+                "value": {
+                  "path": "$.billRootData.rlSearchData.additionalDetails.selectedProperty.allotmentType"
+                }
+              },
+              {
                 "variable": "approverComment",
                 "value": {
                   "path": "$.billRootData.rlSearchData.additionalDetails.approverComment"
@@ -125,6 +131,66 @@
                 "variable": "paidAmount", 
                 "value": {
                   "path": "$.amount"
+                }
+              },
+              {
+                "variable": "propertyAddress",
+                "value": {
+                  "path": "$.billRootData.rlSearchData.additionalDetails.propertyDetails[0].address"
+                }
+              },
+              {
+                "variable": "feesPeriodCycle",
+                "value": {
+                  "path": "$.billRootData.rlSearchData.additionalDetails.propertyDetails[0].feesPeriodCycle"
+                }
+              },
+              {
+                "variable": "billToPeriod",
+                "value": {
+                  "path": "$.toPeriod"
+                },
+                "type": "date"
+              },
+              {
+                "variable": "totalAdjustedAmount",
+                "value": {
+                  "path": "$.totalAdjustedAmount"
+                }
+              },
+              {
+                "variable": "totalpreAdjustedAmount",
+                "value": {
+                  "path": "$.totalpreAdjustedAmount"
+                }
+              },
+              {
+                "variable": "var_billDetails",
+                "value": {
+                  "path": "$.billAccountDetails[*]"
+                },
+                "type": "array",
+                "format": {
+                  "type": "object",
+                  "scema": [
+                    {
+                      "variable": "billTaxHeadCode",
+                      "value": "taxHeadCode",
+                      "localisation": {
+                        "required": true,
+                        "prefix": null,
+                        "module": "rainmaker-common"
+                      }
+                    },
+                    {
+                      "variable": "billAmount",
+                      "value": "adjustedAmount"
+                    },
+                    {
+                      "variable": "billAmountOG",
+                      "value": "amount"
+                    }
+                  ]
                 }
               },
               {
@@ -400,7 +466,7 @@
               {
                 "variable": "no_signature",
                 "value": {
-                  "path": "PDF_STATIC_LABEL_CONSOLIDATED_RECEIPT_NO_SIGNATURE"
+                  "path": "PT_RECEIPT_COMPUTER_GENERATED_MESSAGE"
                 },
                 "type": "label",
                 "localisation":{
