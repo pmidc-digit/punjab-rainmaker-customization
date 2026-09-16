@@ -236,24 +236,50 @@
             [
               {
                 "text": "{{transaction_id}}",
-                "border": [true, false, false, true],
+                "border": [true, false, false, false],
                 "style": "receipt-table-value"
               },
               {
                 "text": "{{transactionID}}",
-                "border": [false, false, false, true],
+                "border": [false, false, false, false],
                 "style": "receipt-table"
               },
               {
                 "text": "{{rlAmountLeftLabel}}",
-                "border": [false, false, false, true],
+                "border": [false, false, false, false],
                 "style": "receipt-table-value"
               },
               {
                 "text": "{{rlAmountLeft}}",
-                "border": [false, false, true, true],
+                "border": [false, false, true, false],
                 "style": "receipt-table",
                 "font": "Roboto"
+              }
+            ],
+            [
+              {
+                "text": "{{shop_name}}",
+                "border": [true, false, false, false],
+                "style": "receipt-table-value"
+              },
+              {
+                "text": "{{shopName}}",
+                "border": [false, false, false, false],
+                "style": "receipt-table",
+                "colspan":3
+              }
+            ],
+            [
+              {
+                "text": "Comments",
+                "border": [true, false, false, true],
+                "style": "receipt-table-value"
+              },
+              {
+                "text": "{{approverComment}}",
+                "border": [false, false, true, true],
+                "style": "receipt-table",
+                "colSpan": 3
               }
             ]
           ]
@@ -268,8 +294,28 @@
             [
               {
                 "table": {
-                  "widths": ["*", "*"],
-                  "body": "[{{#var_billDetails}}[{\"text\":\"{{billTaxHeadCode}}\",\"alignment\":\"left\",\"border\":[true,true,false,true], \"style\":\"receipt-table2\"},{\"text\":\"{{billAmount}}\",\"alignment\":\"left\",\"style\":\"receipt-table2\",\"border\":[false,true,true,true]}]{{/var_billDetails}}]"
+                  "widths": ["*", "*" ,"*"],
+                  "body": [
+                    [
+                      {
+                        "text": "Tax Head Code",
+                        "border": [true, true, false, true],
+                        "style": "receipt-table-value"
+                      },
+                      {
+                        "text": "Adjusted Amount",
+                        "border": [false, true, false, true],
+                        "style": "receipt-table-value"
+                      },
+                      {
+                        "text": "Original Amount",
+                        "border": [false, true, true, true],
+                        "style": "receipt-table-value",
+                        "font": "Roboto"
+                      }
+                    ],
+                    "{{#var_billDetails}}[{\"text\":\"{{billTaxHeadCode}}\",\"alignment\":\"left\",\"border\":[true,true,false,true], \"style\":\"receipt-table2\"},{\"text\":\"{{billAmount}}\",\"alignment\":\"left\",\"style\":\"receipt-table2\",\"border\":[false,true,false,true]},{\"text\":\"{{billAmountOG}}\",\"alignment\":\"left\",\"border\":[false,true,true,true], \"style\":\"receipt-table2\"}]{{/var_billDetails}}"
+                  ]
                 },
                 "border": [true, true, true, true]
               }
@@ -277,7 +323,7 @@
             [
               {
                 "table": {
-                  "widths": ["*", "*"],
+                  "widths": ["35%", "35%", "30%"],
                   "body": [
                     [
                       {
@@ -287,6 +333,14 @@
                       },
                       {
                         "text": "{{totalAdjustedAmount}}",
+                        "border": [false, false, false, false],
+                        "style": "receipt-table-value",
+                        "margin-left": 3,
+                        "bold":false,
+                        "font": "Roboto"
+                      },
+                      {
+                        "text": "{{totalpreAdjustedAmount}}",
                         "border": [false, false, false, false],
                         "style": "receipt-table-value",
                         "margin-left": 3,
