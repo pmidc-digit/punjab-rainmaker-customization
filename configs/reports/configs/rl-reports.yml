@@ -20,7 +20,7 @@ ReportDefinitions:
         source: rl
         total: false
       - name: mobilenumber
-        label: Mobilen Number
+        label: Mobile Number
         type: string
         source: rl
         total: false
@@ -193,7 +193,7 @@ ReportDefinitions:
          FROM eg_rl_allotment AS r
          LEFT JOIN eg_rl_owner_info AS o ON o.allotment_id = r.id
          LEFT JOIN eg_user AS u ON u.uuid = o.user_uuid
-         WHERE r.tenantid = $tenantid
+         WHERE r.tenant_id = $tenantid
 
   - reportName: StateCollectionsReport
     decryptionPathId: RLREPORTS  
@@ -204,7 +204,7 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: tenantid
+      - name: ulb
         label: Ulb Name
         type: string
         source: rl
@@ -225,7 +225,7 @@ ReportDefinitions:
         source: rl
         total: false
       - name: businessservice
-        label: businessservice
+        label: Businessservice
         type: string
         source: rl
         total: false
@@ -531,7 +531,7 @@ ReportDefinitions:
         FROM unique_transactions
         WHERE 1=1
     orderby: ORDER BY createdtime DESC
-
+    
   - reportName: ReceiptRegisterRL
     decryptionPathId: RLREPORTS
     summary: Details of collector register in Rent & Lease service
@@ -690,7 +690,7 @@ ReportDefinitions:
         AND pd.businessservice = 'rl-services'
     groupby: GROUP BY pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name, payment.instrumentdate, payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
     orderby: ORDER BY pd.receiptdate DESC
-    
+
   - reportName: StateReceiptRegisterRL
     decryptionPathId: RLREPORTS
     summary: Details of collector register in Rent & Lease service
@@ -700,7 +700,7 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: tenantid
+      - name: ulb
         label: ULB Name
         type: string
         source: rl
@@ -775,6 +775,26 @@ ReportDefinitions:
         type: string
         source: rl
         total: false
+      - name: rl_arrear_fee
+        label: RL Arrear Fee
+        type: string
+        source: rl
+        total: true
+      - name: rl_cgst_fee
+        label: RL CGST Fee
+        type: string
+        source: rl
+        total: true
+      - name: rl_sgst_fee
+        label: RL SGST Fee
+        type: string
+        source: rl
+        total: true
+      - name: total_amount
+        label: Total Amount
+        type: string
+        source: rl
+        total: true
     searchParams:
       - name: fromDate
         label: From Date
@@ -807,38 +827,95 @@ ReportDefinitions:
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: rl
         isMandatory: false
-        searchClause: AND bill.tenantid = $ulb
+        searchClause: AND tenantid = $ulb
+
     query: >
-      -- Use CTE to force query plan, compute & use CTE later
-       SELECT
-        pd.receiptnumber AS receiptno,
-        bill.consumercode AS connectionno,
-        TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS receiptdate,
-        'Rent & lease' AS service,
-        usr.name AS collectorname,
-        TO_CHAR(TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY') AS transactiondate,
-        payment.instrumentnumber AS instrumentnumber,
-        u_owner.name AS payername,
-        pd.amountpaid,bill.tenantid,
-        payment.paymentmode,
-        payment.paymentstatus,
-        u_owner.name AS ownername1,
-        usr.id AS user,
-        usr.name  AS ownername1,
-        pd.amountpaid AS amountpaid,
-        payment.paymentmode AS paymentmode,
-        payment.paymentstatus AS paymentstatus,
-        pd.manualreceiptnumber,
-        pd.manualreceiptdate
-       FROM egcl_paymentdetail pd
-       INNER JOIN egcl_bill bill ON bill.id = pd.billid 
-       INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
-       JOIN eg_rl_allotment r ON r.application_number = bill.consumercode
-       INNER JOIN public.eg_rl_owner_info o ON o.allotment_id= r.id
-       LEFT JOIN eg_user u_owner ON u_owner.uuid = o.user_uuid      
-       LEFT JOIN eg_user usr  ON usr.id = payment.createdby::integer
-       WHERE  pd.businessservice = 'rl-services'
-    orderby: ORDER BY pd.receiptdate DESC;
+      SELECT
+          pd.receiptnumber AS receiptno,
+          bill.consumercode AS connectionno,
+          TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate,
+          'Rent & lease' AS service,
+          usr.name AS collectorname,
+          TO_CHAR(TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS transactiondate,
+          payment.instrumentnumber AS instrumentnumber,
+          u_owner.name AS payername,
+          pd.amountpaid AS amountpaid,
+          payment.paymentmode AS paymentmode,
+          payment.paymentstatus AS paymentstatus,
+          u_owner.name AS ownername1,
+          pd.manualreceiptnumber AS manualreceiptnumber,
+          pd.manualreceiptdate AS manualreceiptdate,
+          SUM(CASE WHEN dd.taxheadcode = 'RL_ARREAR_FEE' THEN dd.taxamount ELSE 0 END) AS rl_arrear_fee,
+          SUM(CASE WHEN dd.taxheadcode = 'RL_CGST_FEE' THEN dd.taxamount ELSE 0 END) AS rl_cgst_fee,
+          SUM(CASE WHEN dd.taxheadcode = 'RL_SGST_FEE' THEN dd.taxamount ELSE 0 END) AS rl_sgst_fee,
+          SUM(dd.taxamount) AS total_amount
+      FROM egcl_paymentdetail pd
+      INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = $tenantid
+      INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
+      INNER JOIN egbs_demanddetail_v1 dd ON dd.demandid = bd.demandid
+      INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
+      JOIN eg_rl_allotment r ON r.application_number = bill.consumercode
+      INNER JOIN public.eg_rl_owner_info o ON o.allotment_id = r.id
+      LEFT JOIN eg_user u_owner ON u_owner.uuid = o.user_uuid
+      LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
+      WHERE bill.tenantid = $tenantid
+        AND pd.businessservice = 'rl-services'
+    groupby: GROUP BY pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name, payment.instrumentdate, payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
+    orderby: ORDER BY pd.receiptdate DESC
+
+
+  - reportName: RLdetailreport
+    summary: Details of application in Rent & Lease service learning
+    version: 1.0.0
+    moduleName: rainmaker-rl
+    additionalConfig:
+      print:
+        pdfPageSize: A4
+    sourceColumns:
+      - name: tenant_id
+        label: Tenant id
+        type: string
+        source: rl
+        total: false
+      - name: status
+        label: Application Status
+        type: string
+        source: rl
+        total: false
+      - name: property_id
+        label: Property Id
+        type: string
+        source: rl
+        total: false
+      - name: application_type
+        label: Application type
+        type: string
+        source: rl
+        total: false
+      - name: application_number
+        label: Application number
+        type: string
+        source: rl
+        total: false      
+    searchParams:
+      - name: status
+        label: Application Status
+        type: singlevaluelist
+        pattern: 'list://INITIATED:Initiated,FORWARD_FOT_SETLEMENT:Forward For Settlement,CLOSED:Closed, APPROVED:Approved,PENDINGFORAPPROVAL:Pending For Approval , PENDING_FOR_DOCUMENT_VERIFY:Pending For Document Verify,PENDING_FOR_PAYMENT:Pending For Payment,PENDING_REQUEST_FOR_DISCONNECTION:Pending Request For Disconnection'
+        source: rl
+        isMandatory: false
+        searchClause: AND status = $status
+      - name: ulb
+        label: ULB
+        type: singlevaluelist
+        pattern: 'http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name'
+        source: rl
+        isMandatory: false
+        searchClause: AND tenant_id = $ulb
+
+    query: |
+        select tenant_id, status, property_id, application_type, application_number from public.eg_rl_allotment 
+        where 1=1
 
   - reportName: RentAndLeaseNewApplicationsReport
     decryptionPathId: RLREPORTS
@@ -854,52 +931,53 @@ ReportDefinitions:
         type: string
         source: rl
         total: false
-
       - name: property_id
         label: Property ID
         type: string
         source: rl
         total: false
-
-      - name: owner_name
-        label: Owner/Tenant Name
-        type: string
-        source: rl
-        total: false
-
-      - name: ulb
-        label: ULB
-        type: string
-        source: rl
-        total: false
-
-      - name: rent_amount
-        label: Rent Amount
-        type: string
-        source: rl
-        total: true
-
       - name: application_status
         label: Application Status
         type: string
         source: rl
         total: false
-
-      - name: application_creation_date
-        label: Application Creation Date
+      - name: application_date
+        label: Application Date
         type: string
         source: rl
         total: false
-
+      - name: taxperiodfrom
+        label: Tax Period From
+        type: string
+        source: rl
+        total: false
+      - name: taxperiodto
+        label: Tax Period To
+        type: string
+        source: rl
+        total: false
+      - name: demand_amount
+        label: Demand Amount
+        type: string
+        source: rl
+        total: true
+      - name: collected_amount
+        label: Collected Amount
+        type: string
+        source: rl
+        total: true
+      - name: pending_amount
+        label: Pending Rent Amount
+        type: string
+        source: rl
+        total: true
     searchParams:
-
       - name: applicationNumber
         label: Application Number
         type: string
         source: rl
         isMandatory: false
         searchClause: AND a.application_number LIKE $applicationNumber
-
       - name: status
         label: Application Status
         type: singlevaluelist
@@ -907,14 +985,12 @@ ReportDefinitions:
         source: rl
         isMandatory: false
         searchClause: AND a.status = $status
-
       - name: fromDate
         label: From Date
         type: epoch
         source: rl
         isMandatory: true
         searchClause: AND a.created_time >= $fromDate
-
       - name: toDate
         label: To Date
         type: epoch
@@ -922,13 +998,6 @@ ReportDefinitions:
         isMandatory: true
         searchClause: AND a.created_time <= $toDate
 
-      - name: ulb
-        label: ULB Name
-        type: singlevaluelist
-        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-        source: rl
-        isMandatory: true
-        searchClause: AND a.tenant_id = $ulb
 
     query: |
       SELECT
@@ -958,7 +1027,247 @@ ReportDefinitions:
       WHERE 1=1
 
     groupby: GROUP BY a.id, a.application_number, a.property_id, a.tenant_id, a.amount_tobe_deducted, a.status, a.created_time
+    orderby: ORDER BY a.created_time DESC
 
+
+  - reportName: StateRentAndLeaseNewApplicationsReport
+    decryptionPathId: RLREPORTS
+    summary: Details of applications in Rent & Lease service with owner name, ULB, rent amount and status
+    version: 1.0.0
+    moduleName: rainmaker-rl
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenantid
+        label: ULB Name
+        type: string
+        source: rl
+        total: false
+      - name: application_number
+        label: Application Number
+        type: string
+        source: rl
+        total: false
+      - name: property_id
+        label: Property ID
+        type: string
+        source: rl
+        total: false
+      - name: application_status
+        label: Application Status
+        type: string
+        source: rl
+        total: false
+      - name: application_date
+        label: Application Date
+        type: string
+        source: rl
+        total: false
+      - name: taxperiodfrom
+        label: Tax Period From
+        type: string
+        source: rl
+        total: false
+      - name: taxperiodto
+        label: Tax Period To
+        type: string
+        source: rl
+        total: false
+      - name: demand_amount
+        label: Demand Amount
+        type: string
+        source: rl
+        total: true
+      - name: collected_amount
+        label: Collected Amount
+        type: string
+        source: rl
+        total: true
+      - name: pending_amount
+        label: Pending Rent Amount
+        type: string
+        source: rl
+        total: true
+    searchParams:
+      - name: applicationNumber
+        label: Application Number
+        type: string
+        source: rl
+        isMandatory: false
+        searchClause: AND a.application_number LIKE $applicationNumber
+      - name: status
+        label: Application Status
+        type: singlevaluelist
+        pattern: 'list://INITIATED:Initiated,FORWARD_FOT_SETLEMENT:Forward For Settlement,CLOSED:Closed, APPROVED:Approved,PENDINGFORAPPROVAL:Pending For Approval , PENDING_FOR_DOCUMENT_VERIFY:Pending For Document Verify,PENDING_FOR_PAYMENT:Pending For Payment,PENDING_REQUEST_FOR_DISCONNECTION:Pending Request For Disconnection'
+        source: rl
+        isMandatory: false
+        searchClause: AND a.status = $status
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: rl
+        isMandatory: true
+        searchClause: AND a.created_time >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: rl
+        isMandatory: true
+        searchClause: AND a.created_time <= $toDate
+      - name: ulb
+        label: ULB Name
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: rl
+        isMandatory: false
+        searchClause: AND a.tenant_id = $ulb
+    query: |
+      SELECT
+          a.tenant_id AS tenantid,
+          a.application_number,
+          a.property_id,
+          STRING_AGG(
+              DISTINCT
+              CASE
+                  WHEN eu.name IS NULL
+                  THEN '30048|23/xn3x2FAxn8vYAN0IdplsOxaE='
+                  ELSE eu.name
+              END,
+              ', '
+          ) AS owner_name,
+          a.tenant_id AS ulb,
+          a.amount_tobe_deducted AS rent_amount,
+          a.status AS application_status,
+          TO_CHAR(
+              TO_TIMESTAMP(a.created_time/1000),
+              'DD-MM-YYYY HH24:MI:SS'
+          ) AS application_creation_date
+      FROM eg_rl_allotment a
+      LEFT JOIN eg_rl_owner_info oi
+            ON oi.allotment_id = a.id
+      LEFT JOIN eg_user eu
+            ON eu.uuid = oi.user_uuid
+      WHERE 1=1
+
+    groupby: GROUP BY a.id, a.application_number, a.property_id, a.tenant_id, a.amount_tobe_deducted, a.status, a.created_time
+    orderby: ORDER BY a.created_time DESC
+
+  - reportName: StateRentAndLeaseDefaulterReport
+    decryptionPathId: RLREPORTS
+    summary: Report of properties/tenants in Rent & Lease service with pending rent dues (defaulters), showing demand amount, collected amount and pending rent amount
+    version: 1.0.0
+    moduleName: rainmaker-rl
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: ulb
+        label: ULB Name
+        type: string
+        source: rl
+        total: false
+      - name: application_number
+        label: Application Number
+        type: string
+        source: rl
+        total: false
+      - name: property_id
+        label: Property ID
+        type: string
+        source: rl
+        total: false
+      - name: application_status
+        label: Application Status
+        type: string
+        source: rl
+        total: false
+      - name: application_date
+        label: Application Date
+        type: string
+        source: rl
+        total: false
+      - name: taxperiodfrom
+        label: Tax Period From
+        type: string
+        source: rl
+        total: false
+      - name: taxperiodto
+        label: Tax Period To
+        type: string
+        source: rl
+        total: false
+      - name: demand_amount
+        label: Demand Amount
+        type: string
+        source: rl
+        total: true
+      - name: collected_amount
+        label: Collected Amount
+        type: string
+        source: rl
+        total: true
+      - name: pending_amount
+        label: Pending Rent Amount
+        type: string
+        source: rl
+        total: true
+    searchParams:
+      - name: applicationNumber
+        label: Application Number
+        type: string
+        source: rl
+        isMandatory: false
+        searchClause: AND a.application_number LIKE $applicationNumber
+      - name: status
+        label: Application Status
+        type: singlevaluelist
+        pattern: 'list://INITIATED:Initiated,FORWARD_FOT_SETLEMENT:Forward For Settlement,CLOSED:Closed, APPROVED:Approved,PENDINGFORAPPROVAL:Pending For Approval , PENDING_FOR_DOCUMENT_VERIFY:Pending For Document Verify,PENDING_FOR_PAYMENT:Pending For Payment,PENDING_REQUEST_FOR_DISCONNECTION:Pending Request For Disconnection'
+        source: rl
+        isMandatory: false
+        searchClause: AND a.status = $status
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: rl
+        isMandatory: false
+        searchClause: AND a.created_time >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: rl
+        isMandatory: false
+        searchClause: AND a.created_time <= $toDate
+      - name: ulb
+        label: ULB Name
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: rl
+        isMandatory: false
+        searchClause: AND a.tenant_id = $ulb
+    query: |
+      SELECT
+          a.tenant_id AS tenantid,
+          a.application_number AS application_number,
+          a.property_id AS property_id,
+          a.status AS application_status,
+          TO_CHAR(TO_TIMESTAMP(a.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS application_date,
+          TO_CHAR(TO_TIMESTAMP(d.taxperiodfrom / 1000), 'DD-MM-YYYY') AS taxperiodfrom,
+          TO_CHAR(TO_TIMESTAMP(d.taxperiodto / 1000), 'DD-MM-YYYY') AS taxperiodto,
+          SUM(dd.taxamount) AS demand_amount,
+          SUM(dd.collectionamount) AS collected_amount,
+          SUM(dd.taxamount - dd.collectionamount) AS pending_amount
+      FROM eg_rl_allotment a
+      JOIN egbs_demand_v1 d
+          ON d.consumercode = a.application_number
+         AND d.businessservice = 'rl-services'
+         AND d.tenantid = a.tenant_id
+      JOIN egbs_demanddetail_v1 dd
+          ON dd.demandid = d.id
+         AND dd.tenantid = d.tenantid
+      WHERE a.status <> 'REJECTED'
+        AND 1=1
+    groupby: GROUP BY a.id, a.application_number, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto HAVING SUM(dd.taxamount - dd.collectionamount) > 0 AND TO_TIMESTAMP(d.taxperiodto / 1000)::date < date_trunc('month', current_date)::date
     orderby: ORDER BY a.created_time DESC
 
   - reportName: RentAndLeaseDefaulterReport
@@ -980,11 +1289,6 @@ ReportDefinitions:
         type: string
         source: rl
         total: false
-      - name: tenant_id
-        label: ULB / Tenant
-        type: string
-        source: rl
-        total: false
       - name: application_status
         label: Application Status
         type: string
@@ -1046,130 +1350,6 @@ ReportDefinitions:
         source: rl
         isMandatory: false
         searchClause: AND a.created_time <= $toDate
-      - name: ulb
-        label: ULB Name
-        type: singlevaluelist
-        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-        source: rl
-        isMandatory: true
-        searchClause: AND a.tenant_id = $ulb
-    query: |
-      SELECT
-          a.application_number AS application_number,
-          a.property_id AS property_id,
-          a.tenant_id AS tenant_id,
-          a.status AS application_status,
-          TO_CHAR(TO_TIMESTAMP(a.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS application_date,
-          TO_CHAR(TO_TIMESTAMP(d.taxperiodfrom / 1000), 'DD-MM-YYYY') AS taxperiodfrom,
-          TO_CHAR(TO_TIMESTAMP(d.taxperiodto / 1000), 'DD-MM-YYYY') AS taxperiodto,
-          SUM(dd.taxamount) AS demand_amount,
-          SUM(dd.collectionamount) AS collected_amount,
-          SUM(dd.taxamount - dd.collectionamount) AS pending_amount
-      FROM eg_rl_allotment a
-      JOIN egbs_demand_v1 d
-          ON d.consumercode = a.application_number
-         AND d.businessservice = 'rl-services'
-         AND d.tenantid = a.tenant_id
-      JOIN egbs_demanddetail_v1 dd
-          ON dd.demandid = d.id
-         AND dd.tenantid = d.tenantid
-      WHERE a.status <> 'REJECTED'
-        AND 1=1
-    groupby: GROUP BY a.id, a.application_number, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto HAVING SUM(dd.taxamount - dd.collectionamount) > 0 AND TO_TIMESTAMP(d.taxperiodto / 1000)::date < date_trunc('month', current_date)::date
-    orderby: ORDER BY a.created_time DESC
-
-  - reportName: StateRentAndLeaseDefaulterReport
-    decryptionPathId: RLREPORTS
-    summary: State level report of properties and tenants in Rent & Lease service with pending rent dues (defaulters), showing ULB, demand amount, collected amount and pending rent amount
-    version: 1.0.0
-    moduleName: rainmaker-rl
-    additionalConfig:
-      print:
-        pdfPageSize: A1
-    sourceColumns:
-      - name: tenantid
-        label: ULB Name
-        type: string
-        source: rl
-        total: false
-      - name: application_number
-        label: Application Number
-        type: string
-        source: rl
-        total: false
-      - name: property_id
-        label: Property ID
-        type: string
-        source: rl
-        total: false
-      - name: application_status
-        label: Application Status
-        type: string
-        source: rl
-        total: false
-      - name: application_date
-        label: Application Date
-        type: string
-        source: rl
-        total: false
-      - name: taxperiodfrom
-        label: Tax Period From
-        type: string
-        source: rl
-        total: false
-      - name: taxperiodto
-        label: Tax Period To
-        type: string
-        source: rl
-        total: false
-      - name: demand_amount
-        label: Demand Amount
-        type: string
-        source: rl
-        total: true
-      - name: collected_amount
-        label: Collected Amount
-        type: string
-        source: rl
-        total: true
-      - name: pending_amount
-        label: Pending Rent Amount
-        type: string
-        source: rl
-        total: true
-    searchParams:
-      - name: applicationNumber
-        label: Application Number
-        type: string
-        source: rl
-        isMandatory: false
-        searchClause: AND a.application_number LIKE $applicationNumber
-      - name: status
-        label: Application Status
-        type: singlevaluelist
-        pattern: 'list://INITIATED:Initiated,FORWARD_FOT_SETLEMENT:Forward For Settlement,CLOSED:Closed, APPROVED:Approved,PENDINGFORAPPROVAL:Pending For Approval , PENDING_FOR_DOCUMENT_VERIFY:Pending For Document Verify,PENDING_FOR_PAYMENT:Pending For Payment,PENDING_REQUEST_FOR_DISCONNECTION:Pending Request For Disconnection'
-        source: rl
-        isMandatory: false
-        searchClause: AND a.status = $status
-      - name: fromDate
-        label: From Date
-        type: epoch
-        source: rl
-        isMandatory: false
-        searchClause: AND a.created_time >= $fromDate
-      - name: toDate
-        label: To Date
-        type: epoch
-        source: rl
-        isMandatory: false
-        searchClause: AND a.created_time <= $toDate
-      - name: ulb
-        label: ULB Name
-        type: singlevaluelist
-        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-        source: rl
-        isMandatory: false
-        searchClause: AND a.tenant_id = $ulb
     query: |
       SELECT
           a.tenant_id AS tenantid,
@@ -1194,126 +1374,4 @@ ReportDefinitions:
         AND 1=1
     groupby: GROUP BY a.id, a.application_number, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto HAVING SUM(dd.taxamount - dd.collectionamount) > 0 AND TO_TIMESTAMP(d.taxperiodto / 1000)::date < date_trunc('month', current_date)::date
     orderby: ORDER BY a.created_time DESC
-
-  - reportName: StateRentAndLeaseNewApplicationsReport
-    decryptionPathId: RLREPORTS
-    summary: State level report of applications in Rent & Lease service with ULB, owner name, rent amount and status
-    version: 1.0.0
-    moduleName: rainmaker-rl
-    additionalConfig:
-      print:
-        pdfPageSize: A1
-
-    sourceColumns:
-      - name: tenantid
-        label: ULB Name
-        type: string
-        source: rl
-        total: false
-
-      - name: application_number
-        label: Application Number
-        type: string
-        source: rl
-        total: false
-
-      - name: property_id
-        label: Property ID
-        type: string
-        source: rl
-        total: false
-
-      - name: owner_name
-        label: Owner/Tenant Name
-        type: string
-        source: rl
-        total: false
-
-      - name: rent_amount
-        label: Rent Amount
-        type: string
-        source: rl
-        total: true
-
-      - name: application_status
-        label: Application Status
-        type: string
-        source: rl
-        total: false
-
-      - name: application_creation_date
-        label: Application Creation Date
-        type: string
-        source: rl
-        total: false
-
-    searchParams:
-
-      - name: applicationNumber
-        label: Application Number
-        type: string
-        source: rl
-        isMandatory: false
-        searchClause: AND a.application_number LIKE $applicationNumber
-
-      - name: status
-        label: Application Status
-        type: singlevaluelist
-        pattern: 'list://INITIATED:Initiated,FORWARD_FOT_SETLEMENT:Forward For Settlement,CLOSED:Closed, APPROVED:Approved,PENDINGFORAPPROVAL:Pending For Approval , PENDING_FOR_DOCUMENT_VERIFY:Pending For Document Verify,PENDING_FOR_PAYMENT:Pending For Payment,PENDING_REQUEST_FOR_DISCONNECTION:Pending Request For Disconnection'
-        source: rl
-        isMandatory: false
-        searchClause: AND a.status = $status
-
-      - name: fromDate
-        label: From Date
-        type: epoch
-        source: rl
-        isMandatory: true
-        searchClause: AND a.created_time >= $fromDate
-
-      - name: toDate
-        label: To Date
-        type: epoch
-        source: rl
-        isMandatory: true
-        searchClause: AND a.created_time <= $toDate
-
-      - name: ulb
-        label: ULB Name
-        type: singlevaluelist
-        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
-        source: rl
-        isMandatory: false
-        searchClause: AND a.tenant_id = $ulb
-
-    query: |
-      SELECT
-          a.tenant_id AS tenantid,
-          a.application_number,
-          a.property_id,
-          STRING_AGG(
-              DISTINCT
-              CASE
-                  WHEN eu.name IS NULL
-                  THEN '30048|23/xn3x2FAxn8vYAN0IdplsOxaE='
-                  ELSE eu.name
-              END,
-              ', '
-          ) AS owner_name,
-          a.tenant_id AS ulb,
-          a.amount_tobe_deducted AS rent_amount,
-          a.status AS application_status,
-          TO_CHAR(
-              TO_TIMESTAMP(a.created_time/1000),
-              'DD-MM-YYYY HH24:MI:SS'
-          ) AS application_creation_date
-      FROM eg_rl_allotment a
-      LEFT JOIN eg_rl_owner_info oi
-            ON oi.allotment_id = a.id
-      LEFT JOIN eg_user eu
-            ON eu.uuid = oi.user_uuid
-      WHERE 1=1
-
-    groupby: GROUP BY a.id, a.application_number, a.property_id, a.tenant_id, a.amount_tobe_deducted, a.status, a.created_time
-
-    orderby: ORDER BY a.created_time DESC
+ 
