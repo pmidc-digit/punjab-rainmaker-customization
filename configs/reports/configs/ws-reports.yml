@@ -7343,18 +7343,18 @@ ReportDefinitions:
       type: epoch
       source: ws
       isMandatory: false
-      searchClause: AND (EXTRACT(EPOCH FROM first_bill_date) * 1000) >= $billDateFrom
+      searchClause: AND (EXTRACT(EPOCH FROM first_bill_date) * 1000) >= $billDateFrom::numeric
     - name: billDateTo
       label: Bill Date To
       type: epoch
       source: ws
       isMandatory: false
-      searchClause: AND (EXTRACT(EPOCH FROM first_bill_date) * 1000) < ($billDateTo + 86400000)
+      searchClause: AND (EXTRACT(EPOCH FROM first_bill_date) * 1000) < ($billDateTo::numeric + 86400000)
     - name: taxPeriodfrom
       label: Quarter From
       type: singlevaluelist
       source: ws
-      isMandatory: true
+      isMandatory: false
       pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=pb&moduleName=BillingService&masterName=TaxPeriod|$.MdmsRes.BillingService.TaxPeriod[?(@.service=='WS')].fromDate|$.MdmsRes.BillingService.TaxPeriod[?(@.service=='WS')].code
       wrapper: true
       searchClause: AND 1=1
@@ -7362,7 +7362,7 @@ ReportDefinitions:
       label: Quarter To
       type: singlevaluelist
       source: ws
-      isMandatory: true
+      isMandatory: false
       pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=pb&moduleName=BillingService&masterName=TaxPeriod|$.MdmsRes.BillingService.TaxPeriod[?(@.service=='WS')].toDate|$.MdmsRes.BillingService.TaxPeriod[?(@.service=='WS')].code
       wrapper: true
       searchClause: AND 1=1
@@ -7453,18 +7453,18 @@ ReportDefinitions:
       type: epoch
       source: ws
       isMandatory: false
-      searchClause: AND (EXTRACT(EPOCH FROM first_bill_date) * 1000) >= $billDateFrom
+      searchClause: AND (EXTRACT(EPOCH FROM first_bill_date) * 1000) >= $billDateFrom::numeric
     - name: billDateTo
       label: Bill Date To
       type: epoch
       source: ws
       isMandatory: false
-      searchClause: AND (EXTRACT(EPOCH FROM first_bill_date) * 1000) < ($billDateTo + 86400000)
+      searchClause: AND (EXTRACT(EPOCH FROM first_bill_date) * 1000) < ($billDateTo::numeric + 86400000)
     - name: taxPeriodfrom
       label: Quarter From
       type: singlevaluelist
       source: ws
-      isMandatory: true
+      isMandatory: false
       pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=pb&moduleName=BillingService&masterName=TaxPeriod|$.MdmsRes.BillingService.TaxPeriod[?(@.service=='SW')].fromDate|$.MdmsRes.BillingService.TaxPeriod[?(@.service=='SW')].code
       wrapper: true
       searchClause: AND 1=1
@@ -7472,7 +7472,7 @@ ReportDefinitions:
       label: Quarter To
       type: singlevaluelist
       source: ws
-      isMandatory: true
+      isMandatory: false
       pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=pb&moduleName=BillingService&masterName=TaxPeriod|$.MdmsRes.BillingService.TaxPeriod[?(@.service=='SW')].toDate|$.MdmsRes.BillingService.TaxPeriod[?(@.service=='SW')].code
       wrapper: true
       searchClause: AND 1=1
