@@ -813,24 +813,25 @@ ReportDefinitions:
         type: string
         source: rl
         isMandatory: false
-        searchClause: AND pd.receiptnumber like $receiptno
+        searchClause: AND pd.receiptnumber LIKE $receiptno
       - name: paymentMode
         label: Payment Mode
         type: singlevaluelist
         pattern: list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT
         source: rl
         isMandatory: false
-        searchClause: AND payment.paymentmode like $paymentMode
+        searchClause: AND payment.paymentmode LIKE $paymentMode
       - name: ulb
         label: ULB Name
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: rl
         isMandatory: false
-        searchClause: AND tenantid = $ulb
+        searchClause: AND pd.tenantid = $ulb
 
     query: >
       SELECT
+          pd.tenantid AS tenantid,
           pd.receiptnumber AS receiptno,
           bill.consumercode AS connectionno,
           TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate,
@@ -850,7 +851,7 @@ ReportDefinitions:
           SUM(CASE WHEN dd.taxheadcode = 'RL_SGST_FEE' THEN dd.taxamount ELSE 0 END) AS rl_sgst_fee,
           SUM(dd.taxamount) AS total_amount
       FROM egcl_paymentdetail pd
-      INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = $tenantid
+      INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = bill.tenantid
       INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
       INNER JOIN egbs_demanddetail_v1 dd ON dd.demandid = bd.demandid
       INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
@@ -858,11 +859,9 @@ ReportDefinitions:
       INNER JOIN public.eg_rl_owner_info o ON o.allotment_id = r.id
       LEFT JOIN eg_user u_owner ON u_owner.uuid = o.user_uuid
       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
-      WHERE bill.tenantid = $tenantid
-        AND pd.businessservice = 'rl-services'
-    groupby: GROUP BY pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name, payment.instrumentdate, payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
+      WHERE pd.businessservice = 'rl-services'
+    groupby: GROUP BY pd.tenantid, pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name, payment.instrumentdate, payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
     orderby: ORDER BY pd.receiptdate DESC
-
 
   - reportName: RLdetailreport
     summary: Details of application in Rent & Lease service learning
@@ -1151,30 +1150,33 @@ ReportDefinitions:
           a.application_number,
           a.application_type,
           a.property_id,
-          STRING_AGG(
-              DISTINCT
-              CASE
-                  WHEN eu.name IS NULL
-                  THEN '30048|23/xn3x2FAxn8vYAN0IdplsOxaE='
-                  ELSE eu.name
-              END,
-              ', '
-          ) AS owner_name,
-          a.tenant_id AS ulb,
-          a.amount_tobe_deducted AS rent_amount,
           a.status AS application_status,
           TO_CHAR(
-              TO_TIMESTAMP(a.created_time/1000),
+              TO_TIMESTAMP(a.created_time / 1000),
               'DD-MM-YYYY HH24:MI:SS'
-          ) AS application_creation_date
+          ) AS application_date,
+          TO_CHAR(
+              TO_TIMESTAMP(d.taxperiodfrom / 1000),
+              'DD-MM-YYYY'
+          ) AS taxperiodfrom,
+          TO_CHAR(
+              TO_TIMESTAMP(d.taxperiodto / 1000),
+              'DD-MM-YYYY'
+          ) AS taxperiodto,
+          COALESCE(SUM(dd.taxamount), 0) AS demand_amount,
+          COALESCE(SUM(dd.collectionamount), 0) AS collected_amount,
+          COALESCE(SUM(dd.taxamount - dd.collectionamount), 0) AS pending_amount
       FROM eg_rl_allotment a
-      LEFT JOIN eg_rl_owner_info oi
-            ON oi.allotment_id = a.id
-      LEFT JOIN eg_user eu
-            ON eu.uuid = oi.user_uuid
+      LEFT JOIN egbs_demand_v1 d
+            ON d.consumercode = a.application_number
+           AND d.businessservice = 'rl-services'
+           AND d.tenantid = a.tenant_id
+      LEFT JOIN egbs_demanddetail_v1 dd
+            ON dd.demandid = d.id
+           AND dd.tenantid = d.tenantid
       WHERE 1=1
 
-    groupby: GROUP BY a.id, a.application_number, a.application_type, a.property_id, a.tenant_id, a.amount_tobe_deducted, a.status, a.created_time
+    groupby: GROUP BY a.id, a.application_number, a.application_type, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto
     orderby: ORDER BY a.created_time DESC
 
   - reportName: StateRentAndLeaseDefaulterReport
@@ -1271,59 +1273,30 @@ ReportDefinitions:
         searchClause: AND a.tenant_id = $ulb
 
     query: |
-      WITH demand_pending AS (
-          SELECT
-              a.id AS allotment_id,
-              a.tenant_id AS tenantid,
-              a.application_number,
-              a.property_id,
-              a.status AS application_status,
-              a.created_time,
-              TO_CHAR(TO_TIMESTAMP(a.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_time_str,
-              d.id AS demand_id,
-              TO_CHAR(TO_TIMESTAMP(d.taxperiodfrom / 1000), 'DD-MM-YYYY') AS taxperiodfrom_str,
-              TO_CHAR(TO_TIMESTAMP(d.taxperiodto / 1000), 'DD-MM-YYYY') AS taxperiodto_str,
-              d.taxperiodto,
-              SUM(dd.taxamount) AS demand_amount,
-              SUM(dd.collectionamount) AS collected_amount,
-              SUM(dd.taxamount - dd.collectionamount) AS pending_amount
-          FROM eg_rl_allotment a
-          JOIN egbs_demand_v1 d
-              ON d.consumercode = a.application_number
-             AND d.businessservice = 'rl-services'
-             AND d.tenantid = a.tenant_id
-          JOIN egbs_demanddetail_v1 dd
-              ON dd.demandid = d.id
-             AND dd.tenantid = d.tenantid
-          WHERE a.status <> 'REJECTED'
-            AND 1=1
-          GROUP BY
-              a.id,
-              a.application_number,
-              a.property_id,
-              a.tenant_id,
-              a.status,
-              a.created_time,
-              d.id,
-              d.taxperiodfrom,
-              d.taxperiodto
-      )
       SELECT
-          tenantid,
-          application_number,
-          property_id,
-          application_status,
-          created_time_str AS created_time,
-          taxperiodfrom_str AS taxperiodfrom,
-          taxperiodto_str AS taxperiodto,
-          demand_amount,
-          collected_amount,
-          pending_amount
-      FROM demand_pending
-      WHERE pending_amount > 0
-        AND TO_TIMESTAMP(taxperiodto / 1000)::date < DATE_TRUNC('month', CURRENT_DATE)::date
+          a.tenant_id AS tenantid,
+          a.application_number AS application_number,
+          a.property_id AS property_id,
+          a.status AS application_status,
+          TO_CHAR(TO_TIMESTAMP(a.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_time,
+          TO_CHAR(TO_TIMESTAMP(d.taxperiodfrom / 1000), 'DD-MM-YYYY') AS taxperiodfrom,
+          TO_CHAR(TO_TIMESTAMP(d.taxperiodto / 1000), 'DD-MM-YYYY') AS taxperiodto,
+          SUM(dd.taxamount) AS demand_amount,
+          SUM(dd.collectionamount) AS collected_amount,
+          SUM(dd.taxamount - dd.collectionamount) AS pending_amount
+      FROM eg_rl_allotment a
+      JOIN egbs_demand_v1 d
+          ON d.consumercode = a.application_number
+         AND d.businessservice = 'rl-services'
+         AND d.tenantid = a.tenant_id
+      JOIN egbs_demanddetail_v1 dd
+          ON dd.demandid = d.id
+         AND dd.tenantid = d.tenantid
+      WHERE a.status <> 'REJECTED'
+        AND 1=1
 
-    orderby: ORDER BY created_time DESC
+    groupby: GROUP BY a.id, a.application_number, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto HAVING SUM(dd.taxamount - dd.collectionamount) > 0 AND TO_TIMESTAMP(d.taxperiodto / 1000)::date < DATE_TRUNC('month', CURRENT_DATE)::date
+    orderby: ORDER BY a.created_time DESC
 
   - reportName: RentAndLeaseDefaulterReport
     decryptionPathId: RLREPORTS
