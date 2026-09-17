@@ -6,7 +6,7 @@ serviceMaps:
       fromTopic: save-advertisement-booking
       isTransaction: true
       queryMaps:
-        - query: INSERT INTO public.eg_adv_booking_detail(booking_id, booking_no, payment_date, application_date, tenant_id, booking_status, receipt_no, booking_start_date, booking_end_date, createdby, createdtime, lastmodifiedby, lastmodifiedtime,advertisementId) VALUES (?, ?, ?, ?, ?, ?, ?, ?::DATE, ?::DATE, ?, ?, ?, ?, ?);
+        - query: INSERT INTO public.eg_adv_booking_detail(booking_id, booking_no, payment_date, application_date, tenant_id, booking_status, receipt_no, booking_start_date, booking_end_date, createdby, createdtime, lastmodifiedby, lastmodifiedtime,advertisementId,additionaldetails) VALUES (?, ?, ?, ?, ?, ?, ?, ?::DATE, ?::DATE, ?, ?, ?, ?, ?, ?);
           basePath: bookingApplication
           jsonMaps:
             - jsonPath: $.bookingApplication.bookingId
@@ -25,6 +25,10 @@ serviceMaps:
             - jsonPath: $.bookingApplication.advertisementId
 
             
+            - jsonPath: $.bookingApplication.additionalDetails
+              type: JSON
+              dbType: JSONB
+
         - query: INSERT INTO public.eg_adv_cart_detail(cart_id, booking_id, add_type, location, face_area, night_light, booking_date, booking_from_time, booking_to_time, status, createdby, createdtime, lastmodifiedby, lastmodifiedtime, advertisementId) VALUES (?, ?, ?, ?, ?, ?, ?::DATE, ?::TIME, ?::TIME, ?, ?, ?, ?, ?, ?);
           basePath: bookingApplication.cartDetails.*
           jsonMaps:
@@ -128,7 +132,7 @@ serviceMaps:
       fromTopic: update-advertisement-booking
       isTransaction: true
       queryMaps:
-        - query: UPDATE public.eg_adv_booking_detail SET booking_status = ?, payment_date = ?, lastmodifiedby = ?, lastmodifiedtime = ?, permission_letter_filestore_id = ?, payment_receipt_filestore_id = ? WHERE booking_id = ?;
+        - query: UPDATE public.eg_adv_booking_detail SET booking_status = ?, payment_date = ?, lastmodifiedby = ?, lastmodifiedtime = ?, permission_letter_filestore_id = ?, payment_receipt_filestore_id = ?, additionaldetails = COALESCE(?::jsonb, additionaldetails) WHERE booking_id = ?;
           basePath: bookingApplication
           jsonMaps:
             - jsonPath: $.bookingApplication.bookingStatus
@@ -138,6 +142,9 @@ serviceMaps:
             - jsonPath: $.bookingApplication.auditDetails.lastModifiedTime
             - jsonPath: $.bookingApplication.permissionLetterFilestoreId
             - jsonPath: $.bookingApplication.paymentReceiptFilestoreId
+            - jsonPath: $.bookingApplication.additionalDetails
+              type: JSON
+              dbType: JSONB
             - jsonPath: $.bookingApplication.bookingId
             
 
