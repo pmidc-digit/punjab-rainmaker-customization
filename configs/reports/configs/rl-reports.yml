@@ -99,7 +99,7 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: tenantid
+      - name: tenant_id
         label: ULB Name
         type: string
         source: rl
@@ -188,6 +188,7 @@ ReportDefinitions:
           r.amount_tobe_deducted,
           r.amount_to_be_refund, 
           u.mobilenumber, 
+          r.tenant_id,
           u.name
          FROM eg_rl_allotment AS r
          LEFT JOIN eg_rl_owner_info AS o ON o.allotment_id = r.id
@@ -570,11 +571,6 @@ ReportDefinitions:
         type: string
         source: rl
         total: false
-      - name: instrumentnumber
-        label: Instrument Number
-        type: string
-        source: rl
-        total: false
       - name: payername
         label: Payer Name
         type: string
@@ -597,16 +593,6 @@ ReportDefinitions:
         total: false
       - name: ownername1
         label: Owner Name
-        type: string
-        source: rl
-        total: false
-      - name: manualreceiptnumber
-        label: Manual Receipt Number
-        type: string
-        source: rl
-        total: false
-      - name: manualreceiptdate
-        label: Manual Receipt Date
         type: string
         source: rl
         total: false
@@ -734,11 +720,6 @@ ReportDefinitions:
         type: string
         source: rl
         total: false
-      - name: instrumentnumber
-        label: Instrument Number
-        type: string
-        source: rl
-        total: false
       - name: payername
         label: Payer Name
         type: string
@@ -761,16 +742,6 @@ ReportDefinitions:
         total: false
       - name: ownername1
         label: Owner Name
-        type: string
-        source: rl
-        total: false
-      - name: manualreceiptnumber
-        label: Manual Receipt Number
-        type: string
-        source: rl
-        total: false
-      - name: manualreceiptdate
-        label: Manual Receipt Date
         type: string
         source: rl
         total: false
