@@ -1116,7 +1116,7 @@ ReportDefinitions:
         pattern: 'list://NEW:New,LEGACY:Legacy'
         source: rl
         isMandatory: true
-        searchClause: AND a.application_type = $applicationType
+        searchClause: AND UPPER(a.application_type) = $applicationType
       - name: status
         label: Application Status
         type: singlevaluelist
@@ -1169,16 +1169,16 @@ ReportDefinitions:
       FROM eg_rl_allotment a
       LEFT JOIN egbs_demand_v1 d
             ON d.consumercode = a.application_number
-           AND d.businessservice = 'rl-services'
-           AND d.tenantid = a.tenant_id
+          AND d.businessservice = 'rl-services'
+          AND d.tenantid = a.tenant_id
       LEFT JOIN egbs_demanddetail_v1 dd
             ON dd.demandid = d.id
-           AND dd.tenantid = d.tenantid
+          AND dd.tenantid = d.tenantid
       WHERE 1=1
 
     groupby: GROUP BY a.id, a.application_number, a.application_type, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto
     orderby: ORDER BY a.created_time DESC
-
+    
   - reportName: StateRentAndLeaseDefaulterReport
     decryptionPathId: RLREPORTS
     summary: Report of properties/tenants in Rent & Lease service with pending rent dues (defaulters), showing demand amount, collected amount and pending rent amount
@@ -1287,11 +1287,11 @@ ReportDefinitions:
       FROM eg_rl_allotment a
       JOIN egbs_demand_v1 d
           ON d.consumercode = a.application_number
-         AND d.businessservice = 'rl-services'
-         AND d.tenantid = a.tenant_id
+        AND d.businessservice = 'rl-services'
+        AND d.tenantid = a.tenant_id
       JOIN egbs_demanddetail_v1 dd
           ON dd.demandid = d.id
-         AND dd.tenantid = d.tenantid
+        AND dd.tenantid = d.tenantid
       WHERE a.status <> 'REJECTED'
         AND 1=1
 
