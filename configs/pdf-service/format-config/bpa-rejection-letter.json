@@ -56,7 +56,7 @@
             [
               {
                 "stack": [
-                  { "text": "CLU No: {{consumerID}}", "margin": [0, 0, 0, 0] }
+                  { "text": "Application No: {{consumerID}}", "margin": [0, 0, 0, 0] }
                 ],
                 "style": "receipt-table",
                 "alignment": "left",
@@ -86,7 +86,7 @@
               {
                 "stack": [
                   {
-                    "text": "To {{#var_owners}}{{name}}, {{permanentAddress}} {{/var_owners}}  ",
+                    "text": "To: {{#var_owners}}{{name}}, {{permanentAddress}} {{/var_owners}}  ",
                     "style": "receipt-table",
                     "alignment": "left",
                     "margin": [0, 5, 0, 5],
@@ -124,10 +124,12 @@
               {
                 "text": [
                   "With reference to your application No ",
-                  { "text": "{{consumerID}}", "bold": true },
+                  { "text": "{{fileNo}}", "bold": true },
                   " dated ",
                   { "text": "{{submittedOn}}", "bold": true },
-                  " for the grant of sanction for the application of Change of Land Use(CLU) at House/Site No. ",
+                  " for the grant of sanction for the ",
+                  { "text": "{{noc_module_name}}", "bold": true },
+                  " at House/Site No. ",
                   { "text": "{{plotNo}}", "bold": true },
                   " Ward no. ",
                   { "text": "{{wardNo}}", "bold": true },

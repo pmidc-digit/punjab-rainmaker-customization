@@ -4,7 +4,7 @@
   "DataConfigs": {
     "moduleName": "rainmaker-common",
     "version": "1.0.0",
-    "baseKeyPath": "$.Payments.*",
+    "baseKeyPath": "$.Bpa.*",
     "entityIdPath": "$.id",
     "isCommonTableBorderRequired": true,
     "mappings": [
@@ -22,26 +22,32 @@
               {
                 "variable": "approverCommentLine",
                 "value": {
-                  "path": "$.Clu[0].approverComment.ConditionLine"
+                  "path": "$.approverComment.approverCommentLine"
                 }
               },
               {
                 "variable": "approverComment",
                 "value": {
-                  "path": "$.ApproverComment"
+                  "path": "$.approverComment.approverComment"
                 }
               },
               {
                 "variable": "currentDate",
                 "value": {
-                  "path": "$.currentDate"
+                  "path": "$.nowIST"
+                }
+              },
+              {
+                "variable": "fileNo",
+                "value": {
+                  "path": "$.fileno"
                 }
               },
 
               {
                 "variable": "var_owners",
                 "value": {
-                  "path": "$.Clu[0].owners[*]"
+                  "path": "$.Bpa[0].landInfo.owners[*]"
                 },
                 "type": "array",
                 "format": {
@@ -65,7 +71,7 @@
               {
                 "variable": "proposedSiteAddress",
                 "value": {
-                  "path": "$.Clu[0].cluDetails.additionalDetails.siteDetails.proposedSiteAddress"
+                  "path": "$.Bpa[0].landInfo.address.locality.name"
                 }
               },
               {
@@ -120,13 +126,13 @@
               {
                 "variable": "ulbName",
                 "value": {
-                  "path": "$.Clu[0].cluDetails.additionalDetails.siteDetails.ulbName.city.name"
+                  "path": "$.Bpa[0].additionalDetails.UlbName"
                 }
               },
               {
                 "variable": "nocUlbType",
                 "value": {
-                  "path": "$.Clu[0].cluDetails.additionalDetails.siteDetails.ulbType"
+                  "path": "$.Bpa[0].additionalDetails.Ulblisttype"
                 }
               },
               {
@@ -150,8 +156,9 @@
               {
                 "variable": "submittedOn",
                 "value": {
-                  "path": "$.Clu[0].cluDetails.additionalDetails.SubmittedOn"
-                }
+                  "path": "$.Bpa[0].applicationDate"
+                },
+                "type": "date"
               },
 
               {
@@ -193,13 +200,13 @@
               {
                 "variable": "plotNo",
                 "value": {
-                  "path": "$.Clu[0].cluDetails.additionalDetails.siteDetails.plotNo"
+                  "path": "$.Bpa[0].edcrDetail[0].planDetail.planInfoProperties.PLOT_NO"
                 }
               },
                {
                 "variable": "wardNo",
                 "value": {
-                  "path": "$.Clu[0].cluDetails.additionalDetails.siteDetails.wardNo"
+                  "path": "$.Bpa[0].edcrDetail[0].planDetail.planInfoProperties.WARD_NO"
                 }
               },
               {
@@ -243,7 +250,7 @@
               {
                 "variable": "tenantid",
                 "value": {
-                  "path": "$.tenantId"
+                  "path": "$.Bpa[0].tenantId"
                 }
               },
               {
@@ -278,12 +285,7 @@
               {
                 "variable": "officerDesignation",
                 "value": {
-                  "path": "$.EmpData.officer.designation"
-                },
-                "localisation": {
-                  "required": true,
-                  "prefix": "COMMON_MASTERS_DESIGNATION",
-                  "module": "rainmaker-common"
+                  "path": "$.designation"
                 }
               },
               {
@@ -353,7 +355,7 @@
               {
                 "variable": "consumerID",
                 "value": {
-                  "path": "$.Clu[0].applicationNo"
+                  "path": "$.Bpa[0].applicationNo"
                 }
               },
               {
@@ -840,12 +842,11 @@
               {
                 "variable": "noc_module_name",
                 "value": {
-                  "path": "ACTION_TEST_CLU_HOME"
+                  "path": "$.Bpa[0].businessService"
                 },
-                "type": "label",
                 "localisation": {
                   "required": true,
-                  "prefix": null,
+                  "prefix": "MODULE",
                   "module": "rainmaker-common"
                 }
               },
@@ -939,7 +940,7 @@
             "externalAPI": [
               {
                 "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
-                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}')%5D",
+                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.Bpa[0].tenantId}')%5D",
                 "apiRequest": null,
                 "responseMapping": [
                   {
@@ -992,7 +993,7 @@
               },
               {
                 "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
-                "queryParam": "moduleName=tenant&masterName=footer&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}' %26%26 @.service=='{$.paymentDetails[0].businessService}')%5D",
+                "queryParam": "moduleName=tenant&masterName=footer&tenantId=pb&filter=%5B?(@.code=='{$.Bpa[0].tenantId}' %26%26 @.service=='{$.Bpa[0].businessService}')%5D",
                 "apiRequest": null,
                 "responseMapping": [
                   {
