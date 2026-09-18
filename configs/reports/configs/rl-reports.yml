@@ -644,17 +644,16 @@ ReportDefinitions:
         type: string
         source: rl
         isMandatory: false
-        searchClause: AND pd.receiptnumber LIKE $receiptno
+        searchClause: AND pd.receiptnumber like $receiptno
       - name: paymentMode
         label: Payment Mode
         type: singlevaluelist
         pattern: list://CASH:CASH,CHEQUE:CHEQUE,DD:DD,ONLINE:ONLINE,CARD:CARD,OFFLINE_NEFT:OFFLINE NEFT
         source: rl
         isMandatory: false
-        searchClause: AND payment.paymentmode LIKE $paymentMode
+        searchClause: AND payment.paymentmode like $paymentMode
     query: |
       SELECT
-          pd.tenantid AS tenantid,
           pd.receiptnumber AS receiptno,
           bill.consumercode AS connectionno,
           TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate,
@@ -676,7 +675,7 @@ ReportDefinitions:
           ABS(SUM(CASE WHEN dd.taxheadcode = 'RL_ADVANCE_CARRYFORWARD' THEN dd.taxamount ELSE 0 END)) AS advance_paid,
           pd.amountpaid AS amountcollected
       FROM egcl_paymentdetail pd
-      INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = bill.tenantid
+      INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = $tenantid
       INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
       INNER JOIN egbs_demanddetail_v1 dd ON dd.demandid = bd.demandid
       INNER JOIN egbs_demand_v1 d ON d.id = dd.demandid
@@ -685,9 +684,10 @@ ReportDefinitions:
       INNER JOIN public.eg_rl_owner_info o ON o.allotment_id = r.id
       LEFT JOIN eg_user u_owner ON u_owner.uuid = o.user_uuid
       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
-      WHERE pd.businessservice = 'rl-services' 
+      WHERE bill.tenantid = $tenantid 
         AND d.status <> 'CANCELLED'
-    groupby: GROUP BY pd.tenantid, pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name,payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
+        AND pd.businessservice = 'rl-services'
+    groupby: GROUP BY pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name, payment.instrumentdate, payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
     orderby: ORDER BY pd.receiptdate DESC
 
   - reportName: StateReceiptRegisterRL
@@ -858,7 +858,7 @@ ReportDefinitions:
       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
       WHERE pd.businessservice = 'rl-services' 
         AND d.status <> 'CANCELLED'
-    groupby: GROUP BY pd.tenantid, pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name,payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
+    groupby: GROUP BY pd.tenantid, pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name, payment.instrumentdate, payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
     orderby: ORDER BY pd.receiptdate DESC
 
   - reportName: RLdetailreport
