@@ -57,7 +57,7 @@ ReportDefinitions:
       - name: status
         label: Application Status
         type: singlevaluelist
-        pattern: 'list://INITIATED:Initiated,FORWARD_FOT_SETLEMENT:Forward For Settlement,CLOSED:Closed, APPROVED:Approved,PENDINGFORAPPROVAL:Pending For Approval , PENDING_FOR_DOCUMENT_VERIFY:Pending For Document Verify,PENDING_FOR_PAYMENT:Pending For Payment,PENDING_REQUEST_FOR_DISCONNECTION:Pending Request For Disconnection'
+        pattern: 'list://INITIATED:Initiated,FORWARD_FOT_SETLEMENT:Forward For Settlement,CLOSED:Closed,APPROVED:Approved,PENDINGFORAPPROVAL:Pending For Approval,PENDING_FOR_DOCUMENT_VERIFY:Pending For Document Verify,PENDING_FOR_PAYMENT:Pending For Payment,PENDING_REQUEST_FOR_DISCONNECTION:Pending Request For Disconnection'
         source: rl
         isMandatory: false
         searchClause: AND r.status = $status
@@ -88,7 +88,7 @@ ReportDefinitions:
          FROM eg_rl_allotment AS r
          LEFT JOIN eg_rl_owner_info AS o ON o.allotment_id = r.id
          LEFT JOIN eg_user AS u ON u.uuid = o.user_uuid
-         WHERE r.tenant_id = $tenantid
+         WHERE 1=1
 
   - reportName: STATERENT&LEASEDETAILSReport
     decryptionPathId: RLREPORTS
@@ -153,7 +153,7 @@ ReportDefinitions:
       - name: status
         label: Application Status
         type: singlevaluelist
-        pattern: 'list://INITIATED:Initiated,FORWARD_FOT_SETLEMENT:Forward For Settlement,CLOSED:Closed, APPROVED:Approved,PENDINGFORAPPROVAL:Pending For Approval , PENDING_FOR_DOCUMENT_VERIFY:Pending For Document Verify,PENDING_FOR_PAYMENT:Pending For Payment,PENDING_REQUEST_FOR_DISCONNECTION:Pending Request For Disconnection'
+        pattern: 'list://INITIATED:Initiated,FORWARD_FOT_SETLEMENT:Forward For Settlement,CLOSED:Closed,APPROVED:Approved,PENDINGFORAPPROVAL:Pending For Approval,PENDING_FOR_DOCUMENT_VERIFY:Pending For Document Verify,PENDING_FOR_PAYMENT:Pending For Payment,PENDING_REQUEST_FOR_DISCONNECTION:Pending Request For Disconnection'
         source: rl
         isMandatory: false
         searchClause: AND r.status = $status
@@ -475,7 +475,7 @@ ReportDefinitions:
          LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
          LEFT JOIN eg_user u ON u.uuid = wa.assignee
          LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-         WHERE wf.tenantid =$tenantid and wf.businessservice IN ('RENT_AND_LEASE_LG','RENT_N_LEASE_NEW')
+         WHERE wf.businessservice IN ('RENT_AND_LEASE_LG','RENT_N_LEASE_NEW')
          ORDER BY wf.businessid, wf.lastmodifiedtime DESC
         ),
         unique_transactions AS (
@@ -576,11 +576,6 @@ ReportDefinitions:
         type: string
         source: rl
         total: false
-      - name: amountpaid
-        label: Amount Paid
-        type: string
-        source: rl
-        total: true
       - name: paymentmode
         label: Payment Mode
         type: string
@@ -596,23 +591,38 @@ ReportDefinitions:
         type: string
         source: rl
         total: false
-      - name: rl_arrear_fee
-        label: RL Arrear Fee
+      - name: arrear_charge
+        label: Arrear Charge
         type: string
         source: rl
         total: true
-      - name: rl_cgst_fee
-        label: RL CGST Fee
+      - name: cgst_charge
+        label: CGST Charge
         type: string
         source: rl
         total: true
-      - name: rl_sgst_fee
-        label: RL SGST Fee
+      - name: sgst_charge
+        label: SGST Charge
         type: string
         source: rl
         total: true
-      - name: total_amount
-        label: Total Amount
+      - name: other_charges
+        label: Other Charges
+        type: string
+        source: rl
+        total: true
+      - name: amount_paid
+        label: Amount Paid
+        type: string
+        source: rl
+        total: true
+      - name: advance_paid
+        label: Advance Paid
+        type: string
+        source: rl
+        total: true
+      - name: amountcollected
+        label: Amount Collected
         type: string
         source: rl
         total: true
@@ -652,26 +662,30 @@ ReportDefinitions:
           TO_CHAR(TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS transactiondate,
           payment.instrumentnumber AS instrumentnumber,
           u_owner.name AS payername,
-          pd.amountpaid AS amountpaid,
           payment.paymentmode AS paymentmode,
           payment.paymentstatus AS paymentstatus,
           u_owner.name AS ownername1,
           pd.manualreceiptnumber AS manualreceiptnumber,
           pd.manualreceiptdate AS manualreceiptdate,
-          SUM(CASE WHEN dd.taxheadcode = 'RL_ARREAR_FEE' THEN dd.taxamount ELSE 0 END) AS rl_arrear_fee,
-          SUM(CASE WHEN dd.taxheadcode = 'RL_CGST_FEE' THEN dd.taxamount ELSE 0 END) AS rl_cgst_fee,
-          SUM(CASE WHEN dd.taxheadcode = 'RL_SGST_FEE' THEN dd.taxamount ELSE 0 END) AS rl_sgst_fee,
-          SUM(dd.taxamount) AS total_amount
+          SUM(CASE WHEN dd.taxheadcode = 'RL_ARREAR_FEE' THEN dd.taxamount ELSE 0 END) AS arrear_charge,
+          SUM(CASE WHEN dd.taxheadcode = 'RL_CGST_FEE' THEN dd.taxamount ELSE 0 END) AS cgst_charge,
+          SUM(CASE WHEN dd.taxheadcode = 'RL_SGST_FEE' THEN dd.taxamount ELSE 0 END) AS sgst_charge,
+          SUM(CASE WHEN dd.taxheadcode NOT IN ('RL_ADVANCE_CARRYFORWARD', 'RL_ARREAR_FEE', 'RL_CGST_FEE', 'RL_SGST_FEE') THEN dd.taxamount ELSE 0 END) AS other_charges,
+          SUM(CASE WHEN dd.taxheadcode <> 'RL_ADVANCE_CARRYFORWARD' THEN dd.taxamount ELSE 0 END) AS amount_paid,
+          ABS(SUM(CASE WHEN dd.taxheadcode = 'RL_ADVANCE_CARRYFORWARD' THEN dd.taxamount ELSE 0 END)) AS advance_paid,
+          pd.amountpaid AS amountcollected
       FROM egcl_paymentdetail pd
       INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = $tenantid
       INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
       INNER JOIN egbs_demanddetail_v1 dd ON dd.demandid = bd.demandid
+      INNER JOIN egbs_demand_v1 d ON d.id = dd.demandid
       INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
       JOIN eg_rl_allotment r ON r.application_number = bill.consumercode
       INNER JOIN public.eg_rl_owner_info o ON o.allotment_id = r.id
       LEFT JOIN eg_user u_owner ON u_owner.uuid = o.user_uuid
       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
-      WHERE bill.tenantid = $tenantid
+      WHERE bill.tenantid = $tenantid 
+        AND d.status <> 'CANCELLED'
         AND pd.businessservice = 'rl-services'
     groupby: GROUP BY pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name, payment.instrumentdate, payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
     orderby: ORDER BY pd.receiptdate DESC
@@ -725,11 +739,6 @@ ReportDefinitions:
         type: string
         source: rl
         total: false
-      - name: amountpaid
-        label: Amount Paid
-        type: string
-        source: rl
-        total: true
       - name: paymentmode
         label: Payment Mode
         type: string
@@ -745,23 +754,38 @@ ReportDefinitions:
         type: string
         source: rl
         total: false
-      - name: rl_arrear_fee
-        label: RL Arrear Fee
+      - name: arrear_charge
+        label: Arrear Charge
         type: string
         source: rl
         total: true
-      - name: rl_cgst_fee
-        label: RL CGST Fee
+      - name: cgst_charge
+        label: CGST Charge
         type: string
         source: rl
         total: true
-      - name: rl_sgst_fee
-        label: RL SGST Fee
+      - name: sgst_charge
+        label: SGST Charge
         type: string
         source: rl
         total: true
-      - name: total_amount
-        label: Total Amount
+      - name: other_charges
+        label: Other Charges
+        type: string
+        source: rl
+        total: true
+      - name: amount_paid
+        label: Amount Paid
+        type: string
+        source: rl
+        total: true
+      - name: advance_paid
+        label: Advance Paid
+        type: string
+        source: rl
+        total: true
+      - name: amountcollected
+        label: Amount Collected
         type: string
         source: rl
         total: true
@@ -810,26 +834,30 @@ ReportDefinitions:
           TO_CHAR(TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS transactiondate,
           payment.instrumentnumber AS instrumentnumber,
           u_owner.name AS payername,
-          pd.amountpaid AS amountpaid,
           payment.paymentmode AS paymentmode,
           payment.paymentstatus AS paymentstatus,
           u_owner.name AS ownername1,
           pd.manualreceiptnumber AS manualreceiptnumber,
           pd.manualreceiptdate AS manualreceiptdate,
-          SUM(CASE WHEN dd.taxheadcode = 'RL_ARREAR_FEE' THEN dd.taxamount ELSE 0 END) AS rl_arrear_fee,
-          SUM(CASE WHEN dd.taxheadcode = 'RL_CGST_FEE' THEN dd.taxamount ELSE 0 END) AS rl_cgst_fee,
-          SUM(CASE WHEN dd.taxheadcode = 'RL_SGST_FEE' THEN dd.taxamount ELSE 0 END) AS rl_sgst_fee,
-          SUM(dd.taxamount) AS total_amount
+          SUM(CASE WHEN dd.taxheadcode = 'RL_ARREAR_FEE' THEN dd.taxamount ELSE 0 END) AS arrear_charge,
+          SUM(CASE WHEN dd.taxheadcode = 'RL_CGST_FEE' THEN dd.taxamount ELSE 0 END) AS cgst_charge,
+          SUM(CASE WHEN dd.taxheadcode = 'RL_SGST_FEE' THEN dd.taxamount ELSE 0 END) AS sgst_charge,
+          SUM(CASE WHEN dd.taxheadcode NOT IN ('RL_ADVANCE_CARRYFORWARD', 'RL_ARREAR_FEE', 'RL_CGST_FEE', 'RL_SGST_FEE') THEN dd.taxamount ELSE 0 END) AS other_charges,
+          SUM(CASE WHEN dd.taxheadcode <> 'RL_ADVANCE_CARRYFORWARD' THEN dd.taxamount ELSE 0 END) AS amount_paid,
+          ABS(SUM(CASE WHEN dd.taxheadcode = 'RL_ADVANCE_CARRYFORWARD' THEN dd.taxamount ELSE 0 END)) AS advance_paid,
+          pd.amountpaid AS amountcollected
       FROM egcl_paymentdetail pd
       INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = bill.tenantid
       INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
       INNER JOIN egbs_demanddetail_v1 dd ON dd.demandid = bd.demandid
+      INNER JOIN egbs_demand_v1 d ON d.id = dd.demandid
       INNER JOIN egcl_payment payment ON payment.id = pd.paymentid
       JOIN eg_rl_allotment r ON r.application_number = bill.consumercode
       INNER JOIN public.eg_rl_owner_info o ON o.allotment_id = r.id
       LEFT JOIN eg_user u_owner ON u_owner.uuid = o.user_uuid
       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
-      WHERE pd.businessservice = 'rl-services'
+      WHERE pd.businessservice = 'rl-services' 
+        AND d.status <> 'CANCELLED'
     groupby: GROUP BY pd.tenantid, pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name, payment.instrumentdate, payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
     orderby: ORDER BY pd.receiptdate DESC
 
@@ -885,6 +913,7 @@ ReportDefinitions:
     query: |
         select tenant_id, status, property_id, application_type, application_number from public.eg_rl_allotment 
         where 1=1
+
   - reportName: RentAndLeaseNewApplicationsReport
     decryptionPathId: RLREPORTS
     summary: Details of applications in Rent & Lease service with owner name, ULB, rent amount and status
@@ -957,7 +986,7 @@ ReportDefinitions:
         pattern: 'list://NEW:New,LEGACY:Legacy'
         source: rl
         isMandatory: true
-        searchClause: AND a.application_type = $applicationType
+        searchClause: AND UPPER(a.application_type) = $applicationType
       - name: status
         label: Application Status
         type: singlevaluelist
@@ -980,33 +1009,37 @@ ReportDefinitions:
 
     query: |
       SELECT
+          a.tenant_id AS tenantid,
           a.application_number,
           a.application_type,
           a.property_id,
-          STRING_AGG(
-              DISTINCT
-              CASE
-                  WHEN eu.name IS NULL
-                  THEN '30048|23/xn3x2FAxn8vYAN0IdplsOxaE='
-                  ELSE eu.name
-              END,
-              ', '
-          ) AS owner_name,
-          a.tenant_id AS ulb,
-          a.amount_tobe_deducted AS rent_amount,
           a.status AS application_status,
           TO_CHAR(
-              TO_TIMESTAMP(a.created_time/1000),
+              TO_TIMESTAMP(a.created_time / 1000),
               'DD-MM-YYYY HH24:MI:SS'
-          ) AS application_creation_date
+          ) AS application_date,
+          TO_CHAR(
+              TO_TIMESTAMP(d.taxperiodfrom / 1000),
+              'DD-MM-YYYY'
+          ) AS taxperiodfrom,
+          TO_CHAR(
+              TO_TIMESTAMP(d.taxperiodto / 1000),
+              'DD-MM-YYYY'
+          ) AS taxperiodto,
+          COALESCE(SUM(dd.taxamount), 0) AS demand_amount,
+          COALESCE(SUM(dd.collectionamount), 0) AS collected_amount,
+          COALESCE(SUM(dd.taxamount - dd.collectionamount), 0) AS pending_amount
       FROM eg_rl_allotment a
-      LEFT JOIN eg_rl_owner_info oi
-            ON oi.allotment_id = a.id
-      LEFT JOIN eg_user eu
-            ON eu.uuid = oi.user_uuid
+      LEFT JOIN egbs_demand_v1 d
+            ON d.consumercode = a.application_number
+          AND d.businessservice = 'rl-services'
+          AND d.tenantid = a.tenant_id
+      LEFT JOIN egbs_demanddetail_v1 dd
+            ON dd.demandid = d.id
+          AND dd.tenantid = d.tenantid
       WHERE 1=1
 
-    groupby: GROUP BY a.id, a.application_number, a.application_type, a.property_id, a.tenant_id, a.amount_tobe_deducted, a.status, a.created_time
+    groupby: GROUP BY a.id, a.application_number, a.application_type, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto
     orderby: ORDER BY a.created_time DESC
 
   - reportName: StateRentAndLeaseNewApplicationsReport
@@ -1292,8 +1325,8 @@ ReportDefinitions:
         type: string
         source: rl
         total: false
-      - name: application_date
-        label: Application Date
+      - name: created_time
+        label: Created time
         type: string
         source: rl
         total: false
@@ -1350,55 +1383,27 @@ ReportDefinitions:
         searchClause: AND a.created_time <= $toDate
 
     query: |
-      WITH demand_pending AS (
-          SELECT
-              a.id AS allotment_id,
-              a.tenant_id AS tenantid,
-              a.application_number,
-              a.property_id,
-              a.status AS application_status,
-              a.created_time,
-              TO_CHAR(TO_TIMESTAMP(a.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS application_date,
-              d.id AS demand_id,
-              TO_CHAR(TO_TIMESTAMP(d.taxperiodfrom / 1000), 'DD-MM-YYYY') AS taxperiodfrom,
-              TO_CHAR(TO_TIMESTAMP(d.taxperiodto / 1000), 'DD-MM-YYYY') AS taxperiodto,
-              d.taxperiodto,
-              SUM(dd.taxamount) AS demand_amount,
-              SUM(dd.collectionamount) AS collected_amount,
-              SUM(dd.taxamount - dd.collectionamount) AS pending_amount
-          FROM eg_rl_allotment a
-          JOIN egbs_demand_v1 d
-              ON d.consumercode = a.application_number
-             AND d.businessservice = 'rl-services'
-             AND d.tenantid = a.tenant_id
-          JOIN egbs_demanddetail_v1 dd
-              ON dd.demandid = d.id
-             AND dd.tenantid = d.tenantid
-          WHERE a.status <> 'REJECTED'
-            AND 1=1
-          GROUP BY
-              a.id,
-              a.application_number,
-              a.property_id,
-              a.tenant_id,
-              a.status,
-              a.created_time,
-              d.id,
-              d.taxperiodfrom,
-              d.taxperiodto
-      )
       SELECT
-          application_number,
-          property_id,
-          application_status,
-          application_date,
-          taxperiodfrom,
-          taxperiodto,
-          demand_amount,
-          collected_amount,
-          pending_amount
-      FROM demand_pending
-      WHERE pending_amount > 0
-        AND TO_TIMESTAMP(taxperiodto / 1000)::date < DATE_TRUNC('month', CURRENT_DATE)::date
+          a.tenant_id AS tenantid,
+          a.application_number AS application_number,
+          a.property_id AS property_id,
+          a.status AS application_status,
+          TO_CHAR(TO_TIMESTAMP(a.created_time / 1000), 'DD-MM-YYYY HH24:MI:SS') AS created_time,
+          TO_CHAR(TO_TIMESTAMP(d.taxperiodfrom / 1000), 'DD-MM-YYYY') AS taxperiodfrom,
+          TO_CHAR(TO_TIMESTAMP(d.taxperiodto / 1000), 'DD-MM-YYYY') AS taxperiodto,
+          SUM(dd.taxamount) AS demand_amount,
+          SUM(dd.collectionamount) AS collected_amount,
+          SUM(dd.taxamount - dd.collectionamount) AS pending_amount
+      FROM eg_rl_allotment a
+      JOIN egbs_demand_v1 d
+          ON d.consumercode = a.application_number
+        AND d.businessservice = 'rl-services'
+        AND d.tenantid = a.tenant_id
+      JOIN egbs_demanddetail_v1 dd
+          ON dd.demandid = d.id
+        AND dd.tenantid = d.tenantid
+      WHERE a.status <> 'REJECTED'
+        AND 1=1
 
-    orderby: ORDER BY created_time DESC
+    groupby: GROUP BY a.id, a.application_number, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto HAVING SUM(dd.taxamount - dd.collectionamount) > 0 AND TO_TIMESTAMP(d.taxperiodto / 1000)::date < DATE_TRUNC('month', CURRENT_DATE)::date
+    orderby: ORDER BY a.created_time DESC
