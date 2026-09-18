@@ -760,8 +760,8 @@ ReportDefinitions:
         type: string
         source: rl
         total: true
-      - name: total_amount
-        label: Total Amount
+      - name: pending_amount
+        label: Pending Amount
         type: string
         source: rl
         total: true
@@ -819,7 +819,7 @@ ReportDefinitions:
           SUM(CASE WHEN dd.taxheadcode = 'RL_ARREAR_FEE' THEN dd.taxamount ELSE 0 END) AS rl_arrear_fee,
           SUM(CASE WHEN dd.taxheadcode = 'RL_CGST_FEE' THEN dd.taxamount ELSE 0 END) AS rl_cgst_fee,
           SUM(CASE WHEN dd.taxheadcode = 'RL_SGST_FEE' THEN dd.taxamount ELSE 0 END) AS rl_sgst_fee,
-          SUM(dd.taxamount) AS total_amount
+          SUM(dd.taxamount - dd.collectionamount) AS pending_amount
       FROM egcl_paymentdetail pd
       INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = bill.tenantid
       INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
