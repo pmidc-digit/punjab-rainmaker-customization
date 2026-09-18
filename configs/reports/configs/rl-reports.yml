@@ -725,11 +725,6 @@ ReportDefinitions:
         type: string
         source: rl
         total: false
-      - name: amountpaid
-        label: Amount Paid
-        type: string
-        source: rl
-        total: true
       - name: paymentmode
         label: Payment Mode
         type: string
@@ -760,8 +755,18 @@ ReportDefinitions:
         type: string
         source: rl
         total: true
-      - name: pending_amount
-        label: Pending Amount
+      - name: remaining_amount
+        label: Remaining Amount
+        type: string
+        source: rl
+        total: true
+      - name: amount_tobe_paid
+        label: Amount To Be Paid
+        type: string
+        source: rl
+        total: true
+      - name: amountcollected
+        label: Amount Collected
         type: string
         source: rl
         total: true
@@ -810,7 +815,6 @@ ReportDefinitions:
           TO_CHAR(TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS transactiondate,
           payment.instrumentnumber AS instrumentnumber,
           u_owner.name AS payername,
-          pd.amountpaid AS amountpaid,
           payment.paymentmode AS paymentmode,
           payment.paymentstatus AS paymentstatus,
           u_owner.name AS ownername1,
@@ -819,7 +823,9 @@ ReportDefinitions:
           SUM(CASE WHEN dd.taxheadcode = 'RL_ARREAR_FEE' THEN dd.taxamount ELSE 0 END) AS rl_arrear_fee,
           SUM(CASE WHEN dd.taxheadcode = 'RL_CGST_FEE' THEN dd.taxamount ELSE 0 END) AS rl_cgst_fee,
           SUM(CASE WHEN dd.taxheadcode = 'RL_SGST_FEE' THEN dd.taxamount ELSE 0 END) AS rl_sgst_fee,
-          SUM(dd.taxamount - dd.collectionamount) AS pending_amount
+          SUM(CASE WHEN dd.taxheadcode NOT IN ('RL_ARREAR_FEE', 'RL_CGST_FEE', 'RL_SGST_FEE') THEN dd.taxamount ELSE 0 END) AS remaining_amount,
+          SUM(dd.taxamount) AS amount_tobe_paid,
+          pd.amountpaid AS amountcollected
       FROM egcl_paymentdetail pd
       INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = bill.tenantid
       INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
@@ -832,7 +838,7 @@ ReportDefinitions:
       WHERE pd.businessservice = 'rl-services'
     groupby: GROUP BY pd.tenantid, pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name, payment.instrumentdate, payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
     orderby: ORDER BY pd.receiptdate DESC
-
+    
   - reportName: RLdetailreport
     summary: Details of application in Rent & Lease service learning
     version: 1.0.0
