@@ -32,6 +32,46 @@
                 }
               },
               {
+                "variable": "officerDesignation",
+                "value": {
+                  "path": "$.EmpData.officer.designation"
+                },
+                "localisation": {
+                  "required": true,
+                  "prefix": "COMMON_MASTERS_DESIGNATION",
+                  "module": "rainmaker-common"
+                }
+              },
+              {
+                "variable": "appType",
+                "value": {
+                  "path": "$.additionalDetails.applicationType"
+                },
+                "localisation": {
+                  "required": true,
+                  "prefix": "WF_BPA",
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "appSubType",
+                "value": {
+                  "path": "$.additionalDetails.serviceType"
+                },
+                "localisation": {
+                  "required": true,
+                  "prefix": "BPA_SERVICETYPE",
+                  "module": "rainmaker-bpa"
+                }
+              },
+              {
+                "variable": "rejectionDate",
+                "value": {
+                  "path": "$.approverComment.approveRejectDate"
+                },
+                "type":"date"
+              },
+              {
                 "variable": "currentDate",
                 "value": {
                   "path": "$.nowIST"
@@ -47,7 +87,7 @@
               {
                 "variable": "var_owners",
                 "value": {
-                  "path": "$.Bpa[0].landInfo.owners[*]"
+                  "path": "$.landInfo.owners[*]"
                 },
                 "type": "array",
                 "format": {
@@ -71,7 +111,7 @@
               {
                 "variable": "proposedSiteAddress",
                 "value": {
-                  "path": "$.Bpa[0].landInfo.address.locality.name"
+                  "path": "$.additionalDetails.registrationDetails"
                 }
               },
               {
@@ -126,13 +166,13 @@
               {
                 "variable": "ulbName",
                 "value": {
-                  "path": "$.Bpa[0].additionalDetails.UlbName"
+                  "path": "$.additionalDetails.UlbName"
                 }
               },
               {
                 "variable": "nocUlbType",
                 "value": {
-                  "path": "$.Bpa[0].additionalDetails.Ulblisttype"
+                  "path": "$.additionalDetails.Ulblisttype"
                 }
               },
               {
@@ -156,7 +196,7 @@
               {
                 "variable": "submittedOn",
                 "value": {
-                  "path": "$.Bpa[0].applicationDate"
+                  "path": "$.applicationDate"
                 },
                 "type": "date"
               },
@@ -200,13 +240,13 @@
               {
                 "variable": "plotNo",
                 "value": {
-                  "path": "$.Bpa[0].edcrDetail[0].planDetail.planInfoProperties.PLOT_NO"
+                  "path": "$.edcrDetail[0].planDetail.planInformation.plotNo"
                 }
               },
-               {
+              {
                 "variable": "wardNo",
                 "value": {
-                  "path": "$.Bpa[0].edcrDetail[0].planDetail.planInfoProperties.WARD_NO"
+                  "path": "$.additionalDetails.wardnumber"
                 }
               },
               {
@@ -250,7 +290,7 @@
               {
                 "variable": "tenantid",
                 "value": {
-                  "path": "$.Bpa[0].tenantId"
+                  "path": "$.tenantId"
                 }
               },
               {
@@ -355,7 +395,7 @@
               {
                 "variable": "consumerID",
                 "value": {
-                  "path": "$.Bpa[0].applicationNo"
+                  "path": "$.applicationNo"
                 }
               },
               {
@@ -842,7 +882,7 @@
               {
                 "variable": "noc_module_name",
                 "value": {
-                  "path": "$.Bpa[0].businessService"
+                  "path": "$.businessService"
                 },
                 "localisation": {
                   "required": true,
@@ -940,43 +980,43 @@
             "externalAPI": [
               {
                 "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
-                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.Bpa[0].tenantId}')%5D",
+                "queryParam": "moduleName=tenant&masterName=tenants&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}')%5D",
                 "apiRequest": null,
-                "responseMapping": [
-                  {
-                    "variable": "address",
-                    "value": "$.MdmsRes.tenant.tenants[0].address"
-                  },
-                  {
-                    "variable": "ulbType",
-                    "value": "$.MdmsRes.tenant.tenants[0].city.ulbType"
-                  },
-                  {
-                    "variable": "phoneNumber",
-                    "value": "$.MdmsRes.tenant.tenants[0].contactNumber"
-                  },
-                  {
-                    "variable": "website",
-                    "value": "$.MdmsRes.tenant.tenants[0].domainUrl"
-                  },
-                  {
-                    "variable": "email",
-                    "value": "$.MdmsRes.tenant.tenants[0].emailId"
-                  },
-                  {
-                    "variable": "logoImage",
-                    "value": "$.MdmsRes.tenant.tenants[0].logoId",
-                    "type": "image"
-                  },
-                  {
-                    "variable": "logo-header",
-                    "value": "$.MdmsRes.tenant.tenants[0].code",
-                    "localisation": {
-                      "required": true,
-                      "prefix": "TENANT_TENANTS",
-                      "module": "rainmaker-common"
+                "responseMapping":[
+                    {             
+                      "variable":"address",
+                      "value":"$.MdmsRes.tenant.tenants[0].address"
+                    },
+                    {
+                      "variable":"phoneNumber",
+                      "value":"$.MdmsRes.tenant.tenants[0].contactNumber"
+                    },
+                    {
+                      "variable":"website",
+                      "value":"$.MdmsRes.tenant.tenants[0].domainUrl"
+                    },
+                    {
+                      "variable":"mcGrade",
+                      "value":"$.MdmsRes.tenant.tenants[0].city.ulbType"
+                    },
+                    {
+                      "variable":"email",
+                      "value":"$.MdmsRes.tenant.tenants[0].emailId"
+                    },
+                    {
+                      "variable": "logoImage",                        
+                      "value":"$.MdmsRes.tenant.tenants[0].logoId",
+                      "type":"image"      
+                    },
+                    {
+                      "variable": "logo-header",
+                      "value":"$.MdmsRes.tenant.tenants[0].code",
+                      "localisation":{
+                        "required":true,
+                        "prefix": "TENANT_TENANTS",
+                        "module":"rainmaker-common"
+                        }
                     }
-                  }
                 ]
               },
               {
@@ -993,7 +1033,7 @@
               },
               {
                 "path": "http://egov-mdms-service:8080/egov-mdms-service/v1/_get",
-                "queryParam": "moduleName=tenant&masterName=footer&tenantId=pb&filter=%5B?(@.code=='{$.Bpa[0].tenantId}' %26%26 @.service=='{$.Bpa[0].businessService}')%5D",
+                "queryParam": "moduleName=tenant&masterName=footer&tenantId=pb&filter=%5B?(@.code=='{$.tenantId}' %26%26 @.service=='{$.businessService}')%5D",
                 "apiRequest": null,
                 "responseMapping": [
                   {
