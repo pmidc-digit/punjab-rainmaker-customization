@@ -661,13 +661,10 @@ ReportDefinitions:
           'Rent & lease' AS service,
           usr.name AS collectorname,
           TO_CHAR(TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS transactiondate,
-          payment.instrumentnumber AS instrumentnumber,
           u_owner.name AS payername,
           payment.paymentmode AS paymentmode,
           payment.paymentstatus AS paymentstatus,
           u_owner.name AS ownername1,
-          pd.manualreceiptnumber AS manualreceiptnumber,
-          pd.manualreceiptdate AS manualreceiptdate,
           SUM(CASE WHEN dd.taxheadcode = 'RL_ARREAR_FEE' THEN dd.taxamount ELSE 0 END) AS arrear_charge,
           SUM(CASE WHEN dd.taxheadcode = 'RL_CGST_FEE' THEN dd.taxamount ELSE 0 END) AS cgst_charge,
           SUM(CASE WHEN dd.taxheadcode = 'RL_SGST_FEE' THEN dd.taxamount ELSE 0 END) AS sgst_charge,
@@ -687,7 +684,7 @@ ReportDefinitions:
       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
       WHERE pd.businessservice = 'rl-services' 
         AND d.status <> 'CANCELLED'
-    groupby: GROUP BY pd.tenantid, pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name,payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
+    groupby: GROUP BY pd.tenantid, pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name,u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus
     orderby: ORDER BY pd.receiptdate DESC
 
   - reportName: StateReceiptRegisterRL
@@ -832,13 +829,10 @@ ReportDefinitions:
           'Rent & lease' AS service,
           usr.name AS collectorname,
           TO_CHAR(TO_TIMESTAMP(payment.instrumentdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS transactiondate,
-          payment.instrumentnumber AS instrumentnumber,
           u_owner.name AS payername,
           payment.paymentmode AS paymentmode,
           payment.paymentstatus AS paymentstatus,
           u_owner.name AS ownername1,
-          pd.manualreceiptnumber AS manualreceiptnumber,
-          pd.manualreceiptdate AS manualreceiptdate,
           SUM(CASE WHEN dd.taxheadcode = 'RL_ARREAR_FEE' THEN dd.taxamount ELSE 0 END) AS arrear_charge,
           SUM(CASE WHEN dd.taxheadcode = 'RL_CGST_FEE' THEN dd.taxamount ELSE 0 END) AS cgst_charge,
           SUM(CASE WHEN dd.taxheadcode = 'RL_SGST_FEE' THEN dd.taxamount ELSE 0 END) AS sgst_charge,
@@ -858,7 +852,7 @@ ReportDefinitions:
       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
       WHERE pd.businessservice = 'rl-services' 
         AND d.status <> 'CANCELLED'
-    groupby: GROUP BY pd.tenantid, pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name,payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
+    groupby: GROUP BY pd.tenantid, pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name,u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus
     orderby: ORDER BY pd.receiptdate DESC
 
   - reportName: RLdetailreport
