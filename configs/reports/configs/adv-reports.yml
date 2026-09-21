@@ -1070,3 +1070,121 @@ ReportDefinitions:
        LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
        WHERE payment.paymentstatus != 'CANCELLED' and pd.tenantid != 'pb.testing'
     orderby: ORDER BY pd.receiptnumber, pd.receiptdate DESC;
+
+  - reportName: StateDaysPendingReport
+    decryptionPathId: STATEADVREPORTS
+    summary: Days Pending Report for Individual ULBs
+    version: 1.0.0
+    moduleName: rainmaker-adv
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: tenant
+        label: ULB Name
+        type: string
+        source: adv
+        total: false
+      - name: booking_no
+        label: Application/Booking No.
+        type: string
+        source: adv
+        total: false
+      - name: applicant_name
+        label: Applicant Name
+        type: string
+        source: adv
+        total: false
+      - name: location
+        label: Site/Location
+        type: string
+        source: adv
+        total: false
+      - name: add_type
+        label: Advertisement Type
+        type: string
+        source: adv
+        total: false
+      - name: booking_date
+        label: Booking Date
+        type: string
+        source: adv
+        total: false
+      - name: booking_from_time
+        label: From Date
+        type: string
+        source: adv
+        total: false
+      - name: booking_to_time
+        label: To Date
+        type: string
+        source: adv
+        total: false
+      - name: status
+        label: Booking Status
+        type: string
+        source: adv
+        total: false
+      - name: days_pending
+        label: Days Pending
+        type: number
+        source: adv
+        total: false
+      - name: payment_status
+        label: Payment Status
+        type: string
+        source: adv
+        total: false
+    searchParams:
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: adv
+        isMandatory: true
+        searchClause: AND c.booking_date >= to_timestamp($fromDate / 1000)
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: adv
+        isMandatory: true
+        searchClause: AND c.booking_date <= to_timestamp($toDate / 1000)
+      - name: ulb
+        label: ULB Name
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: adv
+        isMandatory: true
+        searchClause: AND b.tenant_id = $ulb
+      - name: bookingStatus
+        label: Booking Status
+        type: singlevaluelist
+        pattern: list://BOOKED:Booked,EXPIRED:Expired
+        source: adv
+        isMandatory: true
+        searchClause: AND UPPER(c.status) = UPPER($bookingStatus)
+    query: >
+       SELECT 
+           INITCAP(split_part(b.tenant_id, '.', 2)) AS tenant,
+           b.booking_no, 
+           a.applicant_name,
+           c.location, 
+           c.add_type, 
+           TO_CHAR(c.booking_date AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS booking_date, 
+           c.booking_from_time, 
+           c.booking_to_time, 
+           c.status,
+           CASE 
+               WHEN UPPER(c.status) = 'BOOKED' AND c.booking_to_time::date > CURRENT_DATE 
+               THEN (c.booking_to_time::date - CURRENT_DATE)
+               ELSE 0 
+           END AS days_pending,
+           CASE 
+               WHEN b.receipt_no IS NOT NULL AND b.receipt_no != '' THEN 'Paid'
+               ELSE 'Unpaid'
+           END AS payment_status
+         FROM eg_adv_booking_detail b
+         INNER JOIN eg_adv_applicant_detail a ON a.booking_id = b.booking_id
+         INNER JOIN eg_adv_address_detail ad ON ad.applicant_detail_id = a.applicant_detail_id
+         INNER JOIN eg_adv_cart_detail c ON c.booking_id = b.booking_id
+         WHERE 1=1 AND b.tenant_id != 'pb.testing'
+    orderby: ORDER BY c.booking_date DESC
