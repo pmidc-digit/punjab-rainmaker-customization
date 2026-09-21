@@ -1174,8 +1174,8 @@ ReportDefinitions:
            c.booking_to_time, 
            c.status,
            CASE 
-               WHEN UPPER(c.status) = 'BOOKED' AND c.booking_to_time::date > CURRENT_DATE 
-               THEN (c.booking_to_time::date - CURRENT_DATE)
+               WHEN UPPER(c.status) = 'BOOKED' AND c.booking_date::date > CURRENT_DATE 
+               THEN (c.booking_date::date - CURRENT_DATE)
                ELSE 0 
            END AS days_pending,
            CASE 
