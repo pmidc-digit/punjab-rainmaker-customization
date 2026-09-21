@@ -190,10 +190,10 @@ ReportDefinitions:
           u.mobilenumber, 
           r.tenant_id,
           u.name
-         FROM eg_rl_allotment AS r
-         LEFT JOIN eg_rl_owner_info AS o ON o.allotment_id = r.id
-         LEFT JOIN eg_user AS u ON u.uuid = o.user_uuid
-         WHERE 1=1
+          FROM eg_rl_allotment AS r
+          LEFT JOIN eg_rl_owner_info AS o ON o.allotment_id = r.id
+          LEFT JOIN eg_user AS u ON u.uuid = o.user_uuid
+          WHERE 1=1 AND r.tenant_id != 'pb.testing'
 
   - reportName: StateCollectionsReport
     decryptionPathId: RLREPORTS  
@@ -366,7 +366,7 @@ ReportDefinitions:
         amountpaid,
         to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate
         FROM unique_transactions
-        WHERE 1=1
+        WHERE 1=1 AND tenantid != 'pb.testing'
     orderby: ORDER BY createdtime DESC
 
   - reportName: CollectionsReport
@@ -858,6 +858,7 @@ ReportDefinitions:
       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
       WHERE pd.businessservice = 'rl-services' 
         AND d.status <> 'CANCELLED'
+        AND pd.tenantid != 'pb.testing'
     groupby: GROUP BY pd.tenantid, pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name, payment.instrumentdate, payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
     orderby: ORDER BY pd.receiptdate DESC
 
@@ -1037,10 +1038,10 @@ ReportDefinitions:
       LEFT JOIN egbs_demanddetail_v1 dd
             ON dd.demandid = d.id
           AND dd.tenantid = d.tenantid
-      WHERE 1=1
+      WHERE 1=1 
 
     groupby: GROUP BY a.id, a.application_number, a.application_type, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto
-    orderby: ORDER BY a.created_time DESC
+    orderby: ORDER BY a.created_time DESC  
 
   - reportName: StateRentAndLeaseNewApplicationsReport
     decryptionPathId: RLREPORTS
@@ -1177,11 +1178,11 @@ ReportDefinitions:
       LEFT JOIN egbs_demanddetail_v1 dd
             ON dd.demandid = d.id
           AND dd.tenantid = d.tenantid
-      WHERE 1=1
+      WHERE 1=1 AND a.tenant_id != 'pb.testing'
 
     groupby: GROUP BY a.id, a.application_number, a.application_type, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto
-    orderby: ORDER BY a.created_time DESC
-    
+    orderby: ORDER BY a.created_time DESC    
+
   - reportName: StateRentAndLeaseDefaulterReport
     decryptionPathId: RLREPORTS
     summary: Report of properties/tenants in Rent & Lease service with pending rent dues (defaulters), showing demand amount, collected amount and pending rent amount
@@ -1251,7 +1252,7 @@ ReportDefinitions:
       - name: status
         label: Application Status
         type: singlevaluelist
-        pattern: 'list://INITIATED:Initiated,FORWARD_FOT_SETLEMENT:Forward For Settlement,CLOSED:Closed, APPROVED:Approved,PENDINGFORAPPROVAL:Pending For Approval , PENDING_FOR_DOCUMENT_VERIFY:Pending For Document Verify,PENDING_FOR_PAYMENT:Pending For Payment,PENDING_REQUEST_FOR_DISCONNECTION:Pending Request For Disconnection'
+        pattern: 'list://INITIATED:Initiated,FORWARD_FOT_SETLEMENT:Forward For Settlement,CLOSED:Closed,APPROVED:Approved,PENDINGFORAPPROVAL:Pending For Approval , PENDING_FOR_DOCUMENT_VERIFY:Pending For Document Verify,PENDING_FOR_PAYMENT:Pending For Payment,PENDING_REQUEST_FOR_DISCONNECTION:Pending Request For Disconnection'
         source: rl
         isMandatory: false
         searchClause: AND a.status = $status
@@ -1296,11 +1297,12 @@ ReportDefinitions:
           ON dd.demandid = d.id
         AND dd.tenantid = d.tenantid
       WHERE a.status <> 'REJECTED'
-        AND 1=1
+        AND 1=1 
+        AND a.tenant_id != 'pb.testing'
 
     groupby: GROUP BY a.id, a.application_number, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto HAVING SUM(dd.taxamount - dd.collectionamount) > 0 AND TO_TIMESTAMP(d.taxperiodto / 1000)::date < DATE_TRUNC('month', CURRENT_DATE)::date
     orderby: ORDER BY a.created_time DESC
-
+    
   - reportName: RentAndLeaseDefaulterReport
     decryptionPathId: RLREPORTS
     summary: Report of properties/tenants in Rent & Lease service with pending rent dues (defaulters), showing demand amount, collected amount and pending rent amount
