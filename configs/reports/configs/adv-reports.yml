@@ -1158,9 +1158,9 @@ ReportDefinitions:
       - name: bookingStatus
         label: Booking Status
         type: singlevaluelist
-        pattern: list://BOOKED:Booked,EXPIRED:Expired
+        pattern: list://BOOKED:Booked,BOOKING_EXPIRED:Expired
         source: adv
-        isMandatory: true
+        isMandatory: false
         searchClause: AND UPPER(c.status) = UPPER($bookingStatus)
     query: >
        SELECT 
