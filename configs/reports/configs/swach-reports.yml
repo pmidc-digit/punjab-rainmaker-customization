@@ -777,7 +777,7 @@ ReportDefinitions:
       INNER JOIN  eg_user u on u.uuid= h.uuid
         WHERE
          p.businessservice = 'SBMR'
-         AND p.tenantid = 'pb.amritsar'
+         AND p.tenantid = $tenantid
          AND p.latest = 'true'
         GROUP BY h.code, u.mobilenumber,u.name,ss.createdtime,ss.applicationstatus,ss.servicerequestid
       )
