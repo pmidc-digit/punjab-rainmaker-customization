@@ -1158,11 +1158,11 @@ ReportDefinitions:
       - name: bookingStatus
         label: Booking Status
         type: singlevaluelist
-        pattern: 'list://BOOKED:Booked,BOOKING_EXPIRED:Expired'
+        pattern: 'list://BOOKED:Booked,BOOKING_EXPIRED:Expired,APPROVED:Approved'
         source: adv
         isMandatory: true
-        searchClause: AND TRIM(c.status) ILIKE TRIM($bookingStatus)
-    query: >
+        searchClause: AND UPPER(c.status) = UPPER($bookingStatus)
+    query: |
        SELECT 
            INITCAP(split_part(b.tenant_id, '.', 2)) AS tenant,
            b.booking_no, 
