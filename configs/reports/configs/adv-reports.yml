@@ -1186,5 +1186,10 @@ ReportDefinitions:
          INNER JOIN eg_adv_applicant_detail a ON a.booking_id = b.booking_id
          INNER JOIN eg_adv_address_detail ad ON ad.applicant_detail_id = a.applicant_detail_id
          INNER JOIN eg_adv_cart_detail c ON c.booking_id = b.booking_id
+         INNER JOIN (
+             SELECT booking_id, MAX(booking_date) AS max_date 
+             FROM eg_adv_cart_detail 
+             GROUP BY booking_id
+         ) latest_cart ON c.booking_id = latest_cart.booking_id AND c.booking_date = latest_cart.max_date
          WHERE 1=1 AND b.tenant_id != 'pb.testing'
     orderby: ORDER BY b.booking_no, c.booking_date DESC
