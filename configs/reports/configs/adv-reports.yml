@@ -1163,7 +1163,7 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND c.status = $bookingStatus
     query: >
-       SELECT 
+       SELECT DISTINCT ON (b.booking_no)
            INITCAP(split_part(b.tenant_id, '.', 2)) AS tenant,
            b.booking_no, 
            a.applicant_name,
@@ -1187,4 +1187,4 @@ ReportDefinitions:
          INNER JOIN eg_adv_address_detail ad ON ad.applicant_detail_id = a.applicant_detail_id
          INNER JOIN eg_adv_cart_detail c ON c.booking_id = b.booking_id
          WHERE 1=1 AND b.tenant_id != 'pb.testing'
-    orderby: ORDER BY c.booking_date DESC
+    orderby: ORDER BY b.booking_no, c.booking_date DESC
