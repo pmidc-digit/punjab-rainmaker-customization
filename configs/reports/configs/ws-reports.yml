@@ -3669,45 +3669,107 @@ ReportDefinitions:
         source: pt
         isMandatory: false
         searchClause: AND bm.localitycode IN ($localityArray)
-    query: WITH latest_bill AS (
-      SELECT
-      bill.*,
-      ROW_NUMBER() OVER (
-      PARTITION BY bill.consumercode
-      ORDER BY bill.fromperiod DESC
-      ) AS rn
-      FROM egbs_billdetail_v1 bill
-      WHERE bill.businessservice = 'SW'
-      and bill.tenantid = $tenantid
+    query: |
+      WITH pending_period AS (
+          SELECT
+              d.consumercode,
+              MIN(d.taxperiodfrom) AS pending_from_period
+          FROM egbs_demand_v1 d
+          JOIN egbs_demanddetail_v1 dd
+              ON dd.demandid = d.id
+          WHERE d.tenantid = $tenantid
+            AND d.businessservice = 'SW'
+            AND dd.taxamount > COALESCE(dd.collectionamount, 0)
+            AND d.status = 'ACTIVE'
+          GROUP BY d.consumercode
+      ),
+      latest_bill AS (
+          SELECT
+              b.id AS bill_id,
+              b.createddate,
+              b.status AS bill_status,
+              bd.billno,
+              bd.consumercode,
+              bd.fromperiod,
+              bd.toperiod,
+              bd.expirydate,
+              ROW_NUMBER() OVER (
+                  PARTITION BY bd.consumercode
+                  ORDER BY b.createddate DESC
+              ) AS rn
+          FROM egbs_bill_v1 b
+          JOIN egbs_billdetail_v1 bd
+              ON bd.billid = b.id
+             AND bd.tenantid = $tenantid
+             AND bd.businessservice = 'SW'
+          WHERE b.tenantid = $tenantid
+      ),
+      bill_amount AS (
+          SELECT
+              lb.bill_id,
+              lb.billno,
+              lb.consumercode,
+              lb.fromperiod,
+              lb.toperiod,
+              lb.createddate,
+              lb.expirydate,
+              lb.bill_status,
+              SUM(bd.totalamount) AS total_amount
+          FROM latest_bill lb
+          JOIN egbs_billdetail_v1 bd
+              ON bd.billid = lb.bill_id
+             AND bd.tenantid = $tenantid
+             AND bd.businessservice = 'SW'
+          WHERE lb.rn = 1
+          GROUP BY
+              lb.bill_id,
+              lb.billno,
+              lb.consumercode,
+              lb.fromperiod,
+              lb.toperiod,
+              lb.createddate,
+              lb.expirydate,
+              lb.bill_status
       )
       SELECT
-      to_char(
-      (to_timestamp(lb.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
-      'YYYY-MM'
-      ) || '-' ||
-      to_char(
-      (to_timestamp(lb.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
-      'YYYY-MM'
-      ) AS finyear,
-      pt.usagecategory,
-      wc.connectionno,
-      wc.property_id,
-      lb.billid,
-      lb.totalamount,
-      lb.consumercode,
-      bm.localityname,bm.localitycode,bm.zonecode,bm.blockcode,
-      wc.status AS wc_status,
-      pt.landarea,
-      b.status AS bill_status
-      FROM eg_sw_connection wc JOIN eg_pt_property pt  ON wc.property_id = pt.propertyid AND pt.status IN ('ACTIVE', 'PENDINGWS')
-      JOIN eg_pt_address  pa ON pt.id = pa.propertyid and pa.tenantid = $tenantid
-      JOIN  eg_bndry_mohalla bm  ON pa.locality = bm.localitycode and pa.tenantid = bm.tenantid
-      JOIN latest_bill lb     ON lb.consumercode = wc.connectionno
-      AND lb.rn = 1
-      JOIN egbs_bill_v1 b     ON lb.billid = b.id and b.tenantid = $tenantid
+          to_char(
+              to_timestamp(COALESCE(pp.pending_from_period, ba.fromperiod) / 1000)
+              AT TIME ZONE 'Asia/Kolkata',
+              'YYYY-MM'
+          )
+          || '-' ||
+          to_char(
+              to_timestamp(ba.toperiod / 1000)
+              AT TIME ZONE 'Asia/Kolkata',
+              'YYYY-MM'
+          ) AS finyear,
+          pt.usagecategory,
+          wc.connectionno,
+          wc.property_id,
+          ba.bill_id AS billid,
+          ba.total_amount AS totalamount,
+          ba.consumercode,
+          bm.localityname,
+          bm.localitycode,
+          bm.zonecode,
+          bm.blockcode,
+          wc.status AS wc_status,
+          pt.landarea,
+          ba.bill_status
+      FROM eg_sw_connection wc 
+      JOIN eg_pt_property pt 
+          ON wc.property_id = pt.propertyid AND pt.status IN ('ACTIVE', 'PENDINGWS')
+      JOIN eg_pt_address pa 
+          ON pt.id = pa.propertyid AND pa.tenantid = $tenantid
+      JOIN eg_bndry_mohalla bm 
+          ON pa.locality = bm.localitycode AND pa.tenantid = bm.tenantid
+      JOIN bill_amount ba 
+          ON ba.consumercode = wc.connectionno
+      LEFT JOIN pending_period pp 
+          ON pp.consumercode = ba.consumercode
       WHERE wc.tenantid = $tenantid
-      AND wc.connectionno IS NOT NULL
-      AND wc.status = 'Active'
+        AND wc.connectionno IS NOT NULL
+        AND wc.status = 'Active'
 
   - reportName: WSTotal_Bill_Generate
     summary: WS Total Bill Generate Report
