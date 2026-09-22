@@ -1155,13 +1155,13 @@ ReportDefinitions:
         source: adv
         isMandatory: false
         searchClause: AND b.tenant_id = $ulb
-      - name: status
+      - name: bookingStatus
         label: Booking Status
         type: singlevaluelist
-        pattern: 'list://BOOKED:BOOKED,BOOKING_EXPIRED:Expired'
+        pattern: 'list://BOOKED:Booked,BOOKING_EXPIRED:Expired'
         source: adv
         isMandatory: false
-        searchClause: AND UPPER(c.status) = UPPER($bookingStatus)
+        searchClause: AND c.bookingStatus = $bookingStatus
     query: >
        SELECT 
            INITCAP(split_part(b.tenant_id, '.', 2)) AS tenant,
