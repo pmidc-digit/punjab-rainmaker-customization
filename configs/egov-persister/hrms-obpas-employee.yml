@@ -9,9 +9,9 @@ serviceMaps:
       queryMaps:
         - query: >
             INSERT INTO public.eg_hrms_obpass_employee
-            (tenantid, userid, category, subcategory, zone, assigned_tenantid,
+            (tenantid, userid, category, subcategory, zone, assigned_tenantid, modulename,
              createdby, createddate, lastmodifiedby, lastmodifieddate)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
           basePath: Employees.*
 
           jsonMaps:
@@ -21,6 +21,7 @@ serviceMaps:
             - jsonPath: $.Employees.*.subcategory
             - jsonPath: $.Employees.*.zone
             - jsonPath: $.Employees.*.assignedTenantId  # FIXED
+            - jsonPath: $.Employees.*.modulename
             - jsonPath: $.Employees.*.auditDetails.createdBy         # FIXED
             - jsonPath: $.Employees.*.auditDetails.createdDate       # FIXED
             - jsonPath: $.Employees.*.auditDetails.lastModifiedBy    # FIXED
