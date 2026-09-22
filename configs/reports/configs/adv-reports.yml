@@ -1141,28 +1141,28 @@ ReportDefinitions:
         type: epoch
         source: adv
         isMandatory: true
-        searchClause: AND c.booking_date >= (to_timestamp($fromDate / 1000))::DATE
+        searchClause: AND c.booking_date >= to_timestamp($fromDate / 1000)::date
       - name: toDate
         label: To Date
         type: epoch
         source: adv
         isMandatory: true
-        searchClause: AND c.booking_date <= (to_timestamp($toDate / 1000))::DATE
+        searchClause: AND c.booking_date <= to_timestamp($toDate / 1000)::date
       - name: ulb
         label: ULB Name
         type: singlevaluelist
         pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
         source: adv
-        isMandatory: true
+        isMandatory: false
         searchClause: AND b.tenant_id = $ulb
       - name: bookingStatus
         label: Booking Status
         type: singlevaluelist
-        pattern: 'list://BOOKED:Booked,BOOKING_EXPIRED:Expired,APPROVED:Approved'
+        pattern: list://BOOKED:Booked,BOOKING_EXPIRED:Expired
         source: adv
-        isMandatory: true
+        isMandatory: false
         searchClause: AND UPPER(c.status) = UPPER($bookingStatus)
-    query: |
+    query: >
        SELECT 
            INITCAP(split_part(b.tenant_id, '.', 2)) AS tenant,
            b.booking_no, 
@@ -1173,20 +1173,15 @@ ReportDefinitions:
            c.booking_from_time, 
            c.booking_to_time, 
            c.status,
-           
-           -- Days Pending Calculation: Validates status and ensures the date is in the future before calculating
            CASE 
                WHEN UPPER(c.status) = 'BOOKED' AND c.booking_date > CURRENT_DATE 
                THEN (c.booking_date - CURRENT_DATE)
                ELSE 0 
            END AS days_pending,
-           
-           -- Payment Status: Uses TRIM() to ensure spaces aren't evaluated as valid receipt numbers
            CASE 
-               WHEN b.receipt_no IS NOT NULL AND TRIM(b.receipt_no) != '' THEN 'Paid'
+               WHEN b.receipt_no IS NOT NULL AND b.receipt_no != '' THEN 'Paid'
                ELSE 'Unpaid'
            END AS payment_status
-           
          FROM eg_adv_booking_detail b
          INNER JOIN eg_adv_applicant_detail a ON a.booking_id = b.booking_id
          INNER JOIN eg_adv_address_detail ad ON ad.applicant_detail_id = a.applicant_detail_id
