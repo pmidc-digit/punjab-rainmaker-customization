@@ -1161,7 +1161,7 @@ ReportDefinitions:
         pattern: 'list://BOOKED:Booked,BOOKING_EXPIRED:Expired'
         source: adv
         isMandatory: false
-        searchClause: AND c.bookingStatus = $bookingStatus
+        searchClause: AND c.status = $bookingStatus
     query: >
        SELECT 
            INITCAP(split_part(b.tenant_id, '.', 2)) AS tenant,
