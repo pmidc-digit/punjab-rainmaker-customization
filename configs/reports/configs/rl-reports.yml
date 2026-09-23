@@ -1517,3 +1517,114 @@ ReportDefinitions:
       
     groupby: ""
     orderby: ORDER BY tenantid, month_start    
+
+  - reportName: StateMonthWiseBillingGenerationReport
+    decryptionPathId: RLREPORTS
+    summary: State-level report to track monthly billing generation with both cumulative and monthly record counts for Rent & Lease service across all ULBs.
+    version: 1.0.0
+    moduleName: rainmaker-rl
+    additionalConfig:
+      print:
+        pdfPageSize: A4
+    sourceColumns:
+      - name: tenantid
+        label: ULB Name
+        type: string
+        source: rl
+        total: false
+      - name: month
+        label: Month
+        type: string
+        source: rl
+        total: false
+      - name: new_applications
+        label: New Records Created
+        type: number
+        source: rl
+        total: true
+      - name: cumulative_applications
+        label: Cumulative Total Records
+        type: number
+        source: rl
+        total: false
+      - name: newbills_generated
+        label: Bills Generated (Monthly)
+        type: number
+        source: rl
+        total: true
+      - name: cumulative_bills_generated
+        label: Cumulative Total Bills
+        type: number
+        source: rl
+        total: false
+    searchParams:
+      - name: ulb
+        label: ULB Name
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: rl
+        isMandatory: false
+        searchClause: AND tenantid = $ulb
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: rl
+        isMandatory: false
+        searchClause: AND month_start >= DATE_TRUNC('month', TO_TIMESTAMP($fromDate / 1000))
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: rl
+        isMandatory: false
+        searchClause: AND month_start <= DATE_TRUNC('month', TO_TIMESTAMP($toDate / 1000))
+    query: |
+      WITH monthly_allotments AS (
+          SELECT
+              a.tenant_id,
+              date_trunc('month', to_timestamp(a.created_time / 1000)) AS month_start,
+              COUNT(a.id) AS new_applications
+          FROM eg_rl_allotment a
+          WHERE a.status <> 'REJECTED' 
+            AND a.tenant_id != 'pb.testing'
+          GROUP BY a.tenant_id, 2
+      ),
+      monthly_bills AS (
+          SELECT
+              bd.tenantid AS tenant_id,
+              date_trunc('month', to_timestamp(bd.createddate / 1000)) AS month_start,
+              COUNT(DISTINCT bd.billid) AS newbills_generated
+          FROM egbs_billdetail_v1 bd
+          WHERE bd.businessservice = 'rl-services' 
+            AND bd.tenantid != 'pb.testing'
+          GROUP BY bd.tenantid, 2
+      ),
+      months AS (
+          SELECT tenant_id, month_start FROM monthly_allotments
+          UNION
+          SELECT tenant_id, month_start FROM monthly_bills
+      ),
+      cumulative_data AS (
+          SELECT
+              m.tenant_id AS tenantid,
+              m.month_start,
+              to_char(m.month_start, 'Mon-YYYY') AS month,
+              COALESCE(a.new_applications, 0) AS new_applications,
+              SUM(COALESCE(a.new_applications, 0)) OVER (PARTITION BY m.tenant_id ORDER BY m.month_start) AS cumulative_applications,
+              COALESCE(b.newbills_generated, 0) AS newbills_generated,
+              SUM(COALESCE(b.newbills_generated, 0)) OVER (PARTITION BY m.tenant_id ORDER BY m.month_start) AS cumulative_bills_generated
+          FROM months m
+          LEFT JOIN monthly_allotments a ON a.tenant_id = m.tenant_id AND a.month_start = m.month_start
+          LEFT JOIN monthly_bills b ON b.tenant_id = m.tenant_id AND b.month_start = m.month_start
+      )
+      SELECT 
+          tenantid,
+          month,
+          new_applications,
+          cumulative_applications,
+          newbills_generated,
+          cumulative_bills_generated
+      FROM cumulative_data
+      WHERE 1=1
+      
+    groupby: ""
+    orderby: ORDER BY tenantid, month_start
