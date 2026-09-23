@@ -3592,71 +3592,36 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: finyear
-        label: finyear
+      - name: billing_period
+        label: billing_period
         type: string
         source: ws
         total: false
-      - name: usagecategory
-        label: usagecategory
-        type: string
-        source: ws
-        total: false
-      - name: connectionno
-        label: Connection No
-        type: string
-        source: ws
-        total: false
-      - name: property_id
-        label: Property id
-        type: string
-        source: ws
-        total: false
-      - name: billid
-        label: Bill Id
-        type: string
-        source: ws
-        total: false
-      - name: totalamount
-        label: totalamount
-        type: string
-        source: ws
-        total: true
       - name: consumercode
         label: consumercode
         type: string
         source: ws
         total: false
-      - name: localityname
-        label: localityname
+      - name: bill_no
+        label: bill_no
         type: string
         source: ws
         total: false
-      - name: localitycode
-        label: localitycode
+      - name: bill_created_date
+        label: bill_created_date
         type: string
         source: ws
         total: false
-      - name: zonecode
-        label: zonecode
+      - name: expiry_date
+        label: expiry_date
         type: string
         source: ws
         total: false
-      - name: blockcode
-        label: blockcode
+      - name: total_amount
+        label: total_amount
         type: string
         source: ws
-        total: false
-      - name: wc_status
-        label: wc_status
-        type: string
-        source: ws
-        total: false
-      - name: landarea
-        label: landarea
-        type: string
-        source: ws
-        total: false
+        total: true
       - name: bill_status
         label: bill_status
         type: string
@@ -3679,10 +3644,12 @@ ReportDefinitions:
               ON dd.demandid = d.id
           WHERE d.tenantid = $tenantid
             AND d.businessservice = 'SW'
+            --AND d.consumercode = '0311000219'
             AND dd.taxamount > COALESCE(dd.collectionamount, 0)
             AND d.status = 'ACTIVE'
           GROUP BY d.consumercode
       ),
+
       latest_bill AS (
           SELECT
               b.id AS bill_id,
@@ -3700,10 +3667,12 @@ ReportDefinitions:
           FROM egbs_bill_v1 b
           JOIN egbs_billdetail_v1 bd
               ON bd.billid = b.id
-             AND bd.tenantid = $tenantid
-             AND bd.businessservice = 'SW'
+            AND bd.tenantid = $tenantid
+            AND bd.businessservice = 'SW'
+            --AND bd.consumercode = '0311000219'
           WHERE b.tenantid = $tenantid
       ),
+
       bill_amount AS (
           SELECT
               lb.bill_id,
@@ -3718,8 +3687,9 @@ ReportDefinitions:
           FROM latest_bill lb
           JOIN egbs_billdetail_v1 bd
               ON bd.billid = lb.bill_id
-             AND bd.tenantid = $tenantid
-             AND bd.businessservice = 'SW'
+            AND bd.tenantid = $tenantid
+            AND bd.businessservice = 'SW'
+            --AND bd.consumercode = '0311000231'
           WHERE lb.rn = 1
           GROUP BY
               lb.bill_id,
@@ -3731,9 +3701,10 @@ ReportDefinitions:
               lb.expirydate,
               lb.bill_status
       )
+
       SELECT
           to_char(
-              to_timestamp(COALESCE(pp.pending_from_period, ba.fromperiod) / 1000)
+              to_timestamp(pp.pending_from_period / 1000)
               AT TIME ZONE 'Asia/Kolkata',
               'YYYY-MM'
           )
@@ -3742,34 +3713,30 @@ ReportDefinitions:
               to_timestamp(ba.toperiod / 1000)
               AT TIME ZONE 'Asia/Kolkata',
               'YYYY-MM'
-          ) AS finyear,
-          pt.usagecategory,
-          wc.connectionno,
-          wc.property_id,
-          ba.bill_id AS billid,
-          ba.total_amount AS totalamount,
+          ) AS billing_period,
+
           ba.consumercode,
-          bm.localityname,
-          bm.localitycode,
-          bm.zonecode,
-          bm.blockcode,
-          wc.status AS wc_status,
-          pt.landarea,
+          ba.billno AS bill_no,
+
+          to_char(
+              to_timestamp(ba.createddate / 1000)
+              AT TIME ZONE 'Asia/Kolkata',
+              'YYYY-MM-DD HH24:MI:SS'
+          ) AS bill_created_date,
+
+          to_char(
+              to_timestamp(ba.expirydate / 1000)
+              AT TIME ZONE 'Asia/Kolkata',
+              'YYYY-MM-DD HH24:MI:SS'
+          ) AS expiry_date,
+
+          ba.total_amount,
+          ba.bill_id,
           ba.bill_status
-      FROM eg_sw_connection wc 
-      JOIN eg_pt_property pt 
-          ON wc.property_id = pt.propertyid AND pt.status IN ('ACTIVE', 'PENDINGWS')
-      JOIN eg_pt_address pa 
-          ON pt.id = pa.propertyid AND pa.tenantid = $tenantid
-      JOIN eg_bndry_mohalla bm 
-          ON pa.locality = bm.localitycode AND pa.tenantid = bm.tenantid
-      JOIN bill_amount ba 
-          ON ba.consumercode = wc.connectionno
-      LEFT JOIN pending_period pp 
-          ON pp.consumercode = ba.consumercode
-      WHERE wc.tenantid = $tenantid
-        AND wc.connectionno IS NOT NULL
-        AND wc.status = 'Active'
+
+      FROM bill_amount ba
+      LEFT JOIN pending_period pp
+          ON pp.consumercode = ba.consumercode;
 
   - reportName: WSTotal_Bill_Generate
     summary: WS Total Bill Generate Report
