@@ -131,50 +131,47 @@ SearchDefinitions:
           SELECT * FROM (SELECT mr.*, ROW_NUMBER() OVER (PARTITION BY mr.connectionno ORDER BY mr.createdtime DESC) rn FROM eg_ws_meterreading mr) t WHERE rn = 1
           ) lm ON lm.connectionno = conn.connectionno $where and conn.status='Active')
           select * from bill_data inner join (select max(b_createddate) as maxcreateddate, bd_consumercode from bill_data group by bd_consumercode) as max ON max.maxcreateddate=b_createddate  
-      searchParams:
-        condition: AND
-        params:
-          - name: b.tenantid
-            isMandatory: true
-            jsonPath: $.searchCriteria.tenantId
-          - name: bd.consumercode
-            isMandatory: false
-            jsonPath: $.searchCriteria.consumerCode
-            operator: =
-          - name: bd.businessservice
-            isMandatory: false
-            jsonPath: $.searchCriteria.businesService
-          - name: b.mobilenumber
-            isMandatory: false
-            jsonPath: $.searchCriteria.mobileNumber
-          - name: bd.billno
-            isMandatory: false
-            operator: =
-            jsonPath: $.searchCriteria.billNo
-          - name: ptadd.locality
-            isMandatory: false
-            jsonPath: $.searchCriteria.locality
-          - name: fromperiod
-            isMandatory: false
-            jsonPath: $.searchCriteria.fromPeriod
-            operator: LE
-          - name: toperiod
-            isMandatory: false
-            jsonPath: $.searchCriteria.toPeriod
-            operator: GE
-          - name: b.status
-            isMandatory: false
-            jsonPath: $.searchCriteria.billActive
-          - name: conn.property_id
-            isMandatory: false
-            jsonPath: $.searchCriteria.propertyId
-
-      output:
-        jsonFormat:
-          ResponseInfo: {}
-          Bills: []
-        outJsonPath: $.Bills
-        responseInfoPath: $.ResponseInfo
+   searchParams:
+    condition: AND
+    params:
+    - name: b.tenantid
+      isMandatory: true
+      jsonPath: $.searchCriteria.tenantId
+    - name: bd.consumercode
+      isMandatory: false
+      jsonPath: $.searchCriteria.consumerCode
+      operator: =
+    - name: bd.businessservice
+      isMandatory: false
+      jsonPath: $.searchCriteria.businesService
+    - name: b.mobilenumber
+      isMandatory: false
+      jsonPath: $.searchCriteria.mobileNumber
+    - name: bd.billno
+      isMandatory: false
+      operator: =
+      jsonPath: $.searchCriteria.billNo
+    - name: ptadd.locality
+      isMandatory: false
+      jsonPath: $.searchCriteria.locality
+    - name: fromperiod
+      isMandatory: false
+      jsonPath: $.searchCriteria.fromPeriod
+      operator: LE
+    - name: toperiod
+      isMandatory: false
+      jsonPath: $.searchCriteria.toPeriod
+      operator: GE
+    - name: b.status
+      isMandatory: false
+      jsonPath: $.searchCriteria.billActive
+    - name: conn.property_id
+      isMandatory: false
+      jsonPath: $.searchCriteria.propertyI 
+   output:
+    jsonFormat: {"ResponseInfo": {},"Bills": []}
+    outJsonPath: $.Bills
+    responseInfoPath: $.ResponseInfo
 
 
  - name: integratedbills
