@@ -113,11 +113,13 @@ serviceMaps:
     
     - query: INSERT INTO eg_rl_owner_info(id, allotment_id, user_uuid, is_primary_owner, owner_type, ownership_percentage, relationship, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
              ON CONFLICT (id) DO UPDATE SET
-        is_primary_owner = EXCLUDED.is_primary_owner,
-        owner_type = EXCLUDED.owner_type,
-        ownership_percentage = EXCLUDED.ownership_percentage,
-        relationship = EXCLUDED.relationship,
-        status = EXCLUDED.status;
+        allotment_id = COALESCE(EXCLUDED.allotment_id, eg_rl_owner_info.allotment_id),
+        user_uuid = COALESCE(EXCLUDED.user_uuid, eg_rl_owner_info.user_uuid),
+        is_primary_owner = COALESCE(EXCLUDED.is_primary_owner, eg_rl_owner_info.is_primary_owner),
+        owner_type = COALESCE(EXCLUDED.owner_type, eg_rl_owner_info.owner_type),
+        ownership_percentage = COALESCE(EXCLUDED.ownership_percentage, eg_rl_owner_info.ownership_percentage),
+        relationship = COALESCE(EXCLUDED.relationship, eg_rl_owner_info.relationship),
+        status = COALESCE(EXCLUDED.status, eg_rl_owner_info.status);
       basePath: AllotmentDetails.*.OwnerInfo.*
       jsonMaps:
       - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.ownerId
