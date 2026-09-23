@@ -1469,54 +1469,43 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND month_start <= DATE_TRUNC('month', TO_TIMESTAMP($toDate / 1000))
     query: |
-      WITH monthly_allotments AS (
-          SELECT
-              a.tenant_id,
-              date_trunc('month', to_timestamp(a.created_time / 1000)) AS month_start,
-              COUNT(a.id) AS new_applications
-          FROM eg_rl_allotment a
-          WHERE a.status <> 'REJECTED'
-          GROUP BY a.tenant_id, 2
-      ),
-      monthly_bills AS (
-          SELECT
-              bd.tenantid AS tenant_id,
-              date_trunc('month', to_timestamp(bd.createddate / 1000)) AS month_start,
-              COUNT(DISTINCT bd.billid) AS newbills_generated
-          FROM egbs_billdetail_v1 bd
-          WHERE bd.businessservice = 'rl-services'
-          GROUP BY bd.tenantid, 2
-      ),
-      months AS (
-          SELECT tenant_id, month_start FROM monthly_allotments
-          UNION
-          SELECT tenant_id, month_start FROM monthly_bills
-      ),
-      cumulative_data AS (
-          SELECT
-              m.tenant_id AS tenantid,
-              m.month_start,
-              to_char(m.month_start, 'Mon-YYYY') AS month,
-              COALESCE(a.new_applications, 0) AS new_applications,
-              SUM(COALESCE(a.new_applications, 0)) OVER (PARTITION BY m.tenant_id ORDER BY m.month_start) AS cumulative_applications,
-              COALESCE(b.newbills_generated, 0) AS newbills_generated,
-              SUM(COALESCE(b.newbills_generated, 0)) OVER (PARTITION BY m.tenant_id ORDER BY m.month_start) AS cumulative_bills_generated
-          FROM months m
-          LEFT JOIN monthly_allotments a ON a.tenant_id = m.tenant_id AND a.month_start = m.month_start
-          LEFT JOIN monthly_bills b ON b.tenant_id = m.tenant_id AND b.month_start = m.month_start
-      )
       SELECT 
           tenantid,
           month,
           new_applications,
-          cumulative_applications,
+          SUM(new_applications) OVER (PARTITION BY tenantid ORDER BY month_start) AS cumulative_applications,
           newbills_generated,
-          cumulative_bills_generated
-      FROM cumulative_data
+          SUM(newbills_generated) OVER (PARTITION BY tenantid ORDER BY month_start) AS cumulative_bills_generated
+      FROM (
+          SELECT
+              COALESCE(a.tenant_id, b.tenant_id) AS tenantid,
+              COALESCE(a.month_start, b.month_start) AS month_start,
+              to_char(COALESCE(a.month_start, b.month_start), 'Mon-YYYY') AS month,
+              COALESCE(a.new_applications, 0) AS new_applications,
+              COALESCE(b.newbills_generated, 0) AS newbills_generated
+          FROM (
+              SELECT
+                  tenant_id,
+                  date_trunc('month', to_timestamp(created_time / 1000)) AS month_start,
+                  COUNT(id) AS new_applications
+              FROM eg_rl_allotment
+              WHERE status <> 'REJECTED' AND tenant_id != 'pb.testing'
+              GROUP BY tenant_id, 2
+          ) a
+          FULL OUTER JOIN (
+              SELECT
+                  tenantid AS tenant_id,
+                  date_trunc('month', to_timestamp(createddate / 1000)) AS month_start,
+                  COUNT(DISTINCT billid) AS newbills_generated
+              FROM egbs_billdetail_v1
+              WHERE businessservice = 'rl-services' AND tenantid != 'pb.testing'
+              GROUP BY tenantid, 2
+          ) b ON a.tenant_id = b.tenant_id AND a.month_start = b.month_start
+      ) cumulative_data
       WHERE 1=1
-      
+
     groupby: ""
-    orderby: ORDER BY tenantid, month_start    
+    orderby: ORDER BY tenantid, month_start   
 
   - reportName: StateMonthWiseBillingGenerationReport
     decryptionPathId: RLREPORTS
@@ -1578,53 +1567,40 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND month_start <= DATE_TRUNC('month', TO_TIMESTAMP($toDate / 1000))
     query: |
-      WITH monthly_allotments AS (
-          SELECT
-              a.tenant_id,
-              date_trunc('month', to_timestamp(a.created_time / 1000)) AS month_start,
-              COUNT(a.id) AS new_applications
-          FROM eg_rl_allotment a
-          WHERE a.status <> 'REJECTED' 
-            AND a.tenant_id != 'pb.testing'
-          GROUP BY a.tenant_id, 2
-      ),
-      monthly_bills AS (
-          SELECT
-              bd.tenantid AS tenant_id,
-              date_trunc('month', to_timestamp(bd.createddate / 1000)) AS month_start,
-              COUNT(DISTINCT bd.billid) AS newbills_generated
-          FROM egbs_billdetail_v1 bd
-          WHERE bd.businessservice = 'rl-services' 
-            AND bd.tenantid != 'pb.testing'
-          GROUP BY bd.tenantid, 2
-      ),
-      months AS (
-          SELECT tenant_id, month_start FROM monthly_allotments
-          UNION
-          SELECT tenant_id, month_start FROM monthly_bills
-      ),
-      cumulative_data AS (
-          SELECT
-              m.tenant_id AS tenantid,
-              m.month_start,
-              to_char(m.month_start, 'Mon-YYYY') AS month,
-              COALESCE(a.new_applications, 0) AS new_applications,
-              SUM(COALESCE(a.new_applications, 0)) OVER (PARTITION BY m.tenant_id ORDER BY m.month_start) AS cumulative_applications,
-              COALESCE(b.newbills_generated, 0) AS newbills_generated,
-              SUM(COALESCE(b.newbills_generated, 0)) OVER (PARTITION BY m.tenant_id ORDER BY m.month_start) AS cumulative_bills_generated
-          FROM months m
-          LEFT JOIN monthly_allotments a ON a.tenant_id = m.tenant_id AND a.month_start = m.month_start
-          LEFT JOIN monthly_bills b ON b.tenant_id = m.tenant_id AND b.month_start = m.month_start
-      )
       SELECT 
           tenantid,
           month,
           new_applications,
-          cumulative_applications,
+          SUM(new_applications) OVER (PARTITION BY tenantid ORDER BY month_start) AS cumulative_applications,
           newbills_generated,
-          cumulative_bills_generated
-      FROM cumulative_data
+          SUM(newbills_generated) OVER (PARTITION BY tenantid ORDER BY month_start) AS cumulative_bills_generated
+      FROM (
+          SELECT
+              COALESCE(a.tenant_id, b.tenant_id) AS tenantid,
+              COALESCE(a.month_start, b.month_start) AS month_start,
+              to_char(COALESCE(a.month_start, b.month_start), 'Mon-YYYY') AS month,
+              COALESCE(a.new_applications, 0) AS new_applications,
+              COALESCE(b.newbills_generated, 0) AS newbills_generated
+          FROM (
+              SELECT
+                  tenant_id,
+                  date_trunc('month', to_timestamp(created_time / 1000)) AS month_start,
+                  COUNT(id) AS new_applications
+              FROM eg_rl_allotment
+              WHERE status <> 'REJECTED' AND tenant_id != 'pb.testing'
+              GROUP BY tenant_id, 2
+          ) a
+          FULL OUTER JOIN (
+              SELECT
+                  tenantid AS tenant_id,
+                  date_trunc('month', to_timestamp(createddate / 1000)) AS month_start,
+                  COUNT(DISTINCT billid) AS newbills_generated
+              FROM egbs_billdetail_v1
+              WHERE businessservice = 'rl-services' AND tenantid != 'pb.testing'
+              GROUP BY tenantid, 2
+          ) b ON a.tenant_id = b.tenant_id AND a.month_start = b.month_start
+      ) cumulative_data
       WHERE 1=1
-      
+
     groupby: ""
     orderby: ORDER BY tenantid, month_start
