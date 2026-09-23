@@ -3627,13 +3627,7 @@ ReportDefinitions:
         type: string
         source: ws
         total: false
-    searchParams:
-      - name: localityArray
-        label: zoneList
-        type: boundarylist
-        source: pt
-        isMandatory: false
-        searchClause: AND bm.localitycode IN ($localityArray)
+    searchParams: []
     query: |
       WITH pending_period AS (
           SELECT
@@ -3644,12 +3638,10 @@ ReportDefinitions:
               ON dd.demandid = d.id
           WHERE d.tenantid = $tenantid
             AND d.businessservice = 'SW'
-            --AND d.consumercode = '0311000219'
             AND dd.taxamount > COALESCE(dd.collectionamount, 0)
             AND d.status = 'ACTIVE'
           GROUP BY d.consumercode
       ),
-
       latest_bill AS (
           SELECT
               b.id AS bill_id,
@@ -3667,12 +3659,10 @@ ReportDefinitions:
           FROM egbs_bill_v1 b
           JOIN egbs_billdetail_v1 bd
               ON bd.billid = b.id
-            AND bd.tenantid = $tenantid
-            AND bd.businessservice = 'SW'
-            --AND bd.consumercode = '0311000219'
+             AND bd.tenantid = $tenantid
+             AND bd.businessservice = 'SW'
           WHERE b.tenantid = $tenantid
       ),
-
       bill_amount AS (
           SELECT
               lb.bill_id,
@@ -3687,9 +3677,8 @@ ReportDefinitions:
           FROM latest_bill lb
           JOIN egbs_billdetail_v1 bd
               ON bd.billid = lb.bill_id
-            AND bd.tenantid = $tenantid
-            AND bd.businessservice = 'SW'
-            --AND bd.consumercode = '0311000231'
+             AND bd.tenantid = $tenantid
+             AND bd.businessservice = 'SW'
           WHERE lb.rn = 1
           GROUP BY
               lb.bill_id,
@@ -3701,7 +3690,6 @@ ReportDefinitions:
               lb.expirydate,
               lb.bill_status
       )
-
       SELECT
           to_char(
               to_timestamp(pp.pending_from_period / 1000)
@@ -3714,29 +3702,24 @@ ReportDefinitions:
               AT TIME ZONE 'Asia/Kolkata',
               'YYYY-MM'
           ) AS billing_period,
-
           ba.consumercode,
           ba.billno AS bill_no,
-
           to_char(
               to_timestamp(ba.createddate / 1000)
               AT TIME ZONE 'Asia/Kolkata',
               'YYYY-MM-DD HH24:MI:SS'
           ) AS bill_created_date,
-
           to_char(
               to_timestamp(ba.expirydate / 1000)
               AT TIME ZONE 'Asia/Kolkata',
               'YYYY-MM-DD HH24:MI:SS'
           ) AS expiry_date,
-
           ba.total_amount,
           ba.bill_id,
           ba.bill_status
-
       FROM bill_amount ba
       LEFT JOIN pending_period pp
-          ON pp.consumercode = ba.consumercode;
+          ON pp.consumercode = ba.consumercode
 
   - reportName: WSTotal_Bill_Generate
     summary: WS Total Bill Generate Report
