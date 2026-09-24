@@ -6880,30 +6880,76 @@ ReportDefinitions:
       source: ws
       total: false                                                                                   
   query:
-     select  d.consumercode , wc.status, ep.propertyid , ep.landarea , ep.usagecategory , 
-     to_char((To_timestamp(d.taxperiodfrom/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') ||'-'|| to_char
-     ((To_timestamp(d.taxperiodto/1000) at time Zone 'Asia/Kolkata'),'YYYY-MM') as finyear,
-     d.status as demandstatus, (To_timestamp(dd.createdtime/1000) at time Zone 'Asia/Kolkata') ddupdated, 
-     dd.taxheadcode, dd.taxamount as taxamt, dd.collectionamount as taxcoll, (dd.taxamount - dd.collectionamount) balance, 
-     CASE WHEN d.ispaymentcompleted = true THEN 'True'ELSE 'False'END AS ispaymentcompleted,dd.additionaldetails
-     from egbs_demanddetail_v1 dd, egbs_demand_v1 d , eg_ws_connection wc , eg_pt_property ep
-     where dd.demandid=d.id 
-     and d.consumercode = wc.connectionno and wc.status = 'Active' and wc.tenantid = $tenantid
-     and wc.property_id = ep.propertyid and ep.tenantid = $tenantid
-     and d.status!='CANCELLED' 
-     and d.businessservice='WS' 
-     and dd.taxheadcode = 'WS_CHARGE'
-     AND d.taxperiodfrom = (
-           SELECT MAX(d2.taxperiodfrom)
-           FROM   egbs_demand_v1 d2
-           WHERE  d2.consumercode    = d.consumercode
-             AND  d2.tenantid        = d.tenantid
-             AND  d2.businessservice = 'WS'
-             AND  d2.status         != 'CANCELLED'
-             )
-       and d.tenantid = $tenantid
-  orderby: order by d.taxperiodfrom desc 
-
+       WITH latest_demand AS
+       (
+           SELECT DISTINCT ON (consumercode)
+                  id,
+                  consumercode,
+                  tenantid,
+                  businessservice,
+                  taxperiodfrom,taxperiodto,ispaymentcompleted,
+                  status
+           FROM egbs_demand_v1
+           WHERE tenantid = $tenantid
+             AND businessservice = 'WS'
+             AND status <> 'CANCELLED'
+           ORDER BY consumercode, taxperiodfrom DESC
+       )
+       SELECT
+           ld.consumercode,
+           wc.status,
+           ep.propertyid,
+           ep.landarea,
+           ep.usagecategory,
+       
+           to_char(
+               to_timestamp(ld.taxperiodfrom / 1000)
+               AT TIME ZONE 'Asia/Kolkata',
+               'YYYY-MM'
+           )
+           || '-' ||
+           to_char(
+               to_timestamp(ld.taxperiodto / 1000)
+               AT TIME ZONE 'Asia/Kolkata',
+               'YYYY-MM'
+           ) AS finyear,
+       
+           ld.status AS demandstatus,
+       
+           (
+               to_timestamp(dd.createdtime / 1000)
+               AT TIME ZONE 'Asia/Kolkata'
+           ) AS ddupdated,
+       
+           dd.taxheadcode,
+           dd.taxamount AS taxamt,
+           dd.collectionamount AS taxcoll,
+           (dd.taxamount - dd.collectionamount) AS balance,
+       
+           CASE
+               WHEN ld.ispaymentcompleted = true THEN 'True'
+               ELSE 'False'
+           END AS ispaymentcompleted,
+       
+           dd.additionaldetails
+       
+       FROM latest_demand ld
+       
+       INNER JOIN eg_ws_connection wc
+           ON wc.connectionno = ld.consumercode
+          AND wc.tenantid = $tenantid
+          AND wc.status = 'Active'
+       
+       INNER JOIN eg_pt_property ep
+           ON ep.propertyid = wc.property_id
+          AND ep.tenantid = $tenantid
+       
+       INNER JOIN egbs_demanddetail_v1 dd
+           ON dd.demandid = ld.id
+          AND dd.tenantid = $tenantid
+          AND dd.taxheadcode = 'WS_CHARGE'
+       
+  orderby: ORDER BY ld.taxperiodfrom DESC
 - reportName: sewerage_demand_status_report
   summary: Sewerage - Demand status report 
   version: 1.0.0
