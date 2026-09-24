@@ -119,7 +119,8 @@ serviceMaps:
         owner_type = COALESCE(EXCLUDED.owner_type, eg_rl_owner_info.owner_type),
         ownership_percentage = COALESCE(EXCLUDED.ownership_percentage, eg_rl_owner_info.ownership_percentage),
         relationship = COALESCE(EXCLUDED.relationship, eg_rl_owner_info.relationship),
-        status = COALESCE(EXCLUDED.status, eg_rl_owner_info.status);
+        status = COALESCE(EXCLUDED.status, eg_rl_owner_info.status)
+        WHERE eg_rl_owner_info.allotment_id = COALESCE(EXCLUDED.allotment_id, eg_rl_owner_info.allotment_id);
       basePath: AllotmentDetails.*.OwnerInfo.*
       jsonMaps:
       - jsonPath: $.AllotmentDetails.*.OwnerInfo.*.ownerId
