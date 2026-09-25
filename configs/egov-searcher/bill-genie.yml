@@ -2428,131 +2428,122 @@ SearchDefinitions:
       rowMapperKey: billsearch
       query:
         baseQuery: >-
-           WITH bill_data AS (
+           WITH ws_conn AS (
              SELECT
-               conn.status AS conn_status,
-               conn.property_id AS propertyId,
-               conn.oldconnectionno AS oldPropertyId,
-               conn.additionaldetails AS conn_add,
-               conn.relatedswconn AS relatedswconn,
-       
-               pt.surveyid AS ledger_no,
-               pt.landArea AS pt_plotsize,
-               pt.usageCategory AS pt_usage,
-       
-               b.id AS b_id,
+               ws.connectionno         AS ws_connectionno,
+               ws.relatedswconn        AS sw_connectionno,
+               ws.property_id          AS propertyId,
+               ws.oldconnectionno      AS oldPropertyId,
+               ws.additionaldetails    AS conn_add,
+               ws.status               AS conn_status
+             FROM eg_ws_connection ws
+             WHERE ws.tenantid = :b.tenantid
+               AND ws.status = 'Active'
+               AND COALESCE(ws.relatedswconn, '') <> ''
+           ),
+           bill_data AS (
+             SELECT
+               wc.conn_status,
+               wc.propertyId,
+               wc.oldPropertyId,
+               wc.conn_add,
+               wc.ws_connectionno      AS relatedswconn,
+               pt.surveyid             AS ledger_no,
+               pt.landArea             AS pt_plotsize,
+               pt.usageCategory        AS pt_usage,
+               b.id                    AS b_id,
                b.mobilenumber,
-               b.tenantid AS b_tenantid,
-               b.payername AS b_payername,
-               b.payeraddress AS b_payeraddress,
-               b.payeremail AS b_payeremail,
-               b.isactive AS b_isactive,
-               b.iscancelled AS b_iscancelled,
-               b.createdby AS b_createdby,
-               b.status AS b_status,
-               b.filestoreid AS b_filestoreid,
-               b.createddate AS b_createddate,
-               b.lastmodifiedby AS b_lastmodifiedby,
-               b.lastmodifieddate AS b_lastmodifieddate,
-       
-               bd.id AS bd_id,
-               bd.billid AS bd_billid,
-               bd.tenantid AS bd_tenantid,
-               bd.businessservice AS bd_businessservice,
+               b.tenantid              AS b_tenantid,
+               b.payername             AS b_payername,
+               b.payeraddress          AS b_payeraddress,
+               b.payeremail            AS b_payeremail,
+               b.isactive              AS b_isactive,
+               b.iscancelled           AS b_iscancelled,
+               b.createdby             AS b_createdby,
+               b.status                AS b_status,
+               b.filestoreid           AS b_filestoreid,
+               b.createddate           AS b_createddate,
+               b.lastmodifiedby        AS b_lastmodifiedby,
+               b.lastmodifieddate      AS b_lastmodifieddate,
+               bd.id                   AS bd_id,
+               bd.billid               AS bd_billid,
+               bd.tenantid             AS bd_tenantid,
+               bd.businessservice      AS bd_businessservice,
                bd.demandid,
                bd.fromperiod,
                bd.toperiod,
-               bd.billno AS bd_billno,
-               bd.billdate AS bd_billdate,
-               bd.consumercode AS bd_consumercode,
-               bd.consumertype AS bd_consumertype,
-               bd.billdescription AS bd_billdescription,
-               bd.displaymessage AS bd_displaymessage,
-               bd.minimumamount AS bd_minimumamount,
-               bd.totalamount AS bd_totalamount,
+               bd.billno               AS bd_billno,
+               bd.billdate             AS bd_billdate,
+               bd.consumercode         AS bd_consumercode,
+               bd.consumertype         AS bd_consumertype,
+               bd.billdescription      AS bd_billdescription,
+               bd.displaymessage       AS bd_displaymessage,
+               bd.minimumamount        AS bd_minimumamount,
+               bd.totalamount          AS bd_totalamount,
                bd.callbackforapportioning AS bd_callbackforapportioning,
-               bd.expirydate AS bd_expirydate,
-               bd.partpaymentallowed AS bd_partpaymentallowed,
-               bd.isadvanceallowed AS bd_isadvanceallowed,
+               bd.expirydate           AS bd_expirydate,
+               bd.partpaymentallowed   AS bd_partpaymentallowed,
+               bd.isadvanceallowed     AS bd_isadvanceallowed,
                bd.collectionmodesnotallowed AS bd_collectionmodesnotallowed,
-               bd.createddate AS bd_createddate,
-       
-               b.additionaldetails AS b_additionaldetails,
-               bd.additionaldetails AS bd_additionaldetails,
-       
-               ad.id AS ad_id,
-               ad.tenantid AS ad_tenantid,
-               ad.billdetail AS ad_billdetail,
-               ad.glcode AS ad_glcode,
-               ad.orderno AS ad_orderno,
-               ad.accountdescription AS ad_accountdescription,
-               ad.amount AS ad_amount,
-               ad.adjustedamount AS ad_adjustedamount,
-               ad.taxheadcode AS ad_taxheadcode,
+               bd.createddate          AS bd_createddate,
+               b.additionaldetails     AS b_additionaldetails,
+               bd.additionaldetails    AS bd_additionaldetails,
+               ad.id                   AS ad_id,
+               ad.tenantid             AS ad_tenantid,
+               ad.billdetail           AS ad_billdetail,
+               ad.glcode               AS ad_glcode,
+               ad.orderno              AS ad_orderno,
+               ad.accountdescription   AS ad_accountdescription,
+               ad.amount               AS ad_amount,
+               ad.adjustedamount       AS ad_adjustedamount,
+               ad.taxheadcode          AS ad_taxheadcode,
                ad.demanddetailid,
-               ad.isactualdemand AS ad_isactualdemand,
-               ad.purpose AS ad_purpose,
-               ad.additionaldetails AS ad_additionaldetails,
-       
-               ptadd.doorNo AS ptadd_doorNo,
-               ptadd.landmark AS ptadd_landmark,
-               ptadd.city AS ptadd_city,
-               ptadd.pincode AS ptadd_pincode,
-               ptadd.locality AS ptadd_locality,
-               ptadd.street AS ptadd_street,
-               ptadd.region AS ptadd_region,
-               ptadd.plotno AS ptadd_plotno,
-               ptadd.buildingname AS ptadd_buildingname,
-               ptadd.district AS ptadd_district,
-               ptadd.state AS ptadd_state,
-               ptadd.latitude AS ptadd_latitude,
-               ptadd.longitude AS ptadd_longitude,
-       
-               ptown.userid AS ptown_userid,
-       
-               lm.connectionno AS mr_connectionno,
-               lm.lastreading AS mr_lastreading,
-               lm.lastreadingdate AS mr_lastreadingdate,
-               lm.currentreading AS mr_currentreading,
-               lm.currentreadingdate AS mr_currentreadingdate,
-               lm.consumption AS mr_consumption,
-               lm.meterstatus AS mr_meterstatus,
-               lm.billingperiod AS mr_billingperiod
-       
+               ad.isactualdemand       AS ad_isactualdemand,
+               ad.purpose              AS ad_purpose,
+               ad.additionaldetails    AS ad_additionaldetails,
+               ptadd.doorNo            AS ptadd_doorNo,
+               ptadd.landmark          AS ptadd_landmark,
+               ptadd.city              AS ptadd_city,
+               ptadd.pincode           AS ptadd_pincode,
+               ptadd.locality          AS ptadd_locality,
+               ptadd.street            AS ptadd_street,
+               ptadd.region            AS ptadd_region,
+               ptadd.plotno            AS ptadd_plotno,
+               ptadd.buildingname      AS ptadd_buildingname,
+               ptadd.district          AS ptadd_district,
+               ptadd.state             AS ptadd_state,
+               ptadd.latitude          AS ptadd_latitude,
+               ptadd.longitude         AS ptadd_longitude,
+               ptown.userid            AS ptown_userid,
+               lm.connectionno         AS mr_connectionno,
+               lm.lastreading          AS mr_lastreading,
+               lm.lastreadingdate      AS mr_lastreadingdate,
+               lm.currentreading       AS mr_currentreading,
+               lm.currentreadingdate   AS mr_currentreadingdate,
+               lm.consumption          AS mr_consumption,
+               lm.meterstatus          AS mr_meterstatus,
+               lm.billingperiod        AS mr_billingperiod
              FROM egbs_bill_v1 b
-       
              INNER JOIN egbs_billdetail_v1 bd
                ON b.tenantid = :b.tenantid
               AND bd.tenantid = :b.tenantid
               AND b.id = bd.billid
               AND b.tenantid = bd.tenantid
-              -- AND bd.totalamount > 0
-              AND bd.businessservice IN ('WS','SW')
-       
+              AND bd.businessservice IN ('WS', 'SW')
              INNER JOIN egbs_billaccountdetail_v1 ad
                ON ad.tenantid = :b.tenantid
               AND bd.id = ad.billdetail
               AND bd.tenantid = ad.tenantid
-       
-             INNER JOIN eg_ws_connection conn
-               ON bd.consumercode IN (
-                 conn.connectionno,
-                 conn.relatedswconn
-               )
-              AND conn.tenantid = :b.tenantid
-              AND conn.status = 'Active'
-       
+             INNER JOIN ws_conn wc
+               ON bd.consumercode IN (wc.ws_connectionno, wc.sw_connectionno)
              INNER JOIN eg_pt_property pt
-               ON conn.property_id = pt.propertyid
+               ON wc.propertyId = pt.propertyid
               AND pt.status <> 'INACTIVE'
-       
              INNER JOIN eg_pt_address ptadd
                ON ptadd.propertyid = pt.id
-       
              INNER JOIN eg_pt_owner ptown
                ON ptown.propertyid = pt.id
               AND ptown.status <> 'INACTIVE'
-       
              LEFT JOIN (
                SELECT *
                FROM (
@@ -2567,11 +2558,9 @@ SearchDefinitions:
                ) t
                WHERE rn = 1
              ) lm
-               ON lm.connectionno = conn.connectionno
-       
-             $where AND b.status = 'Active' 
+               ON lm.connectionno = wc.ws_connectionno
+             $where AND b.status = 'ACTIVE'
            )
-       
            SELECT
              bill_data.*,
              max.maxcreateddate
@@ -2579,22 +2568,31 @@ SearchDefinitions:
            INNER JOIN (
              SELECT
                MAX(b_createddate) AS maxcreateddate,
-               bd_businessservice AS business
+               propertyId,
+               bd_businessservice  AS business
              FROM bill_data
-             GROUP BY bd_businessservice
+             GROUP BY propertyId, bd_businessservice
            ) max
              ON max.maxcreateddate = bill_data.b_createddate
+            AND max.propertyId = bill_data.propertyId
             AND max.business = bill_data.bd_businessservice
+           ORDER BY
+             bill_data.propertyId,
+             CASE bill_data.bd_businessservice WHEN 'WS' THEN 1 WHEN 'SW' THEN 2 ELSE 3 END
       searchParams:
         condition: AND
         params:
           - name: b.tenantid
             isMandatory: true
             jsonPath: $.searchCriteria.tenantId
-    
-          - name: bd.consumercode
+      
+          - name: wc.ws_connectionno
             isMandatory: false
             jsonPath: $.searchCriteria.consumerCode
+
+          - name: wc.propertyId
+            isMandatory: false
+            jsonPath: $.searchCriteria.propertyId
    
           - name: b.mobilenumber
             isMandatory: false
@@ -2625,6 +2623,6 @@ SearchDefinitions:
       output:
         jsonFormat:
           ResponseInfo: {}
-          Bills: []
-        outJsonPath: $.Bills
+          IntegratedBills: []
+        outJsonPath: $.IntegratedBills
         responseInfoPath: $.ResponseInfo
