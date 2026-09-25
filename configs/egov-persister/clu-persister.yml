@@ -135,7 +135,8 @@ serviceMaps:
              UPDATE eg_clu
               SET status = ?, applicationstatus = ?, cluno = ?,
               applicationtype = ?, clutype = ?,
-              lastmodifiedby = ?, lastmodifiedtime = ?
+              lastmodifiedby = ?, lastmodifiedtime = ?,
+              vasikaNumber = ?, vasikaDate = ?
               WHERE id = ?;
 
           basePath: $.Clu
@@ -149,7 +150,8 @@ serviceMaps:
             
             - jsonPath: $.Clu.auditDetails.lastModifiedBy
             - jsonPath: $.Clu.auditDetails.lastModifiedTime
-            
+            - jsonPath: $.Clu.vasikaNumber
+            - jsonPath: $.Clu.vasikaDate
             - jsonPath: $.Clu.id
 
 

@@ -136,7 +136,8 @@ serviceMaps:
              UPDATE eg_noc
               SET status = ?, applicationstatus = ?, nocno = ?,
               applicationtype = ?, noctype = ?,
-              lastmodifiedby = ?, lastmodifiedtime = ?
+              lastmodifiedby = ?, lastmodifiedtime = ?,
+              vasikaNumber = ?, vasikaDate = ?
               WHERE id = ?;
 
           basePath: $.Noc
@@ -150,7 +151,8 @@ serviceMaps:
             
             - jsonPath: $.Noc.auditDetails.lastModifiedBy
             - jsonPath: $.Noc.auditDetails.lastModifiedTime
-            
+            - jsonPath: $.Noc.vasikaNumber
+            - jsonPath: $.Noc.vasikaDate
             - jsonPath: $.Noc.id
 
 
