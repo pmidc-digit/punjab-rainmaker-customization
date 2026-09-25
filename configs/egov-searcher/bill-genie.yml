@@ -2522,15 +2522,15 @@ SearchDefinitions:
              FROM egbs_bill_v1 b
        
              INNER JOIN egbs_billdetail_v1 bd
-               ON b.tenantid = 'pb.nangal'
-              AND bd.tenantid = 'pb.nangal'
+               ON b.tenantid = :b.tenantid
+              AND bd.tenantid = :b.tenantid
               AND b.id = bd.billid
               AND b.tenantid = bd.tenantid
               -- AND bd.totalamount > 0
               AND bd.businessservice IN ('WS','SW')
        
              INNER JOIN egbs_billaccountdetail_v1 ad
-               ON ad.tenantid = 'pb.nangal'
+               ON ad.tenantid = :b.tenantid
               AND bd.id = ad.billdetail
               AND bd.tenantid = ad.tenantid
        
@@ -2539,7 +2539,7 @@ SearchDefinitions:
                  conn.connectionno,
                  conn.relatedswconn
                )
-              AND conn.tenantid = 'pb.nangal'
+              AND conn.tenantid = :b.tenantid
               AND conn.status = 'Active'
        
              INNER JOIN eg_pt_property pt
@@ -2563,7 +2563,7 @@ SearchDefinitions:
                      ORDER BY mr.createdtime DESC
                    ) rn
                  FROM eg_ws_meterreading mr
-                 WHERE mr.tenantid = 'pb.nangal'
+                 WHERE mr.tenantid = :b.tenantid
                ) t
                WHERE rn = 1
              ) lm
