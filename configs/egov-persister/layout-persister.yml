@@ -135,7 +135,8 @@ serviceMaps:
              UPDATE eg_layout
               SET status = ?, applicationstatus = ?, layoutno = ?,
               applicationtype = ?, layouttype = ?,
-              lastmodifiedby = ?, lastmodifiedtime = ?
+              lastmodifiedby = ?, lastmodifiedtime = ?,
+              vasikaNumber = ?, vasikaDate = ?
               WHERE id = ?;
 
           basePath: $.Layout
@@ -149,7 +150,8 @@ serviceMaps:
             
             - jsonPath: $.Layout.auditDetails.lastModifiedBy
             - jsonPath: $.Layout.auditDetails.lastModifiedTime
-            
+            - jsonPath: $.Layout.vasikaNumber
+            - jsonPath: $.Layout.vasikaDate
             - jsonPath: $.Layout.id
 
 
