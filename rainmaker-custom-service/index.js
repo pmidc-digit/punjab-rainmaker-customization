@@ -123,9 +123,13 @@ const redirectGatewayResponse = function (req, res, fallbackTxnId) {
   }
 
   const pgTxnId = req.query.eg_pg_txnid || fallbackTxnId;
+  const encResp = req.body.encResp || req.query.encResp;
 
   if (pgTxnId) {
     redirectUrl.searchParams.set("eg_pg_txnid", pgTxnId);
+  }
+  if (encResp) {
+    redirectUrl.searchParams.set("encResp", encResp);
   }
 
   return res.redirect(302, redirectUrl.toString());
