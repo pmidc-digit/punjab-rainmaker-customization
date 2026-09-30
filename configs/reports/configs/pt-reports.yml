@@ -2500,7 +2500,7 @@ ReportDefinitions:
       TO_CHAR(TO_TIMESTAMP(pd.manualreceiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS g8issuedate,
       manualreceiptnumber AS g8receiptno
       FROM egcl_paymentdetail pd
-      LEFT OUTER JOIN eg_user ON eg_user.id = pd.createdby::INTEGER
+      LEFT OUTER JOIN eg_user ON eg_user.id = pd.createdby::bigint
       LEFT OUTER JOIN egcl_payment payment ON pd.paymentid = payment.id
       LEFT OUTER JOIN bank_branches ON bank_branches.ifsc = payment.ifsccode
       LEFT JOIN egcl_bill bill ON bill.id = pd.billid AND bill.tenantid = pd.tenantid
