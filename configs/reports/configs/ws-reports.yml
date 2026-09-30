@@ -7389,13 +7389,13 @@ ReportDefinitions:
       type: epoch
       source: ws
       isMandatory: false
-      searchClause: AND (EXTRACT(EPOCH FROM first_bill_date) * 1000) >= $billDateFrom::numeric
+      searchClause: AND first_bill_date >= ($firstBillDateFrom::timestamptz AT TIME ZONE 'Asia/Kolkata')
     - name: billDateTo
       label: Bill Date To
       type: epoch
       source: ws
       isMandatory: false
-      searchClause: AND (EXTRACT(EPOCH FROM first_bill_date) * 1000) < ($billDateTo::numeric + 86400000)
+      searchClause: AND first_bill_date < (($firstBillDateTo::timestamptz AT TIME ZONE 'Asia/Kolkata') + interval '1 day')
     - name: taxPeriodfrom
       label: Quarter From
       type: singlevaluelist
@@ -7499,13 +7499,13 @@ ReportDefinitions:
       type: epoch
       source: ws
       isMandatory: false
-      searchClause: AND (EXTRACT(EPOCH FROM first_bill_date) * 1000) >= $billDateFrom::numeric
+      searchClause: AND first_bill_date >= ($firstBillDateFrom::timestamptz AT TIME ZONE 'Asia/Kolkata')
     - name: billDateTo
       label: Bill Date To
       type: epoch
       source: ws
       isMandatory: false
-      searchClause: AND (EXTRACT(EPOCH FROM first_bill_date) * 1000) < ($billDateTo::numeric + 86400000)
+      searchClause: AND first_bill_date < (($firstBillDateTo::timestamptz AT TIME ZONE 'Asia/Kolkata') + interval '1 day')
     - name: taxPeriodfrom
       label: Quarter From
       type: singlevaluelist
