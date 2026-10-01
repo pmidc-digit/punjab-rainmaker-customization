@@ -8,11 +8,6 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: tenant_id
-        label: ULB Name
-        type: string
-        source: rl
-        total: false
       - name: application_number
         label: Application Number
         type: string
@@ -89,12 +84,11 @@ ReportDefinitions:
           r.amount_tobe_deducted,
           r.amount_to_be_refund, 
           u.mobilenumber, 
-          r.tenant_id,
           u.name
-          FROM eg_rl_allotment AS r
-          LEFT JOIN eg_rl_owner_info AS o ON o.allotment_id = r.id
-          LEFT JOIN eg_user AS u ON u.uuid = o.user_uuid
-          WHERE 1=1 AND r.tenant_id != 'pb.testing' AND r.tenant_id = $tenantid
+         FROM eg_rl_allotment AS r
+         LEFT JOIN eg_rl_owner_info AS o ON o.allotment_id = r.id
+         LEFT JOIN eg_user AS u ON u.uuid = o.user_uuid
+         WHERE 1=1
 
   - reportName: STATERENT&LEASEDETAILSReport
     decryptionPathId: RLREPORTS
@@ -384,11 +378,6 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: tenant_id
-        label: ULB Name
-        type: string
-        source: rl
-        total: false
       - name: applicationno
         label: Application Number
         type: string
@@ -521,12 +510,13 @@ ReportDefinitions:
           LEFT JOIN current_holder ch ON ch.applicationno = r.application_number
           WHERE pd.businessservice = 'rl-services'
           AND p.paymentstatus != 'CANCELLED'
+          AND p.tenantid = $tenantid
         ) 
        SELECT
         applicationno,
-        name,tenantid,
+        name,
         mobilenumber,
-        'Rent & Lease' AS businessservice,status,
+        'Rent & Lease' AS businessservice,
         current_stage ,
         collector_code,
         cash_amount,
@@ -539,7 +529,7 @@ ReportDefinitions:
         amountpaid,
         to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate
         FROM unique_transactions
-        WHERE 1=1 AND tenantid != 'pb.testing' AND tenantid = $tenantid
+        WHERE 1=1
     orderby: ORDER BY createdtime DESC
     
   - reportName: ReceiptRegisterRL
@@ -551,11 +541,6 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: tenant_id
-        label: ULB Name
-        type: string
-        source: rl
-        total: false
       - name: receiptno
         label: Receipt Number
         type: string
@@ -669,7 +654,6 @@ ReportDefinitions:
         searchClause: AND payment.paymentmode like $paymentMode
     query: |
       SELECT
-          pd.tenantid AS tenantid,
           pd.receiptnumber AS receiptno,
           bill.consumercode AS connectionno,
           TO_CHAR(TO_TIMESTAMP(pd.receiptdate / 1000) AT TIME ZONE 'Asia/Kolkata', 'DD-MM-YYYY') AS receiptdate,
@@ -691,7 +675,7 @@ ReportDefinitions:
           ABS(SUM(CASE WHEN dd.taxheadcode = 'RL_ADVANCE_CARRYFORWARD' THEN dd.taxamount ELSE 0 END)) AS advance_paid,
           pd.amountpaid AS amountcollected
       FROM egcl_paymentdetail pd
-      INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = bill.tenantid
+      INNER JOIN egcl_bill bill ON bill.id = pd.billid AND pd.tenantid = $tenantid
       INNER JOIN egbs_billdetail_v1 bd ON bd.billid = bill.id
       INNER JOIN egbs_demanddetail_v1 dd ON dd.demandid = bd.demandid
       INNER JOIN egbs_demand_v1 d ON d.id = dd.demandid
@@ -700,13 +684,11 @@ ReportDefinitions:
       INNER JOIN public.eg_rl_owner_info o ON o.allotment_id = r.id
       LEFT JOIN eg_user u_owner ON u_owner.uuid = o.user_uuid
       LEFT JOIN eg_user usr ON usr.id = payment.createdby::integer
-      WHERE pd.businessservice = 'rl-services' 
+      WHERE bill.tenantid = $tenantid 
         AND d.status <> 'CANCELLED'
-        AND pd.tenantid != 'pb.testing' 
-        AND pd.tenantid = $tenantid
-    groupby: GROUP BY pd.tenantid, pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name, payment.instrumentdate, payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
+        AND pd.businessservice = 'rl-services'
+    groupby: GROUP BY pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name, payment.instrumentdate, payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
     orderby: ORDER BY pd.receiptdate DESC
-
 
   - reportName: StateReceiptRegisterRL
     decryptionPathId: RLREPORTS
@@ -942,11 +924,6 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: tenant_id
-        label: ULB Name
-        type: string
-        source: rl
-        total: false
       - name: application_number
         label: Application Number
         type: string
@@ -1061,12 +1038,10 @@ ReportDefinitions:
       LEFT JOIN egbs_demanddetail_v1 dd
             ON dd.demandid = d.id
           AND dd.tenantid = d.tenantid
-      WHERE 1=1 AND a.tenant_id != 'pb.testing'
-      AND a.tenant_id = $tenantid
+      WHERE 1=1 
 
     groupby: GROUP BY a.id, a.application_number, a.application_type, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto
-    orderby: ORDER BY a.created_time DESC    
-  
+    orderby: ORDER BY a.created_time DESC  
 
   - reportName: StateRentAndLeaseNewApplicationsReport
     decryptionPathId: RLREPORTS
@@ -1337,11 +1312,6 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: tenant_id
-        label: ULB Name
-        type: string
-        source: rl
-        total: false
       - name: application_number
         label: Application Number
         type: string
@@ -1435,9 +1405,7 @@ ReportDefinitions:
           ON dd.demandid = d.id
         AND dd.tenantid = d.tenantid
       WHERE a.status <> 'REJECTED'
-        AND 1=1 
-        AND a.tenant_id != 'pb.testing'
-        AND a.tenant_id = $tenantid
+        AND 1=1
 
     groupby: GROUP BY a.id, a.application_number, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto HAVING SUM(dd.taxamount - dd.collectionamount) > 0 AND TO_TIMESTAMP(d.taxperiodto / 1000)::date < DATE_TRUNC('month', CURRENT_DATE)::date
     orderby: ORDER BY a.created_time DESC
