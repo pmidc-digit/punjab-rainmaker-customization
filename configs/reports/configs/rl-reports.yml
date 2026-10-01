@@ -94,7 +94,7 @@ ReportDefinitions:
           FROM eg_rl_allotment AS r
           LEFT JOIN eg_rl_owner_info AS o ON o.allotment_id = r.id
           LEFT JOIN eg_user AS u ON u.uuid = o.user_uuid
-          WHERE 1=1 AND r.tenant_id != 'pb.testing' AND r.tenant_id = $tenantId
+          WHERE 1=1 AND r.tenant_id != 'pb.testing' AND r.tenant_id = $tenantid
 
   - reportName: STATERENT&LEASEDETAILSReport
     decryptionPathId: RLREPORTS
@@ -199,7 +199,7 @@ ReportDefinitions:
           FROM eg_rl_allotment AS r
           LEFT JOIN eg_rl_owner_info AS o ON o.allotment_id = r.id
           LEFT JOIN eg_user AS u ON u.uuid = o.user_uuid
-          WHERE 1=1 AND r.tenant_id != 'pb.testing' AND r.tenant_id = $tenantId
+          WHERE 1=1 AND r.tenant_id != 'pb.testing' AND r.tenant_id = $tenantid
 
   - reportName: StateCollectionsReport
     decryptionPathId: RLREPORTS  
@@ -372,7 +372,7 @@ ReportDefinitions:
         amountpaid,
         to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate
         FROM unique_transactions
-        WHERE 1=1 AND tenantid != 'pb.testing' AND p.tenantid = $tenantId
+        WHERE 1=1 AND tenantid != 'pb.testing' AND p.tenantid = $tenantid
     orderby: ORDER BY createdtime DESC
 
   - reportName: CollectionsReport
@@ -539,7 +539,7 @@ ReportDefinitions:
         amountpaid,
         to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS PaymentDate
         FROM unique_transactions
-        WHERE 1=1 AND tenantid != 'pb.testing' AND p.tenantid = $tenantId
+        WHERE 1=1 AND tenantid != 'pb.testing' AND p.tenantid = $tenantid
     orderby: ORDER BY createdtime DESC
     
   - reportName: ReceiptRegisterRL
@@ -703,7 +703,7 @@ ReportDefinitions:
       WHERE pd.businessservice = 'rl-services' 
         AND d.status <> 'CANCELLED'
         AND pd.tenantid != 'pb.testing' 
-        AND pd.tenantid = $tenantId
+        AND pd.tenantid = $tenantid
     groupby: GROUP BY pd.tenantid, pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name, payment.instrumentdate, payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
     orderby: ORDER BY pd.receiptdate DESC
 
@@ -877,7 +877,7 @@ ReportDefinitions:
       WHERE pd.businessservice = 'rl-services' 
         AND d.status <> 'CANCELLED'
         AND pd.tenantid != 'pb.testing'
-        AND pd.tenantid = $tenantId
+        AND pd.tenantid = $tenantid
     groupby: GROUP BY pd.tenantid, pd.receiptnumber, bill.consumercode, pd.receiptdate, usr.name, payment.instrumentdate, payment.instrumentnumber, u_owner.name, pd.amountpaid, payment.paymentmode, payment.paymentstatus, pd.manualreceiptnumber, pd.manualreceiptdate
     orderby: ORDER BY pd.receiptdate DESC
 
@@ -1063,7 +1063,7 @@ ReportDefinitions:
             ON dd.demandid = d.id
           AND dd.tenantid = d.tenantid
       WHERE 1=1 AND a.tenant_id != 'pb.testing'
-      AND a.tenant_id = $tenantId
+      AND a.tenant_id = $tenantid
 
     groupby: GROUP BY a.id, a.application_number, a.application_type, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto
     orderby: ORDER BY a.created_time DESC    
@@ -1205,7 +1205,7 @@ ReportDefinitions:
             ON dd.demandid = d.id
           AND dd.tenantid = d.tenantid
       WHERE 1=1 AND a.tenant_id != 'pb.testing'
-      AND a.tenant_id = $tenantId
+      AND a.tenant_id = $tenantid
 
     groupby: GROUP BY a.id, a.application_number, a.application_type, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto
     orderby: ORDER BY a.created_time DESC    
@@ -1326,7 +1326,7 @@ ReportDefinitions:
       WHERE a.status <> 'REJECTED'
         AND 1=1 
         AND a.tenant_id != 'pb.testing'
-        AND a.tenant_id = $tenantId
+        AND a.tenant_id = $tenantid
 
     groupby: GROUP BY a.id, a.application_number, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto HAVING SUM(dd.taxamount - dd.collectionamount) > 0 AND TO_TIMESTAMP(d.taxperiodto / 1000)::date < DATE_TRUNC('month', CURRENT_DATE)::date
     orderby: ORDER BY a.created_time DESC
@@ -1440,7 +1440,7 @@ ReportDefinitions:
       WHERE a.status <> 'REJECTED'
         AND 1=1 
         AND a.tenant_id != 'pb.testing'
-        AND a.tenant_id = $tenantId
+        AND a.tenant_id = $tenantid
 
     groupby: GROUP BY a.id, a.application_number, a.property_id, a.tenant_id, a.status, a.created_time, d.id, d.taxperiodfrom, d.taxperiodto HAVING SUM(dd.taxamount - dd.collectionamount) > 0 AND TO_TIMESTAMP(d.taxperiodto / 1000)::date < DATE_TRUNC('month', CURRENT_DATE)::date
     orderby: ORDER BY a.created_time DESC
