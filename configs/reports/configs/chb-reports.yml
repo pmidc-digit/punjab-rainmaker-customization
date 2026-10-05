@@ -649,6 +649,7 @@ ReportDefinitions:
           LEFT JOIN eg_user u_applic ON u_applic.uuid = o.uuid
         WHERE p.paymentstatus != 'CANCELLED'
           AND pd.businessservice = 'chb-services'
+          AND b.booking_status != 'EXPIRED'
       )
       SELECT
         applicationno, name, mobilenumber, businessservice, status,tenantid,
