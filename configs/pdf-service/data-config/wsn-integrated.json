@@ -471,19 +471,19 @@
                             {
                                 "variable": "totalwater",
                                 "value": {
-                                    "path": "$.bills[0].waterBill.totalAmount"
+                                    "path": "$.bills.waterBill.totalAmount"
                                 }
                             },
                             {
                                 "variable": "totalsewerage",
                                 "value": {
-                                    "path": "$.bills[1].sewerageBill.totalAmount"
+                                    "path": "$.bills.sewerageBill.totalAmount"
                                 }
                             },
                             {
                                 "variable": "wspayerName",
                                 "value": {
-                                    "path": "$.bills[0].waterBill.payerName"
+                                    "path": "$.bills.waterBill.payerName"
                                 }
                             },
                             {
@@ -495,88 +495,88 @@
                             {
                                 "variable": "wsbillNumber",
                                 "value": {
-                                    "path": "$.bills[0].waterBill.billNumber"
+                                    "path": "$.bills.waterBill.billNumber"
                                 }
                             },
                             {
                                 "variable": "wsbillDate",
                                 "value": {
-                                    "path": "$.bills[0].waterBill.billDate"
+                                    "path": "$.bills.waterBill.billDate"
                                 },
                                 "type": "date"
                             },
                             {
                                 "variable": "wsconsumerCode",
                                 "value": {
-                                    "path": "$.bills[0].waterBill.consumerCode"
+                                    "path": "$.bills.waterBill.consumerCode"
                                 }
                             },
                             {
                                 "variable": "wsfromPeriod",
                                 "value": {
-                                    "path": "$.bills[0].waterBill.billDetails[1].fromPeriod"
+                                    "path": "$.bills.waterBill.billDetails[1].fromPeriod"
                                 },
                                 "type": "date"
                             },
                             {
                                 "variable": "wstoPeriod",
                                 "value": {
-                                    "path": "$.bills[0].waterBill.billDetails[0].toPeriod"
+                                    "path": "$.bills.waterBill.billDetails[0].toPeriod"
                                 },
                                 "type": "date"
                             },
                             {
                                 "variable": "wscharge",
                                 "value": {
-                                    "path": "$.bills[0].waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_CHARGE')].amount"
+                                    "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_CHARGE')].amount"
                                 }
                             },
                             {
                                 "variable": "wsarrears",
                                 "value": {
-                                    "path": "$.connection.waterDetails[0].integratedBillDetails[0].arrears"
-                                }
-                            },
-                             {
-                                "variable": "wsothers",
-                                "value": {
-                                    "path": "$.connection.waterDetails[0].integratedBillDetails[0].others"
-                                }
-                            },
-                             {
-                                "variable": "wsrebate",
-                                "value": {
-                                    "path": "$.connection.waterDetails[0].integratedBillDetails[0].rebate"
+                                    "path": "$.connection.waterDetails.integratedBillDetails[0].arrears"
                                 }
                             },
                             {
-                                "variable": "wspenalty",
-                                "value": {
-                                    "path": "$.connection.waterDetails[0].integratedBillDetails[0].penalty"
-                                }
-                            },
-                            {
-                                "variable": "wsinterest",
-                                "value": {
-                                    "path": "$.connection.waterDetails[0].integratedBillDetails[0].interest"
-                                }
-                            },
-                            {
-                                "variable": "wsadvance",
-                                "value": {
-                                    "path": "$.connection.waterDetails[0].integratedBillDetails[0].advance"
-                                }
-                            },
+                              "variable": "wspenalty",
+                              "value": {
+                                  "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_TIME_PENALTY')].amount"
+                              }
+                          },
+                          {
+                              "variable": "wsinterest",
+                              "value": {
+                                  "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_TIME_INTEREST')].amount"
+                              }
+                          },
+                          {
+                              "variable": "wsadvance",
+                              "value": {
+                                  "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_ADVANCE_CARRYFORWARD')].amount"
+                              }
+                          },
+                          {
+                              "variable": "wsothers",
+                              "value": {
+                                  "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_Round_Off')].amount"
+                              }
+                          },
+                           {
+                              "variable": "wsrebate",
+                              "value": {
+                                  "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_TIME_REBATE')].amount"
+                              }
+                          },
                             {
                                 "variable": "wschargestotalAmount",
                                 "value": {
-                                    "path": "$.bills[0].waterBill.totalAmount"
+                                    "path": "$.bills.waterBill.totalAmount"
                                 }
                             },
                             {
                                 "variable": "swpayerName",
                                 "value": {
-                                    "path": "$.bills[1].sewerageBill.payerName"
+                                    "path": "$.bills.sewerageBill.payerName"
                                 }
                             },
                             {
@@ -588,81 +588,81 @@
                             {
                                 "variable": "swbillNumber",
                                 "value": {
-                                    "path": "$.bills[1].sewerageBill.billNumber"
+                                    "path": "$.bills.sewerageBill.billNumber"
                                 }
                             },
                             {
                                 "variable": "swbillDate",
                                 "value": {
-                                    "path": "$.bills[1].sewerageBill.billDate"
+                                    "path": "$.bills.sewerageBill.billDate"
                                 }
                             },
                             {
                                 "variable": "swconsumerCode",
                                 "value": {
-                                    "path": "$.bills[1].sewerageBill.consumerCode"
+                                    "path": "$.bills.sewerageBill.consumerCode"
                                 }
                             },
                             {
                                 "variable": "swfromPeriod",
                                 "value": {
-                                    "path": "$.bills[1].sewerageBill.billDetails[1].fromPeriod"
+                                    "path": "$.bills.sewerageBill.billDetails[1].fromPeriod"
                                 },
                                 "type": "date"
                             },
                             {
                                 "variable": "swtoPeriod",
                                 "value": {
-                                    "path": "$.bills[1].sewerageBill.billDetails[0].toPeriod"
+                                    "path": "$.bills.sewerageBill.billDetails[0].toPeriod"
                                 },
                                 "type": "date"
                             },
                             {
                                 "variable": "swcharge",
                                 "value": {
-                                    "path": "$.bills[1].sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_CHARGE')].amount"
+                                    "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_CHARGE')].amount"
                                 }
                             },
                             {
                                 "variable": "swarrears",
                                 "value": {
-                                    "path": "$.bills[1].sewerageBill.arrearAmount"
+                                    "path": "$.bills.sewerageBill.arrearAmount"
                                 }
                             },
                             {
                                 "variable": "swpenalty",
                                 "value": {
-                                    "path": "$.bills[1].sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_TIME_PENALTY')].amount"
+                                    "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_TIME_PENALTY')].amount"
                                 }
                             },
                             {
                                 "variable": "swinterest",
                                 "value": {
-                                    "path": "$.bills[1].sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_TIME_INTEREST')].amount"
+                                    "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_TIME_INTEREST')].amount"
                                 }
                             },
                             {
                                 "variable": "swadvance",
                                 "value": {
-                                    "path": "$.bills[1].sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_ADVANCE_CARRYFORWARD')].amount"
+                                    "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_ADVANCE_CARRYFORWARD')].amount"
                                 }
                             },
                             {
                                 "variable": "swothers",
                                 "value": {
-                                    "path": "$.bills[1].sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_Round_Off')].amount"
+                                    "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_Round_Off')].amount"
                                 }
                             },
                              {
                                 "variable": "swrebate",
                                 "value": {
-                                    "path": "$.bills[1].sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_TIME_REBATE')].amount"
+                                    "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_TIME_REBATE')].amount"
                                 }
                             },
                             {
                                 "variable": "swchargestotalAmount",
                                 "value": {
-                                    "path": "$.bills[1].sewerageBill.totalAmount"
+                                    "path": "$.bills.sewerageBill.totalAmount"
                                 }
                             },
                             {
@@ -698,7 +698,7 @@
                             {
                                 "variable": "mobileNo",
                                 "value": {
-                                    "path": "$.bills[0].waterBill.mobileNumber"
+                                    "path": "$. mobileNumber"
                                 }
                             }
                         ]
