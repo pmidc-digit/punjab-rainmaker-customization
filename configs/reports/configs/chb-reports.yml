@@ -141,7 +141,7 @@ ReportDefinitions:
       source: chb
       total: false
     - name: businessservice
-      label: businessservice
+      label: Business Service
       type: string
       source: chb
       total: false
@@ -224,7 +224,7 @@ ReportDefinitions:
           CASE WHEN p.paymentmode = 'ONLINE' THEN p.totalamountpaid ELSE 0 END AS online_amount,
           b.booking_no AS applicationno,
           b.booking_status AS status,
-          'Venue Booking' AS businessservice,
+          'chb-services' AS businessservice,
           u_applic.name AS name,
           u_applic.mobilenumber AS mobilenumber
         FROM egcl_paymentdetail pd
@@ -235,6 +235,7 @@ ReportDefinitions:
           LEFT JOIN eg_chb_owner o ON o.booking_id = a.booking_id
           LEFT JOIN eg_user u_applic ON u_applic.uuid = o.uuid
         WHERE p.paymentstatus != 'CANCELLED'
+        AND b.booking_status NOT IN ('EXPIRED', 'CANCELLED')
           AND pd.businessservice = 'chb-services'
           AND p.tenantid = $tenantid
       )
@@ -521,32 +522,32 @@ ReportDefinitions:
         pdfPageSize: A1
     sourceColumns:
     - name: tenantid
-      label: tenantid
+      label: ULB
       type: string
       source: chb
       total: false
     - name: applicationno
-      label: applicationno
+      label: Application Number
       type: string
       source: chb
       total: false
     - name: name
-      label: name
+      label: Name
       type: string
       source: chb
       total: false
     - name: mobilenumber
-      label: mobilenumber
+      label: Mobile Number
       type: string
       source: chb
       total: false
     - name: businessservice
-      label: businessservice
+      label: Business Service
       type: string
       source: chb
       total: false
     - name: status
-      label: status
+      label: Status
       type: string
       source: chb
       total: false
@@ -597,13 +598,13 @@ ReportDefinitions:
       total: false
     searchParams:
     - name: fromDate
-      label: fromDate
+      label: From Date
       type: epoch
       source: chb
       isMandatory: true
       searchClause: AND createdtime >= $fromDate
     - name: toDate
-      label: toDate
+      label: To Date
       type: epoch
       source: chb
       isMandatory: true
@@ -632,7 +633,7 @@ ReportDefinitions:
           CASE WHEN p.paymentmode = 'ONLINE' THEN p.totalamountpaid ELSE 0 END AS online_amount,
           b.booking_no AS applicationno,
           b.booking_status AS status,
-          'Venue Booking' AS businessservice,
+          'chb-services' AS businessservice,
           u_applic.name AS name,
           u_applic.mobilenumber AS mobilenumber
         FROM egcl_paymentdetail pd
@@ -644,6 +645,7 @@ ReportDefinitions:
           LEFT JOIN eg_user u_applic ON u_applic.uuid = o.uuid
         WHERE p.paymentstatus != 'CANCELLED'
           AND pd.businessservice = 'chb-services'
+          AND b.booking_status NOT IN ('EXPIRED', 'CANCELLED')
       )
       SELECT
         applicationno, name, mobilenumber, businessservice, status,tenantid,
@@ -653,7 +655,7 @@ ReportDefinitions:
       FROM unique_transactions
       WHERE tenantid not in ('testing')
     orderby: ORDER BY createdtime DESC
-    
+
   - reportName: StateReceiptRegisterVenueBooking
     decryptionPathId: STATECHBREPORTS
     summary: Details of collector register in Venue Booking service
