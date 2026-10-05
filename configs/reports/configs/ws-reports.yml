@@ -3630,16 +3630,16 @@ ReportDefinitions:
     searchParams: 
       - name: propertyType
         label: Property Type
-        type: singlevaluelist
+        type: string
         source: pt
         isMandatory: false
         searchClause: AND pt.usagecategory LIKE $propertyType || '%'
       - name: isExempted
         label: Exempted Status
-        type: singlevaluelist
+        type: string
         source: pt
         isMandatory: false
-        searchClause: AND ($isExempted != 'Exempted' OR (pt.usagecategory LIKE 'RESIDENTIAL%' AND NULLIF(pt.landarea, '') IS NOT NULL AND CAST(NULLIF(pt.landarea, '') AS NUMERIC) <= 125))
+        searchClause: AND pt.usagecategory LIKE 'RESIDENTIAL%' AND NULLIF(pt.landarea, '') IS NOT NULL AND CAST(NULLIF(pt.landarea, '') AS NUMERIC) <= 125
     query: |
       WITH pending_period AS (
           SELECT
@@ -3825,16 +3825,16 @@ ReportDefinitions:
         searchClause: AND bm.localitycode IN ($localityArray)
       - name: propertyType
         label: Property Type
-        type: singlevaluelist
+        type: string
         source: pt
         isMandatory: false
         searchClause: AND pt.usagecategory LIKE $propertyType || '%'
       - name: isExempted
         label: Exempted Status
-        type: singlevaluelist
+        type: string
         source: pt
         isMandatory: false
-        searchClause: AND ($isExempted != 'Exempted' OR (pt.usagecategory LIKE 'RESIDENTIAL%' AND NULLIF(pt.landarea, '') IS NOT NULL AND CAST(NULLIF(pt.landarea, '') AS NUMERIC) <= 125))
+        searchClause: AND pt.usagecategory LIKE 'RESIDENTIAL%' AND NULLIF(pt.landarea, '') IS NOT NULL AND CAST(NULLIF(pt.landarea, '') AS NUMERIC) <= 125
     query: |
       WITH latest_bill AS (
         SELECT
