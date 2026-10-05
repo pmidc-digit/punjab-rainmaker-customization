@@ -463,12 +463,6 @@
                                 }
                             },
                             {
-                                "variable": "totalAmountDue",
-                                "value": {
-                                    "path": "$.connection.propertyTotalAmount"
-                                }
-                            },
-                            {
                                 "variable": "totalwater",
                                 "value": {
                                     "path": "$.bills.waterBill.totalAmount"
@@ -703,7 +697,14 @@
                             }
                         ]
                     },
-                    
+                    {
+                        "derived": [
+                            {
+                                "variable": "totalAmountDue",
+                                "formula": "{{totalwater}}+{{totalsewerage}}"
+                            }
+                        ]
+                    },
                     {
                         "externalAPI": [
                             {
