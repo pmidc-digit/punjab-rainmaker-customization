@@ -3635,11 +3635,11 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND pt.usagecategory LIKE $propertyType || '%'
       - name: isExempted
-        label: Exempted
-        type: checkbox
+        label: Exempted Status
+        type: singlevaluelist
         source: pt
         isMandatory: false
-        searchClause: AND pt.usagecategory LIKE 'RESIDENTIAL%' AND pt.landarea IS NOT NULL AND CAST(pt.landarea AS NUMERIC) <= 125
+        searchClause: AND ($isExempted != 'Exempted' OR (pt.usagecategory LIKE 'RESIDENTIAL%' AND NULLIF(pt.landarea, '') IS NOT NULL AND CAST(NULLIF(pt.landarea, '') AS NUMERIC) <= 125))
     query: |
       WITH pending_period AS (
           SELECT
@@ -3830,11 +3830,11 @@ ReportDefinitions:
         isMandatory: false
         searchClause: AND pt.usagecategory LIKE $propertyType || '%'
       - name: isExempted
-        label: Exempted
-        type: checkbox
+        label: Exempted Status
+        type: singlevaluelist
         source: pt
         isMandatory: false
-        searchClause: AND pt.usagecategory LIKE 'RESIDENTIAL%' AND pt.landarea IS NOT NULL AND CAST(pt.landarea AS NUMERIC) <= 125
+        searchClause: AND ($isExempted != 'Exempted' OR (pt.usagecategory LIKE 'RESIDENTIAL%' AND NULLIF(pt.landarea, '') IS NOT NULL AND CAST(NULLIF(pt.landarea, '') AS NUMERIC) <= 125))
     query: |
       WITH latest_bill AS (
         SELECT
