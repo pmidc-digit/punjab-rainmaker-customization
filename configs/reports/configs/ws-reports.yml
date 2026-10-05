@@ -3627,7 +3627,21 @@ ReportDefinitions:
         type: string
         source: ws
         total: false
-    searchParams: []
+    searchParams:
+      - name: propertyType
+        label: Property Type
+        type: singlevaluelist
+        source: pt
+        isMandatory: false
+        pattern: '[{"code":"RESIDENTIAL","name":"Residential"},{"code":"COMMERCIAL","name":"Commercial"}]'
+        searchClause: AND (($propertyType = 'RESIDENTIAL' AND pt.usagecategory = 'RESIDENTIAL') OR ($propertyType = 'COMMERCIAL' AND pt.usagecategory LIKE 'NONRESIDENTIAL%'))
+      - name: exempted
+        label: Exempted
+        type: singlevaluelist
+        source: pt
+        isMandatory: false
+        pattern: '[{"code":"Y","name":"Exempted"}]'
+        searchClause: AND $exempted = 'Y' AND pt.usagecategory = 'RESIDENTIAL' AND pt.landarea <= 125
     query: |
       WITH pending_period AS (
           SELECT
@@ -3720,6 +3734,15 @@ ReportDefinitions:
       FROM bill_amount ba
       LEFT JOIN pending_period pp
           ON pp.consumercode = ba.consumercode
+      LEFT JOIN eg_sw_connection sc
+          ON sc.connectionno = ba.consumercode
+         AND sc.tenantid = $tenantid
+         AND sc.status = 'Active'
+      LEFT JOIN eg_pt_property pt
+          ON pt.propertyid = sc.property_id
+         AND pt.tenantid = $tenantid
+         AND pt.status IN ('ACTIVE', 'PENDINGWS', 'PENDINGSW')
+      WHERE 1=1
 
   - reportName: WSTotal_Bill_Generate
     summary: WS Total Bill Generate Report
@@ -3806,46 +3829,62 @@ ReportDefinitions:
         source: pt
         isMandatory: false
         searchClause: AND bm.localitycode IN ($localityArray)
-    query: WITH latest_bill AS (
-      SELECT
-      bill.*,
-      ROW_NUMBER() OVER (
-      PARTITION BY bill.consumercode
-      ORDER BY bill.fromperiod DESC
-      ) AS rn
-      FROM egbs_billdetail_v1 bill
-      WHERE bill.businessservice = 'WS'
-      and bill.tenantid = $tenantid
+      - name: propertyType
+        label: Property Type
+        type: singlevaluelist
+        source: pt
+        isMandatory: false
+        pattern: '[{"code":"RESIDENTIAL","name":"Residential"},{"code":"COMMERCIAL","name":"Commercial"}]'
+        searchClause: AND (($propertyType = 'RESIDENTIAL' AND pt.usagecategory = 'RESIDENTIAL') OR ($propertyType = 'COMMERCIAL' AND pt.usagecategory LIKE 'NONRESIDENTIAL%'))
+      - name: exempted
+        label: Exempted
+        type: singlevaluelist
+        source: pt
+        isMandatory: false
+        pattern: '[{"code":"Y","name":"Exempted"}]'
+        searchClause: AND $exempted = 'Y' AND pt.usagecategory = 'RESIDENTIAL' AND pt.landarea <= 125
+    query: |
+      WITH latest_bill AS (
+          SELECT
+              bill.*,
+              ROW_NUMBER() OVER (
+                  PARTITION BY bill.consumercode
+                  ORDER BY bill.fromperiod DESC
+              ) AS rn
+          FROM egbs_billdetail_v1 bill
+          WHERE bill.businessservice = 'WS'
+            AND bill.tenantid = $tenantid
       )
       SELECT
-      to_char(
-      (to_timestamp(lb.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
-      'YYYY-MM'
-      ) || '-' ||
-      to_char(
-      (to_timestamp(lb.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
-      'YYYY-MM'
-      ) AS finyear,
-      pt.usagecategory,
-      wc.connectionno,
-      wc.property_id,
-      lb.billid,
-      lb.totalamount,
-      lb.consumercode,
-      bm.localityname,bm.localitycode,bm.zonecode,bm.blockcode,
-      wc.status AS wc_status,
-      pt.landarea,
-      b.status AS bill_status
-      FROM eg_ws_connection wc JOIN eg_pt_property pt  ON wc.property_id = pt.propertyid AND pt.status IN ('ACTIVE', 'PENDINGWS')
-      JOIN eg_pt_address  pa ON pt.id = pa.propertyid and pa.tenantid = $tenantid
-      JOIN  eg_bndry_mohalla bm  ON pa.locality = bm.localitycode and pa.tenantid = bm.tenantid
-      JOIN latest_bill lb     ON lb.consumercode = wc.connectionno
-      AND lb.rn = 1
-      JOIN egbs_bill_v1 b     ON lb.billid = b.id and b.tenantid = $tenantid
+          to_char(
+              (to_timestamp(lb.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
+              'YYYY-MM'
+          ) || '-' ||
+          to_char(
+              (to_timestamp(lb.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
+              'YYYY-MM'
+          ) AS finyear,
+          pt.usagecategory,
+          wc.connectionno,
+          wc.property_id,
+          lb.billid,
+          lb.totalamount,
+          lb.consumercode,
+          bm.localityname, bm.localitycode, bm.zonecode, bm.blockcode,
+          wc.status AS wc_status,
+          pt.landarea,
+          b.status AS bill_status
+      FROM eg_ws_connection wc
+      JOIN eg_pt_property pt ON wc.property_id = pt.propertyid AND pt.status IN ('ACTIVE', 'PENDINGWS')
+      JOIN eg_pt_address pa ON pt.id = pa.propertyid AND pa.tenantid = $tenantid
+      JOIN eg_bndry_mohalla bm ON pa.locality = bm.localitycode AND pa.tenantid = bm.tenantid
+      JOIN latest_bill lb ON lb.consumercode = wc.connectionno
+          AND lb.rn = 1
+      JOIN egbs_bill_v1 b ON lb.billid = b.id AND b.tenantid = $tenantid
       WHERE wc.tenantid = $tenantid
-      AND wc.connectionno IS NOT NULL
-      AND wc.status = 'Active'
-
+        AND wc.connectionno IS NOT NULL
+        AND wc.status = 'Active'
+        
   - reportName: Bill_Amendment_Report
     summary: Bill Amendment Report
     version: 1.0.0
