@@ -235,6 +235,7 @@ ReportDefinitions:
           LEFT JOIN eg_chb_owner o ON o.booking_id = a.booking_id
           LEFT JOIN eg_user u_applic ON u_applic.uuid = o.uuid
         WHERE p.paymentstatus != 'CANCELLED'
+        AND b.booking_status NOT IN ('EXPIRED', 'CANCELLED')
           AND pd.businessservice = 'chb-services'
           AND p.tenantid = $tenantid
       )
@@ -649,7 +650,7 @@ ReportDefinitions:
           LEFT JOIN eg_user u_applic ON u_applic.uuid = o.uuid
         WHERE p.paymentstatus != 'CANCELLED'
           AND pd.businessservice = 'chb-services'
-          AND b.booking_status != 'EXPIRED'
+          AND b.booking_status NOT IN ('EXPIRED', 'CANCELLED')
       )
       SELECT
         applicationno, name, mobilenumber, businessservice, status,tenantid,
@@ -659,7 +660,7 @@ ReportDefinitions:
       FROM unique_transactions
       WHERE tenantid not in ('testing')
     orderby: ORDER BY createdtime DESC
-    
+
   - reportName: StateReceiptRegisterVenueBooking
     decryptionPathId: STATECHBREPORTS
     summary: Details of collector register in Venue Booking service
