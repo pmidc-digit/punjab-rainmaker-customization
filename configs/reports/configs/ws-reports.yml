@@ -3597,13 +3597,33 @@ ReportDefinitions:
         type: string
         source: ws
         total: false
+      - name: finyear
+        label: finyear
+        type: string
+        source: ws
+        total: false
       - name: consumercode
         label: consumercode
         type: string
         source: ws
         total: false
+      - name: connectionno
+        label: Connection No
+        type: string
+        source: ws
+        total: false
       - name: bill_no
         label: bill_no
+        type: string
+        source: ws
+        total: false
+      - name: bill_id
+        label: bill_id
+        type: string
+        source: ws
+        total: false
+      - name: billid
+        label: Bill Id
         type: string
         source: ws
         total: false
@@ -3627,19 +3647,67 @@ ReportDefinitions:
         type: string
         source: ws
         total: false
+      - name: usagecategory
+        label: usagecategory
+        type: string
+        source: ws
+        total: false
+      - name: property_id
+        label: Property id
+        type: string
+        source: ws
+        total: false
+      - name: localityname
+        label: localityname
+        type: string
+        source: ws
+        total: false
+      - name: localitycode
+        label: localitycode
+        type: string
+        source: ws
+        total: false
+      - name: zonecode
+        label: zonecode
+        type: string
+        source: ws
+        total: false
+      - name: blockcode
+        label: blockcode
+        type: string
+        source: ws
+        total: false
+      - name: wc_status
+        label: wc_status
+        type: string
+        source: ws
+        total: false
+      - name: landarea
+        label: landarea
+        type: string
+        source: ws
+        total: false
     searchParams: 
-      - name: propertyType
-        label: Property Type
-        type: string
+      - name: localityArray
+        label: zoneList
+        type: boundarylist
         source: pt
         isMandatory: false
-        searchClause: AND pt.usagecategory LIKE $propertyType || '%'
-      - name: isExempted
+        searchClause: AND bm.localitycode IN ($localityArray)
+      - name: usagecategory
+        label: Category
+        type: singlevaluelist
+        pattern: "list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED"
+        source: ws
+        isMandatory: false
+        searchClause: AND pt.propertyusagetype = $usagecategory
+      - name: Exempted
         label: Exempted Status
-        type: string
-        source: pt
+        type: singlevaluelist
+        pattern: "list://ALL:All,EXEMPTED:Exempted"
+        source: ws
         isMandatory: false
-        searchClause: AND pt.usagecategory LIKE 'RESIDENTIAL%' AND NULLIF(pt.landarea, '') IS NOT NULL AND CAST(NULLIF(pt.landarea, '') AS NUMERIC) <= 125
+        searchClause: AND ( '$Exempted' = 'ALL' OR (pt.usagecategory LIKE 'RESIDENTIAL%' AND NULLIF(pt.landarea, '') IS NOT NULL AND CAST(NULLIF(pt.landarea, '') AS NUMERIC) <= 125) )
     query: |
       WITH pending_period AS (
           SELECT
@@ -3703,39 +3771,30 @@ ReportDefinitions:
               lb.bill_status
       )
       SELECT
-          to_char(
-              to_timestamp(pp.pending_from_period / 1000)
-              AT TIME ZONE 'Asia/Kolkata',
-              'YYYY-MM'
-          )
-          || '-' ||
-          to_char(
-              to_timestamp(ba.toperiod / 1000)
-              AT TIME ZONE 'Asia/Kolkata',
-              'YYYY-MM'
-          ) AS billing_period,
+          to_char(to_timestamp(pp.pending_from_period / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM') || '-' || to_char(to_timestamp(ba.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM') AS billing_period,
+          to_char(to_timestamp(pp.pending_from_period / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM') || '-' || to_char(to_timestamp(ba.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM') AS finyear,
           ba.consumercode,
+          sw.connectionno AS connectionno,
           ba.billno AS bill_no,
-          to_char(
-              to_timestamp(ba.createddate / 1000)
-              AT TIME ZONE 'Asia/Kolkata',
-              'YYYY-MM-DD HH24:MI:SS'
-          ) AS bill_created_date,
-          to_char(
-              to_timestamp(ba.expirydate / 1000)
-              AT TIME ZONE 'Asia/Kolkata',
-              'YYYY-MM-DD HH24:MI:SS'
-          ) AS expiry_date,
+          ba.bill_id AS bill_id,
+          to_char(to_timestamp(ba.createddate / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD HH24:MI:SS') AS bill_created_date,
+          to_char(to_timestamp(ba.expirydate / 1000) AT TIME ZONE 'Asia/Kolkata', 'YYYY-MM-DD HH24:MI:SS') AS expiry_date,
           ba.total_amount,
-          ba.bill_id,
-          ba.bill_status
+          ba.bill_status,
+          pt.usagecategory,
+          sw.property_id,
+          bm.localityname,
+          bm.localitycode,
+          bm.zonecode,
+          bm.blockcode,
+          sw.status AS wc_status,
+          pt.landarea
       FROM bill_amount ba
-      LEFT JOIN pending_period pp
-          ON pp.consumercode = ba.consumercode
-      LEFT JOIN eg_sw_connection sw 
-          ON ba.consumercode = sw.connectionno AND sw.tenantid = $tenantid
-      LEFT JOIN eg_pt_property pt 
-          ON sw.property_id = pt.propertyid AND pt.tenantid = $tenantid
+      LEFT JOIN pending_period pp ON pp.consumercode = ba.consumercode
+      LEFT JOIN eg_sw_connection sw ON ba.consumercode = sw.connectionno AND sw.tenantid = $tenantid
+      LEFT JOIN eg_pt_property pt ON sw.property_id = pt.propertyid AND pt.tenantid = $tenantid
+      LEFT JOIN eg_pt_address pa ON pt.id = pa.propertyid AND pa.tenantid = $tenantid
+      LEFT JOIN eg_bndry_mohalla bm ON pa.locality = bm.localitycode AND pa.tenantid = bm.tenantid
       WHERE 1=1
 
   - reportName: WSTotal_Bill_Generate
@@ -3746,13 +3805,18 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
+      - name: billing_period
+        label: billing_period
+        type: string
+        source: ws
+        total: false
       - name: finyear
         label: finyear
         type: string
         source: ws
         total: false
-      - name: usagecategory
-        label: usagecategory
+      - name: consumercode
+        label: consumercode
         type: string
         source: ws
         total: false
@@ -3761,23 +3825,43 @@ ReportDefinitions:
         type: string
         source: ws
         total: false
-      - name: property_id
-        label: Property id
+      - name: bill_no
+        label: bill_no
         type: string
         source: ws
         total: false
-      - name: billid
-        label: Bill Id
+      - name: bill_id
+        label: bill_id
         type: string
         source: ws
         total: false
-      - name: totalamount
-        label: totalamount
+      - name: bill_created_date
+        label: bill_created_date
+        type: string
+        source: ws
+        total: false
+      - name: expiry_date
+        label: expiry_date
+        type: string
+        source: ws
+        total: false
+      - name: total_amount
+        label: total_amount
         type: string
         source: ws
         total: true
-      - name: consumercode
-        label: consumercode
+      - name: bill_status
+        label: bill_status
+        type: string
+        source: ws
+        total: false
+      - name: usagecategory
+        label: usagecategory
+        type: string
+        source: ws
+        total: false
+      - name: property_id
+        label: Property id
         type: string
         source: ws
         total: false
@@ -3811,11 +3895,6 @@ ReportDefinitions:
         type: string
         source: ws
         total: false
-      - name: bill_status
-        label: bill_status
-        type: string
-        source: ws
-        total: false
     searchParams:
       - name: localityArray
         label: zoneList
@@ -3823,18 +3902,20 @@ ReportDefinitions:
         source: pt
         isMandatory: false
         searchClause: AND bm.localitycode IN ($localityArray)
-      - name: propertyType
-        label: Property Type
-        type: string
-        source: pt
+      - name: usagecategory
+        label: Category
+        type: singlevaluelist
+        pattern: "list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED"
+        source: ws
         isMandatory: false
-        searchClause: AND pt.usagecategory LIKE $propertyType || '%'
-      - name: isExempted
+        searchClause: AND pt.propertyusagetype = $usagecategory
+      - name: Exempted
         label: Exempted Status
-        type: string
-        source: pt
+        type: singlevaluelist
+        pattern: "list://ALL:All,EXEMPTED:Exempted"
+        source: ws
         isMandatory: false
-        searchClause: AND pt.usagecategory LIKE 'RESIDENTIAL%' AND NULLIF(pt.landarea, '') IS NOT NULL AND CAST(NULLIF(pt.landarea, '') AS NUMERIC) <= 125
+        searchClause: AND ( '$Exempted' = 'ALL' OR (pt.usagecategory LIKE 'RESIDENTIAL%' AND NULLIF(pt.landarea, '') IS NOT NULL AND CAST(NULLIF(pt.landarea, '') AS NUMERIC) <= 125) )
     query: |
       WITH latest_bill AS (
         SELECT
@@ -3848,30 +3929,30 @@ ReportDefinitions:
         and bill.tenantid = $tenantid
       )
       SELECT
-      to_char(
-      (to_timestamp(lb.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
-      'YYYY-MM'
-      ) || '-' ||
-      to_char(
-      (to_timestamp(lb.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
-      'YYYY-MM'
-      ) AS finyear,
+      to_char((to_timestamp(lb.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') || '-' || to_char((to_timestamp(lb.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS billing_period,
+      to_char((to_timestamp(lb.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') || '-' || to_char((to_timestamp(lb.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM') AS finyear,
       pt.usagecategory,
       wc.connectionno,
-      wc.property_id,
-      lb.billid,
-      lb.totalamount,
       lb.consumercode,
-      bm.localityname,bm.localitycode,bm.zonecode,bm.blockcode,
+      wc.property_id,
+      lb.billno AS bill_no,
+      lb.billid AS bill_id,
+      to_char((to_timestamp(b.createddate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM-DD HH24:MI:SS') AS bill_created_date,
+      to_char((to_timestamp(lb.expirydate / 1000) AT TIME ZONE 'Asia/Kolkata'), 'YYYY-MM-DD HH24:MI:SS') AS expiry_date,
+      lb.totalamount AS total_amount,
+      bm.localityname,
+      bm.localitycode,
+      bm.zonecode,
+      bm.blockcode,
       wc.status AS wc_status,
       pt.landarea,
       b.status AS bill_status
-      FROM eg_ws_connection wc JOIN eg_pt_property pt  ON wc.property_id = pt.propertyid AND pt.status IN ('ACTIVE', 'PENDINGWS')
-      JOIN eg_pt_address  pa ON pt.id = pa.propertyid and pa.tenantid = $tenantid
-      JOIN  eg_bndry_mohalla bm  ON pa.locality = bm.localitycode and pa.tenantid = bm.tenantid
-      JOIN latest_bill lb     ON lb.consumercode = wc.connectionno
-      AND lb.rn = 1
-      JOIN egbs_bill_v1 b     ON lb.billid = b.id and b.tenantid = $tenantid
+      FROM eg_ws_connection wc 
+      JOIN eg_pt_property pt ON wc.property_id = pt.propertyid AND pt.status IN ('ACTIVE', 'PENDINGWS')
+      JOIN eg_pt_address pa ON pt.id = pa.propertyid and pa.tenantid = $tenantid
+      JOIN eg_bndry_mohalla bm ON pa.locality = bm.localitycode and pa.tenantid = bm.tenantid
+      JOIN latest_bill lb ON lb.consumercode = wc.connectionno AND lb.rn = 1
+      JOIN egbs_bill_v1 b ON lb.billid = b.id and b.tenantid = $tenantid
       WHERE wc.tenantid = $tenantid
       AND wc.connectionno IS NOT NULL
       AND wc.status = 'Active'
