@@ -447,7 +447,7 @@ ReportDefinitions:
         SELECT
           servicerequestid,
           -- we only need the second latest assignee (previous)
-          MAX(CASE WHEN rn = 2 THEN assignee_uuid END) AS lastassignedto_uuid
+          MAX(CASE WHEN rn = 1 THEN assignee_uuid END) AS lastassignedto_uuid
         FROM ranked_assignments
         GROUP BY servicerequestid
       )
@@ -502,10 +502,8 @@ ReportDefinitions:
         ON atwo.servicerequestid = ess.servicerequestid
       
       -- resolve previous assignee -> employee -> user, and alias user as 'ua' to match legacy syntax
-      LEFT OUTER JOIN public.eg_hrms_employee AS h_prev
-        ON h_prev.uuid = atwo.lastassignedto_uuid
-      LEFT OUTER JOIN public.eg_user AS ua
-        ON ua.uuid::text = h_prev.uuid
+        LEFT OUTER JOIN public.eg_user AS ua
+        ON ua.uuid::text = atwo.lastassignedto_uuid
       
       WHERE ess.tenantid <> 'pb.testing'
       
