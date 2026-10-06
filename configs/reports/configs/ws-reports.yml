@@ -3682,7 +3682,7 @@ ReportDefinitions:
         pattern: "list://Exempted:Exempted,All:All"
         source: pt
         isMandatory: false
-        searchClause: AND (UPPER($isExempted) NOT LIKE '%EXEMPT%' OR (pt.usagecategory LIKE 'RESIDENTIAL%' AND CAST(COALESCE(NULLIF(TRIM(CAST(pt.landarea AS VARCHAR)), ''), '0') AS NUMERIC) <= 125))
+        searchClause: AND ($isExempted = 'All' OR ($isExempted = 'Exempted' AND pt.usagecategory LIKE 'RESIDENTIAL%' AND CAST(COALESCE(NULLIF(TRIM(CAST(pt.landarea AS VARCHAR)), ''), '0') AS NUMERIC) <= 125))
     query:
       WITH latest_bill AS (
           SELECT 
@@ -3695,7 +3695,7 @@ ReportDefinitions:
           WHERE bill.businessservice = 'SW'
         and bill.tenantid = $tenantid
       )
-      SELECT 
+      SELECT DISTINCT
           to_char(
               (to_timestamp(lb.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
               'YYYY-MM'
@@ -3824,7 +3824,7 @@ ReportDefinitions:
         pattern: "list://Exempted:Exempted,All:All"
         source: pt
         isMandatory: false
-        searchClause: AND (UPPER($isExempted) NOT LIKE '%EXEMPT%' OR (pt.usagecategory LIKE 'RESIDENTIAL%' AND CAST(COALESCE(NULLIF(TRIM(CAST(pt.landarea AS VARCHAR)), ''), '0') AS NUMERIC) <= 125))
+        searchClause: AND ($isExempted = 'All' OR ($isExempted = 'Exempted' AND pt.usagecategory LIKE 'RESIDENTIAL%' AND CAST(COALESCE(NULLIF(TRIM(CAST(pt.landarea AS VARCHAR)), ''), '0') AS NUMERIC) <= 125))
     query: |                                                   
       WITH latest_bill AS (
           SELECT 
@@ -3837,7 +3837,7 @@ ReportDefinitions:
           WHERE bill.businessservice = 'WS'
         and bill.tenantid = $tenantid
       )
-      SELECT 
+      SELECT DISTINCT
           to_char(
               (to_timestamp(lb.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
               'YYYY-MM'
