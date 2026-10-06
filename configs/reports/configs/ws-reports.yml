@@ -3630,13 +3630,15 @@ ReportDefinitions:
     searchParams: 
       - name: propertyType
         label: Property Type
-        type: string
+        type: singlevaluelist
+        pattern: "list://RESIDENTIAL:Residential,COMMERCIAL:Commercial"
         source: pt
         isMandatory: false
-        searchClause: AND pt.usagecategory LIKE UPPER($propertyType) || '%'
+        searchClause: AND pt.usagecategory LIKE '%' || UPPER($propertyType) || '%'
       - name: isExempted
         label: Exempted Status
-        type: string
+        type: singlevaluelist
+        pattern: "list://Exempted:Exempted,All:All"
         source: pt
         isMandatory: false
         searchClause: AND (UPPER($isExempted) NOT LIKE '%EXEMPT%' OR (pt.usagecategory LIKE 'RESIDENTIAL%' AND CAST(COALESCE(NULLIF(TRIM(CAST(pt.landarea AS VARCHAR)), ''), '0') AS NUMERIC) <= 125))
@@ -3829,13 +3831,15 @@ ReportDefinitions:
         searchClause: AND bm.localitycode IN ($localityArray)
       - name: propertyType
         label: Property Type
-        type: string
+        type: singlevaluelist
+        pattern: "list://RESIDENTIAL:Residential,COMMERCIAL:Commercial"
         source: pt
         isMandatory: false
-        searchClause: AND pt.usagecategory LIKE UPPER($propertyType) || '%'
+        searchClause: AND pt.usagecategory LIKE '%' || UPPER($propertyType) || '%'
       - name: isExempted
         label: Exempted Status
-        type: string
+        type: singlevaluelist
+        pattern: "list://Exempted:Exempted,All:All"
         source: pt
         isMandatory: false
         searchClause: AND (UPPER($isExempted) NOT LIKE '%EXEMPT%' OR (pt.usagecategory LIKE 'RESIDENTIAL%' AND CAST(COALESCE(NULLIF(TRIM(CAST(pt.landarea AS VARCHAR)), ''), '0') AS NUMERIC) <= 125))
