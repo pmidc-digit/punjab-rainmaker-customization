@@ -3672,11 +3672,17 @@ ReportDefinitions:
       - name: usagecategory
         label: Category
         type: singlevaluelist
-        pattern: "list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED"
+        pattern: "list://RESIDENTIAL:Residential,NONRESIDENTIAL.COMMERCIAL:Commercial,NONRESIDENTIAL.INSTITUTIONAL:Institutional,NONRESIDENTIAL:Non-Residencial,NONRESIDENTIAL.OTHERS:Other,MIXED:Mixed"
         source: ws
         isMandatory: false
         searchClause: AND pt.usagecategory = $usagecategory 
-
+      - name: isExempted
+        label: Exempted Status
+        type: singlevaluelist
+        pattern: "list://Exempted:Exempted,All:All"
+        source: pt
+        isMandatory: false
+        searchClause: AND (UPPER($isExempted) NOT LIKE '%EXEMPT%' OR (pt.usagecategory LIKE 'RESIDENTIAL%' AND CAST(COALESCE(NULLIF(TRIM(CAST(pt.landarea AS VARCHAR)), ''), '0') AS NUMERIC) <= 125))
     query:
       WITH latest_bill AS (
           SELECT 
@@ -3808,11 +3814,18 @@ ReportDefinitions:
       - name: usagecategory
         label: Category
         type: singlevaluelist
-        pattern: "list://RESIDENTIAL:RESIDENTIAL,NONRESIDENTIAL.COMMERCIAL:NONRESIDENTIAL.COMMERCIAL,NONRESIDENTIAL.INSTITUTIONAL:NONRESIDENTIAL.INSTITUTIONAL,NONRESIDENTIAL:NONRESIDENTIAL,NONRESIDENTIAL.OTHERS:NONRESIDENTIAL.OTHERS,MIXED:MIXED"
+        pattern: "list://RESIDENTIAL:Residential,NONRESIDENTIAL.COMMERCIAL:Commercial,NONRESIDENTIAL.INSTITUTIONAL:Institutional,NONRESIDENTIAL:Non-Residencial,NONRESIDENTIAL.OTHERS:Other,MIXED:Mixed"
         source: ws
         isMandatory: false
-        searchClause: AND pt.usagecategory = $usagecategory                                                   
-    query:
+        searchClause: AND pt.usagecategory = $usagecategory
+      - name: isExempted
+        label: Exempted Status
+        type: singlevaluelist
+        pattern: "list://Exempted:Exempted,All:All"
+        source: pt
+        isMandatory: false
+        searchClause: AND (UPPER($isExempted) NOT LIKE '%EXEMPT%' OR (pt.usagecategory LIKE 'RESIDENTIAL%' AND CAST(COALESCE(NULLIF(TRIM(CAST(pt.landarea AS VARCHAR)), ''), '0') AS NUMERIC) <= 125))
+    query: |                                                   
       WITH latest_bill AS (
           SELECT 
               bill.*,
