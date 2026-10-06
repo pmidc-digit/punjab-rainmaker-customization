@@ -3679,7 +3679,7 @@ ReportDefinitions:
       - name: isExempted
         label: Exempted Status
         type: singlevaluelist
-        pattern: "list://Exempted:Exempted,All:All"
+        pattern: "list://Exempted:Exempted"
         source: pt
         isMandatory: false
         searchClause: AND ($isExempted = 'All' OR ($isExempted = 'Exempted' AND pt.usagecategory LIKE 'RESIDENTIAL%' AND CAST(COALESCE(NULLIF(TRIM(CAST(pt.landarea AS VARCHAR)), ''), '0') AS NUMERIC) <= 125))
@@ -3821,7 +3821,7 @@ ReportDefinitions:
       - name: isExempted
         label: Exempted Status
         type: singlevaluelist
-        pattern: "list://Exempted:Exempted,All:All"
+        pattern: "list://Exempted:Exempted"
         source: pt
         isMandatory: false
         searchClause: AND ($isExempted = 'All' OR ($isExempted = 'Exempted' AND pt.usagecategory LIKE 'RESIDENTIAL%' AND CAST(COALESCE(NULLIF(TRIM(CAST(pt.landarea AS VARCHAR)), ''), '0') AS NUMERIC) <= 125))
