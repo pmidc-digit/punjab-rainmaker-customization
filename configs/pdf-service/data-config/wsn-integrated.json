@@ -526,41 +526,65 @@
                                 }
                             },
                             {
-                                "variable": "wsarrears",
+                                "variable": "wsbreakdownPenaltyCharge",
                                 "value": {
-                                    "path": "$.connection.waterDetails.integratedBillDetails[0].arrears"
+                                    "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_BREAKDOWN_PENALTY' )].amount"
                                 }
                             },
                             {
-                              "variable": "wspenalty",
-                              "value": {
-                                  "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_TIME_PENALTY')].amount"
-                              }
-                          },
-                          {
-                              "variable": "wsinterest",
-                              "value": {
-                                  "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_TIME_INTEREST')].amount"
-                              }
-                          },
-                          {
-                              "variable": "wsadvance",
-                              "value": {
-                                  "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_ADVANCE_CARRYFORWARD')].amount"
-                              }
-                          },
-                          {
-                              "variable": "wsothers",
-                              "value": {
-                                  "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_Round_Off')].amount"
-                              }
-                          },
-                           {
-                              "variable": "wsrebate",
-                              "value": {
-                                  "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_TIME_REBATE')].amount"
-                              }
-                          },
+                                "variable": "waterDischargeCharge",
+                                "value": {
+                                    "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_DISCHARGE_CHARGES')].amount"
+                                }
+                            },
+                            {
+                                "variable": "wstimeRebate",
+                                "value": {
+                                    "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_TIME_REBATE')].amount"
+                                }
+                            },
+                            {
+                                "variable": "adhocRebate",
+                                "value": {
+                                    "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_ADHOC_REBATE' || @.taxHeadCode == 'TL_ADHOC_REBATE' || @.taxHeadCode == 'FIRENOC_ADHOC_REBATE')].amount"
+                                }
+                            },
+                            {
+                                "variable": "wstimePenalty",
+                                "value": {
+                                    "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_TIME_PENALTY')].amount"
+                                }
+                            },
+                            {
+                                "variable": "adhocPenalty",
+                                "value": {
+                                    "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_ADHOC_PENALTY' || @.taxHeadCode == 'TL_ADHOC_PENALTY' || @.taxHeadCode == 'FIRENOC_ADHOC_PENALTY')].amount"
+                                }
+                            },
+                            {
+                                "variable": "wsroundoff",
+                                "value": {
+                                    "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_Round_Off')].amount"
+                                }
+                            },
+                            {
+                                "variable": "waterCess",
+                                "value": {
+                                    "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_WATER_CESS')].amount"
+                                }
+                            },
+                            {
+                                "variable": "wstimeInterest",
+                                "value": {
+                                    "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_TIME_INTEREST')].amount"
+                                }
+                            },
+                            {
+                                "variable": "wscarryForward",
+                                "value": {
+                                    "path": "$.bills.waterBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'WS_ADVANCE_CARRYFORWARD')].amount"
+                                }
+                            },
                             {
                                 "variable": "wschargestotalAmount",
                                 "value": {
@@ -618,39 +642,63 @@
                                 }
                             },
                             {
-                                "variable": "swarrears",
+                                "variable": "swbreakdownPenaltyCharge",
                                 "value": {
-                                    "path": "$.bills.sewerageBill.arrearAmount"
+                                    "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_BREAKDOWN_PENALTY' )].amount"
                                 }
                             },
                             {
-                                "variable": "swpenalty",
+                                "variable": "sewerageDischargeCharge",
+                                "value": {
+                                    "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_DISCHARGE_CHARGES')].amount"
+                                }
+                            },
+                            {
+                                "variable": "swtimeRebate",
+                                "value": {
+                                    "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_TIME_REBATE')].amount"
+                                }
+                            },
+                            {
+                                "variable": "adhocRebate",
+                                "value": {
+                                    "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_ADHOC_REBATE' || @.taxHeadCode == 'TL_ADHOC_REBATE' || @.taxHeadCode == 'FIRENOC_ADHOC_REBATE')].amount"
+                                }
+                            },
+                            {
+                                "variable": "swtimePenalty",
                                 "value": {
                                     "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_TIME_PENALTY')].amount"
                                 }
                             },
                             {
-                                "variable": "swinterest",
+                                "variable": "adhocPenalty",
+                                "value": {
+                                    "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'PT_ADHOC_PENALTY' || @.taxHeadCode == 'TL_ADHOC_PENALTY' || @.taxHeadCode == 'FIRENOC_ADHOC_PENALTY')].amount"
+                                }
+                            },
+                            {
+                                "variable": "swroundoff",
+                                "value": {
+                                    "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_Round_Off')].amount"
+                                }
+                            },
+                            {
+                                "variable": "sewerageCess",
+                                "value": {
+                                    "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_WATER_CESS')].amount"
+                                }
+                            },
+                            {
+                                "variable": "swtimeInterest",
                                 "value": {
                                     "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_TIME_INTEREST')].amount"
                                 }
                             },
                             {
-                                "variable": "swadvance",
+                                "variable": "swcarryForward",
                                 "value": {
                                     "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_ADVANCE_CARRYFORWARD')].amount"
-                                }
-                            },
-                            {
-                                "variable": "swothers",
-                                "value": {
-                                    "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_Round_Off')].amount"
-                                }
-                            },
-                             {
-                                "variable": "swrebate",
-                                "value": {
-                                    "path": "$.bills.sewerageBill.billDetails[0].billAccountDetails[?(@.taxHeadCode == 'SW_TIME_REBATE')].amount"
                                 }
                             },
                             {
@@ -702,6 +750,70 @@
                             {
                                 "variable": "totalAmountDue",
                                 "formula": "{{totalwater}}+{{totalsewerage}}"
+                            },
+                            {
+                                "variable": "wspenalty",
+                                "formula": "{{wstimePenalty}}+{{adhocPenalty}} + {{wsbreakdownPenaltyCharge}}"
+                            },
+                            {
+                                "variable": "wsrebate",
+                                "formula": "{{wstimeRebate}}+{{adhocRebate}}"
+                            },
+                            {
+                                "variable": "wsbillOthers",
+                                "formula": "{{waterCess}}+{{wsroundoff}}+{{wstimeInterest}}"
+                            },
+                            {
+                                "variable": "wsdemandTotalAmount",
+                                "formula": "{{wsroundoff}}+{{wscharge}}+{{watercess}}+{{wstimeInterest}}+{{wstimePenalty}} + {{wsbreakdownPenaltyCharge}}"
+                            },
+                            {
+                                "variable": "wsarrears",
+                                "formula": "{{totalwater}}>{{wsdemandTotalAmount}}?({{totalwater}}-{{wsdemandTotalAmount}}).toFixed(2):0"
+                            },
+                            {
+                                "variable": "wsadvanceAdjusted",
+                                "formula": "{{totalwater}}>=0?({{totalwater}}<{{wsdemandTotalAmount}}?({{totalwater}}-{{wsdemandTotalAmount}}).toFixed(2):0):{{wsdemandTotalAmount}} * -1"
+                            },
+                            {
+                                "variable": "wsadvanceAvailable",
+                                "formula": "{{totalwater}}<0?{{totalwater}}*-1:0"
+                            },
+                            {
+                                "variable": "wsothers",
+                                "formula": "({{wsroundoff}}+{{watercess}}+{{wstimeInterest}}+{{waterDischargeCharge}}).toFixed(2)"
+                            },
+                            {
+                                "variable": "swpenalty",
+                                "formula": "{{swtimePenalty}}+{{adhocPenalty}} + {{swbreakdownPenaltyCharge}}"
+                            },
+                            {
+                                "variable": "swrebate",
+                                "formula": "{{swtimeRebate}}+{{adhocRebate}}"
+                            },
+                            {
+                                "variable": "swbillOthers",
+                                "formula": "{{sewerageCess}}+{{swroundoff}}+{{swtimeInterest}}"
+                            },
+                            {
+                                "variable": "wsdemandTotalAmount",
+                                "formula": "{{swroundoff}}+{{swcharge}}+{{sewerageCess}}+{{swtimeInterest}}+{{swtimePenalty}} + {{swbreakdownPenaltyCharge}}"
+                            },
+                            {
+                                "variable": "swarrears",
+                                "formula": "{{totalsewerage}}>{{swdemandTotalAmount}}?({{totalsewerage}}-{{swdemandTotalAmount}}).toFixed(2):0"
+                            },
+                            {
+                                "variable": "swadvanceAdjusted",
+                                "formula": "{{totalsewerage}}>=0?({{totalsewerage}}<{{swdemandTotalAmount}}?({{totalsewerage}}-{{swdemandTotalAmount}}).toFixed(2):0):{{swdemandTotalAmount}} * -1"
+                            },
+                            {
+                                "variable": "swadvanceAvailable",
+                                "formula": "{{totalsewerage}}<0?{{totalsewerage}}*-1:0"
+                            },
+                            {
+                                "variable": "swothers",
+                                "formula": "({{swroundoff}}+{{sewerageCess}}+{{swtimeInterest}}+{{sewerageDischargeCharge}}).toFixed(2)"
                             }
                         ]
                     },
