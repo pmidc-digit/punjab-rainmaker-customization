@@ -6457,290 +6457,288 @@ ReportDefinitions:
       and p.status != 'INACTIVE'
       and ws.connectionno IS NOT NULL
 
-  - reportName: SWTotal_Bill_Generate
-    summary: SW Total Bill Generate Report
-    version: 1.0.0
-    moduleName: rainmaker-ws
-    additionalConfig:
-      print:
-        pdfPageSize: A1
-    sourceColumns:
-      - name: finyear
-        label: finyear
-        type: string
-        source: ws
-        total: false
-      - name: usagecategory
-        label: usagecategory
-        type: string
-        source: ws
-        total: false
-      - name: connectionno
-        label: Connection No
-        type: string
-        source: ws
-        total: false
-      - name: property_id
-        label: Property id
-        type: string
-        source: ws
-        total: false
-      - name: totalamount
-        label: totalamount
-        type: string
-        source: ws
-        total: true
-      - name: localityname
-        label: localityname
-        type: string
-        source: ws
-        total: false
-      - name: localitycode
-        label: localitycode
-        type: string
-        source: ws
-        total: false
-      - name: zonecode
-        label: zonecode
-        type: string
-        source: ws
-        total: false
-      - name: blockcode
-        label: blockcode
-        type: string
-        source: ws
-        total: false                   
-      - name: sc_status
-        label: wc_status
-        type: string
-        source: ws
-        total: false 
-      - name: landarea
-        label: landarea
-        type: string
-        source: ws
-        total: false
-      - name: bill_no
-        label: bill_number
-        type: string
-        source: ws
-        total: false
-      - name: bill_status
-        label: bill_status
-        type: string
-        source: ws
-        total: false
-      - name: bill_date
-        label: bill_date
-        type: string
-        source: ws
-        total: false
-    searchParams:
-      - name: localityArray
-        label: zoneList
-        type: boundarylist
-        source: pt
-        isMandatory: false
-        searchClause: AND bm.localitycode IN ($localityArray) 
-      - name: usagecategory
-        label: Category
-        type: singlevaluelist
-        pattern: "list://RESIDENTIAL:Residential,NONRESIDENTIAL.COMMERCIAL:Commercial,NONRESIDENTIAL.INSTITUTIONAL:Institutional,NONRESIDENTIAL:Non-Residencial,NONRESIDENTIAL.OTHERS:Other,MIXED:Mixed"
-        source: ws
-        isMandatory: false
-        searchClause: AND pt.usagecategory = $usagecategory 
-      - name: isExempted
-        label: Exempted Status
-        type: singlevaluelist
-        pattern: "list://Exempted:Exempted"
-        source: pt
-        isMandatory: false
-        searchClause: AND ($isExempted = 'All' OR ($isExempted = 'Exempted' AND pt.usagecategory LIKE 'RESIDENTIAL%' AND CAST(COALESCE(NULLIF(TRIM(CAST(pt.landarea AS VARCHAR)), ''), '0') AS NUMERIC) <= 125))
-    query:
-      WITH latest_bill AS (
-          SELECT 
-              bill.*,
-              ROW_NUMBER() OVER (
-                  PARTITION BY bill.consumercode 
-                  ORDER BY bill.fromperiod DESC
-              ) AS rn
-          FROM egbs_billdetail_v1 bill
-          WHERE bill.businessservice = 'SW'
-        and bill.tenantid = $tenantid
-      )
-      SELECT DISTINCT
-          to_char(
-              (to_timestamp(lb.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
-              'YYYY-MM'
-          ) || '-' ||
-          to_char(
-              (to_timestamp(lb.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
-              'YYYY-MM'
-          ) AS finyear,
-          pt.usagecategory,
-          wc.connectionno,
-          wc.property_id,
-          lb.billno AS bill_no,
-          to_char((to_timestamp(lb.billdate / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD HH24:MI:SS') AS bill_date, 
-          to_char((to_timestamp(lb.expirydate / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD HH24:MI:SS') AS expiry_date,
-          lb.totalamount,
-          bm.localityname,bm.localitycode,bm.zonecode,bm.blockcode,
-          wc.status AS wc_status,
-          wc.additionaldetails ->> 'groups' AS group_name,
-          pt.landarea,
-          b.status AS bill_status
-      FROM eg_sw_connection wc JOIN eg_pt_property pt  ON wc.property_id = pt.propertyid AND pt.status IN ('ACTIVE', 'PENDINGWS')
-      JOIN eg_pt_address  pa ON pt.id = pa.propertyid and pa.tenantid = $tenantid
-      JOIN  eg_bndry_mohalla bm  ON pa.locality = bm.localitycode and pa.tenantid = bm.tenantid 
-      JOIN latest_bill lb     ON lb.consumercode = wc.connectionno
-          AND lb.rn = 1           
-      JOIN egbs_bill_v1 b     ON lb.billid = b.id and b.tenantid = $tenantid
-      WHERE wc.tenantid = $tenantid
-        AND wc.connectionno IS NOT NULL
-        AND wc.status = 'Active' 
-
-  - reportName: WSTotal_Bill_Generate
-    summary: WS Total Bill Generate Report
-    version: 1.0.0
-    moduleName: rainmaker-ws
-    additionalConfig:
-      print:
-        pdfPageSize: A1
-    sourceColumns:
-      - name: finyear
-        label: finyear
-        type: string
-        source: ws
-        total: false
-      - name: usagecategory
-        label: usagecategory
-        type: string
-        source: ws
-        total: false
-      - name: connectionno
-        label: Connection No
-        type: string
-        source: ws
-        total: false
-      - name: property_id
-        label: Property id
-        type: string
-        source: ws
-        total: false     
-      - name: bill_no
-        label: bill_number
-        type: string
-        source: ws
-        total: false
-      - name: totalamount
-        label: totalamount
-        type: string
-        source: ws
-        total: true
-      - name: localityname
-        label: localityname
-        type: string
-        source: ws
-        total: false
-      - name: localitycode
-        label: localitycode
-        type: string
-        source: ws
-        total: false
-      - name: zonecode
-        label: zonecode
-        type: string
-        source: ws
-        total: false
-      - name: blockcode
-        label: blockcode
-        type: string
-        source: ws
-        total: false      
-      - name: wc_status
-        label: wc_status
-        type: string
-        source: ws
-        total: false 
-      - name: landarea
-        label: landarea
-        type: string
-        source: ws
-        total: false    
-      - name: bill_status
-        label: bill_status
-        type: string
-        source: ws
-        total: false
-      - name: bill_date
-        label: bill_date
-        type: string
-        source: ws
-        total: false
-    searchParams:
-      - name: localityArray
-        label: zoneList
-        type: boundarylist
-        source: pt
-        isMandatory: false
-        searchClause: AND bm.localitycode IN ($localityArray)  
-      - name: usagecategory
-        label: Category
-        type: singlevaluelist
-        pattern: "list://RESIDENTIAL:Residential,NONRESIDENTIAL.COMMERCIAL:Commercial,NONRESIDENTIAL.INSTITUTIONAL:Institutional,NONRESIDENTIAL:Non-Residencial,NONRESIDENTIAL.OTHERS:Other,MIXED:Mixed"
-        source: ws
-        isMandatory: false
-        searchClause: AND pt.usagecategory = $usagecategory
-      - name: isExempted
-        label: Exempted Status
-        type: singlevaluelist
-        pattern: "list://Exempted:Exempted"
-        source: pt
-        isMandatory: false
-        searchClause: AND ($isExempted = 'All' OR ($isExempted = 'Exempted' AND pt.usagecategory LIKE 'RESIDENTIAL%' AND CAST(COALESCE(NULLIF(TRIM(CAST(pt.landarea AS VARCHAR)), ''), '0') AS NUMERIC) <= 125))
-    query: |                                                   
-      WITH latest_bill AS (
-          SELECT 
-              bill.*,
-              ROW_NUMBER() OVER (
-                  PARTITION BY bill.consumercode 
-                  ORDER BY bill.fromperiod DESC
-              ) AS rn
-          FROM egbs_billdetail_v1 bill
-          WHERE bill.businessservice = 'WS'
-        and bill.tenantid = $tenantid
-      )
-      SELECT DISTINCT
-          to_char(
-              (to_timestamp(lb.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
-              'YYYY-MM'
-          ) || '-' ||
-          to_char(
-              (to_timestamp(lb.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
-              'YYYY-MM'
-          ) AS finyear,
-          pt.usagecategory,
-          wc.connectionno,
-          wc.property_id,
-          lb.billno AS bill_no,
-          to_char((to_timestamp(lb.billdate / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD HH24:MI:SS') AS bill_date,
-          to_char((to_timestamp(lb.expirydate / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD HH24:MI:SS') AS expiry_date,
-          lb.totalamount,
-          bm.localityname,bm.localitycode,bm.zonecode,bm.blockcode,
-          wc.additionaldetails ->> 'groups' AS group_name,
-          wc.status AS wc_status,
-          pt.landarea,
-          b.status AS bill_status
-      FROM eg_ws_connection wc JOIN eg_pt_property pt  ON wc.property_id = pt.propertyid AND pt.status IN ('ACTIVE', 'PENDINGWS')
-      JOIN eg_pt_address  pa ON pt.id = pa.propertyid and pa.tenantid = $tenantid
-      JOIN  eg_bndry_mohalla bm  ON pa.locality = bm.localitycode and pa.tenantid = bm.tenantid 
-      JOIN latest_bill lb     ON lb.consumercode = wc.connectionno
-          AND lb.rn = 1           
-      JOIN egbs_bill_v1 b     ON lb.billid = b.id and b.tenantid = $tenantid
-      WHERE wc.tenantid = $tenantid
-        AND wc.connectionno IS NOT NULL
-        AND wc.status = 'Active'
-
+- reportName: SWTotal_Bill_Generate
+  summary: SW Total Bill Generate Report
+  version: 1.0.0
+  moduleName: rainmaker-ws
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+    - name: finyear
+      label: finyear
+      type: string
+      source: ws
+      total: false
+    - name: usagecategory
+      label: usagecategory
+      type: string
+      source: ws
+      total: false
+    - name: connectionno
+      label: Connection No
+      type: string
+      source: ws
+      total: false
+    - name: property_id
+      label: Property id
+      type: string
+      source: ws
+      total: false
+    - name: totalamount
+      label: totalamount
+      type: string
+      source: ws
+      total: true
+    - name: localityname
+      label: localityname
+      type: string
+      source: ws
+      total: false
+    - name: localitycode
+      label: localitycode
+      type: string
+      source: ws
+      total: false
+    - name: zonecode
+      label: zonecode
+      type: string
+      source: ws
+      total: false
+    - name: blockcode
+      label: blockcode
+      type: string
+      source: ws
+      total: false                   
+    - name: sc_status
+      label: wc_status
+      type: string
+      source: ws
+      total: false 
+    - name: landarea
+      label: landarea
+      type: string
+      source: ws
+      total: false
+    - name: bill_no
+      label: bill_number
+      type: string
+      source: ws
+      total: false
+    - name: bill_status
+      label: bill_status
+      type: string
+      source: ws
+      total: false
+    - name: bill_date
+      label: bill_date
+      type: string
+      source: ws
+      total: false
+  searchParams:
+    - name: localityArray
+      label: zoneList
+      type: boundarylist
+      source: pt
+      isMandatory: false
+      searchClause: AND bm.localitycode IN ($localityArray) 
+    - name: usagecategory
+      label: Category
+      type: singlevaluelist
+      pattern: "list://RESIDENTIAL:Residential,NONRESIDENTIAL.COMMERCIAL:Commercial,NONRESIDENTIAL.INSTITUTIONAL:Institutional,NONRESIDENTIAL:Non-Residencial,NONRESIDENTIAL.OTHERS:Other,MIXED:Mixed"
+      source: ws
+      isMandatory: false
+      searchClause: AND pt.usagecategory = $usagecategory 
+    - name: isExempted
+      label: Exempted Status
+      type: singlevaluelist
+      pattern: "list://Exempted:Exempted"
+      source: pt
+      isMandatory: false
+      searchClause: AND ($isExempted = 'All' OR ($isExempted = 'Exempted' AND pt.usagecategory LIKE 'RESIDENTIAL%' AND CAST(COALESCE(NULLIF(TRIM(CAST(pt.landarea AS VARCHAR)), ''), '0') AS NUMERIC) <= 125))
+  query:
+    WITH latest_bill AS (
+        SELECT 
+            bill.*,
+            ROW_NUMBER() OVER (
+                PARTITION BY bill.consumercode 
+                ORDER BY bill.fromperiod DESC
+            ) AS rn
+        FROM egbs_billdetail_v1 bill
+        WHERE bill.businessservice = 'SW'
+      and bill.tenantid = $tenantid
+    )
+    SELECT DISTINCT
+        to_char(
+            (to_timestamp(lb.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
+            'YYYY-MM'
+        ) || '-' ||
+        to_char(
+            (to_timestamp(lb.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
+            'YYYY-MM'
+        ) AS finyear,
+        pt.usagecategory,
+        wc.connectionno,
+        wc.property_id,
+        lb.billno AS bill_no,
+        to_char((to_timestamp(lb.billdate / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD HH24:MI:SS') AS bill_date, 
+        to_char((to_timestamp(lb.expirydate / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD HH24:MI:SS') AS expiry_date,
+        lb.totalamount,
+        bm.localityname,bm.localitycode,bm.zonecode,bm.blockcode,
+        wc.status AS wc_status,
+        wc.additionaldetails ->> 'groups' AS group_name,
+        pt.landarea,
+        b.status AS bill_status
+    FROM eg_sw_connection wc JOIN eg_pt_property pt  ON wc.property_id = pt.propertyid AND pt.status IN ('ACTIVE', 'PENDINGWS')
+    JOIN eg_pt_address  pa ON pt.id = pa.propertyid and pa.tenantid = $tenantid
+    JOIN  eg_bndry_mohalla bm  ON pa.locality = bm.localitycode and pa.tenantid = bm.tenantid 
+    JOIN latest_bill lb     ON lb.consumercode = wc.connectionno
+        AND lb.rn = 1           
+    JOIN egbs_bill_v1 b     ON lb.billid = b.id and b.tenantid = $tenantid
+    WHERE wc.tenantid = $tenantid
+      AND wc.connectionno IS NOT NULL
+      AND wc.status = 'Active' 
+- reportName: WSTotal_Bill_Generate
+  summary: WS Total Bill Generate Report
+  version: 1.0.0
+  moduleName: rainmaker-ws
+  additionalConfig:
+    print:
+      pdfPageSize: A1
+  sourceColumns:
+    - name: finyear
+      label: finyear
+      type: string
+      source: ws
+      total: false
+    - name: usagecategory
+      label: usagecategory
+      type: string
+      source: ws
+      total: false
+    - name: connectionno
+      label: Connection No
+      type: string
+      source: ws
+      total: false
+    - name: property_id
+      label: Property id
+      type: string
+      source: ws
+      total: false     
+    - name: bill_no
+      label: bill_number
+      type: string
+      source: ws
+      total: false
+    - name: totalamount
+      label: totalamount
+      type: string
+      source: ws
+      total: true
+    - name: localityname
+      label: localityname
+      type: string
+      source: ws
+      total: false
+    - name: localitycode
+      label: localitycode
+      type: string
+      source: ws
+      total: false
+    - name: zonecode
+      label: zonecode
+      type: string
+      source: ws
+      total: false
+    - name: blockcode
+      label: blockcode
+      type: string
+      source: ws
+      total: false      
+    - name: wc_status
+      label: wc_status
+      type: string
+      source: ws
+      total: false 
+    - name: landarea
+      label: landarea
+      type: string
+      source: ws
+      total: false    
+    - name: bill_status
+      label: bill_status
+      type: string
+      source: ws
+      total: false
+    - name: bill_date
+      label: bill_date
+      type: string
+      source: ws
+      total: false
+  searchParams:
+    - name: localityArray
+      label: zoneList
+      type: boundarylist
+      source: pt
+      isMandatory: false
+      searchClause: AND bm.localitycode IN ($localityArray)  
+    - name: usagecategory
+      label: Category
+      type: singlevaluelist
+      pattern: "list://RESIDENTIAL:Residential,NONRESIDENTIAL.COMMERCIAL:Commercial,NONRESIDENTIAL.INSTITUTIONAL:Institutional,NONRESIDENTIAL:Non-Residencial,NONRESIDENTIAL.OTHERS:Other,MIXED:Mixed"
+      source: ws
+      isMandatory: false
+      searchClause: AND pt.usagecategory = $usagecategory
+    - name: isExempted
+      label: Exempted Status
+      type: singlevaluelist
+      pattern: "list://Exempted:Exempted"
+      source: pt
+      isMandatory: false
+      searchClause: AND ($isExempted = 'All' OR ($isExempted = 'Exempted' AND pt.usagecategory LIKE 'RESIDENTIAL%' AND CAST(COALESCE(NULLIF(TRIM(CAST(pt.landarea AS VARCHAR)), ''), '0') AS NUMERIC) <= 125))
+  query: |                                                   
+    WITH latest_bill AS (
+        SELECT 
+            bill.*,
+            ROW_NUMBER() OVER (
+                PARTITION BY bill.consumercode 
+                ORDER BY bill.fromperiod DESC
+            ) AS rn
+        FROM egbs_billdetail_v1 bill
+        WHERE bill.businessservice = 'WS'
+      and bill.tenantid = $tenantid
+    )
+    SELECT DISTINCT
+        to_char(
+            (to_timestamp(lb.fromperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
+            'YYYY-MM'
+        ) || '-' ||
+        to_char(
+            (to_timestamp(lb.toperiod / 1000) AT TIME ZONE 'Asia/Kolkata'),
+            'YYYY-MM'
+        ) AS finyear,
+        pt.usagecategory,
+        wc.connectionno,
+        wc.property_id,
+        lb.billno AS bill_no,
+        to_char((to_timestamp(lb.billdate / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD HH24:MI:SS') AS bill_date,
+        to_char((to_timestamp(lb.expirydate / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD HH24:MI:SS') AS expiry_date,
+        lb.totalamount,
+        bm.localityname,bm.localitycode,bm.zonecode,bm.blockcode,
+        wc.additionaldetails ->> 'groups' AS group_name,
+        wc.status AS wc_status,
+        pt.landarea,
+        b.status AS bill_status
+    FROM eg_ws_connection wc JOIN eg_pt_property pt  ON wc.property_id = pt.propertyid AND pt.status IN ('ACTIVE', 'PENDINGWS')
+    JOIN eg_pt_address  pa ON pt.id = pa.propertyid and pa.tenantid = $tenantid
+    JOIN  eg_bndry_mohalla bm  ON pa.locality = bm.localitycode and pa.tenantid = bm.tenantid 
+    JOIN latest_bill lb     ON lb.consumercode = wc.connectionno
+        AND lb.rn = 1           
+    JOIN egbs_bill_v1 b     ON lb.billid = b.id and b.tenantid = $tenantid
+    WHERE wc.tenantid = $tenantid
+      AND wc.connectionno IS NOT NULL
+      AND wc.status = 'Active'
 - reportName: Bill_Amendment_Report
   summary: Bill Amendment Report
   version: 1.0.0
