@@ -292,7 +292,7 @@ ReportDefinitions:
       print:
         pdfPageSize: A1
     sourceColumns:
-      - name: tenant_name
+      - name: tenantid
         label: Tenant Id
         type: string
         source: ch
@@ -322,7 +322,7 @@ ReportDefinitions:
         type: string
         source: ch
         total: false
-      - name: collector_name
+      - name: collectorname
         label: Collector Name
         type: string
         source: ch
@@ -352,7 +352,7 @@ ReportDefinitions:
         type: string
         source: ch
         total: true
-      - name: paymentDate
+      - name: paymentdate
         label: Payment Date
         type: string
         source: ch
@@ -405,7 +405,7 @@ ReportDefinitions:
               p.createdtime,
               p.paymentmode AS payment_mode,
               pd.amountpaid,             
-              COALESCE(emp.code, 'SELF') AS collector_code,uu.name as  collector_name,uu.mobilenumber as emp_mobile,
+              COALESCE(emp.code, 'SELF') AS collector_code,uu.name as  collectorname,uu.mobilenumber as emp_mobile,
               c.challanno,
               c.applicationstatus,
               c.offence_type_name,
@@ -432,7 +432,7 @@ ReportDefinitions:
           SELECT
               split_part(tenantid, '.', 2) AS tenantid,
               challanno, name, mobilenumber, 'CHALLAN' AS businessservice, applicationstatus,payment_mode,
-              collector_code, collector_name,emp_mobile, offence_category_name,offence_subcategory_name,offence_type_name, amountpaid,
+              collector_code, collectorname,emp_mobile, offence_category_name,offence_subcategory_name,offence_type_name, amountpaid,
               TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS paymentdate         
              FROM unique_transactions
              WHERE tenantid != 'pb.testing'
