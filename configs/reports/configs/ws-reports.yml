@@ -7363,6 +7363,11 @@ ReportDefinitions:
         type: string
         source: ws
         total: false
+      - name: zone
+        label: zone
+        type: string
+        source: ws
+        total: false            
       - name: demand_amount
         label: Demand Amount
         type: string
@@ -7439,7 +7444,7 @@ ReportDefinitions:
       searchClause: AND 1=1
   query:
                      SELECT
-              quarter,
+              quarter,zone, 
               consumercode,
               demand_amount,
               first_bill_no,
@@ -7450,7 +7455,7 @@ ReportDefinitions:
               latest_bill_amount,
               TO_CHAR(latest_bill_date, 'DD-MM-YYYY') AS latest_bill_date,
               latest_bill_status
-          FROM mv_ws_amritsar_bills_summary          
+          FROM mv_ws_bill_history_zone          
         WHERE taxperiodfrom::text = $taxPeriodfrom 
               AND taxperiodto::text   = $taxPeriodto 
 
@@ -7473,6 +7478,11 @@ ReportDefinitions:
         type: string
         source: ws
         total: false
+      - name: zone
+        label: zone
+        type: string
+        source: ws
+        total: false         
       - name: demand_amount
         label: Demand Amount
         type: string
@@ -7548,9 +7558,9 @@ ReportDefinitions:
       wrapper: true
       searchClause: AND 1=1
   query:
-                   SELECT
+                   SELECT 
               quarter,
-              consumercode,
+              consumercode, zone,
               demand_amount,
               first_bill_no,
               first_bill_amount,
@@ -7560,6 +7570,6 @@ ReportDefinitions:
               latest_bill_amount,
               TO_CHAR(latest_bill_date, 'DD-MM-YYYY') AS latest_bill_date,
               latest_bill_status
-          FROM mv_sw_amritsar_bills_summary          
+          FROM mv_sw_bill_history_zone          
         WHERE taxperiodfrom::text = $taxPeriodfrom 
               AND taxperiodto::text   = $taxPeriodto 
