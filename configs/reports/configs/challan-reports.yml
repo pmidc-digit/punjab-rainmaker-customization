@@ -141,7 +141,7 @@ ReportDefinitions:
               offence_subcategory_name, amountpaid,
               TO_CHAR(TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS paymentdate
              FROM unique_transactions
-             WHERE 1=1
+             WHERE 1=1 and tenantid != 'pb.testing'
     orderby: ORDER BY createdtime DESC
   - reportName: ReceiptRegisterCHALLAN
     decryptionPathId: CHALLANREPORTS
@@ -282,6 +282,7 @@ ReportDefinitions:
       WHERE bill.tenantid = $tenantid
         AND pd.businessservice = 'Challan_Generation'
         AND payment.paymentstatus != 'CANCELLED'
+        AND pd.tenantid != 'pb.testing'
     orderby: ORDER BY pd.receiptdate DESC
   - reportName: StateUserWiseCollectionsReport
     decryptionPathId: STATECHALLANREPORTS
@@ -694,6 +695,7 @@ ReportDefinitions:
          LEFT JOIN eg_challanaddress ca on ca.challanid = c.id
          LEFT JOIN eg_user u on u.uuid = c.accountid
          WHERE c.tenantid = $tenantid
+         AND c.tenantid != 'pb.testing'
   - reportName: StateCategoryWiseChallanDetailReport
     decryptionPathId: STATECHALLANREPORTS
     summary: Challan wise detail report per tenant
@@ -813,7 +815,7 @@ ReportDefinitions:
          from eg_challan c
          LEFT JOIN eg_challanaddress ca on ca.challanid = c.id
          LEFT JOIN eg_user u on u.uuid = c.accountid
-         WHERE 1=1
+         WHERE 1=1 AND c.tenantid != 'pb.testing'
   - reportName: ChallanDefaulterReport
     decryptionPathId: CHALLANREPORTS
     summary: Details of user who doesn't pay his challan within 10 days till now.
@@ -941,7 +943,7 @@ ReportDefinitions:
          TO_CHAR( TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY' ) AS challan_date,
         'DEFAULTER' AS defaulter_status
         FROM defaulter_challans
-        WHERE 1=1
+        WHERE 1=1 AND tenantid != 'pb.testing'
     orderby: ORDER BY pending_days DESC
   - reportName: StateChallanDefaulterReport
     decryptionPathId: STATECHALLANREPORTS
@@ -1085,7 +1087,7 @@ ReportDefinitions:
         TO_CHAR( TO_TIMESTAMP(createdtime / 1000),'DD-MM-YYYY' ) AS challan_date,
         'DEFAULTER' AS defaulter_status, generated_by
         FROM defaulter_challans
-        WHERE 1=1
+        WHERE 1=1 AND tenantid != 'pb.testing'
     orderby: ORDER BY pending_days DESC
   - reportName: ChallanSummaryReport
     summary: Summary of challan application with status and total collection per category per tenant.
@@ -1169,9 +1171,9 @@ ReportDefinitions:
        COALESCE(SUM(p.amountpaid),0) AS total_collection
        FROM challan_data c
        LEFT JOIN payment_data p ON p.challanno = c.challanno
-       WHERE 1=1
+       WHERE 1=1 AND c.tenantid != 'pb.testing'
     groupby: GROUP BY split_part(c.tenantid,'.',2),c.offence_category_name
-    orderby: ORDER BY  ulb,  offence_category_name;
+    orderby: ORDER BY  ulb,  offence_category_name
 
   - reportName: StateChallanSummaryReport
     summary: Summary of challan application with status and total collection per category per tenant.
