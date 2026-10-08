@@ -6511,7 +6511,7 @@ ReportDefinitions:
       source: ws
       total: false                   
     - name: sc_status
-      label: wc_status
+      label: sc_status
       type: string
       source: ws
       total: false 
@@ -6585,7 +6585,7 @@ ReportDefinitions:
         to_char((to_timestamp(lb.expirydate / 1000) AT TIME ZONE 'Asia/Kolkata'),'YYYY-MM-DD HH24:MI:SS') AS expiry_date,
         lb.totalamount,
         bm.localityname,bm.localitycode,bm.zonecode,bm.blockcode,
-        wc.status AS wc_status,
+        wc.status AS sc_status,
         wc.additionaldetails ->> 'groups' AS group_name,
         pt.landarea,
         b.status AS bill_status
