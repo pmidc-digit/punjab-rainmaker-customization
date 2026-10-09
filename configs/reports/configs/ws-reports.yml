@@ -7429,6 +7429,13 @@ ReportDefinitions:
         source: ws
         total: false
   searchParams:
+    - name: zone
+      label: Zone
+      type: singlevaluelist
+      pattern: 'list://SOUTH:SOUTH,CENTRE:CENTRE,WEST:WEST,EAST:EAST,OUTSIDE-MC-LIMIT:OUTSIDE-MC-LIMIT,NORTH:NORTH'
+      source: ws
+      isMandatory: false
+      searchClause: AND zone = $zone  
     - name: billDateFrom
       label: Bill Date From
       type: epoch
@@ -7544,6 +7551,13 @@ ReportDefinitions:
         source: ws
         total: false
   searchParams:
+    - name: zone
+      label: Zone
+      type: singlevaluelist
+      pattern: 'list://SOUTH:SOUTH,CENTRE:CENTRE,WEST:WEST,EAST:EAST,OUTSIDE-MC-LIMIT:OUTSIDE-MC-LIMIT,NORTH:NORTH'
+      source: ws
+      isMandatory: false
+      searchClause: AND zone = $zone
     - name: billDateFrom
       label: Bill Date From
       type: epoch
@@ -7579,11 +7593,11 @@ ReportDefinitions:
               demand_amount,
               first_bill_no,
               first_bill_amount,
-              TO_CHAR(first_bill_date, 'DD-MM-YYYY') AS first_bill_date,
+              TO_CHAR(TO_TIMESTAMP(first_bill_date / 1000.0) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY HH24:MI:SS') AS first_bill_date,
               first_bill_status,
               latest_bill_no,
               latest_bill_amount,
-              TO_CHAR(latest_bill_date, 'DD-MM-YYYY') AS latest_bill_date,
+              TO_CHAR(TO_TIMESTAMP(latest_bill_date / 1000.0) AT TIME ZONE 'Asia/Kolkata','DD-MM-YYYY HH24:MI:SS') AS latest_bill_date,
               latest_bill_status
           FROM mv_sw_bill_history_zone          
         WHERE taxperiodfrom::text = $taxPeriodfrom 
