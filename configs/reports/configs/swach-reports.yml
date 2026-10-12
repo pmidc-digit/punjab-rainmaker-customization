@@ -488,9 +488,8 @@ ReportDefinitions:
         ON atwo.servicerequestid = ess.servicerequestid
       LEFT OUTER JOIN public.eg_user AS ua
         ON ua.uuid::text = atwo.lastassignedto_uuid
-      WHERE ess.tenantid <> 'pb.testing'
-      ORDER BY ess.servicerequestid, ess.createdtime DESC;      
-    orderby: ORDER BY ess.servicerequestid, ess.createdtime DESC;    
+      WHERE ess.tenantid <> 'pb.testing'     
+    orderby: ORDER BY ess.servicerequestid, ess.createdtime DESC    
     
   - reportName: Detailed_Attendance_report_swach
     decryptionPathId: ULBPTDataDumpReport_V2 
