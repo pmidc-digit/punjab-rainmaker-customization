@@ -1959,18 +1959,18 @@ ReportDefinitions:
           
           UNION ALL
           
-          SELECT tenantid, applicationstatus, 'CLU' as module 
-          FROM eg_clu 
-          WHERE tenantid != 'pb.testing'  and applicationno like 'PB-%'
-            AND createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
-          
+          SELECT c.tenantid, c.applicationstatus, 'CLU' as module 
+          FROM eg_clu  c
+          inner join eg_clu_details cd on cd.cluid = c.id
+          WHERE c.tenantid != 'pb.testing'  and c.applicationno like 'PB-%'
+            AND c.createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27' and cd.additionaldetails::text not LIKE '%isMigrationTrue%'  OR cd.additionaldetails IS NULL          
           UNION ALL
           
-          SELECT tenantid, applicationstatus, 'Layout' as module 
-          FROM eg_layout 
-          WHERE tenantid != 'pb.testing'  and applicationno like 'PB-%'
-            AND createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
-      ),
+          SELECT l.tenantid, l.applicationstatus, 'Layout' as module 
+          FROM eg_layout l
+          inner join eg_layout_details ld on ld.layoutid = l.id
+          WHERE l.tenantid != 'pb.testing'  and l.applicationno like 'PB-%'
+            AND l.createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27' and ld.additionaldetails::text not LIKE '%isMigrationTrue%'  OR ld.additionaldetails IS NULL      ),
       ulb_metadata AS (
           -- 2. Metadata Join
           SELECT 
