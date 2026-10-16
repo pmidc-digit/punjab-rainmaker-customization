@@ -1970,7 +1970,8 @@ ReportDefinitions:
           FROM eg_layout l
           inner join eg_layout_details ld on ld.layoutid = l.id
           WHERE l.tenantid != 'pb.testing'  and l.applicationno like 'PB-%'
-            AND l.createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27' and ld.additionaldetails::text not LIKE '%isMigrationTrue%'  OR ld.additionaldetails IS NULL      ),
+            AND l.createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27' AND ld.additionaldetails IS NOT NULL AND ld.additionaldetails::text NOT LIKE '%isMigrationTrue%
+      ),
       ulb_metadata AS (
           -- 2. Metadata Join
           SELECT 
