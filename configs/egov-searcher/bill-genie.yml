@@ -2276,10 +2276,10 @@ SearchDefinitions:
      outJsonPath: $.Bills
      responseInfoPath: $.ResponseInfo
 
-    - name: integratedbillsnew
-      isCustomerRowMapEnabled: true
-      rowMapperKey: billsearch
-      query:
+ - name: integratedbillsnew
+   isCustomerRowMapEnabled: true
+   rowMapperKey: billsearch
+   query:
         baseQuery: >-
            WITH ws_conn AS (
              SELECT
@@ -2432,7 +2432,7 @@ SearchDefinitions:
            ORDER BY
              bill_data.propertyId,
              CASE bill_data.bd_businessservice WHEN 'WS' THEN 1 WHEN 'SW' THEN 2 ELSE 3 END
-      searchParams:
+   searchParams:
         condition: AND
         params:
           - name: b.tenantid
@@ -2473,7 +2473,7 @@ SearchDefinitions:
             isMandatory: false
             jsonPath: $.searchCriteria.billActive
 
-      output:
+        output:
         jsonFormat:
           ResponseInfo: {}
           IntegratedBills: []
