@@ -292,6 +292,7 @@ SearchDefinitions:
               ptadd.city AS ptadd_city,
               ptadd.pincode AS ptadd_pincode,
               ptadd.locality AS ptadd_locality,
+              ptadd.street AS ptadd_street,
               ptown.userid AS ptown_userid
             FROM egbs_bill_v1 b
             INNER JOIN egbs_billdetail_v1 bd
@@ -1002,6 +1003,7 @@ SearchDefinitions:
           LIMIT 1
            ) lm ON TRUE
           $where
+            AND conn.tenantid = :conn.tenantid
             AND conn.status = 'Active'
           )
           SELECT
