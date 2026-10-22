@@ -1433,3 +1433,193 @@ ReportDefinitions:
            WHERE  (TO_TIMESTAMP(r.validitydate/1000)::date < CURRENT_DATE)   
            AND r.status NOT IN ('RENEWED', 'APPROVED')   
             and r.tenantid not in ('pb.testing')
+
+  - reportName: StatePetRegistrationReport
+    decryptionPathId: STATEPETREPORTS
+    summary: State-wide Pet Registration and Status Report covering Gender, New/Renewal segregation, Deceased, and Revoked applications across all ULBs
+    version: 1.0.0
+    moduleName: rainmaker-ptr
+    additionalConfig:
+      print:
+        pdfPageSize: A1
+    sourceColumns:
+      - name: ulb
+        label: ULB Name
+        type: string
+        source: ptr
+        total: false
+      - name: applicationnumber
+        label: Application Number
+        type: string
+        source: ptr
+        total: false
+      - name: applicationtype
+        label: Application Type
+        type: string
+        source: ptr
+        total: false
+      - name: name
+        label: Owner Name
+        type: string
+        source: ptr
+        total: false
+      - name: mobilenumber
+        label: Mobile Number
+        type: string
+        source: ptr
+        total: false
+      - name: petname
+        label: Pet Name
+        type: string
+        source: ptr
+        total: false
+      - name: pettype
+        label: Pet Type
+        type: string
+        source: ptr
+        total: false
+      - name: petgender
+        label: Gender
+        type: string
+        source: ptr
+        total: false
+      - name: petage
+        label: Pet Age
+        type: string
+        source: ptr
+        total: false
+      - name: breedtype
+        label: Breed Type
+        type: string
+        source: ptr
+        total: false
+      - name: petcolor
+        label: Pet Color
+        type: string
+        source: ptr
+        total: false
+      - name: identificationmark
+        label: Identification Mark
+        type: string
+        source: ptr
+        total: false
+      - name: vaccinationnumber
+        label: Vaccination Number
+        type: string
+        source: ptr
+        total: false
+      - name: doctorname
+        label: Doctor Name
+        type: string
+        source: ptr
+        total: false
+      - name: clinicname
+        label: Clinic Name
+        type: string
+        source: ptr
+        total: false
+      - name: status
+        label: Application Status
+        type: string
+        source: ptr
+        total: false
+      - name: status_remarks
+        label: Reason
+        type: string
+        source: ptr
+        total: false
+      - name: assignee_employee
+        label: Assignee Employee
+        type: string
+        source: ptr
+        total: false
+      - name: assignee_code
+        label: Assignee Code
+        type: string
+        source: ptr
+        total: false
+    searchParams:
+      - name: ulb
+        label: ULB
+        type: singlevaluelist
+        pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+        source: ptr
+        isMandatory: false
+        searchClause: AND r.tenantid = $ulb
+      - name: applicationtype
+        label: Application Type
+        type: singlevaluelist
+        pattern: list://ALL:ALL,NEWAPPLICATION:NEWAPPLICATION,RENEWAPPLICATION:RENEWAPPLICATION
+        source: ptr
+        isMandatory: false
+        searchClause: AND ($applicationtype = 'ALL' OR r.applicationtype = $applicationtype)
+      - name: petgender
+        label: Sex of Pet
+        type: singlevaluelist
+        pattern: list://ALL:ALL,MALE:MALE,FEMALE:FEMALE
+        source: ptr
+        isMandatory: false
+        searchClause: AND ($petgender = 'ALL' OR UPPER(pd.petgender) = $petgender)
+      - name: status
+        label: Status
+        type: singlevaluelist
+        pattern: list://ALL:ALL,INITIATED:INITIATED,DOCUMENTVERIFY:DOCUMENTVERIFY,PENDINGAPPROVAL:PENDINGAPPROVAL,PENDINGPAYMENT:PENDINGPAYMENT,APPROVED:APPROVED,REJECTED:REJECTED,DECEASED:DECEASED,REVOKED:REVOKED,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
+        source: ptr
+        isMandatory: false
+        searchClause: AND ($status = 'ALL' OR r.status = $status)
+      - name: fromDate
+        label: From Date
+        type: epoch
+        source: ptr
+        isMandatory: true
+        searchClause: AND r.createdtime >= $fromDate
+      - name: toDate
+        label: To Date
+        type: epoch
+        source: ptr
+        isMandatory: true
+        searchClause: AND r.createdtime <= $toDate
+    query: |
+      -- State-wide Pet Status and Segregation Query across all ULBs
+      WITH current_holder AS (
+          SELECT DISTINCT ON (wf.businessid)
+              wf.businessid AS applicationnumber,
+              u.name AS assignee_employee,
+              e.code AS assignee_code,
+              wf.comment AS latest_comment
+            FROM eg_wf_processinstance_v2 wf
+            JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+            LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
+            LEFT JOIN eg_user u ON u.uuid = wa.assignee
+            LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
+            WHERE wf.businessservice = 'ptr'
+            ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+      )
+      SELECT
+          split_part(r.tenantid, '.', 2) AS ulb,
+          r.applicationnumber,
+          r.applicationtype,
+          r.status,
+          pd.petname,
+          pd.pettype,
+          pd.breedtype,
+          pd.petage,
+          pd.petgender,
+          pd.petcolor,
+          pd.identificationmark,
+          pd.vaccinationnumber,
+          pd.doctorname,
+          pd.clinicname,
+          u.name,
+          u.mobilenumber,
+          ch.latest_comment AS status_remarks,
+          ch.assignee_employee,
+          ch.assignee_code
+      FROM eg_ptr_registration AS r
+      LEFT JOIN eg_ptr_owner AS o ON o.ptrregistrationid = r.id
+      LEFT JOIN eg_ptr_petdetails AS pd ON r.id = pd.petdetailsid
+      LEFT JOIN eg_user AS u ON u.uuid = o.uuid
+      LEFT JOIN current_holder ch ON ch.applicationnumber = r.applicationnumber
+      WHERE 1 = 1
+        AND r.tenantid NOT IN ('pb.testing')
+    orderby: ORDER BY r.tenantid, r.createdtime DESC;
