@@ -2417,7 +2417,7 @@ SearchDefinitions:
                WHERE rn = 1
              ) lm
                ON lm.connectionno = wc.ws_connectionno
-             $where AND b.status = 'ACTIVE'
+             $where AND b.status = 'ACTIVE' and b.tenantid = :b.tenantid
            )
            SELECT
              bill_data.*,
