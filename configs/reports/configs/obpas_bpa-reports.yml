@@ -3157,7 +3157,7 @@ ReportDefinitions:
       pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
       source: obpas_bpa
       isMandatory: false
-      searchClause: AND u.district = $district
+      searchClause: AND s.district = $district
 
     - name: ulb
       label: ULB Name
@@ -3165,7 +3165,7 @@ ReportDefinitions:
       pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
       source: obpas_bpa
       isMandatory: false
-      searchClause: AND u.ulb_code = $ulb
+      searchClause: AND s.ulb_code = $ulb
 
   query: |
     WITH all_applications AS (
@@ -3281,50 +3281,83 @@ ReportDefinitions:
             END AS timeline_status
         FROM all_applications app
         LEFT JOIN wf_sla_data ws ON app.applicationno = ws.businessid
+    ),
+    ulb_summary AS (
+        SELECT 
+            u.district,
+            u.name_of_ulb,
+            u.ulb_code,
+            
+            -- Building Plan (BPA)
+            COUNT(CASE WHEN ca.module = 'BPA' THEN 1 END) AS bpa_total,
+            COUNT(CASE WHEN ca.module = 'BPA' AND ca.file_category = 'APPROVED' THEN 1 END) AS bpa_approved,
+            COUNT(CASE WHEN ca.module = 'BPA' AND ca.file_category = 'PENDING' THEN 1 END) AS bpa_pending,
+            COUNT(CASE WHEN ca.module = 'BPA' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN 1 END) AS bpa_within_timeline,
+            COUNT(CASE WHEN ca.module = 'BPA' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN 1 END) AS bpa_beyond_timeline,
+
+            -- NOC
+            COUNT(CASE WHEN ca.module = 'NOC' THEN 1 END) AS noc_total,
+            COUNT(CASE WHEN ca.module = 'NOC' AND ca.file_category = 'APPROVED' THEN 1 END) AS noc_approved,
+            COUNT(CASE WHEN ca.module = 'NOC' AND ca.file_category = 'PENDING' THEN 1 END) AS noc_pending,
+            COUNT(CASE WHEN ca.module = 'NOC' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN 1 END) AS noc_within_timeline,
+            COUNT(CASE WHEN ca.module = 'NOC' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN 1 END) AS noc_beyond_timeline,
+
+            -- CLU
+            COUNT(CASE WHEN ca.module = 'CLU' THEN 1 END) AS clu_total,
+            COUNT(CASE WHEN ca.module = 'CLU' AND ca.file_category = 'APPROVED' THEN 1 END) AS clu_approved,
+            COUNT(CASE WHEN ca.module = 'CLU' AND ca.file_category = 'PENDING' THEN 1 END) AS clu_pending,
+            COUNT(CASE WHEN ca.module = 'CLU' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN 1 END) AS clu_within_timeline,
+            COUNT(CASE WHEN ca.module = 'CLU' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN 1 END) AS clu_beyond_timeline,
+
+            -- Layout
+            COUNT(CASE WHEN ca.module = 'LAYOUT' THEN 1 END) AS layout_total,
+            COUNT(CASE WHEN ca.module = 'LAYOUT' AND ca.file_category = 'APPROVED' THEN 1 END) AS layout_approved,
+            COUNT(CASE WHEN ca.module = 'LAYOUT' AND ca.file_category = 'PENDING' THEN 1 END) AS layout_pending,
+            COUNT(CASE WHEN ca.module = 'LAYOUT' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN 1 END) AS layout_within_timeline,
+            COUNT(CASE WHEN ca.module = 'LAYOUT' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN 1 END) AS layout_beyond_timeline,
+
+            -- Total Across All Modules
+            COUNT(ca.module) AS total_submitted,
+            COUNT(CASE WHEN ca.file_category = 'APPROVED' THEN 1 END) AS total_approved,
+            COUNT(CASE WHEN ca.file_category = 'PENDING' THEN 1 END) AS total_pending,
+            COUNT(CASE WHEN ca.timeline_status = 'WITHIN_TIMELINE' THEN 1 END) AS total_within_timeline,
+            COUNT(CASE WHEN ca.timeline_status = 'BEYOND_TIMELINE' THEN 1 END) AS total_beyond_timeline
+
+        FROM ulb_data u
+        LEFT JOIN classified_applications ca ON u.ulb_code = ca.tenantid
+        WHERE u.ulb_code != 'pb.testing'
+        GROUP BY u.district, u.name_of_ulb, u.ulb_code
     )
     SELECT 
-        DENSE_RANK() OVER (ORDER BY u.district)::int AS district_sno,
-        u.district AS district,
-        ROW_NUMBER() OVER (PARTITION BY u.district ORDER BY u.name_of_ulb)::int AS ulb_sno,
-        u.name_of_ulb AS name_of_ulb,
-        
-        -- Building Plan (BPA)
-        COUNT(CASE WHEN ca.module = 'BPA' THEN 1 END) AS bpa_total,
-        COUNT(CASE WHEN ca.module = 'BPA' AND ca.file_category = 'APPROVED' THEN 1 END) AS bpa_approved,
-        COUNT(CASE WHEN ca.module = 'BPA' AND ca.file_category = 'PENDING' THEN 1 END) AS bpa_pending,
-        COUNT(CASE WHEN ca.module = 'BPA' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN 1 END) AS bpa_within_timeline,
-        COUNT(CASE WHEN ca.module = 'BPA' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN 1 END) AS bpa_beyond_timeline,
-
-        -- NOC
-        COUNT(CASE WHEN ca.module = 'NOC' THEN 1 END) AS noc_total,
-        COUNT(CASE WHEN ca.module = 'NOC' AND ca.file_category = 'APPROVED' THEN 1 END) AS noc_approved,
-        COUNT(CASE WHEN ca.module = 'NOC' AND ca.file_category = 'PENDING' THEN 1 END) AS noc_pending,
-        COUNT(CASE WHEN ca.module = 'NOC' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN 1 END) AS noc_within_timeline,
-        COUNT(CASE WHEN ca.module = 'NOC' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN 1 END) AS noc_beyond_timeline,
-
-        -- CLU
-        COUNT(CASE WHEN ca.module = 'CLU' THEN 1 END) AS clu_total,
-        COUNT(CASE WHEN ca.module = 'CLU' AND ca.file_category = 'APPROVED' THEN 1 END) AS clu_approved,
-        COUNT(CASE WHEN ca.module = 'CLU' AND ca.file_category = 'PENDING' THEN 1 END) AS clu_pending,
-        COUNT(CASE WHEN ca.module = 'CLU' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN 1 END) AS clu_within_timeline,
-        COUNT(CASE WHEN ca.module = 'CLU' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN 1 END) AS clu_beyond_timeline,
-
-        -- Layout
-        COUNT(CASE WHEN ca.module = 'LAYOUT' THEN 1 END) AS layout_total,
-        COUNT(CASE WHEN ca.module = 'LAYOUT' AND ca.file_category = 'APPROVED' THEN 1 END) AS layout_approved,
-        COUNT(CASE WHEN ca.module = 'LAYOUT' AND ca.file_category = 'PENDING' THEN 1 END) AS layout_pending,
-        COUNT(CASE WHEN ca.module = 'LAYOUT' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN 1 END) AS layout_within_timeline,
-        COUNT(CASE WHEN ca.module = 'LAYOUT' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN 1 END) AS layout_beyond_timeline,
-
-        -- Total Across All Modules
-        COUNT(ca.module) AS total_submitted,
-        COUNT(CASE WHEN ca.file_category = 'APPROVED' THEN 1 END) AS total_approved,
-        COUNT(CASE WHEN ca.file_category = 'PENDING' THEN 1 END) AS total_pending,
-        COUNT(CASE WHEN ca.timeline_status = 'WITHIN_TIMELINE' THEN 1 END) AS total_within_timeline,
-        COUNT(CASE WHEN ca.timeline_status = 'BEYOND_TIMELINE' THEN 1 END) AS total_beyond_timeline
-
-    FROM ulb_data u
-    LEFT JOIN classified_applications ca ON u.ulb_code = ca.tenantid
-    WHERE u.ulb_code != 'pb.testing' AND 1=1
-  groupby: GROUP BY u.district, u.name_of_ulb
-  orderby: ORDER BY u.district, u.name_of_ulb
+        DENSE_RANK() OVER (ORDER BY s.district)::int AS district_sno,
+        s.district AS district,
+        ROW_NUMBER() OVER (PARTITION BY s.district ORDER BY s.name_of_ulb)::int AS ulb_sno,
+        s.name_of_ulb AS name_of_ulb,
+        s.bpa_total,
+        s.bpa_approved,
+        s.bpa_pending,
+        s.bpa_within_timeline,
+        s.bpa_beyond_timeline,
+        s.noc_total,
+        s.noc_approved,
+        s.noc_pending,
+        s.noc_within_timeline,
+        s.noc_beyond_timeline,
+        s.clu_total,
+        s.clu_approved,
+        s.clu_pending,
+        s.clu_within_timeline,
+        s.clu_beyond_timeline,
+        s.layout_total,
+        s.layout_approved,
+        s.layout_pending,
+        s.layout_within_timeline,
+        s.layout_beyond_timeline,
+        s.total_submitted,
+        s.total_approved,
+        s.total_pending,
+        s.total_within_timeline,
+        s.total_beyond_timeline
+    FROM ulb_summary s
+    WHERE 1=1
+  orderby: ORDER BY s.district, s.name_of_ulb
