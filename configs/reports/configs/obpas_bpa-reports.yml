@@ -3170,7 +3170,7 @@ ReportDefinitions:
   query: |
     WITH all_applications AS (
         -- 1. Building Plan (BPA)
-        SELECT 
+        SELECT DISTINCT ON (bpa.applicationno)
             bpa.tenantid,
             bpa.applicationno,
             'BPA' AS module,
@@ -3182,13 +3182,14 @@ ReportDefinitions:
         FROM eg_bpa_buildingplan bpa
         WHERE bpa.tenantid != 'pb.testing'
           AND bpa.applicationno LIKE 'PB-%'
-          AND (bpa.additionaldetails->>'isMigrationTrue' IS NULL OR bpa.additionaldetails->>'isMigrationTrue' != 'true')
-          AND bpa.createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
+          AND UPPER(TRIM(bpa.status)) NOT IN ('INITIATED', 'CITIZEN_APPROVAL_INPROCESS', 'PROFESSIONAL_ACTION_REQUIRED', 'PENDING_APPL_FEE')
+          AND (bpa.additionaldetails IS NULL OR bpa.additionaldetails::text NOT LIKE '%isMigrationTrue%')
+        ORDER BY bpa.applicationno, bpa.lastmodifiedtime DESC
 
         UNION ALL
 
         -- 2. NOC
-        SELECT 
+        SELECT DISTINCT ON (n.applicationno)
             n.tenantid,
             n.applicationno,
             'NOC' AS module,
@@ -3202,13 +3203,14 @@ ReportDefinitions:
         WHERE n.tenantid != 'pb.testing'
           AND n.applicationno LIKE 'PB-%'
           AND n.applicationno NOT LIKE 'PB/%'
-          AND (nd.additionaldetails->>'isMigrationTrue' IS NULL OR nd.additionaldetails->>'isMigrationTrue' != 'true')
-          AND n.createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
+          AND UPPER(TRIM(n.applicationstatus)) NOT IN ('INITIATED', 'CITIZEN_APPROVAL_INPROCESS', 'PROFESSIONAL_ACTION_REQUIRED', 'PENDING_APPL_FEE', 'PENDINGPAYMENT', 'PENDINGAPPLICATIONPAYMENT')
+          AND (nd.additionaldetails IS NULL OR nd.additionaldetails::text NOT LIKE '%isMigrationTrue%')
+        ORDER BY n.applicationno, n.lastmodifiedtime DESC
 
         UNION ALL
 
         -- 3. CLU
-        SELECT 
+        SELECT DISTINCT ON (c.applicationno)
             c.tenantid,
             c.applicationno,
             'CLU' AS module,
@@ -3221,13 +3223,14 @@ ReportDefinitions:
         INNER JOIN eg_clu_details cd ON cd.cluid = c.id
         WHERE c.tenantid != 'pb.testing'
           AND c.applicationno LIKE 'PB-%'
-          AND (cd.additionaldetails->>'isMigrationTrue' IS NULL OR cd.additionaldetails->>'isMigrationTrue' != 'true')
-          AND c.createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
+          AND UPPER(TRIM(c.applicationstatus)) NOT IN ('INITIATED', 'CITIZEN_APPROVAL_INPROCESS', 'PROFESSIONAL_ACTION_REQUIRED', 'PENDING_APPL_FEE', 'PENDINGPAYMENT', 'PENDINGAPPLICATIONPAYMENT')
+          AND (cd.additionaldetails IS NULL OR cd.additionaldetails::text NOT LIKE '%isMigrationTrue%')
+        ORDER BY c.applicationno, c.lastmodifiedtime DESC
 
         UNION ALL
 
         -- 4. Layout
-        SELECT 
+        SELECT DISTINCT ON (l.applicationno)
             l.tenantid,
             l.applicationno,
             'LAYOUT' AS module,
@@ -3240,8 +3243,9 @@ ReportDefinitions:
         INNER JOIN eg_layout_details ld ON ld.layoutid = l.id
         WHERE l.tenantid != 'pb.testing'
           AND l.applicationno LIKE 'PB-%'
-          AND (ld.additionaldetails->>'isMigrationTrue' IS NULL OR ld.additionaldetails->>'isMigrationTrue' != 'true')
-          AND l.createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
+          AND UPPER(TRIM(l.applicationstatus)) NOT IN ('INITIATED', 'CITIZEN_APPROVAL_INPROCESS', 'PROFESSIONAL_ACTION_REQUIRED', 'PENDING_APPL_FEE', 'PENDINGPAYMENT', 'PENDINGAPPLICATIONPAYMENT')
+          AND (ld.additionaldetails IS NULL OR ld.additionaldetails::text NOT LIKE '%isMigrationTrue%')
+        ORDER BY l.applicationno, l.lastmodifiedtime DESC
     ),
     pending_applications AS (
         SELECT applicationno, module
