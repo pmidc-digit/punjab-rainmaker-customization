@@ -3170,7 +3170,7 @@ ReportDefinitions:
   query: |
     WITH all_applications AS (
         -- 1. Building Plan (BPA)
-        SELECT DISTINCT ON (bpa.applicationno)
+        SELECT 
             bpa.tenantid,
             bpa.applicationno,
             'BPA' AS module,
@@ -3184,12 +3184,11 @@ ReportDefinitions:
           AND bpa.applicationno LIKE 'PB-%'
           AND UPPER(TRIM(bpa.status)) NOT IN ('INITIATED', 'CITIZEN_APPROVAL_INPROCESS', 'PROFESSIONAL_ACTION_REQUIRED', 'PENDING_APPL_FEE')
           AND (bpa.additionaldetails IS NULL OR bpa.additionaldetails::text NOT LIKE '%isMigrationTrue%')
-        ORDER BY bpa.applicationno, bpa.lastmodifiedtime DESC
 
         UNION ALL
 
         -- 2. NOC
-        SELECT DISTINCT ON (n.applicationno)
+        SELECT 
             n.tenantid,
             n.applicationno,
             'NOC' AS module,
@@ -3205,12 +3204,11 @@ ReportDefinitions:
           AND n.applicationno NOT LIKE 'PB/%'
           AND UPPER(TRIM(n.applicationstatus)) NOT IN ('INITIATED', 'CITIZEN_APPROVAL_INPROCESS', 'PROFESSIONAL_ACTION_REQUIRED', 'PENDING_APPL_FEE', 'PENDINGPAYMENT', 'PENDINGAPPLICATIONPAYMENT')
           AND (nd.additionaldetails IS NULL OR nd.additionaldetails::text NOT LIKE '%isMigrationTrue%')
-        ORDER BY n.applicationno, n.lastmodifiedtime DESC
 
         UNION ALL
 
         -- 3. CLU
-        SELECT DISTINCT ON (c.applicationno)
+        SELECT 
             c.tenantid,
             c.applicationno,
             'CLU' AS module,
@@ -3225,12 +3223,11 @@ ReportDefinitions:
           AND c.applicationno LIKE 'PB-%'
           AND UPPER(TRIM(c.applicationstatus)) NOT IN ('INITIATED', 'CITIZEN_APPROVAL_INPROCESS', 'PROFESSIONAL_ACTION_REQUIRED', 'PENDING_APPL_FEE', 'PENDINGPAYMENT', 'PENDINGAPPLICATIONPAYMENT')
           AND (cd.additionaldetails IS NULL OR cd.additionaldetails::text NOT LIKE '%isMigrationTrue%')
-        ORDER BY c.applicationno, c.lastmodifiedtime DESC
 
         UNION ALL
 
         -- 4. Layout
-        SELECT DISTINCT ON (l.applicationno)
+        SELECT 
             l.tenantid,
             l.applicationno,
             'LAYOUT' AS module,
@@ -3245,7 +3242,6 @@ ReportDefinitions:
           AND l.applicationno LIKE 'PB-%'
           AND UPPER(TRIM(l.applicationstatus)) NOT IN ('INITIATED', 'CITIZEN_APPROVAL_INPROCESS', 'PROFESSIONAL_ACTION_REQUIRED', 'PENDING_APPL_FEE', 'PENDINGPAYMENT', 'PENDINGAPPLICATIONPAYMENT')
           AND (ld.additionaldetails IS NULL OR ld.additionaldetails::text NOT LIKE '%isMigrationTrue%')
-        ORDER BY l.applicationno, l.lastmodifiedtime DESC
     ),
     pending_applications AS (
         SELECT applicationno, module
@@ -3270,6 +3266,7 @@ ReportDefinitions:
     classified_applications AS (
         SELECT 
             app.tenantid,
+            app.applicationno,
             app.module,
             app.file_category,
             CASE 
@@ -3293,39 +3290,39 @@ ReportDefinitions:
             u.ulb_code,
             
             -- Building Plan (BPA)
-            COUNT(CASE WHEN ca.module = 'BPA' THEN 1 END) AS bpa_total,
-            COUNT(CASE WHEN ca.module = 'BPA' AND ca.file_category = 'APPROVED' THEN 1 END) AS bpa_approved,
-            COUNT(CASE WHEN ca.module = 'BPA' AND ca.file_category = 'PENDING' THEN 1 END) AS bpa_pending,
-            COUNT(CASE WHEN ca.module = 'BPA' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN 1 END) AS bpa_within_timeline,
-            COUNT(CASE WHEN ca.module = 'BPA' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN 1 END) AS bpa_beyond_timeline,
+            COUNT(DISTINCT CASE WHEN ca.module = 'BPA' THEN ca.applicationno END) AS bpa_total,
+            COUNT(DISTINCT CASE WHEN ca.module = 'BPA' AND ca.file_category = 'APPROVED' THEN ca.applicationno END) AS bpa_approved,
+            COUNT(DISTINCT CASE WHEN ca.module = 'BPA' AND ca.file_category = 'PENDING' THEN ca.applicationno END) AS bpa_pending,
+            COUNT(DISTINCT CASE WHEN ca.module = 'BPA' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN ca.applicationno END) AS bpa_within_timeline,
+            COUNT(DISTINCT CASE WHEN ca.module = 'BPA' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN ca.applicationno END) AS bpa_beyond_timeline,
 
             -- NOC
-            COUNT(CASE WHEN ca.module = 'NOC' THEN 1 END) AS noc_total,
-            COUNT(CASE WHEN ca.module = 'NOC' AND ca.file_category = 'APPROVED' THEN 1 END) AS noc_approved,
-            COUNT(CASE WHEN ca.module = 'NOC' AND ca.file_category = 'PENDING' THEN 1 END) AS noc_pending,
-            COUNT(CASE WHEN ca.module = 'NOC' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN 1 END) AS noc_within_timeline,
-            COUNT(CASE WHEN ca.module = 'NOC' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN 1 END) AS noc_beyond_timeline,
+            COUNT(DISTINCT CASE WHEN ca.module = 'NOC' THEN ca.applicationno END) AS noc_total,
+            COUNT(DISTINCT CASE WHEN ca.module = 'NOC' AND ca.file_category = 'APPROVED' THEN ca.applicationno END) AS noc_approved,
+            COUNT(DISTINCT CASE WHEN ca.module = 'NOC' AND ca.file_category = 'PENDING' THEN ca.applicationno END) AS noc_pending,
+            COUNT(DISTINCT CASE WHEN ca.module = 'NOC' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN ca.applicationno END) AS noc_within_timeline,
+            COUNT(DISTINCT CASE WHEN ca.module = 'NOC' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN ca.applicationno END) AS noc_beyond_timeline,
 
             -- CLU
-            COUNT(CASE WHEN ca.module = 'CLU' THEN 1 END) AS clu_total,
-            COUNT(CASE WHEN ca.module = 'CLU' AND ca.file_category = 'APPROVED' THEN 1 END) AS clu_approved,
-            COUNT(CASE WHEN ca.module = 'CLU' AND ca.file_category = 'PENDING' THEN 1 END) AS clu_pending,
-            COUNT(CASE WHEN ca.module = 'CLU' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN 1 END) AS clu_within_timeline,
-            COUNT(CASE WHEN ca.module = 'CLU' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN 1 END) AS clu_beyond_timeline,
+            COUNT(DISTINCT CASE WHEN ca.module = 'CLU' THEN ca.applicationno END) AS clu_total,
+            COUNT(DISTINCT CASE WHEN ca.module = 'CLU' AND ca.file_category = 'APPROVED' THEN ca.applicationno END) AS clu_approved,
+            COUNT(DISTINCT CASE WHEN ca.module = 'CLU' AND ca.file_category = 'PENDING' THEN ca.applicationno END) AS clu_pending,
+            COUNT(DISTINCT CASE WHEN ca.module = 'CLU' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN ca.applicationno END) AS clu_within_timeline,
+            COUNT(DISTINCT CASE WHEN ca.module = 'CLU' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN ca.applicationno END) AS clu_beyond_timeline,
 
             -- Layout
-            COUNT(CASE WHEN ca.module = 'LAYOUT' THEN 1 END) AS layout_total,
-            COUNT(CASE WHEN ca.module = 'LAYOUT' AND ca.file_category = 'APPROVED' THEN 1 END) AS layout_approved,
-            COUNT(CASE WHEN ca.module = 'LAYOUT' AND ca.file_category = 'PENDING' THEN 1 END) AS layout_pending,
-            COUNT(CASE WHEN ca.module = 'LAYOUT' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN 1 END) AS layout_within_timeline,
-            COUNT(CASE WHEN ca.module = 'LAYOUT' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN 1 END) AS layout_beyond_timeline,
+            COUNT(DISTINCT CASE WHEN ca.module = 'LAYOUT' THEN ca.applicationno END) AS layout_total,
+            COUNT(DISTINCT CASE WHEN ca.module = 'LAYOUT' AND ca.file_category = 'APPROVED' THEN ca.applicationno END) AS layout_approved,
+            COUNT(DISTINCT CASE WHEN ca.module = 'LAYOUT' AND ca.file_category = 'PENDING' THEN ca.applicationno END) AS layout_pending,
+            COUNT(DISTINCT CASE WHEN ca.module = 'LAYOUT' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN ca.applicationno END) AS layout_within_timeline,
+            COUNT(DISTINCT CASE WHEN ca.module = 'LAYOUT' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN ca.applicationno END) AS layout_beyond_timeline,
 
             -- Total Across All Modules
-            COUNT(ca.module) AS total_submitted,
-            COUNT(CASE WHEN ca.file_category = 'APPROVED' THEN 1 END) AS total_approved,
-            COUNT(CASE WHEN ca.file_category = 'PENDING' THEN 1 END) AS total_pending,
-            COUNT(CASE WHEN ca.timeline_status = 'WITHIN_TIMELINE' THEN 1 END) AS total_within_timeline,
-            COUNT(CASE WHEN ca.timeline_status = 'BEYOND_TIMELINE' THEN 1 END) AS total_beyond_timeline
+            COUNT(DISTINCT ca.applicationno) AS total_submitted,
+            COUNT(DISTINCT CASE WHEN ca.file_category = 'APPROVED' THEN ca.applicationno END) AS total_approved,
+            COUNT(DISTINCT CASE WHEN ca.file_category = 'PENDING' THEN ca.applicationno END) AS total_pending,
+            COUNT(DISTINCT CASE WHEN ca.timeline_status = 'WITHIN_TIMELINE' THEN ca.applicationno END) AS total_within_timeline,
+            COUNT(DISTINCT CASE WHEN ca.timeline_status = 'BEYOND_TIMELINE' THEN ca.applicationno END) AS total_beyond_timeline
 
         FROM ulb_data u
         LEFT JOIN classified_applications ca ON u.ulb_code = ca.tenantid
