@@ -3171,8 +3171,12 @@ ReportDefinitions:
     WITH all_applications AS (
         -- 1. Building Plan (BPA)
         SELECT 
-            bpa.tenantid,
+            CASE 
+                WHEN bpa.tenantid LIKE 'pb.it%' THEN REPLACE(bpa.tenantid, 'pb.it', 'pb.')
+                ELSE bpa.tenantid 
+            END AS tenantid,
             bpa.applicationno,
+            bpa.createdtime AS app_createdtime,
             'BPA' AS module,
             CASE 
                 WHEN UPPER(TRIM(bpa.status)) = 'APPROVED' THEN 'APPROVED'
@@ -3189,8 +3193,12 @@ ReportDefinitions:
 
         -- 2. NOC
         SELECT 
-            n.tenantid,
+            CASE 
+                WHEN n.tenantid LIKE 'pb.it%' THEN REPLACE(n.tenantid, 'pb.it', 'pb.')
+                ELSE n.tenantid 
+            END AS tenantid,
             n.applicationno,
+            n.createdtime AS app_createdtime,
             'NOC' AS module,
             CASE 
                 WHEN UPPER(TRIM(n.applicationstatus)) = 'APPROVED' THEN 'APPROVED'
@@ -3209,8 +3217,12 @@ ReportDefinitions:
 
         -- 3. CLU
         SELECT 
-            c.tenantid,
+            CASE 
+                WHEN c.tenantid LIKE 'pb.it%' THEN REPLACE(c.tenantid, 'pb.it', 'pb.')
+                ELSE c.tenantid 
+            END AS tenantid,
             c.applicationno,
+            c.createdtime AS app_createdtime,
             'CLU' AS module,
             CASE 
                 WHEN UPPER(TRIM(c.applicationstatus)) = 'APPROVED' THEN 'APPROVED'
@@ -3228,8 +3240,12 @@ ReportDefinitions:
 
         -- 4. Layout
         SELECT 
-            l.tenantid,
+            CASE 
+                WHEN l.tenantid LIKE 'pb.it%' THEN REPLACE(l.tenantid, 'pb.it', 'pb.')
+                ELSE l.tenantid 
+            END AS tenantid,
             l.applicationno,
+            l.createdtime AS app_createdtime,
             'LAYOUT' AS module,
             CASE 
                 WHEN UPPER(TRIM(l.applicationstatus)) = 'APPROVED' THEN 'APPROVED'
@@ -3251,12 +3267,15 @@ ReportDefinitions:
     wf_sla_data AS (
         SELECT 
             wf.businessid,
-            MIN(CASE 
-                WHEN wf.businessservice = 'BPA_LOW' AND st.applicationstatus = 'PENDINGINITIALVERIFICATION' THEN wf.createdtime
-                WHEN st.applicationstatus = 'FIELDINSPECTION_INPROGRESS' THEN wf.createdtime
-                ELSE NULL 
-            END) AS sla_start_time,
-            MAX(bs.businessservicesla) AS sla_limit
+            COALESCE(
+                MIN(CASE 
+                    WHEN wf.businessservice = 'BPA_LOW' AND st.applicationstatus = 'PENDINGINITIALVERIFICATION' THEN wf.createdtime
+                    WHEN st.applicationstatus IN ('FIELDINSPECTION_INPROGRESS', 'DOC_VERIFICATION_PENDING', 'DOCUMENTVERIFY') THEN wf.createdtime
+                    ELSE NULL 
+                END),
+                MIN(wf.createdtime)
+            ) AS sla_start_time,
+            COALESCE(MAX(bs.businessservicesla), 2592000000) AS sla_limit
         FROM eg_wf_processinstance_v2 wf
         JOIN eg_wf_state_v2 st ON wf.status = st.uuid
         LEFT JOIN eg_wf_businessservice_v2 bs ON wf.businessservice = bs.businessservice
@@ -3272,9 +3291,7 @@ ReportDefinitions:
             CASE 
                 WHEN app.file_category = 'PENDING' THEN
                     CASE 
-                        WHEN ws.sla_start_time IS NOT NULL 
-                             AND ws.sla_limit IS NOT NULL 
-                             AND (EXTRACT(EPOCH FROM NOW()) * 1000 - ws.sla_start_time) > ws.sla_limit 
+                        WHEN (EXTRACT(EPOCH FROM NOW()) * 1000 - COALESCE(ws.sla_start_time, app.app_createdtime)) > COALESCE(ws.sla_limit, 2592000000)
                         THEN 'BEYOND_TIMELINE'
                         ELSE 'WITHIN_TIMELINE'
                     END
@@ -3285,8 +3302,11 @@ ReportDefinitions:
     ),
     ulb_summary AS (
         SELECT 
-            u.district,
-            u.name_of_ulb,
+            CASE 
+                WHEN LOWER(TRIM(u.district)) = 'kapurthala' THEN 'Kapurthala'
+                ELSE TRIM(u.district)
+            END AS district,
+            TRIM(u.name_of_ulb) AS name_of_ulb,
             u.ulb_code,
             
             -- Building Plan (BPA)
@@ -3327,7 +3347,13 @@ ReportDefinitions:
         FROM ulb_data u
         LEFT JOIN classified_applications ca ON u.ulb_code = ca.tenantid
         WHERE u.ulb_code != 'pb.testing'
-        GROUP BY u.district, u.name_of_ulb, u.ulb_code
+        GROUP BY 
+            CASE 
+                WHEN LOWER(TRIM(u.district)) = 'kapurthala' THEN 'Kapurthala'
+                ELSE TRIM(u.district)
+            END,
+            TRIM(u.name_of_ulb),
+            u.ulb_code
     )
     SELECT 
         DENSE_RANK() OVER (ORDER BY s.district)::int AS district_sno,
