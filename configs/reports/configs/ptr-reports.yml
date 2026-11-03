@@ -1453,8 +1453,18 @@ ReportDefinitions:
         type: string
         source: ptr
         total: false
+      - name: petregistrationnumber
+        label: Pet Registration Number
+        type: string
+        source: ptr
+        total: false
       - name: applicationtype
         label: Application Type
+        type: string
+        source: ptr
+        total: false
+      - name: previousapplicationnumber
+        label: Previous Application Number
         type: string
         source: ptr
         total: false
@@ -1549,10 +1559,10 @@ ReportDefinitions:
       - name: applicationtype
         label: Application Type
         type: singlevaluelist
-        pattern: list://ALL:ALL,NEWAPPLICATION:NEWAPPLICATION,RENEWAPPLICATION:RENEWAPPLICATION
+        pattern: list://ALL:All,NEWAPPLICATION:New Pet Registration Applications,RENEWAPPLICATION:Renewed Pet Registration Applications
         source: ptr
         isMandatory: false
-        searchClause: AND ($applicationtype = 'ALL' OR r.applicationtype = $applicationtype)
+        searchClause: AND ($applicationtype = 'ALL' OR ($applicationtype = 'NEWAPPLICATION' AND (UPPER(COALESCE(r.applicationtype, '')) IN ('NEWAPPLICATION', 'NEW') OR (r.applicationtype IS NULL AND r.previousapplicationnumber IS NULL AND r.status != 'RENEWED'))) OR ($applicationtype = 'RENEWAPPLICATION' AND (UPPER(COALESCE(r.applicationtype, '')) IN ('RENEWAPPLICATION', 'RENEW', 'RENEWAL') OR r.previousapplicationnumber IS NOT NULL OR r.status = 'RENEWED')))
       - name: petgender
         label: Sex of Pet
         type: singlevaluelist
@@ -1563,7 +1573,7 @@ ReportDefinitions:
       - name: status
         label: Status
         type: singlevaluelist
-        pattern: list://ALL:ALL,INITIATED:INITIATED,DOCUMENTVERIFY:DOCUMENTVERIFY,PENDINGAPPROVAL:PENDINGAPPROVAL,PENDINGPAYMENT:PENDINGPAYMENT,APPROVED:APPROVED,REJECTED:REJECTED,DECEASED:DECEASED,REVOKED:REVOKED,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
+        pattern: list://ALL:ALL,INITIATED:INITIATED,DOCUMENTVERIFY:DOCUMENTVERIFY,PENDINGAPPROVAL:PENDINGAPPROVAL,PENDINGPAYMENT:PENDINGPAYMENT,APPROVED:APPROVED,REJECTED:REJECTED,RENEWED:RENEWED,DECEASED:DECEASED,REVOKED:REVOKED,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
         source: ptr
         isMandatory: false
         searchClause: AND ($status = 'ALL' OR r.status = $status)
@@ -1598,7 +1608,15 @@ ReportDefinitions:
       SELECT
           split_part(r.tenantid, '.', 2) AS ulb,
           r.applicationnumber,
-          r.applicationtype,
+          r.petregistrationnumber,
+          CASE
+              WHEN UPPER(COALESCE(r.applicationtype, '')) IN ('RENEWAPPLICATION', 'RENEW', 'RENEWAL')
+                   OR r.previousapplicationnumber IS NOT NULL
+                   OR r.status = 'RENEWED'
+              THEN 'Renewed Pet Registration'
+              ELSE 'New Pet Registration'
+          END AS applicationtype,
+          r.previousapplicationnumber,
           r.status,
           pd.petname,
           pd.pettype,
