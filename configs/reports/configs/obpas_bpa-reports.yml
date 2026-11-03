@@ -1603,9 +1603,6 @@ ReportDefinitions:
   groupby: GROUP BY u.district, u.name_of_ulb,ub.applicationstatus,ub.uuid
   orderby: ORDER BY u.district, u.name_of_ulb ,ub.applicationstatus,ub.uuid DESC        
 
-
-
-  ReportDefinitions:
 - reportName: UserLoginDetailReportBPA
   decryptionPathId: LAYOUTREPORTS
   summary: User login details with BPA, CLU, Layout & NOC
@@ -2995,336 +2992,399 @@ ReportDefinitions:
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
     print:
-      pdfPageSize: A1
+      pdfPageSize: A4
   sourceColumns:
-  - name: ulb_type_label
-    label: ULB Type
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: district
-    label: District
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: ulb_name
-    label: ULB Name
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: bp_sub
-    label: Building Plan - Total Files Submitted
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: bp_app
-    label: Building Plan - Approved
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: bp_pen
-    label: Building Plan - Pending
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: bp_in
-    label: Building Plan - Within Timeline
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: bp_out
-    label: Building Plan - Beyond Timeline
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: noc_sub
-    label: NOC - Total Files Submitted
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: noc_app
-    label: NOC - Approved
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: noc_pen
-    label: NOC - Pending
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: noc_in
-    label: NOC - Within Timeline
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: noc_out
-    label: NOC - Beyond Timeline
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: clu_sub
-    label: CLU - Total Files Submitted
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: clu_app
-    label: CLU - Approved
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: clu_pen
-    label: CLU - Pending
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: clu_in
-    label: CLU - Within Timeline
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: clu_out
-    label: CLU - Beyond Timeline
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: lay_sub
-    label: Layout - Total Files Submitted
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: lay_app
-    label: Layout - Approved
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: lay_pen
-    label: Layout - Pending
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: lay_in
-    label: Layout - Within Timeline
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: lay_out
-    label: Layout - Beyond Timeline
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: t_sub
-    label: Total - Files Submitted
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: t_app
-    label: Total - Approved
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: t_pen
-    label: Total - Pending
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: t_in
-    label: Total - Within Timeline
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: t_out
-    label: Total - Beyond Timeline
-    type: string
-    source: obpas_bpa
-    total: false
+    - name: district_sno
+      label: "#"
+      type: number
+      source: obpas_bpa
+      total: false
+    - name: district
+      label: District
+      type: string
+      source: obpas_bpa
+      total: false
+    - name: ulb_sno
+      label: "ULB #"
+      type: number
+      source: obpas_bpa
+      total: false
+    - name: name_of_ulb
+      label: Name of ULB
+      type: string
+      source: obpas_bpa
+      total: false
+
+    # --- Module 1: Building Plan (BPA) ---
+    - name: bpa_total
+      label: Building Plan - Total Files Submitted
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: bpa_approved
+      label: Building Plan - Approved
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: bpa_pending
+      label: Building Plan - Pending
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: bpa_within_timeline
+      label: Building Plan - Within Timeline
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: bpa_beyond_timeline
+      label: Building Plan - Beyond Timeline
+      type: number
+      source: obpas_bpa
+      total: true
+
+    # --- Module 2: NOC ---
+    - name: noc_total
+      label: NOC - Total Files Submitted
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: noc_approved
+      label: NOC - Approved
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: noc_pending
+      label: NOC - Pending
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: noc_within_timeline
+      label: NOC - Within Timeline
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: noc_beyond_timeline
+      label: NOC - Beyond Timeline
+      type: number
+      source: obpas_bpa
+      total: true
+
+    # --- Module 3: CLU ---
+    - name: clu_total
+      label: CLU - Total Files Submitted
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: clu_approved
+      label: CLU - Approved
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: clu_pending
+      label: CLU - Pending
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: clu_within_timeline
+      label: CLU - Within Timeline
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: clu_beyond_timeline
+      label: CLU - Beyond Timeline
+      type: number
+      source: obpas_bpa
+      total: true
+
+    # --- Module 4: Layout ---
+    - name: layout_total
+      label: Layout - Total Files Submitted
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: layout_approved
+      label: Layout - Approved
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: layout_pending
+      label: Layout - Pending
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: layout_within_timeline
+      label: Layout - Within Timeline
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: layout_beyond_timeline
+      label: Layout - Beyond Timeline
+      type: number
+      source: obpas_bpa
+      total: true
+
+    # --- Total Across All Modules ---
+    - name: total_submitted
+      label: Total - Files Submitted
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: total_approved
+      label: Total - Approved
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: total_pending
+      label: Total - Pending
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: total_within_timeline
+      label: Total - Within Timeline
+      type: number
+      source: obpas_bpa
+      total: true
+    - name: total_beyond_timeline
+      label: Total - Beyond Timeline
+      type: number
+      source: obpas_bpa
+      total: true
+
   searchParams:
-  - name: fromDate
-    label: From Date
-    type: epoch
-    source: obpas_bpa
-    isMandatory: true
-    searchClause: AND bpa.createdtime >= $fromDate
-  - name: toDate
-    label: To Date
-    type: epoch
-    source: obpas_bpa
-    isMandatory: true
-    searchClause: AND bpa.createdtime <= $toDate
-  - name: ulbtype
-    label: ULB Type
-    type: singlevaluelist
-    pattern: 'list://ALL:All,Nagar Panchayat:Nagar Panchayat,MC Class I:MC Class I,MC Class II:MC Class II,MC Class III:MC Class III,Municipal Corporation:Municipal Corporation'
-    source: obpas_bpa
-    isMandatory: false
-    searchClause: AND ($ulbtype = 'ALL' OR u.type = $ulbtype)
-  - name: district
-    label: District
-    type: singlevaluelist
-    pattern: 'list://ALL:All,Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
-    source: obpas_bpa
-    isMandatory: false
-    searchClause: AND ($district = 'ALL' OR u.district = $district)
+    - name: district
+      label: District
+      type: singlevaluelist
+      pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
+      source: obpas_bpa
+      isMandatory: false
+      searchClause: AND s.district = $district
+
+    - name: ulb
+      label: ULB Name
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: obpas_bpa
+      isMandatory: false
+      searchClause: AND s.ulb_code = $ulb
+
   query: |
-      WITH params AS (
-        SELECT (EXTRACT(EPOCH FROM ((d.to_dt + 1)::timestamp AT TIME ZONE 'Asia/Kolkata')) * 1000)::bigint - 1 AS end_ms
-        FROM (SELECT (to_timestamp($toDate / 1000.0) AT TIME ZONE 'Asia/Kolkata')::date AS to_dt) d
-      ),
-      -- 1. One row per application. Every AND/OR is parenthesised; EXISTS/NOT EXISTS avoids join fan-out.
-      combined_modules AS (
-        SELECT 'Building Plan' AS module, b.tenantid, b.applicationno
-        FROM eg_bpa_buildingplan b
-        WHERE b.tenantid != 'pb.testing'
-          AND b.applicationno LIKE 'PB-%'
-          AND b.createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
-          AND (b.additionaldetails IS NULL OR b.additionaldetails::text NOT LIKE '%isMigrationTrue%')
+    WITH all_applications AS (
+        -- 1. Building Plan (BPA)
+        SELECT 
+            CASE 
+                WHEN bpa.tenantid LIKE 'pb.it%' THEN REPLACE(bpa.tenantid, 'pb.it', 'pb.')
+                ELSE bpa.tenantid 
+            END AS tenantid,
+            bpa.applicationno,
+            bpa.createdtime AS app_createdtime,
+            'BPA' AS module,
+            CASE 
+                WHEN UPPER(TRIM(bpa.status)) = 'APPROVED' THEN 'APPROVED'
+                WHEN UPPER(TRIM(bpa.status)) IN ('REJECTED', 'CANCELLED') THEN 'TERMINAL_OTHER'
+                ELSE 'PENDING'
+            END AS file_category
+        FROM eg_bpa_buildingplan bpa
+        WHERE bpa.tenantid != 'pb.testing'
+          AND bpa.applicationno LIKE 'PB-%'
+          AND UPPER(TRIM(bpa.status)) NOT IN ('INITIATED', 'CITIZEN_APPROVAL_INPROCESS', 'PROFESSIONAL_ACTION_REQUIRED', 'PENDING_APPL_FEE')
+          AND (bpa.additionaldetails IS NULL OR bpa.additionaldetails::text NOT LIKE '%isMigrationTrue%')
+
         UNION ALL
-        SELECT 'NOC', n.tenantid, n.applicationno
+
+        -- 2. NOC
+        SELECT 
+            CASE 
+                WHEN n.tenantid LIKE 'pb.it%' THEN REPLACE(n.tenantid, 'pb.it', 'pb.')
+                ELSE n.tenantid 
+            END AS tenantid,
+            n.applicationno,
+            n.createdtime AS app_createdtime,
+            'NOC' AS module,
+            CASE 
+                WHEN UPPER(TRIM(n.applicationstatus)) = 'APPROVED' THEN 'APPROVED'
+                WHEN UPPER(TRIM(n.applicationstatus)) IN ('REJECTED', 'CANCELLED') THEN 'TERMINAL_OTHER'
+                ELSE 'PENDING'
+            END AS file_category
         FROM eg_noc n
+        INNER JOIN eg_noc_details nd ON nd.nocid = n.id
         WHERE n.tenantid != 'pb.testing'
+          AND n.applicationno LIKE 'PB-%'
           AND n.applicationno NOT LIKE 'PB/%'
-          AND n.createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
-          AND EXISTS (SELECT 1 FROM eg_noc_details d WHERE d.nocid = n.id)
-          AND NOT EXISTS (SELECT 1 FROM eg_noc_details d WHERE d.nocid = n.id AND d.additionaldetails::text LIKE '%isMigrationTrue%')
+          AND UPPER(TRIM(n.applicationstatus)) NOT IN ('INITIATED', 'CITIZEN_APPROVAL_INPROCESS', 'PROFESSIONAL_ACTION_REQUIRED', 'PENDING_APPL_FEE', 'PENDINGPAYMENT', 'PENDINGAPPLICATIONPAYMENT')
+          AND (nd.additionaldetails IS NULL OR nd.additionaldetails::text NOT LIKE '%isMigrationTrue%')
+
         UNION ALL
-        SELECT 'CLU', c.tenantid, c.applicationno
+
+        -- 3. CLU
+        SELECT 
+            CASE 
+                WHEN c.tenantid LIKE 'pb.it%' THEN REPLACE(c.tenantid, 'pb.it', 'pb.')
+                ELSE c.tenantid 
+            END AS tenantid,
+            c.applicationno,
+            c.createdtime AS app_createdtime,
+            'CLU' AS module,
+            CASE 
+                WHEN UPPER(TRIM(c.applicationstatus)) = 'APPROVED' THEN 'APPROVED'
+                WHEN UPPER(TRIM(c.applicationstatus)) IN ('REJECTED', 'CANCELLED') THEN 'TERMINAL_OTHER'
+                ELSE 'PENDING'
+            END AS file_category
         FROM eg_clu c
+        INNER JOIN eg_clu_details cd ON cd.cluid = c.id
         WHERE c.tenantid != 'pb.testing'
           AND c.applicationno LIKE 'PB-%'
-          AND c.createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
-          AND EXISTS (SELECT 1 FROM eg_clu_details d WHERE d.cluid = c.id)
-          AND NOT EXISTS (SELECT 1 FROM eg_clu_details d WHERE d.cluid = c.id AND d.additionaldetails::text LIKE '%isMigrationTrue%')
+          AND UPPER(TRIM(c.applicationstatus)) NOT IN ('INITIATED', 'CITIZEN_APPROVAL_INPROCESS', 'PROFESSIONAL_ACTION_REQUIRED', 'PENDING_APPL_FEE', 'PENDINGPAYMENT', 'PENDINGAPPLICATIONPAYMENT')
+          AND (cd.additionaldetails IS NULL OR cd.additionaldetails::text NOT LIKE '%isMigrationTrue%')
+
         UNION ALL
-        SELECT 'Layout', l.tenantid, l.applicationno
+
+        -- 4. Layout
+        SELECT 
+            CASE 
+                WHEN l.tenantid LIKE 'pb.it%' THEN REPLACE(l.tenantid, 'pb.it', 'pb.')
+                ELSE l.tenantid 
+            END AS tenantid,
+            l.applicationno,
+            l.createdtime AS app_createdtime,
+            'LAYOUT' AS module,
+            CASE 
+                WHEN UPPER(TRIM(l.applicationstatus)) = 'APPROVED' THEN 'APPROVED'
+                WHEN UPPER(TRIM(l.applicationstatus)) IN ('REJECTED', 'CANCELLED') THEN 'TERMINAL_OTHER'
+                ELSE 'PENDING'
+            END AS file_category
         FROM eg_layout l
+        INNER JOIN eg_layout_details ld ON ld.layoutid = l.id
         WHERE l.tenantid != 'pb.testing'
           AND l.applicationno LIKE 'PB-%'
-          AND l.createdby != '9ff4f498-46b0-4d7b-b833-874a8b1d0c27'
-          AND EXISTS (SELECT 1 FROM eg_layout_details d WHERE d.layoutid = l.id)
-          AND NOT EXISTS (SELECT 1 FROM eg_layout_details d WHERE d.layoutid = l.id AND d.additionaldetails::text LIKE '%isMigrationTrue%')
-      ),
-      -- 2. Workflow history up to end of the as-on day (same tables the existing SLA reports use)
-      wf AS (
-        SELECT m.module, m.applicationno, m.tenantid, pi.businessservice, pi.createdtime,
-               UPPER(TRIM(s.applicationstatus)) AS st,
-               COALESCE(s.isterminatestate, false) AS term
-        FROM combined_modules m
-        CROSS JOIN params p
-        JOIN eg_wf_processinstance_v2 pi
-               ON pi.businessid = m.applicationno AND pi.tenantid = m.tenantid AND pi.createdtime <= p.end_ms
-        JOIN eg_wf_state_v2 s ON s.uuid = pi.status
-      ),
-      -- 3. Status as on date = latest transition on or before the as-on date
-      latest AS (
-        SELECT DISTINCT ON (module, applicationno, tenantid)
-               module, applicationno, tenantid, businessservice, st, term,
-               MIN(createdtime) OVER (PARTITION BY module, applicationno, tenantid) AS first_ms
-        FROM wf
-        ORDER BY module, applicationno, tenantid, createdtime DESC
-      ),
-      -- 4a. STATUS RULES (verified against workflow data). category: NOT_SUBMITTED | APPROVED | CLOSED | PENDING
-      --     clock_runs = false => file is pending but never counted Beyond Timeline (SLA clock stopped).
-      --     Any status not listed falls back to PENDING / clock running (or CLOSED if workflow-terminal).
-      status_rules AS (
-        SELECT * FROM (VALUES
-          ('INITIATED',                 'NOT_SUBMITTED', true),
-          ('PENDING_APPL_FEE',          'NOT_SUBMITTED', true),   -- [DECISION 1] application-fee wait: counted as submitted or not
-          ('PENDINGAPPLICATIONPAYMENT', 'NOT_SUBMITTED', true),   -- [DECISION 1]
-          ('PENDING_APPL_FEE_PAYMENT',  'NOT_SUBMITTED', true),   -- [DECISION 1]
-          ('CITIZEN_APPROVAL_INPROCESS','NOT_SUBMITTED', true),   -- existing SLA report excludes it
-          ('APPROVED',                  'APPROVED',      true),
-          ('E-SIGNED',                  'APPROVED',      true),   -- verified: APPROVED -> E-SIGNED, workflow-terminal
-          ('E_SIGNED',                  'APPROVED',      true),
-          ('ESIGNED',                   'APPROVED',      true),
-          ('CANCELLED',                 'CLOSED',        true),   -- verified terminal
-          ('REJECTED',                  'CLOSED',        true),   -- [CONFIRM] not seen in your 4.1 results
-          ('BLOCKED',                   'CLOSED',        true),   -- [CONFIRM] not seen in your 4.1 results
-          ('PENDING_SANC_FEE_PAYMENT',  'PENDING',       false),  -- existing reports stop the clock here
-          ('PENDINGSANCTIONPAYMENT',    'PENDING',       false)
-        ) AS t(st, category, clock_runs)
-      ),
-      -- 4b. SLA START RULES. SLA length itself comes from eg_wf_businessservice_v2.businessservicesla (BPA 10d, CLU 10d, NOC 32d).
-      --     '*' = any businessservice of that module.
-      sla_start_rules AS (
-        SELECT * FROM (VALUES
-          ('Building Plan', 'BPA_LOW',          'PENDINGINITIALVERIFICATION'),  -- existing BPA reports
-          ('Building Plan', 'BPA_NP_HIGH_OTH',  'FIELDINSPECTION_INPROGRESS'),  -- existing BPA reports
-          ('Building Plan', 'BPA_MC',           'FIELDINSPECTION_INPROGRESS'),
-          ('Building Plan', 'BPA_NP',           'FIELDINSPECTION_INPROGRESS'),
-          ('Building Plan', 'BPA_MC_HIGH_OTH',  'FIELDINSPECTION_INPROGRESS'),
-          ('Building Plan', 'BPA_NP_HIGH',      'FIELDINSPECTION_INPROGRESS'),
-          ('Building Plan', 'BPA_MC_HIGH',      'FIELDINSPECTION_INPROGRESS'),
-          ('CLU',           '*',                'DOC_VERIFICATION_PENDING'),    -- [DECISION 2] needs department sign-off
-          ('NOC',           '*',                'DOCUMENTVERIFY')               -- [DECISION 2] needs department sign-off
-          -- Layout: no rule yet (waiting for Layout results); until added, Layout pending files count as Within Timeline
-        ) AS t(module, businessservice, start_st)
-      ),
-      sla_start AS (
-        SELECT w.module, w.applicationno, w.tenantid, MIN(w.createdtime) AS start_ms
-        FROM wf w
-        JOIN sla_start_rules r
-          ON r.module = w.module AND (r.businessservice = '*' OR r.businessservice = w.businessservice) AND r.start_st = w.st
-        GROUP BY w.module, w.applicationno, w.tenantid
-      ),
-      sla_master AS (
-        SELECT businessservice, MAX(businessservicesla) AS sla_ms
-        FROM eg_wf_businessservice_v2
-        GROUP BY businessservice
-      ),
-      classified AS (
-        SELECT l.module, l.tenantid, l.first_ms,
-          COALESCE(sr.category, CASE WHEN l.term THEN 'CLOSED' ELSE 'PENDING' END) AS bucket,
-          (ss.start_ms IS NOT NULL AND sm.sla_ms IS NOT NULL
-             AND COALESCE(sr.clock_runs, true)
-             AND (p.end_ms - ss.start_ms) > sm.sla_ms) AS is_beyond
-        FROM latest l
-        CROSS JOIN params p
-        LEFT JOIN status_rules sr ON sr.st = l.st
-        LEFT JOIN sla_start ss ON ss.module = l.module AND ss.applicationno = l.applicationno AND ss.tenantid = l.tenantid
-        LEFT JOIN sla_master sm ON sm.businessservice = l.businessservice
-      ),
-      -- one row per application; createdtime = first workflow entry, so the From/To Date searchClauses filter ALL modules
-      app_rows AS (
-        SELECT c.module, c.tenantid, c.first_ms AS createdtime, c.bucket, c.is_beyond
-        FROM classified c
-      )
-      SELECT
-        CASE WHEN GROUPING(u.type, u.district, u.name_of_ulb) = 0
-              AND ROW_NUMBER() OVER (PARTITION BY u.type ORDER BY u.district, u.name_of_ulb) = 1
-             THEN u.type ELSE '' END AS ulb_type_label,
-        CASE WHEN GROUPING(u.type, u.district, u.name_of_ulb) = 0
-              AND ROW_NUMBER() OVER (PARTITION BY u.type, u.district ORDER BY u.name_of_ulb) = 1
-             THEN u.district ELSE '' END AS district,
-        CASE GROUPING(u.type, u.district, u.name_of_ulb)
-             WHEN 0 THEN u.name_of_ulb
-             WHEN 1 THEN 'Total of ' || u.district
-             ELSE 'Grand Total' END AS ulb_name,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'Building Plan' AND bpa.bucket <> 'NOT_SUBMITTED'),0)::text,'—') AS bp_sub,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'Building Plan' AND bpa.bucket = 'APPROVED'),0)::text,'—') AS bp_app,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'Building Plan' AND bpa.bucket = 'PENDING'),0)::text,'—') AS bp_pen,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'Building Plan' AND bpa.bucket = 'PENDING' AND NOT bpa.is_beyond),0)::text,'—') AS bp_in,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'Building Plan' AND bpa.bucket = 'PENDING' AND bpa.is_beyond),0)::text,'—') AS bp_out,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'NOC' AND bpa.bucket <> 'NOT_SUBMITTED'),0)::text,'—') AS noc_sub,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'NOC' AND bpa.bucket = 'APPROVED'),0)::text,'—') AS noc_app,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'NOC' AND bpa.bucket = 'PENDING'),0)::text,'—') AS noc_pen,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'NOC' AND bpa.bucket = 'PENDING' AND NOT bpa.is_beyond),0)::text,'—') AS noc_in,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'NOC' AND bpa.bucket = 'PENDING' AND bpa.is_beyond),0)::text,'—') AS noc_out,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'CLU' AND bpa.bucket <> 'NOT_SUBMITTED'),0)::text,'—') AS clu_sub,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'CLU' AND bpa.bucket = 'APPROVED'),0)::text,'—') AS clu_app,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'CLU' AND bpa.bucket = 'PENDING'),0)::text,'—') AS clu_pen,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'CLU' AND bpa.bucket = 'PENDING' AND NOT bpa.is_beyond),0)::text,'—') AS clu_in,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'CLU' AND bpa.bucket = 'PENDING' AND bpa.is_beyond),0)::text,'—') AS clu_out,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'Layout' AND bpa.bucket <> 'NOT_SUBMITTED'),0)::text,'—') AS lay_sub,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'Layout' AND bpa.bucket = 'APPROVED'),0)::text,'—') AS lay_app,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'Layout' AND bpa.bucket = 'PENDING'),0)::text,'—') AS lay_pen,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'Layout' AND bpa.bucket = 'PENDING' AND NOT bpa.is_beyond),0)::text,'—') AS lay_in,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.module = 'Layout' AND bpa.bucket = 'PENDING' AND bpa.is_beyond),0)::text,'—') AS lay_out,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.bucket <> 'NOT_SUBMITTED'),0)::text,'—') AS t_sub,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.bucket = 'APPROVED'),0)::text,'—') AS t_app,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.bucket = 'PENDING'),0)::text,'—') AS t_pen,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.bucket = 'PENDING' AND NOT bpa.is_beyond),0)::text,'—') AS t_in,
-        COALESCE(NULLIF(COUNT(*) FILTER (WHERE bpa.bucket = 'PENDING' AND bpa.is_beyond),0)::text,'—') AS t_out
-      FROM app_rows bpa
-      JOIN ulb_data u ON u.ulb_code = bpa.tenantid
-      WHERE 1=1
-  groupby: GROUP BY GROUPING SETS ((u.type, u.district, u.name_of_ulb), (u.type, u.district), ())
-  orderby: ORDER BY u.type NULLS LAST, u.district NULLS LAST, GROUPING(u.name_of_ulb), u.name_of_ulb
+          AND UPPER(TRIM(l.applicationstatus)) NOT IN ('INITIATED', 'CITIZEN_APPROVAL_INPROCESS', 'PROFESSIONAL_ACTION_REQUIRED', 'PENDING_APPL_FEE', 'PENDINGPAYMENT', 'PENDINGAPPLICATIONPAYMENT')
+          AND (ld.additionaldetails IS NULL OR ld.additionaldetails::text NOT LIKE '%isMigrationTrue%')
+    ),
+    pending_applications AS (
+        SELECT applicationno, module
+        FROM all_applications
+        WHERE file_category = 'PENDING'
+    ),
+    wf_sla_data AS (
+        SELECT 
+            wf.businessid,
+            COALESCE(
+                MIN(CASE 
+                    WHEN wf.businessservice = 'BPA_LOW' AND st.applicationstatus = 'PENDINGINITIALVERIFICATION' THEN wf.createdtime
+                    WHEN st.applicationstatus IN ('FIELDINSPECTION_INPROGRESS', 'DOC_VERIFICATION_PENDING', 'DOCUMENTVERIFY') THEN wf.createdtime
+                    ELSE NULL 
+                END),
+                MIN(wf.createdtime)
+            ) AS sla_start_time,
+            COALESCE(MAX(bs.businessservicesla), 2592000000) AS sla_limit
+        FROM eg_wf_processinstance_v2 wf
+        JOIN eg_wf_state_v2 st ON wf.status = st.uuid
+        LEFT JOIN eg_wf_businessservice_v2 bs ON wf.businessservice = bs.businessservice
+        WHERE wf.businessid IN (SELECT applicationno FROM pending_applications)
+        GROUP BY wf.businessid
+    ),
+    classified_applications AS (
+        SELECT 
+            app.tenantid,
+            app.applicationno,
+            app.module,
+            app.file_category,
+            CASE 
+                WHEN app.file_category = 'PENDING' THEN
+                    CASE 
+                        WHEN (EXTRACT(EPOCH FROM NOW()) * 1000 - COALESCE(ws.sla_start_time, app.app_createdtime)) > COALESCE(ws.sla_limit, 2592000000)
+                        THEN 'BEYOND_TIMELINE'
+                        ELSE 'WITHIN_TIMELINE'
+                    END
+                ELSE NULL
+            END AS timeline_status
+        FROM all_applications app
+        LEFT JOIN wf_sla_data ws ON app.applicationno = ws.businessid
+    ),
+    ulb_summary AS (
+        SELECT 
+            CASE 
+                WHEN LOWER(TRIM(u.district)) = 'kapurthala' THEN 'Kapurthala'
+                ELSE TRIM(u.district)
+            END AS district,
+            TRIM(u.name_of_ulb) AS name_of_ulb,
+            u.ulb_code,
+            
+            -- Building Plan (BPA)
+            COUNT(DISTINCT CASE WHEN ca.module = 'BPA' THEN ca.applicationno END) AS bpa_total,
+            COUNT(DISTINCT CASE WHEN ca.module = 'BPA' AND ca.file_category = 'APPROVED' THEN ca.applicationno END) AS bpa_approved,
+            COUNT(DISTINCT CASE WHEN ca.module = 'BPA' AND ca.file_category = 'PENDING' THEN ca.applicationno END) AS bpa_pending,
+            COUNT(DISTINCT CASE WHEN ca.module = 'BPA' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN ca.applicationno END) AS bpa_within_timeline,
+            COUNT(DISTINCT CASE WHEN ca.module = 'BPA' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN ca.applicationno END) AS bpa_beyond_timeline,
+
+            -- NOC
+            COUNT(DISTINCT CASE WHEN ca.module = 'NOC' THEN ca.applicationno END) AS noc_total,
+            COUNT(DISTINCT CASE WHEN ca.module = 'NOC' AND ca.file_category = 'APPROVED' THEN ca.applicationno END) AS noc_approved,
+            COUNT(DISTINCT CASE WHEN ca.module = 'NOC' AND ca.file_category = 'PENDING' THEN ca.applicationno END) AS noc_pending,
+            COUNT(DISTINCT CASE WHEN ca.module = 'NOC' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN ca.applicationno END) AS noc_within_timeline,
+            COUNT(DISTINCT CASE WHEN ca.module = 'NOC' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN ca.applicationno END) AS noc_beyond_timeline,
+
+            -- CLU
+            COUNT(DISTINCT CASE WHEN ca.module = 'CLU' THEN ca.applicationno END) AS clu_total,
+            COUNT(DISTINCT CASE WHEN ca.module = 'CLU' AND ca.file_category = 'APPROVED' THEN ca.applicationno END) AS clu_approved,
+            COUNT(DISTINCT CASE WHEN ca.module = 'CLU' AND ca.file_category = 'PENDING' THEN ca.applicationno END) AS clu_pending,
+            COUNT(DISTINCT CASE WHEN ca.module = 'CLU' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN ca.applicationno END) AS clu_within_timeline,
+            COUNT(DISTINCT CASE WHEN ca.module = 'CLU' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN ca.applicationno END) AS clu_beyond_timeline,
+
+            -- Layout
+            COUNT(DISTINCT CASE WHEN ca.module = 'LAYOUT' THEN ca.applicationno END) AS layout_total,
+            COUNT(DISTINCT CASE WHEN ca.module = 'LAYOUT' AND ca.file_category = 'APPROVED' THEN ca.applicationno END) AS layout_approved,
+            COUNT(DISTINCT CASE WHEN ca.module = 'LAYOUT' AND ca.file_category = 'PENDING' THEN ca.applicationno END) AS layout_pending,
+            COUNT(DISTINCT CASE WHEN ca.module = 'LAYOUT' AND ca.timeline_status = 'WITHIN_TIMELINE' THEN ca.applicationno END) AS layout_within_timeline,
+            COUNT(DISTINCT CASE WHEN ca.module = 'LAYOUT' AND ca.timeline_status = 'BEYOND_TIMELINE' THEN ca.applicationno END) AS layout_beyond_timeline,
+
+            -- Total Across All Modules
+            COUNT(DISTINCT ca.applicationno) AS total_submitted,
+            COUNT(DISTINCT CASE WHEN ca.file_category = 'APPROVED' THEN ca.applicationno END) AS total_approved,
+            COUNT(DISTINCT CASE WHEN ca.file_category = 'PENDING' THEN ca.applicationno END) AS total_pending,
+            COUNT(DISTINCT CASE WHEN ca.timeline_status = 'WITHIN_TIMELINE' THEN ca.applicationno END) AS total_within_timeline,
+            COUNT(DISTINCT CASE WHEN ca.timeline_status = 'BEYOND_TIMELINE' THEN ca.applicationno END) AS total_beyond_timeline
+
+        FROM ulb_data u
+        LEFT JOIN classified_applications ca ON u.ulb_code = ca.tenantid
+        WHERE u.ulb_code != 'pb.testing'
+        GROUP BY 
+            CASE 
+                WHEN LOWER(TRIM(u.district)) = 'kapurthala' THEN 'Kapurthala'
+                ELSE TRIM(u.district)
+            END,
+            TRIM(u.name_of_ulb),
+            u.ulb_code
+    )
+    SELECT 
+        DENSE_RANK() OVER (ORDER BY s.district)::int AS district_sno,
+        s.district AS district,
+        ROW_NUMBER() OVER (PARTITION BY s.district ORDER BY s.name_of_ulb)::int AS ulb_sno,
+        s.name_of_ulb AS name_of_ulb,
+        s.bpa_total,
+        s.bpa_approved,
+        s.bpa_pending,
+        s.bpa_within_timeline,
+        s.bpa_beyond_timeline,
+        s.noc_total,
+        s.noc_approved,
+        s.noc_pending,
+        s.noc_within_timeline,
+        s.noc_beyond_timeline,
+        s.clu_total,
+        s.clu_approved,
+        s.clu_pending,
+        s.clu_within_timeline,
+        s.clu_beyond_timeline,
+        s.layout_total,
+        s.layout_approved,
+        s.layout_pending,
+        s.layout_within_timeline,
+        s.layout_beyond_timeline,
+        s.total_submitted,
+        s.total_approved,
+        s.total_pending,
+        s.total_within_timeline,
+        s.total_beyond_timeline
+    FROM ulb_summary s
+    WHERE 1=1
+  orderby: ORDER BY s.district, s.name_of_ulb
