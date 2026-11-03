@@ -1544,21 +1544,21 @@ ReportDefinitions:
       - name: applicationtype
         label: Application Type
         type: singlevaluelist
-        pattern: list://ALL:All,NEW:New,RENEW:Renew
+        pattern: list://NEW:New,RENEW:Renew
         source: ptr
         isMandatory: false
         searchClause: AND ($applicationtype = 'ALL' OR ($applicationtype IN ('NEW', 'NEWAPPLICATION') AND (UPPER(COALESCE(r.applicationtype, '')) IN ('NEWAPPLICATION', 'NEW') OR (r.applicationtype IS NULL AND r.previousapplicationnumber IS NULL AND r.status != 'RENEWED'))) OR ($applicationtype IN ('RENEW', 'RENEWAL', 'RENEWAPPLICATION') AND (UPPER(COALESCE(r.applicationtype, '')) IN ('RENEWAPPLICATION', 'RENEW', 'RENEWAL') OR r.previousapplicationnumber IS NOT NULL OR r.status = 'RENEWED')))
       - name: petgender
         label: Sex of Pet
         type: singlevaluelist
-        pattern: list://ALL:All,MALE:Male,FEMALE:Female
+        pattern: list://MALE:Male,FEMALE:Female
         source: ptr
         isMandatory: false
         searchClause: AND ($petgender = 'ALL' OR UPPER(pd.petgender) = $petgender)
       - name: status
         label: Status
         type: singlevaluelist
-        pattern: list://ALL:ALL,INITIATED:INITIATED,DOCUMENTVERIFY:DOCUMENTVERIFY,PENDINGAPPROVAL:PENDINGAPPROVAL,PENDINGPAYMENT:PENDINGPAYMENT,APPROVED:APPROVED,REJECTED:REJECTED,RENEWED:RENEWED,DECEASED:DECEASED,REVOKED:REVOKED,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
+        pattern: list://INITIATED:INITIATED,DOCUMENTVERIFY:DOCUMENTVERIFY,PENDINGAPPROVAL:PENDINGAPPROVAL,PENDINGPAYMENT:PENDINGPAYMENT,APPROVED:APPROVED,REJECTED:REJECTED,RENEWED:RENEWED,DECEASED:DECEASED,REVOKED:REVOKED,CITIZENACTIONREQUIRED:CITIZENACTIONREQUIRED
         source: ptr
         isMandatory: false
         searchClause: AND ($status = 'ALL' OR r.status = $status)
