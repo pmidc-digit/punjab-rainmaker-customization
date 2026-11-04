@@ -2996,7 +2996,7 @@ ReportDefinitions:
   sourceColumns:
     - name: district_sno
       label: "#"
-      type: number
+      type: string
       source: obpas_bpa
       total: false
     - name: district
@@ -3302,11 +3302,8 @@ ReportDefinitions:
     ),
     ulb_summary AS (
         SELECT 
-            CASE 
-                WHEN LOWER(TRIM(u.district)) = 'kapurthala' THEN 'Kapurthala'
-                ELSE TRIM(u.district)
-            END AS district,
-            TRIM(u.name_of_ulb) AS name_of_ulb,
+            u.district AS district,
+            u.name_of_ulb AS name_of_ulb,
             u.ulb_code,
             
             -- Building Plan (BPA)
@@ -3348,16 +3345,21 @@ ReportDefinitions:
         LEFT JOIN classified_applications ca ON u.ulb_code = ca.tenantid
         WHERE u.ulb_code != 'pb.testing'
         GROUP BY 
-            CASE 
-                WHEN LOWER(TRIM(u.district)) = 'kapurthala' THEN 'Kapurthala'
-                ELSE TRIM(u.district)
-            END,
-            TRIM(u.name_of_ulb),
+            u.district,
+            u.name_of_ulb,
             u.ulb_code
     )
     SELECT 
-        DENSE_RANK() OVER (ORDER BY s.district)::int AS district_sno,
-        s.district AS district,
+        CASE 
+            WHEN ROW_NUMBER() OVER (PARTITION BY s.district ORDER BY s.name_of_ulb) = 1 
+            THEN DENSE_RANK() OVER (ORDER BY s.district)::text 
+            ELSE '' 
+        END AS district_sno,
+        CASE 
+            WHEN ROW_NUMBER() OVER (PARTITION BY s.district ORDER BY s.name_of_ulb) = 1 
+            THEN s.district 
+            ELSE '' 
+        END AS district,
         ROW_NUMBER() OVER (PARTITION BY s.district ORDER BY s.name_of_ulb)::int AS ulb_sno,
         s.name_of_ulb AS name_of_ulb,
         s.bpa_total,
@@ -3388,3 +3390,4 @@ ReportDefinitions:
     FROM ulb_summary s
     WHERE 1=1
   orderby: ORDER BY s.district, s.name_of_ulb
+
