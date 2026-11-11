@@ -54,6 +54,8 @@ SearchDefinitions:
 
           INNER JOIN eg_pt_property epp
               ON conn.property_id = epp.propertyid
+              AND epp.status != 'INACTIVE'
+             
 
           INNER JOIN eg_pt_address epa
               ON epa.propertyid = epp.id
