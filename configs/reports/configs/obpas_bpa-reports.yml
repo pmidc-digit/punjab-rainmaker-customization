@@ -1,4 +1,4 @@
----
+﻿---
 ReportDefinitions:
 - reportName: ApplicationDetailReportBPA
   decryptionPathId: LAYOUTREPORTS
@@ -156,6 +156,11 @@ ReportDefinitions:
     type: string
     source: obpas_bpa
     total: false
+  - name: cash_amount
+    label: Cash Amount
+    type: string
+    source: obpas_bpa
+    total: true
   - name: cheque_amount
     label: Cheque Amount
     type: string
@@ -202,13 +207,13 @@ ReportDefinitions:
     type: epoch
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND createdtime >= $fromDate
+    searchClause: AND 1=1
   - name: toDate
     label: To Date
     type: epoch
     source: obpas_bpa
     isMandatory: true
-    searchClause: AND createdtime <= $toDate
+    searchClause: AND 1=1
   - name: businessservice
     label: Service
     type: singlevaluelist
@@ -222,7 +227,7 @@ ReportDefinitions:
     pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
     source: obpas_bpa
     isMandatory: false
-    searchClause: and tenantid = $ulb     
+    searchClause: AND tenantid = $ulb
   - name: collector_code
     label: Collector Code
     type: string
@@ -230,81 +235,95 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND collector_code = $collector_code
   query: |
-      WITH current_holder AS (
-        SELECT DISTINCT ON (wf.businessid)
-          wf.businessid AS applicationno,
-          u.name AS employee_name,wf.tenantid,
-          e.code AS assignee_code,
-          wf.businessservice,
-          UPPER(st.applicationstatus) AS current_stage
-        FROM eg_wf_processinstance_v2 wf
-        JOIN eg_wf_state_v2 st ON wf.status = st.uuid
-        LEFT JOIN eg_wf_assignee_v2 wa ON wf.id = wa.processinstanceid
-        LEFT JOIN eg_user u ON u.uuid = wa.assignee
-        LEFT JOIN eg_hrms_employee e ON e.uuid = wa.assignee
-        WHERE wf.businessservice in   ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH') and wf.businessid like 'PB-%'
-        ORDER BY wf.businessid, wf.lastmodifiedtime DESC
+      WITH filtered_payments AS (
+          -- 1. Filter by payment date range, tenant, and businessservice early to minimize row scans
+          SELECT 
+              p.id AS transaction_id,
+              p.createdtime,
+              p.tenantid,
+              p.paymentmode,
+              p.createdby,
+              pd.amountpaid,
+              TRIM(bill.consumercode) AS consumercode
+          FROM egcl_payment p
+          INNER JOIN egcl_paymentdetail pd ON pd.paymentid = p.id
+          LEFT JOIN egcl_bill bill ON bill.id = pd.billid
+          WHERE p.createdtime >= $fromDate 
+            AND p.createdtime <= $toDate
+            AND LOWER(p.tenantid) != 'pb.testing'
+            AND UPPER(p.paymentstatus) != 'CANCELLED'
+            AND pd.businessservice IN ('BPA.NC_APP_FEE', 'BPA.NC_SAN_FEE')
       ),
-      
       unique_transactions AS (
-        SELECT
-          p.id AS transaction_id,
-          p.createdtime,INITCAP(split_part(p.tenantid, '.', 2)) AS tenant, 
-          pd.amountpaid,
-          CASE WHEN upper(p.paymentmode) IN ('CASH','OFFLINE_CASH') THEN pd.amountpaid ELSE 0 END AS cash_amount,
-          CASE WHEN upper(p.paymentmode) = 'CHEQUE' THEN pd.amountpaid ELSE 0 END AS cheque_amount,
-          CASE WHEN upper(p.paymentmode) IN ('CARD','DEBIT_CARD','CREDIT_CARD','OFFLINE_CARD') THEN pd.amountpaid ELSE 0 END AS card_amount,
-          CASE WHEN upper(p.paymentmode) = 'DD' THEN pd.amountpaid ELSE 0 END AS dd_amount,
-          CASE WHEN upper(p.paymentmode) IN ('NEFT','OFFLINE_NEFT') THEN pd.amountpaid ELSE 0 END AS neft_amount,
-          CASE WHEN upper(p.paymentmode) IN ('RTGS','OFFLINE_RTGS','NEFT_RTGS') THEN pd.amountpaid ELSE 0 END AS rtgs_amount,
-          CASE WHEN upper(p.paymentmode) = 'ONLINE' THEN pd.amountpaid ELSE 0 END AS online_amount,
-          COALESCE(emp.code, 'SELF') AS collector_code,
-          a.id AS bpa_id,
-          a.applicationno,
-          CASE 
-            WHEN UPPER(a.status) IN ('LEVEL3_VERIFICATION_PENDING', 'LEVEL_3_PENDING', 'FIELDINSPECTION_PENDING') THEN 'ATP Verification Pending'
-            WHEN UPPER(a.status) = 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In Progress' -- Naya rule yahan add kiya hai
-            WHEN UPPER(a.status) = 'CITIZEN_APPROVAL_INPROGRESS' THEN 'Citizen Approval In Progress'
-            WHEN UPPER(a.status) = 'PENDING_FOR_PAYMENT' THEN 'Pending for Payment'
-            WHEN UPPER(a.status) = 'DOC_VERIFICATION_PENDING' THEN 'Document Verification Pending'
-            WHEN UPPER(a.status) = 'VERIFICATION_INPROGRESS' THEN 'Verification In Progress'
-            WHEN UPPER(a.status) = 'APPROVED' THEN 'Approved'
-            WHEN UPPER(a.status) = 'REJECTED' THEN 'Rejected'
-            ELSE INITCAP(REPLACE(a.status, '_', ' ')) 
-          END AS localized_status,
-          u_applicant.name,
-          u_applicant.mobilenumber,
-          ch.employee_name AS assignee_employee,
-          ch.assignee_code   AS assignee_code,
-          bill.consumercode  AS bill_consumercode,
-          ch.businessservice,
-          CASE WHEN a.applicationno IS NULL THEN 'NO_MATCH_IN_EG_BPA' ELSE 'MATCHED' END AS match_status
-        FROM egcl_paymentdetail pd
-        JOIN egcl_payment p ON pd.paymentid = p.id
-        LEFT JOIN egcl_bill bill ON bill.id = pd.billid
-        LEFT JOIN eg_bpa_buildingplan a ON trim(bill.consumercode) = trim(a.applicationno)
-                           OR trim(bill.consumercode) = trim(a.id::text)
-        LEFT JOIN eg_user u_applicant ON u_applicant.uuid = a.accountid
-        LEFT JOIN eg_user u ON u.id::text = p.createdby::text
-        LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
-        LEFT JOIN current_holder ch ON ch.applicationno = a.applicationno OR ch.applicationno = a.id::text
-        WHERE pd.businessservice in ('BPA.NC_APP_FEE','BPA.NC_SAN_FEE') AND (a.additionaldetails->>'isMigrationTrue' IS NULL OR a.additionaldetails->>'isMigrationTrue' != 'true')
-          AND upper(p.paymentstatus) != 'CANCELLED'
+          SELECT 
+              to_char(to_timestamp(fp.createdtime / 1000), 'DD-MM-YYYY HH24:MI:SS') AS payment_date,
+              fp.createdtime,
+              fp.tenantid,
+              INITCAP(split_part(fp.tenantid, '.', 2)) AS tenant,
+              INITCAP(split_part(fp.tenantid, '.', 2)) AS "Tenant",
+              a.applicationno,
+              fp.consumercode AS bill_consumercode,
+              u_applicant.name,
+              u_applicant.mobilenumber,
+              'BPA' AS businessservice,
+              CASE 
+                  WHEN UPPER(a.status) IN ('LEVEL3_VERIFICATION_PENDING', 'LEVEL_3_PENDING', 'FIELDINSPECTION_PENDING') THEN 'ATP Verification Pending'
+                  WHEN UPPER(a.status) = 'FIELDINSPECTION_INPROGRESS' THEN 'Field Inspection In Progress'
+                  WHEN UPPER(a.status) = 'CITIZEN_APPROVAL_INPROGRESS' THEN 'Citizen Approval In Progress'
+                  WHEN UPPER(a.status) = 'PENDING_FOR_PAYMENT' THEN 'Pending for Payment'
+                  WHEN UPPER(a.status) = 'DOC_VERIFICATION_PENDING' THEN 'Document Verification Pending'
+                  WHEN UPPER(a.status) = 'VERIFICATION_INPROGRESS' THEN 'Verification In Progress'
+                  WHEN UPPER(a.status) = 'APPROVED' THEN 'Approved'
+                  WHEN UPPER(a.status) = 'REJECTED' THEN 'Rejected'
+                  ELSE INITCAP(REPLACE(a.status, '_', ' ')) 
+              END AS status,
+              COALESCE(emp.code, 'SELF') AS collector_code,
+              CASE WHEN UPPER(fp.paymentmode) IN ('CASH', 'OFFLINE_CASH') THEN fp.amountpaid ELSE 0 END AS cash_amount,
+              CASE WHEN UPPER(fp.paymentmode) = 'CHEQUE' THEN fp.amountpaid ELSE 0 END AS cheque_amount,
+              CASE WHEN UPPER(fp.paymentmode) IN ('CARD', 'DEBIT_CARD', 'CREDIT_CARD', 'OFFLINE_CARD') THEN fp.amountpaid ELSE 0 END AS card_amount,
+              CASE WHEN UPPER(fp.paymentmode) = 'DD' THEN fp.amountpaid ELSE 0 END AS dd_amount,
+              CASE WHEN UPPER(fp.paymentmode) IN ('NEFT', 'OFFLINE_NEFT') THEN fp.amountpaid ELSE 0 END AS neft_amount,
+              CASE WHEN UPPER(fp.paymentmode) IN ('RTGS', 'OFFLINE_RTGS', 'NEFT_RTGS') THEN fp.amountpaid ELSE 0 END AS rtgs_amount,
+              CASE WHEN UPPER(fp.paymentmode) = 'ONLINE' THEN fp.amountpaid ELSE 0 END AS online_amount,
+              fp.amountpaid
+          FROM filtered_payments fp
+          -- 2. Two-step direct index joins instead of slow OR conditions
+          LEFT JOIN eg_bpa_buildingplan a1 ON a1.applicationno = fp.consumercode
+          LEFT JOIN eg_bpa_buildingplan a2 ON a2.id::text = fp.consumercode AND a1.id IS NULL
+          LEFT JOIN LATERAL (
+              SELECT 
+                  COALESCE(a1.id, a2.id) AS id,
+                  COALESCE(a1.applicationno, a2.applicationno) AS applicationno,
+                  COALESCE(a1.status, a2.status) AS status,
+                  COALESCE(a1.accountid, a2.accountid) AS accountid,
+                  COALESCE(a1.additionaldetails, a2.additionaldetails) AS additionaldetails
+          ) a ON TRUE
+          LEFT JOIN eg_user u_applicant ON u_applicant.uuid = a.accountid
+          LEFT JOIN eg_user u ON u.id::text = fp.createdby::text
+          LEFT JOIN eg_hrms_employee emp ON emp.uuid::text = u.uuid::text
+          WHERE (
+              a.additionaldetails IS NULL 
+              OR a.additionaldetails->>'isMigrationTrue' IS NULL 
+              OR LOWER(a.additionaldetails->>'isMigrationTrue') != 'true'
+          )
       )
-      
-      SELECT  
-        to_char(to_timestamp(createdtime / 1000),'DD-MM-YYYY HH24:MI:SS') AS payment_date,
-        applicationno,tenant,
-        bill_consumercode,
-        name,
-        mobilenumber,
-        'BPA' AS businessservice,
-         localized_status AS status,
-        collector_code,
-        cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
-      FROM unique_transactions where 1=1 AND LOWER(tenant) != 'testing'
-  orderby: ORDER BY applicationno,createdtime DESC 
-  
+      SELECT 
+          payment_date,
+          tenantid,
+          "Tenant",
+          tenant,
+          applicationno,
+          bill_consumercode,
+          name,
+          mobilenumber,
+          businessservice,
+          status,
+          collector_code,
+          cash_amount, cheque_amount, card_amount, dd_amount, neft_amount, rtgs_amount, online_amount, amountpaid
+      FROM unique_transactions
+      WHERE 1=1
+  orderby: ORDER BY applicationno, createdtime DESC
+
 - reportName: SLAReportbpa
   decryptionPathId: LAYOUTREPORTS
   summary: SLA report for building_plan service
