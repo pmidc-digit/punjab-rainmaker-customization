@@ -3443,12 +3443,12 @@ ReportDefinitions:
     label: Approved Applications
     type: string
     source: obpas_bpa
-    total: true
+    total: false
   - name: ulb_pending_count
     label: Pending Applications
     type: string
     source: obpas_bpa
-    total: true
+    total: false
   - name: name
     label: Officer Name
     type: string
@@ -3583,7 +3583,7 @@ ReportDefinitions:
                       ORDER BY j.name_of_ulb, j.ulb_code, j.officer_pending_count DESC, j.officer_name, j.officer_code) = 1
                THEN j.district
                ELSE '' END AS district,
-          -- ULB serial / name / counts: only on the first row of each ULB (avoids repeated totals)
+          -- ULB serial / name / counts: only on the first row of each ULB
           CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code
                       ORDER BY j.officer_pending_count DESC, j.officer_name, j.officer_code) = 1
                THEN DENSE_RANK() OVER (PARTITION BY j.district ORDER BY j.name_of_ulb, j.ulb_code)::text
@@ -3594,10 +3594,12 @@ ReportDefinitions:
                ELSE '' END AS name_of_ulb,
           CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code
                       ORDER BY j.officer_pending_count DESC, j.officer_name, j.officer_code) = 1
-               THEN j.ulb_approved_count END AS ulb_approved_count,
+               THEN j.ulb_approved_count::text
+               ELSE '' END AS ulb_approved_count,
           CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code
                       ORDER BY j.officer_pending_count DESC, j.officer_name, j.officer_code) = 1
-               THEN j.ulb_pending_count END AS ulb_pending_count,
+               THEN j.ulb_pending_count::text
+               ELSE '' END AS ulb_pending_count,
           j.officer_name AS name,
           j.officer_code,
           j.officer_designation,
