@@ -3195,3 +3195,201 @@ ReportDefinitions:
     WHERE 1 = 1
       AND r.tenantid NOT IN ('pb.testing')
   orderby: ORDER BY r.tenantid, r.createdtime DESC;
+
+- reportName: ULBWiseBPAApplicationStatusReport
+  decryptionPathId: LAYOUTREPORTS
+  summary: District and ULB wise Approved / Pending Building Plan applications with officer wise pendency
+  version: 1.0.0
+  moduleName: rainmaker-obpas_bpa
+  additionalConfig:
+    print:
+      pdfPageSize: A4
+  sourceColumns:
+  - name: district_sno
+    label: "#"
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: district
+    label: District
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: ulb_sno
+    label: ULB #
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: name_of_ulb
+    label: ULB Name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: ulb_approved_count
+    label: Approved Applications
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: ulb_pending_count
+    label: Pending Applications
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: name
+    label: Officer Name
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: officer_code
+    label: Officer Code
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: officer_designation
+    label: Designation / Role
+    type: string
+    source: obpas_bpa
+    total: false
+  - name: officer_pending_count
+    label: Officer Pending Applications
+    type: number
+    source: obpas_bpa
+    total: true
+  searchParams:
+  - name: district
+    label: District
+    type: singlevaluelist
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND j.district = $district
+  - name: ulb
+    label: ULB Name
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_bpa
+    isMandatory: false
+    searchClause: AND j.ulb_code = $ulb
+  query: |
+      WITH bpa_base AS (
+          -- One row per BPA application: Approved or Pending only
+          SELECT
+              b.applicationno,
+              b.tenantid,
+              CASE WHEN b.status = 'APPROVED' THEN 'APPROVED' ELSE 'PENDING' END AS file_category
+          FROM eg_bpa_buildingplan b
+          WHERE b.tenantid != 'pb.testing'
+            AND b.applicationno LIKE 'PB-%'
+            AND (b.additionaldetails->>'isMigrationTrue' IS NULL
+                 OR b.additionaldetails->>'isMigrationTrue' != 'true')
+            AND b.status IN (
+                'APPROVED',
+                'APPROVAL_PENDING','ATPHQ_APPROVAL_PENDING','DOC_VERIFICATION_PENDING','EO_VERIFICATION_PENDING',
+                'FIELDINSPECTION_INPROGRESS','INPROGRESS','INSPECTION_REPORT_PENDING','JC_VERIFICATION_PENDING',
+                'LEVEL3_VERIFICATION_PENDING','LEVEL4_VERIFICATION_PENDING','MC_VERIFICATION_PENDING',
+                'MTPHQ_APPROVAL_PENDING','PENDINGINITIALVERIFICATION','PENDINGVERIFICATION',
+                'STP_VERIFICATION_PENDING','STPHQ_APPROVAL_PENDING'
+            )
+      ),
+      latest_pi AS (
+          -- Latest workflow process instance per application (current workflow state)
+          SELECT DISTINCT ON (wf.businessid)
+              wf.businessid,
+              wf.id AS processinstanceid
+          FROM eg_wf_processinstance_v2 wf
+          WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+            AND wf.businessid LIKE 'PB-%'
+          ORDER BY wf.businessid, wf.lastmodifiedtime DESC, wf.createdtime DESC, wf.id DESC
+      ),
+      current_assignee AS (
+          -- Exactly one assignee per application from the latest process instance
+          SELECT DISTINCT ON (lp.businessid)
+              lp.businessid,
+              wa.assignee
+          FROM latest_pi lp
+          JOIN eg_wf_assignee_v2 wa ON wa.processinstanceid = lp.processinstanceid
+          ORDER BY lp.businessid, wa.assignee
+      ),
+      emp_designation AS (
+          -- Exactly one designation per employee (prefer current assignment)
+          SELECT DISTINCT ON (a.employeeid)
+              a.employeeid,
+              d.name AS designation
+          FROM eg_hrms_assignment a
+          JOIN designation d ON d.code = a.designation
+          ORDER BY a.employeeid, a.iscurrentassignment DESC NULLS LAST, a.fromdate DESC NULLS LAST
+      ),
+      ulb_counts AS (
+          -- ULB wise Approved / Pending counts
+          SELECT
+              tenantid,
+              COUNT(DISTINCT applicationno) FILTER (WHERE file_category = 'APPROVED') AS approved_count,
+              COUNT(DISTINCT applicationno) FILTER (WHERE file_category = 'PENDING')  AS pending_count
+          FROM bpa_base
+          GROUP BY tenantid
+      ),
+      officer_pending AS (
+          -- Officer wise pending counts per ULB (name left NULL when unassigned so decryption skips it)
+          SELECT
+              b.tenantid,
+              u.name                                  AS officer_name,
+              COALESCE(e.code, '-')                   AS officer_code,
+              COALESCE(ed.designation, 'UNASSIGNED')  AS officer_designation,
+              COUNT(DISTINCT b.applicationno)         AS officer_pending_count
+          FROM bpa_base b
+          LEFT JOIN current_assignee ca ON ca.businessid = b.applicationno
+          LEFT JOIN eg_hrms_employee e  ON e.uuid = ca.assignee
+          LEFT JOIN eg_user u           ON u.uuid = ca.assignee
+          LEFT JOIN emp_designation ed  ON ed.employeeid = e.uuid
+          WHERE b.file_category = 'PENDING'
+          GROUP BY b.tenantid, u.name, COALESCE(e.code, '-'), COALESCE(ed.designation, 'UNASSIGNED')
+      ),
+      joined AS (
+          SELECT
+              ud.district,
+              ud.name_of_ulb,
+              ud.ulb_code,
+              uc.approved_count                       AS ulb_approved_count,
+              uc.pending_count                        AS ulb_pending_count,
+              op.officer_name,
+              op.officer_code,
+              COALESCE(op.officer_designation, '-')   AS officer_designation,
+              COALESCE(op.officer_pending_count, 0)   AS officer_pending_count
+          FROM ulb_counts uc
+          JOIN ulb_data ud ON ud.ulb_code = uc.tenantid
+          LEFT JOIN officer_pending op ON op.tenantid = uc.tenantid
+      )
+      SELECT
+          -- District serial: only on the first row of each district
+          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.district
+                      ORDER BY j.name_of_ulb, j.ulb_code, j.officer_pending_count DESC, j.officer_name, j.officer_code) = 1
+               THEN DENSE_RANK() OVER (ORDER BY j.district)::text
+               ELSE '' END AS district_sno,
+          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.district
+                      ORDER BY j.name_of_ulb, j.ulb_code, j.officer_pending_count DESC, j.officer_name, j.officer_code) = 1
+               THEN j.district
+               ELSE '' END AS district,
+          -- ULB serial / name / counts: only on the first row of each ULB
+          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code
+                      ORDER BY j.officer_pending_count DESC, j.officer_name, j.officer_code) = 1
+               THEN DENSE_RANK() OVER (PARTITION BY j.district ORDER BY j.name_of_ulb, j.ulb_code)::text
+               ELSE '' END AS ulb_sno,
+          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code
+                      ORDER BY j.officer_pending_count DESC, j.officer_name, j.officer_code) = 1
+               THEN j.name_of_ulb
+               ELSE '' END AS name_of_ulb,
+          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code
+                      ORDER BY j.officer_pending_count DESC, j.officer_name, j.officer_code) = 1
+               THEN j.ulb_approved_count::text
+               ELSE '' END AS ulb_approved_count,
+          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code
+                      ORDER BY j.officer_pending_count DESC, j.officer_name, j.officer_code) = 1
+               THEN j.ulb_pending_count::text
+               ELSE '' END AS ulb_pending_count,
+          j.officer_name AS name,
+          j.officer_code,
+          j.officer_designation,
+          j.officer_pending_count
+      FROM joined j
+      WHERE 1=1
+  orderby: ORDER BY j.district, j.name_of_ulb, j.ulb_code, j.officer_pending_count DESC, j.officer_name, j.officer_code
