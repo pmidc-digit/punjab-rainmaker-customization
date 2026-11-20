@@ -3198,7 +3198,7 @@ ReportDefinitions:
 
 - reportName: ULBWiseBPAApplicationStatusReport
   decryptionPathId: LAYOUTREPORTS
-  summary: District and ULB wise Approved / Pending Building Plan applications with officer wise pendency
+  summary: District and ULB wise Approved / Pending Building Plan applications with designation wise breakup
   version: 1.0.0
   moduleName: rainmaker-obpas_bpa
   additionalConfig:
@@ -3226,32 +3226,27 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: ulb_approved_count
-    label: Approved Applications
+    label: ULB Total Approved
     type: string
     source: obpas_bpa
     total: false
   - name: ulb_pending_count
-    label: Pending Applications
+    label: ULB Total Pending
     type: string
     source: obpas_bpa
     total: false
-  - name: name
-    label: Officer Name
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: officer_code
-    label: Officer Code
-    type: string
-    source: obpas_bpa
-    total: false
-  - name: officer_designation
+  - name: designation_role
     label: Designation / Role
     type: string
     source: obpas_bpa
     total: false
-  - name: officer_pending_count
-    label: Officer Pending Applications
+  - name: role_approved_count
+    label: Approved Applications
+    type: number
+    source: obpas_bpa
+    total: true
+  - name: role_pending_count
+    label: Pending Applications
     type: number
     source: obpas_bpa
     total: true
@@ -3271,11 +3266,42 @@ ReportDefinitions:
     isMandatory: false
     searchClause: AND j.ulb_code = $ulb
   query: |
-      WITH bpa_base AS (
+      WITH level_map (stage_code, designation) AS (
+          -- Workflow state -> designation (Excel mapping + workflow config roles)
+          VALUES
+              -- JE/BI
+              ('FIELDINSPECTION_INPROGRESS',  'JE/BI'),
+              ('INSPECTION_REPORT_PENDING',   'JE/BI'),
+              ('JE_VERIFICATION_PENDING',     'JE/BI'),
+              -- DM
+              ('DOCUMENTVERIFY',              'DM'),
+              ('DOC_VERIFICATION_INPROGRESS', 'DM'),
+              ('DOC_VERIFICATION_PENDING',    'DM'),
+              -- ATP
+              ('ATP_VERIFICATION_PENDING',    'ATP'),
+              ('LEVEL3_VERIFICATION_PENDING', 'ATP'),
+              -- MTP
+              ('MTP_VERIFICATION_PENDING',    'MTP'),
+              ('LEVEL4_VERIFICATION_PENDING', 'MTP'),
+              -- JC
+              ('JC_VERIFICATION_PENDING',     'JC'),
+              -- EO/MC
+              ('EO_VERIFICATION_PENDING',     'EO/MC'),
+              ('PENDINGAPPROVAL',             'EO/MC'),
+              ('APPROVAL_PENDING',            'EO/MC'),
+              ('MC_VERIFICATION_PENDING',     'EO/MC'),
+              ('PENDINGINITIALVERIFICATION',  'EO/MC'),
+              ('PENDINGVERIFICATION',         'EO/MC')
+      ),
+      levels (designation, level_order) AS (
+          VALUES ('JE/BI', 1), ('DM', 2), ('ATP', 3), ('MTP', 4), ('JC', 5), ('EO/MC', 6)
+      ),
+      bpa_base AS (
           -- One row per BPA application: Approved or Pending only
           SELECT
               b.applicationno,
               b.tenantid,
+              b.status,
               CASE WHEN b.status = 'APPROVED' THEN 'APPROVED' ELSE 'PENDING' END AS file_category
           FROM eg_bpa_buildingplan b
           WHERE b.tenantid != 'pb.testing'
@@ -3292,104 +3318,114 @@ ReportDefinitions:
             )
       ),
       latest_pi AS (
-          -- Latest workflow process instance per application (current workflow state)
+          -- Current workflow state per application (latest process instance)
           SELECT DISTINCT ON (wf.businessid)
               wf.businessid,
-              wf.id AS processinstanceid
+              wf.status AS state_uuid
           FROM eg_wf_processinstance_v2 wf
           WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
             AND wf.businessid LIKE 'PB-%'
           ORDER BY wf.businessid, wf.lastmodifiedtime DESC, wf.createdtime DESC, wf.id DESC
       ),
-      current_assignee AS (
-          -- Exactly one assignee per application from the latest process instance
-          SELECT DISTINCT ON (lp.businessid)
-              lp.businessid,
-              wa.assignee
-          FROM latest_pi lp
-          JOIN eg_wf_assignee_v2 wa ON wa.processinstanceid = lp.processinstanceid
-          ORDER BY lp.businessid, wa.assignee
-      ),
-      emp_designation AS (
-          -- Exactly one designation per employee (prefer current assignment)
-          SELECT DISTINCT ON (a.employeeid)
-              a.employeeid,
-              d.name AS designation
-          FROM eg_hrms_assignment a
-          JOIN designation d ON d.code = a.designation
-          ORDER BY a.employeeid, a.iscurrentassignment DESC NULLS LAST, a.fromdate DESC NULLS LAST
-      ),
-      ulb_counts AS (
-          -- ULB wise Approved / Pending counts
-          SELECT
-              tenantid,
-              COUNT(DISTINCT applicationno) FILTER (WHERE file_category = 'APPROVED') AS approved_count,
-              COUNT(DISTINCT applicationno) FILTER (WHERE file_category = 'PENDING')  AS pending_count
-          FROM bpa_base
-          GROUP BY tenantid
-      ),
-      officer_pending AS (
-          -- Officer wise pending counts per ULB (name left NULL when unassigned so decryption skips it)
+      pending_role AS (
+          -- Pending files: workflow state they are in now
           SELECT
               b.tenantid,
-              u.name                                  AS officer_name,
-              COALESCE(e.code, '-')                   AS officer_code,
-              COALESCE(ed.designation, 'UNASSIGNED')  AS officer_designation,
-              COUNT(DISTINCT b.applicationno)         AS officer_pending_count
+              b.applicationno,
+              COALESCE(st.state, b.status) AS stage_code
           FROM bpa_base b
-          LEFT JOIN current_assignee ca ON ca.businessid = b.applicationno
-          LEFT JOIN eg_hrms_employee e  ON e.uuid = ca.assignee
-          LEFT JOIN eg_user u           ON u.uuid = ca.assignee
-          LEFT JOIN emp_designation ed  ON ed.employeeid = e.uuid
+          LEFT JOIN latest_pi lp      ON lp.businessid = b.applicationno
+          LEFT JOIN eg_wf_state_v2 st ON st.uuid = lp.state_uuid
           WHERE b.file_category = 'PENDING'
-          GROUP BY b.tenantid, u.name, COALESCE(e.code, '-'), COALESCE(ed.designation, 'UNASSIGNED')
+      ),
+      approved_last AS (
+          -- Last officer-level stage an approved file passed through
+          SELECT DISTINCT ON (wf.businessid)
+              wf.businessid,
+              st.state AS state_name
+          FROM eg_wf_processinstance_v2 wf
+          JOIN eg_wf_state_v2 st ON st.uuid = wf.status
+          WHERE wf.businessservice IN ('BPA_LOW','BPA_NP_HIGH_OTH','BPA_MC','BPA_NP','BPA_MC_HIGH_OTH','BPA_NP_HIGH','BPA_MC_HIGH')
+            AND wf.businessid LIKE 'PB-%'
+            AND wf.businessid IN (SELECT applicationno FROM bpa_base WHERE file_category = 'APPROVED')
+            AND st.state NOT IN (
+                'APPROVED','PENDING_SANC_FEE_PAYMENT','SANCTION_LETTER_ESIGN_PENDING','DRAWING_ESIGN_PENDING',
+                'CITIZEN_APPROVAL_PENDING','PENDING_APPL_FEE_PAYMENT','PULLED_BACK','SEND_TO_CITIZEN',
+                'INPROGRESS','PROFESSIONAL_ACTION_REQUIRED','BLOCKED','REJECTED','CANCELLED','INITIATED'
+            )
+          ORDER BY wf.businessid, wf.createdtime DESC, wf.id DESC
+      ),
+      approved_role AS (
+          SELECT
+              b.tenantid,
+              b.applicationno,
+              COALESCE(al.state_name, b.status) AS stage_code
+          FROM bpa_base b
+          LEFT JOIN approved_last al ON al.businessid = b.applicationno
+          WHERE b.file_category = 'APPROVED'
+      ),
+      stage_rows AS (
+          -- Only files whose stage maps to one of the six designations
+          SELECT u.tenantid, u.applicationno, u.kind, lm.designation
+          FROM (
+              SELECT tenantid, applicationno, stage_code, 'PENDING'  AS kind FROM pending_role
+              UNION ALL
+              SELECT tenantid, applicationno, stage_code, 'APPROVED' AS kind FROM approved_role
+          ) u
+          JOIN level_map lm ON lm.stage_code = UPPER(u.stage_code)
+      ),
+      role_counts AS (
+          SELECT
+              tenantid,
+              designation,
+              COUNT(DISTINCT applicationno) FILTER (WHERE kind = 'APPROVED') AS role_approved_count,
+              COUNT(DISTINCT applicationno) FILTER (WHERE kind = 'PENDING')  AS role_pending_count
+          FROM stage_rows
+          GROUP BY tenantid, designation
       ),
       joined AS (
+          -- Six fixed designation rows per ULB; ULB totals are the sum of its designation rows
           SELECT
               ud.district,
               ud.name_of_ulb,
               ud.ulb_code,
-              uc.approved_count                       AS ulb_approved_count,
-              uc.pending_count                        AS ulb_pending_count,
-              op.officer_name,
-              op.officer_code,
-              COALESCE(op.officer_designation, '-')   AS officer_designation,
-              COALESCE(op.officer_pending_count, 0)   AS officer_pending_count
-          FROM ulb_counts uc
-          JOIN ulb_data ud ON ud.ulb_code = uc.tenantid
-          LEFT JOIN officer_pending op ON op.tenantid = uc.tenantid
+              lv.level_order,
+              (SUM(COALESCE(rc.role_approved_count, 0)) OVER (PARTITION BY ud.ulb_code))::int AS ulb_approved_count,
+              (SUM(COALESCE(rc.role_pending_count, 0))  OVER (PARTITION BY ud.ulb_code))::int AS ulb_pending_count,
+              lv.designation                          AS designation_role,
+              COALESCE(rc.role_approved_count, 0)     AS role_approved_count,
+              COALESCE(rc.role_pending_count, 0)      AS role_pending_count
+          FROM (SELECT DISTINCT tenantid FROM bpa_base) t
+          JOIN ulb_data ud ON ud.ulb_code = t.tenantid
+          CROSS JOIN levels lv
+          LEFT JOIN role_counts rc ON rc.tenantid = t.tenantid AND rc.designation = lv.designation
       )
       SELECT
-          -- District serial: only on the first row of each district
+          -- District serial / name: only on the first row of each district
           CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.district
-                      ORDER BY j.name_of_ulb, j.ulb_code, j.officer_pending_count DESC, j.officer_name, j.officer_code) = 1
+                      ORDER BY j.name_of_ulb, j.ulb_code, j.level_order) = 1
                THEN DENSE_RANK() OVER (ORDER BY j.district)::text
                ELSE '' END AS district_sno,
           CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.district
-                      ORDER BY j.name_of_ulb, j.ulb_code, j.officer_pending_count DESC, j.officer_name, j.officer_code) = 1
+                      ORDER BY j.name_of_ulb, j.ulb_code, j.level_order) = 1
                THEN j.district
                ELSE '' END AS district,
-          -- ULB serial / name / counts: only on the first row of each ULB
-          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code
-                      ORDER BY j.officer_pending_count DESC, j.officer_name, j.officer_code) = 1
+          -- ULB serial / name / totals: only on the first row of each ULB
+          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code ORDER BY j.level_order) = 1
                THEN DENSE_RANK() OVER (PARTITION BY j.district ORDER BY j.name_of_ulb, j.ulb_code)::text
                ELSE '' END AS ulb_sno,
-          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code
-                      ORDER BY j.officer_pending_count DESC, j.officer_name, j.officer_code) = 1
+          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code ORDER BY j.level_order) = 1
                THEN j.name_of_ulb
                ELSE '' END AS name_of_ulb,
-          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code
-                      ORDER BY j.officer_pending_count DESC, j.officer_name, j.officer_code) = 1
+          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code ORDER BY j.level_order) = 1
                THEN j.ulb_approved_count::text
                ELSE '' END AS ulb_approved_count,
-          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code
-                      ORDER BY j.officer_pending_count DESC, j.officer_name, j.officer_code) = 1
+          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code ORDER BY j.level_order) = 1
                THEN j.ulb_pending_count::text
                ELSE '' END AS ulb_pending_count,
-          j.officer_name AS name,
-          j.officer_code,
-          j.officer_designation,
-          j.officer_pending_count
+          j.designation_role,
+          j.role_approved_count,
+          j.role_pending_count
       FROM joined j
       WHERE 1=1
-  orderby: ORDER BY j.district, j.name_of_ulb, j.ulb_code, j.officer_pending_count DESC, j.officer_name, j.officer_code
+  orderby: ORDER BY j.district, j.name_of_ulb, j.ulb_code, j.level_order
