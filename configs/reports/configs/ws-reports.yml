@@ -6460,7 +6460,7 @@ ReportDefinitions:
         ) AS address
     FROM eg_sw_connection ws
     JOIN eg_pt_property p
-        ON ws.property_id = p.propertyid
+        ON ws.property_id = p.propertyid and p.tenantid = $ulb
     JOIN eg_sw_service wss ON ws.id = wss.connection_id
     INNER JOIN eg_pt_owner po
         ON p.id = po.propertyid
