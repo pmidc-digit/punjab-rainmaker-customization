@@ -6444,7 +6444,7 @@ ReportDefinitions:
       wss.connectionexecutiondate,
         ws.property_id,
         u.name as ownername,
-        u.guardian as guardianname,
+        COALESCE(u.guardian, '30048|21Fj+c3k2ldB0X3AzIh7atXB') AS guardianname,
         u.mobilenumber as mobileno,
         p.oldpropertyid,
         p.status AS property_status,
