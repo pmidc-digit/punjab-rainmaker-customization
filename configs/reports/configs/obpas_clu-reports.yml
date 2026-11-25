@@ -2045,16 +2045,17 @@ ReportDefinitions:
           ORDER BY wf.businessid, wf.createdtime DESC, wf.id DESC
       ),
       stage_rows AS (
-          SELECT b.tenantid, b.applicationno, 'PENDING' AS kind, sl.designation
+          -- Pending: designation of the current workflow state. Approved: designation of the last officer-level stage.
+          SELECT
+              b.tenantid,
+              b.applicationno,
+              b.file_category AS kind,
+              CASE WHEN b.file_category = 'PENDING' THEN sl.designation ELSE al.designation END AS designation
           FROM clu_base b
-          JOIN latest_pi lp   ON lp.businessid = b.applicationno
-          JOIN state_level sl ON sl.state_uuid = lp.state_uuid
-          WHERE b.file_category = 'PENDING'
-          UNION ALL
-          SELECT b.tenantid, b.applicationno, 'APPROVED' AS kind, al.designation
-          FROM clu_base b
-          JOIN approved_last al ON al.businessid = b.applicationno
-          WHERE b.file_category = 'APPROVED'
+          LEFT JOIN latest_pi lp     ON lp.businessid = b.applicationno AND b.file_category = 'PENDING'
+          LEFT JOIN state_level sl   ON sl.state_uuid = lp.state_uuid
+          LEFT JOIN approved_last al ON al.businessid = b.applicationno AND b.file_category = 'APPROVED'
+          WHERE b.file_category IN ('PENDING','APPROVED')
       ),
       role_counts AS (
           SELECT
@@ -2063,6 +2064,7 @@ ReportDefinitions:
               COUNT(DISTINCT applicationno) FILTER (WHERE kind = 'APPROVED') AS role_approved_count,
               COUNT(DISTINCT applicationno) FILTER (WHERE kind = 'PENDING')  AS role_pending_count
           FROM stage_rows
+          WHERE designation IS NOT NULL
           GROUP BY tenantid, designation
       ),
       joined AS (
