@@ -1912,3 +1912,202 @@ ReportDefinitions:
        WHERE bd.businessservice IN ('CLU.PAY1', 'CLU.PAY2') 
        AND pg.tenant_id != 'pb.testing' and clu.applicationno like 'PB-%'
   orderby: ORDER BY application_number, created_date;
+
+- reportName: ULBWiseCLUApplicationStatusReport
+  summary: District and ULB wise Approved / Pending CLU applications with designation wise breakup
+  version: 1.0.0
+  moduleName: rainmaker-obpas_clu
+  additionalConfig:
+    print:
+      pdfPageSize: A4
+  sourceColumns:
+  - name: district_sno
+    label: "#"
+    type: string
+    source: obpas_clu
+    total: false
+  - name: district
+    label: District
+    type: string
+    source: obpas_clu
+    total: false
+  - name: ulb_sno
+    label: ULB #
+    type: string
+    source: obpas_clu
+    total: false
+  - name: name_of_ulb
+    label: ULB Name
+    type: string
+    source: obpas_clu
+    total: false
+  - name: ulb_approved_count
+    label: ULB Total Approved
+    type: string
+    source: obpas_clu
+    total: false
+  - name: ulb_pending_count
+    label: ULB Total Pending
+    type: string
+    source: obpas_clu
+    total: false
+  - name: designation_role
+    label: Designation / Role
+    type: string
+    source: obpas_clu
+    total: false
+  - name: role_approved_count
+    label: Approved Applications
+    type: number
+    source: obpas_clu
+    total: true
+  - name: role_pending_count
+    label: Pending Applications
+    type: number
+    source: obpas_clu
+    total: true
+  searchParams:
+  - name: district
+    label: District
+    type: singlevaluelist
+    pattern: 'list://Amritsar:Amritsar,Barnala:Barnala,Bathinda:Bathinda,Faridkot:Faridkot,Fatehgarh Sahib:Fatehgarh Sahib,Fazilka:Fazilka,Ferozepur:Ferozepur,Gurdaspur:Gurdaspur,Hoshiarpur:Hoshiarpur,Jalandhar:Jalandhar,Kapurthala:Kapurthala,Ludhiana:Ludhiana,Malerkotla:Malerkotla,Mansa:Mansa,Moga:Moga,Pathankot:Pathankot,Patiala:Patiala,Roopnagar:Roopnagar,SAS Nagar:SAS Nagar,SBS Nagar:SBS Nagar,Sangrur:Sangrur,Sri Muktsar Sahib:Sri Muktsar Sahib,Tarn Taran:Tarn Taran'
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND j.district = $district
+  - name: ulb
+    label: ULB Name
+    type: singlevaluelist
+    pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+    source: obpas_clu
+    isMandatory: false
+    searchClause: AND j.ulb_code = $ulb
+  query: |
+      WITH role_map (role_code, designation) AS (
+          -- CLU workflow role codes (from workflow config) -> designation
+          VALUES
+              ('OBPAS_CLU_BI',  'JE/BI'),
+              ('OBPAS_CLU_JE',  'JE/BI'),
+              ('OBPAS_CLU_DM',  'DM'),
+              ('OBPAS_CLU_ATP', 'ATP'),
+              ('OBPAS_CLU_AME', 'ATP'),
+              ('OBPAS_CLU_MTP', 'MTP'),
+              ('OBPAS_CLU_ME',  'MTP'),
+              ('OBPAS_CLU_JC',  'JC'),
+              ('OBPAS_CLU_EO',  'EO/MC'),
+              ('OBPAS_CLU_CMC', 'EO/MC'),
+              ('OBPAS_CLU_ADC', 'ADC')
+      ),
+      levels (designation, level_order) AS (
+          VALUES ('JE/BI', 1), ('DM', 2), ('ATP', 3), ('MTP', 4), ('JC', 5), ('EO/MC', 6), ('ADC', 7)
+      ),
+      state_level AS (
+          -- Designation that acts at each workflow state (terminal approval states excluded)
+          SELECT act.currentstate AS state_uuid, MIN(rm.designation) AS designation
+          FROM eg_wf_action_v2 act
+          JOIN eg_wf_state_v2 stt ON stt.uuid = act.currentstate
+                                 AND UPPER(stt.state) NOT IN ('APPROVED','E-SIGNED')
+          CROSS JOIN LATERAL unnest(string_to_array(act.roles, ',')) AS rc(role_code)
+          JOIN role_map rm ON rm.role_code = TRIM(rc.role_code)
+          WHERE COALESCE(act.active, true)
+          GROUP BY act.currentstate
+      ),
+      clu_base AS (
+          SELECT DISTINCT
+              c.applicationno,
+              c.tenantid,
+              CASE
+                  WHEN UPPER(TRIM(c.applicationstatus)) = 'APPROVED' THEN 'APPROVED'
+                  WHEN UPPER(TRIM(c.applicationstatus)) IN ('E-SIGNED','REJECTED','CANCELLED','INITIATED') THEN 'OTHER'
+                  ELSE 'PENDING'
+              END AS file_category
+          FROM eg_clu c
+          JOIN eg_clu_details cd ON cd.cluid = c.id
+          WHERE c.tenantid != 'pb.testing'
+            AND c.applicationno LIKE 'PB-%'
+            AND (cd.additionaldetails IS NULL OR cd.additionaldetails::text NOT LIKE '%isMigrationTrue%')
+      ),
+      latest_pi AS (
+          -- Current workflow state per application (latest process instance)
+          SELECT DISTINCT ON (wf.businessid) wf.businessid, wf.status AS state_uuid
+          FROM eg_wf_processinstance_v2 wf
+          WHERE wf.businessservice IN ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH')
+            AND wf.businessid LIKE 'PB-%'
+          ORDER BY wf.businessid, wf.lastmodifiedtime DESC, wf.createdtime DESC, wf.id DESC
+      ),
+      approved_last AS (
+          -- Last officer-level stage an approved file passed through
+          SELECT DISTINCT ON (wf.businessid) wf.businessid, sl.designation
+          FROM eg_wf_processinstance_v2 wf
+          JOIN state_level sl ON sl.state_uuid = wf.status
+          WHERE wf.businessservice IN ('CLU_MC','CLU_MC_HIGH','CLU_MC_OTH','CLU_NP','CLU_NP_HIGH','CLU_NP_OTH')
+            AND wf.businessid LIKE 'PB-%'
+            AND wf.businessid IN (SELECT applicationno FROM clu_base WHERE file_category = 'APPROVED')
+          ORDER BY wf.businessid, wf.createdtime DESC, wf.id DESC
+      ),
+      stage_rows AS (
+          SELECT b.tenantid, b.applicationno, 'PENDING' AS kind, sl.designation
+          FROM clu_base b
+          JOIN latest_pi lp   ON lp.businessid = b.applicationno
+          JOIN state_level sl ON sl.state_uuid = lp.state_uuid
+          WHERE b.file_category = 'PENDING'
+          UNION ALL
+          SELECT b.tenantid, b.applicationno, 'APPROVED' AS kind, al.designation
+          FROM clu_base b
+          JOIN approved_last al ON al.businessid = b.applicationno
+          WHERE b.file_category = 'APPROVED'
+      ),
+      role_counts AS (
+          SELECT
+              tenantid,
+              designation,
+              COUNT(DISTINCT applicationno) FILTER (WHERE kind = 'APPROVED') AS role_approved_count,
+              COUNT(DISTINCT applicationno) FILTER (WHERE kind = 'PENDING')  AS role_pending_count
+          FROM stage_rows
+          GROUP BY tenantid, designation
+      ),
+      joined AS (
+          -- Seven fixed designation rows per ULB; ULB totals are the sum of its designation rows
+          SELECT
+              ud.district,
+              ud.name_of_ulb,
+              ud.ulb_code,
+              lv.level_order,
+              (SUM(COALESCE(rc.role_approved_count, 0)) OVER (PARTITION BY ud.ulb_code))::int AS ulb_approved_count,
+              (SUM(COALESCE(rc.role_pending_count, 0))  OVER (PARTITION BY ud.ulb_code))::int AS ulb_pending_count,
+              lv.designation                          AS designation_role,
+              COALESCE(rc.role_approved_count, 0)     AS role_approved_count,
+              COALESCE(rc.role_pending_count, 0)      AS role_pending_count
+          FROM (SELECT DISTINCT tenantid FROM clu_base) t
+          JOIN ulb_data ud ON ud.ulb_code = t.tenantid
+          CROSS JOIN levels lv
+          LEFT JOIN role_counts rc ON rc.tenantid = t.tenantid AND rc.designation = lv.designation
+      )
+      SELECT
+          -- District serial / name: only on the first row of each district
+          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.district
+                      ORDER BY j.name_of_ulb, j.ulb_code, j.level_order) = 1
+               THEN DENSE_RANK() OVER (ORDER BY j.district)::text
+               ELSE '' END AS district_sno,
+          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.district
+                      ORDER BY j.name_of_ulb, j.ulb_code, j.level_order) = 1
+               THEN j.district
+               ELSE '' END AS district,
+          -- ULB serial / name / totals: only on the first row of each ULB
+          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code ORDER BY j.level_order) = 1
+               THEN DENSE_RANK() OVER (PARTITION BY j.district ORDER BY j.name_of_ulb, j.ulb_code)::text
+               ELSE '' END AS ulb_sno,
+          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code ORDER BY j.level_order) = 1
+               THEN j.name_of_ulb
+               ELSE '' END AS name_of_ulb,
+          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code ORDER BY j.level_order) = 1
+               THEN j.ulb_approved_count::text
+               ELSE '' END AS ulb_approved_count,
+          CASE WHEN ROW_NUMBER() OVER (PARTITION BY j.ulb_code ORDER BY j.level_order) = 1
+               THEN j.ulb_pending_count::text
+               ELSE '' END AS ulb_pending_count,
+          j.designation_role,
+          j.role_approved_count,
+          j.role_pending_count
+      FROM joined j
+      WHERE 1=1
+  orderby: ORDER BY j.district, j.name_of_ulb, j.ulb_code, j.level_order
