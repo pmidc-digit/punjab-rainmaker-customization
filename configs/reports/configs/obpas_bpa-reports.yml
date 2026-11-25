@@ -3216,7 +3216,7 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: ulb_sno
-    label: ULB #
+    label: "#"
     type: string
     source: obpas_bpa
     total: false
@@ -3226,27 +3226,22 @@ ReportDefinitions:
     source: obpas_bpa
     total: false
   - name: ulb_approved_count
-    label: ULB Total Approved
+    label: Total Approved Applications in ULB
     type: string
     source: obpas_bpa
     total: false
   - name: ulb_pending_count
-    label: ULB Total Pending
+    label: Total Pending Applications in ULB
     type: string
     source: obpas_bpa
     total: false
   - name: designation_role
-    label: Designation / Role
+    label: Designation
     type: string
     source: obpas_bpa
     total: false
-  - name: role_approved_count
-    label: Approved Applications
-    type: number
-    source: obpas_bpa
-    total: true
   - name: role_pending_count
-    label: Pending Applications
+    label: Designation-wise Pending Applications
     type: number
     source: obpas_bpa
     total: true
@@ -3366,13 +3361,11 @@ ReportDefinitions:
       ),
       stage_rows AS (
           -- Only files whose stage maps to one of the six designations
-          SELECT u.tenantid, u.applicationno, u.kind, lm.designation
-          FROM (
-              SELECT tenantid, applicationno, stage_code, 'PENDING'  AS kind FROM pending_role
-              UNION ALL
-              SELECT tenantid, applicationno, stage_code, 'APPROVED' AS kind FROM approved_role
-          ) u
-          JOIN level_map lm ON lm.stage_code = UPPER(u.stage_code)
+          SELECT b.tenantid, b.applicationno, b.file_category AS kind, lm.designation
+          FROM bpa_base b
+          LEFT JOIN pending_role pr  ON pr.applicationno = b.applicationno AND b.file_category = 'PENDING'
+          LEFT JOIN approved_role ar ON ar.applicationno = b.applicationno AND b.file_category = 'APPROVED'
+          JOIN level_map lm ON lm.stage_code = UPPER(COALESCE(pr.stage_code, ar.stage_code))
       ),
       role_counts AS (
           SELECT
