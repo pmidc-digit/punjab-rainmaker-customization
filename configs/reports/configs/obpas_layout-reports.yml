@@ -1754,3 +1754,90 @@ ReportDefinitions:
       WHERE bd.businessservice IN ('LAYOUT.PAY1', 'LAYOUT.PAY2') 
       AND pg.tenant_id != 'pb.testing'
   orderby: ORDER BY application_number, created_date;
+
+- reportName: LayoutApplicationRecentReport
+  decryptionPathId: LAYOUTREPORTS
+  summary: Recent Layout Applications Status and Tracking Details for Chhattisgarh
+  version: 1.0.0
+  moduleName: rainmaker-obpas_layout
+  additionalConfig:
+    print:
+      pdfPageSize: A4
+  sourceColumns:
+    - name: file_number
+      label: File Number
+      type: string
+      source: obpas_layout
+      total: false
+    - name: regional_office_name
+      label: Regional Office
+      type: string
+      source: obpas_layout
+      total: false
+    - name: submission_date_to_office
+      label: Submission Date to Office
+      type: string
+      source: obpas_layout
+      total: false
+    - name: current_status
+      label: Current Status
+      type: string
+      source: obpas_layout
+      total: false
+  searchParams:
+    - name: tenantId
+      label: Regional Office / ULB
+      type: singlevaluelist
+      pattern: http://egov-mdms-service:8080/egov-mdms-service/v1/_get?tenantId=$tenantid&moduleName=tenant&masterName=tenants|$.MdmsRes.tenant.tenants.*.code|$.MdmsRes.tenant.tenants.*.name
+      source: obpas_layout
+      wrapper: true
+      isMandatory: false
+      searchClause: AND l.tenantid = $tenantId
+    - name: location
+      label: Location
+      type: string
+      source: obpas_layout
+      isMandatory: false
+      searchClause: AND (SPLIT_PART(l.tenantid, '.', 2) ILIKE CONCAT('%', $location, '%') OR d.additionaldetails::text ILIKE CONCAT('%', $location, '%'))
+    - name: fromDate
+      label: From Date
+      type: epoch
+      source: obpas_layout
+      isMandatory: false
+      searchClause: AND l.createdtime >= $fromDate
+    - name: toDate
+      label: To Date
+      type: epoch
+      source: obpas_layout
+      isMandatory: false
+      searchClause: AND l.createdtime <= $toDate
+  query: >
+    SELECT 
+        l.applicationno AS file_number,
+        INITCAP(REPLACE(SPLIT_PART(l.tenantid, '.', 2), '_', ' ')) AS regional_office_name,
+        TO_CHAR(
+            TO_TIMESTAMP(sub.submission_time / 1000.0) AT TIME ZONE 'Asia/Kolkata',
+            'YYYY-MM-DD HH24:MI:SS'
+        ) AS submission_date_to_office,
+        l.applicationstatus AS current_status
+    FROM eg_layout l
+    LEFT JOIN eg_layout_details d 
+        ON d.layoutid = l.id
+    LEFT JOIN (
+        SELECT 
+            wf.businessid,
+            MIN(wf.createdtime) AS submission_time
+        FROM eg_wf_processinstance_v2 wf
+        WHERE wf.action NOT IN ('INITIATE', 'SAVE_AS_DRAFT')
+        GROUP BY wf.businessid
+    ) sub 
+        ON sub.businessid = l.applicationno
+    WHERE l.applicationno LIKE '%PL1%'
+      AND l.tenantid != 'pb.testing'
+      AND l.applicationstatus NOT IN (
+          'CITIZEN_APPROVAL_INPROCESS',
+          'INITIATED',
+          'PENDING_APPLICATION_FEE'
+      )
+      AND (d.additionaldetails::text NOT LIKE '%ismigrationtrue%' OR d.additionaldetails IS NULL)
+  orderby: ORDER BY l.createdtime DESC
