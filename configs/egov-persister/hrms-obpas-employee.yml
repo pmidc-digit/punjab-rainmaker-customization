@@ -41,3 +41,24 @@ serviceMaps:
           jsonMaps:
             - jsonPath: $.Employees.*.uuid       # FIXED
             - jsonPath: $.Employees.*.tenantId       # FIXED
+
+        - query: >
+            INSERT INTO public.eg_hrms_obpass_employee_delete_audit
+            (tenantid, userid, category, subcategory, zone, assigned_tenantid, modulename, role_code,
+             createdby, createddate, lastmodifiedby, lastmodifieddate)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          basePath: Employees.*
+
+          jsonMaps:
+            - jsonPath: $.Employees.*.tenantId       # FIXED
+            - jsonPath: $.Employees.*.userUUID       # FIXED
+            - jsonPath: $.Employees.*.category
+            - jsonPath: $.Employees.*.subcategory
+            - jsonPath: $.Employees.*.zone
+            - jsonPath: $.Employees.*.assignedTenantId  # FIXED
+            - jsonPath: $.Employees.*.modulename
+            - jsonPath: $.Employees.*.roles
+            - jsonPath: $.Employees.*.auditDetails.createdBy         # FIXED
+            - jsonPath: $.Employees.*.auditDetails.createdDate       # FIXED
+            - jsonPath: $.Employees.*.auditDetails.lastModifiedBy    # FIXED
+            - jsonPath: $.Employees.*.auditDetails.lastModifiedDate  # FIXED
